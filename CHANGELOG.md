@@ -39,6 +39,12 @@
 - New technical debt: TD-28 (company-directory-match heuristic
   uncalibrated against a real page). New risk: R-19 (guard against
   future fabrication of domain hints/constituent lists).
+- Closed TD-16's remaining half: `HttpFetcher.fetch_bytes` now times each
+  real request (excluding rate-limit/backoff sleeps); `CollectionService.
+  run()` feeds the average into `SourceMetricsRepository.record_run()`.
+  `reputation.py`'s `latency` dimension stays honestly `None` until a live
+  collector runs, but the mechanism no longer needs building later. 4 new
+  tests (431 Python tests total).
 
 ## 0.10.0 — First Production Execution Pipeline
 - `agx_research.production` (new package): `ProductionPipeline` wires every

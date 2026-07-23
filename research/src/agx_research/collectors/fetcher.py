@@ -41,6 +41,12 @@ class HttpFetcher:
         self._last_request_at: dict[str, float] = {}
         self._robots_cache: dict[str, urllib.robotparser.RobotFileParser] = {}
         self._robots_unreachable: dict[str, bool] = {}
+        # Real network round-trip time per successful request (urlopen+read
+        # only -- excludes rate-limit/backoff sleeps, which aren't the
+        # source's latency). `CollectionService` reads new entries after
+        # each `Collector.fetch()` call to feed `reputation.py`'s `latency`
+        # dimension (see TD-16).
+        self.request_latencies: list[float] = []
 
     def _get_robots_parser(self, base: str) -> urllib.robotparser.RobotFileParser:
         parser = self._robots_cache.get(base)
@@ -102,8 +108,11 @@ class HttpFetcher:
             self._last_request_at[spec.id] = time.monotonic()
             try:
                 request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+                request_started_at = time.monotonic()
                 with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
-                    return response.read()
+                    content = response.read()
+                self.request_latencies.append(time.monotonic() - request_started_at)
+                return content
             except (urllib.error.URLError, OSError, TimeoutError) as exc:
                 last_error = exc
                 if attempts < spec.retry_policy.max_attempts:

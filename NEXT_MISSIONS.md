@@ -80,12 +80,14 @@ collector produces `CorporateEvent`s. Once a company's own IR/PDF source
 disclosure PDF collector should extract corporate actions (splits,
 dividends, earnings dates), not just narrative news.
 
-## 6. Cross-source corroboration + latency measurement (TD-11 / TD-16)
+## 6. Cross-source corroboration (TD-11)
 
 Once two `IMPLEMENTED` sources overlap coverage (e.g. two independent EGX
-price sources), wire real `consistency_score`. Instrument `HttpFetcher` to
-time requests so `reputation.py`'s `latency` dimension stops being
-permanently unmeasured.
+price sources), wire real `consistency_score` in `collectors.quality.
+assess_quality()`. (Latency measurement, TD-16's other half, is done —
+`HttpFetcher` now times every real request and `CollectionService` feeds
+the average into `reputation.py`; it starts reporting real numbers the
+moment a live collector runs, no further engineering needed.)
 
 ## 7. Calibration pass (TD-17, TD-20, TD-28 — new this phase)
 

@@ -42,7 +42,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(427 Python tests + 33 TypeScript tests green).
+(431 Python tests + 33 TypeScript tests green).
 
 ## Dashboard dual-provider architecture (post-Data-Acquisition-Program)
 
@@ -317,3 +317,17 @@ Everything engineering could complete without those two inputs has been
 completed. See `CURRENT_MISSION.md` for the full statement and
 `NEXT_MISSIONS.md` for exactly what runs automatically the moment either
 clears.
+
+**One more genuinely unblocked item, closed while auditing for further
+engineering-closeable work**: TD-16's remaining half (`reputation.py`'s
+`latency` dimension permanently `None`) did not depend on either blocker
+above — it needed only real request timing inside `HttpFetcher`, testable
+offline with a mocked `urlopen`, same as every other test in this suite.
+`HttpFetcher.fetch_bytes` now records real elapsed time per successful
+request (deliberately excluding rate-limit/backoff sleeps, which aren't
+the source's latency) into `self.request_latencies`; `CollectionService.
+run()` reads the entries a `Collector.fetch()` call appended and passes
+their average into `SourceMetricsRepository.record_run(latency_seconds=...)`.
+It still reports `None` in practice until a live (non-mock/replay)
+collector actually runs — the mechanism is real, the number it would
+produce today would not be. 4 new tests (431 total).

@@ -59,9 +59,11 @@ provenance, replay, acquisition intelligence — see `docs/DATA_ACQUISITION.md`)
   cover overlapping data (e.g. a second price source alongside Stooq),
   wire `consistency_score` in `collectors.quality.assess_quality()` instead
   of leaving it `None`.
-- Instrument `HttpFetcher` to time requests and feed real `latency_seconds`
-  into `SourceMetricsRepository.record_run()` (TD-16) — the only reputation
-  dimension still unmeasured in practice.
+- ~~Instrument `HttpFetcher` to time requests and feed real `latency_seconds`
+  into `SourceMetricsRepository.record_run()`~~ **Closed (TD-16)**: done —
+  `HttpFetcher.fetch_bytes` times each real request, `CollectionService`
+  passes the average into `record_run`. Stays `None` in practice until a
+  live collector actually runs (no fabricated placeholder in the interim).
 - Calibration once real run history exists: `qualification.py`'s stage
   thresholds, `health.py`'s alert thresholds, and the Acquisition
   Intelligence Engine's own thresholds (TD-17, and its legality keyword

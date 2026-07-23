@@ -177,7 +177,10 @@ class CollectionService:
         self.min_confidence = min_confidence
 
     def run(self, collector: Collector, *, expected_records: int) -> CollectionRunResult:
+        latencies_before = len(getattr(collector.fetcher, "request_latencies", []))
         documents = collector.fetch()
+        new_latencies = getattr(collector.fetcher, "request_latencies", [])[latencies_before:]
+        latency_seconds = sum(new_latencies) / len(new_latencies) if new_latencies else None
         result = CollectionRunResult(
             source_id=collector.spec.id,
             documents_fetched=len(documents),
@@ -206,7 +209,7 @@ class CollectionService:
             if parser_raised:
                 self._record_run_outcome(
                     collector, document, succeeded=False, expected_records=expected_records,
-                    records_produced=0, parser_raised=True,
+                    records_produced=0, parser_raised=True, latency_seconds=latency_seconds,
                 )
                 result.batches_withheld += 1
                 continue
@@ -278,6 +281,7 @@ class CollectionService:
                 collector, document, succeeded=True, expected_records=expected_records,
                 records_produced=produced, materialized=materialized, assessment=assessment,
                 corroborated_candidates=corroborated, new_candidates=new_candidates,
+                latency_seconds=latency_seconds,
             )
 
         return result
@@ -308,6 +312,7 @@ class CollectionService:
         assessment: QualityAssessment | None = None,
         corroborated_candidates: int = 0,
         new_candidates: int = 0,
+        latency_seconds: float | None = None,
     ) -> None:
         prior = self.metrics.latest(collector.spec.id)
         had_produced_before = bool(prior and prior.records_produced_total > 0)
@@ -319,6 +324,7 @@ class CollectionService:
             confidence_score=assessment.confidence_score if assessment else None,
             freshness_score=assessment.freshness_score if assessment else None,
             coverage_score=assessment.coverage_score if assessment else None,
+            latency_seconds=latency_seconds,
             materialized=materialized,
             corroborated_candidates=corroborated_candidates,
             new_candidates=new_candidates,

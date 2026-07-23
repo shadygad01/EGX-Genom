@@ -219,6 +219,54 @@ def test_run_records_source_metrics_and_updates_registry_health_and_reputation(t
     assert updated_spec.data_quality_score is not None
 
 
+class _FakeTimedFetcher:
+    """Stands in for `HttpFetcher`: only the `request_latencies` list matters
+    to `CollectionService`, which reads new entries appended during
+    `Collector.fetch()` to derive a real (never fabricated) latency for
+    sources that actually issue timed requests -- see
+    `collectors.fetcher.HttpFetcher`."""
+
+    def __init__(self):
+        self.request_latencies: list[float] = []
+
+
+class _TimedStubCollector(StubCollector):
+    """Like `StubCollector`, but simulates issuing two timed HTTP requests
+    during `fetch()`, the way a real `HttpFetcher`-backed collector would."""
+
+    def fetch(self):
+        self.fetcher.request_latencies.extend([1.0, 3.0])
+        return super().fetch()
+
+
+def test_real_fetch_latency_is_recorded_into_source_metrics(tmp_path):
+    from agx_research.sources.reputation import SourceMetricsRepository
+
+    metrics_repo = SourceMetricsRepository()
+    fetcher = _FakeTimedFetcher()
+    service = CollectionService(tmp_path, metrics=metrics_repo, min_confidence=0.5)
+    collector = _TimedStubCollector(make_spec(), {"https://x/1": good_batch()}, fetcher=fetcher)
+
+    service.run(collector, expected_records=1)
+
+    metrics = metrics_repo.latest("stub_source")
+    assert metrics.latency_count == 1
+    assert metrics.latency_seconds_sum == 2.0  # average of [1.0, 3.0]
+
+
+def test_no_latency_recorded_when_fetcher_never_timed_a_request(tmp_path):
+    from agx_research.sources.reputation import SourceMetricsRepository
+
+    metrics_repo = SourceMetricsRepository()
+    service = CollectionService(tmp_path, metrics=metrics_repo, min_confidence=0.5)
+    collector = StubCollector(make_spec(), {"https://x/1": good_batch()})  # default HttpFetcher, unused
+
+    service.run(collector, expected_records=1)
+
+    metrics = metrics_repo.latest("stub_source")
+    assert metrics.latency_count == 0  # never fabricated when nothing was actually timed
+
+
 def test_parser_exception_is_withheld_and_recorded_not_propagated(tmp_path):
     class RaisingCollector(StubCollector):
         def parse(self, document):

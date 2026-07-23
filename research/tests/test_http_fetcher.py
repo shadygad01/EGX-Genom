@@ -105,6 +105,40 @@ def test_exhausted_retries_raise_fetch_error(monkeypatch):
         )))
 
 
+def test_successful_fetch_records_real_request_latency(monkeypatch):
+    fetcher = HttpFetcher(respect_robots=False)
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
+
+    clock = {"t": 0.0}
+
+    def fake_monotonic():
+        clock["t"] += 0.5
+        return clock["t"]
+
+    monkeypatch.setattr("time.monotonic", fake_monotonic)
+    monkeypatch.setattr(urllib.request, "urlopen", lambda request, timeout: _FakeResponse("ok"))
+
+    fetcher.fetch_text("https://example.test/data", make_spec())
+
+    assert fetcher.request_latencies == [0.5]
+
+
+def test_latency_not_recorded_for_a_failed_fetch(monkeypatch):
+    fetcher = HttpFetcher(respect_robots=False)
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
+
+    def always_fails(request, timeout):
+        raise urllib.error.URLError("connection refused")
+
+    monkeypatch.setattr(urllib.request, "urlopen", always_fails)
+    with pytest.raises(FetchError):
+        fetcher.fetch_text("https://example.test/data", make_spec(retry_policy=RetryPolicy(
+            max_attempts=2, backoff_seconds=0.01, backoff_multiplier=2.0
+        )))
+
+    assert fetcher.request_latencies == []
+
+
 def test_rate_limit_sleeps_between_requests_to_same_source(monkeypatch):
     fetcher = HttpFetcher(respect_robots=False)
     sleeps: list[float] = []

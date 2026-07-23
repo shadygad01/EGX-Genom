@@ -39,7 +39,11 @@ list is supplied.
 
 ## Verification
 
-- 427 Python tests (up from 413), 14 new. Covers: priority ordering of
+- 431 Python tests (up from 413), 18 new — 14 for the priority-ordered
+  catalog work, plus 4 more from closing TD-16's remaining half
+  (`HttpFetcher` request-latency timing feeding `reputation.py`, found and
+  closed while auditing for further unblocked engineering work; see
+  `docs/PHASE_STATUS.md`). Covers: priority ordering of
   every named target matches the mission's list exactly; company IR target
   generation produces one target per company with `domain_hints == []`
   (never guessed) and deterministic ticker ordering; `run_catalog()`

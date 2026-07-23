@@ -32,7 +32,7 @@ close without a cloud/vendor/secrets decision from the user.**
 
 ## Test health
 
-- Python: 427 tests, all green (`cd research && uv run pytest`).
+- Python: 431 tests, all green (`cd research && uv run pytest`).
 - TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
   + `git diff --exit-code`).
@@ -70,6 +70,13 @@ Production Execution Phase section has the full breakdown.
 - 14 new tests. See `CURRENT_MISSION.md` for the full honesty note on the
   two real blockers (network egress; no verified EGX30/EGX70 constituent
   list) and `COMPLETION_REPORT.md` for this build's report.
+- Closed TD-16's remaining half while auditing for unblocked engineering
+  work: `HttpFetcher.fetch_bytes` now times every real request (excluding
+  rate-limit/backoff sleeps) and `CollectionService.run()` feeds the
+  average into `SourceMetricsRepository.record_run()` — `reputation.py`'s
+  `latency` dimension stops being permanently `None` the moment a live
+  collector runs, with no fabricated placeholder in the meantime. 4 new
+  tests (431 total).
 
 ## Production Execution Pipeline (earlier mission)
 

@@ -94,8 +94,13 @@ describe("App shell", () => {
     expect(await screen.findByText("No mission status yet")).toBeInTheDocument();
   });
 
-  it("routes to the Source Intelligence placeholder", async () => {
+  it("routes to Source Intelligence", async () => {
     await renderApp("/sources");
+    expect(await screen.findByText("No sources registered yet")).toBeInTheDocument();
+  });
+
+  it("routes to the System Administration placeholder", async () => {
+    await renderApp("/admin");
     expect(await screen.findByText("Under construction")).toBeInTheDocument();
   });
 });

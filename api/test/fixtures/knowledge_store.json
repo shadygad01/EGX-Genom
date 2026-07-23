@@ -1,0 +1,40 @@
+{
+  "egx-test-knowledge": [
+    {
+      "id": "egx-test-knowledge",
+      "version": 1,
+      "discovery_date": "2026-05-12",
+      "creator_agent": "corporate_events_agent",
+      "supporting_evidence": ["experiment_p_value=0.008"],
+      "confidence": 0.74,
+      "statistical_strength": 0.008,
+      "economic_explanation": "test fixture",
+      "affected_assets": ["COMI"],
+      "horizon": "swing",
+      "expected_return": 0.032,
+      "expected_risk": 0.021,
+      "status": "promoted",
+      "performance_history": [],
+      "retired_at": null,
+      "retirement_reason": null
+    },
+    {
+      "id": "egx-test-knowledge",
+      "version": 2,
+      "discovery_date": "2026-05-12",
+      "creator_agent": "corporate_events_agent",
+      "supporting_evidence": ["experiment_p_value=0.008"],
+      "confidence": 0.74,
+      "statistical_strength": 0.008,
+      "economic_explanation": "test fixture",
+      "affected_assets": ["COMI"],
+      "horizon": "swing",
+      "expected_return": 0.032,
+      "expected_risk": 0.021,
+      "status": "monitoring",
+      "performance_history": [],
+      "retired_at": null,
+      "retirement_reason": null
+    }
+  ]
+}

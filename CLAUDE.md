@@ -4,9 +4,9 @@ This file orients any Claude session working in this repository. It is not
 the vision document itself — that lives in `docs/VISION.md` verbatim — but a
 practical guide to how the codebase is organized and what invariants to
 protect when touching it. `docs/ARCHITECTURE.md` describes the current
-design in more detail; `docs/ARCHITECTURE_AUDIT.md` explains *why* it's
-shaped this way (a full audit against the vision, done deliberately early
-while the codebase was still cheap to restructure).
+design in more detail; `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
+`docs/EPOCH_II_DESIGN.md`/`docs/EPOCH_II_REPORT.md` (Epoch II) explain *why*
+it's shaped this way and what's real vs. interface-only in each subsystem.
 
 ## What this repository is
 
@@ -44,27 +44,36 @@ to one of them. In particular:
   it for any new versioned entity instead of writing a new JSON
   read/write loop.
 
-## Current state (foundation scaffold)
+## Current state
 
-This is an early scaffold, not a working research pipeline. Statistical
-validation, backtesting, and the individual research agents are stubs with
-clear interfaces and `NotImplementedError`/TODO markers — they define the
-contract future sessions implement against. Do not read the presence of a
-file as evidence the underlying research logic exists yet.
+Epoch I built a foundation scaffold (interfaces, knowledge lifecycle,
+provenance, versioned repositories, point-in-time datasets). Epoch II built
+the scientific core on top: research sessions/task graphs/artifacts, an
+event layer, market memory, autonomous feature discovery, an experiment
+factory, the Alpha Genome lineage, a causal-reasoning architecture, a
+knowledge graph, research paper generation, a scientific review board, and
+an adversarial scientist. This is still not a working end-to-end research
+pipeline — real statistical/ML depth, real data ingestion, and most agents
+remain stubs or narrow illustrative examples. Do not read the presence of a
+file as evidence the underlying research logic is fully real; check
+`docs/EPOCH_II_REPORT.md`'s gap inventory before assuming otherwise.
 
 Layout:
 
-- `docs/` — vision, architecture, and the architecture audit.
+- `docs/` — vision, architecture, and the Epoch I/II audit and design docs.
 - `research/` — Python package (`agx_research`) containing the research
   engine. See `docs/ARCHITECTURE.md`'s component map for the full
-  subpackage breakdown (`domain/`, `storage/`, `universe/`, `data/`,
-  `features/`, `knowledge/`, `hypotheses/`, `validation/`, `agents/`,
-  `horizons/`, `meta/`, `explainability/`, `orchestration/`).
+  subpackage breakdown (Epoch I: `domain/`, `storage/`, `universe/`,
+  `data/`, `knowledge/`, `hypotheses/`, `validation/`, `agents/`,
+  `horizons/`, `meta/`, `explainability/`; Epoch II adds `orchestration/`,
+  `events/`, `market_memory/`, `features/` extensions, `genome/`,
+  `causal/`, `graph/`, `papers/`, `review/`, `adversarial/`).
 - `api/` — TypeScript (Fastify) service exposing the knowledge base over
   HTTP. Currently reads a JSON knowledge store; has no business logic of
-  its own by design (logic lives in `research/`).
+  its own by design (logic lives in `research/`). Epoch II added no new
+  API surface — it was scoped exclusively to the Python research core.
 - `web/` — TypeScript (Vite + React) dashboard, currently a minimal viewer
-  for knowledge objects returned by `api/`.
+  for knowledge objects returned by `api/`. Untouched in Epoch II.
 - `contracts/` — JSON Schema generated from the pydantic models `api/`
   serves, regenerated via `research/scripts/export_schemas.py`. CI fails if
   this drifts from the schema; `api/src/types.ts` and `web/src/types.ts`
@@ -101,6 +110,22 @@ Layout:
   `storage.JsonFileRepository`, following the pattern in
   `knowledge/store.py` and `hypotheses/repository.py` — not a new bespoke
   persistence mechanism.
+- `KnowledgeObject`/`KnowledgeStore` remain the system of record for the
+  promotion gate. `genome.Gene`/`AlphaGenome` are the lineage layer *on
+  top* — don't fold gene fields into `KnowledgeObject` or vice versa.
+- `genome.AlphaGenome.mutate()` is the only way an existing discovery's
+  understanding changes; it always creates a new `Gene` and marks the
+  parent `REPLACED`. Never add a path that edits a gene's `knowledge_id`,
+  `evidence`, or lineage fields in place.
+- The `review.ScientificReviewBoard` and `causal.EconomicRationaleGate` are
+  meant to run *before* `KnowledgeStore.promote()`, not inside it —
+  `promote()`'s signature is unchanged from Epoch I on purpose. Wire new
+  promotion flows as "board reviews, then promote," not by modifying
+  `promote()` to take reviewers as an argument.
+- `graph.KnowledgeGraph` edges should come from `graph.edges_from_provenance()`
+  wherever possible, not be hand-constructed from scratch — the graph is a
+  view over `Provenance`, and hand-built edges are exactly the kind of
+  parallel source of truth that drifts.
 
 ## What NOT to do
 
@@ -113,3 +138,12 @@ Layout:
   statistical tests are implemented.
 - Do not hardcode a new validation gate into `Hypothesis` or its stage
   logic — add or reorder `GateSpec`s in a pipeline instead.
+- Do not fake a result for an unimplemented experiment, reviewer, or
+  adversarial attack. Every stub in `ExperimentFactory`,
+  `review.reviewers`, and `AdversarialScientist` raises
+  `NotImplementedError` (or, for attacks, reports `attempted=False`) —
+  preserve that honesty rather than returning a plausible-looking but
+  fabricated number.
+- Do not let `ScientificReviewBoard` or `AdversarialScientist` silently
+  treat a skipped/unimplemented check as a pass. A board with zero working
+  reviewers must never approve anything.

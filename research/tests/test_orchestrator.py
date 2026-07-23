@@ -43,3 +43,31 @@ def test_orchestrator_with_no_agents_produces_empty_findings():
 
     assert cycle.findings == []
     assert cycle.agent_versions == {}
+
+
+def test_run_session_builds_an_explicit_task_graph_and_persists_snapshot_artifact():
+    from agx_research.orchestration.artifacts import ArtifactKind
+    from agx_research.orchestration.task_graph import TaskStatus
+
+    provider = MockDataProvider(MOCK_ROOT)
+    agent = MarketStructureAgent(ticker_pairs=[("COMI", "MFPC")], correlation_threshold=0.0)
+    orchestrator = ResearchOrchestrator(
+        agents=[agent],
+        data_provider=provider,
+        tickers=["COMI", "MFPC"],
+        macro_series_ids=["BRENT_USD"],
+        lookback_days=30,
+    )
+
+    session = orchestrator.run_session(date(2026, 6, 14))
+
+    assert session.run_date == date(2026, 6, 14)
+    assert len(session.tasks) == 2
+    assert all(t.status == TaskStatus.SUCCEEDED for t in session.tasks)
+    assert session.tasks[1].dependencies == [session.tasks[0].id]
+    assert len(session.findings) == 1
+    assert len(session.artifact_ids) == 1
+
+    artifact = orchestrator.artifact_repository.latest(session.artifact_ids[0])
+    assert artifact.kind == ArtifactKind.DATASET_SNAPSHOT
+    assert artifact.payload["id"] == session.dataset_snapshot_id

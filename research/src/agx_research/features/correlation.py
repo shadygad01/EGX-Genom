@@ -23,11 +23,14 @@ PAIRWISE_RETURN_CORRELATION = FeatureDefinition(
 )
 
 
-def _daily_returns(closes: list[float]) -> list[float]:
+def daily_returns(closes: list[float]) -> list[float]:
+    """Public: reused by `hypotheses.experiment_factory`'s cross-validation,
+    bootstrap, walk-forward, and out-of-sample experiments.
+    """
     return [(closes[i] - closes[i - 1]) / closes[i - 1] for i in range(1, len(closes))]
 
 
-def _pearson_correlation(a: list[float], b: list[float]) -> float | None:
+def pearson_correlation(a: list[float], b: list[float]) -> float | None:
     n = min(len(a), len(b))
     if n < 2:
         return None
@@ -48,9 +51,9 @@ def compute_pairwise_return_correlation(
     bars_b = snapshot.price_history.get(ticker_b, [])
     if len(bars_a) < 3 or len(bars_b) < 3:
         return None
-    returns_a = _daily_returns([b.close for b in bars_a])
-    returns_b = _daily_returns([b.close for b in bars_b])
-    return _pearson_correlation(returns_a, returns_b)
+    returns_a = daily_returns([b.close for b in bars_a])
+    returns_b = daily_returns([b.close for b in bars_b])
+    return pearson_correlation(returns_a, returns_b)
 
 
 def default_feature_registry() -> FeatureRegistry:

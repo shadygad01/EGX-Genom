@@ -99,9 +99,9 @@ describe("App shell", () => {
     expect(await screen.findByText("No sources registered yet")).toBeInTheDocument();
   });
 
-  it("routes to the System Administration placeholder", async () => {
+  it("routes to System Administration", async () => {
     await renderApp("/admin");
-    expect(await screen.findByText("Under construction")).toBeInTheDocument();
+    expect(await screen.findByText("No execution report yet")).toBeInTheDocument();
   });
 });
 

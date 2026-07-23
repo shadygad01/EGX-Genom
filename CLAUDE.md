@@ -52,24 +52,31 @@ to one of them. In particular:
 
 ## Current state
 
-Epoch I built a foundation scaffold (interfaces, knowledge lifecycle,
-provenance, versioned repositories, point-in-time datasets). Epoch II built
-the scientific core on top: research sessions/task graphs/artifacts, an
-event layer, market memory, autonomous feature discovery, an experiment
-factory, the Alpha Genome lineage, a causal-reasoning architecture, a
-knowledge graph, research paper generation, a scientific review board, and
-an adversarial scientist. This is still not a working end-to-end research
-pipeline — real statistical/ML depth, real data ingestion, and most agents
-remain stubs or narrow illustrative examples. Do not read the presence of a
-file as evidence the underlying research logic is fully real; check
-`docs/EPOCH_II_REPORT.md`'s gap inventory before assuming otherwise.
+All 18 charter systems are architecturally complete and tested except
+the business-blocked remainder of 18 (deployment/secrets/scheduling) —
+see `docs/PHASE_STATUS.md` for the per-system audit. The platform runs a
+real end-to-end daily research cycle (`orchestration/pipeline.py` →
+`runtime/engine.py` → `cli.py`): agents propose, the 8-gate pipeline
+validates with concrete statistics/backtests/stress tests, the review
+board and adversarial scientist judge, promoted knowledge becomes genes
+and papers, knowledge-weighted models produce predictions, and the
+continuous-learning monitor retires degraded knowledge. The critical
+caveat: it all runs on placeholder mock data until a real EGX vendor is
+licensed (a business decision reserved for the user) — no output is real
+research until then. A handful of components remain honest
+`NotImplementedError` stubs where their data source doesn't exist; the
+gap inventory lives in `docs/PHASE_STATUS.md` and `docs/TECHNICAL_DEBT.md`.
 
 Layout:
 
 - `MASTER_PROMPT.md` — the operating charter (role, non-negotiable
   principles, strict 18-system build order).
-- `docs/` — vision, architecture, the Epoch I/II audit and design docs, and
-  `PHASE_STATUS.md` (current status of all 18 systems against the charter).
+- `docs/` — vision, architecture, the Epoch I/II audit and design docs,
+  `PHASE_STATUS.md` (current status of all 18 systems against the
+  charter), plus the management set the charter mandates: `ROADMAP.md`,
+  `TECHNICAL_DEBT.md`, `ARCHITECTURE_DECISIONS.md`, `RISK_REGISTER.md`
+  (and `CHANGELOG.md` at the repo root). Keep all of them current when
+  making changes.
 - `research/` — Python package (`agx_research`) containing the research
   engine. See `docs/ARCHITECTURE.md`'s component map for the full
   subpackage breakdown (Epoch I: `domain/`, `storage/`, `universe/`,

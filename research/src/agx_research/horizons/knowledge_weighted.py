@@ -1,0 +1,112 @@
+"""Knowledge-weighted horizon models: predictions derived exclusively from
+validated, promoted knowledge.
+
+`predict()` aggregates every non-retired `KnowledgeObject` for the ticker
+and horizon, weighting each by its (evidence-derived, adversarially
+adjusted) confidence. No knowledge means no prediction — the model returns
+None rather than guessing, which is Principle 1 ("no recommendation
+without evidence") executing at the model layer.
+
+This is deliberately not a trained statistical model. Training one needs
+years of real market data (a business-blocked dependency); until then this
+is the honest v1: it adds no information of its own, it only aggregates
+what survived the full validation pipeline. The Epoch I stubs
+(`MicroAlphaModel` etc.) remain reserved for future trained models.
+"""
+
+from __future__ import annotations
+
+from datetime import date, datetime
+
+from agx_research.config import Horizon
+from agx_research.domain.provenance import Provenance, ProvenanceRef
+from agx_research.events.service import EventPlatform
+from agx_research.explainability import Explanation
+from agx_research.explainability.historical_cases import find_similar_cases
+from agx_research.horizons.base import HorizonModel, Prediction
+from agx_research.knowledge import KnowledgeObject
+from agx_research.knowledge.lifecycle import KnowledgeStatus
+
+
+class KnowledgeWeightedHorizonModel(HorizonModel):
+    model_id = "knowledge_weighted"
+    model_version = "1.0.0"
+
+    def __init__(self, horizon: Horizon, *, event_platform: EventPlatform | None = None):
+        self.horizon = horizon
+        self.event_platform = event_platform
+
+    def predict(
+        self, ticker: str, as_of: date, knowledge: list[KnowledgeObject]
+    ) -> Prediction | None:
+        relevant = [
+            k
+            for k in knowledge
+            if k.horizon == self.horizon
+            and ticker in k.affected_assets
+            and k.status != KnowledgeStatus.RETIRED
+            and k.confidence > 0
+        ]
+        if not relevant:
+            return None  # no evidence, no prediction -- never guess
+
+        total_weight = sum(k.confidence for k in relevant)
+        expected_return = sum(k.confidence * k.expected_return for k in relevant) / total_weight
+        expected_risk = sum(k.confidence * k.expected_risk for k in relevant) / total_weight
+        # Aggregate confidence is the weighted mean, never more than the
+        # strongest single piece of knowledge -- combining evidence must
+        # not fabricate certainty beyond what any source claimed.
+        confidence = min(total_weight / len(relevant), max(k.confidence for k in relevant))
+
+        similar_cases = (
+            find_similar_cases(self.event_platform, ticker, before=as_of)
+            if self.event_platform is not None
+            else []
+        )
+        explanation = Explanation(
+            why_this_stock=(
+                f"{len(relevant)} validated knowledge object(s) cover {ticker} on the "
+                f"{self.horizon.value} horizon: "
+                + "; ".join(k.economic_explanation for k in relevant)
+            ),
+            why_now=f"Knowledge active and unretired as of {as_of.isoformat()}.",
+            why_not_others=(
+                "This model only aggregates promoted knowledge; tickers without "
+                "surviving knowledge get no prediction at all rather than a weaker one."
+            ),
+            supporting_evidence=[
+                f"{k.id} v{k.version}: confidence={k.confidence:.2f}, "
+                f"expected_return={k.expected_return:.4f}, "
+                f"p_value={k.statistical_evidence.p_value:.4g}"
+                for k in relevant
+            ],
+            evidence_refs=[
+                ProvenanceRef(kind="knowledge", ref_id=k.id, ref_version=k.version)
+                for k in relevant
+            ],
+            similar_historical_cases=similar_cases,
+            invalidation_conditions=[
+                "Any supporting knowledge object is retired or its monitored "
+                "performance degrades below its retirement threshold.",
+            ],
+        )
+        return Prediction(
+            ticker=ticker,
+            horizon=self.horizon,
+            as_of=as_of,
+            model_id=self.model_id,
+            model_version=self.model_version,
+            expected_return=expected_return,
+            expected_risk=expected_risk,
+            confidence=confidence,
+            explanation=explanation,
+            supporting_knowledge_ids=[k.id for k in relevant],
+            provenance=Provenance(
+                produced_by=f"{self.model_id}@{self.model_version}",
+                produced_at=datetime.now(),
+                inputs=[
+                    ProvenanceRef(kind="knowledge", ref_id=k.id, ref_version=k.version)
+                    for k in relevant
+                ],
+            ),
+        )

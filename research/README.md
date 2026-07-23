@@ -53,8 +53,15 @@ uv run pytest
 - `agx_research.explainability` — `Explanation` object required on every
   prediction/recommendation.
 - `agx_research.orchestration` — `TaskGraph`, `Artifact`/`ArtifactRepository`,
-  `ResearchSession` + `ResearchOrchestrator`, the first-class "one trading
-  day's research run."
+  `ResearchSession` + `ResearchOrchestrator`, and `DailyResearchPipeline`
+  (the end-to-end 8-gate research chain).
+- `agx_research.runtime` — `RuntimeEngine`: date-range execution with
+  per-day failure isolation and a persistent run ledger.
+- `agx_research.portfolio` — cross-ticker `PortfolioConstructor`.
+- `agx_research.learning` — `ContinuousLearningMonitor`: realized
+  performance recording + mechanical retirement.
+- `agx_research.infrastructure` — integrity-checked backup/verify/restore.
+- `agx_research.cli` — `python -m agx_research.cli run|status|backup|restore`.
 
 ## Regenerating the API contract
 

@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.7.0 — Dual-provider dashboard architecture (static + API)
+- `web/src/data/`: `DashboardDataProvider` interface with two
+  implementations — `StaticJsonProvider` (reads JSON artifacts published
+  alongside the static site) and `ApiProvider` (reads from a hosted
+  `api/`). `web/src/data/factory.ts` selects one via `VITE_DATA_PROVIDER`
+  (`web/.env.production` = static, `web/.env.development` = api); no
+  component imports either implementation directly. `App` now takes an
+  optional `provider` prop for testability.
+- `research/src/agx_research/dashboard/`: `export_*()`/`write_dashboard_artifacts()`
+  produce `knowledge.json`, `events.json`, `patterns.json`,
+  `recommendations.json`, `market_state.json`, `runtime_metrics.json`,
+  `system_status.json`, and `source_registry.json` — each a
+  `model_dump(mode="json")` of an existing domain model, no duplicated
+  schemas. `validate_dashboard_artifacts()` re-parses every file through
+  its pydantic model before publishing, and hard-fails if `patterns.json`
+  is ever non-empty (`HistoricalPatternsAgent` isn't implemented, so it
+  must stay honestly empty). New CLI subcommands: `export-dashboard`,
+  `validate-dashboard`.
+- `contracts/`: `export_schemas.py` now emits schemas for `Event`,
+  `Recommendation`, `MarketState`, `RunRecord`, `SourceSpec`, and the new
+  `DashboardSystemStatus`, alongside `KnowledgeObject`; `api/src/types.ts`
+  and `web/src/types.ts` extended to match.
+- `api/`: new routes `/events`, `/patterns`, `/recommendations`,
+  `/market-state`, `/runtime-metrics`, `/system-status`,
+  `/source-registry` alongside the existing `/knowledge`. Events/runtime
+  metrics flatten the same raw versioned-repository files `/knowledge`
+  already does; the other five read the same generated snapshot files
+  `StaticJsonProvider` reads, refreshed on a schedule in a real deployment
+  (System 18 scheduling remains business-blocked).
+- `cli.py`: events now persist to `data_dir/events.json` (previously
+  in-memory only) via a shared `build_market_memory()` helper, so
+  `export-dashboard` sees the same events any `run` produced.
+- `.github/workflows/deploy-pages.yml`: now runs the real daily research
+  pipeline against mock data (`agx run --date 2026-06-14`), generates and
+  validates the dashboard artifacts into `web/public/data/`, then builds
+  and publishes `web/`. Root-caused and fixed why the site was serving
+  GitHub's default content: the repo's legacy branch-based Pages builder
+  was still enabled alongside the Actions workflow and always won the
+  race; `actions/configure-pages@v5` now fails the build loudly instead if
+  that regresses.
+- 17 new Python tests (273 total) and a new web test suite (19 tests,
+  first `vitest`+`@testing-library/react`+`jsdom` setup for `web/`) plus 5
+  new API tests (14 total) covering both providers, provider switching,
+  App rendering with static artifacts, and "no `/api/*` calls happen in
+  GitHub Pages mode."
+- Docs synced: `MASTER_PROMPT.md` (new "Dashboard Data Architecture"
+  section), `ARCHITECTURE.md`, `ROADMAP.md`, `TECHNICAL_DEBT.md`,
+  `PHASE_STATUS.md`, `CLAUDE.md`.
+
 ## 0.6.1 — GitHub Pages deployment for the web dashboard
 - `.github/workflows/deploy-pages.yml`: builds `web/` and publishes
   `web/dist` to GitHub Pages on push to `main` (paths-filtered to

@@ -1,0 +1,17 @@
+{
+  "run-test": [
+    {
+      "id": "run-test",
+      "version": 1,
+      "run_date": "2026-06-14",
+      "status": "succeeded",
+      "session_id": null,
+      "hypotheses": 4,
+      "promoted": 0,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-06-14T00:00:00",
+      "completed_at": "2026-06-14T00:00:05"
+    }
+  ]
+}

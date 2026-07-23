@@ -23,7 +23,11 @@ from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.service import CollectionService
 from agx_research.collectors.stooq import StooqPriceCollector
+from agx_research.dashboard import validate_dashboard_artifacts, write_dashboard_artifacts
+from agx_research.dashboard.validate import DashboardArtifactError
 from agx_research.data.mock_provider import MockDataProvider
+from agx_research.events.repository import EventRepository
+from agx_research.events.service import EventPlatform
 from agx_research.genome.service import AlphaGenome
 from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.infrastructure.backup import create_backup, restore_backup, verify_backup
@@ -38,20 +42,31 @@ from agx_research.universe.static import EGX30_UNIVERSE_PLACEHOLDER, StaticUnive
 
 _DEFAULT_MOCK_DATA = Path(__file__).resolve().parents[2] / "data" / "mock"
 
+TICKERS = sorted(EGX30_UNIVERSE_PLACEHOLDER)
+MACRO_SERIES_IDS = ["BRENT_USD", "EGP_USD"]
 
-def build_engine(data_dir: Path, mock_data: Path) -> RuntimeEngine:
-    tickers = sorted(EGX30_UNIVERSE_PLACEHOLDER)
-    memory = MarketMemory(
+
+def build_market_memory(data_dir: Path, mock_data: Path) -> MarketMemory:
+    """The single sanctioned way every subcommand reconstructs market state,
+    so `run`, `export-dashboard`, etc. all see the same persisted events
+    store (`data_dir/events.json`) rather than each starting from a fresh
+    in-memory EventPlatform."""
+    return MarketMemory(
         MockDataProvider(mock_data),
         StaticUniverseProvider(),
         StaticSectorProvider(),
-        tickers=tickers,
-        macro_series_ids=["BRENT_USD", "EGP_USD"],
+        tickers=TICKERS,
+        macro_series_ids=MACRO_SERIES_IDS,
         lookback_days=30,
+        event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
     )
+
+
+def build_engine(data_dir: Path, mock_data: Path) -> RuntimeEngine:
+    memory = build_market_memory(data_dir, mock_data)
     agents = [
         MarketStructureAgent(
-            ticker_pairs=[(a, b) for i, a in enumerate(tickers) for b in tickers[i + 1 :]]
+            ticker_pairs=[(a, b) for i, a in enumerate(TICKERS) for b in TICKERS[i + 1 :]]
         ),
         MacroAgent(),
         CorporateEventsAgent(),
@@ -103,6 +118,23 @@ def main(argv: list[str] | None = None) -> int:
     collect_parser.add_argument("--ticker-hints", help="rss_generic only: comma-separated tickers to match")
     collect_parser.add_argument("--expected-records", type=int, required=True)
     collect_parser.add_argument("--min-confidence", type=float, default=0.5)
+
+    export_dashboard_parser = sub.add_parser(
+        "export-dashboard",
+        help="Write the web dashboard's JSON artifacts (knowledge, events, "
+        "recommendations, market state, runtime metrics, system status, source registry)",
+    )
+    export_dashboard_parser.add_argument(
+        "--date",
+        help="ISO date to reconstruct market_state.json/recommendations.json as of "
+        "(defaults to the most recent run in --data-dir's run ledger, if any)",
+    )
+    export_dashboard_parser.add_argument("--out", type=Path, required=True)
+
+    validate_dashboard_parser = sub.add_parser(
+        "validate-dashboard", help="Validate a directory of exported dashboard artifacts"
+    )
+    validate_dashboard_parser.add_argument("--dir", type=Path, required=True)
 
     args = parser.parse_args(argv)
 
@@ -197,6 +229,36 @@ def main(argv: list[str] | None = None) -> int:
             },
             indent=2,
         ))
+        return 0
+
+    if args.command == "export-dashboard":
+        if args.date:
+            as_of = date.fromisoformat(args.date)
+        else:
+            runs = RunRecordRepository(args.data_dir / "runs.json").all_latest()
+            succeeded = [r for r in runs if r.status.value == "succeeded"]
+            as_of = max((r.run_date for r in succeeded), default=None)
+
+        memory = build_market_memory(args.data_dir, args.mock_data)
+        counts = write_dashboard_artifacts(
+            knowledge_store=KnowledgeStore(args.data_dir / "knowledge.json"),
+            event_repository=EventRepository(args.data_dir / "events.json"),
+            runs=RunRecordRepository(args.data_dir / "runs.json"),
+            memory=memory,
+            tickers=TICKERS,
+            as_of=as_of,
+            out_dir=args.out,
+        )
+        print(json.dumps({"as_of": as_of.isoformat() if as_of else None, "counts": counts}, indent=2))
+        return 0
+
+    if args.command == "validate-dashboard":
+        try:
+            counts = validate_dashboard_artifacts(args.dir)
+        except DashboardArtifactError as exc:
+            print(f"Dashboard artifact validation failed: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(counts, indent=2))
         return 0
 
     return 1

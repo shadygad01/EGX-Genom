@@ -1,0 +1,288 @@
+{
+  "$defs": {
+    "EntityKind": {
+      "enum": [
+        "company",
+        "sector",
+        "macro_series",
+        "market",
+        "unknown"
+      ],
+      "title": "EntityKind",
+      "type": "string"
+    },
+    "EntityRef": {
+      "properties": {
+        "canonical_id": {
+          "title": "Canonical Id",
+          "type": "string"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Name"
+        },
+        "kind": {
+          "$ref": "#/$defs/EntityKind"
+        },
+        "raw_mention": {
+          "title": "Raw Mention",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "canonical_id",
+        "raw_mention"
+      ],
+      "title": "EntityRef",
+      "type": "object"
+    },
+    "EventRelationship": {
+      "properties": {
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        },
+        "related_event_id": {
+          "title": "Related Event Id",
+          "type": "string"
+        },
+        "relationship_type": {
+          "$ref": "#/$defs/EventRelationshipType"
+        }
+      },
+      "required": [
+        "related_event_id",
+        "relationship_type"
+      ],
+      "title": "EventRelationship",
+      "type": "object"
+    },
+    "EventRelationshipType": {
+      "enum": [
+        "corroborates",
+        "supersedes",
+        "contradicts",
+        "causally_precedes",
+        "part_of"
+      ],
+      "title": "EventRelationshipType",
+      "type": "string"
+    },
+    "EventSeverity": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "EventSeverity",
+      "type": "string"
+    },
+    "EventStatus": {
+      "enum": [
+        "pending",
+        "confirmed",
+        "corroborated",
+        "disputed",
+        "retracted",
+        "superseded",
+        "archived"
+      ],
+      "title": "EventStatus",
+      "type": "string"
+    },
+    "EventType": {
+      "enum": [
+        "corporate",
+        "macroeconomic",
+        "political",
+        "market",
+        "technical",
+        "news"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "Horizon": {
+      "description": "The three independent time horizons the platform optimizes simultaneously.",
+      "enum": [
+        "micro",
+        "swing",
+        "investment"
+      ],
+      "title": "Horizon",
+      "type": "string"
+    },
+    "Provenance": {
+      "properties": {
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "produced_at": {
+          "format": "date-time",
+          "title": "Produced At",
+          "type": "string"
+        },
+        "produced_by": {
+          "title": "Produced By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "produced_by",
+        "produced_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "description": "A pointer to one input entity: what kind it is, its id, and (if versioned) which version.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "ref_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Version"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "disputed_keys": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Disputed Keys",
+      "type": "array"
+    },
+    "entities": {
+      "items": {
+        "$ref": "#/$defs/EntityRef"
+      },
+      "title": "Entities",
+      "type": "array"
+    },
+    "event_date": {
+      "format": "date",
+      "title": "Event Date",
+      "type": "string"
+    },
+    "event_type": {
+      "$ref": "#/$defs/EventType"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "impact_horizons": {
+      "items": {
+        "$ref": "#/$defs/Horizon"
+      },
+      "title": "Impact Horizons",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "relationships": {
+      "items": {
+        "$ref": "#/$defs/EventRelationship"
+      },
+      "title": "Relationships",
+      "type": "array"
+    },
+    "severity": {
+      "$ref": "#/$defs/EventSeverity"
+    },
+    "source": {
+      "title": "Source",
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/EventStatus",
+      "default": "pending"
+    },
+    "subtype": {
+      "title": "Subtype",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "version": {
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "event_type",
+    "subtype",
+    "event_date",
+    "timestamp",
+    "source",
+    "confidence",
+    "severity",
+    "provenance"
+  ],
+  "title": "Event",
+  "type": "object"
+}

@@ -1,24 +1,33 @@
 import { useEffect, useState } from "react";
-import { fetchKnowledge } from "./api";
+import { dataProvider as defaultDataProvider, type DashboardDataProvider } from "./data";
 import type { KnowledgeObject } from "./types";
 
-export function App() {
+export interface AppProps {
+  /** Defaults to the module-level provider selected by VITE_DATA_PROVIDER
+   * (see web/src/data/factory.ts) -- overridable for tests, never for
+   * ordinary use, so components never hardcode which provider they talk to. */
+  provider?: DashboardDataProvider;
+}
+
+export function App({ provider = defaultDataProvider }: AppProps) {
   const [knowledge, setKnowledge] = useState<KnowledgeObject[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchKnowledge()
+    provider
+      .getKnowledge()
       .then(setKnowledge)
       .catch((err: unknown) => setError(err instanceof Error ? err.message : String(err)));
-  }, []);
+  }, [provider]);
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "2rem", maxWidth: 1100, margin: "0 auto" }}>
       <h1>AGX Knowledge Base</h1>
       <p style={{ color: "#555" }}>
         Promoted, statistically validated knowledge objects currently in Monitoring or Promoted
-        status. This is a minimal read-only viewer over the API in <code>api/</code> — see{" "}
-        <code>docs/ARCHITECTURE.md</code>.
+        status. This is a minimal read-only viewer over a{" "}
+        <code>DashboardDataProvider</code> (static JSON artifacts or a hosted{" "}
+        <code>api/</code>, per configuration) — see <code>docs/ARCHITECTURE.md</code>.
       </p>
 
       {error && <p style={{ color: "crimson" }}>Error loading knowledge: {error}</p>}

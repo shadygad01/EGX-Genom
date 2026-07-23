@@ -1,0 +1,90 @@
+{
+  "$defs": {
+    "RunStatus": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "skipped_non_trading"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "completed_at": {
+      "format": "date-time",
+      "title": "Completed At",
+      "type": "string"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error"
+    },
+    "hypotheses": {
+      "default": 0,
+      "title": "Hypotheses",
+      "type": "integer"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "notes": {
+      "default": "",
+      "title": "Notes",
+      "type": "string"
+    },
+    "promoted": {
+      "default": 0,
+      "title": "Promoted",
+      "type": "integer"
+    },
+    "run_date": {
+      "format": "date",
+      "title": "Run Date",
+      "type": "string"
+    },
+    "session_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Session Id"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/RunStatus"
+    },
+    "version": {
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "run_date",
+    "status",
+    "started_at",
+    "completed_at"
+  ],
+  "title": "RunRecord",
+  "type": "object"
+}

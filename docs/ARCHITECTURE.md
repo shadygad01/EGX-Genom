@@ -66,29 +66,87 @@ research/        Python package `agx_research` — the research engine
                   QualityAssessment scoring, CollectionService
                   (materialize-if-above-confidence-floor, else withhold;
                   routes derived news events through EventPlatform.register())
+  dashboard/      Dashboard artifact export: DashboardSystemStatus schema +
+                  export_*()/write_dashboard_artifacts() (model_dump of
+                  existing domain models -> the 8 JSON files the dashboard
+                  reads) + validate_dashboard_artifacts() (re-parses each
+                  file through its pydantic model before publishing); see
+                  "Dashboard data providers" below
 
 api/              TypeScript (Fastify) — HTTP surface over the knowledge base
 web/              TypeScript (Vite + React) — dashboard for knowledge/recs
 contracts/        Generated JSON Schema for API-facing pydantic models
 ```
 
-## Web dashboard deployment (GitHub Pages)
+## Dashboard data providers
 
-`.github/workflows/deploy-pages.yml` builds `web/` and publishes `web/dist`
-to GitHub Pages on every push to `main` that touches `web/`, at
-`https://shadygad01.github.io/EGX-Genom/`. `web/vite.config.ts` sets
-`base: "/EGX-Genom/"` for production builds only (the dev server still
-serves at `/`) so asset URLs resolve correctly as a project site.
+GitHub Pages is static hosting: it can serve `web/`'s built assets but
+never `api/`'s Fastify server. Rather than treat that as a permanent
+limitation on what the dashboard can show, `web/` never talks to a data
+source directly — every component reads through one interface,
+`DashboardDataProvider` (`web/src/data/DataProvider.ts`), with two
+implementations:
 
-GitHub Pages is static hosting: it can serve `web/`'s built assets but not
-`api/`'s Fastify server. `web/src/api.ts` still calls the relative path
-`/api/knowledge` (the dev-only Vite proxy target), which has nothing to
-resolve to once deployed statically — the page loads and renders correctly,
-but shows its existing "Error loading knowledge" state
-(`web/src/App.tsx`) rather than fabricating data. Making the dashboard
-functional end-to-end on Pages needs `api/` deployed somewhere reachable
-over HTTPS and `web/src/api.ts` pointed at it (e.g. via a build-time env
-var) — a hosting decision out of scope for a static-only deployment target.
+- `StaticJsonProvider` (`web/src/data/StaticJsonProvider.ts`) fetches
+  `${BASE_URL}data/<resource>.json` — the artifacts published alongside
+  the static site. This is what GitHub Pages uses: no backend, no API.
+- `ApiProvider` (`web/src/data/ApiProvider.ts`) fetches `/api/<resource>`
+  from a hosted `api/` instance.
+
+`web/src/data/factory.ts` picks which one to construct from
+`VITE_DATA_PROVIDER` (`web/.env.production` = `static`,
+`web/.env.development` = `api`) — switching providers is a config change,
+never a React code change, and no component imports either concrete
+implementation directly.
+
+Both implementations return exactly the same shapes, defined once in
+`web/src/types.ts` and mirrored from the pydantic models that produce them
+(`contracts/*.schema.json`, regenerated via
+`research/scripts/export_schemas.py`). Concretely:
+
+- **Static side**: `agx_research.dashboard.export.write_dashboard_artifacts()`
+  calls `.model_dump(mode="json")` on the existing `KnowledgeStore`,
+  `EventRepository`, `RunRecordRepository`, `MarketMemory`,
+  `RecommendationService`, and `SourceRegistry` outputs, writing
+  `knowledge.json`, `events.json`, `patterns.json`, `recommendations.json`,
+  `market_state.json`, `runtime_metrics.json`, `system_status.json`, and
+  `source_registry.json`. `agx_research.dashboard.validate.validate_dashboard_artifacts()`
+  re-parses every file back through its owning model before anything is
+  published — a schema drift or truncated write fails the build, not the
+  live site. Both are exposed as CLI subcommands (`agx export-dashboard`,
+  `agx validate-dashboard`).
+- **API side**: `api/src/routes/dashboard.ts` serves `/events` and
+  `/runtime-metrics` by flattening the same raw versioned-repository files
+  (`events.json`/`runs.json`) `KnowledgeStoreReader` already flattens for
+  `/knowledge`. `/patterns`, `/recommendations`, `/market-state`,
+  `/system-status`, and `/source-registry` have no live TypeScript-side
+  recomputation (three are computed on demand by the research engine, one
+  is a static Python catalog, one is reserved for an unimplemented agent)
+  — `api/src/artifactsStore.ts` reads the same generated snapshot files
+  `write_dashboard_artifacts()` produces, refreshed on a schedule in a real
+  deployment (System 18 scheduling is business-blocked — see
+  `docs/ROADMAP.md`). In production, `ApiProvider` and `StaticJsonProvider`
+  can even point at the same underlying files.
+- `patterns.json` is always `[]`: `agents.historical_patterns.HistoricalPatternsAgent`
+  raises `NotImplementedError`, so there is no real output to export.
+  `validate_dashboard_artifacts()` enforces this — it fails the build if
+  `patterns.json` is ever non-empty, so a future contributor can't
+  accidentally fabricate pattern data to make the dashboard look more
+  complete than the platform actually is.
+
+`.github/workflows/deploy-pages.yml` runs the real daily research pipeline
+against the mock market data (`agx run --date 2026-06-14`, the same date
+`test_daily_pipeline.py` uses for its full-promotion-path test), generates
+and validates the dashboard artifacts into `web/public/data/`, then builds
+`web/` (Vite copies `public/` into `dist/` unchanged) and publishes
+`web/dist` to GitHub Pages at `https://shadygad01.github.io/EGX-Genom/`.
+`web/vite.config.ts` sets `base: "/EGX-Genom/"` for production builds only
+(the dev server still serves at `/`) so asset and artifact URLs resolve
+correctly as a project site. Because the pipeline runs on mock data, the
+generated `knowledge.json`/`recommendations.json` are honestly often empty
+(default gate thresholds correctly reject weak evidence from ~2 weeks of
+2-ticker mock history) — that's the platform's real behavior faithfully
+surfaced, not a demo bug.
 
 ## Data flow
 
@@ -214,6 +272,13 @@ until the schema surface is large enough to justify full codegen.
   otherwise look like a huge fake return and corrupt every statistic
   downstream — do not reintroduce `[bar.close for bar in bars]` return
   calculations that bypass this.
+- **The dashboard never knows its data source.** Every `web/` component
+  reads through `DashboardDataProvider`; `StaticJsonProvider` and
+  `ApiProvider` are the only two things that know they're fetching static
+  JSON vs. hitting `/api/*`, and which one is active is picked once, by
+  configuration, in `web/src/data/factory.ts`. Don't add a component that
+  calls `fetch()` directly or imports a concrete provider — that's exactly
+  the coupling this interface exists to prevent.
 
 ## What is intentionally not built yet
 

@@ -187,6 +187,15 @@ Layout:
   corroboration silently stop working. A factual correction is
   `EventPlatform.supersede()` (a new event linked to the old), never an
   in-place edit.
+- The web dashboard reads every resource through `DashboardDataProvider`
+  (`web/src/data/DataProvider.ts`); components never call `fetch()` or
+  import `StaticJsonProvider`/`ApiProvider` directly — only
+  `web/src/data/factory.ts` does, picking one via `VITE_DATA_PROVIDER`.
+  New dashboard data goes through `agx_research.dashboard.export`
+  (a `model_dump(mode="json")` of an existing pydantic model, not a new
+  bespoke shape) plus a matching route in `api/src/routes/dashboard.ts` —
+  never a one-off fetch wired straight into a component. See
+  `docs/ARCHITECTURE.md`'s "Dashboard data providers" section.
 
 ## What NOT to do
 
@@ -211,3 +220,7 @@ Layout:
 - Do not compute a dividend adjustment factor from the close *on* the
   ex-date — use the last *cum*-dividend close, strictly before it (a real
   bug caught by this codebase's own tests; see `data/adjustments.py`).
+- Do not populate `patterns.json` with invented entries. It stays `[]`
+  until `agents.historical_patterns.HistoricalPatternsAgent` is
+  implemented; `validate_dashboard_artifacts()` enforces this and fails
+  the build if it's ever non-empty.

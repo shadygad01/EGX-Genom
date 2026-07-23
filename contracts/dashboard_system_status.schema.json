@@ -1,0 +1,54 @@
+{
+  "properties": {
+    "by_status": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "By Status",
+      "type": "object"
+    },
+    "failed": {
+      "default": 0,
+      "title": "Failed",
+      "type": "integer"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "knowledge_objects": {
+      "default": 0,
+      "title": "Knowledge Objects",
+      "type": "integer"
+    },
+    "pipeline_run_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pipeline Run Date"
+    },
+    "runs": {
+      "default": 0,
+      "title": "Runs",
+      "type": "integer"
+    },
+    "succeeded": {
+      "default": 0,
+      "title": "Succeeded",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "generated_at"
+  ],
+  "title": "DashboardSystemStatus",
+  "type": "object"
+}

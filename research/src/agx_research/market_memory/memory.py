@@ -1,12 +1,14 @@
 """MarketMemory: the single sanctioned way to reconstruct historical state.
 
-Backtesting-style experiments (Phase 5's `ExperimentFactory` outputs) must
-call `MarketMemory.reconstruct(as_of)` rather than touching `DataProvider`
-directly or reading "today" in any form — that's what makes "backtesting
-must never use today's knowledge" an enforceable seam instead of a
-convention someone can forget. `DatasetSnapshot` already guarantees no data
-after `as_of` (Epoch I); this composes that guarantee with universe and
-sector state into one queryable historical reconstruction.
+Backtesting-style experiments must call `MarketMemory.reconstruct(as_of)`
+rather than touching `DataProvider` directly or reading "today" in any
+form — that's what makes "backtesting must never use today's knowledge" an
+enforceable seam instead of a convention someone can forget.
+`DatasetSnapshot` already guarantees no data after `as_of` by construction;
+this composes that guarantee with universe/sector state, the trading
+calendar, and the day's canonical Events (registered through the Event
+Platform, so they arrive deduplicated and conflict-resolved) into one
+queryable historical reconstruction.
 """
 
 from __future__ import annotations
@@ -15,19 +17,18 @@ from datetime import date
 
 from agx_research.data.provider import DataProvider
 from agx_research.data.snapshot import build_snapshot
+from agx_research.events.adapters import derive_events_from_snapshot
+from agx_research.events.service import EventPlatform
+from agx_research.market_memory.calendar import StaticEGXCalendar, TradingCalendar
 from agx_research.market_memory.state import MarketState, TradingSession
 from agx_research.universe.provider import UniverseProvider
 from agx_research.universe.sector import SectorProvider
 
-# EGX's trading week is Sunday-Thursday; Friday/Saturday are the weekend.
-_EGX_WEEKEND_WEEKDAYS = {4, 5}  # date.weekday(): Friday=4, Saturday=5
-
 
 def is_egx_trading_day(as_of: date) -> bool:
-    """A simple, real trading-calendar rule. Does not account for public
-    holidays — see docs/EPOCH_II_DESIGN.md for that as a named gap.
-    """
-    return as_of.weekday() not in _EGX_WEEKEND_WEEKDAYS
+    """Kept for backward compatibility; delegates to the calendar
+    (weekends + fixed holidays + the placeholder movable-holiday table)."""
+    return StaticEGXCalendar().is_trading_day(as_of)
 
 
 class MarketMemory:
@@ -40,6 +41,8 @@ class MarketMemory:
         tickers: list[str],
         macro_series_ids: list[str] | None = None,
         lookback_days: int = 30,
+        calendar: TradingCalendar | None = None,
+        event_platform: EventPlatform | None = None,
     ):
         self.data_provider = data_provider
         self.universe_provider = universe_provider
@@ -47,6 +50,8 @@ class MarketMemory:
         self.tickers = tickers
         self.macro_series_ids = macro_series_ids or []
         self.lookback_days = lookback_days
+        self.calendar = calendar or StaticEGXCalendar()
+        self.event_platform = event_platform or EventPlatform()
 
     def reconstruct(self, as_of: date) -> MarketState:
         snapshot = build_snapshot(
@@ -65,12 +70,15 @@ class MarketMemory:
         }
         trading_session = TradingSession(
             session_date=as_of,
-            is_trading_day=is_egx_trading_day(as_of),
+            is_trading_day=self.calendar.is_trading_day(as_of),
+            holiday_name=self.calendar.holiday_name(as_of),
         )
+        events = self.event_platform.register_all(derive_events_from_snapshot(snapshot))
         return MarketState(
             as_of=as_of,
             dataset_snapshot=snapshot,
             constituents=constituents,
             sectors=sectors,
             trading_session=trading_session,
+            events=events,
         )

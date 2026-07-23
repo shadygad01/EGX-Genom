@@ -5,7 +5,7 @@ from agx_research.domain.provenance import Provenance
 from agx_research.review.board import ScientificReviewBoard
 from agx_research.review.candidate import PromotionCandidate
 from agx_research.review.reviewers import (
-    EconomistReviewer,
+    HistoricalReviewer,
     RiskReviewer,
     StatisticianReviewer,
 )
@@ -85,14 +85,14 @@ def test_board_rejects_if_any_reviewer_fails():
 
 
 def test_board_skips_unimplemented_reviewers_rather_than_failing():
-    board = ScientificReviewBoard([StatisticianReviewer(), EconomistReviewer()])
+    board = ScientificReviewBoard([StatisticianReviewer(), HistoricalReviewer()])
     decision = board.review(hypothesis=hypothesis(), candidate=good_candidate(), experiment_results={})
     assert decision.approved
-    assert len(decision.reports) == 1  # EconomistReviewer skipped, not counted as pass or fail
+    assert len(decision.reports) == 1  # HistoricalReviewer skipped, not counted as pass or fail
 
 
 def test_board_with_no_working_reviewers_never_approves():
-    board = ScientificReviewBoard([EconomistReviewer()])
+    board = ScientificReviewBoard([HistoricalReviewer()])
     decision = board.review(hypothesis=hypothesis(), candidate=good_candidate(), experiment_results={})
     assert not decision.approved
     assert decision.reports == []

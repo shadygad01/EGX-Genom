@@ -83,3 +83,49 @@ def test_full_chain_is_walkable_from_knowledge_back_to_hypothesis():
     assert len(edges) == 1
     assert edges[0].source_type == NodeType.HYPOTHESIS
     assert edges[0].target_type == NodeType.KNOWLEDGE
+
+
+def _chain_graph():
+    """a -> b -> c, plus isolated d."""
+    graph = KnowledgeGraph()
+    for node_id, node_type in [
+        ("a", NodeType.HYPOTHESIS),
+        ("b", NodeType.KNOWLEDGE),
+        ("c", NodeType.GENE),
+        ("d", NodeType.COMPANY),
+    ]:
+        graph.add_node(GraphNode(id=node_id, node_type=node_type, label=node_id))
+    from agx_research.graph.edges import GraphEdge
+    from agx_research.domain.identifiers import new_id
+
+    graph.add_edge(GraphEdge(id=new_id("edge"), source_id="a", source_type=NodeType.HYPOTHESIS,
+                             target_id="b", target_type=NodeType.KNOWLEDGE, relationship="contributed_to"))
+    graph.add_edge(GraphEdge(id=new_id("edge"), source_id="b", source_type=NodeType.KNOWLEDGE,
+                             target_id="c", target_type=NodeType.GENE, relationship="contributed_to"))
+    return graph
+
+
+def test_shortest_path_walks_the_chain():
+    graph = _chain_graph()
+    path = graph.shortest_path("a", "c")
+    assert path is not None
+    assert [(e.source_id, e.target_id) for e in path] == [("a", "b"), ("b", "c")]
+
+
+def test_shortest_path_returns_none_when_unreachable():
+    graph = _chain_graph()
+    assert graph.shortest_path("a", "d") is None
+
+
+def test_shortest_path_same_node_is_empty():
+    assert _chain_graph().shortest_path("a", "a") == []
+
+
+def test_subgraph_respects_hop_limit():
+    graph = _chain_graph()
+    nodes_1hop, edges_1hop = graph.subgraph("a", hops=1)
+    assert {n.id for n in nodes_1hop} == {"a", "b"}
+    assert len(edges_1hop) == 1
+
+    nodes_2hop, _ = graph.subgraph("a", hops=2)
+    assert {n.id for n in nodes_2hop} == {"a", "b", "c"}

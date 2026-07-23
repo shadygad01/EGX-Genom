@@ -101,6 +101,63 @@ class AlphaGenome:
         self.repository.add(updated_parent)
         return child
 
+    def merge(
+        self, parent_gene_ids: list[str], new_knowledge: KnowledgeObject, mutation_notes: str
+    ) -> Gene:
+        """Synthesize multiple genes into one new gene (multi-parent lineage).
+
+        The explicit resolution of the multi-parent question deferred in
+        docs/EPOCH_II_REPORT.md: `mutate()` remains single-parent (a
+        refinement of one idea); `merge()` is for a discovery whose
+        evidence genuinely synthesizes several prior genes. Every parent is
+        marked REPLACED with a forward link to the child; as always,
+        nothing is overwritten.
+        """
+        if len(parent_gene_ids) < 2:
+            raise ValueError("merge() requires at least two parent genes; use mutate() for one")
+        parents = []
+        for parent_id in parent_gene_ids:
+            parent = self.repository.latest(parent_id)
+            if parent is None:
+                raise KeyError(f"No gene with id {parent_id}")
+            parents.append(parent)
+
+        child = Gene(
+            id=new_id("gene"),
+            knowledge_id=new_knowledge.id,
+            generation=max(parent.generation for parent in parents) + 1,
+            parent_gene_ids=[parent.id for parent in parents],
+            mutation_notes=mutation_notes,
+            evidence=list(new_knowledge.supporting_evidence),
+            status=GeneStatus.PROMOTED,
+            provenance=Provenance(
+                produced_by="alpha_genome.merge",
+                produced_at=datetime.now(),
+                inputs=[
+                    *[
+                        ProvenanceRef(kind="gene", ref_id=parent.id, ref_version=parent.version)
+                        for parent in parents
+                    ],
+                    ProvenanceRef(
+                        kind="knowledge", ref_id=new_knowledge.id, ref_version=new_knowledge.version
+                    ),
+                ],
+            ),
+        )
+        self.repository.add(child)
+
+        for parent in parents:
+            self.repository.add(
+                parent.model_copy(
+                    update={
+                        "version": parent.version + 1,
+                        "status": GeneStatus.REPLACED,
+                        "child_gene_ids": [*parent.child_gene_ids, child.id],
+                    }
+                )
+            )
+        return child
+
     def record_performance(self, gene_id: str, record: PerformanceRecord) -> Gene:
         current = self.repository.latest(gene_id)
         if current is None:

@@ -46,3 +46,27 @@ def test_reconstruct_is_deterministic():
     state_a = memory.reconstruct(date(2026, 6, 14))
     state_b = memory.reconstruct(date(2026, 6, 14))
     assert state_a.dataset_snapshot.id == state_b.dataset_snapshot.id
+
+
+def test_calendar_fixed_holiday_is_not_a_trading_day():
+    from agx_research.market_memory.calendar import StaticEGXCalendar
+
+    calendar = StaticEGXCalendar()
+    assert calendar.is_trading_day(date(2026, 10, 6)) is False  # Armed Forces Day (Tuesday)
+    assert calendar.holiday_name(date(2026, 10, 6)) == "Armed Forces Day"
+
+
+def test_calendar_movable_holiday_table_is_respected():
+    from agx_research.market_memory.calendar import StaticEGXCalendar
+
+    calendar = StaticEGXCalendar(movable_holidays={date(2026, 6, 9): "Test Eid"})
+    assert calendar.is_trading_day(date(2026, 6, 9)) is False
+    # And with an empty table the same Tuesday is a normal trading day.
+    assert StaticEGXCalendar(movable_holidays={}).is_trading_day(date(2026, 6, 9)) is True
+
+
+def test_reconstruct_populates_canonical_events():
+    state = make_memory().reconstruct(date(2026, 6, 14))
+    assert state.events, "expected registered events for the mock window"
+    # Events come through the platform: fingerprint ids, resolved entities.
+    assert all(e.id.startswith("event_") for e in state.events)

@@ -1,11 +1,15 @@
-from agx_research.validation.backtest import Backtester, BacktestResult
+from agx_research.validation.backtest import Backtester, BacktestResult, NaiveDirectionalBacktester
 from agx_research.validation.statistical import (
     SignificanceThresholdValidator,
     StatisticalEvidence,
     StatisticalValidator,
     ValidationResult,
 )
-from agx_research.validation.stress_test import StressTester, StressTestResult
+from agx_research.validation.stress_test import (
+    HistoricalWorstWindowStressTester,
+    StressTester,
+    StressTestResult,
+)
 
 __all__ = [
     "Backtester",
@@ -16,4 +20,6 @@ __all__ = [
     "ValidationResult",
     "StressTester",
     "StressTestResult",
+    "NaiveDirectionalBacktester",
+    "HistoricalWorstWindowStressTester",
 ]

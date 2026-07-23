@@ -52,6 +52,15 @@ class MarketStructureAgent(ResearchAgent):
                         f"{ticker_a} return co-movement with {ticker_b} predicts "
                         f"short-horizon direction beyond chance"
                     ),
+                    proposed_economic_rationale=(
+                        f"{ticker_a} and {ticker_b} are large-cap EGX names plausibly "
+                        "exposed to shared market-wide capital flows and index-tracking "
+                        "activity, which would produce genuine (not coincidental) "
+                        "return co-movement."
+                    ),
+                    proposed_candidate_cause=(
+                        "Shared exposure to EGX-wide fund flows and index membership"
+                    ),
                     affected_assets=[ticker_a, ticker_b],
                     horizon=Horizon.MICRO,
                     evidence=[

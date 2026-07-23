@@ -29,7 +29,16 @@ from agx_research.domain.provenance import Provenance
 
 
 class ResearchFinding(BaseModel):
-    """An agent's proposed observation — not yet a hypothesis, not yet knowledge."""
+    """An agent's proposed observation — not yet a hypothesis, not yet knowledge.
+
+    `proposed_economic_rationale`/`proposed_candidate_cause` are the
+    agent's *stated mechanism hypothesis* — an honest proposal to be judged
+    later by the causal gate, the economist reviewer, and the adversarial
+    scientist, never taken as established truth. An agent that can't state
+    a mechanism leaves them None, and the causal gate will (correctly)
+    block promotion of the resulting hypothesis until a human or another
+    agent supplies one.
+    """
 
     id: str = Field(default_factory=lambda: new_id("finding"))
     agent_name: str
@@ -37,6 +46,8 @@ class ResearchFinding(BaseModel):
     observed_at: date
     observation: str
     proposed_hypothesis_statement: str
+    proposed_economic_rationale: str | None = None
+    proposed_candidate_cause: str | None = None
     affected_assets: list[str]
     horizon: Horizon
     evidence: list[str] = Field(default_factory=list)

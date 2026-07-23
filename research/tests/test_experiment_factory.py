@@ -43,7 +43,7 @@ def hypothesis(affected_assets=("COMI", "MFPC")) -> Hypothesis:
 def test_cross_validation_produces_a_significance_test_across_folds():
     result = CrossValidationExperiment(folds=3).run(hypothesis(), snapshot())
     assert result.sample_size == 9
-    assert len(result.details["fold_correlations"]) == 3
+    assert len(result.details["fold_statistics"]) == 3
     assert 0.0 <= result.p_value <= 1.0
 
 
@@ -56,23 +56,39 @@ def test_bootstrap_is_deterministic_given_a_seed():
 
 def test_walk_forward_produces_a_rolling_window_series():
     result = WalkForwardExperiment(window=5, step=1).run(hypothesis(), snapshot())
-    assert len(result.details["window_correlations"]) == 5  # 9 obs, window 5, step 1 -> 5 windows
+    assert len(result.details["window_statistics"]) == 5  # 9 obs, window 5, step 1 -> 5 windows
 
 
 def test_out_of_sample_reports_both_halves():
     result = OutOfSampleExperiment().run(hypothesis(), snapshot())
-    assert "in_sample_correlation" in result.details
-    assert "out_of_sample_correlation" in result.details
+    assert "in_sample_statistic" in result.details
+    assert "out_of_sample_statistic" in result.details
 
 
-def test_pairwise_experiments_require_two_affected_assets():
+def test_single_asset_hypothesis_uses_mean_return_statistic():
+    """One affected asset -> the claim statistic is the mean adjusted daily return."""
+    result = CrossValidationExperiment(folds=3).run(hypothesis(affected_assets=("COMI",)), snapshot())
+    assert len(result.details["fold_statistics"]) == 3
+
+    oos = OutOfSampleExperiment().run(hypothesis(affected_assets=("COMI",)), snapshot())
+    assert 0.0 <= oos.p_value <= 1.0
+
+
+def test_three_asset_hypothesis_is_rejected_not_guessed():
     with pytest.raises(ValueError):
-        CrossValidationExperiment().run(hypothesis(affected_assets=("COMI",)), snapshot())
+        CrossValidationExperiment().run(
+            hypothesis(affected_assets=("COMI", "MFPC", "SWDY")), snapshot()
+        )
 
 
-def test_sensitivity_and_monte_carlo_are_explicit_placeholders():
-    with pytest.raises(NotImplementedError):
-        SensitivityAnalysisExperiment().run(hypothesis(), snapshot())
+def test_sensitivity_analysis_reports_sign_stability_across_windows():
+    result = SensitivityAnalysisExperiment().run(hypothesis(), snapshot())
+    assert result.details["settings"] >= 2
+    assert 0.0 <= result.p_value <= 1.0
+    assert result.p_value == result.details["sign_flips"] / result.details["settings"]
+
+
+def test_monte_carlo_is_an_explicit_placeholder():
     with pytest.raises(NotImplementedError):
         MonteCarloExperiment().run(hypothesis(), snapshot())
 
@@ -81,12 +97,15 @@ def test_factory_run_all_skips_placeholders_and_returns_real_results():
     factory = ExperimentFactory()
     results = factory.run_all(hypothesis(), snapshot())
 
-    assert "SensitivityAnalysisExperiment" not in results
     assert "MonteCarloExperiment" not in results
-    assert "CrossValidationExperiment" in results
-    assert "BootstrapExperiment" in results
-    assert "WalkForwardExperiment" in results
-    assert "OutOfSampleExperiment" in results
+    for name in (
+        "CrossValidationExperiment",
+        "BootstrapExperiment",
+        "WalkForwardExperiment",
+        "OutOfSampleExperiment",
+        "SensitivityAnalysisExperiment",
+    ):
+        assert name in results
 
 
 def test_experiment_results_can_be_stored_as_versioned_artifacts():

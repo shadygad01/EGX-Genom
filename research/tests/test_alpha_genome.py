@@ -96,3 +96,25 @@ def test_mutate_unknown_parent_raises():
     genome = AlphaGenome()
     with pytest.raises(KeyError):
         genome.mutate("does-not-exist", make_knowledge("know-1"), "n/a")
+
+
+def test_merge_synthesizes_multiple_parents():
+    genome = AlphaGenome()
+    parent_a = genome.promote_to_gene(make_knowledge("know-a"))
+    parent_b = genome.promote_to_gene(make_knowledge("know-b"))
+
+    child = genome.merge([parent_a.id, parent_b.id], make_knowledge("know-merged"), "synthesis")
+
+    assert set(child.parent_gene_ids) == {parent_a.id, parent_b.id}
+    assert child.generation == 1
+    for parent_id in (parent_a.id, parent_b.id):
+        updated = genome.repository.latest(parent_id)
+        assert updated.status == GeneStatus.REPLACED
+        assert updated.child_gene_ids == [child.id]
+
+
+def test_merge_requires_at_least_two_parents():
+    genome = AlphaGenome()
+    parent = genome.promote_to_gene(make_knowledge("know-a"))
+    with pytest.raises(ValueError):
+        genome.merge([parent.id], make_knowledge("know-merged"), "n/a")

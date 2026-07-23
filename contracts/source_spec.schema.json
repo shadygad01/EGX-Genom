@@ -1,0 +1,277 @@
+{
+  "$defs": {
+    "AccessMethod": {
+      "enum": [
+        "csv_download",
+        "json_api",
+        "rss_feed",
+        "xbrl",
+        "pdf_download",
+        "html_scrape",
+        "manual"
+      ],
+      "title": "AccessMethod",
+      "type": "string"
+    },
+    "RateLimit": {
+      "properties": {
+        "min_seconds_between_requests": {
+          "default": 1.0,
+          "title": "Min Seconds Between Requests",
+          "type": "number"
+        },
+        "requests_per_minute": {
+          "default": 10,
+          "title": "Requests Per Minute",
+          "type": "integer"
+        }
+      },
+      "title": "RateLimit",
+      "type": "object"
+    },
+    "RetryPolicy": {
+      "properties": {
+        "backoff_multiplier": {
+          "default": 2.0,
+          "title": "Backoff Multiplier",
+          "type": "number"
+        },
+        "backoff_seconds": {
+          "default": 2.0,
+          "title": "Backoff Seconds",
+          "type": "number"
+        },
+        "max_attempts": {
+          "default": 3,
+          "title": "Max Attempts",
+          "type": "integer"
+        }
+      },
+      "title": "RetryPolicy",
+      "type": "object"
+    },
+    "SourceCategory": {
+      "enum": [
+        "official",
+        "company",
+        "market_data",
+        "news",
+        "arabic_news",
+        "macroeconomic",
+        "global_markets",
+        "alternative",
+        "research"
+      ],
+      "title": "SourceCategory",
+      "type": "string"
+    },
+    "SourceStatus": {
+      "enum": [
+        "implemented",
+        "planned",
+        "needs_key",
+        "tos_review",
+        "disabled"
+      ],
+      "title": "SourceStatus",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "access_method": {
+      "$ref": "#/$defs/AccessMethod"
+    },
+    "authentication": {
+      "default": "none",
+      "title": "Authentication",
+      "type": "string"
+    },
+    "base_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Base Url"
+    },
+    "category": {
+      "$ref": "#/$defs/SourceCategory"
+    },
+    "collector": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Collector"
+    },
+    "collector_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Collector Version"
+    },
+    "conflict_priority": {
+      "default": 50,
+      "description": "Higher wins ties in cross-source conflict resolution (0-100).",
+      "title": "Conflict Priority",
+      "type": "integer"
+    },
+    "data_quality_score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Measured only; never declared.",
+      "title": "Data Quality Score"
+    },
+    "expected_latency": {
+      "default": "unknown",
+      "title": "Expected Latency",
+      "type": "string"
+    },
+    "freshness_score": {
+      "description": "Declared prior until measured",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Freshness Score",
+      "type": "number"
+    },
+    "historical_coverage": {
+      "default": "unknown",
+      "title": "Historical Coverage",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "license": {
+      "default": "unknown",
+      "title": "License",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "normalization_rules": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Normalization Rules",
+      "type": "array"
+    },
+    "notes": {
+      "default": "",
+      "title": "Notes",
+      "type": "string"
+    },
+    "provenance_policy": {
+      "default": "raw_document_envelope",
+      "title": "Provenance Policy",
+      "type": "string"
+    },
+    "rate_limit": {
+      "$ref": "#/$defs/RateLimit"
+    },
+    "reliability_score": {
+      "description": "Declared prior until measured",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Reliability Score",
+      "type": "number"
+    },
+    "retry_policy": {
+      "$ref": "#/$defs/RetryPolicy"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/SourceStatus"
+    },
+    "supported_entities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Supported Entities",
+      "type": "array"
+    },
+    "supported_event_types": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Supported Event Types",
+      "type": "array"
+    },
+    "supported_languages": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Supported Languages",
+      "type": "array"
+    },
+    "terms_of_use_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terms Of Use Url"
+    },
+    "update_frequency": {
+      "default": "unknown",
+      "title": "Update Frequency",
+      "type": "string"
+    },
+    "validation_rules": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Validation Rules",
+      "type": "array"
+    },
+    "version": {
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "category",
+    "access_method",
+    "status",
+    "reliability_score",
+    "freshness_score"
+  ],
+  "title": "SourceSpec",
+  "type": "object"
+}

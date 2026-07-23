@@ -1,0 +1,249 @@
+{
+  "$defs": {
+    "Explanation": {
+      "description": "Answers to the questions every recommendation must be able to answer.\n\n`evidence_refs` is what keeps `supporting_evidence` from being just\nprose: each entry points at an actual, looked-up-able entity (a\nknowledge object, a dataset snapshot, a feature) rather than only a\nsentence describing one.",
+      "properties": {
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "invalidation_conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidation Conditions",
+          "type": "array"
+        },
+        "similar_historical_cases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Similar Historical Cases",
+          "type": "array"
+        },
+        "supporting_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Evidence",
+          "type": "array"
+        },
+        "why_not_others": {
+          "title": "Why Not Others",
+          "type": "string"
+        },
+        "why_now": {
+          "title": "Why Now",
+          "type": "string"
+        },
+        "why_this_stock": {
+          "title": "Why This Stock",
+          "type": "string"
+        }
+      },
+      "required": [
+        "why_this_stock",
+        "why_now",
+        "why_not_others"
+      ],
+      "title": "Explanation",
+      "type": "object"
+    },
+    "Horizon": {
+      "description": "The three independent time horizons the platform optimizes simultaneously.",
+      "enum": [
+        "micro",
+        "swing",
+        "investment"
+      ],
+      "title": "Horizon",
+      "type": "string"
+    },
+    "Prediction": {
+      "description": "A single-horizon prediction for one ticker. Never returned without an Explanation.\n\n`model_id`/`model_version` record exactly which model artifact produced\nthis \u2014 necessary once a model is retrained, so a monitoring/retirement\ndecision (Principle 4) can tell whether a degrading result came from the\nsame model or a since-replaced one (Principle 5: models are versioned).",
+      "properties": {
+        "as_of": {
+          "format": "date",
+          "title": "As Of",
+          "type": "string"
+        },
+        "confidence": {
+          "title": "Confidence",
+          "type": "number"
+        },
+        "expected_return": {
+          "title": "Expected Return",
+          "type": "number"
+        },
+        "expected_risk": {
+          "title": "Expected Risk",
+          "type": "number"
+        },
+        "explanation": {
+          "$ref": "#/$defs/Explanation"
+        },
+        "horizon": {
+          "$ref": "#/$defs/Horizon"
+        },
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "model_version": {
+          "title": "Model Version",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "supporting_knowledge_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Knowledge Ids",
+          "type": "array"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "horizon",
+        "as_of",
+        "model_id",
+        "model_version",
+        "expected_return",
+        "expected_risk",
+        "confidence",
+        "explanation",
+        "provenance"
+      ],
+      "title": "Prediction",
+      "type": "object"
+    },
+    "Provenance": {
+      "properties": {
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "produced_at": {
+          "format": "date-time",
+          "title": "Produced At",
+          "type": "string"
+        },
+        "produced_by": {
+          "title": "Produced By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "produced_by",
+        "produced_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "description": "A pointer to one input entity: what kind it is, its id, and (if versioned) which version.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "ref_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Version"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    }
+  },
+  "description": "A final, explainable output combining every available horizon's prediction.\n\nNever constructed without an Explanation \u2014 see Principle 3. `provenance`\nlinks back to every contributing prediction's model and to every\nsupporting knowledge object, so the full chain from recommendation back\nto raw data is walkable via repository lookups.",
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "combined_expected_return": {
+      "title": "Combined Expected Return",
+      "type": "number"
+    },
+    "combined_expected_risk": {
+      "title": "Combined Expected Risk",
+      "type": "number"
+    },
+    "confidence": {
+      "title": "Confidence",
+      "type": "number"
+    },
+    "explanation": {
+      "$ref": "#/$defs/Explanation"
+    },
+    "horizon_predictions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Prediction"
+      },
+      "propertyNames": {
+        "$ref": "#/$defs/Horizon"
+      },
+      "title": "Horizon Predictions",
+      "type": "object"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "supporting_knowledge_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Supporting Knowledge Ids",
+      "type": "array"
+    },
+    "ticker": {
+      "title": "Ticker",
+      "type": "string"
+    }
+  },
+  "required": [
+    "ticker",
+    "as_of",
+    "combined_expected_return",
+    "combined_expected_risk",
+    "confidence",
+    "horizon_predictions",
+    "explanation",
+    "provenance"
+  ],
+  "title": "Recommendation",
+  "type": "object"
+}

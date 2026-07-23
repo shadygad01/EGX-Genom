@@ -7,7 +7,12 @@ end-to-end daily research cycles on placeholder data. The Data Acquisition
 Program (`sources/`+`collectors/`, see `docs/DATA_ACQUISITION.md`) has
 since added a real (non-mock) collection path for free EGX/global/macro/
 news data, feeding the same local-CSV layout the placeholder data uses
-today.
+today. The web dashboard now runs on a dual-provider architecture
+(`docs/ARCHITECTURE.md`'s "Dashboard data providers" section):
+`StaticJsonProvider` for the GitHub Pages build (JSON artifacts generated
+by the real pipeline, published via `.github/workflows/deploy-pages.yml`)
+and `ApiProvider` for a hosted `api/`, both behind one interface so no
+component needs to know which is active.
 
 ## Milestone: Production 1.0 (blocked on business decisions)
 
@@ -43,6 +48,22 @@ framework:
   wire `consistency_score` in `collectors.quality.assess_quality()` instead
   of leaving it `None`, and start feeding `SourceRegistry.record_measured_quality()`
   from real run history instead of leaving `data_quality_score` unset.
+
+## Dashboard architecture: next engineering-closeable steps
+
+- Schedule `agx export-dashboard` to refresh a production `api/`'s
+  `DASHBOARD_ARTIFACTS_DIR` periodically (System 18 scheduling is
+  business-blocked in general, but this specific refresh needs only a cron
+  job/timer once *any* deployment target exists — smaller than the
+  System 18 blockers above).
+- `patterns.json` stays `[]` — and `validate_dashboard_artifacts()` enforces
+  that — until `agents.historical_patterns.HistoricalPatternsAgent` is
+  implemented (still a data/methodology gap, see `docs/PHASE_STATUS.md`
+  System 08).
+- Once a second `IMPLEMENTED` source overlaps an existing one, wire
+  `consistency_score` (see the Data Acquisition Program item above) — this
+  also improves `system_status.json`'s honesty once real corroboration
+  data exists.
 
 ## Post-1.0 engineering roadmap (unblocked by real data accumulating)
 

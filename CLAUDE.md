@@ -1,12 +1,18 @@
 # AGX — Alpha Genome (EGX Research Platform)
 
 This file orients any Claude session working in this repository. It is not
-the vision document itself — that lives in `docs/VISION.md` verbatim — but a
+the vision document itself — that lives in `docs/VISION.md` verbatim — nor
+the operating charter, which is `MASTER_PROMPT.md` (role, non-negotiable
+principles, and the strict 18-system build order). This file is the
 practical guide to how the codebase is organized and what invariants to
 protect when touching it. `docs/ARCHITECTURE.md` describes the current
 design in more detail; `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`/`docs/EPOCH_II_REPORT.md` (Epoch II) explain *why*
-it's shaped this way and what's real vs. interface-only in each subsystem.
+it's shaped this way. `docs/PHASE_STATUS.md` is the living, must-be-updated
+audit of where every one of `MASTER_PROMPT.md`'s 18 systems actually
+stands — check it before starting new work: per the charter, a later
+system's work should not start while an earlier one still has closeable
+gaps.
 
 ## What this repository is
 
@@ -60,7 +66,10 @@ file as evidence the underlying research logic is fully real; check
 
 Layout:
 
-- `docs/` — vision, architecture, and the Epoch I/II audit and design docs.
+- `MASTER_PROMPT.md` — the operating charter (role, non-negotiable
+  principles, strict 18-system build order).
+- `docs/` — vision, architecture, the Epoch I/II audit and design docs, and
+  `PHASE_STATUS.md` (current status of all 18 systems against the charter).
 - `research/` — Python package (`agx_research`) containing the research
   engine. See `docs/ARCHITECTURE.md`'s component map for the full
   subpackage breakdown (Epoch I: `domain/`, `storage/`, `universe/`,
@@ -98,13 +107,25 @@ Layout:
   intentionally holds only the stable `Horizon` enum).
 - The market data provider (`agx_research.data.provider.DataProvider`) is
   implemented today only by `MockDataProvider`, which reads local CSVs
-  under `research/data/mock/`. A real EGX vendor integration is future work
-  — do not hardcode assumptions about a specific vendor's API shape into
-  code outside `data/`.
+  under `research/data/mock/`, and `FallbackDataProvider`, which composes
+  multiple `DataProvider`s in priority order. A real, licensed EGX vendor
+  integration is a business decision (which vendor, cost, coverage) — flag
+  it to the user rather than picking one; don't hardcode assumptions about
+  a specific vendor's API shape into code outside `data/`.
 - Agents, experiments, and validators consume a `DatasetSnapshot`
   (`data/snapshot.py`), never a live `DataProvider` directly — this is what
   makes findings/experiments reproducible and prevents look-ahead bias.
   Don't reintroduce direct `DataProvider` calls in those layers.
+- Return calculations always go through `data.adjustments.adjusted_returns_for_ticker()`,
+  never raw `[bar.close for bar in bars]` — a stock split or dividend
+  would otherwise look like a huge fake return. If you add a new place
+  that computes returns from prices, wire it through this function, not a
+  new inline calculation.
+- New raw price data (a new mock ticker, a future real feed) should be run
+  through `data.quality.validate_price_bars()` before being trusted by
+  anything downstream. Corporate events with a `split_ratio` or
+  `dividend_amount` in `details` are the only ones `data.adjustments`
+  acts on — other event types are informational only.
 - New versioned entities (predictions, dataset registries, whatever comes
   next) should get a thin repository composing
   `storage.JsonFileRepository`, following the pattern in
@@ -147,3 +168,6 @@ Layout:
 - Do not let `ScientificReviewBoard` or `AdversarialScientist` silently
   treat a skipped/unimplemented check as a pass. A board with zero working
   reviewers must never approve anything.
+- Do not compute a dividend adjustment factor from the close *on* the
+  ex-date — use the last *cum*-dividend close, strictly before it (a real
+  bug caught by this codebase's own tests; see `data/adjustments.py`).

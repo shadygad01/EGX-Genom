@@ -3,7 +3,11 @@
 Layout expected under `root`:
 
     prices/<TICKER>.csv          columns: date,open,high,low,close,volume
-    corporate_events.csv         columns: ticker,date,event_type,description
+    corporate_events.csv         columns: ticker,date,event_type,description,details_json
+                                  (details_json is an optional JSON object, e.g.
+                                  {"split_ratio": 2.0} or {"dividend_amount": 3.5};
+                                  defaults to {} if the column is missing/blank --
+                                  see data/adjustments.py for how it's used)
     macro/<SERIES_ID>.csv        columns: date,value
     news.csv                     columns: date,source,headline,tickers,body
                                   (tickers is a "|"-separated list, body optional)
@@ -15,6 +19,7 @@ treated as a source of truth for research conclusions.
 from __future__ import annotations
 
 import csv
+import json
 from datetime import date
 from pathlib import Path
 
@@ -65,12 +70,14 @@ class MockDataProvider(DataProvider):
                     continue
                 event_date = _parse_date(row["date"])
                 if start <= event_date <= end:
+                    raw_details = (row.get("details_json") or "").strip()
                     events.append(
                         CorporateEvent(
                             ticker=ticker,
                             event_date=event_date,
                             event_type=row["event_type"],
                             description=row["description"],
+                            details=json.loads(raw_details) if raw_details else {},
                         )
                     )
         return sorted(events, key=lambda e: e.event_date)

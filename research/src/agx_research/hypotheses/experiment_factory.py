@@ -23,8 +23,9 @@ import statistics
 
 from scipy import stats as scipy_stats
 
+from agx_research.data.adjustments import adjusted_returns_for_ticker
 from agx_research.data.snapshot import DatasetSnapshot
-from agx_research.features.correlation import daily_returns, pearson_correlation
+from agx_research.features.correlation import pearson_correlation
 from agx_research.hypotheses.experiment import Experiment, ExperimentResult
 from agx_research.hypotheses.hypothesis import Hypothesis
 from agx_research.validation.stress_test import StressTester
@@ -40,8 +41,7 @@ def _tickers_from_hypothesis(hypothesis: Hypothesis) -> tuple[str, str]:
 
 
 def _returns_for(snapshot: DatasetSnapshot, ticker: str) -> list[float]:
-    bars = snapshot.price_history.get(ticker, [])
-    return daily_returns([b.close for b in bars])
+    return adjusted_returns_for_ticker(snapshot, ticker)
 
 
 def _aligned_returns(

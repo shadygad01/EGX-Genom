@@ -1,8 +1,10 @@
 # agx_research
 
 Python research engine for AGX. See the repository root
-[`README.md`](../README.md), [`CLAUDE.md`](../CLAUDE.md), and
-[`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) for context.
+[`README.md`](../README.md), [`CLAUDE.md`](../CLAUDE.md),
+[`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md), and
+[`docs/PHASE_STATUS.md`](../docs/PHASE_STATUS.md) (the strict-order phase
+audit against `MASTER_PROMPT.md`) for context.
 
 ## Setup
 
@@ -16,23 +18,40 @@ uv run pytest
 - `agx_research.config` — the stable `Horizon` enum only.
 - `agx_research.domain` — cross-cutting primitives: `new_id()`, `Provenance`/`ProvenanceRef`.
 - `agx_research.storage` — generic, versioned `Repository[T]` / `JsonFileRepository[T]`.
-- `agx_research.universe` — `UniverseProvider` interface + placeholder EGX30 snapshot.
-- `agx_research.data` — `DataProvider` interface, `MockDataProvider`, and
-  `DatasetSnapshot` (point-in-time, content-hashed data bundles).
-- `agx_research.features` — versioned `FeatureDefinition` registry.
+- `agx_research.universe` — `UniverseProvider`/`SectorProvider` interfaces + placeholder data.
+- `agx_research.data` — `DataProvider` interface, `MockDataProvider`,
+  `FallbackDataProvider` (multi-source composition), `DatasetSnapshot` +
+  `DatasetSnapshotRepository`, `quality` (mechanical OHLCV sanity checks),
+  and `adjustments` (split/dividend-adjusted returns — used by every
+  correlation/experiment calculation instead of raw closes).
+- `agx_research.features` — versioned `FeatureDefinition` registry plus
+  `discovery` (`FeatureCandidate`/`FeatureGenerator`/`FeatureDiscoveryEngine`,
+  autonomous search rather than hand-picked features).
 - `agx_research.knowledge` — `KnowledgeObject` schema, lifecycle, store.
 - `agx_research.hypotheses` — `Hypothesis`, its configurable gate `pipeline`,
-  `Experiment` machinery, and `HypothesisRepository`.
+  `HypothesisRepository`, and `experiment_factory` (7 experiment types).
 - `agx_research.validation` — statistical validation (incl. `StatisticalEvidence`)
   / stress test / backtest interfaces.
 - `agx_research.agents` — research agents (propose findings from a
   `DatasetSnapshot`, never publish knowledge).
+- `agx_research.events` — canonical `Event` schema + adapters deriving
+  events from a `DatasetSnapshot`.
+- `agx_research.market_memory` — `MarketState` + `MarketMemory`, the
+  sanctioned way to reconstruct any historical day.
+- `agx_research.genome` — `Gene` (immutable lineage) + `AlphaGenome` service.
+- `agx_research.causal` — `CausalAssessment` shapes + `EconomicRationaleGate`.
+- `agx_research.graph` — `KnowledgeGraph` (nodes/edges) +
+  `edges_from_provenance()`.
+- `agx_research.papers` — `ResearchPaper` schema + mechanical generator.
+- `agx_research.review` — `PromotionCandidate`, reviewers, `ScientificReviewBoard`.
+- `agx_research.adversarial` — `AdversarialScientist`, 9 named attack types.
 - `agx_research.horizons` — Micro / Swing / Investment model interfaces.
 - `agx_research.meta` — Meta Decision Engine.
 - `agx_research.explainability` — `Explanation` object required on every
   prediction/recommendation.
-- `agx_research.orchestration` — `ResearchCycle` + `ResearchOrchestrator`,
-  the first-class "one trading day's research run."
+- `agx_research.orchestration` — `TaskGraph`, `Artifact`/`ArtifactRepository`,
+  `ResearchSession` + `ResearchOrchestrator`, the first-class "one trading
+  day's research run."
 
 ## Regenerating the API contract
 

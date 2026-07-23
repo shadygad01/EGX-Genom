@@ -23,7 +23,15 @@ from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem
 
 
 class DatasetSnapshot(BaseModel):
+    """`version` is always 1: `id` is a content hash, so genuinely different
+    content always gets a different id rather than a new revision of the
+    same one. The field exists so `DatasetSnapshotRepository` (and the
+    generic `storage.Repository[T]` it's built on) can treat every entity
+    in the system uniformly, per "everything must be versioned."
+    """
+
     id: str
+    version: int = 1
     as_of: date
     lookback_days: int
     tickers: list[str]

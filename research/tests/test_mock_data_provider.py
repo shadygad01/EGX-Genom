@@ -26,6 +26,16 @@ def test_get_corporate_events_filters_by_ticker_and_date():
     assert events[0].event_type == "DIVIDEND"
 
 
+def test_get_corporate_events_parses_structured_details_json():
+    events = provider().get_corporate_events("MFPC", date(2026, 6, 1), date(2026, 6, 30))
+    assert events[0].details == {"dividend_amount": 3.5}
+
+
+def test_get_corporate_events_defaults_to_empty_details_when_blank():
+    events = provider().get_corporate_events("COMI", date(2026, 6, 1), date(2026, 6, 30))
+    assert events[0].details == {}
+
+
 def test_get_macro_series_returns_observations_in_range():
     obs = provider().get_macro_series("BRENT_USD", date(2026, 6, 1), date(2026, 6, 3))
     assert [o.value for o in obs] == [82.10, 82.90, 83.40]

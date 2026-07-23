@@ -3,10 +3,15 @@
 Pulled out of `agents/market_structure.py` so the correlation computation
 is a versioned, named, reusable `FeatureDefinition` rather than inline
 arithmetic duplicated across whichever agents happen to need it.
+
+Returns are split/dividend-adjusted (`data.adjustments`) — computing this
+from raw, unadjusted closes would let a corporate action masquerade as a
+huge fake "return" and corrupt the correlation.
 """
 
 from __future__ import annotations
 
+from agx_research.data.adjustments import adjusted_returns_for_ticker
 from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.features.definition import FeatureDefinition
 from agx_research.features.registry import FeatureRegistry
@@ -51,8 +56,8 @@ def compute_pairwise_return_correlation(
     bars_b = snapshot.price_history.get(ticker_b, [])
     if len(bars_a) < 3 or len(bars_b) < 3:
         return None
-    returns_a = daily_returns([b.close for b in bars_a])
-    returns_b = daily_returns([b.close for b in bars_b])
+    returns_a = adjusted_returns_for_ticker(snapshot, ticker_a)
+    returns_b = adjusted_returns_for_ticker(snapshot, ticker_b)
     return pearson_correlation(returns_a, returns_b)
 
 

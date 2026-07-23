@@ -1,9 +1,12 @@
 # AGX Architecture
 
 This describes the current shape of the codebase and how it is intended to
-grow. See `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
-`docs/EPOCH_II_DESIGN.md` (Epoch II) for the reasoning behind the design
-choices below — this document is the resulting shape, those are the "why."
+grow. See `docs/ARCHITECTURE_AUDIT.md` (Epoch I), `docs/EPOCH_II_DESIGN.md`
+(Epoch II), and `docs/PHASE_STATUS.md` (the strict-order phase audit
+against `MASTER_PROMPT.md`'s 18-system architecture) for the reasoning
+behind the design choices below — this document is the resulting shape,
+those are the "why," and `PHASE_STATUS.md` is the current source of truth
+for what's actually done vs. partial vs. not started per system.
 
 Epoch I built a foundation scaffold: interfaces, the knowledge lifecycle,
 provenance, versioned repositories, point-in-time datasets. Epoch II
@@ -25,7 +28,9 @@ research/        Python package `agx_research` — the research engine
   domain/         Cross-cutting primitives: id minting, Provenance
   storage/        Generic versioned Repository[T] used by every store
   universe/       UniverseProvider + SectorProvider interfaces (placeholder data)
-  data/           DataProvider interface, mock impl, point-in-time DatasetSnapshot
+  data/           DataProvider/FallbackDataProvider, mock impl, point-in-time
+                  DatasetSnapshot(+repository), quality checks, split/dividend
+                  adjustment
   knowledge/      KnowledgeObject schema, lifecycle state machine, store
   hypotheses/     Hypothesis + configurable gate pipeline + Experiment machinery
   validation/     Statistical validation / stress test / backtest interfaces
@@ -154,12 +159,24 @@ until the schema surface is large enough to justify full codegen.
   `graph.edges_from_provenance()` derives edges mechanically from
   `Provenance` objects that already exist; nothing should hand-maintain
   graph edges that duplicate what provenance already encodes.
+- **Returns are always adjusted, never computed from raw closes.**
+  `features.correlation` and `hypotheses.experiment_factory` compute
+  returns via `data.adjustments.adjusted_returns_for_ticker()`, which
+  applies split/dividend adjustment using each ticker's
+  `DatasetSnapshot.corporate_events`. A stock split or dividend would
+  otherwise look like a huge fake return and corrupt every statistic
+  downstream — do not reintroduce `[bar.close for bar in bars]` return
+  calculations that bypass this.
 
 ## What is intentionally not built yet
 
-- Real EGX market data ingestion (vendor TBD) — `MockDataProvider` reads
-  local CSVs as a stand-in. Same for `universe.StaticUniverseProvider`/
-  `SectorProvider` — placeholders for live EGX30 membership/sector feeds.
+- A licensed, real-time EGX market data vendor integration —
+  `MockDataProvider` reads local CSVs as a stand-in, and
+  `data.FallbackDataProvider` is the composition seam a real vendor drops
+  into. *Which* vendor to license is a business decision (cost, coverage,
+  contract terms), not an engineering one — see `docs/PHASE_STATUS.md`.
+  Same caveat for `universe.StaticUniverseProvider`/`SectorProvider` —
+  placeholders for live EGX30 membership/sector feeds.
 - Actual statistical tests beyond `SignificanceThresholdValidator` and the
   four real `ExperimentFactory` experiments — `SensitivityAnalysisExperiment`
   and `MonteCarloExperiment` are explicit placeholders; `stress_test.py`/

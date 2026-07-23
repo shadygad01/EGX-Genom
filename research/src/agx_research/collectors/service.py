@@ -53,6 +53,7 @@ class CollectionRunResult:
     news_items_written: int
     corporate_events_written: int
     index_constituents_written: int
+    financial_statement_line_items_written: int
     events_registered: int
     assessments: list[QualityAssessment]
 
@@ -137,6 +138,41 @@ def _write_corporate_events(
         for key in sorted(existing):
             writer.writerow(existing[key])
     return len(events)
+
+
+def _write_financial_statement_line_items(
+    data_dir: Path, ticker: str, items, *, on_written=None
+) -> int:
+    path = data_dir / "financial_statements" / f"{ticker}.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing: dict[tuple[str, str, str], dict] = {}
+    if path.exists():
+        with path.open(newline="") as f:
+            for row in csv.DictReader(f):
+                existing[(row["period_end_date"], row["statement_type"], row["line_item"])] = row
+    for item in items:
+        key = (item.period_end_date.isoformat(), item.statement_type, item.line_item)
+        existing[key] = {
+            "period_end_date": item.period_end_date.isoformat(),
+            "period_type": item.period_type,
+            "statement_type": item.statement_type,
+            "line_item": item.line_item,
+            "value": item.value,
+            "currency": item.currency,
+        }
+        if on_written:
+            on_written(item.statement_type, item.line_item, item.period_end_date)
+    with path.open("w", newline="") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "period_end_date", "period_type", "statement_type", "line_item", "value", "currency",
+            ],
+        )
+        writer.writeheader()
+        for key in sorted(existing):
+            writer.writerow(existing[key])
+    return len(items)
 
 
 def _write_index_constituents(
@@ -252,6 +288,7 @@ class CollectionService:
             news_items_written=0,
             corporate_events_written=0,
             index_constituents_written=0,
+            financial_statement_line_items_written=0,
             events_registered=0,
             assessments=[],
         )
@@ -296,6 +333,7 @@ class CollectionService:
             produced = (
                 len(batch.price_bars) + len(batch.macro_observations) + len(batch.news_items)
                 + len(batch.corporate_events) + len(batch.index_constituents)
+                + len(batch.financial_statement_line_items)
             )
             materialized = assessment.confidence_score >= self.min_confidence
 
@@ -366,6 +404,20 @@ class CollectionService:
                             on_written=lambda ticker, d, i=index: self._trace(
                                 "index_constituent", f"{i}|{ticker}", d, collector, document
                             ),
+                        )
+
+                if batch.financial_statement_line_items:
+                    by_stmt_ticker: dict[str, list] = {}
+                    for item in batch.financial_statement_line_items:
+                        by_stmt_ticker.setdefault(item.ticker, []).append(item)
+                    for ticker, items in by_stmt_ticker.items():
+                        result.financial_statement_line_items_written += (
+                            _write_financial_statement_line_items(
+                                self.data_dir, ticker, items,
+                                on_written=lambda stmt, line, d, t=ticker: self._trace(
+                                    "financial_statement", f"{t}|{stmt}|{line}", d, collector, document
+                                ),
+                            )
                         )
             else:
                 result.batches_withheld += 1

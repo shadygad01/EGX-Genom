@@ -13,12 +13,14 @@ commit whenever the fact they state changes.
   production execution pipeline runs the full chain end to end
   (`agx run`); the Acquisition Intelligence Engine can discover, verify,
   rank, and register a live source for the entire business-value priority
-  catalog; a real Universe Engine (`universe.CollectedUniverseProvider` +
-  `collectors.index_constituents.IndexConstituentCollector`) and a real
-  corporate-event classifier (`collectors.corporate_event_classifier`,
-  closing TD-24) are now built and tested. Every research conclusion the
-  platform can currently produce is still scoped to placeholder/mock data
-  — no live source is connected yet.
+  catalog; a real Universe Engine, a real corporate-event classifier
+  (closing TD-24), and now real Financial Statement Collection
+  infrastructure (`financials.*` + `collectors.financial_statements.
+  FinancialStatementCollector`) are all built and tested — the last of
+  these closes the data-source half of `agents.financial_performance.
+  FinancialPerformanceAgent`'s long-standing honest stub. Every research
+  conclusion the platform can currently produce is still scoped to
+  placeholder/mock data — no live source is connected yet.
 - **Current mission:** Engineering ownership handoff — close every
   remaining engineering-closeable gap toward real Egyptian market data, in
   business-priority order: EGX official → Universe Engine → Investor
@@ -26,30 +28,34 @@ commit whenever the fact they state changes.
   collection → Historical backfill → Live incremental sync → CBE/FRA/
   CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → anything
   else discovered. See `CURRENT_MISSION.md`.
-- **Next mission:** Financial Statement Collection (priority 5) — needs no
-  live source to design; underway. Separately, resume live-source
-  connection (priorities 1, 2 at real scale, 3 at real scale, 8–16) the
-  moment either blocker below clears, with zero further code changes. See
-  `NEXT_MISSIONS.md`.
-- **Overall completion:** ~99% of everything engineering-closeable without
-  a business/vendor decision. The remaining ~1% is exclusively: (a) writing
-  a concrete collector once a source resolves live (including pointing the
-  now-built `IndexConstituentCollector` at a verified `egx_official`
-  endpoint), (b) Financial Statement Collection's canonical schema/collector
-  (in progress, no blocker), and (c) System 18's deployment/secrets/
+- **Next mission:** Priorities 1 through 7 are now all engineering-complete
+  (blocked only where named below); the remaining engineering-closeable
+  work — richer PDF-based extraction (corporate disclosures and financial
+  statements alike) once a real filing layout can be inspected, and
+  calibration passes once real data exists — is queued but itself gated on
+  the same two blockers clearing first. See `NEXT_MISSIONS.md` for the
+  full list and what runs automatically the moment either clears.
+- **Overall completion:** ~99.5% of everything engineering-closeable
+  without a business/vendor decision. The remaining fraction is
+  exclusively: (a) writing a concrete collector once a source resolves
+  live (`IndexConstituentCollector`/`FinancialStatementCollector` are
+  already built and waiting), (b) a source-verified PDF extraction stage
+  once a real filing layout exists (deliberately not attempted
+  speculatively — TD-32), and (c) System 18's deployment/secrets/
   scheduling wiring, blocked on a hosting/vendor decision.
 - **Connected live sources: 0** — blocked, not unbuilt. Every mechanism
   needed (discovery, verification, ranking, registration, qualification,
   collection, archival, validation, universe membership, corporate-event
-  classification) is built and tested; zero are connected because this
-  sandbox has no outbound network egress to arbitrary hosts (confirmed
-  directly and repeatedly across four missions).
+  classification, financial-statement collection) is built and tested;
+  zero are connected because this sandbox has no outbound network egress
+  to arbitrary hosts (confirmed directly and repeatedly across four
+  missions).
 - **Historical coverage:** 0 real trading days from any live source (same
   blocker — no source has ever been reachable to backfill from). No
   separate backfill mechanism is needed or exists; every collector
-  (including the new `IndexConstituentCollector`) already fetches a
-  source's full available series by construction, so a source's first live
-  run *is* its backfill.
+  (including `IndexConstituentCollector`/`FinancialStatementCollector`)
+  already fetches a source's full available series by construction, so a
+  source's first live run *is* its backfill.
 - **Knowledge growth:** 0 real `KnowledgeObject`s promoted from live data.
   The full validation → promotion pipeline is proven correct against mock
   data (the production pipeline's daily research cycle produces real
@@ -72,13 +78,13 @@ commit whenever the fact they state changes.
   any output as real research (`docs/ROADMAP.md`).
 - **Estimated remaining work:** Near-zero engineering effort once either
   blocker (1) or (2) above clears — `agx discover-sources`,
-  `generate_company_ir_targets()`, and `IndexConstituentCollector` are all
-  already built to scale automatically. From there, each newly-resolved
-  source needs one concrete collector (small, per-source, following the
-  existing `Collector` pattern) before it's `IMPLEMENTED`. Financial
-  Statement Collection (priority 5) is separately underway with no
-  blocker. System 18's remaining deployment/secrets/scheduling work is
-  separately blocked on a hosting/vendor decision.
+  `generate_company_ir_targets()`, `IndexConstituentCollector`, and
+  `FinancialStatementCollector` are all already built to scale
+  automatically. From there, each newly-resolved source needs one concrete
+  collector (small, per-source, following the existing `Collector`
+  pattern) before it's `IMPLEMENTED`. System 18's remaining deployment/
+  secrets/scheduling work is separately blocked on a hosting/vendor
+  decision.
 
 ## Where to look
 

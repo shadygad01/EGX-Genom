@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.13.0 — Financial Statement Collection
+- `financials/` (new package): `FinancialStatementLineItem` — `{ticker,
+  period_end_date, period_type, statement_type, line_item, value,
+  currency}`; `STANDARD_LINE_ITEMS` (a small IFRS/GAAP-style vocabulary,
+  reused where possible, never hard-enforced). `FinancialStatementProvider`
+  (new, small ABC — mirrors `universe.UniverseProvider` rather than
+  growing `data.provider.DataProvider`'s existing method set) +
+  `CollectedFinancialStatementProvider` (reads collected CSV, empty when
+  nothing's collected).
+- `collectors/base.py`: `CollectionBatch` gained
+  `financial_statement_line_items`. `collectors/service.py`:
+  `CollectionService` materializes to `financial_statements/<TICKER>.csv`
+  (merged by `period_end_date,statement_type,line_item`), provenance-traced,
+  matching the existing writer pattern. `collectors/quality.py` counts the
+  new record type.
+- `collectors/financial_statements.py` (new): `FinancialStatementCollector`
+  — a generic, header-matching CSV parser for a structured financial-
+  statement export. Built and tested; not yet wireable into the live
+  pipeline (`company_ir` stays `PLANNED` until its real endpoint is
+  verified, `AD-24`).
+- Deliberately **not** built: a generic PDF-based statement extractor —
+  real filing layouts vary enough that a generic heuristic risks silently
+  reading the wrong line item's value, the same reason
+  `PdfDocumentCollector.parse()` stays abstract for every other PDF source.
+- Confirms this closes a real, already-named gap:
+  `agents.financial_performance.FinancialPerformanceAgent` has been an
+  honest `NotImplementedError` stub since System 08, explicitly waiting on
+  "a financial statement data source." The agent's own fundamental-factor
+  logic remains separate, later work.
+- 13 new tests (475 total, up from 462); `ruff` clean; `contracts/`
+  unchanged. New technical debt: TD-31 (column detection, uncalibrated),
+  TD-32 (PDF extraction, deliberately deferred). New risk: R-21 (guard
+  against a future generic PDF-numeric-extraction attempt).
+
 ## 0.12.0 — Universe Engine + Corporate Disclosures
 - `universe/constituent.py` (new): `IndexConstituent` — `{index, ticker,
   company_name, as_of_date}`, point-in-time correct (a date per row, not

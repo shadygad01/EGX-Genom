@@ -12,6 +12,7 @@ from agx_research.collectors.service import CollectionService
 from agx_research.data.mock_provider import LocalCsvDataProvider
 from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem, PriceBar
 from agx_research.events.service import EventPlatform
+from agx_research.financials.schema import FinancialStatementLineItem
 from agx_research.sources.spec import AccessMethod, SourceCategory, SourceSpec, SourceStatus
 from agx_research.universe.constituent import IndexConstituent
 
@@ -351,6 +352,51 @@ def test_reingesting_same_index_constituents_is_idempotent(tmp_path):
     service.run(collector, expected_records=1)
 
     path = tmp_path / "universe" / "EGX30.csv"
+    rows = path.read_text().strip().splitlines()
+    assert len(rows) == 2  # header + one row, not duplicated
+
+
+def test_financial_statement_line_items_materialized_to_csv(tmp_path):
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        financial_statement_line_items=[
+            FinancialStatementLineItem(
+                ticker="COMI", period_end_date=date(2026, 6, 30), period_type="QUARTERLY",
+                statement_type="INCOME_STATEMENT", line_item="revenue", value=1_000_000.0,
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": batch})
+
+    result = service.run(collector, expected_records=1)
+
+    assert result.financial_statement_line_items_written == 1
+    from agx_research.financials.collected import CollectedFinancialStatementProvider
+
+    provider = CollectedFinancialStatementProvider(tmp_path)
+    items = provider.get_line_items("COMI", date(2026, 1, 1), date(2026, 12, 31))
+    assert len(items) == 1
+    assert items[0].line_item == "revenue"
+    assert items[0].value == 1_000_000.0
+
+
+def test_reingesting_same_financial_statement_line_items_is_idempotent(tmp_path):
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        financial_statement_line_items=[
+            FinancialStatementLineItem(
+                ticker="COMI", period_end_date=date(2026, 6, 30), period_type="QUARTERLY",
+                statement_type="INCOME_STATEMENT", line_item="revenue", value=1_000_000.0,
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": batch})
+    service.run(collector, expected_records=1)
+    service.run(collector, expected_records=1)
+
+    path = tmp_path / "financial_statements" / "COMI.csv"
     rows = path.read_text().strip().splitlines()
     assert len(rows) == 2  # header + one row, not duplicated
 

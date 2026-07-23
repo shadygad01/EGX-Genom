@@ -67,6 +67,7 @@ def _completeness_score(batch: CollectionBatch) -> float:
         + len(batch.news_items)
         + len(batch.corporate_events)
         + len(batch.index_constituents)
+        + len(batch.financial_statement_line_items)
     )
     if produced == 0:
         return 0.0 if batch.parse_warnings else 1.0
@@ -87,6 +88,7 @@ def assess_quality(
         + len(batch.news_items)
         + len(batch.corporate_events)
         + len(batch.index_constituents)
+        + len(batch.financial_statement_line_items)
     )
     coverage = min(1.0, produced / expected_records) if expected_records > 0 else (
         1.0 if produced > 0 else 0.0

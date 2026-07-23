@@ -4,27 +4,18 @@ In priority order (business value, per the project owner's explicit
 ordering — not engineering convenience). See `docs/ROADMAP.md` for full
 detail and `docs/PHASE_STATUS.md` for what's already closed.
 
-## 1. Financial Statement Collection (priority 5) — next up, no blocker
+## 1. Clear the blocker: network egress or a verified company list
 
-The next engineering-closeable milestone, needing no live source to design:
-a canonical schema for structured financial-statement line items (income
-statement, balance sheet, cash flow), a generic collector shape (mirroring
-`IndexConstituentCollector`'s header-matching, format-tolerant posture —
-never guessing a specific vendor's real layout before one is verified),
-and a `DataProvider`-consistent read path. Same "generic infrastructure
-now, wire-format-pending-verification" pattern this phase used for the
-Universe Engine and corporate events.
-
-## 2. Clear the blocker: network egress or a verified company list
-
-Two independent unblocks, either one lets real connection work resume for
-priority 1 (EGX official) and everything gated on it:
+Priorities 1 (EGX official), 2/3 (at real scale), 4/5 (at real scale), and
+8–16 are all engineering-complete and waiting on one of these two
+independent unblocks:
 
 - **Run somewhere with outbound network egress** (a deployment, or a
   differently-configured sandbox). The moment this happens,
   `agx discover-sources` performs real, verified discovery for the entire
-  catalog below with no code changes, and `IndexConstituentCollector` can
-  be pointed at `egx_official`'s real endpoint once verified.
+  catalog below with no code changes, and `IndexConstituentCollector`/
+  `FinancialStatementCollector` can be pointed at their real, verified
+  endpoints.
 - **Project owner supplies a verified EGX30/EGX70 constituent list**
   (tickers + names) and/or per-company IR domains. This is explicitly a
   business decision, not something engineering should fabricate from
@@ -51,76 +42,99 @@ too, for whichever companies exist in the universe at the time
 placeholder, expanding with zero code changes once the Universe Engine's
 `IndexConstituentCollector` (or a user-supplied list) provides a real one.
 
-## 3. Once a source resolves: write and test its concrete collector
+## 2. Once a source resolves: write and test its concrete collector
 
 Every `SourceSpec` `agx discover-sources` registers stays `PLANNED` by
 design (`AD-24`) until an engineer writes and tests the concrete collector
 its `collector` field suggests (`RssNewsCollector` for RSS,
 `ExcelSeriesCollector`/`PdfDocumentCollector` for structured/PDF sources,
-`IndexConstituentCollector` for `egx_official`'s constituent list once its
-real endpoint is verified). Wire it into `production/collector_plan.py`
-(extending its existing mock/replay seam, `AD-28`) and flip `status` to
-`IMPLEMENTED`.
+`IndexConstituentCollector` for `egx_official`'s constituent list,
+`FinancialStatementCollector` for a structured company/vendor financial-
+statement export — both built and tested, awaiting endpoint verification).
+Wire it into `production/collector_plan.py` (extending its existing
+mock/replay seam, `AD-28`) and flip `status` to `IMPLEMENTED`.
 
-## 4. Historical backfill / 5. Live incremental sync — already automatic
+## 3. Historical backfill / live incremental sync — already automatic
 
-Priorities 6/7 in the mission's list needed no new engineering this phase
-and need none going forward: every collector (`StooqPriceCollector`,
-`FredCsvCollector`, `WorldBankCollector`, `RssNewsCollector`,
-`IndexConstituentCollector`) fetches a source's full available series by
+Priorities 6/7 in the mission's list needed no new engineering across any
+sub-phase of this mission and need none going forward: every collector
+(`StooqPriceCollector`, `FredCsvCollector`, `WorldBankCollector`,
+`RssNewsCollector`, `IndexConstituentCollector`,
+`FinancialStatementCollector`) fetches a source's full available series by
 construction, and every materialization writer merges by natural key and
 overwrites idempotently — a first real run *is* the backfill, and every
 subsequent run *is* the incremental sync, through the identical production
 pipeline. No separate "backfill mode" or "incremental mode" exists or is
 needed.
 
-## 6. World Bank / IMF / FRED live activation — deprioritized, not abandoned
+## 4. World Bank / IMF / FRED live activation — deprioritized, not abandoned
 
 Still valid engineering, just not the first priority per the project
 owner's ordering: these are enrichment sources. Revisit after priorities
 1–15 have real collectors, or opportunistically if World Bank's egress
 happens to clear first (same blocker, same unblock).
 
-## 7. Richer corporate disclosures beyond the headline classifier
+## 5. Richer, PDF-based corporate disclosures and financial statements
 
-TD-24 is closed (`corporate_event_classifier` + `RssNewsCollector`'s
-`classify_corporate_events` flag produce real, if headline-only,
-`CorporateEvent`s today). Once a company's own IR/PDF source (priority 2/3
-at real scale) is real, a disclosure-PDF extraction stage would give
-numeric detail (split ratios, dividend amounts) a headline never can —
-follows `PdfDocumentCollector`'s existing abstract-`parse()` pattern.
+TD-24 is closed (headline-based `CorporateEvent`s, real if narrow) and
+Financial Statement Collection's structured-export path is built
+(`FinancialStatementCollector`, TD-31). What's deliberately *not* built
+yet, for both: PDF-based extraction. Once a company's own IR/PDF source
+(priority 2/3 at real scale) is real and a concrete filing layout can be
+inspected, write a source-verified `PdfDocumentCollector` subclass — for
+corporate-action detail (split ratios, dividend amounts a headline can't
+give) and/or full financial-statement line items (TD-32). Never a generic
+PDF-numeric-extraction heuristic attempted ahead of a real, verified
+layout — that risks silently reading the wrong value, worse than missing
+data.
 
-## 8. Cross-source corroboration (TD-11)
+## 6. Cross-source corroboration (TD-11)
 
 Once two `IMPLEMENTED` sources overlap coverage (e.g. two independent EGX
 price sources), wire real `consistency_score` in `collectors.quality.
 assess_quality()`.
 
-## 9. Calibration pass (TD-17, TD-20, TD-28, TD-29, TD-30 — new this phase)
+## 7. Calibration pass (TD-17, TD-20, TD-28, TD-29, TD-30, TD-31 — this mission)
 
-Once real run history, real ToS-page checks, and real fetched pages exist,
-revisit `qualification.py`'s promotion thresholds, `health.py`'s alert
-thresholds, `legality.py`'s red/green keyword lists, the company-directory-
-match token-overlap heuristic (TD-28), the corporate-event headline
-classifier's keyword list (TD-29), and `IndexConstituentCollector`'s
-column-header matching (TD-30) — all declared policy today.
+Once real run history, real ToS-page checks, and real fetched pages/
+exports exist, revisit `qualification.py`'s promotion thresholds,
+`health.py`'s alert thresholds, `legality.py`'s red/green keyword lists,
+the company-directory-match token-overlap heuristic (TD-28), the
+corporate-event headline classifier's keyword list (TD-29),
+`IndexConstituentCollector`'s column-header matching (TD-30), and
+`FinancialStatementCollector`'s column-header matching (TD-31) — all
+declared policy today.
 
-## 10. Scheduled production pipeline + discovery runs
+## 8. Scheduled production pipeline + discovery runs
 
 Wire `agx run` and `agx discover-sources` into a periodic job once any
 deployment target exists (System 18) — both are deployment-ready today;
 only the "run this on a schedule" wiring is deployment-shaped.
 
-## 11. ToS reviews (business/legal decision, not engineering)
+## 9. ToS reviews (business/legal decision, not engineering)
 
 Yahoo Finance, TradingView, Investing.com, Google Trends, LinkedIn/company
 social, public Telegram, Google Scholar, ResearchGate — each needs a human
 legal judgment on automated-collection terms before any code changes.
 
+## 10. Wire Financial Statement Collection's output into research (later)
+
+`FinancialStatementProvider`/`CollectedFinancialStatementProvider` exist
+and materialize real data the moment a collector runs, but `DatasetSnapshot`/
+`MarketMemory` don't read from them yet, and
+`agents.financial_performance.FinancialPerformanceAgent` still correctly
+raises `NotImplementedError` (it needs a defined fundamental factor set,
+not just data availability). Wiring the provider into `MarketMemory`'s
+constructor (an additive change, matching how `UniverseProvider`/
+`SectorProvider` are already composed there) is natural prep work once
+`FinancialPerformanceAgent`'s actual logic is scoped — deliberately not
+done speculatively ahead of that, to avoid extending a completed system
+(Market Memory) for a consumer that doesn't exist yet.
+
 ## Beyond this
 
 Per the charter's build order, no later system's work should start while
-System 02 still has closeable (non-business-blocked) gaps. Items 1 and 3
+System 02 still has closeable (non-business-blocked) gaps. Items 1 and 2
 above are exactly that kind of gap and take priority. Longer-horizon,
 post-1.0 items (trained per-horizon models, covariance-based portfolio
 optimization, remaining scientist agents/adversarial attacks, a Monte

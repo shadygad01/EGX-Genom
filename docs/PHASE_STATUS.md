@@ -42,7 +42,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(462 Python tests + 33 TypeScript tests green).
+(475 Python tests + 33 TypeScript tests green).
 
 ## Dashboard dual-provider architecture (post-Data-Acquisition-Program)
 
@@ -425,3 +425,62 @@ codebase. Neither blocks what this phase closed — the Universe Engine and
 corporate-event classifier are both real, working, engineering-complete
 capabilities today; they simply have nothing live to run against yet. See
 `CURRENT_MISSION.md` for the full statement.
+
+## Financial Statement Collection (same Engineering Ownership phase)
+
+Continuing directly from the Universe Engine + Corporate Disclosures work
+above, in the same autonomous phase: priority 5, Financial Statement
+Collection. This closes a real, already-named gap, not speculative
+scope — `agents.financial_performance.FinancialPerformanceAgent` has been
+an honest `NotImplementedError` stub since System 08 was built, explicitly
+documented as needing "a financial statement data source and a defined
+fundamental factor set." This phase built the data-source half; the
+agent's own fundamental-factor logic remains separate, later Scientist
+Framework work.
+
+- New package `financials/`: `FinancialStatementLineItem` — `{ticker,
+  period_end_date, period_type, statement_type, line_item, value,
+  currency}`. `STANDARD_LINE_ITEMS` names a small, well-known IFRS/GAAP-
+  style vocabulary (revenue, net_income, total_assets, etc.) reused where
+  possible but never hard-validated — an uncommon real line item is
+  preserved verbatim, matching `CorporateEvent.event_type`'s existing
+  "never coerce or drop" precedent.
+- `financials.FinancialStatementProvider`: a new, small, dedicated ABC
+  (mirroring `universe.UniverseProvider`'s shape) rather than adding an
+  abstract method to `data.provider.DataProvider` — `DataProvider` is a
+  completed, tested interface every implementation depends on the exact
+  method set of; growing it for an unrelated concern would be a redesign,
+  not an extension. `CollectedFinancialStatementProvider` reads the
+  collected CSV, empty (never fabricated) when nothing's been collected.
+- `CollectionBatch.financial_statement_line_items` (new field);
+  `CollectionService` materializes to `financial_statements/<TICKER>.csv`,
+  merged by `(period_end_date, statement_type, line_item)`, with full
+  provenance tracing — the same writer pattern as every other record type.
+- `collectors.financial_statements.FinancialStatementCollector` (new): a
+  generic, header-matching CSV parser for a structured financial-statement
+  export (five required columns identified by header text: period end,
+  period type, statement type, line item, value; an optional sixth,
+  currency). Built and fully tested, but **not yet wireable** into the
+  live pipeline — `company_ir`'s `SourceSpec` stays `PLANNED` until its
+  real endpoint is verified (`AD-24`), same honest boundary as
+  `IndexConstituentCollector` and the AlphaVantage/FMP collectors.
+- **Deliberately not built**: a generic PDF-based financial-statement
+  extractor. `sources.catalog`'s own `company_ir` notes expect PDF/XBRL
+  disclosures to be the more common real case, but a generic numeric-
+  extraction heuristic over arbitrary filing layouts risks silently
+  reading the *wrong* line item's value — materially worse than a missing
+  column, and the exact reason `collectors.pdf.PdfDocumentCollector.
+  parse()` already stays abstract. That extraction is left for a
+  concrete, source-verified subclass once a real filing layout exists
+  (TD-32).
+
+13 new tests (475 total, up from 462); `ruff` clean; `contracts/`
+unchanged (`FinancialStatementLineItem` isn't API-facing). New technical
+debt: TD-31 (`FinancialStatementCollector`'s column detection,
+uncalibrated), TD-32 (PDF-based extraction, deliberately deferred).
+
+**Same two named blockers, unchanged again.** Every sub-phase of this
+mission (Universe Engine, Corporate Disclosures, Financial Statement
+Collection) is now engineering-complete and ready to execute the moment
+either clears. See `CURRENT_MISSION.md` for the current statement and
+`NEXT_MISSIONS.md` for what's next in the meantime.

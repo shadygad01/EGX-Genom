@@ -1,4 +1,4 @@
-# Completion Report — Universe Engine + Corporate Disclosures
+# Completion Report — Financial Statement Collection
 
 ## Mission
 
@@ -9,89 +9,69 @@ order: (1) EGX official, (2) Universe Engine, (3) Investor Relations
 discovery, (4) Corporate disclosures, (5) Financial statement collection,
 (6) Historical backfill, (7) Live incremental synchronization, (8–15) CBE/
 FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics, (16)
-anything else discovered automatically.
+anything else discovered automatically. This report covers priority 5,
+delivered directly after priorities 2–4 (see this repository's git
+history / earlier `CHANGELOG.md` entries for that report).
 
 ## Delivered
 
 | Module | Delivers |
 |---|---|
-| `universe/constituent.py` | `IndexConstituent` — `{index, ticker, company_name, as_of_date}`, a date per row (not one overwritten snapshot) for point-in-time-correct universe membership. |
-| `collectors/base.py`, `collectors/service.py`, `collectors/quality.py` | `CollectionBatch` gained `index_constituents` + `corporate_events`; `CollectionService` materializes both to CSV (merged by natural key, provenance-traced) exactly like the existing price/macro writers. |
-| `universe/collected.py` | `CollectedUniverseProvider` (reads the collected CSV, never fabricates) + `FallbackUniverseProvider` (mirrors `FallbackDataProvider`); wired into `production.pipeline` and `cli.py`'s `discover-sources`. |
-| `collectors/index_constituents.py` | `IndexConstituentCollector` — generic header-matching CSV parser for a constituent-list export; built and tested, not yet wireable (endpoint unverified). |
-| `collectors/corporate_event_classifier.py` | `classify_corporate_event_type()` — declared headline keyword heuristic reusing `events.adapters`'s exact taxonomy keys. |
-| `collectors/rss.py` | `RssNewsCollector` gained `classify_corporate_events`, applying the classifier per entry alongside the existing `NewsItem` production. |
-| `production/collector_plan.py` | `rss_generic`'s mock/replay collector now classifies corporate events; verified live. |
+| `financials/schema.py` | `FinancialStatementLineItem` — `{ticker, period_end_date, period_type, statement_type, line_item, value, currency}`; `STANDARD_LINE_ITEMS`, a small IFRS/GAAP-style vocabulary, reused where possible but never hard-enforced. |
+| `financials/provider.py`, `financials/collected.py` | `FinancialStatementProvider` (new, small ABC — mirrors `universe.UniverseProvider` rather than growing `data.provider.DataProvider`'s method set) + `CollectedFinancialStatementProvider` (reads collected data, empty when nothing collected). |
+| `collectors/base.py`, `collectors/service.py`, `collectors/quality.py` | `CollectionBatch` gained `financial_statement_line_items`; `CollectionService` materializes to `financial_statements/<TICKER>.csv` (merged by `period_end_date,statement_type,line_item`), provenance-traced, matching the existing writer pattern exactly. |
+| `collectors/financial_statements.py` | `FinancialStatementCollector` — generic header-matching CSV parser for a structured financial-statement export; built and tested, not yet wireable (endpoint unverified). |
 
-## The gaps this closed
+## The gap this closed
 
-**Universe Engine (priority 2).** `universe.UniverseProvider` had exactly
-one implementation (`StaticUniverseProvider`, a fixed placeholder) and no
-path for a real collected constituent list to ever reach it — even once
-one could be collected, nothing would have known where to write it or how
-to read it back. Both halves now exist: the generic collection +
-materialization + read-back infrastructure (fully real, fully tested), and
-the collector itself (built, tested, but honestly gated on endpoint
-verification — see below).
-
-**Corporate disclosures (priority 4), closing TD-24.** `CorporateEvent`
-had a schema and a read path but nothing ever produced one —
-`CorporateEventsAgent` found nothing from `--data-dir`. A declared
-headline-keyword classifier now produces real (if narrow, headline-only)
-corporate events from the same RSS content the platform already collects
-for news, verified with a live mock-mode pipeline run.
-
-**Investor Relations discovery (priority 3)** needed no new engineering —
-confirmed already fully built two missions ago and ready to scale the
-moment the Universe Engine (or a user-supplied list) provides a real
-constituent set.
-
-**Historical Backfill (priority 6) / Live Incremental Sync (priority 7)**
-needed no new engineering either — confirmed already satisfied by every
-collector's existing "fetch full series" + "merge idempotently by key"
-design.
+`agents.financial_performance.FinancialPerformanceAgent` has been an
+honest `NotImplementedError` stub since System 08 was built (see
+`docs/PHASE_STATUS.md`'s System 08 entry: "News/FinancialPerformance/
+HistoricalPatterns are honest stubs, all data-blocked... fundamentals
+feed"), explicitly documented as needing "a financial statement data
+source and a defined fundamental factor set." This phase built the data
+source — the acquisition-side infrastructure a real financial-statement
+feed needs to reach the platform at all. The agent's own fundamental-
+factor logic (relating margins/ROE/leverage/earnings growth to forward
+returns) remains separate, later Scientist Framework work, deliberately
+not attempted here — this milestone was scoped to priority 5 (data
+acquisition), not System 08 (research agent implementation).
 
 ## Verification
 
-- 462 Python tests (up from 431), 31 new. Covers: `IndexConstituent`
-  point-in-time correctness (never looks ahead of the query date, empty
-  when nothing collected or every snapshot postdates the query);
-  `FallbackUniverseProvider`'s preference order; `IndexConstituentCollector`'s
-  header-matching (order-independent, warns rather than guesses on
-  ambiguous/malformed input); `CollectionService`'s materialization and
-  idempotent re-ingestion of both new record types with correct provenance
-  keys; the corporate-event classifier's keyword coverage and
-  false-positive avoidance (no keyword match → `None`, never a guess);
-  `RssNewsCollector`'s classification requiring exactly one ticker match;
-  that `CollectionService` never double-registers a corporate event as an
-  Event (materializes only, composing with the existing
-  `events_from_corporate_events` adapter rather than duplicating it).
-- `ruff check` clean; `contracts/` unchanged (neither new type is
-  API-facing).
-- **Live verification**: `agx run --mode mock` now writes real
-  `COMI,2026-06-09,EARNINGS,...` and `MFPC,2026-06-04,DIVIDEND,...` rows
-  to `--data-dir/corporate_events.csv`, derived from the platform's
-  existing mock RSS headlines — a genuine, working capability, run and
-  confirmed directly, not merely unit-tested in isolation.
+- 475 Python tests (up from 462), 13 new. Covers: `FinancialStatementCollector`'s
+  column detection (order-independent across all five required columns,
+  optional sixth currency column, warns rather than guesses on
+  ambiguous/malformed/missing-column input, never silently drops an
+  unparseable row); `CollectedFinancialStatementProvider`'s date-range
+  filtering, `statement_type` filtering, sorted output, empty-when-
+  nothing-collected and empty-when-out-of-range behavior, default currency
+  handling; `CollectionService`'s materialization and idempotent
+  re-ingestion of the new record type with correct provenance keys.
+- `ruff check` clean; `contracts/` unchanged (`FinancialStatementLineItem`
+  isn't API-facing).
 
 ## What did not change, deliberately
 
-- No redesign of `CollectionService`, `RssNewsCollector`, or
-  `UniverseProvider` — every change extends an existing interface
-  (`CollectionBatch` gained fields; `RssNewsCollector` gained an opt-in
-  flag; `FallbackUniverseProvider` mirrors `FallbackDataProvider`'s
-  existing pattern exactly) rather than introducing a parallel mechanism.
-- No specific EGX wire-format assumptions: `IndexConstituentCollector`'s
-  column detection is header-text-matching, not a hardcoded column order,
-  because no real EGX constituent-list page has ever been fetched to
-  verify one — inventing a specific parser for an unverified format would
-  be guessing a wire format, not parsing a real one (new debt, TD-30).
-- No numeric detail fabricated from a headline: classified corporate
-  events always carry `details={}` — a split ratio or dividend amount
-  cannot be reliably read off a title, and guessing one would corrupt
-  `data.adjustments` (new debt, TD-29; new risk, R-20, for the
-  `events_from_corporate_events` confidence-modeling question this exposes).
-- `egx_official`'s `SourceSpec` stays `PLANNED` — not flipped to
+- No change to `data.provider.DataProvider`'s abstract method set —
+  `FinancialStatementProvider` is a new, small, dedicated interface
+  instead, matching the precedent `universe.UniverseProvider`/
+  `SectorProvider` already set (one clean interface per concern, not
+  growing a completed, tested interface every implementation depends on).
+- No generic PDF-based financial-statement extractor. `sources.catalog`'s
+  own `company_ir` notes expect PDF/XBRL disclosures to be the more common
+  real case, but a generic numeric-extraction heuristic over arbitrary
+  filing layouts risks silently reading the *wrong* line item's value —
+  materially worse than a missing column, and the exact reason
+  `collectors.pdf.PdfDocumentCollector.parse()` already stays abstract for
+  every other PDF source (new debt, TD-32; new risk, R-21).
+- No wiring of `FinancialStatementProvider` into `MarketMemory`/
+  `DatasetSnapshot`. `FinancialPerformanceAgent`'s implementation would be
+  the natural trigger for that additive change (matching how
+  `UniverseProvider`/`SectorProvider` are already composed into
+  `MarketMemory`'s constructor) — doing it now, ahead of a defined
+  consumer, would extend a completed system (Market Memory) speculatively.
+- `company_ir`'s `SourceSpec` stays `PLANNED` — not flipped to
   `IMPLEMENTED` to make the new collector "usable," since that would
   misrepresent verification that hasn't happened.
 
@@ -99,15 +79,21 @@ design.
 
 1. **No outbound network egress** from this sandbox (confirmed directly
    and repeatedly across four missions now) — blocks verifying
-   `egx_official`'s real endpoint, which blocks `IndexConstituentCollector`
-   ever running live, which blocks priorities 1, 2 (at real scale), 3 (at
-   real scale), and 8–16.
+   `company_ir`'s/`egx_official`'s real endpoints, which blocks
+   `FinancialStatementCollector`/`IndexConstituentCollector` ever running
+   live, which blocks priorities 1, 2/3/4/5 at real scale, and 8–16.
 2. **No verified, complete EGX30/EGX70 constituent list** exists in this
    codebase — a business decision reserved for the project owner;
    fabricating one from training-data recall would violate the platform's
    anti-fabrication principle.
 
 Everything engineering could complete without either input has been
-completed this phase. The next milestone needing neither input —
-**Financial Statement Collection (priority 5)** — is already queued in
-`NEXT_MISSIONS.md` and underway.
+completed across priorities 2–7 of this mission (Universe Engine,
+Investor Relations discovery confirmed already scaled, Corporate
+Disclosures, Financial Statement Collection, Historical Backfill and Live
+Incremental Sync confirmed already satisfied). See `NEXT_MISSIONS.md` for
+what remains genuinely engineering-closeable in the meantime (richer
+PDF-based extraction once a real layout exists, cross-source
+corroboration once a second overlapping source exists, calibration passes
+once real data exists) and what runs automatically the moment either named
+blocker clears.

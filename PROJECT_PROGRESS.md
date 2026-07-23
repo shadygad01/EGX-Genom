@@ -32,7 +32,7 @@ close without a cloud/vendor/secrets decision from the user.**
 
 ## Test health
 
-- Python: 462 tests, all green (`cd research && uv run pytest`).
+- Python: 475 tests, all green (`cd research && uv run pytest`).
 - TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
   + `git diff --exit-code`).
@@ -45,7 +45,31 @@ are connected because this sandbox has no outbound network egress
 (confirmed directly, repeatedly, across four missions). `docs/PHASE_STATUS.md`'s
 Production Execution Phase section has the full breakdown.
 
-## Universe Engine + Corporate Disclosures (this mission)
+## Financial Statement Collection (this mission)
+
+- New package `financials/`: `FinancialStatementLineItem` (a small,
+  well-known IFRS/GAAP-style vocabulary, never hard-enforced),
+  `FinancialStatementProvider` (own small interface, not grown onto
+  `DataProvider`), `CollectedFinancialStatementProvider` (reads collected
+  data, empty when nothing's collected).
+- `collectors.financial_statements.FinancialStatementCollector` (new): a
+  generic, header-matching CSV parser for a structured financial-statement
+  export. Built and tested, not yet wireable (`company_ir` stays `PLANNED`
+  — TD-31).
+- Deliberately did **not** build a generic PDF-based statement extractor:
+  real filing layouts vary enough that a generic heuristic risks silently
+  reading the *wrong* line item's value, not just a missing one — same
+  reasoning `PdfDocumentCollector.parse()` already stays abstract for
+  (TD-32).
+- Confirmed this closes a real, already-named gap:
+  `agents.financial_performance.FinancialPerformanceAgent` has been an
+  honest `NotImplementedError` stub explicitly waiting on "a financial
+  statement data source" (System 08) — the agent's own fundamental-factor
+  logic remains separate, later work.
+- 13 new tests (475 total). See `CURRENT_MISSION.md` and
+  `COMPLETION_REPORT.md` for the full report.
+
+## Universe Engine + Corporate Disclosures (earlier this mission)
 
 - `universe.IndexConstituent`/`CollectedUniverseProvider`/
   `FallbackUniverseProvider` (new): a real collected constituent list, once
@@ -169,8 +193,9 @@ placeholder/free-source data until a licensed EGX market data vendor is
 selected — a business decision reserved for the user (`docs/ROADMAP.md`).
 Nothing about this mission changes that gate; it makes the platform's
 own priority-ordered path to connecting real, free, legally-accessible
-sources — including, this phase, a real Universe Engine and a real
-corporate-event classifier — fully engineering-complete and ready to
-execute autonomously the moment either of two blockers clears: outbound
-network egress, or a verified EGX30/EGX70 constituent list from the
-project owner. Both are named explicitly in `CURRENT_MISSION.md`.
+sources — including, this phase, a real Universe Engine, a real
+corporate-event classifier, and real Financial Statement Collection
+infrastructure — fully engineering-complete and ready to execute
+autonomously the moment either of two blockers clears: outbound network
+egress, or a verified EGX30/EGX70 constituent list from the project
+owner. Both are named explicitly in `CURRENT_MISSION.md`.

@@ -7,48 +7,36 @@ commit whenever the fact they state changes.
 
 ## Status at a glance
 
-- **Merge readiness:** This branch passed a full production-readiness
-  audit and is a clean merge candidate for `main` — all tests green, no
-  contract drift, no merge conflicts (clean fast-forward), no
-  architecture violations, one real code duplication found and fixed
-  (see `CHANGELOG.md` 0.13.2). No functional changes accompanied the
-  audit.
-- **Where the project is:** All 18 charter systems are architecturally
+- **Merge readiness:** The prior branch (backend/data-acquisition mission)
+  passed a full production-readiness audit and merged into `main`. This
+  branch has since restarted from `main` for the frontend mission below —
+  see `CHANGELOG.md` for what's landed since.
+- **Where the project is:** All 18 charter systems remain architecturally
   complete and tested (17 fully DONE, the 18th DONE for everything
-  engineering can close without a cloud/vendor/secrets decision). A real
-  production execution pipeline runs the full chain end to end
-  (`agx run`); the Acquisition Intelligence Engine can discover, verify,
-  rank, and register a live source for the entire business-value priority
-  catalog; a real Universe Engine, a real corporate-event classifier
-  (closing TD-24), and now real Financial Statement Collection
-  infrastructure (`financials.*` + `collectors.financial_statements.
-  FinancialStatementCollector`) are all built and tested — the last of
-  these closes the data-source half of `agents.financial_performance.
-  FinancialPerformanceAgent`'s long-standing honest stub. Every research
-  conclusion the platform can currently produce is still scoped to
-  placeholder/mock data — no live source is connected yet.
-- **Current mission:** Engineering ownership handoff — close every
-  remaining engineering-closeable gap toward real Egyptian market data, in
-  business-priority order: EGX official → Universe Engine → Investor
-  Relations discovery → Corporate disclosures → Financial statement
-  collection → Historical backfill → Live incremental sync → CBE/FRA/
-  CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → anything
-  else discovered. See `CURRENT_MISSION.md`.
-- **Next mission:** Priorities 1 through 7 are now all engineering-complete
-  (blocked only where named below); the remaining engineering-closeable
-  work — richer PDF-based extraction (corporate disclosures and financial
-  statements alike) once a real filing layout can be inspected, and
-  calibration passes once real data exists — is queued but itself gated on
-  the same two blockers clearing first. See `NEXT_MISSIONS.md` for the
-  full list and what runs automatically the moment either clears.
-- **Overall completion:** ~99.5% of everything engineering-closeable
-  without a business/vendor decision. The remaining fraction is
-  exclusively: (a) writing a concrete collector once a source resolves
-  live (`IndexConstituentCollector`/`FinancialStatementCollector` are
-  already built and waiting), (b) a source-verified PDF extraction stage
-  once a real filing layout exists (deliberately not attempted
-  speculatively — TD-32), and (c) System 18's deployment/secrets/
-  scheduling wiring, blocked on a hosting/vendor decision.
+  engineering can close without a cloud/vendor/secrets decision) — see
+  `docs/PHASE_STATUS.md`. The project owner has declared the backend,
+  research engine, and production pipeline complete and paused further
+  backend work; every research conclusion the platform can currently
+  produce is still scoped to placeholder/mock data — no live source is
+  connected yet (unchanged from the prior mission).
+- **Current mission:** Complete Production User Experience rebuild — a
+  routed, 9-section institutional research platform (AI Briefing,
+  Opportunity Center, Company Research Workspace, Market Intelligence,
+  Research Center, Knowledge Graph, Mission Control, Source Intelligence,
+  System Administration), consuming existing dashboard artifacts only, no
+  frontend-side calculation. See `CURRENT_MISSION.md`.
+- **Progress this mission:** Frontend audit complete. Six new backend
+  dashboard artifacts (genes, papers, hypotheses, knowledge graph,
+  financial statements, source reputation) exported to close gaps the
+  9-section spec needed. Design system, primitive component library, and
+  routed application shell built. AI Briefing (the landing page) fully
+  built and verified in both themes. Remaining 8 sections are honest
+  "under construction" placeholders. See `NEXT_MISSIONS.md` for the
+  section-by-section build order.
+- **Overall completion (backend, unchanged from prior mission):** ~99.5%
+  of everything engineering-closeable without a business/vendor decision.
+  See `docs/PHASE_STATUS.md`/`docs/ROADMAP.md` for the backend detail —
+  paused, not abandoned, during this frontend phase.
 - **Connected live sources: 0** — blocked, not unbuilt. Every mechanism
   needed (discovery, verification, ranking, registration, qualification,
   collection, archival, validation, universe membership, corporate-event

@@ -1,123 +1,96 @@
 # Current Mission
 
-**Build AGX toward collecting, processing, learning from, and presenting
-real Egyptian market data — Engineering Ownership Phase.**
+**Build the complete AGX Production User Experience — a world-class
+Research Intelligence Platform, not a stock website, dashboard, or CRUD
+app.**
 
-The project owner has handed over full engineering ownership: no more
-isolated tasks, no waiting for approval between milestones. Architecture,
-the Data Acquisition Platform, the runtime pipeline, and Mission Control
-are all declared complete — the work now is closing every remaining
-engineering-closeable gap toward real data, in this exact business
-priority order:
+The project owner has declared the backend architecture, the research
+engine, and the production pipeline complete: no more backend redesign
+work. Full engineering ownership has been handed to the frontend — the
+visual/UX bar is a combination of Bloomberg Terminal, Koyfin, TradingView,
+Notion, and institutional sell-side research. The interface must explain
+not only *what* AGX recommends, but *why*, *how* it reached that
+conclusion, and *what evidence* supports or contradicts every thesis.
 
-1. Official Egyptian Exchange integration
-2. Universe Engine
-3. Investor Relations discovery
-4. Corporate disclosures
-5. Financial statement collection
-6. Historical backfill
-7. Live incremental synchronization
-8. Central Bank of Egypt
-9. FRA
-10. CAPMAS
-11. Enterprise
-12. Mubasher
-13. Zawya
-14. Reuters
-15. Trading Economics
-16. Every additional legally accessible free public source discovered automatically
+**Hard constraint, unchanged from the backend mission's own discipline:**
+the frontend consumes artifacts only. No calculation happens in `web/` —
+every number a page shows must already exist in a dashboard artifact
+`research/src/agx_research/dashboard/export.py` or
+`production/artifacts.py` produces. A UI need with no backing artifact
+gets either (a) a new thin backend export (a `model_dump(mode="json")`
+over an already-tested model, same pattern as every prior artifact) or
+(b) an honest "not yet available" gap in the UI — never a fabricated
+number.
 
-## What this phase engineered
+The application is nine sections: AI Briefing (landing page), Opportunity
+Center, Company Research Workspace, Market Intelligence, Research Center,
+Knowledge Graph, Mission Control, Source Intelligence, System
+Administration. See `docs/ARCHITECTURE.md`'s "Frontend: Production User
+Experience" section (to be added as this mission progresses) for the
+per-section content spec.
 
-**Financial Statement Collection (priority 5).**
-`agents.financial_performance.FinancialPerformanceAgent` has been an
-honest `NotImplementedError` stub since System 08 was built, explicitly
-documented as needing "a financial statement data source and a defined
-fundamental factor set" (`docs/PHASE_STATUS.md` System 08) — confirming
-this priority closes a real, already-named architectural gap, not
-speculative scope. Closed the acquisition half (the agent's own
-fundamental-factor logic remains separate, later Scientist Framework
-work):
+## What this phase engineered so far
 
-- **`financials/` (new package)**: `FinancialStatementLineItem` —
-  `{ticker, period_end_date, period_type, statement_type, line_item,
-  value, currency}`, `STANDARD_LINE_ITEMS` (a small, well-known IFRS/GAAP
-  vocabulary — revenue, net_income, total_assets, etc. — reused where
-  possible but never hard-validated, so an uncommon real line item is
-  preserved, not dropped). `FinancialStatementProvider` (ABC, mirroring
-  `universe.UniverseProvider`'s "small dedicated interface" shape rather
-  than growing `data.provider.DataProvider`'s existing method set) +
-  `CollectedFinancialStatementProvider` (reads the collected CSV, empty
-  when nothing's collected — never fabricated).
-- **`CollectionBatch.financial_statement_line_items`** — `CollectionService`
-  now writes `financial_statements/<TICKER>.csv`, merged by
-  `(period_end_date, statement_type, line_item)`, with full provenance
-  tracing, extending the same writer pattern used for every other record
-  type.
-- **`FinancialStatementCollector`** (`collectors/financial_statements.py`):
-  a generic, header-matching CSV parser for a *structured* financial-
-  statement export (income statement/balance sheet/cash flow, long
-  format). Built and tested, not yet wireable live — `company_ir`'s
-  `SourceSpec` stays `PLANNED` until its real endpoint is verified
-  (`AD-24`), same honest boundary as every other unconnected collector.
-- **Deliberately not built**: a generic PDF-based financial-statement
-  extractor. `sources.catalog`'s own `company_ir` notes expect PDF/XBRL
-  disclosures to be the more common real case, but a generic numeric
-  extraction heuristic over arbitrary filing layouts risks silently
-  reading the *wrong* line item's value — a materially worse failure mode
-  than a missing column, and exactly why `collectors.pdf.
-  PdfDocumentCollector.parse()` already stays abstract for the same
-  reason. That extraction is left for a concrete, source-verified
-  subclass once a real filing layout exists to build and test against
-  (TD-32).
+**Frontend Audit.** Read the entire repository, every architecture and
+Mission Control document, the existing `web/` implementation (a single
+hardcoded knowledge table, `App.tsx`), the production pipeline, and every
+JSON artifact AGX produces, before writing any code — per the mission's
+explicit "audit before rebuild" instruction.
 
-## Earlier this phase: Universe Engine + Corporate Disclosures
+**Backend: six new dashboard artifacts.** Before the frontend could cover
+the 9-section spec honestly, the domain models it needed (genes, papers,
+hypotheses, the knowledge graph, financial statement line items, source
+reputation) had to actually be exported. Added `genes.json`, `papers.json`,
+`hypotheses.json`, `knowledge_graph.json`, `financial_statements.json`,
+`source_metrics.json` — all thin `model_dump(mode="json")` exports, no new
+calculations. Found and fixed a real pre-existing bug while wiring the
+knowledge graph: `ProductionPipeline` computed graph edges every run but
+never persisted them (no path was ever passed to the `KnowledgeGraph`
+constructor) — fixed by pointing it at `<data-dir>/graph_nodes.json`/
+`graph_edges.json`, the same composition pattern already used for the
+hypothesis/paper repositories and the genome. Also closed a pre-existing
+API/static-provider parity gap: 6 "bonus" artifacts from the earlier
+Production Pipeline mission (`investment_cases`, `collector_status`,
+`runtime_status`, `dashboard_metrics`, `mission_status`,
+`execution_report`) were only ever wired into `StaticJsonProvider`, never
+into `api/`'s `ArtifactsReader`/routes.
 
-**Universe Engine (priority 2)** closed `universe.UniverseProvider`'s
-missing collected-data path: `IndexConstituent` (point-in-time-correct
-membership), `CollectedUniverseProvider`/`FallbackUniverseProvider` (wired
-into `production.pipeline` and `cli.py discover-sources`), and
-`IndexConstituentCollector` (built, tested, not yet wireable — same
-`egx_official`-verification boundary as above).
+**Design system + routed application shell.** Institutional dark-theme-
+first design tokens (`web/src/styles/tokens.css`), a shared primitive
+library (`Card`, `Badge`, `StatTile`, `Meter`, `DataTable`, `Section`,
+`EmptyState`/`LoadingState`/`ErrorState`), a persistent `Sidebar`/`TopBar`
+`AppShell`, and `react-router-dom` routes for all 9 sections — replacing
+the single hardcoded table `App.tsx` used to render. A `useArtifact` hook
+is the one seam every page uses to pull data through
+`DashboardDataProvider` with consistent loading/error handling; no page
+calls the provider directly.
 
-**Corporate disclosures (priority 4), closing TD-24**: a declared headline
-keyword classifier (`collectors.corporate_event_classifier`) now produces
-real `CorporateEvent`s from `RssNewsCollector`'s existing content —
-verified live via a mock-mode production pipeline run writing real
-`COMI/EARNINGS` and `MFPC/DIVIDEND` rows.
+**AI Briefing** (the landing page, the mission's "signature experience")
+is fully built: System Health, Changes Since Yesterday (derived from
+`ExecutionReport`'s before/after counts — a real artifact field, not a
+frontend computation), Market Summary, Top Opportunities, Biggest Risks,
+Most Important News, Upcoming Catalysts, Knowledge Changes, Scientific
+Discoveries, and Portfolio. Verified in both light and dark theme via a
+headless-browser smoke test against real artifacts produced by
+`agx run` in mock mode.
 
-**Investor Relations discovery (priority 3)** needed no new engineering —
-already fully built two missions ago, scaling automatically once a real
-universe exists.
+The remaining 8 sections render as honest "under construction"
+placeholders (`ComingSoon`) — each names what it will show and why it
+isn't built yet, never a fabricated screen.
 
-See `COMPLETION_REPORT.md` for the full delivery report of both phases.
+## What's next
 
-## Priorities 1, 6, 7: why no new code this phase either
+Opportunity Center (task next in sequence) — see `NEXT_MISSIONS.md` for
+the full remaining order.
 
-- **Priority 1 (EGX official)**: blocked on the same two named constraints
-  below.
-- **Priority 6 (historical backfill) / 7 (live incremental sync)**:
-  already automatic by design — every collector (including
-  `FinancialStatementCollector`) fetches a source's full available series
-  by construction, and every materialization writer (including the new
-  financial-statement one) merges idempotently by natural key.
+## What did NOT change
 
-## The one real constraint, stated plainly (unchanged across four missions)
-
-This sandbox has no outbound network egress to arbitrary hosts — confirmed
-directly and repeatedly. Two consequences:
-
-1. **Priority 1 (EGX official) and everything gated on it (2/3 at real
-   scale, 4/5 at real scale, 8–16) cannot connect live** — every mechanism
-   is built, tested, and wired; only real endpoint verification is
-   missing.
-2. **No real, complete EGX30/EGX70 constituent list exists in this
-   codebase** — a business decision reserved for the project owner (see
-   `docs/DATA_ACQUISITION.md`); fabricating one from training-data recall
-   would violate the platform's anti-fabrication principle.
-
-Everything engineering could complete without either input has been
-completed across all three sub-phases of this mission (Universe Engine,
-Corporate Disclosures, Financial Statement Collection). See
-`NEXT_MISSIONS.md` for what runs automatically the moment either blocker
-clears, and for the next genuinely unblocked items in the meantime.
+Per the mission's explicit instruction, no backend redesign happened
+beyond the sanctioned artifact-export extension point: `hypotheses/`,
+`validation/`, `agents/`, `orchestration/`, `production/pipeline.py`'s
+internal stage logic, `KnowledgeStore.promote()`'s signature, and every
+other backend invariant `CLAUDE.md` documents are unchanged. The one
+backend fix (wiring a persist path into `KnowledgeGraph`'s existing
+constructor parameter) is additive composition, not a redesign — it
+follows the exact pattern already used for every other repository in the
+same function.

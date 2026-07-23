@@ -1,5 +1,63 @@
 # Changelog
 
+## 0.15.0 — Frontend: design system, routed app shell, AI Briefing landing page
+Start of the Production User Experience mission: the backend, research
+engine, and production pipeline are declared complete by the project
+owner; the remaining work is the complete frontend rebuild across 9
+sections (AI Briefing, Opportunity Center, Company Research Workspace,
+Market Intelligence, Research Center, Knowledge Graph, Mission Control,
+Source Intelligence, System Administration).
+
+- New institutional dark-theme-first design token system
+  (`web/src/styles/tokens.css`) plus a shared primitive library: `Card`,
+  `Badge`, `StatTile`, `Meter`, `DataTable`, `Section`,
+  `EmptyState`/`LoadingState`/`ErrorState` — every page builds from these,
+  no bespoke per-page styling.
+- `AppShell`/`Sidebar`/`TopBar` (new): a persistent left-nav-across-9-
+  sections layout with a live system-health status strip, replacing the
+  single hardcoded knowledge table `App.tsx` previously rendered.
+- `react-router-dom` v7.18 wired for all 9 sections; 8 render as honest
+  "under construction" placeholders pending their own milestones.
+- `useArtifact` hook (new): the one seam every page uses to pull data
+  through `DashboardDataProvider` with consistent loading/error states —
+  no page calls the provider directly.
+- **AI Briefing** (landing page, fully built): System Health, Changes
+  Since Yesterday (from `ExecutionReport`'s before/after counts), Market
+  Summary, Top Opportunities, Biggest Risks, Most Important News,
+  Upcoming Catalysts, Knowledge Changes, Scientific Discoveries, and
+  Portfolio — composed entirely from existing dashboard artifacts with no
+  frontend-side calculation, per the mission's explicit constraint.
+- Fixed a real test-infra gap found while rewriting `App.test.tsx`:
+  `@testing-library/react`'s `cleanup()` was never registered as a global
+  `afterEach`, so previous tests' rendered DOM silently accumulated across
+  tests in the same file — invisible before because no two tests' fixtures
+  ever shared literal text. Fixed in `web/test/setup.ts`.
+- 18 web tests green (was 5); `tsc --noEmit` and `vite build` both clean.
+
+## 0.14.0 — Backend: dashboard artifacts for genes, papers, hypotheses, knowledge graph, financial statements, source reputation
+Thin `model_dump(mode="json")` exports (no new calculations) for six
+domain models that already existed but had no dashboard artifact:
+`genes.json`, `papers.json`, `hypotheses.json`, `knowledge_graph.json`,
+`financial_statements.json`, `source_metrics.json`. Wired into
+`production/pipeline.py`'s dashboard-artifact stage and
+`dashboard/validate.py` (optional — absent is not a failure).
+
+- Fixed a real pre-existing bug while wiring the knowledge graph export:
+  `ProductionPipeline._stage_research_pipeline` never passed a persisted
+  `KnowledgeGraph` into `DailyResearchPipeline`, so graph edges were
+  computed every run but silently discarded, never reaching
+  `knowledge_graph.json`. Fixed by pointing it at `<data-dir>/graph_nodes.json`
+  / `graph_edges.json`, matching how `hypothesis_repository`/
+  `paper_repository`/`genome` are already wired.
+- Extended both `StaticJsonProvider` and `ApiProvider` (`web/`/`api/`) with
+  12 new `DashboardDataProvider` methods, and closed a pre-existing parity
+  gap: the 6 "bonus" production-pipeline artifacts from the prior mission
+  (`investment_cases`, `collector_status`, `runtime_status`,
+  `dashboard_metrics`, `mission_status`, `execution_report`) were only ever
+  wired into `StaticJsonProvider`, never into `api/`'s `ArtifactsReader` or
+  routes — both providers now serve the full 18-method interface.
+- 487 Python tests total, all green; `ruff` clean.
+
 ## 0.13.2 — Production-readiness audit for merge into main
 Full audit before merging this branch into `main`: all tests green (477
 Python / 14 API / 19 web), `ruff` clean, `contracts/` drift-free, no merge

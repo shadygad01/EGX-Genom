@@ -24,11 +24,16 @@ from agx_research.sources.spec import (
     SourceCategory,
     SourceSpec,
     SourceStatus,
+    default_lifecycle_for_status,
 )
 
 
 def _spec(**kwargs) -> SourceSpec:
-    return SourceSpec(**kwargs)
+    spec = SourceSpec(**kwargs)
+    lifecycle_state, activation_status = default_lifecycle_for_status(spec.status)
+    return spec.model_copy(
+        update={"lifecycle_state": lifecycle_state, "activation_status": activation_status}
+    )
 
 
 def seed_sources() -> list[SourceSpec]:
@@ -100,6 +105,30 @@ def seed_sources() -> list[SourceSpec]:
             supported_event_types=["news"],
             supported_languages=["en", "ar"],
         ),
+        _spec(
+            id="worldbank",
+            name="World Bank Open Data",
+            category=SourceCategory.MACROECONOMIC,
+            access_method=AccessMethod.JSON_API,
+            status=SourceStatus.IMPLEMENTED,
+            base_url="https://api.worldbank.org/v2",
+            reliability_score=0.9,
+            freshness_score=0.5,
+            historical_coverage="annual indicators, decades of history, Egypt included",
+            expected_latency="annual (some indicators lag a year or more)",
+            update_frequency="annual",
+            collector="WorldBankCollector",
+            collector_version="1.0.0",
+            rate_limit=RateLimit(requests_per_minute=20, min_seconds_between_requests=2.0),
+            license="World Bank Open Data license (CC-BY 4.0): free use with attribution.",
+            terms_of_use_url="https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+            validation_rules=["value present (null years dropped, never imputed)"],
+            normalization_rules=["annual observation normalized to Dec 31 of its year"],
+            conflict_priority=85,
+            supported_entities=["Egypt macro indicators (GDP, inflation, reserves, trade, etc.)"],
+            supported_event_types=["macroeconomic"],
+            supported_languages=["en"],
+        ),
         # ---- OFFICIAL (PLANNED: endpoints must be verified, not guessed) ----
         _spec(
             id="egx_official", name="Egyptian Exchange (EGX)", category=SourceCategory.OFFICIAL,
@@ -163,15 +192,27 @@ def seed_sources() -> list[SourceSpec]:
         _spec(
             id="fmp", name="Financial Modeling Prep (free tier)", category=SourceCategory.MARKET_DATA,
             access_method=AccessMethod.JSON_API, status=SourceStatus.NEEDS_KEY,
+            base_url="https://financialmodelingprep.com/api/v3",
             reliability_score=0.65, freshness_score=0.8, conflict_priority=50,
             authentication="api_key(user-supplied)",
+            collector="FmpCollector", collector_version="1.0.0",
+            validation_rules=["data.quality.validate_price_bars"],
+            notes="Collector code is complete and tested against FMP's documented JSON "
+            "shape; status stays NEEDS_KEY until a user supplies their own API key and "
+            "an operator flips this entry to IMPLEMENTED.",
         ),
         _spec(
             id="alphavantage", name="AlphaVantage (free tier)", category=SourceCategory.MARKET_DATA,
             access_method=AccessMethod.JSON_API, status=SourceStatus.NEEDS_KEY,
+            base_url="https://www.alphavantage.co/query",
             reliability_score=0.65, freshness_score=0.7, conflict_priority=50,
             authentication="api_key(user-supplied)",
+            collector="AlphaVantageCollector", collector_version="1.0.0",
+            validation_rules=["data.quality.validate_price_bars"],
             rate_limit=RateLimit(requests_per_minute=5, min_seconds_between_requests=15.0),
+            notes="Collector code is complete and tested against AlphaVantage's documented "
+            "JSON shape; status stays NEEDS_KEY until a user supplies their own API key and "
+            "an operator flips this entry to IMPLEMENTED.",
         ),
         _spec(
             id="polygon", name="Polygon.io (free tier)", category=SourceCategory.MARKET_DATA,
@@ -249,7 +290,6 @@ def seed_sources() -> list[SourceSpec]:
             )
             for source_id, name, access, note in [
                 ("imf", "IMF", AccessMethod.JSON_API, "IMF SDMX/JSON APIs are free; series mapping pending."),
-                ("worldbank", "World Bank", AccessMethod.JSON_API, "Open API, no key; series mapping pending."),
                 ("oecd", "OECD", AccessMethod.JSON_API, "SDMX API free; Egypt coverage partial."),
                 ("undata", "UN Data", AccessMethod.CSV_DOWNLOAD, "Bulk downloads free."),
                 ("trading_economics", "Trading Economics", AccessMethod.JSON_API,

@@ -40,23 +40,56 @@ class HttpFetcher:
         self.timeout_seconds = timeout_seconds
         self._last_request_at: dict[str, float] = {}
         self._robots_cache: dict[str, urllib.robotparser.RobotFileParser] = {}
+        self._robots_unreachable: dict[str, bool] = {}
+        # Real network round-trip time per successful request (urlopen+read
+        # only -- excludes rate-limit/backoff sleeps, which aren't the
+        # source's latency). `CollectionService` reads new entries after
+        # each `Collector.fetch()` call to feed `reputation.py`'s `latency`
+        # dimension (see TD-16).
+        self.request_latencies: list[float] = []
 
-    def _robots_allows(self, url: str) -> bool:
-        parts = urlsplit(url)
-        base = f"{parts.scheme}://{parts.netloc}"
+    def _get_robots_parser(self, base: str) -> urllib.robotparser.RobotFileParser:
         parser = self._robots_cache.get(base)
         if parser is None:
             parser = urllib.robotparser.RobotFileParser(f"{base}/robots.txt")
             try:
                 parser.read()
+                self._robots_unreachable[base] = False
             except (urllib.error.URLError, OSError):
                 # Unreachable robots.txt: default-allow is the standard
                 # convention; the failure is not treated as a prohibition.
                 parser.allow_all = True
+                self._robots_unreachable[base] = True
             self._robots_cache[base] = parser
+        return parser
+
+    def _robots_allows(self, url: str) -> bool:
+        parts = urlsplit(url)
+        base = f"{parts.scheme}://{parts.netloc}"
+        parser = self._get_robots_parser(base)
+        return parser.can_fetch(_USER_AGENT, url)
+
+    def robots_status(self, url: str) -> bool | None:
+        """Three-state robots.txt check for callers that need to distinguish
+        "explicitly allowed" from "robots.txt unreachable, allowed only by
+        the default-allow convention" -- unlike `_robots_allows` (used by
+        `fetch_bytes`, which permissively proceeds either way, the standard
+        compliant-crawler behavior), this returns `None` when robots.txt
+        itself couldn't be fetched, so a stricter caller (e.g. the
+        Acquisition Intelligence Engine's legality gate) can treat that as
+        genuinely unknown rather than confirmed-allowed.
+        """
+        parts = urlsplit(url)
+        base = f"{parts.scheme}://{parts.netloc}"
+        parser = self._get_robots_parser(base)
+        if self._robots_unreachable.get(base):
+            return None
         return parser.can_fetch(_USER_AGENT, url)
 
     def fetch_text(self, url: str, spec: SourceSpec) -> str:
+        return self.fetch_bytes(url, spec).decode("utf-8", errors="replace")
+
+    def fetch_bytes(self, url: str, spec: SourceSpec) -> bytes:
         if self.respect_robots and not self._robots_allows(url):
             raise FetchDisallowed(f"robots.txt disallows {url}")
 
@@ -75,8 +108,11 @@ class HttpFetcher:
             self._last_request_at[spec.id] = time.monotonic()
             try:
                 request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+                request_started_at = time.monotonic()
                 with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
-                    return response.read().decode("utf-8", errors="replace")
+                    content = response.read()
+                self.request_latencies.append(time.monotonic() - request_started_at)
+                return content
             except (urllib.error.URLError, OSError, TimeoutError) as exc:
                 last_error = exc
                 if attempts < spec.retry_policy.max_attempts:

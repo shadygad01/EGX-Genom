@@ -13,6 +13,39 @@
       "title": "AccessMethod",
       "type": "string"
     },
+    "ActivationStatus": {
+      "description": "Whether this source is switched on for scheduled collection.",
+      "enum": [
+        "active",
+        "paused",
+        "retired"
+      ],
+      "title": "ActivationStatus",
+      "type": "string"
+    },
+    "HealthStatus": {
+      "description": "Current operational health, maintained by `sources.health`.",
+      "enum": [
+        "unknown",
+        "healthy",
+        "degraded",
+        "down"
+      ],
+      "title": "HealthStatus",
+      "type": "string"
+    },
+    "LifecycleState": {
+      "description": "Where a source sits in the qualification pipeline (`sources.qualification`).\n\nDistinct from `SourceStatus`: `status` gates *whether a collector may run\nat all* (auth/ToS/config); `lifecycle_state` gates *how much the rest of\nthe platform trusts it* once it can run. A source can be IMPLEMENTED and\nstill only CANDIDATE/QUARANTINE if it hasn't accumulated evidence yet.\nPromotion only ever moves forward one stage at a time and only on\nevidence (see `qualification.evaluate_promotion`) \u2014 never assigned by\nfiat, never skipped.",
+      "enum": [
+        "candidate",
+        "quarantine",
+        "evaluation",
+        "trusted",
+        "core"
+      ],
+      "title": "LifecycleState",
+      "type": "string"
+    },
     "RateLimit": {
       "properties": {
         "min_seconds_between_requests": {
@@ -81,6 +114,10 @@
     "access_method": {
       "$ref": "#/$defs/AccessMethod"
     },
+    "activation_status": {
+      "$ref": "#/$defs/ActivationStatus",
+      "default": "active"
+    },
     "authentication": {
       "default": "none",
       "title": "Authentication",
@@ -131,6 +168,11 @@
       "title": "Conflict Priority",
       "type": "integer"
     },
+    "country": {
+      "default": "EG",
+      "title": "Country",
+      "type": "string"
+    },
     "data_quality_score": {
       "anyOf": [
         {
@@ -156,6 +198,10 @@
       "title": "Freshness Score",
       "type": "number"
     },
+    "health_status": {
+      "$ref": "#/$defs/HealthStatus",
+      "default": "unknown"
+    },
     "historical_coverage": {
       "default": "unknown",
       "title": "Historical Coverage",
@@ -169,6 +215,10 @@
       "default": "unknown",
       "title": "License",
       "type": "string"
+    },
+    "lifecycle_state": {
+      "$ref": "#/$defs/LifecycleState",
+      "default": "candidate"
     },
     "name": {
       "title": "Name",
@@ -186,6 +236,12 @@
       "title": "Notes",
       "type": "string"
     },
+    "priority": {
+      "default": 50,
+      "description": "Collection scheduling priority (0-100, higher collected/discovered first). Distinct from conflict_priority, which only matters at resolution time.",
+      "title": "Priority",
+      "type": "integer"
+    },
     "provenance_policy": {
       "default": "raw_document_envelope",
       "title": "Provenance Policy",
@@ -200,6 +256,19 @@
       "minimum": 0.0,
       "title": "Reliability Score",
       "type": "number"
+    },
+    "reputation_score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Composite score from sources.reputation; measured only, never declared.",
+      "title": "Reputation Score"
     },
     "retry_policy": {
       "$ref": "#/$defs/RetryPolicy"

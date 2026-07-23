@@ -1,0 +1,35 @@
+{
+  "symbol": "COMI",
+  "historical": [
+    {
+      "date": "2026-06-02",
+      "open": 45.60,
+      "high": 46.10,
+      "low": 45.20,
+      "close": 45.90,
+      "adjClose": 45.90,
+      "volume": 980000,
+      "unadjustedVolume": 980000,
+      "change": 0.3,
+      "changePercent": 0.66,
+      "vwap": 45.7,
+      "label": "June 02, 26",
+      "changeOverTime": 0.0066
+    },
+    {
+      "date": "2026-06-01",
+      "open": 45.00,
+      "high": 45.80,
+      "low": 44.90,
+      "close": 45.50,
+      "adjClose": 45.50,
+      "volume": 1200000,
+      "unadjustedVolume": 1200000,
+      "change": 0.5,
+      "changePercent": 1.11,
+      "vwap": 45.4,
+      "label": "June 01, 26",
+      "changeOverTime": 0.0111
+    }
+  ]
+}

@@ -88,3 +88,59 @@ def test_feed_with_no_entries_recorded_as_warning():
     batch = collector.parse(document)
     assert batch.news_items == []
     assert "No <item>/<entry>" in batch.parse_warnings[0]
+
+
+def test_classify_corporate_events_off_by_default():
+    fetcher = FakeFetcher((FIXTURES / "rss_synthetic.xml").read_text())
+    collector = RssNewsCollector(
+        rss_spec(), feed_url="https://example.test/feed.xml", ticker_hints=["COMI"], fetcher=fetcher
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+    assert batch.corporate_events == []
+
+
+def test_classify_corporate_events_populates_batch_alongside_news_item():
+    fetcher = FakeFetcher((FIXTURES / "rss_synthetic.xml").read_text())
+    collector = RssNewsCollector(
+        rss_spec(), feed_url="https://example.test/feed.xml", ticker_hints=["COMI"],
+        classify_corporate_events=True, fetcher=fetcher,
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+
+    # "COMI reports quarterly results" -> EARNINGS; the CBE-rates and
+    # no-date entries have no ticker match / are skipped, so no event.
+    assert len(batch.corporate_events) == 1
+    event = batch.corporate_events[0]
+    assert event.ticker == "COMI"
+    assert event.event_type == "EARNINGS"
+    assert event.event_date == date(2026, 6, 1)
+    assert event.details == {}
+    # Still a news item too -- classification adds a view, doesn't replace one.
+    assert any(item.headline.startswith("COMI") for item in batch.news_items)
+
+
+def test_classify_corporate_events_skips_entries_with_no_or_multiple_ticker_matches():
+    fetcher = FakeFetcher((FIXTURES / "rss_synthetic.xml").read_text())
+    collector = RssNewsCollector(
+        rss_spec(), feed_url="https://example.test/feed.xml", ticker_hints=["COMI", "quarterly"],
+        classify_corporate_events=True, fetcher=fetcher,
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+    # "quarterly" also appears in the COMI headline, so two hints match --
+    # a CorporateEvent needs exactly one ticker, so nothing is classified.
+    assert batch.corporate_events == []
+
+
+def test_classify_corporate_events_skips_headlines_matching_no_keyword():
+    fetcher = FakeFetcher((FIXTURES / "rss_synthetic.xml").read_text())
+    collector = RssNewsCollector(
+        rss_spec(), feed_url="https://example.test/feed.xml", ticker_hints=["Egypt"],
+        classify_corporate_events=True, fetcher=fetcher,
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+    # "Egypt central bank holds rates" matches no corporate-event keyword.
+    assert batch.corporate_events == []

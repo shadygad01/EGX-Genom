@@ -41,7 +41,8 @@ class RawDocument(BaseModel):
     content_hash: str
     schema_version: str
     license: str
-    content_text: str  # the payload as text (CSV/XML/JSON); binary formats store a reference
+    content_text: str  # the payload as text (CSV/XML/JSON); "" when is_binary
+    is_binary: bool = False  # True: real bytes live in a RawArchive, keyed by content_hash
     normalization_history: list[ProcessingStep] = Field(default_factory=list)
     validation_history: list[ProcessingStep] = Field(default_factory=list)
 
@@ -79,6 +80,62 @@ def build_raw_document(
         schema_version=schema_version,
         license=license,
         content_text=content_text,
+    )
+
+
+def fetch_single_text_document(
+    fetcher, spec, *, collector_name: str, collector_version: str, url: str
+) -> list[RawDocument]:
+    """Shared `Collector.fetch()` body for the common "one URL, one text
+    document" shape (`RssNewsCollector`, `IndexConstituentCollector`,
+    `FinancialStatementCollector`) -- extracted after the same four lines
+    turned up verbatim in three collectors, rather than leaving each as its
+    own copy.
+    """
+    text = fetcher.fetch_text(url, spec)
+    return [
+        build_raw_document(
+            source_id=spec.id,
+            collector=collector_name,
+            collector_version=collector_version,
+            original_url=url,
+            content_text=text,
+            schema_version=spec.schema_version,
+            license=spec.license,
+        )
+    ]
+
+
+def build_binary_raw_document(
+    *,
+    source_id: str,
+    collector: str,
+    collector_version: str,
+    original_url: str,
+    content: bytes,
+    schema_version: str,
+    license: str,
+    archive,  # collectors.archive.RawArchive; typed loosely to avoid a cyclic import
+    fetched_at: datetime | None = None,
+) -> RawDocument:
+    """Like `build_raw_document`, for payloads that don't decode as text (PDF,
+    Excel, images). Bytes go into `archive`, keyed by the same sha256 the
+    document's `content_hash` carries -- `archive.retrieve(document.content_hash)`
+    recovers the original bytes.
+    """
+    content_hash = archive.store(content)
+    return RawDocument(
+        id=derive_document_id(source_id, original_url, content_hash),
+        source_id=source_id,
+        collector=collector,
+        collector_version=collector_version,
+        fetched_at=fetched_at or datetime.now(),
+        original_url=original_url,
+        content_hash=content_hash,
+        schema_version=schema_version,
+        license=license,
+        content_text="",
+        is_binary=True,
     )
 
 

@@ -273,6 +273,12 @@ export type AccessMethod =
 
 export type SourceStatus = "implemented" | "planned" | "needs_key" | "tos_review" | "disabled";
 
+export type LifecycleState = "candidate" | "quarantine" | "evaluation" | "trusted" | "core";
+
+export type HealthStatus = "unknown" | "healthy" | "degraded" | "down";
+
+export type ActivationStatus = "active" | "paused" | "retired";
+
 export interface RetryPolicy {
   max_attempts: number;
   backoff_seconds: number;
@@ -289,8 +295,12 @@ export interface SourceSpec {
   version: number;
   name: string;
   category: SourceCategory;
+  country: string;
   access_method: AccessMethod;
   status: SourceStatus;
+  lifecycle_state: LifecycleState;
+  health_status: HealthStatus;
+  activation_status: ActivationStatus;
   base_url: string | null;
   authentication: string;
   reliability_score: number;
@@ -309,9 +319,11 @@ export interface SourceSpec {
   validation_rules: string[];
   normalization_rules: string[];
   conflict_priority: number;
+  priority: number;
   supported_entities: string[];
   supported_event_types: string[];
   supported_languages: string[];
   data_quality_score: number | null;
+  reputation_score: number | null;
   notes: string;
 }

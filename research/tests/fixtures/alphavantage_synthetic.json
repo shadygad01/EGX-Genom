@@ -1,0 +1,25 @@
+{
+  "Meta Data": {
+    "1. Information": "Daily Prices (open, high, low, close) and Volumes",
+    "2. Symbol": "COMI",
+    "3. Last Refreshed": "2026-06-02",
+    "4. Output Size": "Full size",
+    "5. Time Zone": "US/Eastern"
+  },
+  "Time Series (Daily)": {
+    "2026-06-02": {
+      "1. open": "45.60",
+      "2. high": "46.10",
+      "3. low": "45.20",
+      "4. close": "45.90",
+      "5. volume": "980000"
+    },
+    "2026-06-01": {
+      "1. open": "45.00",
+      "2. high": "45.80",
+      "3. low": "44.90",
+      "4. close": "45.50",
+      "5. volume": "1200000"
+    }
+  }
+}

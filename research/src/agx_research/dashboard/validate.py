@@ -12,11 +12,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from agx_research.dashboard.schemas import DashboardSystemStatus
 from agx_research.events.event import Event
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import Recommendation
-from agx_research.dashboard.schemas import DashboardSystemStatus
+from agx_research.portfolio.constructor import PortfolioRecommendation
+from agx_research.production.mission_control import MissionControlStatus
+from agx_research.production.report import ExecutionReport
 from agx_research.runtime.engine import RunRecord
 from agx_research.sources.spec import SourceSpec
 
@@ -108,4 +111,95 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
         )
     counts["patterns.json"] = 0
 
+    # The following are only produced by the full production pipeline
+    # (`agx run`), not by `export-dashboard` alone -- validated if present,
+    # skipped (not an error) if absent, so `export-dashboard`'s narrower
+    # eight-artifact contract stays unchanged.
+    _validate_optional_execution_report(directory, counts)
+    _validate_optional_mission_status(directory, counts)
+    _validate_optional_investment_cases(directory, counts)
+    _validate_optional_collector_status(directory, counts)
+    _validate_optional_runtime_status(directory, counts)
+    _validate_optional_dashboard_metrics(directory, counts)
+
     return counts
+
+
+def _load_optional_json(directory: Path, filename: str):
+    path = directory / filename
+    if not path.exists():
+        return None, False
+    try:
+        return json.loads(path.read_text()), True
+    except json.JSONDecodeError as exc:
+        raise DashboardArtifactError(f"{filename}: invalid JSON ({exc})") from exc
+
+
+def _validate_optional_execution_report(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "execution_report.json")
+    if not present:
+        return
+    try:
+        ExecutionReport.model_validate(payload)
+    except Exception as exc:
+        raise DashboardArtifactError(f"execution_report.json: {exc}") from exc
+    counts["execution_report.json"] = 1
+
+
+def _validate_optional_mission_status(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "mission_status.json")
+    if not present:
+        return
+    try:
+        MissionControlStatus.model_validate(payload)
+    except Exception as exc:
+        raise DashboardArtifactError(f"mission_status.json: {exc}") from exc
+    counts["mission_status.json"] = 1
+
+
+def _validate_optional_investment_cases(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "investment_cases.json")
+    if not present:
+        return
+    if not isinstance(payload, dict) or "recommendations" not in payload:
+        raise DashboardArtifactError(
+            "investment_cases.json: expected an object with a 'recommendations' key"
+        )
+    try:
+        for item in payload["recommendations"]:
+            Recommendation.model_validate(item)
+        if payload.get("portfolio") is not None:
+            PortfolioRecommendation.model_validate(payload["portfolio"])
+    except Exception as exc:
+        raise DashboardArtifactError(f"investment_cases.json: {exc}") from exc
+    counts["investment_cases.json"] = len(payload["recommendations"])
+
+
+def _validate_optional_collector_status(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "collector_status.json")
+    if not present:
+        return
+    if not isinstance(payload, list):
+        raise DashboardArtifactError("collector_status.json: expected a JSON array")
+    counts["collector_status.json"] = len(payload)
+
+
+def _validate_optional_runtime_status(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "runtime_status.json")
+    if not present:
+        return
+    if payload is not None:
+        try:
+            RunRecord.model_validate(payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"runtime_status.json: {exc}") from exc
+    counts["runtime_status.json"] = 0 if payload is None else 1
+
+
+def _validate_optional_dashboard_metrics(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "dashboard_metrics.json")
+    if not present:
+        return
+    if not isinstance(payload, dict) or "artifacts" not in payload:
+        raise DashboardArtifactError("dashboard_metrics.json: expected an object with an 'artifacts' key")
+    counts["dashboard_metrics.json"] = 1

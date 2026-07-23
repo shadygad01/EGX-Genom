@@ -1,14 +1,15 @@
 """The Adversarial Scientist: its sole purpose is to try to invalidate discoveries.
 
-Three attacks are real and mechanical: `SmallSampleBias`, `TimeLeakage`/
-`LookAheadBias`, and `WeakEconomicRationale` (which delegates to the
-Phase 7 `EconomicRationaleGate`). The remaining five
-(`RandomCoincidence`, `Overfitting`, `ParameterInstability`,
-`RegimeDependency`, `OutOfSampleDegradation`) each need either a
-permutation-test harness or multi-regime historical data this scaffold
-doesn't have yet — `attack()` still reports all nine attack types, marking
-the unimplemented ones `attempted=False` rather than omitting them or
-faking a result.
+Six attacks are real and mechanical: `SmallSampleBias`, `TimeLeakage`,
+`LookAheadBias`, `WeakEconomicRationale`, `RandomCoincidence` (a seeded
+permutation test of the hypothesis statistic against a shuffled null), and
+`ParameterInstability` (sign stability of the statistic across estimation
+windows). The remaining three (`Overfitting`, `RegimeDependency`,
+`OutOfSampleDegradation`) need either a multi-model comparison harness,
+labeled multi-regime history, or a live monitoring record that doesn't
+exist yet — `attack()` still reports all nine attack types, marking the
+unimplemented ones `attempted=False` rather than omitting them or faking
+a result.
 
 Successful attacks (a real problem found) reduce confidence; failed
 attacks (the check ran and found nothing) strengthen it slightly.
@@ -26,17 +27,13 @@ from agx_research.hypotheses.experiment import ExperimentResult
 from agx_research.hypotheses.hypothesis import Hypothesis
 
 _UNIMPLEMENTED_ATTACKS = (
-    AttackType.RANDOM_COINCIDENCE,
     AttackType.OVERFITTING,
-    AttackType.PARAMETER_INSTABILITY,
     AttackType.REGIME_DEPENDENCY,
     AttackType.OUT_OF_SAMPLE_DEGRADATION,
 )
 
 _UNIMPLEMENTED_NOTES = {
-    AttackType.RANDOM_COINCIDENCE: "Needs a permutation-test harness; not yet implemented.",
-    AttackType.OVERFITTING: "Needs a train/test split harness across multiple features; not yet implemented.",
-    AttackType.PARAMETER_INSTABILITY: "Needs multiple parameter configurations to compare; not yet implemented.",
+    AttackType.OVERFITTING: "Needs a multi-model train/test comparison harness; not yet implemented.",
     AttackType.REGIME_DEPENDENCY: "Needs labeled multi-regime historical data; not yet implemented.",
     AttackType.OUT_OF_SAMPLE_DEGRADATION: "Needs a live monitoring history to compare against; not yet implemented.",
 }
@@ -51,9 +48,20 @@ def _provenance(attack_name: str, hypothesis: Hypothesis) -> Provenance:
 
 
 class AdversarialScientist:
-    def __init__(self, *, min_sample_size: int = 30, min_rationale_length: int = 20):
+    def __init__(
+        self,
+        *,
+        min_sample_size: int = 30,
+        min_rationale_length: int = 20,
+        permutation_iterations: int = 500,
+        permutation_seed: int = 42,
+        permutation_alpha: float = 0.05,
+    ):
         self.min_sample_size = min_sample_size
         self.min_rationale_length = min_rationale_length
+        self.permutation_iterations = permutation_iterations
+        self.permutation_seed = permutation_seed
+        self.permutation_alpha = permutation_alpha
 
     def attack(
         self,
@@ -68,6 +76,8 @@ class AdversarialScientist:
             self._attack_time_leakage(hypothesis, snapshot),
             self._attack_look_ahead_bias(hypothesis, snapshot),
             self._attack_weak_economic_rationale(hypothesis, economic_rationale),
+            self._attack_random_coincidence(hypothesis, snapshot),
+            self._attack_parameter_instability(hypothesis, snapshot),
         ]
         for attack_type in _UNIMPLEMENTED_ATTACKS:
             results.append(
@@ -184,6 +194,124 @@ class AdversarialScientist:
                 "(not evaluated here for correctness -- see EconomistReviewer)."
             ),
             provenance=_provenance("AdversarialScientist.weak_economic_rationale", hypothesis),
+        )
+
+
+    def _attack_random_coincidence(
+        self, hypothesis: Hypothesis, snapshot: DatasetSnapshot
+    ) -> AttackResult:
+        """Seeded permutation test: shuffle away the claimed structure and see
+        whether the observed statistic is actually unusual against that null."""
+        import random as _random
+
+        from agx_research.hypotheses.statistic import hypothesis_statistic, series_for_hypothesis
+
+        try:
+            series = series_for_hypothesis(hypothesis, snapshot)
+            observed = hypothesis_statistic(series)
+        except ValueError as exc:
+            observed, series = None, None
+            failure_note = f"Statistic could not be computed: {exc}"
+        if observed is None:
+            return AttackResult(
+                attack_type=AttackType.RANDOM_COINCIDENCE,
+                attempted=True,
+                succeeded=True,
+                confidence_delta=-0.2,
+                notes=(
+                    failure_note
+                    if series is None
+                    else "Statistic undefined on this snapshot."
+                ),
+                provenance=_provenance("AdversarialScientist.random_coincidence", hypothesis),
+            )
+
+        rng = _random.Random(self.permutation_seed)
+        exceed = 0
+        for _ in range(self.permutation_iterations):
+            if len(series) == 2:
+                shuffled = list(series[1])
+                rng.shuffle(shuffled)
+                permuted = hypothesis_statistic([series[0], shuffled])
+            else:
+                # Single-asset drift claim: the null randomizes each return's sign.
+                permuted = hypothesis_statistic(
+                    [[r * rng.choice((-1.0, 1.0)) for r in series[0]]]
+                )
+            if permuted is not None and abs(permuted) >= abs(observed):
+                exceed += 1
+        empirical_p = exceed / self.permutation_iterations
+        succeeded = empirical_p > self.permutation_alpha
+        return AttackResult(
+            attack_type=AttackType.RANDOM_COINCIDENCE,
+            attempted=True,
+            succeeded=succeeded,
+            confidence_delta=-0.2 if succeeded else 0.02,
+            notes=(
+                f"Permutation test ({self.permutation_iterations} shuffles, seed "
+                f"{self.permutation_seed}): empirical p={empirical_p:.4f} "
+                f"{'>' if succeeded else '<='} alpha={self.permutation_alpha} -- the observed "
+                f"statistic {'is consistent with' if succeeded else 'is unlikely under'} "
+                "pure chance."
+            ),
+            provenance=_provenance("AdversarialScientist.random_coincidence", hypothesis),
+        )
+
+    def _attack_parameter_instability(
+        self, hypothesis: Hypothesis, snapshot: DatasetSnapshot
+    ) -> AttackResult:
+        """Does the claim's statistic keep its sign as the estimation window varies?"""
+        from agx_research.hypotheses.statistic import (
+            hypothesis_statistic,
+            series_for_hypothesis,
+            slice_series,
+        )
+
+        try:
+            series = series_for_hypothesis(hypothesis, snapshot)
+            full_value = hypothesis_statistic(series)
+        except ValueError as exc:
+            return AttackResult(
+                attack_type=AttackType.PARAMETER_INSTABILITY,
+                attempted=True,
+                succeeded=True,
+                confidence_delta=-0.15,
+                notes=f"Statistic could not be computed: {exc}",
+                provenance=_provenance("AdversarialScientist.parameter_instability", hypothesis),
+            )
+        n = len(series[0])
+        if full_value is None or n < 6:
+            return AttackResult(
+                attack_type=AttackType.PARAMETER_INSTABILITY,
+                attempted=True,
+                succeeded=True,
+                confidence_delta=-0.15,
+                notes="Too little data to assess stability; instability assumed, not excused.",
+                provenance=_provenance("AdversarialScientist.parameter_instability", hypothesis),
+            )
+
+        flips = 0
+        settings = 0
+        for fraction in (0.5, 0.66, 0.83):
+            window = max(3, int(n * fraction))
+            value = hypothesis_statistic(slice_series(series, n - window, n))
+            if value is None:
+                continue
+            settings += 1
+            if (value <= 0) != (full_value <= 0):
+                flips += 1
+        succeeded = settings == 0 or flips > 0
+        return AttackResult(
+            attack_type=AttackType.PARAMETER_INSTABILITY,
+            attempted=True,
+            succeeded=succeeded,
+            confidence_delta=-0.15 if succeeded else 0.02,
+            notes=(
+                f"Statistic sign flipped in {flips}/{settings} trailing-window settings."
+                if settings
+                else "No alternative window produced a valid statistic."
+            ),
+            provenance=_provenance("AdversarialScientist.parameter_instability", hypothesis),
         )
 
 

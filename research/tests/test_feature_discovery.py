@@ -52,3 +52,39 @@ def test_engine_runs_every_generator_and_persists_candidates():
 
     assert len(candidates) == 1
     assert len(repo.all_latest()) == 1
+
+
+def test_momentum_generator_proposes_scored_candidates():
+    from agx_research.features.generators import MomentumGenerator
+
+    candidates = MomentumGenerator(score_threshold=0.0).generate(make_market_state())
+    assert len(candidates) == 2  # one per ticker
+    for candidate in candidates:
+        assert candidate.feature_id.startswith("trailing_mean_return:")
+        assert candidate.importance is not None
+        assert any(e.startswith("t_like_score=") for e in candidate.evidence)
+
+
+def test_momentum_generator_respects_threshold():
+    from agx_research.features.generators import MomentumGenerator
+
+    assert MomentumGenerator(score_threshold=1e9).generate(make_market_state()) == []
+
+
+def test_volatility_generator_flags_outliers_vs_median():
+    from agx_research.features.generators import VolatilityGenerator
+
+    # Threshold 1.0 means every ticker qualifies (ratio >= 1 or <= 1 always).
+    candidates = VolatilityGenerator(ratio_threshold=1.0).generate(make_market_state())
+    assert len(candidates) == 2
+    # A high threshold with a 2-ticker universe should flag none (both near median).
+    assert VolatilityGenerator(ratio_threshold=100.0).generate(make_market_state()) == []
+
+
+def test_default_registry_now_carries_three_features():
+    from agx_research.features.correlation import default_feature_registry
+
+    registry = default_feature_registry()
+    assert registry.get("pairwise_return_correlation", 1)
+    assert registry.get("trailing_mean_return", 1)
+    assert registry.get("trailing_volatility", 1)

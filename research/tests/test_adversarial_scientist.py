@@ -40,9 +40,7 @@ def test_reports_all_nine_attack_types():
 def test_unimplemented_attacks_are_marked_not_attempted():
     results = AdversarialScientist().attack(hypothesis(), {}, snapshot())
     unimplemented = {
-        AttackType.RANDOM_COINCIDENCE,
         AttackType.OVERFITTING,
-        AttackType.PARAMETER_INSTABILITY,
         AttackType.REGIME_DEPENDENCY,
         AttackType.OUT_OF_SAMPLE_DEGRADATION,
     }
@@ -126,3 +124,21 @@ def test_apply_adversarial_review_clips_to_valid_range():
     )
     adjusted = apply_adversarial_review(0.05, results)
     assert 0.0 <= adjusted <= 1.0
+
+
+def test_random_coincidence_permutation_test_is_deterministic_and_bounded():
+    scientist = AdversarialScientist(permutation_iterations=200, permutation_seed=9)
+    results_a = scientist.attack(hypothesis(), {}, snapshot())
+    results_b = scientist.attack(hypothesis(), {}, snapshot())
+    attack_a = next(r for r in results_a if r.attack_type == AttackType.RANDOM_COINCIDENCE)
+    attack_b = next(r for r in results_b if r.attack_type == AttackType.RANDOM_COINCIDENCE)
+    assert attack_a.attempted and attack_b.attempted
+    assert attack_a.succeeded == attack_b.succeeded
+    assert attack_a.notes == attack_b.notes
+
+
+def test_parameter_instability_reports_window_flips():
+    results = AdversarialScientist().attack(hypothesis(), {}, snapshot())
+    attack = next(r for r in results if r.attack_type == AttackType.PARAMETER_INSTABILITY)
+    assert attack.attempted
+    assert "window" in attack.notes.lower() or "data" in attack.notes.lower()

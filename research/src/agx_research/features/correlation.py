@@ -62,6 +62,10 @@ def compute_pairwise_return_correlation(
 
 
 def default_feature_registry() -> FeatureRegistry:
+    from agx_research.features.basic import TRAILING_MEAN_RETURN, TRAILING_VOLATILITY
+
     registry = FeatureRegistry()
     registry.register(PAIRWISE_RETURN_CORRELATION)
+    registry.register(TRAILING_MEAN_RETURN)
+    registry.register(TRAILING_VOLATILITY)
     return registry

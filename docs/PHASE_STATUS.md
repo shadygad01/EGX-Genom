@@ -26,12 +26,12 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 | 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo an explicit placeholder (needs a simulator — research decision). |
 | 11 | Validation Framework | **DONE** | `SignificanceThresholdValidator`, `NaiveDirectionalBacktester` (costs explicitly out of scope, stated), `HistoricalWorstWindowStressTester` (scenario located in real data, not simulated). Deferred: cost-aware portfolio-level backtesting (with 15's future optimizer). |
 | 12 | Review Board | **DONE** (4 of 5 reviewers real) | Statistician, Risk, Economist (structural coherence, not economic truth — stated), PeerValidator (independent replication). Historical reviewer data-blocked. Board wired into the pipeline before `promote()`. |
-| 13 | Runtime Engine | **DONE** | `RuntimeEngine.run_range`: deterministic, per-day failure isolation, non-trading days recorded not skipped silently, persistent run ledger. OS-level scheduling = deployment config (18). |
+| 13 | Runtime Engine | **DONE** | `RuntimeEngine.run_range`: deterministic, per-day failure isolation, non-trading days recorded not skipped silently, persistent run ledger. Now the core of `production.pipeline.ProductionPipeline`'s Research Pipeline stage — see "Production Execution Pipeline" below. OS-level scheduling = deployment config (18). |
 | 14 | Prediction Intelligence | **DONE** (v1) | `KnowledgeWeightedHorizonModel`: predictions derived exclusively from promoted knowledge; no knowledge → no prediction. Trained statistical models deferred until years of real data exist (data-blocked, would otherwise be fabricated science). |
 | 15 | Portfolio Intelligence | **DONE** (v1) | `PortfolioConstructor`: risk-adjusted confidence-discounted scoring, capped proportional weights, cash fallback, full explanation. Deferred: covariance-based optimization (needs real data depth). |
 | 16 | Explainability Engine | **DONE** | Six-question `Explanation` with structured `evidence_refs` everywhere; `similar_historical_cases` populated from real recorded events via the Event Platform. |
 | 17 | Continuous Learning | **DONE** (v1) | `ContinuousLearningMonitor`: realized performance recorded on knowledge+genes from real later-window data; mechanical sign-disagreement retirement policy with audited reasons. |
-| 18 | Production Infrastructure | **PARTIAL** | Engineering-closeable parts done: integrity-checked backup/verify/restore, CLI (`run`/`status`/`backup`/`restore`), Dockerfile, CI. Business-blocked: cloud provider + payment, secrets management service, managed scheduling, API authentication context, monitoring/alerting stack. Named in `docs/ROADMAP.md`. |
+| 18 | Production Infrastructure | **PARTIAL** | Engineering-closeable parts done: integrity-checked backup/verify/restore, CLI (`run`/`status`/`backup`/`restore`/`discover-sources`/`collect`), the first production execution pipeline (`agx run` — see "Production Execution Pipeline" below), Dockerfile, CI. Business-blocked: cloud provider + payment, secrets management service, managed scheduling, API authentication context, monitoring/alerting stack. Named in `docs/ROADMAP.md`. |
 
 ## What Production 1.0 still needs (all business-blocked)
 
@@ -42,7 +42,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(397 Python tests + 33 TypeScript tests green).
+(413 Python tests + 33 TypeScript tests green).
 
 ## Dashboard dual-provider architecture (post-Data-Acquisition-Program)
 
@@ -168,3 +168,79 @@ all 11 non-per-constituent seed targets in this sandbox correctly reports
 trust an unprobed domain, exactly as designed, not a bug or a fabricated
 result. The engine is complete and will perform real, verified discovery
 the first time it runs somewhere with outbound internet access.
+
+## Production Execution Pipeline (post-Acquisition-Intelligence-Engine)
+
+The mission after the Acquisition Intelligence Engine was explicit: stop
+building architecture and frameworks, wire everything already built into
+one production execution pipeline that proves AGX can run an end-to-end
+production research cycle, using mock/replay providers standing in for a
+live collector (not yet built — that's the next mission).
+
+- `agx_research.production` (new package): `ProductionPipeline` wires
+  every stage the mission specifies, in order — Entry Point, Source
+  Registry, Discovery Engine, Collector Selection, Collector Execution,
+  Raw Archive, Canonical Transformation, Validation, Event Platform,
+  Market Memory, Knowledge Base, Research Pipeline, Genome, Investment
+  Case Generator, Dashboard Artifact Generator, Mission Control Update,
+  Execution Report — by composing `CollectionService`, `DailyResearchPipeline`,
+  `RuntimeEngine`, `RecommendationService`, `PortfolioConstructor`,
+  `write_dashboard_artifacts`, and the Acquisition Intelligence Engine's
+  continuity monitor exactly as they already exist. Nothing was redesigned;
+  this closed a real, previously-unnoticed gap instead: `agx collect`
+  materialized data into `--data-dir`, but `agx run` always read from a
+  separate, static `--mock-data` directory regardless — the two were never
+  actually connected. They are now: the pipeline's own `MarketMemory`
+  reads from `--data-dir`, the same root its own Collector Execution stage
+  writes to.
+- **Collector Execution without live collectors**: per the mission's own
+  instruction not to build live collectors yet, `collector_plan.py` runs
+  the platform's *real* `Collector` subclasses (`StooqPriceCollector`,
+  `FredCsvCollector`, `RssNewsCollector`, `WorldBankCollector`) against
+  either a `MockFetcher` (clearly-synthetic, wire-format-correct content —
+  the same numbers `research/data/mock/` already uses, reformatted into
+  each source's real CSV/JSON/RSS shape) or an `ArchiveReplayCollector`
+  reading previously-archived documents. `CollectionService.run()` is
+  called identically either way — the pipeline cannot tell live data from
+  mocked or replayed data, because nothing about the call site changes.
+- **Failure isolation**: every stage is wrapped independently
+  (`ProductionPipeline.run`'s `execute()` helper); a stage that raises is
+  recorded `FAILED` with its error and execution continues to every
+  remaining stage regardless, exactly matching `RuntimeEngine.run_day`'s
+  existing per-day isolation. `StageStatus.PARTIAL` is the honest middle
+  state when some but not all of a stage's work fails (e.g. one collector
+  among several).
+- **Execution Report** (`execution_report.json`): start/end/duration, every
+  stage's status/detail/error, artifacts generated, errors, warnings,
+  skipped stages, and knowledge/genome/event count deltas for the run.
+- **Mission Control tracking** (`mission_status.json` +
+  `PipelineExecutionRepository`, a versioned execution history): pipeline
+  status, pipeline version, last successful/failed pipeline, current
+  execution mode, execution duration, artifacts produced, knowledge/genome
+  updated — computed entirely from `ExecutionReport`s already produced,
+  no new computation.
+- New artifacts alongside the existing eight dashboard files:
+  `investment_cases.json` (the Investment Case Generator — composes the
+  already-existing but previously never-wired `RecommendationService` +
+  `PortfolioConstructor`), `collector_status.json`, `runtime_status.json`,
+  `dashboard_metrics.json`, `mission_status.json`, `execution_report.json`
+  — 14 artifacts total, all validated by an extended
+  `dashboard.validate.validate_dashboard_artifacts` (the six new ones
+  optionally, since `export-dashboard` alone still only produces the
+  original eight).
+- `agx run` is now the single production entrypoint: one command executes
+  the complete chain (previously `run` only executed the research pipeline
+  against static mock data, and dashboard export was a separate command).
+  `--mode mock` (default) or `--mode replay`; `.github/workflows/
+  deploy-pages.yml` now calls this one command instead of two.
+- 16 new integration tests (`test_production_pipeline.py`) verify: every
+  stage runs in the mission's exact order; collected data actually reaches
+  the research pipeline; replay reproduces the same research outcome as
+  the original mock run; the raw archive doesn't duplicate documents on
+  replay; replay against an empty archive is honest, not fabricated;
+  deterministic execution (same inputs -> same collected values -> same
+  hypothesis count); failure isolation at both the stage level and the
+  per-collector level; every artifact is written and validates; Mission
+  Control tracks execution history across runs; the CLI entrypoint works
+  end to end. 413 Python tests green overall (up from 397); 33 TypeScript
+  tests unaffected; `ruff` clean.

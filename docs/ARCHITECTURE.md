@@ -117,8 +117,31 @@ research/        Python package `agx_research` — the research engine
                   export_*()/write_dashboard_artifacts() (model_dump of
                   existing domain models -> the 8 JSON files the dashboard
                   reads) + validate_dashboard_artifacts() (re-parses each
-                  file through its pydantic model before publishing); see
-                  "Dashboard data providers" below
+                  file through its pydantic model before publishing, incl.
+                  the production/ package's 6 additional artifacts when
+                  present); see "Dashboard data providers" below
+
+  # Production Execution Pipeline: the first end-to-end production run
+  production/     ProductionPipeline -- composes every system above (plus
+                  orchestration/runtime/meta/portfolio below) into the one
+                  chain the mission specifies: Source Registry -> Discovery
+                  Engine -> Collector Selection -> Collector Execution ->
+                  Raw Archive -> Canonical Transformation -> Validation ->
+                  Event Platform -> Market Memory -> Knowledge Base ->
+                  Research Pipeline -> Genome -> Investment Case Generator
+                  -> Dashboard Artifact Generator -> Mission Control Update
+                  -> Execution Report. collector_plan.py wires the real
+                  Collector subclasses against a MockFetcher (execution
+                  mode "mock") or ArchiveReplayCollector (mode "replay") --
+                  no live collector yet, by the mission's own instruction;
+                  CollectionService.run() is called identically either way.
+                  stages.py/report.py define the StageResult/ExecutionReport
+                  vocabulary; mission_control.py derives mission_status.json
+                  purely from ExecutionReport history
+                  (PipelineExecutionRepository). Every stage is isolated: a
+                  raised exception becomes a FAILED StageResult and
+                  execution continues regardless. Wired into cli.py's `run`
+                  subcommand -- the single production entrypoint.
 
 api/              TypeScript (Fastify) — HTTP surface over the knowledge base
 web/              TypeScript (Vite + React) — dashboard for knowledge/recs

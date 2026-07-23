@@ -73,6 +73,31 @@ provenance, replay, acquisition intelligence — see `docs/DATA_ACQUISITION.md`)
   only the "run this on a schedule" wiring is deployment-shaped, not
   engineering (TD-23).
 
+## Production Execution Pipeline: next engineering-closeable steps
+
+The first production pipeline (`agx run` -> `production.pipeline.
+ProductionPipeline`) is complete, tested, and is the platform's single
+production entrypoint. What's next, in priority order:
+
+- **First live production collector** (the current mission — see
+  `CURRENT_MISSION.md`): swap one of `collector_plan.py`'s mock-mode
+  collectors for a real `HttpFetcher`-backed one against a verified live
+  endpoint. World Bank is the natural first candidate (already
+  `IMPLEMENTED`, a stable no-key public API); wiring it live is a
+  `collector_plan.py` change (which fetcher backs the same
+  `WorldBankCollector`), not new engineering.
+- Wire a real corporate-actions collector (TD-24) so `CorporateEventsAgent`
+  has something to find when the production pipeline's `MarketMemory`
+  reads from `--data-dir`, matching what the static mock-data path already
+  provides.
+- Expand `collector_plan.py`'s mock/replay fixture coverage beyond
+  COMI/MFPC once more tickers matter for research breadth.
+- Schedule `agx run` itself (System 18, business-blocked in general, but
+  the command is deployment-ready today) once any deployment target
+  exists — this is the "runs unchanged under GitHub Actions and
+  Cloudflare" the mission specified; `.github/workflows/deploy-pages.yml`
+  already proves the GitHub Actions half.
+
 ## Dashboard architecture: next engineering-closeable steps
 
 - Schedule `agx export-dashboard` to refresh a production `api/`'s

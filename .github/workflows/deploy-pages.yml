@@ -40,22 +40,24 @@ jobs:
 
       - run: uv sync
 
-      # Runs the real daily research pipeline against the mock market data
-      # (research/data/mock/) -- the same date the test suite exercises for
-      # the full promotion path (see research/tests/test_daily_pipeline.py).
-      # This is mechanically real pipeline output, not hand-authored fixture
-      # data; it's only as "real" as the mock data feeding it, which is the
-      # whole platform's documented state until a licensed EGX vendor exists
-      # (see docs/PHASE_STATUS.md). Default (non-permissive) gate thresholds
-      # are used, so an honest "nothing promoted yet" is an expected result,
-      # not a failure.
-      - name: Run the research pipeline against mock data
-        run: uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data run --date 2026-06-14
-
-      - name: Generate dashboard JSON artifacts
+      # Runs the complete production pipeline -- this is the single entry
+      # point (`agx run`) that will later run unchanged in a live
+      # deployment: Source Registry -> Discovery Engine -> Collector
+      # Selection/Execution -> Raw Archive -> Canonical Transformation ->
+      # Validation -> Event Platform -> Market Memory -> Knowledge Base ->
+      # Research Pipeline -> Genome -> Investment Case Generator ->
+      # Dashboard Artifact Generator -> Mission Control -> Execution Report.
+      # Collector Execution runs in --mode mock (production-ready execution
+      # against clearly-synthetic, wire-format-correct fixtures standing in
+      # for a licensed EGX vendor -- see docs/DATA_ACQUISITION.md); this is
+      # mechanically real pipeline output end to end, only as "real" as the
+      # mock data feeding it (see docs/PHASE_STATUS.md). Default
+      # (non-permissive) gate thresholds are used, so an honest "nothing
+      # promoted yet" is an expected result, not a failure.
+      - name: Run the complete production pipeline
         run: |
           uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data \
-            export-dashboard --out ../web/public/data
+            run --date 2026-06-14 --mode mock --dashboard-out ../web/public/data
 
       - name: Validate dashboard JSON artifacts
         run: uv run python -m agx_research.cli validate-dashboard --dir ../web/public/data
@@ -65,11 +67,13 @@ jobs:
       - run: npm run build -w web
         working-directory: .
 
-      - name: Verify build output has an index.html and the dashboard artifacts at its root
+      - name: Verify build output has an index.html and every production artifact at its root
         working-directory: .
         run: |
           test -f web/dist/index.html
-          for f in knowledge events patterns recommendations market_state runtime_metrics system_status source_registry; do
+          for f in knowledge events patterns recommendations market_state runtime_metrics \
+                   system_status source_registry investment_cases collector_status \
+                   runtime_status dashboard_metrics mission_status execution_report; do
             test -f "web/dist/data/$f.json"
           done
 

@@ -1,86 +1,82 @@
-# Completion Report — Acquisition Intelligence Engine
+# Completion Report — First Production Execution Pipeline
 
 ## Mission
 
-The system must never require manually specified endpoints or manually
-provided data sources. For every target organization (EGX, company
-investor relations, Reuters, Mubasher, Zawya, Enterprise, CBE, FRA,
-CAPMAS, Trading Economics, and more as they're added): discover every
-legally accessible acquisition method, evaluate and verify each
-(legality/stability/historical availability), rank them, select the best,
-auto-generate the appropriate collector configuration, register it in the
-Source Registry, and begin qualification — continuing to research
-alternatives whenever a method becomes unavailable.
+Stop building architecture and generic frameworks; wire every completed
+system into the first production execution pipeline, proving AGX can run
+an end-to-end production research cycle. The pipeline must represent the
+exact execution path a live deployment (GitHub Actions, Cloudflare) will
+later run unchanged — collectors stay mock/replay for now, by explicit
+instruction; only the data source changes later.
 
 ## Delivered
 
-New package `research/src/agx_research/acquisition_intelligence/`:
+New package `research/src/agx_research/production/`:
 
 | Module | Delivers |
 |---|---|
-| `target.py` | `TargetOrganization` — identity only (name/category/country/public-brand domain hints), never a URL; seeded for all 12 named organizations, linked to existing `SourceSpec` catalog entries. |
-| `domain_resolution.py` | `HeuristicDomainResolver` — probes every hint and name-derived guess for actual reachability before trusting a domain; nothing is asserted without a successful probe. |
-| `legality.py` | `assess_legality` — robots.txt (three-state, via new `HttpFetcher.robots_status`) + ToS red/green-flag keyword heuristics; `HTML_SCRAPE` can never auto-clear to `ALLOWED`; ambiguity blocks. |
-| `stability.py` | `assess_stability` — URL-shape heuristics + repeated-probe status-code consistency. |
-| `historical.py` | `assess_historical_availability` + `WaybackAvailabilityClient` — the Internet Archive's free, no-key `wayback/available` and CDX APIs, scored by archived-snapshot span. |
-| `ranking.py` | `rank_methods`/`select_best` — legality as a hard gate (never scored down and reconsidered), composite of stability + historical scores among survivors. |
-| `config_generation.py` | `generate_source_spec` — auto-generates a full `SourceSpec` (collector class suggested where unambiguous); `status` always stays `PLANNED`, never silently `IMPLEMENTED`. |
-| `engine.py` | `AcquisitionIntelligenceEngine` — orchestrates domain resolution → discovery → verification → ranking → config generation → registration → an initial qualification-pipeline evaluation, end to end. |
-| `continuity.py` | `AcquisitionContinuityMonitor` — re-runs discovery, excluding the failed method's URL, for any registered source whose health goes `DOWN`. |
-| `live.py` | The one file wiring real network access (`HttpFetcher` + a live Wayback client) for a deployment with egress; every other module is network-free. |
+| `collector_plan.py` | `ExecutionMode` (mock/replay), `MockFetcher` (drop-in for `HttpFetcher.fetch_text`, canned wire-format content), `build_collector_plan()` — selects and constructs real `Collector`s (`StooqPriceCollector`, `FredCsvCollector`, `RssNewsCollector`, `WorldBankCollector`) backed by mock content or `ArchiveReplayCollector`. |
+| `stages.py` | `StageName` (the mission's 17 stages, in order), `StageStatus` (succeeded/partial/failed/skipped), `StageResult`. |
+| `report.py` | `ExecutionReport`, `derive_overall_status()`, `PipelineExecutionRepository` (versioned execution history). |
+| `mission_control.py` | `MissionControlStatus` + `build_mission_control_status()` — derived entirely from `ExecutionReport` history. |
+| `artifacts.py` | `export_investment_cases()` (composes `RecommendationService` + `PortfolioConstructor`, previously never wired together), `export_collector_status()`, `export_runtime_status()`, `export_dashboard_metrics()`. |
+| `pipeline.py` | `ProductionPipeline` — the orchestrator; every stage isolated, every stage's result recorded. |
 
-Plus: `HttpFetcher.robots_status()` (a three-state robots.txt check
-distinct from the existing permissive-by-default `fetch_bytes` behavior),
-and `cli.py`'s new `discover-sources` subcommand.
+## The gap this closed
+
+`agx collect` materialized data into `--data-dir`; `agx run` always read
+from a separate, static `--mock-data` directory. Nothing connected the
+two — collected data was invisible to research, silently, in the existing
+codebase. `ProductionPipeline` builds its own `MarketMemory` pointed at
+`--data-dir`, so what Collector Execution writes is what Research Pipeline
+reads. Verified directly: a fresh run's Stooq/FRED/RSS/World Bank mock
+collectors write `prices/COMI.csv`, `macro/BRENT_USD.csv`, `news.csv` into
+`--data-dir`, and the same run's Research Pipeline stage produces a real
+hypothesis from exactly that data (not from `research/data/mock/`).
 
 ## Verification
 
-- 51 new tests (397 total, up from 346), 100% offline (fakes/fixtures only)
-  — covering every module individually and the full orchestration pipeline:
-  happy path, no-reachable-domain, unfetchable homepage, no candidates
-  discovered, legality gate rejecting the only candidate, successful
-  registration + qualification kickoff, idempotent re-runs, exclusion-driven
-  alternative selection, and continuity recovery.
-- `contracts/` drift check clean (no `SourceSpec` schema change this phase).
-- `ruff check` clean.
+- 413 Python tests (up from 397), 16 new (`test_production_pipeline.py`),
+  all offline. Covers: every one of the 17 stages runs in the mission's
+  exact order; collected data reaches the research pipeline; replay mode
+  reproduces the identical research outcome as the original mock run; the
+  raw archive doesn't duplicate documents between a mock run and a
+  following replay; replay against an empty archive is honest (reports 0
+  documents, doesn't fabricate); deterministic execution (same inputs
+  produce byte-identical collected CSVs and identical hypothesis counts
+  across two independent pipeline instances); failure isolation at both
+  the stage level (a monkeypatched failing stage doesn't stop later
+  stages) and the collector level (one broken collector among several
+  degrades to `PARTIAL`, not total failure); every one of the 14 output
+  artifacts is written and validates against its schema; Mission Control
+  correctly tracks execution history (`total_executions`, last successful/
+  failed) across repeated runs; the CLI `run` command works end to end.
+- `contracts/` unchanged (no pydantic schema drift this phase);
+  `ruff check` clean; 33 TypeScript tests unaffected; both TS packages
+  build clean.
+- `.github/workflows/deploy-pages.yml` updated to call the single `run`
+  command and verified locally to reproduce the exact same sequence
+  (`run` → `validate-dashboard`) the workflow now performs.
 
-## The one honest, verified gap
+## What did not change, deliberately
 
-**This development sandbox has no outbound network egress to arbitrary
-hosts.** This was checked directly, not assumed:
-
-1. `curl` directly to `egx.com.eg`, `reuters.com`, `mubasher.info` — all
-   returned `CONNECT tunnel failed, response 403`.
-2. The environment's proxy status endpoint confirmed the policy: egress is
-   allowlisted to `anthropic.com`, PyPI/npm/crates/Go-proxy registries, and
-   local/private ranges only — nothing else.
-3. `WebFetch` (routed through separate infrastructure) was also tried
-   against `egx.com.eg` and `en.wikipedia.org` — both returned HTTP 403,
-   while a control fetch of `pypi.org` succeeded, confirming the block is
-   general, not site-specific.
-4. Running `agx discover-sources` against all 11 non-per-constituent seed
-   targets in this sandbox produced "no reachable domain found" for every
-   one — the domain resolver correctly refusing to trust an unprobed
-   domain, exactly as designed.
-
-Because of this, the mission's final instruction — "continue autonomously
-by implementing production collectors using the acquisition methods
-discovered by the engine" — could not be carried out for real in this
-session: the engine discovered nothing live to implement a collector
-against, because it has not yet had a network to discover on. Fabricating
-a plausible-looking discovery result to satisfy that step would have
-violated this codebase's core, repeatedly-enforced anti-fabrication rule
-(the same rule that keeps `data_quality_score` unset until measured, keeps
-unimplemented experiments raising `NotImplementedError` instead of faking a
-result, and keeps the seed catalog's 12 `PLANNED` sources honestly
-unverified rather than guessed). The engine itself is complete, tested, and
-ready — this is a genuine external dependency (no egress), exactly the kind
-the mission's own build order anticipates as a legitimate stopping point,
-not a shortcoming in the engineering.
+- No live collector was built — the mission explicitly deferred that to
+  the next one. `collector_plan.py`'s `MockFetcher`/`ArchiveReplayCollector`
+  seam is designed so adding one later touches only that module.
+- `DailyResearchPipeline`, `RuntimeEngine`, `CollectionService`,
+  `RecommendationService`, `PortfolioConstructor`, and
+  `write_dashboard_artifacts` are all called exactly as they already
+  existed — zero lines changed in any of them. The only supporting change
+  outside `production/` was extending `dashboard/validate.py` to
+  optionally validate the six new artifacts, and deleting `cli.build_engine()`
+  (dead code once `run` was repurposed — its only caller).
+- `cli.py`'s `export-dashboard`/`collect`/`status`/`discover-sources`
+  subcommands are untouched and still work exactly as before, for
+  lower-level/manual use.
 
 ## Follow-through
 
-See `NEXT_MISSIONS.md`: item 1 is running the engine somewhere with
-network egress; item 2 is implementing production collectors against
-whatever it discovers there — the literal next step once item 1 is
-possible.
+`CURRENT_MISSION.md` is now set to **implement the first live production
+collector** — World Bank recommended as the first candidate (already
+`IMPLEMENTED`, tested, a stable free no-key API), per the stop condition's
+explicit instruction. See `NEXT_MISSIONS.md` for the full prioritized list.

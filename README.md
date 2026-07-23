@@ -17,11 +17,15 @@ technical debt, risks).
 **Status:** all 18 charter systems architecturally complete and tested
 except the business-blocked remainder of production infrastructure — see
 [`docs/PHASE_STATUS.md`](docs/PHASE_STATUS.md) for the per-system audit.
-The platform runs a real end-to-end daily research cycle on placeholder
-market data plus a real free-source Data Acquisition Platform (see
-[`docs/DATA_ACQUISITION.md`](docs/DATA_ACQUISITION.md)); a licensed EGX
-vendor remains the single gating decision before any output is real
-research.
+`agx run` executes the complete production pipeline end to end — data
+acquisition through a promotable recommendation and dashboard artifacts —
+in one command (see `docs/PHASE_STATUS.md`'s "Production Execution
+Pipeline" section), currently against mock/replayed data (a real
+free-source Data Acquisition Platform exists, see
+[`docs/DATA_ACQUISITION.md`](docs/DATA_ACQUISITION.md), but no live
+collector is wired in yet — the current mission, see
+[`CURRENT_MISSION.md`](CURRENT_MISSION.md)). A licensed EGX vendor remains
+the single gating decision before any output is real research.
 
 ## Layout
 

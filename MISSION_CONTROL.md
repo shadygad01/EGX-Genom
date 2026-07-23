@@ -22,6 +22,8 @@ it points to, not this one, except to add a new pointer.
 | What risks are being tracked? | `docs/RISK_REGISTER.md` |
 | What changed, release by release? | `CHANGELOG.md` |
 | How does the Data Acquisition Platform work? | `docs/DATA_ACQUISITION.md` |
+| How does the production pipeline (`agx run`) work end to end? | `docs/PHASE_STATUS.md`'s "Production Execution Pipeline" section + `docs/ARCHITECTURE.md`'s `production/` entry |
+| What did the last `agx run` actually do? | `<dashboard-out>/execution_report.json` + `mission_status.json` (generated per run, not checked into the repo) |
 
 ## Standing invariant
 

@@ -1,5 +1,56 @@
 # Changelog
 
+## 0.10.0 — First Production Execution Pipeline
+- `agx_research.production` (new package): `ProductionPipeline` wires every
+  stage the mission specifies, in order — Entry Point, Source Registry,
+  Discovery Engine, Collector Selection, Collector Execution, Raw Archive,
+  Canonical Transformation, Validation, Event Platform, Market Memory,
+  Knowledge Base, Research Pipeline, Genome, Investment Case Generator,
+  Dashboard Artifact Generator, Mission Control Update, Execution Report —
+  by composing `CollectionService`, `DailyResearchPipeline`, `RuntimeEngine`,
+  `RecommendationService`, `PortfolioConstructor`, `write_dashboard_artifacts`,
+  and the Acquisition Intelligence Engine's continuity monitor. Nothing
+  redesigned; this closed a real gap instead — `agx collect` wrote to
+  `--data-dir` but `agx run` always read from a separate static
+  `--mock-data` directory. They're connected now.
+- `production/collector_plan.py`: the platform's *real* collectors
+  (`StooqPriceCollector`, `FredCsvCollector`, `RssNewsCollector`,
+  `WorldBankCollector`) run against a `MockFetcher` (execution mode
+  `mock`, clearly-synthetic wire-format-correct content — the same
+  numbers `research/data/mock/` uses, reformatted) or an
+  `ArchiveReplayCollector` reading previously-archived documents
+  (mode `replay`). `CollectionService.run()` is called identically either
+  way — no live collector was built yet, per the mission's own instruction.
+- `production/stages.py`+`report.py`: `StageResult`/`ExecutionReport` —
+  every stage's status (`succeeded`/`partial`/`failed`/`skipped`),
+  duration, detail, and error; per-stage failure isolation (a raised
+  exception becomes a `FAILED` result, execution continues regardless).
+- `production/mission_control.py`: `mission_status.json`, derived purely
+  from `ExecutionReport` history (`PipelineExecutionRepository`) — pipeline
+  status/version, last successful/failed pipeline, current execution mode,
+  duration, artifacts produced, knowledge/genome updated.
+- `production/artifacts.py`: `investment_cases.json` (the Investment Case
+  Generator — composes the existing but previously-unwired
+  `RecommendationService` + `PortfolioConstructor`), `collector_status.json`,
+  `runtime_status.json`, `dashboard_metrics.json`.
+- `collectors/fetcher.py`: `HttpFetcher.robots_status()` reused; no change
+  needed there this phase beyond what Acquisition Intelligence already added.
+- `cli.py`: `run` is now the single production entrypoint (`--mode mock`/
+  `replay`, `--dashboard-out`); `build_engine()` (whose only caller this
+  replaced) deleted along with its now-unused imports.
+- `dashboard/validate.py`: extended to optionally validate the six new
+  artifacts when present, without changing `export-dashboard`'s existing
+  eight-artifact contract.
+- `.github/workflows/deploy-pages.yml`: now calls the single `run` command
+  instead of separate `run` + `export-dashboard` steps.
+- 16 new integration tests (`test_production_pipeline.py`): full stage
+  order, collected-data-reaches-research proof, replay reproduces the same
+  research outcome, no duplicate archiving on replay, honest empty-replay
+  behavior, deterministic execution, failure isolation (stage-level and
+  per-collector), artifact generation + validation, Mission Control history
+  tracking, CLI entrypoint. 413 Python tests green (up from 397); 33
+  TypeScript tests unaffected; `ruff` clean; `contracts/` unchanged.
+
 ## 0.9.0 — Acquisition Intelligence Engine
 - `acquisition_intelligence/` (new package): given only a `TargetOrganization`'s
   identity (name/category/country/public-brand domain hints — never a

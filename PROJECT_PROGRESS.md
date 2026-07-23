@@ -32,13 +32,42 @@ close without a cloud/vendor/secrets decision from the user.**
 
 ## Test health
 
-- Python: 397 tests, all green (`cd research && uv run pytest`).
+- Python: 413 tests, all green (`cd research && uv run pytest`).
 - TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
   + `git diff --exit-code`).
 - Lint: `uv run ruff check` clean.
 
-## Data Acquisition Platform (prior mission)
+## Production Execution Pipeline (this mission)
+
+- New package `production/`: `ProductionPipeline` runs the complete chain
+  end to end — Source Registry → Discovery Engine → Collector Selection
+  → Collector Execution → Raw Archive → Canonical Transformation →
+  Validation → Event Platform → Market Memory → Knowledge Base → Research
+  Pipeline → Genome → Investment Case Generator → Dashboard Artifact
+  Generator → Mission Control Update → Execution Report.
+- Closed a real, previously-unnoticed gap: `agx collect` wrote collected
+  data to `--data-dir`, but `agx run` always read from a separate, static
+  `--mock-data` directory — the two paths were never connected. They are
+  now (`ProductionPipeline`'s own `MarketMemory` reads `--data-dir`).
+- Mock and Replay execution modes both run the platform's *real* collector
+  classes — only what backs `fetch()` changes (a `MockFetcher` with
+  wire-format-correct synthetic content, or an `ArchiveReplayCollector`
+  reading the archive) — no live collector built yet, per the mission's
+  own instruction.
+- 14 output artifacts (8 existing dashboard files + `investment_cases.json`,
+  `collector_status.json`, `runtime_status.json`, `dashboard_metrics.json`,
+  `mission_status.json`, `execution_report.json`), all validated.
+- `agx run` is now the single production entrypoint (`--mode mock`/
+  `replay`); `.github/workflows/deploy-pages.yml` calls it directly.
+- 16 new integration tests prove: full stage order, collected-data-reaches-
+  research, replay reproduces the same outcome, no duplicate archiving,
+  determinism, failure isolation (stage- and collector-level), artifact
+  validity, Mission Control history tracking, CLI entrypoint.
+- See `CURRENT_MISSION.md` (now: first live production collector),
+  `NEXT_MISSIONS.md`, and `COMPLETION_REPORT.md` for this build's report.
+
+## Data Acquisition Platform (earlier mission)
 
 - Registry: 51 sources, 5 IMPLEMENTED / 34 PLANNED / 4 NEEDS_KEY /
   8 TOS_REVIEW, across 9 categories.
@@ -49,7 +78,7 @@ close without a cloud/vendor/secrets decision from the user.**
   Filesystem, Archive Replay (all real); Browser Automation (honest stub,
   no ToS-cleared target yet).
 
-## Acquisition Intelligence Engine (this mission)
+## Acquisition Intelligence Engine (earlier mission)
 
 - New package `acquisition_intelligence/`: given only an organization's
   identity (never a URL), resolves a verified-reachable domain, discovers
@@ -76,8 +105,7 @@ close without a cloud/vendor/secrets decision from the user.**
 All research conclusions the platform produces remain scoped to
 placeholder/free-source data until a licensed EGX market data vendor is
 selected — a business decision reserved for the user (`docs/ROADMAP.md`).
-Nothing about this mission changes that gate; it makes the free-source
-side of the data supply as strong as engineering alone can make it before
-that decision — now including the ability to find its own acquisition
-methods without a human supplying an endpoint, the moment it runs
-somewhere with internet access.
+Nothing about this mission changes that gate; it proves, for the first
+time, that the complete chain from data acquisition through a promotable
+recommendation runs as one production execution — currently against
+mock/replayed data, with a real live collector the explicit next mission.

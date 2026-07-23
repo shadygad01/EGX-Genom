@@ -10,30 +10,42 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
+from agx_research.domain.provenance import Provenance
 from agx_research.explainability import Explanation
 from agx_research.knowledge import KnowledgeObject
 
 
 class Prediction(BaseModel):
-    """A single-horizon prediction for one ticker. Never returned without an Explanation."""
+    """A single-horizon prediction for one ticker. Never returned without an Explanation.
+
+    `model_id`/`model_version` record exactly which model artifact produced
+    this — necessary once a model is retrained, so a monitoring/retirement
+    decision (Principle 4) can tell whether a degrading result came from the
+    same model or a since-replaced one (Principle 5: models are versioned).
+    """
 
     ticker: str
     horizon: Horizon
     as_of: date
+    model_id: str
+    model_version: str
     expected_return: float
     expected_risk: float
     confidence: float
     explanation: Explanation
-    supporting_knowledge_ids: list[str] = []
+    supporting_knowledge_ids: list[str] = Field(default_factory=list)
+    provenance: Provenance
 
 
 class HorizonModel(ABC):
     """A model scoped to exactly one time horizon."""
 
     horizon: Horizon
+    model_id: str
+    model_version: str
 
     @abstractmethod
     def predict(

@@ -3,10 +3,13 @@ from datetime import date, datetime
 import pytest
 
 from agx_research.config import Horizon
-from agx_research.hypotheses.hypothesis import Hypothesis, HypothesisStage, StageResult
+from agx_research.domain.provenance import Provenance
+from agx_research.hypotheses.hypothesis import Hypothesis, StageResult
+from agx_research.hypotheses.pipeline import StageName
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 from agx_research.knowledge.schema import PerformanceRecord
 from agx_research.knowledge.store import KnowledgeStore
+from agx_research.validation.statistical import StatisticalEvidence
 
 
 def peer_validated_hypothesis() -> Hypothesis:
@@ -17,13 +20,22 @@ def peer_validated_hypothesis() -> Hypothesis:
         created_at=date(2026, 6, 1),
         horizon=Horizon.SWING,
         affected_assets=["COMI"],
+        provenance=Provenance(produced_by="corporate_events_agent@0.1.0", produced_at=datetime.now()),
     )
-    for stage in HypothesisStage:
-        hypothesis.advance(StageResult(stage=stage, passed=True, evaluated_at=datetime.now()))
+    for stage in StageName:
+        hypothesis = hypothesis.advance(
+            StageResult(stage_name=stage.value, passed=True, evaluated_at=datetime.now())
+        )
     return hypothesis
 
 
-def test_promote_rejects_hypothesis_not_at_peer_validation():
+def evidence() -> StatisticalEvidence:
+    return StatisticalEvidence(
+        method="SignificanceThresholdValidator", statistic=2.6, p_value=0.01, sample_size=42
+    )
+
+
+def test_promote_rejects_hypothesis_not_at_final_gate():
     store = KnowledgeStore()
     hypothesis = Hypothesis(
         id="hyp-003",
@@ -32,12 +44,13 @@ def test_promote_rejects_hypothesis_not_at_peer_validation():
         created_at=date(2026, 6, 1),
         horizon=Horizon.MICRO,
         affected_assets=["COMI"],
+        provenance=Provenance(produced_by="agent@0.1.0", produced_at=datetime.now()),
     )
     with pytest.raises(ValueError):
         store.promote(
             hypothesis,
             confidence=0.5,
-            statistical_strength=0.01,
+            statistical_evidence=evidence(),
             economic_explanation="n/a",
             expected_return=0.0,
             expected_risk=0.0,
@@ -51,16 +64,18 @@ def test_promote_creates_knowledge_object():
     knowledge = store.promote(
         hypothesis,
         confidence=0.72,
-        statistical_strength=0.01,
+        statistical_evidence=evidence(),
         economic_explanation="Post-earnings-announcement drift in EGX banking sector",
         expected_return=0.03,
         expected_risk=0.02,
-        supporting_evidence=["p_value=0.01", "backtest_sharpe=1.4"],
+        supporting_evidence=["backtest_sharpe=1.4"],
     )
 
     assert knowledge.id == hypothesis.id
     assert knowledge.version == 1
     assert knowledge.status == KnowledgeStatus.PROMOTED
+    assert knowledge.provenance.inputs[0].kind == "hypothesis"
+    assert knowledge.provenance.inputs[0].ref_id == hypothesis.id
     assert store.latest(hypothesis.id) == knowledge
 
 
@@ -70,7 +85,7 @@ def test_status_transitions_and_versioning():
     store.promote(
         hypothesis,
         confidence=0.72,
-        statistical_strength=0.01,
+        statistical_evidence=evidence(),
         economic_explanation="...",
         expected_return=0.03,
         expected_risk=0.02,
@@ -99,7 +114,7 @@ def test_record_performance_appends_history():
     store.promote(
         hypothesis,
         confidence=0.72,
-        statistical_strength=0.01,
+        statistical_evidence=evidence(),
         economic_explanation="...",
         expected_return=0.03,
         expected_risk=0.02,
@@ -119,7 +134,7 @@ def test_persistence_roundtrip(tmp_path):
     store.promote(
         hypothesis,
         confidence=0.72,
-        statistical_strength=0.01,
+        statistical_evidence=evidence(),
         economic_explanation="...",
         expected_return=0.03,
         expected_risk=0.02,

@@ -11,11 +11,12 @@ intuition about what weights "feel right."
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
+from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.explainability import Explanation
 from agx_research.horizons.base import Prediction
 
@@ -23,7 +24,10 @@ from agx_research.horizons.base import Prediction
 class Recommendation(BaseModel):
     """A final, explainable output combining every available horizon's prediction.
 
-    Never constructed without an Explanation — see Principle 3.
+    Never constructed without an Explanation — see Principle 3. `provenance`
+    links back to every contributing prediction's model and to every
+    supporting knowledge object, so the full chain from recommendation back
+    to raw data is walkable via repository lookups.
     """
 
     ticker: str
@@ -34,6 +38,7 @@ class Recommendation(BaseModel):
     horizon_predictions: dict[Horizon, Prediction]
     supporting_knowledge_ids: list[str] = Field(default_factory=list)
     explanation: Explanation
+    provenance: Provenance
 
 
 DEFAULT_HORIZON_WEIGHTS: dict[Horizon, float] = {
@@ -97,6 +102,10 @@ class MetaDecisionEngine:
                 f"expected_risk={p.expected_risk:.4f}, confidence={p.confidence:.2f}"
                 for h, p in predictions.items()
             ],
+            evidence_refs=[
+                ProvenanceRef(kind="knowledge", ref_id=knowledge_id)
+                for knowledge_id in sorted(set(knowledge_ids))
+            ],
             similar_historical_cases=[],
             invalidation_conditions=[
                 "Underlying knowledge is retired or its performance history degrades below threshold."
@@ -112,4 +121,13 @@ class MetaDecisionEngine:
             horizon_predictions=predictions,
             supporting_knowledge_ids=sorted(set(knowledge_ids)),
             explanation=explanation,
+            provenance=Provenance(
+                produced_by="meta_decision_engine",
+                produced_at=datetime.now(),
+                inputs=[
+                    ProvenanceRef(kind="prediction", ref_id=f"{p.model_id}@{p.model_version}:{h.value}")
+                    for h, p in predictions.items()
+                ]
+                + [ProvenanceRef(kind="knowledge", ref_id=kid) for kid in sorted(set(knowledge_ids))],
+            ),
         )

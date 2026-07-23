@@ -18,6 +18,14 @@ jobs:
       - run: uv sync
       - run: uv run ruff check .
       - run: uv run pytest
+      - name: Check contracts/ is up to date with the pydantic schema
+        run: |
+          uv run python scripts/export_schemas.py
+          git diff --exit-code -- ../contracts || {
+            echo "::error::contracts/ is stale. Run 'uv run python research/scripts/export_schemas.py'," \
+                 "commit the result, and update api/src/types.ts and web/src/types.ts to match."
+            exit 1
+          }
 
   api-and-web:
     name: TypeScript api + web

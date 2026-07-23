@@ -1,9 +1,9 @@
 """The post-promotion knowledge lifecycle: Promotion -> Monitoring -> Retirement.
 
-Birth and Validation happen at the hypothesis stage (see
-`agx_research.hypotheses.hypothesis.HypothesisStage`) and end at
-PEER_VALIDATION. Once a hypothesis is promoted it becomes a KnowledgeObject
-and enters this lifecycle instead.
+Birth and Validation happen at the hypothesis stage (see the configurable
+gate pipeline in `agx_research.hypotheses.pipeline`) and end at its final
+gate (`PEER_VALIDATION` by default). Once a hypothesis is promoted it
+becomes a KnowledgeObject and enters this lifecycle instead.
 """
 
 from __future__ import annotations

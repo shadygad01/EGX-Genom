@@ -5,9 +5,15 @@
       "version": 1,
       "discovery_date": "2026-05-12",
       "creator_agent": "corporate_events_agent",
-      "supporting_evidence": ["experiment_p_value=0.008"],
+      "supporting_evidence": ["backtest_sharpe=1.4"],
       "confidence": 0.74,
-      "statistical_strength": 0.008,
+      "statistical_evidence": {
+        "method": "SignificanceThresholdValidator",
+        "statistic": 2.65,
+        "p_value": 0.008,
+        "sample_size": 42,
+        "confidence_interval": null
+      },
       "economic_explanation": "test fixture",
       "affected_assets": ["COMI"],
       "horizon": "swing",
@@ -16,16 +22,27 @@
       "status": "promoted",
       "performance_history": [],
       "retired_at": null,
-      "retirement_reason": null
+      "retirement_reason": null,
+      "provenance": {
+        "produced_by": "hypothesis_promotion_pipeline",
+        "produced_at": "2026-05-20T10:00:00",
+        "inputs": [{ "kind": "hypothesis", "ref_id": "egx-test-knowledge", "ref_version": 9 }]
+      }
     },
     {
       "id": "egx-test-knowledge",
       "version": 2,
       "discovery_date": "2026-05-12",
       "creator_agent": "corporate_events_agent",
-      "supporting_evidence": ["experiment_p_value=0.008"],
+      "supporting_evidence": ["backtest_sharpe=1.4"],
       "confidence": 0.74,
-      "statistical_strength": 0.008,
+      "statistical_evidence": {
+        "method": "SignificanceThresholdValidator",
+        "statistic": 2.65,
+        "p_value": 0.008,
+        "sample_size": 42,
+        "confidence_interval": null
+      },
       "economic_explanation": "test fixture",
       "affected_assets": ["COMI"],
       "horizon": "swing",
@@ -34,7 +51,12 @@
       "status": "monitoring",
       "performance_history": [],
       "retired_at": null,
-      "retirement_reason": null
+      "retirement_reason": null,
+      "provenance": {
+        "produced_by": "hypothesis_promotion_pipeline",
+        "produced_at": "2026-05-20T10:00:00",
+        "inputs": [{ "kind": "hypothesis", "ref_id": "egx-test-knowledge", "ref_version": 9 }]
+      }
     }
   ]
 }

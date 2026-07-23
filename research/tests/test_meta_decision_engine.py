@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 
 from agx_research.config import Horizon
+from agx_research.domain.provenance import Provenance
 from agx_research.explainability import Explanation
 from agx_research.horizons.base import Prediction
 from agx_research.meta.decision_engine import MetaDecisionEngine
@@ -12,6 +13,8 @@ def make_prediction(horizon: Horizon, expected_return: float, expected_risk: flo
         ticker="COMI",
         horizon=horizon,
         as_of=date(2026, 6, 14),
+        model_id=f"{horizon.value}_alpha",
+        model_version="0.1.0",
         expected_return=expected_return,
         expected_risk=expected_risk,
         confidence=confidence,
@@ -21,6 +24,7 @@ def make_prediction(horizon: Horizon, expected_return: float, expected_risk: flo
             why_not_others="test",
         ),
         supporting_knowledge_ids=[knowledge_id],
+        provenance=Provenance(produced_by=f"{horizon.value}_alpha@0.1.0", produced_at=datetime.now()),
     )
 
 
@@ -39,6 +43,11 @@ def test_combines_single_horizon_prediction():
     assert recommendation.combined_expected_return == 0.02
     assert recommendation.supporting_knowledge_ids == ["know-1"]
     assert recommendation.explanation.why_this_stock
+    assert recommendation.explanation.evidence_refs == [
+        recommendation.explanation.evidence_refs[0]
+    ]
+    assert recommendation.explanation.evidence_refs[0].ref_id == "know-1"
+    assert recommendation.provenance.produced_by == "meta_decision_engine"
 
 
 def test_combines_multiple_horizons_weighted_by_confidence():
@@ -54,3 +63,4 @@ def test_combines_multiple_horizons_weighted_by_confidence():
     assert recommendation is not None
     assert round(recommendation.combined_expected_return, 6) == 0.02
     assert set(recommendation.supporting_knowledge_ids) == {"know-1", "know-2"}
+    assert len(recommendation.provenance.inputs) == 4  # 2 predictions + 2 knowledge refs

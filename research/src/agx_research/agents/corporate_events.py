@@ -5,14 +5,12 @@ reactions?"). Not yet implemented — needs an event-study methodology.
 
 from __future__ import annotations
 
-from datetime import date
-
 from agx_research.agents.base import ResearchAgent, ResearchFinding
-from agx_research.data.provider import DataProvider
+from agx_research.data.snapshot import DatasetSnapshot
 
 
 class CorporateEventsAgent(ResearchAgent):
     name = "corporate_events_agent"
 
-    def research(self, data_provider: DataProvider, as_of: date) -> list[ResearchFinding]:
+    def research(self, snapshot: DatasetSnapshot) -> list[ResearchFinding]:
         raise NotImplementedError("CorporateEventsAgent research logic is not yet implemented")

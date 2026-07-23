@@ -10,13 +10,22 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from agx_research.domain.provenance import ProvenanceRef
+
 
 class Explanation(BaseModel):
-    """Answers to the questions every recommendation must be able to answer."""
+    """Answers to the questions every recommendation must be able to answer.
+
+    `evidence_refs` is what keeps `supporting_evidence` from being just
+    prose: each entry points at an actual, looked-up-able entity (a
+    knowledge object, a dataset snapshot, a feature) rather than only a
+    sentence describing one.
+    """
 
     why_this_stock: str
     why_now: str
     why_not_others: str
     supporting_evidence: list[str] = Field(default_factory=list)
+    evidence_refs: list[ProvenanceRef] = Field(default_factory=list)
     similar_historical_cases: list[str] = Field(default_factory=list)
     invalidation_conditions: list[str] = Field(default_factory=list)

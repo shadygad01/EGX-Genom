@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel, Field
 
-from agx_research.data.provider import DataProvider
+from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.hypotheses.hypothesis import Hypothesis
 
 
@@ -29,7 +29,7 @@ class Experiment(ABC):
     """A repeatable procedure that produces evidence for or against a hypothesis."""
 
     @abstractmethod
-    def run(self, hypothesis: Hypothesis, data_provider: DataProvider) -> ExperimentResult:
+    def run(self, hypothesis: Hypothesis, snapshot: DatasetSnapshot) -> ExperimentResult:
         """Execute the experiment and return its raw result.
 
         Implementations must be deterministic given the same data so that

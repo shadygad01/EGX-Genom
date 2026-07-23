@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
 
-from agx_research.data.provider import DataProvider
+from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.hypotheses.hypothesis import Hypothesis
 
 
@@ -27,5 +27,5 @@ class Backtester(ABC):
     """Simulates trading a hypothesis historically and scores the result."""
 
     @abstractmethod
-    def run(self, hypothesis: Hypothesis, data_provider: DataProvider) -> BacktestResult:
+    def run(self, hypothesis: Hypothesis, snapshot: DatasetSnapshot) -> BacktestResult:
         """Run the backtest and return performance metrics."""

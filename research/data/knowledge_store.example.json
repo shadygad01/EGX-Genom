@@ -6,12 +6,17 @@
       "discovery_date": "2026-05-12",
       "creator_agent": "corporate_events_agent",
       "supporting_evidence": [
-        "experiment_p_value=0.008",
         "backtest_sharpe=1.35",
         "sample_size=42 earnings events (2019-2026)"
       ],
       "confidence": 0.74,
-      "statistical_strength": 0.008,
+      "statistical_evidence": {
+        "method": "SignificanceThresholdValidator",
+        "statistic": 2.65,
+        "p_value": 0.008,
+        "sample_size": 42,
+        "confidence_interval": null
+      },
       "economic_explanation": "Post-earnings-announcement drift: the market underreacts to positive earnings surprises in EGX banking names, producing continued price drift over the following weeks.",
       "affected_assets": [
         "COMI"
@@ -22,7 +27,18 @@
       "status": "promoted",
       "performance_history": [],
       "retired_at": null,
-      "retirement_reason": null
+      "retirement_reason": null,
+      "provenance": {
+        "produced_by": "hypothesis_promotion_pipeline",
+        "produced_at": "2026-07-23T08:24:45.901459",
+        "inputs": [
+          {
+            "kind": "hypothesis",
+            "ref_id": "egx-post-earnings-drift-banking",
+            "ref_version": 9
+          }
+        ]
+      }
     },
     {
       "id": "egx-post-earnings-drift-banking",
@@ -30,12 +46,17 @@
       "discovery_date": "2026-05-12",
       "creator_agent": "corporate_events_agent",
       "supporting_evidence": [
-        "experiment_p_value=0.008",
         "backtest_sharpe=1.35",
         "sample_size=42 earnings events (2019-2026)"
       ],
       "confidence": 0.74,
-      "statistical_strength": 0.008,
+      "statistical_evidence": {
+        "method": "SignificanceThresholdValidator",
+        "statistic": 2.65,
+        "p_value": 0.008,
+        "sample_size": 42,
+        "confidence_interval": null
+      },
       "economic_explanation": "Post-earnings-announcement drift: the market underreacts to positive earnings surprises in EGX banking names, producing continued price drift over the following weeks.",
       "affected_assets": [
         "COMI"
@@ -46,7 +67,18 @@
       "status": "monitoring",
       "performance_history": [],
       "retired_at": null,
-      "retirement_reason": null
+      "retirement_reason": null,
+      "provenance": {
+        "produced_by": "hypothesis_promotion_pipeline",
+        "produced_at": "2026-07-23T08:24:45.901459",
+        "inputs": [
+          {
+            "kind": "hypothesis",
+            "ref_id": "egx-post-earnings-drift-banking",
+            "ref_version": 9
+          }
+        ]
+      }
     },
     {
       "id": "egx-post-earnings-drift-banking",
@@ -54,12 +86,17 @@
       "discovery_date": "2026-05-12",
       "creator_agent": "corporate_events_agent",
       "supporting_evidence": [
-        "experiment_p_value=0.008",
         "backtest_sharpe=1.35",
         "sample_size=42 earnings events (2019-2026)"
       ],
       "confidence": 0.74,
-      "statistical_strength": 0.008,
+      "statistical_evidence": {
+        "method": "SignificanceThresholdValidator",
+        "statistic": 2.65,
+        "p_value": 0.008,
+        "sample_size": 42,
+        "confidence_interval": null
+      },
       "economic_explanation": "Post-earnings-announcement drift: the market underreacts to positive earnings surprises in EGX banking names, producing continued price drift over the following weeks.",
       "affected_assets": [
         "COMI"
@@ -76,7 +113,18 @@
         }
       ],
       "retired_at": null,
-      "retirement_reason": null
+      "retirement_reason": null,
+      "provenance": {
+        "produced_by": "hypothesis_promotion_pipeline",
+        "produced_at": "2026-07-23T08:24:45.901459",
+        "inputs": [
+          {
+            "kind": "hypothesis",
+            "ref_id": "egx-post-earnings-drift-banking",
+            "ref_version": 9
+          }
+        ]
+      }
     }
   ]
 }

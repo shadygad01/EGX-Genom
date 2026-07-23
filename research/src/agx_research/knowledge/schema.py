@@ -13,7 +13,9 @@ from datetime import date
 from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
+from agx_research.domain.provenance import Provenance
 from agx_research.knowledge.lifecycle import KnowledgeStatus
+from agx_research.validation.statistical import StatisticalEvidence
 
 
 class PerformanceRecord(BaseModel):
@@ -31,7 +33,9 @@ class KnowledgeObject(BaseModel):
     ID, discovery date, creator agent, supporting evidence, confidence,
     statistical strength, economic explanation, affected assets, applicable
     time horizon, expected return, expected risk, current status,
-    performance history, and retirement status.
+    performance history, and retirement status. `provenance` is the added
+    lineage link back to the hypothesis (and, transitively, the finding and
+    dataset snapshot) this was promoted from.
     """
 
     id: str
@@ -40,7 +44,7 @@ class KnowledgeObject(BaseModel):
     creator_agent: str
     supporting_evidence: list[str]
     confidence: float = Field(ge=0.0, le=1.0)
-    statistical_strength: float  # e.g. the experiment's p-value or test statistic
+    statistical_evidence: StatisticalEvidence
     economic_explanation: str
     affected_assets: list[str]
     horizon: Horizon
@@ -50,3 +54,4 @@ class KnowledgeObject(BaseModel):
     performance_history: list[PerformanceRecord] = Field(default_factory=list)
     retired_at: date | None = None
     retirement_reason: str | None = None
+    provenance: Provenance

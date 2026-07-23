@@ -1,42 +1,38 @@
 """The scientific-method lifecycle every hypothesis moves through before it
 can become knowledge.
 
-Stages are strictly ordered and cannot be skipped:
-
-    OBSERVATION -> HYPOTHESIS -> DATA_COLLECTION -> EXPERIMENT
-    -> STATISTICAL_VALIDATION -> STRESS_TEST -> BACKTEST -> PEER_VALIDATION
-
-A hypothesis that reaches PEER_VALIDATION with a passing result is eligible
-for promotion into a `KnowledgeObject` (see `agx_research.knowledge`).
+A hypothesis walks its `pipeline` (see `hypotheses/pipeline.py`) one named
+gate at a time, in order; gates cannot be skipped or evaluated out of turn.
+A hypothesis that reaches its pipeline's final gate with a passing result is
+eligible for promotion into a `KnowledgeObject` (see `agx_research.knowledge`).
 Promotion, monitoring, and retirement are knowledge-level lifecycle stages,
 not hypothesis stages, and live in `agx_research.knowledge.lifecycle`.
+
+`Hypothesis` is immutable: `advance()` returns a new revision rather than
+mutating in place, consistent with how `KnowledgeObject` revisions work —
+callers persist whichever revision they want via `HypothesisRepository`.
 """
 
 from __future__ import annotations
 
 from datetime import date, datetime
-from enum import IntEnum
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
+from agx_research.domain.identifiers import new_id
+from agx_research.domain.provenance import Provenance, ProvenanceRef
+from agx_research.hypotheses.pipeline import DEFAULT_PIPELINE, GateSpec
 
-
-class HypothesisStage(IntEnum):
-    OBSERVATION = 0
-    HYPOTHESIS = 1
-    DATA_COLLECTION = 2
-    EXPERIMENT = 3
-    STATISTICAL_VALIDATION = 4
-    STRESS_TEST = 5
-    BACKTEST = 6
-    PEER_VALIDATION = 7
+if TYPE_CHECKING:
+    from agx_research.agents.base import ResearchFinding
 
 
 class StageResult(BaseModel):
-    """The outcome recorded when a hypothesis is evaluated at a given stage."""
+    """The outcome recorded when a hypothesis is evaluated at its current gate."""
 
-    stage: HypothesisStage
+    stage_name: str
     passed: bool
     evaluated_at: datetime
     notes: str = ""
@@ -44,39 +40,76 @@ class StageResult(BaseModel):
 
 
 class Hypothesis(BaseModel):
-    """A proposed, falsifiable relationship, moving through the scientific method."""
+    """A proposed, falsifiable relationship, moving through its validation pipeline."""
 
     id: str
+    version: int = 1
     statement: str
     created_by: str  # agent name that produced the originating ResearchFinding
     created_at: date
     horizon: Horizon
     affected_assets: list[str]
-    stage: HypothesisStage = HypothesisStage.OBSERVATION
+    provenance: Provenance
+    pipeline: list[GateSpec] = Field(default_factory=lambda: list(DEFAULT_PIPELINE))
+    stage_index: int = 0
     stage_history: list[StageResult] = Field(default_factory=list)
 
-    def advance(self, result: StageResult) -> None:
-        """Record the outcome of evaluating the hypothesis at its current stage.
+    @classmethod
+    def from_finding(
+        cls,
+        finding: "ResearchFinding",
+        *,
+        hypothesis_id: str | None = None,
+        pipeline: list[GateSpec] | None = None,
+    ) -> "Hypothesis":
+        return cls(
+            id=hypothesis_id or new_id("hyp"),
+            statement=finding.proposed_hypothesis_statement,
+            created_by=finding.agent_name,
+            created_at=finding.observed_at,
+            horizon=finding.horizon,
+            affected_assets=finding.affected_assets,
+            provenance=Provenance(
+                produced_by=f"{finding.agent_name}@{finding.agent_version}",
+                produced_at=datetime.now(),
+                inputs=[ProvenanceRef(kind="research_finding", ref_id=finding.id)],
+            ),
+            pipeline=pipeline or list(DEFAULT_PIPELINE),
+        )
 
-        A failing result retires the hypothesis in place (it does not advance,
-        and it is the caller's responsibility to stop pursuing it). A passing
-        result moves the hypothesis to the next stage in the fixed order
-        above. Stages cannot be skipped or evaluated out of order.
+    @property
+    def current_stage_name(self) -> str:
+        return self.pipeline[self.stage_index].name
+
+    def advance(self, result: StageResult) -> "Hypothesis":
+        """Return a new revision recording the outcome of evaluating the current gate.
+
+        A failing result does not advance the pipeline index (it is the
+        caller's responsibility to stop pursuing a hypothesis that keeps
+        failing its current gate). A passing result moves to the next gate
+        in `pipeline`, in order; gates cannot be skipped.
         """
-        if result.stage != self.stage:
+        if result.stage_name != self.current_stage_name:
             raise ValueError(
-                f"Cannot record a {result.stage.name} result while hypothesis "
-                f"{self.id} is at stage {self.stage.name}"
+                f"Cannot record a {result.stage_name} result while hypothesis "
+                f"{self.id} is at gate {self.current_stage_name}"
             )
-        self.stage_history.append(result)
-        if result.passed and self.stage != HypothesisStage.PEER_VALIDATION:
-            self.stage = HypothesisStage(self.stage + 1)
+        next_stage_index = self.stage_index
+        if result.passed and self.stage_index < len(self.pipeline) - 1:
+            next_stage_index = self.stage_index + 1
+        return self.model_copy(
+            update={
+                "version": self.version + 1,
+                "stage_index": next_stage_index,
+                "stage_history": [*self.stage_history, result],
+            }
+        )
 
     @property
     def is_ready_for_promotion(self) -> bool:
         return (
-            self.stage == HypothesisStage.PEER_VALIDATION
+            self.stage_index == len(self.pipeline) - 1
             and bool(self.stage_history)
-            and self.stage_history[-1].stage == HypothesisStage.PEER_VALIDATION
+            and self.stage_history[-1].stage_name == self.current_stage_name
             and self.stage_history[-1].passed
         )

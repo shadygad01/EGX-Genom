@@ -13,6 +13,8 @@ from agx_research.knowledge import KnowledgeObject
 
 class SwingAlphaModel(HorizonModel):
     horizon = Horizon.SWING
+    model_id = "swing_alpha"
+    model_version = "0.1.0"
 
     def predict(
         self, ticker: str, as_of: date, knowledge: list[KnowledgeObject]

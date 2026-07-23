@@ -1,0 +1,273 @@
+{
+  "$defs": {
+    "Horizon": {
+      "description": "The three independent time horizons the platform optimizes simultaneously.",
+      "enum": [
+        "micro",
+        "swing",
+        "investment"
+      ],
+      "title": "Horizon",
+      "type": "string"
+    },
+    "KnowledgeStatus": {
+      "enum": [
+        "promoted",
+        "monitoring",
+        "retired"
+      ],
+      "title": "KnowledgeStatus",
+      "type": "string"
+    },
+    "PerformanceRecord": {
+      "description": "One monitored outcome of a promoted piece of knowledge.",
+      "properties": {
+        "as_of": {
+          "format": "date",
+          "title": "As Of",
+          "type": "string"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        },
+        "realized_return": {
+          "title": "Realized Return",
+          "type": "number"
+        }
+      },
+      "required": [
+        "as_of",
+        "realized_return"
+      ],
+      "title": "PerformanceRecord",
+      "type": "object"
+    },
+    "Provenance": {
+      "properties": {
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "produced_at": {
+          "format": "date-time",
+          "title": "Produced At",
+          "type": "string"
+        },
+        "produced_by": {
+          "title": "Produced By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "produced_by",
+        "produced_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "description": "A pointer to one input entity: what kind it is, its id, and (if versioned) which version.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "ref_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Version"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    },
+    "StatisticalEvidence": {
+      "description": "What was actually measured and by what method.\n\nReplaces a bare `float` on `KnowledgeObject` \u2014 Principle 2 requires\nvalidation to be auditable, which a single unlabeled number can't\nsupport (a p-value and a t-statistic are both floats, but mean very\ndifferent things).",
+      "properties": {
+        "confidence_interval": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence Interval"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "p_value": {
+          "title": "P Value",
+          "type": "number"
+        },
+        "sample_size": {
+          "title": "Sample Size",
+          "type": "integer"
+        },
+        "statistic": {
+          "title": "Statistic",
+          "type": "number"
+        }
+      },
+      "required": [
+        "method",
+        "statistic",
+        "p_value",
+        "sample_size"
+      ],
+      "title": "StatisticalEvidence",
+      "type": "object"
+    }
+  },
+  "description": "A validated, promoted piece of research knowledge.\n\nFields mirror the vision document's knowledge philosophy exactly: unique\nID, discovery date, creator agent, supporting evidence, confidence,\nstatistical strength, economic explanation, affected assets, applicable\ntime horizon, expected return, expected risk, current status,\nperformance history, and retirement status. `provenance` is the added\nlineage link back to the hypothesis (and, transitively, the finding and\ndataset snapshot) this was promoted from.",
+  "properties": {
+    "affected_assets": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Affected Assets",
+      "type": "array"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "creator_agent": {
+      "title": "Creator Agent",
+      "type": "string"
+    },
+    "discovery_date": {
+      "format": "date",
+      "title": "Discovery Date",
+      "type": "string"
+    },
+    "economic_explanation": {
+      "title": "Economic Explanation",
+      "type": "string"
+    },
+    "expected_return": {
+      "title": "Expected Return",
+      "type": "number"
+    },
+    "expected_risk": {
+      "title": "Expected Risk",
+      "type": "number"
+    },
+    "horizon": {
+      "$ref": "#/$defs/Horizon"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "performance_history": {
+      "items": {
+        "$ref": "#/$defs/PerformanceRecord"
+      },
+      "title": "Performance History",
+      "type": "array"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "retired_at": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retired At"
+    },
+    "retirement_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retirement Reason"
+    },
+    "statistical_evidence": {
+      "$ref": "#/$defs/StatisticalEvidence"
+    },
+    "status": {
+      "$ref": "#/$defs/KnowledgeStatus",
+      "default": "promoted"
+    },
+    "supporting_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Supporting Evidence",
+      "type": "array"
+    },
+    "version": {
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "discovery_date",
+    "creator_agent",
+    "supporting_evidence",
+    "confidence",
+    "statistical_evidence",
+    "economic_explanation",
+    "affected_assets",
+    "horizon",
+    "expected_return",
+    "expected_risk",
+    "provenance"
+  ],
+  "title": "KnowledgeObject",
+  "type": "object"
+}

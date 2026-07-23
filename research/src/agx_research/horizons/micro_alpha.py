@@ -13,6 +13,8 @@ from agx_research.knowledge import KnowledgeObject
 
 class MicroAlphaModel(HorizonModel):
     horizon = Horizon.MICRO
+    model_id = "micro_alpha"
+    model_version = "0.1.0"
 
     def predict(
         self, ticker: str, as_of: date, knowledge: list[KnowledgeObject]

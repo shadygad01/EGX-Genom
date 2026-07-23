@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel, Field
 
-from agx_research.data.provider import DataProvider
+from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.hypotheses.hypothesis import Hypothesis
 
 
@@ -26,5 +26,5 @@ class StressTester(ABC):
     """Evaluates a hypothesis against adverse market scenarios."""
 
     @abstractmethod
-    def run(self, hypothesis: Hypothesis, data_provider: DataProvider) -> StressTestResult:
+    def run(self, hypothesis: Hypothesis, snapshot: DatasetSnapshot) -> StressTestResult:
         """Run the configured stress scenarios and return the aggregate result."""

@@ -16,6 +16,22 @@ from pydantic import BaseModel
 from agx_research.hypotheses.experiment import ExperimentResult
 
 
+class StatisticalEvidence(BaseModel):
+    """What was actually measured and by what method.
+
+    Replaces a bare `float` on `KnowledgeObject` — Principle 2 requires
+    validation to be auditable, which a single unlabeled number can't
+    support (a p-value and a t-statistic are both floats, but mean very
+    different things).
+    """
+
+    method: str
+    statistic: float
+    p_value: float
+    sample_size: int
+    confidence_interval: tuple[float, float] | None = None
+
+
 class ValidationResult(BaseModel):
     passed: bool
     p_value: float

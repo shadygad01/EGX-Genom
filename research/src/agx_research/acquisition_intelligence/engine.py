@@ -30,6 +30,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Callable
+from urllib.parse import urlsplit
 
 from agx_research.acquisition_intelligence.config_generation import generate_source_spec
 from agx_research.acquisition_intelligence.domain_resolution import (
@@ -48,7 +49,7 @@ from agx_research.acquisition_intelligence.legality import assess_legality
 from agx_research.acquisition_intelligence.ranking import RankedMethod, rank_methods, select_best
 from agx_research.acquisition_intelligence.stability import assess_stability
 from agx_research.acquisition_intelligence.target import TargetOrganization
-from agx_research.discovery.engine import DiscoveryEngine
+from agx_research.discovery.engine import DiscoveryEngine, discover_company_directory_links
 from agx_research.sources.qualification import apply_promotion, evaluate_promotion
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
@@ -162,6 +163,64 @@ class AcquisitionIntelligenceEngine:
             reason=f"Registered at lifecycle_state={final_spec.lifecycle_state.value}; "
             f"{decision.reason}",
         )
+
+    def run_catalog(
+        self, targets: list[TargetOrganization], *, companies: dict[str, str] | None = None
+    ) -> list[AcquisitionResult]:
+        """Run every target in business-value priority order (lowest
+        `priority` first). If a target's homepage resolves and `companies`
+        is supplied, scan that homepage for company-directory links
+        (`discovery.discover_company_directory_links`) and feed any matches
+        as `domain_hints` into not-yet-run targets for those same companies
+        (matched by `company_ticker`) -- letting an exchange's or
+        regulator's own listed-company directory supply real per-company
+        Investor Relations hints instead of guessing them centrally. A
+        target that already carries its own `domain_hints` is never
+        overridden by a discovered one.
+
+        This is what makes Priority 1 (the exchange) mechanically enable
+        Priority 2/3 (company Investor Relations) rather than that
+        dependency being documentation-only: whichever named/official
+        target resolves first in priority order gets a real chance to
+        supply hints before the per-company targets run.
+
+        Only the discovered link's hostname is kept as a hint (not the full
+        path) -- `domain_hints` is homepage-level by design everywhere else
+        in this package. If a directory links to a company's own external
+        site, this is a genuinely useful hint; if it links to an internal
+        profile page on the directory's own domain, the hint is harmlessly
+        redundant (resolves back to the directory itself, not a fabrication
+        either way).
+        """
+        ordered = sorted(targets, key=lambda t: t.priority)
+        hints_by_ticker: dict[str, str] = {}
+        results: list[AcquisitionResult] = []
+
+        for target in ordered:
+            if (
+                target.company_ticker
+                and not target.domain_hints
+                and target.company_ticker in hints_by_ticker
+            ):
+                target = target.model_copy(
+                    update={"domain_hints": [hints_by_ticker[target.company_ticker]]}
+                )
+
+            result = self.run_for_target(target)
+            results.append(result)
+
+            if companies and result.resolved_domain is not None:
+                page_text = self.fetch_text(result.resolved_domain.homepage_url)
+                if page_text:
+                    discovered = discover_company_directory_links(
+                        page_text, result.resolved_domain.homepage_url, companies
+                    )
+                    for ticker, url in discovered.items():
+                        hostname = urlsplit(url).netloc
+                        if hostname:
+                            hints_by_ticker.setdefault(ticker, hostname)
+
+        return results
 
     def _assess_historical(self, url: str) -> HistoricalAvailabilityAssessment:
         if self.wayback is None:

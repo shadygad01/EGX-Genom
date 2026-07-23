@@ -22,7 +22,10 @@ from agx_research.acquisition_intelligence.live import (
     build_live_robots_checker,
     build_live_wayback_client,
 )
-from agx_research.acquisition_intelligence.target import seed_target_organizations
+from agx_research.acquisition_intelligence.target import (
+    generate_company_ir_targets,
+    seed_target_organizations,
+)
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.rss import RssNewsCollector
@@ -267,18 +270,26 @@ def main(argv: list[str] | None = None) -> int:
             registry=registry,
             wayback=build_live_wayback_client(),
         )
-        targets = seed_target_organizations()
+        # Every EGX30 constituent (today's placeholder universe; scales
+        # automatically once a real, complete EGX30/EGX70 list exists) gets
+        # its own Investor Relations target -- Priority 2/3, expanded from
+        # the `company_ir` marker entry.
+        universe = StaticUniverseProvider().constituents(date.today())
+        all_targets = [*seed_target_organizations(), *generate_company_ir_targets(universe)]
 
         results = []
         if not args.recover_only:
-            fresh_targets = [
-                t for t in targets
-                if not t.per_constituent and (args.target is None or t.id == args.target)
-            ]
-            for target in fresh_targets:
-                results.append(engine.run_for_target(target))
+            if args.target:
+                selected = [t for t in all_targets if t.id == args.target and not t.per_constituent]
+                results.extend(engine.run_for_target(t) for t in selected)
+            else:
+                # Priority order: whichever named/official source resolves
+                # first (e.g. EGX itself) gets a chance to supply real
+                # per-company IR hints for the rest via its own directory.
+                fresh_targets = [t for t in all_targets if not t.per_constituent]
+                results.extend(engine.run_catalog(fresh_targets, companies=universe))
 
-        monitor = AcquisitionContinuityMonitor(engine, targets)
+        monitor = AcquisitionContinuityMonitor(engine, all_targets)
         results.extend(monitor.check_and_recover(registry))
 
         for result in results:

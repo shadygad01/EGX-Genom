@@ -73,19 +73,44 @@ provenance, replay, acquisition intelligence — see `docs/DATA_ACQUISITION.md`)
   only the "run this on a schedule" wiring is deployment-shaped, not
   engineering (TD-23).
 
+## Priority-Ordered Live Source Connection: next engineering-closeable steps
+
+The current mission (see `CURRENT_MISSION.md`) re-prioritized live source
+connection to strict business value: EGX official, then EGX30/EGX70 company
+Investor Relations, then CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/
+Trading Economics, then anything else the Acquisition Intelligence Engine
+discovers on its own. `AcquisitionIntelligenceEngine.run_catalog()`,
+`generate_company_ir_targets()`, and `discover_company_directory_links()`
+already implement the full ordering and the EGX-directory-to-company-IR
+hint chain end to end (see `docs/PHASE_STATUS.md`'s Production Execution
+Phase section). What's next, in priority order:
+
+- **Clear either blocker** (see `CURRENT_MISSION.md`'s "genuine constraint"
+  section and `NEXT_MISSIONS.md` item 1): outbound network egress from a
+  real deployment target, or a project-owner-supplied verified EGX30/EGX70
+  constituent list. Neither is engineering-closeable from inside this
+  sandbox.
+- The moment either clears, `agx discover-sources` performs real discovery,
+  ranking, `SourceSpec` generation, registration, and qualification kickoff
+  for the entire catalog with zero further code changes.
+- **First live production collector**: once a source in the catalog above
+  resolves and qualifies, swap one of `collector_plan.py`'s mock-mode
+  collectors for a real `HttpFetcher`-backed one against the verified live
+  endpoint (`RssNewsCollector` for an IR/news RSS feed, `PdfDocumentCollector`
+  for an IR disclosure PDF, etc. — see `NEXT_MISSIONS.md` item 2). World
+  Bank remains a valid fallback first candidate (already `IMPLEMENTED`, a
+  stable no-key public API) if its egress happens to clear first, but is no
+  longer the priority per the project owner's explicit re-ordering.
+- Calibration pass (TD-28, new this phase) on the company-directory-match
+  token-overlap heuristic, once real EGX directory pages are actually
+  fetched and matched against.
+
 ## Production Execution Pipeline: next engineering-closeable steps
 
 The first production pipeline (`agx run` -> `production.pipeline.
 ProductionPipeline`) is complete, tested, and is the platform's single
 production entrypoint. What's next, in priority order:
 
-- **First live production collector** (the current mission — see
-  `CURRENT_MISSION.md`): swap one of `collector_plan.py`'s mock-mode
-  collectors for a real `HttpFetcher`-backed one against a verified live
-  endpoint. World Bank is the natural first candidate (already
-  `IMPLEMENTED`, a stable no-key public API); wiring it live is a
-  `collector_plan.py` change (which fetcher backs the same
-  `WorldBankCollector`), not new engineering.
 - Wire a real corporate-actions collector (TD-24) so `CorporateEventsAgent`
   has something to find when the production pipeline's `MarketMemory`
   reads from `--data-dir`, matching what the static mock-data path already

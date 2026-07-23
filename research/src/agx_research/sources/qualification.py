@@ -15,8 +15,8 @@ a pure, testable function of evidence.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
-from agx_research.discovery.candidate import SourceCandidate
 from agx_research.sources.reputation import ReputationScore, SourceMetrics, compute_reputation
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.spec import (
@@ -26,6 +26,16 @@ from agx_research.sources.spec import (
     SourceSpec,
     SourceStatus,
 )
+
+if TYPE_CHECKING:
+    # Deferred: `discovery.candidate` imports `sources.spec`, and this module
+    # is imported by `agx_research.sources`'s package __init__ -- a real,
+    # module-level import here would make `sources` and `discovery` a
+    # circular package dependency the moment `discovery` is the first of the
+    # two imported in a fresh process. `from __future__ import annotations`
+    # (above) already makes this safe at runtime: annotations are strings,
+    # never evaluated, so the type stays fully checkable without the cycle.
+    from agx_research.discovery.candidate import SourceCandidate
 
 _STAGE_ORDER = [
     LifecycleState.CANDIDATE,

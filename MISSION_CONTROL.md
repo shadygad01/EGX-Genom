@@ -1,8 +1,71 @@
 # Mission Control
 
-The top-level index into AGX's living status documents. This file itself
-stays short and stable — it points, it doesn't duplicate. Update the file
-it points to, not this one, except to add a new pointer.
+The top-level index into AGX's living status documents, plus the
+always-current answers to the questions that matter most. Update the
+detail in the file it points to; update the answers below in the same
+commit whenever the fact they state changes.
+
+## Status at a glance
+
+- **Where the project is:** All 18 charter systems are architecturally
+  complete and tested (17 fully DONE, the 18th DONE for everything
+  engineering can close without a cloud/vendor/secrets decision). A real
+  production execution pipeline runs the full chain end to end
+  (`agx run`), and the Acquisition Intelligence Engine can now discover,
+  verify, rank, and register a live source for the entire business-value
+  priority catalog. Every research conclusion the platform can currently
+  produce is still scoped to placeholder/mock data — no live source is
+  connected yet.
+- **Current mission:** Connect AGX's first live production sources, in
+  strict business-value order (EGX official → EGX30/EGX70 company
+  Investor Relations → CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/
+  Trading Economics → anything else discovered). See `CURRENT_MISSION.md`.
+- **Next mission:** Resume the moment either blocker below clears —
+  `agx discover-sources` needs zero further code changes to perform real
+  discovery for the full catalog. See `NEXT_MISSIONS.md`.
+- **Overall completion:** ~99% of everything engineering-closeable without
+  a business/vendor decision. The remaining ~1% is exclusively: (a) writing
+  a concrete collector once a source resolves live, and (b) System 18's
+  deployment/secrets/scheduling wiring, both mechanical once their
+  respective blockers clear.
+- **Connected live sources: 0** — blocked, not unbuilt. Every mechanism
+  needed (discovery, verification, ranking, registration, qualification,
+  collection, archival, validation) is built and tested; zero are
+  connected because this sandbox has no outbound network egress to
+  arbitrary hosts (confirmed directly and repeatedly across three
+  missions).
+- **Historical coverage:** 0 real trading days from any live source (same
+  blocker — no source has ever been reachable to backfill from). No
+  separate backfill mechanism is needed or exists; every collector already
+  fetches a source's full available series by construction, so a source's
+  first live run *is* its backfill (see `NEXT_MISSIONS.md` item 3).
+- **Knowledge growth:** 0 real `KnowledgeObject`s promoted from live data.
+  The full validation → promotion pipeline is proven correct against mock
+  data (the production pipeline's daily research cycle produces real
+  hypotheses, gates, and — when evidence clears the bar — promotions), but
+  every promoted object today traces back to placeholder CSVs, not a
+  licensed or verified live feed.
+- **Genome growth:** 0 real `Gene`s from live evidence, for the same
+  reason — `AlphaGenome` correctly creates genes from mock-data knowledge
+  promotions today; nothing yet exists to create one from real EGX
+  evidence.
+- **Known blockers:** (1) No outbound network egress from this development
+  sandbox — an external/environmental dependency, not an engineering gap.
+  (2) No verified, complete EGX30/EGX70 constituent list exists in this
+  codebase (only a 10-company EGX30 placeholder, no EGX70 list at all) —
+  a business decision reserved for the project owner, since fabricating
+  ~90 ticker/company-name pairs from training-data recall would itself
+  violate the platform's anti-fabrication principle. (3) A licensed EGX
+  market data vendor has not been selected — the standing gate on treating
+  any output as real research (`docs/ROADMAP.md`).
+- **Estimated remaining work:** Near-zero engineering effort once either
+  blocker (1) or (2) above clears — `agx discover-sources` and
+  `generate_company_ir_targets()` are already wired to scale automatically.
+  From there, each newly-resolved source needs one concrete collector
+  (small, per-source, following the existing `Collector` pattern) before
+  it's `IMPLEMENTED`. System 18's remaining deployment/secrets/scheduling
+  work is separately blocked on a hosting/vendor decision, not by this
+  mission.
 
 ## Where to look
 

@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.11.0 — Priority-Ordered Live Source Connection
+- `acquisition_intelligence/target.py`: new `TargetOrganization.priority`
+  field (and `company_ticker`) carrying the project owner's explicit
+  business-value order — EGX official (1), EGX30/EGX70 company Investor
+  Relations (2/3), CBE (4), FRA (5), CAPMAS (6), Enterprise (7), Mubasher
+  (8), Zawya (9), Reuters (10), Trading Economics (11), anything else
+  discovered (12, catch-all default). World Bank/IMF/FRED demoted to
+  enrichment-only per the re-prioritization; every seeded target reassigned
+  accordingly.
+- `generate_company_ir_targets(companies)` (new): expands the prior
+  `company_ir` per-constituent marker into one real `TargetOrganization`
+  per EGX30 constituent — deliberately **no fabricated domain hints**;
+  scales automatically to a real EGX30/EGX70 list the moment one exists,
+  with zero code changes.
+- `discovery/engine.py`: `discover_company_directory_links()` (new) —
+  extracts a company's own homepage link from an already-fetched directory
+  page via real anchor-text token matching against the company's name (not
+  a guess), plus a `_PageLinkParser` extension to track anchor text.
+  `AcquisitionIntelligenceEngine.run_catalog()` (new) processes targets in
+  priority order and feeds any company hints discovered from an earlier
+  target (e.g. EGX's own directory) into not-yet-run company IR targets.
+- `cli.py discover-sources` now runs the full expanded catalog (named
+  organizations + generated company IR targets) through `run_catalog`, in
+  priority order, by default.
+- Fixed a real pre-existing circular-import bug: `agx_research.discovery`
+  failed to import if it was the first AGX module touched in a fresh
+  process (`sources.qualification` imported `discovery.candidate.
+  SourceCandidate` at module level while `discovery.candidate` imports
+  `sources.spec`). Fixed with a `TYPE_CHECKING`-guarded import; regression-
+  tested with a fresh-subprocess import test.
+- Verified: the full 21-target priority-ordered catalog runs correctly
+  end to end, in exact priority order, with an honest "no reachable
+  domain" for every target (this sandbox still has no outbound network
+  egress) — no crash, no fabrication.
+- 14 new tests (427 Python tests total, up from 413); `ruff` clean;
+  `contracts/` unchanged (no new pydantic model exposed to the API).
+- New technical debt: TD-28 (company-directory-match heuristic
+  uncalibrated against a real page). New risk: R-19 (guard against
+  future fabrication of domain hints/constituent lists).
+
 ## 0.10.0 — First Production Execution Pipeline
 - `agx_research.production` (new package): `ProductionPipeline` wires every
   stage the mission specifies, in order — Entry Point, Source Registry,

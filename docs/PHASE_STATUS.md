@@ -15,7 +15,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
 | 01 | Foundation | **DONE** | `domain/`, `storage/`, `config.py`; reused unmodified by every later store; CI green. |
-| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`+`acquisition_intelligence/`, see `docs/DATA_ACQUISITION.md`): a 51-source registry (5 IMPLEMENTED / 34 PLANNED / 4 NEEDS_KEY / 8 TOS_REVIEW) across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap/API-doc scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank (macro), and generic RSS/Atom (news), plus AlphaVantage/FMP code-complete pending a user API key; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version; a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes. **New this phase: the Acquisition Intelligence Engine** (`acquisition_intelligence/`) — given only an organization's identity (never a manually supplied URL), it resolves a verified-reachable domain, discovers candidate acquisition methods, verifies legality (robots.txt + ToS heuristics, scraping never auto-clears)/stability (URL-shape + probe consistency)/historical availability (Wayback Machine APIs), ranks and selects the best, auto-generates a still-`PLANNED` `SourceSpec`, registers it, and begins qualification; `AcquisitionContinuityMonitor` re-runs discovery automatically for any source whose health goes `DOWN`. Fully tested with fakes (20 tests covering the complete pipeline); wired into `cli.py`'s `discover-sources` subcommand. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; a live run of the engine against the 12 named official/company/regional-news targets reports "no reachable domain" in this specific sandbox because it has no outbound network egress to arbitrary hosts (confirmed directly; only PyPI/npm/anthropic.com are allowlisted) — the engine itself is complete and will do real, verified discovery the moment it runs somewhere with egress. |
+| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`+`acquisition_intelligence/`, see `docs/DATA_ACQUISITION.md`): a 51-source registry (5 IMPLEMENTED / 34 PLANNED / 4 NEEDS_KEY / 8 TOS_REVIEW) across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap/API-doc scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank (macro), and generic RSS/Atom (news), plus AlphaVantage/FMP code-complete pending a user API key; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version; a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes. **New this phase: the Acquisition Intelligence Engine** (`acquisition_intelligence/`) — given only an organization's identity (never a manually supplied URL), it resolves a verified-reachable domain, discovers candidate acquisition methods, verifies legality (robots.txt + ToS heuristics, scraping never auto-clears)/stability (URL-shape + probe consistency)/historical availability (Wayback Machine APIs), ranks and selects the best, auto-generates a still-`PLANNED` `SourceSpec`, registers it, and begins qualification; `AcquisitionContinuityMonitor` re-runs discovery automatically for any source whose health goes `DOWN`. Fully tested with fakes (20 tests covering the complete pipeline); wired into `cli.py`'s `discover-sources` subcommand. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; a live run of the engine reports "no reachable domain" in this specific sandbox because it has no outbound network egress to arbitrary hosts (confirmed directly and repeatedly, including this phase; only PyPI/npm/anthropic.com are allowlisted) — the engine itself is complete and will do real, verified discovery the moment it runs somewhere with egress. **New this phase: priority-ordered catalog processing** (`AcquisitionIntelligenceEngine.run_catalog`, `TargetOrganization.priority`) matching the project owner's explicit business-value order (EGX official → EGX30/EGX70 company Investor Relations → CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → everything else discovered), plus `generate_company_ir_targets()` (one real target per EGX30 constituent, expanding the previously-inert `company_ir` marker entry) and `discover_company_directory_links()` (extracts a company's own homepage link from an already-fetched directory page by real anchor-text matching, letting a resolved exchange/regulator homepage supply real per-company hints instead of guessing ~100 corporate domains). See "Production Execution Phase" below. |
 | 03 | Event Platform | **DONE** | Fingerprint identity, taxonomy/ontology, entity resolution, dedup/conflict/lifecycle, `EventPlatform` sole write path, graph projection. Blocked-external: political/technical feeds, NLP entity linking. |
 | 04 | Market Memory | **DONE** | `MarketState` (snapshot+universe+sectors+events+session), `TradingCalendar` (fixed holidays as rules; movable as explicit placeholder table). Blocked-external: authoritative movable-holiday dates. |
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
@@ -42,7 +42,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(413 Python tests + 33 TypeScript tests green).
+(427 Python tests + 33 TypeScript tests green).
 
 ## Dashboard dual-provider architecture (post-Data-Acquisition-Program)
 
@@ -244,3 +244,76 @@ live collector (not yet built — that's the next mission).
   Control tracks execution history across runs; the CLI entrypoint works
   end to end. 413 Python tests green overall (up from 397); 33 TypeScript
   tests unaffected; `ruff` clean.
+
+## Production Execution Phase (post-Production-Pipeline)
+
+Architecture, frameworks, and generic abstractions are considered finished
+per the project owner's explicit instruction. This phase's job was not to
+build more of them, but to advance AGX's actual objective — continuously
+discovering statistically valid investment opportunities for EGX30/EGX70 —
+strictly in the business-value order the project owner named: EGX official
+→ EGX30 Investor Relations → EGX70 Investor Relations → CBE → FRA → CAPMAS
+→ Enterprise → Mubasher → Zawya → Reuters → Trading Economics → anything
+else the Acquisition Intelligence Engine discovers on its own. World Bank/
+IMF/FRED are explicitly demoted to enrichment-only, not primary milestones.
+
+**What closed**: priorities 1 and 4–11 were already seeded
+`TargetOrganization`s from the prior mission; priority 2/3 (company
+Investor Relations) had only a marker entry with no real per-company
+expansion. This phase built:
+
+- `TargetOrganization.priority` + `AcquisitionIntelligenceEngine.
+  run_catalog()`: every target now runs in the exact business-value order
+  above, lowest-priority-number first.
+- `generate_company_ir_targets(companies)`: expands the `company_ir`
+  marker into one real target per EGX30 constituent (10 today, from
+  `universe.EGX30_UNIVERSE_PLACEHOLDER`; scales automatically to a real,
+  complete list with no code change) — deliberately **no fabricated
+  domain hints**, since guessing ~10-100 individual corporate domains from
+  training-data recall would be exactly the kind of fabrication this
+  program's rules forbid (unlike the long-established, unambiguous global
+  brand-domain associations already used for Reuters/CBE/etc.).
+- `discovery.discover_company_directory_links()`: a new, real discovery
+  heuristic that matches anchor text against known company names on an
+  already-*fetched* page, letting an exchange's own listed-company
+  directory (once reachable) supply genuine per-company hints —
+  `run_catalog` wires this so whichever named/official target resolves
+  first feeds discovered hints into not-yet-run company targets.
+- Fixed a genuine, pre-existing architectural defect discovered while
+  building this: `agx_research.discovery` failed to import if it was the
+  very first AGX module touched in a fresh process (a real circular
+  package dependency between `sources.qualification` and
+  `discovery.candidate`, previously unhit because nothing existing imported
+  `discovery` first). Fixed with a `TYPE_CHECKING`-guarded import (the
+  module already used `from __future__ import annotations`, so this is a
+  zero-runtime-behavior-change fix); regression-tested with a fresh-
+  subprocess import check.
+- `cli.py discover-sources` now runs the full expanded catalog (org
+  targets + generated company IR targets, ~20 targets today) through
+  `run_catalog` by default, in priority order.
+- 14 new tests (427 total, up from 413), all offline.
+
+**Verified live, again, honestly**: the full 21-target priority-ordered
+catalog (EGX official + 10 EGX30 company IR targets + 10 named
+organizations) was run against the real (blocked) network and correctly
+reported "no reachable domain" for every one, in the exact priority order
+specified, with no crash — the third independent confirmation across three
+missions that this sandbox's network policy blocks arbitrary outbound
+hosts uniformly (not source-specific), including domains already
+`IMPLEMENTED` and previously believed reachable in principle (`stooq.com`,
+`fred.stlouisfed.org`, `api.worldbank.org` were re-checked this phase too).
+
+**Named, real blockers (not engineering gaps)**:
+1. No outbound network egress from this sandbox to any arbitrary host —
+   an environmental limitation, confirmed directly three times now.
+2. No real, complete, verified EGX30/EGX70 constituent list exists in this
+   codebase (only a 10-company EGX30 placeholder, no EGX70 list at all) —
+   the correct source is EGX's own official site (blocked by #1) or a
+   user-supplied verified list (a named business decision, per this
+   phase's own stop conditions). Fabricating one from training-data recall
+   was deliberately not done.
+
+Everything engineering could complete without those two inputs has been
+completed. See `CURRENT_MISSION.md` for the full statement and
+`NEXT_MISSIONS.md` for exactly what runs automatically the moment either
+clears.

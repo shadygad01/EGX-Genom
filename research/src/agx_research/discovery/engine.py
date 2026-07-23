@@ -17,6 +17,7 @@ well-formed.
 
 from __future__ import annotations
 
+import re
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
 
@@ -34,19 +35,31 @@ _FEED_TYPES = {"application/rss+xml", "application/atom+xml", "application/feed+
 
 
 class _PageLinkParser(HTMLParser):
-    """Collects every <a href> and <link rel=alternate> on a page in one pass."""
+    """Collects every <a href> (with its inner text) and <link rel=alternate>
+    on a page in one pass."""
 
     def __init__(self) -> None:
         super().__init__()
         self.anchors: list[dict[str, str]] = []
         self.links: list[dict[str, str]] = []
+        self._open_anchor: dict[str, str] | None = None
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attr_dict = {k: (v or "") for k, v in attrs}
         if tag == "a" and attr_dict.get("href"):
+            attr_dict["text"] = ""
             self.anchors.append(attr_dict)
+            self._open_anchor = attr_dict  # HTML anchors don't nest; last-opened wins
         elif tag == "link" and attr_dict.get("href"):
             self.links.append(attr_dict)
+
+    def handle_data(self, data: str) -> None:
+        if self._open_anchor is not None:
+            self._open_anchor["text"] += data
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "a":
+            self._open_anchor = None
 
 
 def _parse_page(html: str) -> _PageLinkParser:
@@ -159,13 +172,59 @@ def discover_api_documentation(html: str, page_url: str) -> list[SourceCandidate
     return candidates
 
 
+_COMPANY_NAME_STOPWORDS = {
+    "company", "companies", "group", "holding", "holdings", "egypt", "egyptian",
+    "co", "corp", "corporation", "the", "for", "of", "and", "sae", "s.a.e",
+    "production", "production.",
+}
+
+
+def _significant_tokens(name: str) -> set[str]:
+    normalized = re.sub(r"[^a-z0-9\s]", " ", name.lower())
+    return {tok for tok in normalized.split() if tok and tok not in _COMPANY_NAME_STOPWORDS}
+
+
+def discover_company_directory_links(
+    html: str, page_url: str, companies: dict[str, str]
+) -> dict[str, str]:
+    """Find each company's own homepage link on an already-fetched directory
+    page (e.g. an exchange's official list of listed companies) by matching
+    anchor text against `companies` (ticker -> display name).
+
+    Never guesses a company's domain: a match requires every one of the
+    company name's significant tokens (common corporate suffixes like
+    "Company"/"Group"/"Holding"/"Egypt" excluded) to literally appear in an
+    anchor's visible text on a page that was actually fetched. This is the
+    mechanism that lets Priority 1 (the exchange itself) supply real
+    per-company hints for Priority 2/3 (company Investor Relations) once
+    the exchange's site is reachable, instead of guessing ~100 corporate
+    domains from training-data recall.
+
+    Returns ticker -> resolved absolute URL for every company matched (at
+    most once each -- the first anchor found wins, for determinism).
+    """
+    parser = _parse_page(html)
+    significant = {ticker: _significant_tokens(name) for ticker, name in companies.items()}
+    found: dict[str, str] = {}
+
+    for anchor in parser.anchors:
+        text_tokens = _significant_tokens(anchor.get("text", ""))
+        if not text_tokens:
+            continue
+        for ticker, tokens in significant.items():
+            if ticker in found or not tokens:
+                continue
+            if tokens.issubset(text_tokens):
+                found[ticker] = urljoin(page_url, anchor["href"])
+
+    return found
+
+
 def discover_sitemap_urls(sitemap_xml: str, page_url: str) -> list[SourceCandidate]:
     """Minimal <loc> extraction from a sitemap.xml -- a lightweight generic
     parse rather than a full XML sitemap schema, since the only thing this
     engine needs is the list of candidate URLs it points to.
     """
-    import re
-
     urls = re.findall(r"<loc>(.*?)</loc>", sitemap_xml, flags=re.IGNORECASE | re.DOTALL)
     return [
         SourceCandidate(

@@ -32,13 +32,46 @@ close without a cloud/vendor/secrets decision from the user.**
 
 ## Test health
 
-- Python: 413 tests, all green (`cd research && uv run pytest`).
+- Python: 427 tests, all green (`cd research && uv run pytest`).
 - TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
   + `git diff --exit-code`).
 - Lint: `uv run ruff check` clean.
 
-## Production Execution Pipeline (this mission)
+## Connected live sources: 0 (blocked, not unbuilt — see below)
+
+Every mechanism needed to connect a live source is built and tested; zero
+are connected because this sandbox has no outbound network egress
+(confirmed directly, repeatedly, across three missions). `docs/PHASE_STATUS.md`'s
+Production Execution Phase section has the full breakdown.
+
+## Priority-Ordered Live Source Connection (this mission)
+
+- `AcquisitionIntelligenceEngine.run_catalog()` (new): processes every
+  target in strict business-value order (`TargetOrganization.priority`,
+  new field) — EGX official, then EGX30/EGX70 company Investor Relations,
+  then CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics,
+  then anything else discovered — per the project owner's explicit
+  re-prioritization (World Bank/IMF/FRED demoted to enrichment-only).
+- `generate_company_ir_targets()` (new): expands the `company_ir` marker
+  entry into one real target per EGX30 constituent (10 today, scales to a
+  real complete list automatically) — no fabricated domain hints.
+- `discover_company_directory_links()` (new): extracts a company's own
+  homepage link from an already-fetched directory page by real anchor-text
+  matching — the mechanism letting EGX's own site (once reachable) supply
+  real per-company hints instead of guessing ~100 corporate domains.
+- Fixed a real pre-existing circular-import bug (`agx_research.discovery`
+  failed to import first in a fresh process) found while building this —
+  regression-tested.
+- Verified: the full 21-target priority-ordered catalog (EGX official +
+  10 company IR + 10 named orgs) runs correctly end to end, in exact
+  priority order, with an honest "no reachable domain" for every target —
+  no crash, no fabrication.
+- 14 new tests. See `CURRENT_MISSION.md` for the full honesty note on the
+  two real blockers (network egress; no verified EGX30/EGX70 constituent
+  list) and `COMPLETION_REPORT.md` for this build's report.
+
+## Production Execution Pipeline (earlier mission)
 
 - New package `production/`: `ProductionPipeline` runs the complete chain
   end to end — Source Registry → Discovery Engine → Collector Selection
@@ -105,7 +138,9 @@ close without a cloud/vendor/secrets decision from the user.**
 All research conclusions the platform produces remain scoped to
 placeholder/free-source data until a licensed EGX market data vendor is
 selected — a business decision reserved for the user (`docs/ROADMAP.md`).
-Nothing about this mission changes that gate; it proves, for the first
-time, that the complete chain from data acquisition through a promotable
-recommendation runs as one production execution — currently against
-mock/replayed data, with a real live collector the explicit next mission.
+Nothing about this mission changes that gate; it makes the platform's
+own priority-ordered path to connecting real, free, legally-accessible
+sources fully engineering-complete and ready to execute autonomously the
+moment either of two blockers clears: outbound network egress, or a
+verified EGX30/EGX70 constituent list from the project owner. Both are
+named explicitly in `CURRENT_MISSION.md`.

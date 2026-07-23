@@ -188,6 +188,101 @@ def test_continuity_monitor_recovers_down_source_with_alternative_method():
     assert results[0].selected.candidate.discovered_url == "https://testorg.com/data/prices.csv"
 
 
+def test_run_catalog_processes_targets_in_priority_order():
+    registry = SourceRegistry()
+    call_order = []
+
+    def prober(url):
+        call_order.append(url)
+        return ProbeResult(url=url, reachable=False)
+
+    engine = AcquisitionIntelligenceEngine(
+        prober=prober, fetch_text=lambda url: None, robots_checker=lambda url: True,
+        registry=registry,
+    )
+    low = make_target(id="low_priority", domain_hints=["low.com"], priority=10)
+    high = make_target(id="high_priority", domain_hints=["high.com"], priority=1)
+
+    engine.run_catalog([low, high])
+
+    # high_priority's domain is probed before low_priority's, regardless of
+    # input list order.
+    assert call_order.index("https://high.com") < call_order.index("https://low.com")
+
+
+def test_run_catalog_feeds_company_directory_hints_into_later_targets():
+    directory_html = """
+    <html><head>
+    <link rel="alternate" type="application/rss+xml" href="/feed.xml">
+    </head><body><a href="https://testco.example/">Test Company</a></body></html>
+    """
+    company_html = """
+    <html><head>
+    <link rel="alternate" type="application/rss+xml" href="/ir-feed.xml">
+    </head><body>hello</body></html>
+    """
+    reachable = {
+        "https://directory.com", "https://directory.com/feed.xml",
+        "https://testco.example", "https://testco.example/ir-feed.xml",
+    }
+    pages = {
+        "https://directory.com": directory_html,
+        "https://testco.example": company_html,
+    }
+
+    registry = SourceRegistry()
+    engine = AcquisitionIntelligenceEngine(
+        prober=reachable_prober(reachable),
+        fetch_text=lambda url: pages.get(url),
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    directory_target = make_target(
+        id="directory", name="Directory Org", domain_hints=["directory.com"], priority=1,
+    )
+    company_target = make_target(
+        id="company_ir_tco", name="Test Company Investor Relations",
+        domain_hints=[], priority=2, company_ticker="TCO",
+    )
+
+    results = engine.run_catalog(
+        [company_target, directory_target], companies={"TCO": "Test Company"},
+    )
+
+    directory_result = next(r for r in results if r.target_id == "directory")
+    company_result = next(r for r in results if r.target_id == "company_ir_tco")
+    assert directory_result.registered is True
+    # The company target had no domain hints of its own -- it only resolved
+    # because the directory's own page linked to "Test Company".
+    assert company_result.registered is True
+    assert company_result.resolved_domain.domain == "testco.example"
+
+
+def test_run_catalog_never_overrides_a_targets_own_domain_hints():
+    directory_html = '<html><body><a href="https://wrong-domain.example/">Test Company</a></body></html>'
+    reachable = {"https://directory.com", "https://real-domain.example"}
+    pages = {"https://directory.com": directory_html}
+
+    registry = SourceRegistry()
+    engine = AcquisitionIntelligenceEngine(
+        prober=reachable_prober(reachable),
+        fetch_text=lambda url: pages.get(url),
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    directory_target = make_target(id="directory", domain_hints=["directory.com"], priority=1)
+    company_target = make_target(
+        id="company_ir_tco", domain_hints=["real-domain.example"], priority=2, company_ticker="TCO",
+    )
+
+    results = engine.run_catalog(
+        [company_target, directory_target], companies={"TCO": "Test Company"},
+    )
+    company_result = next(r for r in results if r.target_id == "company_ir_tco")
+    # Resolved via its own hint, not the (wrong) discovered directory link.
+    assert company_result.resolved_domain.domain == "real-domain.example"
+
+
 def test_continuity_monitor_skips_per_constituent_targets():
     registry = SourceRegistry()
     engine = AcquisitionIntelligenceEngine(

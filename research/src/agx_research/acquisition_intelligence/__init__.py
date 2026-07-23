@@ -29,11 +29,16 @@ from agx_research.acquisition_intelligence.legality import (
 )
 from agx_research.acquisition_intelligence.ranking import RankedMethod, rank_methods, select_best
 from agx_research.acquisition_intelligence.stability import StabilityAssessment, assess_stability
-from agx_research.acquisition_intelligence.target import TargetOrganization, seed_target_organizations
+from agx_research.acquisition_intelligence.target import (
+    TargetOrganization,
+    generate_company_ir_targets,
+    seed_target_organizations,
+)
 
 __all__ = [
     "TargetOrganization",
     "seed_target_organizations",
+    "generate_company_ir_targets",
     "ProbeResult",
     "ResolvedDomain",
     "HeuristicDomainResolver",

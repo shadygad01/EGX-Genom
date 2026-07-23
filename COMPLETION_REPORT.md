@@ -1,82 +1,94 @@
-# Completion Report — First Production Execution Pipeline
+# Completion Report — Priority-Ordered Live Source Connection
 
 ## Mission
 
-Stop building architecture and generic frameworks; wire every completed
-system into the first production execution pipeline, proving AGX can run
-an end-to-end production research cycle. The pipeline must represent the
-exact execution path a live deployment (GitHub Actions, Cloudflare) will
-later run unchanged — collectors stay mock/replay for now, by explicit
-instruction; only the data source changes later.
+Connect AGX's first live production sources, in strict business-value
+order, autonomously. The project owner reset priorities: engineering
+elegance is secondary to business value now, and the objective is
+continuously discovering statistically valid investment opportunities for
+EGX30/EGX70 — not building more software. World Bank/IMF/FRED are
+enrichment only. The explicit order: EGX official (1), EGX30 Investor
+Relations (2), EGX70 Investor Relations (3), CBE (4), FRA (5), CAPMAS (6),
+Enterprise (7), Mubasher (8), Zawya (9), Reuters (10), Trading Economics
+(11), anything else the Acquisition Intelligence Engine discovers on its
+own (12).
 
 ## Delivered
 
-New package `research/src/agx_research/production/`:
-
 | Module | Delivers |
 |---|---|
-| `collector_plan.py` | `ExecutionMode` (mock/replay), `MockFetcher` (drop-in for `HttpFetcher.fetch_text`, canned wire-format content), `build_collector_plan()` — selects and constructs real `Collector`s (`StooqPriceCollector`, `FredCsvCollector`, `RssNewsCollector`, `WorldBankCollector`) backed by mock content or `ArchiveReplayCollector`. |
-| `stages.py` | `StageName` (the mission's 17 stages, in order), `StageStatus` (succeeded/partial/failed/skipped), `StageResult`. |
-| `report.py` | `ExecutionReport`, `derive_overall_status()`, `PipelineExecutionRepository` (versioned execution history). |
-| `mission_control.py` | `MissionControlStatus` + `build_mission_control_status()` — derived entirely from `ExecutionReport` history. |
-| `artifacts.py` | `export_investment_cases()` (composes `RecommendationService` + `PortfolioConstructor`, previously never wired together), `export_collector_status()`, `export_runtime_status()`, `export_dashboard_metrics()`. |
-| `pipeline.py` | `ProductionPipeline` — the orchestrator; every stage isolated, every stage's result recorded. |
+| `acquisition_intelligence/target.py` | `TargetOrganization.priority` (new field, 12 named tiers matching the mission's order exactly) + `company_ticker`; every seeded target reassigned; `generate_company_ir_targets(companies)` (new) expands the old `company_ir` per-constituent marker into one real target per EGX30 constituent, with no fabricated domain hints. |
+| `discovery/engine.py` | `discover_company_directory_links()` (new) — real anchor-text token matching against a company's name on an already-fetched directory page; `_PageLinkParser` extended to capture anchor text across `handle_starttag`/`handle_data`/`handle_endtag`. |
+| `acquisition_intelligence/engine.py` | `AcquisitionIntelligenceEngine.run_catalog()` (new) — processes targets in priority order and feeds any company hint discovered from an earlier-resolved target (e.g. EGX's own directory) into not-yet-run company IR targets. |
+| `cli.py` | `discover-sources` now builds the full catalog (named orgs + generated company IR targets) and runs it through `run_catalog` by default, in priority order. |
+| `sources/qualification.py` | Fixed a real, pre-existing circular-import bug (`agx_research.discovery` failed to import first in a fresh process) with a `TYPE_CHECKING`-guarded import. |
 
 ## The gap this closed
 
-`agx collect` materialized data into `--data-dir`; `agx run` always read
-from a separate, static `--mock-data` directory. Nothing connected the
-two — collected data was invisible to research, silently, in the existing
-codebase. `ProductionPipeline` builds its own `MarketMemory` pointed at
-`--data-dir`, so what Collector Execution writes is what Research Pipeline
-reads. Verified directly: a fresh run's Stooq/FRED/RSS/World Bank mock
-collectors write `prices/COMI.csv`, `macro/BRENT_USD.csv`, `news.csv` into
-`--data-dir`, and the same run's Research Pipeline stage produces a real
-hypothesis from exactly that data (not from `research/data/mock/`).
+The Acquisition Intelligence Engine (built the mission before this one)
+already covered priorities 1 and 4–11 as seeded named organizations.
+Priority 2/3 — the highest business-value gap, EGX30/EGX70 company
+Investor Relations — had only a marker entry with no actual per-company
+expansion, and no ordering existed to make "EGX official first, unlocking
+company IR hints" an executable dependency rather than just a wishlist.
+Both gaps are closed: `run_catalog()` encodes the ordering and the
+hint-feeding dependency as real logic, and `generate_company_ir_targets()`
+expands to one target per company today (10, the placeholder EGX30 list)
+and automatically to however many exist once a real, complete EGX30/EGX70
+list is supplied.
 
 ## Verification
 
-- 413 Python tests (up from 397), 16 new (`test_production_pipeline.py`),
-  all offline. Covers: every one of the 17 stages runs in the mission's
-  exact order; collected data reaches the research pipeline; replay mode
-  reproduces the identical research outcome as the original mock run; the
-  raw archive doesn't duplicate documents between a mock run and a
-  following replay; replay against an empty archive is honest (reports 0
-  documents, doesn't fabricate); deterministic execution (same inputs
-  produce byte-identical collected CSVs and identical hypothesis counts
-  across two independent pipeline instances); failure isolation at both
-  the stage level (a monkeypatched failing stage doesn't stop later
-  stages) and the collector level (one broken collector among several
-  degrades to `PARTIAL`, not total failure); every one of the 14 output
-  artifacts is written and validates against its schema; Mission Control
-  correctly tracks execution history (`total_executions`, last successful/
-  failed) across repeated runs; the CLI `run` command works end to end.
-- `contracts/` unchanged (no pydantic schema drift this phase);
-  `ruff check` clean; 33 TypeScript tests unaffected; both TS packages
-  build clean.
-- `.github/workflows/deploy-pages.yml` updated to call the single `run`
-  command and verified locally to reproduce the exact same sequence
-  (`run` → `validate-dashboard`) the workflow now performs.
+- 427 Python tests (up from 413), 14 new. Covers: priority ordering of
+  every named target matches the mission's list exactly; company IR target
+  generation produces one target per company with `domain_hints == []`
+  (never guessed) and deterministic ticker ordering; `run_catalog()`
+  processes in priority order and correctly feeds discovered hints forward
+  without overriding a target's own existing hints; `discover_company_
+  directory_links()` matches real anchor text against real company names
+  with a token-subset heuristic; a fresh-subprocess regression test proves
+  `agx_research.discovery` now imports cleanly first.
+- `ruff check` clean; `contracts/` unchanged (no new pydantic model exposed
+  to the API — `TargetOrganization` isn't API-facing).
+- Live verification: ran `discover-sources` against the full 21-target
+  catalog (EGX official + 10 company IR + 10 named organizations) in the
+  background (exceeded the default command timeout at this scale). Exit
+  code 0. Every target processed in exact priority order, each correctly
+  reporting "no reachable domain" — this sandbox's confirmed lack of
+  outbound network egress, not a defect (see below).
 
 ## What did not change, deliberately
 
-- No live collector was built — the mission explicitly deferred that to
-  the next one. `collector_plan.py`'s `MockFetcher`/`ArchiveReplayCollector`
-  seam is designed so adding one later touches only that module.
-- `DailyResearchPipeline`, `RuntimeEngine`, `CollectionService`,
-  `RecommendationService`, `PortfolioConstructor`, and
-  `write_dashboard_artifacts` are all called exactly as they already
-  existed — zero lines changed in any of them. The only supporting change
-  outside `production/` was extending `dashboard/validate.py` to
-  optionally validate the six new artifacts, and deleting `cli.build_engine()`
-  (dead code once `run` was repurposed — its only caller).
-- `cli.py`'s `export-dashboard`/`collect`/`status`/`discover-sources`
-  subcommands are untouched and still work exactly as before, for
-  lower-level/manual use.
+- No redesign of the Acquisition Intelligence Engine, Discovery Engine, or
+  Source Registry — every change composes or extends what already existed
+  (`priority` is a new field, not a new sorting system; `run_catalog` calls
+  the existing `run_for_target` per target).
+- No fabricated domain hints, ticker/company-name pairs, or EGX70
+  constituent list — `generate_company_ir_targets()`'s docstring and its
+  test (`test_generate_company_ir_targets_produces_one_per_company_with_no_fabricated_hints`)
+  both assert this explicitly.
+- `cli.py`'s other subcommands (`run`, `collect`, `status`,
+  `export-dashboard`) untouched.
 
-## Follow-through
+## Genuine blocker — this mission's stop condition
 
-`CURRENT_MISSION.md` is now set to **implement the first live production
-collector** — World Bank recommended as the first candidate (already
-`IMPLEMENTED`, tested, a stable free no-key API), per the stop condition's
-explicit instruction. See `NEXT_MISSIONS.md` for the full prioritized list.
+Two blockers, both outside what engineering can resolve from inside this
+sandbox, are what stop further live connection (stop condition 1, external
+dependency):
+
+1. **No outbound network egress.** Confirmed directly and repeatedly
+   across three missions (`curl`/`WebFetch` against `www.egx.com.eg`,
+   `cbe.org.eg`, `fra.gov.eg`, `capmas.gov.eg`, `mubasher.info`,
+   `stooq.com`, `fred.stlouisfed.org`, `api.worldbank.org` all return
+   `CONNECT tunnel failed, response 403`; only PyPI/npm/anthropic.com are
+   allowlisted).
+2. **No verified, complete EGX30/EGX70 constituent list exists in this
+   codebase** — only a 10-company EGX30 placeholder, no EGX70 list at all.
+   Fabricating ~90 more ticker/company-name pairs from training-data recall
+   would itself violate "never fabricate data" applied to index
+   membership — the correct source is EGX's own site (priority 1, blocked
+   by #1 above) or a verified list the project owner supplies.
+
+Everything engineering could complete without either input has been
+completed. See `NEXT_MISSIONS.md` for what runs automatically the moment
+either clears, and `CURRENT_MISSION.md` for the full honesty note.

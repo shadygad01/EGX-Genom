@@ -1,85 +1,112 @@
 # Next Missions
 
-In priority order. See `docs/ROADMAP.md` for the full detail behind each
-item and `docs/PHASE_STATUS.md` for what's already closed.
+In priority order (business value, per the project owner's explicit
+ordering — not engineering convenience). See `docs/ROADMAP.md` for full
+detail and `docs/PHASE_STATUS.md` for what's already closed.
 
-## 1. First live production collector (current mission — see `CURRENT_MISSION.md`)
+## What runs automatically the moment either blocker below clears
 
-Swap one mock-mode collector in `production/collector_plan.py` for a real
-`HttpFetcher`-backed one against a verified live endpoint. World Bank is
-the recommended first candidate: already `IMPLEMENTED`, tested, a stable
-free no-key public API. This proves the production pipeline's mock/replay
-seam (`AD-28`) actually swaps out cleanly for a live data source with zero
-changes to `CollectionService`, `ProductionPipeline`, or the collector's
-own `parse()`.
+No further engineering is required for this — `agx discover-sources`
+already processes the complete priority-ordered catalog end to end
+(resolve → discover → verify legality/stability/historical-availability →
+rank → select → auto-generate `SourceSpec` → register → begin
+qualification) for:
 
-## 2. Corporate-actions collector (TD-24)
+1. EGX official
+4. CBE
+5. FRA
+6. CAPMAS
+7. Enterprise
+8. Mubasher
+9. Zawya
+10. Reuters
+11. Trading Economics
+12. Anything else the engine finds on its own
 
-`CorporateEventsAgent` currently finds nothing when the production
-pipeline's `MarketMemory` reads from `--data-dir`, since no collector
-produces `CorporateEvent`s yet (unlike the static `research/data/mock/`
-path, which has two hand-authored ones). A real collector — likely parsed
-from Company IR PDF disclosures once that source is verified — closes
-this; wire it the same way `collector_plan.py` wires price/macro/news.
+Priorities 2/3 (EGX30/EGX70 company Investor Relations) run automatically
+too, for whichever companies exist in the universe at the time
+(`generate_company_ir_targets`) — currently the 10-company EGX30
+placeholder, expanding with zero code changes once a real list exists.
 
-## 3. Run the Acquisition Intelligence Engine somewhere with network egress
+## 1. Clear the blocker: network egress or a verified company list
 
-Still open from the prior mission: `agx discover-sources` is complete and
-tested but has not yet run against the real internet (this sandbox has no
-outbound egress to arbitrary hosts, confirmed directly). The moment it
-runs with egress, it will resolve real domains and discover real
-acquisition methods for EGX, Reuters, Mubasher, Zawya, Enterprise, Asharq
-Business, CNBC Arabia, CBE, FRA, CAPMAS, and Trading Economics.
+Two independent unblocks, either one lets real connection work resume:
 
-## 4. Implement production collectors against whatever the engine discovers
+- **Run somewhere with outbound network egress** (a deployment, or a
+  differently-configured sandbox). The moment this happens,
+  `agx discover-sources` performs real, verified discovery for the entire
+  catalog above with no code changes.
+- **Project owner supplies a verified EGX30/EGX70 constituent list**
+  (tickers + names) and/or per-company IR domains. This is explicitly a
+  business decision, not something engineering should fabricate from
+  training-data recall (see `CURRENT_MISSION.md`'s honesty note). Either
+  input slots directly into `generate_company_ir_targets(companies, ...)`
+  and/or each `TargetOrganization.domain_hints`.
 
-Once #3 produces real `AcquisitionResult`s, write and test the concrete
-collector each one's `SourceSpec.collector` field suggests, then flip
-`status` to `IMPLEMENTED` and wire it into `collector_plan.py` alongside
-the collectors #1 and #2 added.
+## 2. Once a source resolves: write and test its concrete collector
 
-## 5. Company IR extraction stage
+Every `SourceSpec` `agx discover-sources` registers stays `PLANNED` by
+design (`AD-24`) until an engineer writes and tests the concrete collector
+its `collector` field suggests (`RssNewsCollector` for RSS,
+`ExcelSeriesCollector`/`PdfDocumentCollector` for structured/PDF sources).
+Wire it into `production/collector_plan.py` (extending its existing
+mock/replay seam, `AD-28`) and flip `status` to `IMPLEMENTED`.
 
-Per-constituent Investor Relations discovery is scoped
-(`TargetOrganization.per_constituent=True`) but not yet iterated over the
-EGX universe list, and needs the report-parsing stage `PdfDocumentCollector`
-already flags as source-specific work.
+## 3. Historical backfill — no new logic needed, already automatic
 
-## 6. Activate AlphaVantage/FMP once a user supplies a key
+Per the mission's own instruction ("never build separate historical
+logic"): every collector already in this platform (`StooqPriceCollector`,
+`FredCsvCollector`, `WorldBankCollector`, `RssNewsCollector`) fetches a
+source's full available series by construction, not an incremental
+window — backfill is what a first real collection run against any of
+these sources already does, through the identical production pipeline
+(`HistoricalReplayEngine` handles reprocessing archived data under a
+parser fix; no separate "backfill mode" exists or is needed). Once
+priorities 1–11's collectors are real, their first run *is* the backfill.
 
-Both collectors are code-complete and tested. Flipping `status` to
-`IMPLEMENTED` and passing the key into the constructor is the entire
-remaining step.
+## 4. World Bank / IMF / FRED live activation — deprioritized, not abandoned
 
-## 7. Cross-source corroboration + latency measurement (TD-11 / TD-16)
+The prior mission's plan (make World Bank the first live collector) is
+still valid engineering, just no longer the first priority per the
+project owner's explicit re-ordering: these are enrichment sources. Revisit
+after priorities 1–11 have real collectors, or opportunistically if World
+Bank's egress happens to clear first (same blocker, same unblock).
 
-Once a second `IMPLEMENTED` source overlaps existing coverage, wire real
-`consistency_score` instead of `None`. Instrument `HttpFetcher` to time
-requests so `reputation.py`'s `latency` dimension stops being permanently
-unmeasured.
+## 5. Corporate-actions collector (TD-24, still open)
 
-## 8. Calibration pass (TD-17, TD-20)
+`CorporateEventsAgent` finds nothing from `--data-dir` today because no
+collector produces `CorporateEvent`s. Once a company's own IR/PDF source
+(priority 2/3) is real, this is likely its natural byproduct — an IR
+disclosure PDF collector should extract corporate actions (splits,
+dividends, earnings dates), not just narrative news.
+
+## 6. Cross-source corroboration + latency measurement (TD-11 / TD-16)
+
+Once two `IMPLEMENTED` sources overlap coverage (e.g. two independent EGX
+price sources), wire real `consistency_score`. Instrument `HttpFetcher` to
+time requests so `reputation.py`'s `latency` dimension stops being
+permanently unmeasured.
+
+## 7. Calibration pass (TD-17, TD-20, TD-28 — new this phase)
 
 Once real run history and real ToS-page checks exist, revisit
 `qualification.py`'s promotion thresholds, `health.py`'s alert thresholds,
-and `legality.py`'s red/green keyword lists — all declared policy today.
+`legality.py`'s red/green keyword lists, and the company-directory-match
+token-overlap heuristic (TD-28) — all declared policy today.
 
-## 9. Scheduled production pipeline runs
+## 8. Scheduled production pipeline + discovery runs
 
-Wire a periodic `agx run` into a scheduled job once any deployment target
-exists (System 18) — the command is deployment-ready today; only the "run
-this on a schedule" wiring is deployment-shaped, not engineering. This is
-the "runs unchanged under GitHub Actions and Cloudflare" the pipeline
-mission specified; `.github/workflows/deploy-pages.yml` already proves the
-GitHub Actions half.
+Wire `agx run` and `agx discover-sources` into a periodic job once any
+deployment target exists (System 18) — both are deployment-ready today;
+only the "run this on a schedule" wiring is deployment-shaped.
 
-## 10. ToS reviews (business/legal decision, not engineering)
+## 9. ToS reviews (business/legal decision, not engineering)
 
 Yahoo Finance, TradingView, Investing.com, Google Trends, LinkedIn/company
 social, public Telegram, Google Scholar, ResearchGate — each needs a human
 legal judgment on automated-collection terms before any code changes.
 
-## Beyond the Data Acquisition Platform
+## Beyond this
 
 Per the charter's build order, no later system's work should start while
 System 02 still has closeable (non-business-blocked) gaps. Items 1–5 above

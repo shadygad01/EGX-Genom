@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.6.0 — Production Data Acquisition Program (System 02 extension)
+- `sources/`: `SourceSpec`/`SourceRegistry` — a 51-source declarative
+  catalog spanning all 9 charter categories (Official, Company, Market
+  Data, News, Arabic News, Macroeconomic, Global Markets, Alternative,
+  Research), each with reliability/freshness priors, retry/rate-limit
+  policy, license, conflict priority, and an honest status
+  (IMPLEMENTED/PLANNED/NEEDS_KEY/TOS_REVIEW/DISABLED).
+- `collectors/`: `RawDocument` provenance envelope (content-hash-derived
+  id, append-only normalization/validation history); `HttpFetcher`
+  enforcing robots.txt, per-source rate limits, and bounded exponential
+  backoff in code, not just policy; `Collector` ABC that refuses to run
+  against any non-IMPLEMENTED source; three real collectors — Stooq
+  (EGX + global daily OHLCV), FRED (macro series), generic RSS/Atom
+  (news, layout-tolerant); `collectors.quality.assess_quality()` computing
+  the charter's 7 quality scores mechanically; `CollectionService`
+  orchestrating fetch → parse → score → materialize-or-withhold → register
+  (news candidates route through the existing `EventPlatform`, never a new
+  write path).
+- `data.mock_provider.LocalCsvDataProvider` — a clearer alias for
+  `MockDataProvider` now that it also serves real collected data through
+  the same CSV layout.
+- CLI: new `collect` subcommand dispatching to the right collector by
+  source id.
+- `docs/DATA_ACQUISITION.md` — full design doc; `PHASE_STATUS`/`ROADMAP`/
+  `TECHNICAL_DEBT` updated; 53 new tests (256 total), all offline against
+  recorded-format fixtures (this environment has no outbound network
+  egress; live fetching is validated only in deployment).
+
 ## 0.5.0 — Autonomous execution epoch: systems 04–18
 - Market Memory: EGX trading calendar (fixed holidays as rules, movable as
   explicit placeholder table); canonical events wired into `MarketState`.

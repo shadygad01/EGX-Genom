@@ -1,0 +1,72 @@
+"""FRED CSV collector for global macro series.
+
+Endpoint: `https://fred.stlouisfed.org/graph/fredgraph.csv?id={SERIES}`
+returns `DATE,{SERIES}` CSV where `.` marks a missing observation
+(dropped with a warning, never imputed).
+"""
+
+from __future__ import annotations
+
+import csv
+import io
+from datetime import date
+
+from agx_research.collectors.base import CollectionBatch, Collector
+from agx_research.collectors.raw import RawDocument, build_raw_document
+from agx_research.data.schemas import MacroObservation
+
+
+class FredCsvCollector(Collector):
+    name = "FredCsvCollector"
+    version = "1.0.0"
+
+    def __init__(self, spec, series_ids: list[str], fetcher=None):
+        super().__init__(spec, fetcher)
+        self.series_ids = series_ids
+
+    def fetch(self) -> list[RawDocument]:
+        documents = []
+        for series_id in sorted(self.series_ids):
+            url = f"{self.spec.base_url}?id={series_id}"
+            text = self.fetcher.fetch_text(url, self.spec)
+            documents.append(
+                build_raw_document(
+                    source_id=self.spec.id,
+                    collector=self.name,
+                    collector_version=self.version,
+                    original_url=url,
+                    content_text=text,
+                    schema_version=self.spec.schema_version,
+                    license=self.spec.license,
+                )
+            )
+        return documents
+
+    def parse(self, document: RawDocument) -> CollectionBatch:
+        batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)
+        reader = csv.reader(io.StringIO(document.content_text))
+        header = next(reader, None)
+        if not header or len(header) != 2 or header[0].upper() != "DATE":
+            batch.parse_warnings.append(f"Unexpected header {header}; expected [DATE, <SERIES>].")
+            return batch
+        series_id = header[1].strip()
+
+        for line_number, row in enumerate(reader, start=2):
+            if len(row) != 2:
+                batch.parse_warnings.append(f"line {line_number}: malformed row; skipped")
+                continue
+            raw_value = row[1].strip()
+            if raw_value == ".":
+                batch.parse_warnings.append(f"line {line_number}: missing observation; dropped")
+                continue
+            try:
+                batch.macro_observations.append(
+                    MacroObservation(
+                        series_id=series_id,
+                        observation_date=date.fromisoformat(row[0].strip()),
+                        value=float(raw_value),
+                    )
+                )
+            except ValueError as exc:
+                batch.parse_warnings.append(f"line {line_number}: unparseable ({exc}); skipped")
+        return batch

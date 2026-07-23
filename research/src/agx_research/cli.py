@@ -19,6 +19,10 @@ from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
 from agx_research.agents.market_structure import MarketStructureAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
+from agx_research.collectors.fred import FredCsvCollector
+from agx_research.collectors.rss import RssNewsCollector
+from agx_research.collectors.service import CollectionService
+from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.genome.service import AlphaGenome
 from agx_research.hypotheses.repository import HypothesisRepository
@@ -28,6 +32,7 @@ from agx_research.market_memory.memory import MarketMemory
 from agx_research.orchestration.pipeline import DailyResearchPipeline
 from agx_research.papers.repository import PaperRepository
 from agx_research.runtime.engine import RunRecordRepository, RuntimeEngine
+from agx_research.sources.catalog import seed_registry
 from agx_research.universe.sector import StaticSectorProvider
 from agx_research.universe.static import EGX30_UNIVERSE_PLACEHOLDER, StaticUniverseProvider
 
@@ -86,6 +91,19 @@ def main(argv: list[str] | None = None) -> int:
     restore_parser.add_argument("--input", type=Path, required=True)
     restore_parser.add_argument("--target", type=Path, required=True)
 
+    collect_parser = sub.add_parser(
+        "collect", help="Run a single IMPLEMENTED source's collector and materialize its data"
+    )
+    collect_parser.add_argument("--source", required=True, help="Source id, e.g. stooq, fred, rss_generic")
+    collect_parser.add_argument(
+        "--symbols", help="stooq only: AGX_TICKER=stooq_symbol,... e.g. COMI=comi.eg,MFPC=mfpc.eg"
+    )
+    collect_parser.add_argument("--series", help="fred only: comma-separated FRED series ids")
+    collect_parser.add_argument("--feed-url", help="rss_generic only: the feed URL to collect")
+    collect_parser.add_argument("--ticker-hints", help="rss_generic only: comma-separated tickers to match")
+    collect_parser.add_argument("--expected-records", type=int, required=True)
+    collect_parser.add_argument("--min-confidence", type=float, default=0.5)
+
     args = parser.parse_args(argv)
 
     if args.command == "run":
@@ -133,6 +151,52 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "restore":
         manifest = restore_backup(args.input, args.target)
         print(f"Restored {len(manifest['files'])} store(s) to {args.target}")
+        return 0
+
+    if args.command == "collect":
+        args.data_dir.mkdir(parents=True, exist_ok=True)
+        registry = seed_registry()
+        spec = registry.latest(args.source)
+        if spec is None:
+            print(f"Unknown source id: {args.source}", file=sys.stderr)
+            return 1
+
+        if spec.collector == "StooqPriceCollector":
+            if not args.symbols:
+                print("--symbols is required for stooq", file=sys.stderr)
+                return 1
+            symbols = dict(pair.split("=", 1) for pair in args.symbols.split(","))
+            collector = StooqPriceCollector(spec, symbols=symbols)
+        elif spec.collector == "FredCsvCollector":
+            if not args.series:
+                print("--series is required for fred", file=sys.stderr)
+                return 1
+            collector = FredCsvCollector(spec, series_ids=args.series.split(","))
+        elif spec.collector == "RssNewsCollector":
+            if not args.feed_url:
+                print("--feed-url is required for rss_generic", file=sys.stderr)
+                return 1
+            hints = args.ticker_hints.split(",") if args.ticker_hints else None
+            collector = RssNewsCollector(spec, feed_url=args.feed_url, ticker_hints=hints)
+        else:
+            print(f"No collector wired for source {args.source} (status={spec.status.value})", file=sys.stderr)
+            return 1
+
+        service = CollectionService(args.data_dir, min_confidence=args.min_confidence)
+        result = service.run(collector, expected_records=args.expected_records)
+        print(json.dumps(
+            {
+                "source_id": result.source_id,
+                "documents_fetched": result.documents_fetched,
+                "batches_materialized": result.batches_materialized,
+                "batches_withheld": result.batches_withheld,
+                "price_bars_written": result.price_bars_written,
+                "macro_observations_written": result.macro_observations_written,
+                "news_items_written": result.news_items_written,
+                "events_registered": result.events_registered,
+            },
+            indent=2,
+        ))
         return 0
 
     return 1

@@ -15,7 +15,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
 | 01 | Foundation | **DONE** | `domain/`, `storage/`, `config.py`; reused unmodified by every later store; CI green. |
-| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment. Blocked-external: licensed EGX vendor (business decision). |
+| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the Data Acquisition Program (`sources/`+`collectors/`): a 51-source registry cataloguing every named free source across 9 categories, with real collectors for Stooq (EGX+global daily OHLCV), FRED (macro series), and generic RSS/Atom (news) — each enforcing robots.txt/rate limits/retries, wrapping every fetch in a provenance-carrying `RawDocument`, mechanically scoring the charter's 7 quality dimensions, and withholding (never silently degrading) batches below the confidence floor. Collected data materializes into the same CSV layout `LocalCsvDataProvider` reads — no new provider needed. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; sources needing a user-supplied API key (`NEEDS_KEY`) or ToS clarification (`TOS_REVIEW`) are catalogued but deliberately not collected. |
 | 03 | Event Platform | **DONE** | Fingerprint identity, taxonomy/ontology, entity resolution, dedup/conflict/lifecycle, `EventPlatform` sole write path, graph projection. Blocked-external: political/technical feeds, NLP entity linking. |
 | 04 | Market Memory | **DONE** | `MarketState` (snapshot+universe+sectors+events+session), `TradingCalendar` (fixed holidays as rules; movable as explicit placeholder table). Blocked-external: authoritative movable-holiday dates. |
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
@@ -42,4 +42,30 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(203 tests green).
+(256 tests green).
+
+## Data Acquisition Program (post-Epoch-II, within System 02's scope)
+
+Per the standing charter, the next objective after all 18 systems reached
+DONE/PARTIAL was not more AI — it was building the largest legally
+accessible free research dataset for EGX, since no research conclusion can
+outrun its data. This closed the *engineering* half of that goal:
+
+- `docs/DATA_ACQUISITION.md` — full design (source registry schema,
+  collector architecture, quality scoring, provenance, legal-compliance
+  enforcement in code, not just policy).
+- 51 sources catalogued across all 9 named categories (Official, Company,
+  Market Data, News, Arabic News, Macroeconomic, Global Markets,
+  Alternative, Research); honestly split IMPLEMENTED (4) / PLANNED (35) /
+  NEEDS_KEY (4) / TOS_REVIEW (8).
+- 3 real collectors (Stooq, FRED, generic RSS/Atom) fully tested against
+  recorded-format fixtures — no live network calls in the test suite (this
+  sandbox has no outbound egress; live fetching is a deployment-time
+  concern only).
+- Remaining catalogued-but-uncollected sources are blocked on exactly one
+  of: endpoint/config verification (PLANNED — engineering-closeable over
+  time, not a business decision), a user-registered API key (NEEDS_KEY —
+  business decision: which paid/free-tier key to obtain), or ToS ambiguity
+  around automated collection/redistribution (TOS_REVIEW — business/legal
+  decision). None of these are silently skipped; each is named in the
+  registry with its blocking reason.

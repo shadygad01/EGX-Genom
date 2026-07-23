@@ -1,0 +1,114 @@
+"""Generic RSS 2.0 / Atom collector: one layout-tolerant parser serving
+every feed-publishing outlet in the registry.
+
+Per-source configuration (feed URL, language, entity hints) lives in the
+SourceSpec, not in code. Parsing tolerates both RSS `<item>` and Atom
+`<entry>` shapes, namespaced or not, and records anything unparseable as a
+warning rather than guessing. Only headline/link/date metadata is
+collected — full-text handling follows each outlet's own terms.
+"""
+
+from __future__ import annotations
+
+import xml.etree.ElementTree as ET
+from datetime import date, datetime
+from email.utils import parsedate_to_datetime
+
+from agx_research.collectors.base import CollectionBatch, Collector
+from agx_research.collectors.raw import RawDocument, build_raw_document
+from agx_research.data.schemas import NewsItem
+
+
+def _local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1] if "}" in tag else tag
+
+
+def _child_text(element: ET.Element, name: str) -> str | None:
+    for child in element:
+        if _local_name(child.tag) == name and child.text:
+            return child.text.strip()
+    return None
+
+
+def _entry_link(element: ET.Element) -> str | None:
+    for child in element:
+        if _local_name(child.tag) == "link":
+            if child.text and child.text.strip():
+                return child.text.strip()  # RSS style
+            href = child.get("href")
+            if href:
+                return href  # Atom style
+    return None
+
+
+def _entry_date(element: ET.Element) -> date | None:
+    for name in ("pubDate", "published", "updated", "date"):
+        raw = _child_text(element, name)
+        if not raw:
+            continue
+        try:
+            return parsedate_to_datetime(raw).date()  # RFC 822 (RSS)
+        except (TypeError, ValueError):
+            pass
+        try:
+            return datetime.fromisoformat(raw.replace("Z", "+00:00")).date()  # ISO (Atom)
+        except ValueError:
+            continue
+    return None
+
+
+class RssNewsCollector(Collector):
+    name = "RssNewsCollector"
+    version = "1.0.0"
+
+    def __init__(self, spec, feed_url: str, *, ticker_hints: list[str] | None = None, fetcher=None):
+        super().__init__(spec, fetcher)
+        self.feed_url = feed_url
+        self.ticker_hints = ticker_hints or []
+
+    def fetch(self) -> list[RawDocument]:
+        text = self.fetcher.fetch_text(self.feed_url, self.spec)
+        return [
+            build_raw_document(
+                source_id=self.spec.id,
+                collector=self.name,
+                collector_version=self.version,
+                original_url=self.feed_url,
+                content_text=text,
+                schema_version=self.spec.schema_version,
+                license=self.spec.license,
+            )
+        ]
+
+    def parse(self, document: RawDocument) -> CollectionBatch:
+        batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)
+        try:
+            root = ET.fromstring(document.content_text)
+        except ET.ParseError as exc:
+            batch.parse_warnings.append(f"Feed is not well-formed XML: {exc}")
+            return batch
+
+        entries = [e for e in root.iter() if _local_name(e.tag) in ("item", "entry")]
+        if not entries:
+            batch.parse_warnings.append("No <item>/<entry> elements found in feed.")
+            return batch
+
+        for index, entry in enumerate(entries):
+            title = _child_text(entry, "title")
+            published = _entry_date(entry)
+            if not title or published is None:
+                batch.parse_warnings.append(f"entry {index}: missing title or date; skipped")
+                continue
+            link = _entry_link(entry)
+            title_lower = title.lower()
+            matched = [t for t in self.ticker_hints if t.lower() in title_lower]
+            batch.news_items.append(
+                NewsItem(
+                    published_at=published,
+                    source=self.spec.id,
+                    headline=" ".join(title.split()),
+                    tickers=matched,
+                    body=link,  # original URL preserved; full text per-outlet terms
+                )
+            )
+        return batch

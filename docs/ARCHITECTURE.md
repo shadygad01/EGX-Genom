@@ -54,6 +54,19 @@ research/        Python package `agx_research` — the research engine
   review/         Scientific Review Board: reviewers + board decision
   adversarial/    AdversarialScientist: attacks against a hypothesis
 
+  # Data Acquisition Program: the free-source collection framework
+  sources/        SourceSpec/SourceRegistry — the declarative catalog of
+                  every known data source (id, access method, status,
+                  reliability/freshness priors, retry/rate-limit policy,
+                  license, conflict priority); see docs/DATA_ACQUISITION.md
+  collectors/     RawDocument provenance envelope, Collector ABC
+                  (fetch -> RawDocument, parse -> CollectionBatch as a pure
+                  function), HttpFetcher (robots.txt + rate limit + retry),
+                  per-source collectors (Stooq, FRED, generic RSS/Atom),
+                  QualityAssessment scoring, CollectionService
+                  (materialize-if-above-confidence-floor, else withhold;
+                  routes derived news events through EventPlatform.register())
+
 api/              TypeScript (Fastify) — HTTP surface over the knowledge base
 web/              TypeScript (Vite + React) — dashboard for knowledge/recs
 contracts/        Generated JSON Schema for API-facing pydantic models
@@ -109,6 +122,19 @@ contracts/        Generated JSON Schema for API-facing pydantic models
 10. `api/` reads knowledge objects (currently from a JSON-backed store)
     and exposes them over HTTP; `web/` renders them. Epoch II added no new
     API surface — the scientific core is Python-only so far.
+11. Upstream of all of the above: `collectors.Collector.fetch()` wraps
+    every payload as a `RawDocument` (source, collector, content hash,
+    license — the provenance envelope), `.parse()` turns it into a
+    `CollectionBatch` of canonical `PriceBar`/`MacroObservation`/`NewsItem`
+    candidates, and `collectors.service.CollectionService` scores it with
+    `assess_quality()` before deciding whether to materialize it into the
+    same local-CSV layout `data.mock_provider.LocalCsvDataProvider` (an
+    alias of `MockDataProvider`) reads, or withhold it. Derived news
+    candidates are registered through `events.service.EventPlatform`,
+    never written directly — identity/dedup/corroboration/conflict
+    resolution apply exactly as they do to any other event source. Only
+    sources marked `IMPLEMENTED` in the `sources.SourceRegistry` are
+    collectable at all; `Collector.__init__` enforces this.
 
 ## Why the split between `research/` (Python) and `api/`+`web/` (TypeScript)
 

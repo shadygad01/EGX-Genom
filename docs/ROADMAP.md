@@ -3,7 +3,11 @@
 Current engineering state: all 18 systems architecturally complete and
 tested except the business-blocked remainder of 18 (see
 `docs/PHASE_STATUS.md` for per-system detail). The platform runs
-end-to-end daily research cycles on placeholder data.
+end-to-end daily research cycles on placeholder data. The Data Acquisition
+Program (`sources/`+`collectors/`, see `docs/DATA_ACQUISITION.md`) has
+since added a real (non-mock) collection path for free EGX/global/macro/
+news data, feeding the same local-CSV layout the placeholder data uses
+today.
 
 ## Milestone: Production 1.0 (blocked on business decisions)
 
@@ -20,6 +24,25 @@ Required user/business inputs, in priority order:
    alerting, API authentication context, backup storage/retention.
 3. **Authoritative EGX trading calendar + universe/sector membership
    feeds** (replace the placeholder tables).
+
+## Data Acquisition Program: next engineering-closeable steps
+
+Unlike the Production 1.0 blockers above, these need no business decision —
+they're config/verification work against the existing `Collector`
+framework:
+
+- Verify real endpoint URLs and wire `SourceSpec`s for the `PLANNED`
+  official sources (EGX, FRA, CBE, MoF, CAPMAS, Egypt Open Data) and the
+  `PLANNED` English/Arabic news RSS feeds — each just needs its actual
+  feed/endpoint confirmed and a `SourceSpec` flipped to `IMPLEMENTED`; the
+  generic `RssNewsCollector`/`FredCsvCollector` already serve them.
+- Add a source-specific collector only where no existing generic collector
+  applies (e.g. company IR PDF/XBRL filings, Suez Canal statistics).
+- Cross-source corroboration measurement: once two IMPLEMENTED sources
+  cover overlapping data (e.g. a second price source alongside Stooq),
+  wire `consistency_score` in `collectors.quality.assess_quality()` instead
+  of leaving it `None`, and start feeding `SourceRegistry.record_measured_quality()`
+  from real run history instead of leaving `data_quality_score` unset.
 
 ## Post-1.0 engineering roadmap (unblocked by real data accumulating)
 

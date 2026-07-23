@@ -1,0 +1,81 @@
+import pytest
+
+from agx_research.sources import (
+    AccessMethod,
+    SourceCategory,
+    SourceRegistry,
+    SourceSpec,
+    SourceStatus,
+    seed_registry,
+    seed_sources,
+)
+
+
+def make_spec(**overrides) -> SourceSpec:
+    defaults = dict(
+        id="test_source",
+        name="Test Source",
+        category=SourceCategory.MARKET_DATA,
+        access_method=AccessMethod.CSV_DOWNLOAD,
+        status=SourceStatus.IMPLEMENTED,
+        reliability_score=0.8,
+        freshness_score=0.9,
+    )
+    defaults.update(overrides)
+    return SourceSpec(**defaults)
+
+
+def test_seed_sources_covers_every_named_category():
+    specs = seed_sources()
+    categories = {s.category for s in specs}
+    assert categories == set(SourceCategory)
+
+
+def test_seed_sources_ids_are_unique():
+    specs = seed_sources()
+    ids = [s.id for s in specs]
+    assert len(ids) == len(set(ids))
+
+
+def test_seed_registry_status_breakdown_matches_seed_sources():
+    registry = seed_registry()
+    specs = seed_sources()
+    for status in SourceStatus:
+        expected = len([s for s in specs if s.status == status])
+        assert len(registry.by_status(status)) == expected
+
+
+def test_only_implemented_sources_are_collectable():
+    registry = seed_registry()
+    collectable = registry.collectable()
+    assert collectable  # at least Stooq/FRED/RSS
+    assert all(s.status == SourceStatus.IMPLEMENTED for s in collectable)
+
+
+def test_data_quality_score_starts_unset_for_every_seeded_source():
+    for spec in seed_sources():
+        assert spec.data_quality_score is None
+
+
+def test_by_category_filters_correctly():
+    registry = SourceRegistry()
+    registry.add(make_spec(id="a", category=SourceCategory.NEWS))
+    registry.add(make_spec(id="b", category=SourceCategory.MACROECONOMIC))
+    assert [s.id for s in registry.by_category(SourceCategory.NEWS)] == ["a"]
+
+
+def test_record_measured_quality_creates_new_version_not_edit_in_place():
+    registry = SourceRegistry()
+    registry.add(make_spec(id="a"))
+    updated = registry.record_measured_quality("a", 0.73)
+    assert updated.version == 2
+    assert updated.data_quality_score == 0.73
+    history = registry.history("a")
+    assert len(history) == 2
+    assert history[0].data_quality_score is None
+
+
+def test_record_measured_quality_unknown_source_raises():
+    registry = SourceRegistry()
+    with pytest.raises(KeyError):
+        registry.record_measured_quality("does_not_exist", 0.5)

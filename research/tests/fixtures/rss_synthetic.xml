@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>AGX Synthetic Test Feed</title>
+    <item>
+      <title>COMI reports quarterly results</title>
+      <link>https://example.test/news/comi-q2</link>
+      <pubDate>Mon, 01 Jun 2026 09:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Egypt central bank holds rates</title>
+      <link>https://example.test/news/cbe-rates</link>
+      <pubDate>Tue, 02 Jun 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Malformed entry with no date</title>
+      <link>https://example.test/news/no-date</link>
+    </item>
+  </channel>
+</rss>

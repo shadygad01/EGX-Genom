@@ -125,3 +125,11 @@ class MockDataProvider(DataProvider):
                     )
                 )
         return sorted(items, key=lambda n: n.published_at)
+
+
+# `MockDataProvider` was always just a local-CSV-backed DataProvider; the
+# "mock" framing described its placeholder *content* (synthetic test
+# fixtures), not its mechanism. Real data collected by `collectors/` is
+# materialized into the same CSV layout and read through this same class
+# under this clearer alias -- collected real data needs no new provider.
+LocalCsvDataProvider = MockDataProvider

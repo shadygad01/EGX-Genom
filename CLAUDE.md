@@ -83,7 +83,9 @@ Layout:
   `data/`, `knowledge/`, `hypotheses/`, `validation/`, `agents/`,
   `horizons/`, `meta/`, `explainability/`; Epoch II adds `orchestration/`,
   `events/`, `market_memory/`, `features/` extensions, `genome/`,
-  `causal/`, `graph/`, `papers/`, `review/`, `adversarial/`).
+  `causal/`, `graph/`, `papers/`, `review/`, `adversarial/`; the Data
+  Acquisition Program adds `sources/` and `collectors/`, see
+  `docs/DATA_ACQUISITION.md`).
 - `api/` — TypeScript (Fastify) service exposing the knowledge base over
   HTTP. Currently reads a JSON knowledge store; has no business logic of
   its own by design (logic lives in `research/`). Epoch II added no new
@@ -119,6 +121,28 @@ Layout:
   integration is a business decision (which vendor, cost, coverage) — flag
   it to the user rather than picking one; don't hardcode assumptions about
   a specific vendor's API shape into code outside `data/`.
+- Real (non-mock) market/macro/news data comes from `sources/`+`collectors/`,
+  not a new `DataProvider`. Every source is a `sources.SourceSpec` in the
+  `SourceRegistry`; a source is only collectable (its `Collector` will
+  construct at all) once its status is `IMPLEMENTED` — `PLANNED`,
+  `NEEDS_KEY`, and `TOS_REVIEW` sources must stay blocked until the user
+  clears the reason (endpoint verified, API key supplied, ToS reviewed).
+  A `Collector.fetch()` only wraps payloads as a `RawDocument`
+  (`collectors/raw.py`) and `.parse()` only turns one `RawDocument` into a
+  canonical `CollectionBatch` — no source-specific logic belongs anywhere
+  else. `collectors.service.CollectionService` is the only path from a
+  batch into the platform: it scores the batch with
+  `collectors.quality.assess_quality()` and materializes it into the same
+  local-CSV layout `LocalCsvDataProvider` reads only if confidence clears
+  the floor, otherwise withholds it — "no downstream system may ignore
+  data quality" is enforced by withholding, not by passing degraded data
+  through. Derived news candidates are registered via
+  `events.service.EventPlatform.register()`, the same as any other event
+  source — never a parallel write path. `HttpFetcher` enforces robots.txt,
+  per-source rate limits, and retry/backoff in code; do not add a fetch
+  path that bypasses it. Prefer official/RSS/structured-API/downloadable
+  sources over HTML scraping; scraping is last-resort only and must
+  tolerate layout changes.
 - Agents, experiments, and validators consume a `DatasetSnapshot`
   (`data/snapshot.py`), never a live `DataProvider` directly — this is what
   makes findings/experiments reproducible and prevents look-ahead bias.

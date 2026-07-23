@@ -116,3 +116,11 @@ describe("AI Briefing", () => {
     expect(await screen.findByText("COMI")).toBeInTheDocument();
   });
 });
+
+describe("Company Research Workspace", () => {
+  it("shows an honest empty state when the ticker has no recommendation or knowledge", async () => {
+    await renderApp("/company/COMI");
+    expect(await screen.findByText("No active recommendation")).toBeInTheDocument();
+    expect(await screen.findByText("No knowledge objects yet")).toBeInTheDocument();
+  });
+});

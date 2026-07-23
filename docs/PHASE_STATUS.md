@@ -42,7 +42,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(431 Python tests + 33 TypeScript tests green).
+(462 Python tests + 33 TypeScript tests green).
 
 ## Dashboard dual-provider architecture (post-Data-Acquisition-Program)
 
@@ -331,3 +331,97 @@ their average into `SourceMetricsRepository.record_run(latency_seconds=...)`.
 It still reports `None` in practice until a live (non-mock/replay)
 collector actually runs — the mechanism is real, the number it would
 produce today would not be. 4 new tests (431 total).
+
+## Universe Engine + Corporate Disclosures Phase (Engineering Ownership handoff)
+
+The project owner handed over full engineering ownership this phase, with
+a refined business-priority order (Universe Engine promoted to priority 2,
+ahead of the org-source catalog; Corporate disclosures and Financial
+Statement Collection added as explicit priorities 4/5; Historical Backfill
+and Live Incremental Sync named as explicit priorities 6/7). Two real gaps
+closed, one confirmed already-satisfied:
+
+**Universe Engine (priority 2).** `universe.UniverseProvider` had exactly
+one implementation, `StaticUniverseProvider` (a fixed placeholder) — no
+path existed for a real collected constituent list to ever reach it, even
+once one could be collected. Closed:
+- `universe.constituent.IndexConstituent`: `{index, ticker, company_name,
+  as_of_date}` — a date per row, not one overwritten snapshot, so universe
+  queries stay point-in-time-correct (the same no-look-ahead guarantee
+  every other query in this platform already gives).
+- `CollectionBatch` gained `index_constituents` (and, built in the same
+  pass since both needed the same materialization plumbing,
+  `corporate_events`); `CollectionService` writes `universe/<INDEX>.csv`
+  (merged by `ticker, as_of_date`) and `corporate_events.csv` (merged by
+  `ticker, date, event_type`), both with full provenance tracing —
+  extending the existing writer pattern (`_write_price_bars`,
+  `_write_macro_observations`), not inventing a new one.
+- `universe.collected.CollectedUniverseProvider` reads that CSV, returning
+  the latest snapshot at-or-before the query date, or `{}` if nothing's
+  collected — never fabricated. `FallbackUniverseProvider` composes it with
+  `StaticUniverseProvider`, mirroring `data.composite_provider.
+  FallbackDataProvider` exactly. Wired into `production.pipeline`'s
+  `_stage_market_memory` and `cli.py`'s `discover-sources` universe lookup.
+- `collectors.index_constituents.IndexConstituentCollector`: the collection
+  half — header-text matching for ticker/name columns (no fixed column
+  order assumed), since no real EGX constituent-list export has been
+  fetched to verify one (TD-30). Built and fully tested, but **cannot** be
+  wired into the live pipeline yet: `egx_official`'s `SourceSpec` stays
+  `PLANNED` until its real endpoint is verified (`AD-24`) — exactly the
+  same honest boundary as the AlphaVantage/FMP collectors sitting at
+  `NEEDS_KEY`.
+
+**Corporate disclosures (priority 4), closing TD-24.** `CorporateEvent` had
+a schema (`data.schemas`) and a read path (`MockDataProvider.
+get_corporate_events`), but nothing ever produced one — `CorporateEventsAgent`
+found nothing from `--data-dir` before this phase. Closed with
+`collectors.corporate_event_classifier.classify_corporate_event_type()`: a
+declared headline keyword heuristic (dividend/split/merger/acquisition/
+buyback/delisting/earnings/guidance/management-change — reusing
+`events.adapters._CORPORATE_SUBTYPES`'s exact raw keys, so the existing
+adapter needs zero changes to consume it) that `RssNewsCollector`'s new
+`classify_corporate_events` flag applies per entry when exactly one ticker
+hint matches, populating `batch.corporate_events` **alongside** the
+always-produced `NewsItem` — the same disclosure viewed two ways, not two
+collector pipelines. Wired into `production.collector_plan.py`'s
+`rss_generic` mock/replay collector.
+
+**Verified live** (mock mode, `agx run --mode mock`): the production
+pipeline now writes real `COMI,2026-06-09,EARNINGS,...` and
+`MFPC,2026-06-04,DIVIDEND,...` rows to `--data-dir/corporate_events.csv`,
+derived from the same existing mock RSS headlines `collector_plan.py`
+already used for news — a real, working, if narrow, capability, not a
+fabricated one. Deliberately headline-only (RSS/ToS terms, TD-12): no
+numeric detail (split ratio, dividend amount) is ever guessed, so a
+classified event stays correctly informational-only until a fuller-text
+source (an IR disclosure PDF) exists — declared as new debt (TD-29).
+`CollectionService` materializes corporate events to CSV only; it does not
+also register them as Events directly, since `events.adapters.
+events_from_corporate_events` (fed by a `DatasetSnapshot` reading the same
+CSV) is already the single place that happens — composing with that
+existing adapter, not duplicating it.
+
+**Investor Relations discovery (priority 3)**: confirmed already fully
+built (two missions ago) and requiring no new engineering this phase —
+`generate_company_ir_targets`/`discover_company_directory_links`/
+`run_catalog` already scale automatically the moment the Universe Engine
+(or a user-supplied list) provides a real constituent set.
+
+**Historical Backfill (priority 6) / Live Incremental Sync (priority 7)**:
+confirmed already satisfied by existing design, no code needed — every
+collector fetches a source's full available series by construction, and
+every materialization writer merges idempotently by natural key. A first
+real run is the backfill; every subsequent run is the incremental sync.
+
+31 new tests (462 total, up from 431); `ruff` clean; `contracts/`
+unchanged (`IndexConstituent`/`CorporateEvent` additions aren't
+API-facing). New technical debt: TD-29 (corporate-event classifier
+keyword list, uncalibrated), TD-30 (`IndexConstituentCollector`'s column
+detection, unverified against a real EGX export). TD-24 closed.
+
+**The same two named blockers, unchanged**: no outbound network egress
+from this sandbox, and no verified EGX30/EGX70 constituent list in this
+codebase. Neither blocks what this phase closed — the Universe Engine and
+corporate-event classifier are both real, working, engineering-complete
+capabilities today; they simply have nothing live to run against yet. See
+`CURRENT_MISSION.md` for the full statement.

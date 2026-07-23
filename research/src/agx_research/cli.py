@@ -43,6 +43,7 @@ from agx_research.production import ExecutionMode, ProductionPipeline, StageStat
 from agx_research.runtime.engine import RunRecordRepository
 from agx_research.sources.catalog import seed_registry
 from agx_research.sources.registry import SourceRegistry
+from agx_research.universe.collected import CollectedUniverseProvider, FallbackUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
 from agx_research.universe.static import EGX30_UNIVERSE_PLACEHOLDER, StaticUniverseProvider
 
@@ -270,11 +271,15 @@ def main(argv: list[str] | None = None) -> int:
             registry=registry,
             wayback=build_live_wayback_client(),
         )
-        # Every EGX30 constituent (today's placeholder universe; scales
-        # automatically once a real, complete EGX30/EGX70 list exists) gets
-        # its own Investor Relations target -- Priority 2/3, expanded from
-        # the `company_ir` marker entry.
-        universe = StaticUniverseProvider().constituents(date.today())
+        # Every EGX30 constituent gets its own Investor Relations target --
+        # Priority 2/3, expanded from the `company_ir` marker entry. Prefers
+        # a real collected universe (Universe Engine, `universe.collected`)
+        # over the static placeholder the moment one has been materialized
+        # into `--data-dir`; scales automatically, no code change needed.
+        universe_provider = FallbackUniverseProvider(
+            [CollectedUniverseProvider(args.data_dir), StaticUniverseProvider()]
+        )
+        universe = universe_provider.constituents(date.today())
         all_targets = [*seed_target_organizations(), *generate_company_ir_targets(universe)]
 
         results = []

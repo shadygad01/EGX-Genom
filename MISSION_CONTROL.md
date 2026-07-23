@@ -11,39 +11,51 @@ commit whenever the fact they state changes.
   complete and tested (17 fully DONE, the 18th DONE for everything
   engineering can close without a cloud/vendor/secrets decision). A real
   production execution pipeline runs the full chain end to end
-  (`agx run`), and the Acquisition Intelligence Engine can now discover,
-  verify, rank, and register a live source for the entire business-value
-  priority catalog. Every research conclusion the platform can currently
-  produce is still scoped to placeholder/mock data — no live source is
-  connected yet.
-- **Current mission:** Connect AGX's first live production sources, in
-  strict business-value order (EGX official → EGX30/EGX70 company
-  Investor Relations → CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/
-  Trading Economics → anything else discovered). See `CURRENT_MISSION.md`.
-- **Next mission:** Resume the moment either blocker below clears —
-  `agx discover-sources` needs zero further code changes to perform real
-  discovery for the full catalog. See `NEXT_MISSIONS.md`.
+  (`agx run`); the Acquisition Intelligence Engine can discover, verify,
+  rank, and register a live source for the entire business-value priority
+  catalog; a real Universe Engine (`universe.CollectedUniverseProvider` +
+  `collectors.index_constituents.IndexConstituentCollector`) and a real
+  corporate-event classifier (`collectors.corporate_event_classifier`,
+  closing TD-24) are now built and tested. Every research conclusion the
+  platform can currently produce is still scoped to placeholder/mock data
+  — no live source is connected yet.
+- **Current mission:** Engineering ownership handoff — close every
+  remaining engineering-closeable gap toward real Egyptian market data, in
+  business-priority order: EGX official → Universe Engine → Investor
+  Relations discovery → Corporate disclosures → Financial statement
+  collection → Historical backfill → Live incremental sync → CBE/FRA/
+  CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → anything
+  else discovered. See `CURRENT_MISSION.md`.
+- **Next mission:** Financial Statement Collection (priority 5) — needs no
+  live source to design; underway. Separately, resume live-source
+  connection (priorities 1, 2 at real scale, 3 at real scale, 8–16) the
+  moment either blocker below clears, with zero further code changes. See
+  `NEXT_MISSIONS.md`.
 - **Overall completion:** ~99% of everything engineering-closeable without
   a business/vendor decision. The remaining ~1% is exclusively: (a) writing
-  a concrete collector once a source resolves live, and (b) System 18's
-  deployment/secrets/scheduling wiring, both mechanical once their
-  respective blockers clear.
+  a concrete collector once a source resolves live (including pointing the
+  now-built `IndexConstituentCollector` at a verified `egx_official`
+  endpoint), (b) Financial Statement Collection's canonical schema/collector
+  (in progress, no blocker), and (c) System 18's deployment/secrets/
+  scheduling wiring, blocked on a hosting/vendor decision.
 - **Connected live sources: 0** — blocked, not unbuilt. Every mechanism
   needed (discovery, verification, ranking, registration, qualification,
-  collection, archival, validation) is built and tested; zero are
-  connected because this sandbox has no outbound network egress to
-  arbitrary hosts (confirmed directly and repeatedly across three
-  missions).
+  collection, archival, validation, universe membership, corporate-event
+  classification) is built and tested; zero are connected because this
+  sandbox has no outbound network egress to arbitrary hosts (confirmed
+  directly and repeatedly across four missions).
 - **Historical coverage:** 0 real trading days from any live source (same
   blocker — no source has ever been reachable to backfill from). No
-  separate backfill mechanism is needed or exists; every collector already
-  fetches a source's full available series by construction, so a source's
-  first live run *is* its backfill (see `NEXT_MISSIONS.md` item 3).
+  separate backfill mechanism is needed or exists; every collector
+  (including the new `IndexConstituentCollector`) already fetches a
+  source's full available series by construction, so a source's first live
+  run *is* its backfill.
 - **Knowledge growth:** 0 real `KnowledgeObject`s promoted from live data.
   The full validation → promotion pipeline is proven correct against mock
   data (the production pipeline's daily research cycle produces real
-  hypotheses, gates, and — when evidence clears the bar — promotions), but
-  every promoted object today traces back to placeholder CSVs, not a
+  hypotheses, gates, and — when evidence clears the bar — promotions;
+  it now also produces real, if headline-classified, corporate events),
+  but every promoted object today traces back to placeholder CSVs, not a
   licensed or verified live feed.
 - **Genome growth:** 0 real `Gene`s from live evidence, for the same
   reason — `AlphaGenome` correctly creates genes from mock-data knowledge
@@ -59,13 +71,14 @@ commit whenever the fact they state changes.
   market data vendor has not been selected — the standing gate on treating
   any output as real research (`docs/ROADMAP.md`).
 - **Estimated remaining work:** Near-zero engineering effort once either
-  blocker (1) or (2) above clears — `agx discover-sources` and
-  `generate_company_ir_targets()` are already wired to scale automatically.
-  From there, each newly-resolved source needs one concrete collector
-  (small, per-source, following the existing `Collector` pattern) before
-  it's `IMPLEMENTED`. System 18's remaining deployment/secrets/scheduling
-  work is separately blocked on a hosting/vendor decision, not by this
-  mission.
+  blocker (1) or (2) above clears — `agx discover-sources`,
+  `generate_company_ir_targets()`, and `IndexConstituentCollector` are all
+  already built to scale automatically. From there, each newly-resolved
+  source needs one concrete collector (small, per-source, following the
+  existing `Collector` pattern) before it's `IMPLEMENTED`. Financial
+  Statement Collection (priority 5) is separately underway with no
+  blocker. System 18's remaining deployment/secrets/scheduling work is
+  separately blocked on a hosting/vendor decision.
 
 ## Where to look
 

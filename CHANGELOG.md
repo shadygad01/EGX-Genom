@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.12.0 — Universe Engine + Corporate Disclosures
+- `universe/constituent.py` (new): `IndexConstituent` — `{index, ticker,
+  company_name, as_of_date}`, point-in-time correct (a date per row, not
+  one overwritten snapshot).
+- `collectors/base.py`: `CollectionBatch` gained `index_constituents` and
+  `corporate_events`. `collectors/service.py`: `CollectionService` now
+  materializes both (`universe/<INDEX>.csv` merged by `ticker,as_of_date`;
+  `corporate_events.csv` merged by `ticker,date,event_type`), with full
+  provenance tracing, matching the existing price/macro writer pattern.
+  `collectors/quality.py`'s `produced`/`completeness_score` counts both.
+- `universe/collected.py` (new): `CollectedUniverseProvider` (reads the
+  collected CSV, latest snapshot at-or-before the query date, `{}` if
+  nothing collected) + `FallbackUniverseProvider` (mirrors
+  `FallbackDataProvider` exactly). Wired into `production.pipeline`'s
+  `_stage_market_memory` and `cli.py`'s `discover-sources`.
+- `collectors/index_constituents.py` (new): `IndexConstituentCollector` —
+  a generic, header-text-matching CSV parser for a constituent-list
+  export (ticker/name columns found by header content, not fixed order).
+  Built and tested; not yet wireable into the live pipeline since
+  `egx_official` stays `PLANNED` until its real endpoint is verified
+  (`AD-24`) — same honest boundary as the AlphaVantage/FMP collectors.
+- `collectors/corporate_event_classifier.py` (new): headline keyword
+  heuristic (dividend/split/merger/acquisition/buyback/delisting/
+  earnings/guidance/management-change), reusing `events.adapters.
+  _CORPORATE_SUBTYPES`'s exact raw keys. `RssNewsCollector` gained a
+  `classify_corporate_events` flag applying it per entry (exactly one
+  ticker match required), populating `batch.corporate_events` alongside
+  the always-produced `NewsItem` — closes TD-24.
+- `production/collector_plan.py`: `rss_generic`'s mock/replay collector
+  now runs with `classify_corporate_events=True`. Verified live: a
+  mock-mode `agx run` now writes real `COMI/EARNINGS` and `MFPC/DIVIDEND`
+  rows to `corporate_events.csv` from the existing mock RSS headlines.
+- 31 new tests (462 total, up from 431); `ruff` clean; `contracts/`
+  unchanged. New technical debt: TD-29 (classifier keyword list,
+  uncalibrated), TD-30 (`IndexConstituentCollector`'s column detection,
+  unverified against a real EGX export). TD-24 closed. New risk: R-20
+  (classifier misclassification and the `events_from_corporate_events`
+  confidence-modeling mismatch it exposes).
+
 ## 0.11.0 — Priority-Ordered Live Source Connection
 - `acquisition_intelligence/target.py`: new `TargetOrganization.priority`
   field (and `company_ticker`) carrying the project owner's explicit

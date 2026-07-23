@@ -107,6 +107,29 @@ Phase section). What's next, in priority order:
   token-overlap heuristic, once real EGX directory pages are actually
   fetched and matched against.
 
+## Universe Engine + Corporate Disclosures: next engineering-closeable steps
+
+Closed this phase (see `docs/PHASE_STATUS.md`'s "Universe Engine +
+Corporate Disclosures Phase" section for the full breakdown):
+`universe.IndexConstituent`/`CollectedUniverseProvider`/
+`FallbackUniverseProvider`, `collectors.index_constituents.
+IndexConstituentCollector`, and `collectors.corporate_event_classifier`
+(closing TD-24) are all built and tested. What's next:
+
+- **Financial Statement Collection (priority 5, next milestone)**: design
+  a canonical schema for structured financial-statement line items and a
+  generic, format-tolerant collector shape, following the exact pattern
+  `IndexConstituentCollector` set — no live source needed to build this.
+- **Wire `IndexConstituentCollector` live** once `egx_official` is verified
+  and flipped to `IMPLEMENTED` (blocked on network egress, `AD-24`).
+- **Richer corporate disclosures**: once a company's own IR/PDF source
+  (priority 2/3, at real scale) is real, a disclosure-PDF extraction stage
+  (following `PdfDocumentCollector`'s existing abstract-`parse()` pattern)
+  would give numeric detail (split ratios, dividend amounts) the headline
+  classifier never can.
+- Calibration pass (TD-29, TD-30, new this phase) once real headlines and
+  a real EGX constituent-list export exist to calibrate against.
+
 ## Production Execution Pipeline: next engineering-closeable steps
 
 The first production pipeline (`agx run` -> `production.pipeline.

@@ -22,6 +22,7 @@ doesn't quietly become knowledge, it's visibly withheld.
 from __future__ import annotations
 
 import csv
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -50,6 +51,8 @@ class CollectionRunResult:
     price_bars_written: int
     macro_observations_written: int
     news_items_written: int
+    corporate_events_written: int
+    index_constituents_written: int
     events_registered: int
     assessments: list[QualityAssessment]
 
@@ -103,6 +106,64 @@ def _write_macro_observations(
         for date_key in sorted(existing):
             writer.writerow([date_key, existing[date_key]])
     return len(observations)
+
+
+def _write_corporate_events(
+    data_dir: Path, ticker: str, events, *, on_written=None
+) -> int:
+    path = data_dir / "corporate_events.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing: dict[tuple[str, str, str], dict] = {}
+    if path.exists():
+        with path.open(newline="") as f:
+            for row in csv.DictReader(f):
+                existing[(row["ticker"], row["date"], row["event_type"])] = row
+    for event in events:
+        key = (event.ticker, event.event_date.isoformat(), event.event_type)
+        existing[key] = {
+            "ticker": event.ticker,
+            "date": event.event_date.isoformat(),
+            "event_type": event.event_type,
+            "description": event.description,
+            "details_json": json.dumps(event.details) if event.details else "",
+        }
+        if on_written:
+            on_written(event.event_type, event.event_date)
+    with path.open("w", newline="") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=["ticker", "date", "event_type", "description", "details_json"]
+        )
+        writer.writeheader()
+        for key in sorted(existing):
+            writer.writerow(existing[key])
+    return len(events)
+
+
+def _write_index_constituents(
+    data_dir: Path, index: str, constituents, *, on_written=None
+) -> int:
+    path = data_dir / "universe" / f"{index}.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing: dict[tuple[str, str], dict] = {}
+    if path.exists():
+        with path.open(newline="") as f:
+            for row in csv.DictReader(f):
+                existing[(row["ticker"], row["as_of_date"])] = row
+    for constituent in constituents:
+        key = (constituent.ticker, constituent.as_of_date.isoformat())
+        existing[key] = {
+            "ticker": constituent.ticker,
+            "company_name": constituent.company_name,
+            "as_of_date": constituent.as_of_date.isoformat(),
+        }
+        if on_written:
+            on_written(constituent.ticker, constituent.as_of_date)
+    with path.open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["ticker", "company_name", "as_of_date"])
+        writer.writeheader()
+        for key in sorted(existing):
+            writer.writerow(existing[key])
+    return len(constituents)
 
 
 def _append_news(data_dir: Path, items) -> int:
@@ -189,6 +250,8 @@ class CollectionService:
             price_bars_written=0,
             macro_observations_written=0,
             news_items_written=0,
+            corporate_events_written=0,
+            index_constituents_written=0,
             events_registered=0,
             assessments=[],
         )
@@ -232,6 +295,7 @@ class CollectionService:
 
             produced = (
                 len(batch.price_bars) + len(batch.macro_observations) + len(batch.news_items)
+                + len(batch.corporate_events) + len(batch.index_constituents)
             )
             materialized = assessment.confidence_score >= self.min_confidence
 
@@ -274,6 +338,35 @@ class CollectionService:
                             "news", registered.id, registered.event_date, collector, document,
                         )
                     result.events_registered += len(candidates)
+
+                if batch.corporate_events:
+                    by_event_ticker: dict[str, list] = {}
+                    for event in batch.corporate_events:
+                        by_event_ticker.setdefault(event.ticker, []).append(event)
+                    for ticker, events in by_event_ticker.items():
+                        result.corporate_events_written += _write_corporate_events(
+                            self.data_dir, ticker, events,
+                            on_written=lambda event_type, d, t=ticker: self._trace(
+                                "corporate_event", f"{t}|{event_type}", d, collector, document
+                            ),
+                        )
+                    # Materialized here only -- `events_from_corporate_events`
+                    # (events.adapters) is the single place these become
+                    # registered Events, once a DatasetSnapshot reads this
+                    # same corporate_events.csv. Registering here too would
+                    # duplicate that path rather than compose with it.
+
+                if batch.index_constituents:
+                    by_index: dict[str, list] = {}
+                    for constituent in batch.index_constituents:
+                        by_index.setdefault(constituent.index, []).append(constituent)
+                    for index, constituents in by_index.items():
+                        result.index_constituents_written += _write_index_constituents(
+                            self.data_dir, index, constituents,
+                            on_written=lambda ticker, d, i=index: self._trace(
+                                "index_constituent", f"{i}|{ticker}", d, collector, document
+                            ),
+                        )
             else:
                 result.batches_withheld += 1
 

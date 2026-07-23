@@ -20,8 +20,9 @@ from pydantic import BaseModel, Field
 
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.raw import RawDocument
-from agx_research.data.schemas import MacroObservation, NewsItem, PriceBar
+from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem, PriceBar
 from agx_research.sources.spec import SourceSpec, SourceStatus
+from agx_research.universe.constituent import IndexConstituent
 
 
 class CollectionBatch(BaseModel):
@@ -30,6 +31,8 @@ class CollectionBatch(BaseModel):
     price_bars: list[PriceBar] = Field(default_factory=list)
     macro_observations: list[MacroObservation] = Field(default_factory=list)
     news_items: list[NewsItem] = Field(default_factory=list)
+    corporate_events: list[CorporateEvent] = Field(default_factory=list)
+    index_constituents: list[IndexConstituent] = Field(default_factory=list)
     parse_warnings: list[str] = Field(default_factory=list)
 
 

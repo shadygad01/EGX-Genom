@@ -32,7 +32,7 @@ close without a cloud/vendor/secrets decision from the user.**
 
 ## Test health
 
-- Python: 431 tests, all green (`cd research && uv run pytest`).
+- Python: 462 tests, all green (`cd research && uv run pytest`).
 - TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
   + `git diff --exit-code`).
@@ -42,10 +42,32 @@ close without a cloud/vendor/secrets decision from the user.**
 
 Every mechanism needed to connect a live source is built and tested; zero
 are connected because this sandbox has no outbound network egress
-(confirmed directly, repeatedly, across three missions). `docs/PHASE_STATUS.md`'s
+(confirmed directly, repeatedly, across four missions). `docs/PHASE_STATUS.md`'s
 Production Execution Phase section has the full breakdown.
 
-## Priority-Ordered Live Source Connection (this mission)
+## Universe Engine + Corporate Disclosures (this mission)
+
+- `universe.IndexConstituent`/`CollectedUniverseProvider`/
+  `FallbackUniverseProvider` (new): a real collected constituent list, once
+  one exists, is preferred over `StaticUniverseProvider`'s placeholder with
+  zero further code changes — point-in-time correct (no look-ahead bias).
+- `collectors.index_constituents.IndexConstituentCollector` (new): a
+  generic, header-matching CSV parser for a constituent-list export, built
+  and tested but not yet wireable into the live pipeline (`egx_official`
+  stays `PLANNED` until its real endpoint is verified — TD-30).
+- `collectors.corporate_event_classifier` (new) + `RssNewsCollector`'s new
+  `classify_corporate_events` flag: closes TD-24 — a real, if headline-only
+  and declared-heuristic (TD-29), corporate-event classifier now produces
+  genuine `COMI/EARNINGS` and `MFPC/DIVIDEND` rows in a mock-mode
+  production pipeline run, verified directly.
+- `CollectionBatch`/`CollectionService` extended (not redesigned) to
+  materialize both new record types, with full provenance tracing and
+  idempotent merge-by-key writers, matching the existing price/macro
+  pattern exactly.
+- 31 new tests (462 total). See `CURRENT_MISSION.md` for the full
+  breakdown and `COMPLETION_REPORT.md` for this build's report.
+
+## Priority-Ordered Live Source Connection (earlier mission)
 
 - `AcquisitionIntelligenceEngine.run_catalog()` (new): processes every
   target in strict business-value order (`TargetOrganization.priority`,
@@ -147,7 +169,8 @@ placeholder/free-source data until a licensed EGX market data vendor is
 selected — a business decision reserved for the user (`docs/ROADMAP.md`).
 Nothing about this mission changes that gate; it makes the platform's
 own priority-ordered path to connecting real, free, legally-accessible
-sources fully engineering-complete and ready to execute autonomously the
-moment either of two blockers clears: outbound network egress, or a
-verified EGX30/EGX70 constituent list from the project owner. Both are
-named explicitly in `CURRENT_MISSION.md`.
+sources — including, this phase, a real Universe Engine and a real
+corporate-event classifier — fully engineering-complete and ready to
+execute autonomously the moment either of two blockers clears: outbound
+network egress, or a verified EGX30/EGX70 constituent list from the
+project owner. Both are named explicitly in `CURRENT_MISSION.md`.

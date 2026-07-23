@@ -10,9 +10,10 @@ from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.raw import RawDocument, RawDocumentRepository, build_raw_document
 from agx_research.collectors.service import CollectionService
 from agx_research.data.mock_provider import LocalCsvDataProvider
-from agx_research.data.schemas import MacroObservation, NewsItem, PriceBar
+from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem, PriceBar
 from agx_research.events.service import EventPlatform
 from agx_research.sources.spec import AccessMethod, SourceCategory, SourceSpec, SourceStatus
+from agx_research.universe.constituent import IndexConstituent
 
 
 def make_spec(**overrides) -> SourceSpec:
@@ -265,6 +266,93 @@ def test_no_latency_recorded_when_fetcher_never_timed_a_request(tmp_path):
 
     metrics = metrics_repo.latest("stub_source")
     assert metrics.latency_count == 0  # never fabricated when nothing was actually timed
+
+
+def test_corporate_events_materialized_to_csv(tmp_path):
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        corporate_events=[
+            CorporateEvent(
+                ticker="COMI", event_date=date(2026, 6, 1),
+                event_type="DIVIDEND", description="COMI declares dividend",
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": batch})
+
+    result = service.run(collector, expected_records=1)
+
+    assert result.corporate_events_written == 1
+    provider = LocalCsvDataProvider(tmp_path)
+    events = provider.get_corporate_events("COMI", date(2026, 1, 1), date(2026, 12, 31))
+    assert len(events) == 1
+    assert events[0].event_type == "DIVIDEND"
+
+
+def test_corporate_events_do_not_directly_register_events(tmp_path):
+    # events_from_corporate_events (events.adapters), fed by a DatasetSnapshot
+    # reading corporate_events.csv, is the single place these become
+    # registered Events -- CollectionService materializes only, so the same
+    # disclosure is never registered through two separate paths.
+    event_platform = EventPlatform()
+    service = CollectionService(tmp_path, event_platform=event_platform, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        corporate_events=[
+            CorporateEvent(
+                ticker="COMI", event_date=date(2026, 6, 1),
+                event_type="DIVIDEND", description="COMI declares dividend",
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": batch})
+
+    service.run(collector, expected_records=1)
+
+    assert len(event_platform.repository.all_latest()) == 0
+
+
+def test_index_constituents_materialized_to_csv(tmp_path):
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        index_constituents=[
+            IndexConstituent(
+                index="EGX30", ticker="COMI", company_name="Commercial International Bank",
+                as_of_date=date(2026, 6, 1),
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": batch})
+
+    result = service.run(collector, expected_records=1)
+
+    assert result.index_constituents_written == 1
+    from agx_research.universe.collected import CollectedUniverseProvider
+
+    provider = CollectedUniverseProvider(tmp_path, index="EGX30")
+    assert provider.constituents(date(2026, 6, 14)) == {"COMI": "Commercial International Bank"}
+
+
+def test_reingesting_same_index_constituents_is_idempotent(tmp_path):
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        index_constituents=[
+            IndexConstituent(
+                index="EGX30", ticker="COMI", company_name="Commercial International Bank",
+                as_of_date=date(2026, 6, 1),
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": batch})
+    service.run(collector, expected_records=1)
+    service.run(collector, expected_records=1)
+
+    path = tmp_path / "universe" / "EGX30.csv"
+    rows = path.read_text().strip().splitlines()
+    assert len(rows) == 2  # header + one row, not duplicated
 
 
 def test_parser_exception_is_withheld_and_recorded_not_propagated(tmp_path):

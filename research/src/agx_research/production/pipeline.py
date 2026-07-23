@@ -88,6 +88,7 @@ from agx_research.sources.catalog import seed_registry
 from agx_research.sources.health import HealthAlertRepository, HealthMonitor
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
+from agx_research.universe.collected import CollectedUniverseProvider, FallbackUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
 from agx_research.universe.static import StaticUniverseProvider
 
@@ -392,7 +393,9 @@ class ProductionPipeline:
             )
         self.market_memory = MarketMemory(
             LocalCsvDataProvider(self.data_dir),
-            StaticUniverseProvider(),
+            FallbackUniverseProvider(
+                [CollectedUniverseProvider(self.data_dir), StaticUniverseProvider()]
+            ),
             StaticSectorProvider(),
             tickers=self.tickers,
             macro_series_ids=self.macro_series_ids,

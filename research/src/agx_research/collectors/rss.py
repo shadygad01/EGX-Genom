@@ -6,6 +6,13 @@ SourceSpec, not in code. Parsing tolerates both RSS `<item>` and Atom
 `<entry>` shapes, namespaced or not, and records anything unparseable as a
 warning rather than guessing. Only headline/link/date metadata is
 collected — full-text handling follows each outlet's own terms.
+
+`classify_corporate_events=True` additionally runs each entry through
+`corporate_event_classifier`'s headline keyword heuristic when exactly one
+ticker hint matches, populating `batch.corporate_events` alongside the
+always-produced `NewsItem` -- the same disclosure viewed two ways, not two
+collectors. Off by default: most RSS sources are pure news outlets, not
+IR disclosure feeds, where this classification wouldn't be meaningful.
 """
 
 from __future__ import annotations
@@ -15,8 +22,9 @@ from datetime import date, datetime
 from email.utils import parsedate_to_datetime
 
 from agx_research.collectors.base import CollectionBatch, Collector
+from agx_research.collectors.corporate_event_classifier import classify_corporate_event_type
 from agx_research.collectors.raw import RawDocument, build_raw_document
-from agx_research.data.schemas import NewsItem
+from agx_research.data.schemas import CorporateEvent, NewsItem
 
 
 def _local_name(tag: str) -> str:
@@ -61,10 +69,22 @@ class RssNewsCollector(Collector):
     name = "RssNewsCollector"
     version = "1.0.0"
 
-    def __init__(self, spec, feed_url: str, *, ticker_hints: list[str] | None = None, fetcher=None):
+    def __init__(
+        self,
+        spec,
+        feed_url: str,
+        *,
+        ticker_hints: list[str] | None = None,
+        classify_corporate_events: bool = False,
+        fetcher=None,
+    ):
         super().__init__(spec, fetcher)
         self.feed_url = feed_url
         self.ticker_hints = ticker_hints or []
+        # Opt-in: most RSS sources are pure news outlets, not IR disclosure
+        # feeds -- classification only makes sense where headlines plausibly
+        # announce corporate actions (see `corporate_event_classifier`).
+        self.classify_corporate_events = classify_corporate_events
 
     def fetch(self) -> list[RawDocument]:
         text = self.fetcher.fetch_text(self.feed_url, self.spec)
@@ -111,4 +131,19 @@ class RssNewsCollector(Collector):
                     body=link,  # original URL preserved; full text per-outlet terms
                 )
             )
+            if self.classify_corporate_events and len(matched) == 1:
+                event_type = classify_corporate_event_type(title)
+                if event_type is not None:
+                    batch.corporate_events.append(
+                        CorporateEvent(
+                            ticker=matched[0],
+                            event_date=published,
+                            event_type=event_type,
+                            description=" ".join(title.split()),
+                            # Headline-only: no numeric detail (split ratio,
+                            # dividend amount) can be reliably read off a
+                            # title -- see corporate_event_classifier's
+                            # module docstring.
+                        )
+                    )
         return batch

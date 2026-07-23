@@ -1,111 +1,120 @@
 # Current Mission
 
-**Connect AGX's first live production sources, in strict business-value
-order, autonomously — Production Execution Phase.**
+**Build AGX toward collecting, processing, learning from, and presenting
+real Egyptian market data — Engineering Ownership Phase.**
 
-The project owner has reset priorities: engineering elegance is now
-secondary to business value, and the objective is no longer building
-software, it's continuously discovering statistically valid investment
-opportunities for EGX30/EGX70. World Bank/IMF/FRED remain useful
-enrichment but are explicitly **not** primary production milestones
-anymore — the priority order is now:
+The project owner has handed over full engineering ownership: no more
+isolated tasks, no waiting for approval between milestones. Architecture,
+the Data Acquisition Platform, the runtime pipeline, and Mission Control
+are all declared complete — the work now is closing every remaining
+engineering-closeable gap toward real data, in this exact business
+priority order:
 
-1. Official Egyptian Exchange (EGX)
-2. Investor Relations — every EGX30 company
-3. Investor Relations — every EGX70 company
-4. Central Bank of Egypt (CBE)
-5. Financial Regulatory Authority (FRA)
-6. CAPMAS
-7. Enterprise
-8. Mubasher
-9. Zawya
-10. Reuters (legally accessible public mechanisms)
-11. Trading Economics
-12. Every additional free public source the Acquisition Intelligence
-    Engine discovers on its own
+1. Official Egyptian Exchange integration
+2. Universe Engine
+3. Investor Relations discovery
+4. Corporate disclosures
+5. Financial statement collection
+6. Historical backfill
+7. Live incremental synchronization
+8. Central Bank of Egypt
+9. FRA
+10. CAPMAS
+11. Enterprise
+12. Mubasher
+13. Zawya
+14. Reuters
+15. Trading Economics
+16. Every additional legally accessible free public source discovered automatically
 
 ## What this phase engineered
 
-The Acquisition Intelligence Engine (built two missions ago) already
-covers priorities 1, 4–11 as seeded `TargetOrganization`s. Priority 2/3
-(company Investor Relations) had only a marker entry (`company_ir`,
-`per_constituent=True`) with no actual per-company expansion — the real
-gap this phase closed:
+**Universe Engine (priority 2).** `universe.UniverseProvider` had only
+`StaticUniverseProvider`, a fixed placeholder — no path existed for a real
+collected constituent list to reach it. Closed:
 
-- **`TargetOrganization.priority`** (new field): every seeded target now
-  carries the exact business-value order above; `AcquisitionIntelligenceEngine.
-  run_catalog()` (new) processes targets in that order, lowest first.
-- **`generate_company_ir_targets(companies)`** (new,
-  `acquisition_intelligence/target.py`): one target per EGX30 (today's
-  placeholder universe; scales automatically once a real, complete list
-  exists) constituent, with **no fabricated domain hints** — see "The one
-  real constraint" below for why.
-- **`discover_company_directory_links()`** (new,
-  `discovery/engine.py`): finds a company's own homepage link on an
-  already-fetched directory page by matching anchor text against the
-  company's real name — the mechanism that lets Priority 1 (EGX itself,
-  once reachable) mechanically supply real per-company hints for Priority
-  2/3, instead of guessing ~10-100 corporate domains from training-data
-  recall (which would have been exactly the "fabricate a URL" the policy
-  forbids).
-- **`run_catalog()`** wires the two together: whichever target resolves
-  first in priority order gets a real chance to feed discovered company
-  hints into not-yet-run per-company targets.
-- **`cli.py discover-sources`** now runs the full expanded catalog (org
-  targets + generated company IR targets) through `run_catalog`, in
-  priority order, by default.
-- **Fixed a real, pre-existing circular-import bug** discovered while
-  building this (`agx_research.discovery` failed to import if it was the
-  first AGX module touched in a fresh process, because `sources.
-  qualification` imported `discovery.candidate.SourceCandidate` at module
-  level while `discovery.candidate` imports `sources.spec` — a genuine
-  architectural defect per this phase's own "fix only if a real defect is
-  discovered" rule, not a redesign. Fixed with a `TYPE_CHECKING`-guarded
-  import (annotations are already lazy via `from __future__ import
-  annotations`); regression-tested with a fresh-subprocess import test.
+- **`IndexConstituent`** (`universe/constituent.py`): `{index, ticker,
+  company_name, as_of_date}` — carrying a date per row, not a single
+  overwritten snapshot, so membership queries stay point-in-time-correct
+  (no look-ahead bias, the same guarantee every other query in this
+  platform gives).
+- **`CollectionBatch.index_constituents`** (+ `corporate_events`, built at
+  the same time since both are new record types the same materialization
+  path needed) — `CollectionService` now writes `universe/<INDEX>.csv`,
+  merged by `(ticker, as_of_date)`, with full provenance tracing.
+- **`CollectedUniverseProvider`** (`universe/collected.py`): reads that
+  CSV, returning the latest snapshot at-or-before the query date, or `{}`
+  if nothing's been collected yet — never fabricated. **`FallbackUniverseProvider`**
+  composes it with `StaticUniverseProvider`, mirroring `FallbackDataProvider`
+  exactly. Wired into `production.pipeline`'s `_stage_market_memory` and
+  `cli.py`'s `discover-sources`, so a real collected universe is preferred
+  the instant one exists, with zero further code changes.
+- **`IndexConstituentCollector`** (`collectors/index_constituents.py`):
+  the collection half — a generic, header-matching CSV parser (finds
+  ticker/name columns by header text, not a fixed column order). Fully
+  built and tested, exactly like the AlphaVantage/FMP collectors sitting
+  at `NEEDS_KEY` — it cannot be wired into the live pipeline until
+  `egx_official`'s real endpoint is verified and its status flips from
+  `PLANNED` to `IMPLEMENTED` (`AD-24`), since inventing a specific parser
+  for an unverified page would be guessing a wire format, not parsing a
+  real one (TD-30).
 
-## The one real constraint, stated plainly (unchanged across three missions)
+**Corporate disclosures (priority 4), closing TD-24.** `CorporateEvent`
+had a schema and a `DataProvider` read path, but nothing produced one.
+Closed with `collectors.corporate_event_classifier`: a declared headline
+keyword heuristic (dividend/split/merger/buyback/earnings/etc., same
+posture as the legality and company-directory heuristics, TD-29) that
+`RssNewsCollector`'s new `classify_corporate_events` flag applies per
+entry, populating `batch.corporate_events` alongside the always-produced
+`NewsItem` — one disclosure, two views, not two collectors. Wired into
+`collector_plan.py`'s `rss_generic` mock/replay collector. **Verified
+live**: a mock-mode production pipeline run now writes real
+`COMI/EARNINGS` and `MFPC/DIVIDEND` rows to `corporate_events.csv` from
+the existing mock RSS headlines — no fabrication, a real (if narrow)
+capability. Headline-only by design (RSS/ToS terms): classified events
+carry no numeric detail (split ratio, dividend amount), so they stay
+correctly informational-only until a fuller-text source (an IR disclosure
+PDF) exists.
 
-This development sandbox has no outbound network egress to arbitrary
-hosts — confirmed directly and repeatedly, including this phase (`curl`
-against `www.egx.com.eg`, `cbe.org.eg`, `fra.gov.eg`, `capmas.gov.eg`,
-`mubasher.info`, `stooq.com`, `fred.stlouisfed.org`, and
-`api.worldbank.org` all return `CONNECT tunnel failed, response 403`; only
-PyPI/npm/anthropic.com are allowlisted). Two direct consequences, both
-environmental, not engineering, gaps:
+**Investor Relations discovery (priority 3)** — no new engineering this
+phase; it was fully built two missions ago (`generate_company_ir_targets`,
+`discover_company_directory_links`, `run_catalog`) and now automatically
+scales the moment the Universe Engine's collector (or a user-supplied
+list) supplies a real constituent set, per its original design.
 
-1. **No live source can be verified or connected from this sandbox.**
-   `agx discover-sources` is fully wired for the entire priority-ordered
-   catalog (12 tiers, ~20 targets today) and correctly reports "no
-   reachable domain" for every one — the domain resolver refusing to
-   trust an unprobed domain, exactly as designed, every time this has been
-   checked across three missions.
-2. **The real, complete EGX30/EGX70 constituent lists don't exist in this
-   codebase yet** — only a 10-company EGX30 placeholder
-   (`universe.EGX30_UNIVERSE_PLACEHOLDER`) and no EGX70 list at all. This
-   is a deliberate choice, not an oversight: fabricating ~90 additional
-   ticker/company-name pairs from training-data recall (some inevitably
-   wrong or stale) would itself violate "never fabricate data" applied to
-   something as consequential as index membership. The correct source for
-   this list is EGX's own official site (Priority 1) or a verified,
-   user-supplied list (a business decision) — not this codebase's memory.
-   `generate_company_ir_targets()` already scales to either the moment it
-   exists.
+## Priorities 1, 6, 7: why no new code this phase
 
-**Neither of these is a shortcoming in the engineering.** Every mechanism
-needed is built, tested, and wired; the moment this platform runs
-somewhere with outbound internet access, `agx discover-sources` performs
-real, verified discovery, ranking, `SourceSpec` generation, registration,
-and qualification kickoff for the full priority-ordered catalog, with zero
-further code changes.
+- **Priority 1 (EGX official)**: blocked on the same two named constraints
+  below — its `SourceSpec` (`egx_official`) is fully seeded and its
+  `TargetOrganization` fully wired into `run_catalog`; only real endpoint
+  verification (network access) can move it past `PLANNED`.
+- **Priority 6 (historical backfill)**: already automatic by design, no
+  separate logic exists or is needed — every collector (including the new
+  `IndexConstituentCollector`) fetches a source's full available series by
+  construction; a first real run *is* the backfill.
+- **Priority 7 (live incremental sync)**: already satisfied by design too
+  — every materialization writer (price bars, macro observations,
+  corporate events, index constituents) merges by natural key and
+  overwrites idempotently; a subsequent run naturally only changes what's
+  actually new, with no separate "incremental mode" required.
 
-## Genuine blocker (stop condition 1: external dependency)
+## The one real constraint, stated plainly (unchanged across four missions)
 
-Continuing to connect real live sources requires either (a) this platform
-running somewhere with outbound network egress, or (b) the project owner
-supplying a verified EGX30/EGX70 constituent list and/or per-company IR
-domains as a business input. Both are named, real, and outside what
-engineering alone can resolve from inside this sandbox. Everything
-engineering could complete without them has been completed — see
-`NEXT_MISSIONS.md` for what runs automatically the moment either unblocks,
-and what remains genuinely engineering-closeable in the meantime.
+This sandbox has no outbound network egress to arbitrary hosts — confirmed
+directly and repeatedly. Two consequences:
+
+1. **Priority 1 (EGX official) and everything gated on it (2/3 at real
+   scale, 8–16) cannot connect live** — every mechanism is built, tested,
+   and wired; only real endpoint verification is missing.
+2. **No real, complete EGX30/EGX70 constituent list exists in this
+   codebase** — a business decision reserved for the project owner (see
+   `docs/DATA_ACQUISITION.md`); fabricating one from training-data recall
+   would violate the platform's anti-fabrication principle.
+
+Everything engineering could complete without either input has been
+completed. See `NEXT_MISSIONS.md` for what runs automatically the moment
+either clears, and what's next regardless: **Financial Statement
+Collection (priority 5)**, which needs no live source to design the
+canonical schema, collector shape, and provider read path — the same
+generic-infrastructure-now pattern this phase used for the Universe
+Engine and corporate events.

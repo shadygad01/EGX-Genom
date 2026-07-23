@@ -229,7 +229,7 @@ def build_collector_plan(
                     "rss_generic",
                     RssNewsCollector(
                         collectable["rss_generic"], feed_url=_MOCK_FEED_URL,
-                        ticker_hints=tickers, fetcher=fetcher,
+                        ticker_hints=tickers, classify_corporate_events=True, fetcher=fetcher,
                     ),
                 )
             )
@@ -256,7 +256,9 @@ def build_collector_plan(
         elif source_id == "fred":
             real = FredCsvCollector(spec, series_ids=list(_FRED_SERIES))
         elif source_id == "rss_generic":
-            real = RssNewsCollector(spec, feed_url=_MOCK_FEED_URL, ticker_hints=tickers)
+            real = RssNewsCollector(
+                spec, feed_url=_MOCK_FEED_URL, ticker_hints=tickers, classify_corporate_events=True,
+            )
         elif source_id == "worldbank":
             real = WorldBankCollector(spec, indicators={_WORLDBANK_INDICATOR: _WORLDBANK_SERIES_ID})
         else:

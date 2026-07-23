@@ -1,0 +1,67 @@
+"""A UniverseProvider backed by collected data, mirroring
+`data.mock_provider.LocalCsvDataProvider`'s "collected data reads through
+the same interface as everything else" pattern.
+
+Reads `<data_dir>/universe/<INDEX>.csv` (columns: ticker,company_name,
+as_of_date) -- the layout `collectors.service.CollectionService` writes
+whenever a batch carries `IndexConstituent`s. Point-in-time correct: for a
+given `as_of` date, returns the constituent set from the latest collected
+snapshot at or before that date, never a later one -- the same no-look-
+ahead guarantee every other point-in-time query in this platform gives.
+
+Empty (never fabricated) when nothing has been collected yet for that
+index, or when every collected snapshot postdates `as_of`. Callers that
+want a placeholder fallback should compose this with
+`StaticUniverseProvider` via `FallbackUniverseProvider`, not rely on this
+class inventing one.
+"""
+
+from __future__ import annotations
+
+import csv
+from datetime import date
+from pathlib import Path
+
+from agx_research.universe.provider import UniverseProvider
+
+
+class CollectedUniverseProvider(UniverseProvider):
+    def __init__(self, data_dir: Path | str, *, index: str = "EGX30"):
+        self.data_dir = Path(data_dir)
+        self.index = index
+
+    def constituents(self, as_of: date) -> dict[str, str]:
+        path = self.data_dir / "universe" / f"{self.index}.csv"
+        if not path.exists():
+            return {}
+
+        by_date: dict[date, dict[str, str]] = {}
+        with path.open(newline="") as f:
+            for row in csv.DictReader(f):
+                snapshot_date = date.fromisoformat(row["as_of_date"])
+                by_date.setdefault(snapshot_date, {})[row["ticker"]] = row["company_name"]
+
+        eligible_dates = [d for d in by_date if d <= as_of]
+        if not eligible_dates:
+            return {}
+        return dict(by_date[max(eligible_dates)])
+
+
+class FallbackUniverseProvider(UniverseProvider):
+    """Tries each provider in order, returning the first non-empty result --
+    mirrors `data.composite_provider.FallbackDataProvider` exactly, so a
+    real collected universe (once one exists) is preferred over the
+    placeholder without either caller-side branching or a new interface.
+    """
+
+    def __init__(self, providers: list[UniverseProvider]):
+        if not providers:
+            raise ValueError("FallbackUniverseProvider requires at least one provider")
+        self.providers = providers
+
+    def constituents(self, as_of: date) -> dict[str, str]:
+        for provider in self.providers:
+            result = provider.constituents(as_of)
+            if result:
+                return result
+        return {}

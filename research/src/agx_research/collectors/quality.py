@@ -61,7 +61,13 @@ def _validation_score(batch: CollectionBatch) -> float:
 
 
 def _completeness_score(batch: CollectionBatch) -> float:
-    produced = len(batch.price_bars) + len(batch.macro_observations) + len(batch.news_items)
+    produced = (
+        len(batch.price_bars)
+        + len(batch.macro_observations)
+        + len(batch.news_items)
+        + len(batch.corporate_events)
+        + len(batch.index_constituents)
+    )
     if produced == 0:
         return 0.0 if batch.parse_warnings else 1.0
     return produced / (produced + len(batch.parse_warnings))
@@ -75,7 +81,13 @@ def assess_quality(
     freshness_score: float = 1.0,
     consistency_score: float | None = None,
 ) -> QualityAssessment:
-    produced = len(batch.price_bars) + len(batch.macro_observations) + len(batch.news_items)
+    produced = (
+        len(batch.price_bars)
+        + len(batch.macro_observations)
+        + len(batch.news_items)
+        + len(batch.corporate_events)
+        + len(batch.index_constituents)
+    )
     coverage = min(1.0, produced / expected_records) if expected_records > 0 else (
         1.0 if produced > 0 else 0.0
     )

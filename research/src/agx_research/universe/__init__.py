@@ -1,3 +1,5 @@
+from agx_research.universe.collected import CollectedUniverseProvider, FallbackUniverseProvider
+from agx_research.universe.constituent import IndexConstituent
 from agx_research.universe.provider import UniverseProvider
 from agx_research.universe.sector import EGX_SECTOR_PLACEHOLDER, SectorProvider, StaticSectorProvider
 from agx_research.universe.static import EGX30_UNIVERSE_PLACEHOLDER, StaticUniverseProvider
@@ -9,4 +11,7 @@ __all__ = [
     "SectorProvider",
     "StaticSectorProvider",
     "EGX_SECTOR_PLACEHOLDER",
+    "IndexConstituent",
+    "CollectedUniverseProvider",
+    "FallbackUniverseProvider",
 ]

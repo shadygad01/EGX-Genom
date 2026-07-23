@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.16.0 — Frontend: the remaining 8 sections (Opportunity Center through System Administration)
+Completes the Production User Experience mission's 9-section rollout
+(0.15.0 delivered the shell and AI Briefing). Every section composes only
+from existing dashboard artifacts, per the mission's no-frontend-
+calculation constraint.
+
+- **Opportunity Center** — recommendations ranked by confidence,
+  master/detail: ranked table + full `Explanation` breakdown (research/
+  risk summary, supporting/contradicting evidence, historical similar
+  cases, per-ticker upcoming catalysts) for the selected row.
+- **Company Research Workspace** (`/company/:ticker`) — investment
+  thesis, upcoming catalysts, knowledge timeline, research papers and
+  gene lineage (cross-referenced via knowledge object ids), financial
+  statements, corporate actions, news timeline. Market Regime & Macro
+  Exposure is an honest "not yet available" gap.
+- **Market Intelligence** — universe/sector composition, macro
+  dashboard, market-wide corporate actions. Market Breadth & Liquidity
+  and Market Regime & Historical Comparison are honest gaps — the
+  frontend must not compute returns from raw price bars itself.
+- **Research Center** — the 8-gate hypothesis pipeline (master/detail:
+  ranked list + full stage history), covering "Experiments,"
+  "Validation Queue," "Active Research," and "Discovery History" as
+  views over the same `Hypothesis.stage_history`; Knowledge Objects;
+  Scientific Papers. Review Board is an honest gap.
+- **Knowledge Graph** — interactive, searchable, pan/zoomable rendering
+  of `getKnowledgeGraph()`. New `web/src/lib/forceLayout.ts`: a small,
+  dependency-free Fruchterman-Reingold-style force simulation, chosen
+  over adding a graph-rendering library for a single page.
+- **Mission Control** — mission status, pipeline health (stage-by-
+  stage), knowledge/genome status, collectors, source health rollup,
+  current blockers, execution history. Discovery Engine detail is an
+  honest gap.
+- **Source Intelligence** — every registered source, master/detail:
+  health, lifecycle, reputation dimensions (availability, coverage,
+  freshness, latency, accuracy, schema stability) as meters, joined
+  across the source registry, source metrics, and the most recent
+  collector run.
+- **System Administration** — runtime/versions, configuration, replay
+  capability, artifact inventory, per-stage performance (slowest
+  first), execution history with error/session detail. Logs is an
+  honest gap.
+- Every page verified in a headless browser (dark theme) against real
+  artifacts from a mock-mode `agx run` or a synthetic fixture where the
+  mock pipeline currently produces no data (e.g. zero promoted
+  knowledge/recommendations).
+- 25 web tests total (was 19 after 0.15.0), all green. `npm run build`
+  (`tsc -b && vite build`) passes clean.
+
 ## 0.15.0 — Frontend: design system, routed app shell, AI Briefing landing page
 Start of the Production User Experience mission: the backend, research
 engine, and production pipeline are declared complete by the project

@@ -218,6 +218,47 @@ generated `knowledge.json`/`recommendations.json` are honestly often empty
 2-ticker mock history) — that's the platform's real behavior faithfully
 surfaced, not a demo bug.
 
+## Frontend: Production User Experience
+
+`web/` is a routed, 9-section institutional research platform (the
+Production User Experience mission), not the single hardcoded knowledge
+table it started as. Every page still goes through exactly one
+`DashboardDataProvider` (above) — nothing here changes that contract.
+
+- **Design tokens** (`web/src/styles/tokens.css`): dark-theme-first CSS
+  custom properties (surfaces, borders, text, accent, semantic
+  positive/negative/warning/neutral, typography, spacing, radius) with a
+  light-theme override block. `web/src/styles/global.css` layers resets,
+  focus-visible styling, and a `.num` tabular-numeral utility on top.
+- **Shared primitives** (`web/src/components/primitives/`): `Card`,
+  `Badge`, `StatTile`, `Meter`, `DataTable`, `Section`, and
+  `EmptyState`/`LoadingState`/`ErrorState`. Every page is built from these
+  — no page hand-rolls its own panel, table, or status pill.
+- **Application shell** (`web/src/components/layout/`): `Sidebar` (nav
+  across all 9 sections), `TopBar` (live system-health status strip, via
+  `getSystemStatus()`), and `AppShell` composing both around
+  `react-router-dom` `<Routes>` in `App.tsx`.
+- **`useArtifact` hook** (`web/src/hooks/useArtifact.ts`): the one seam
+  every page uses to call a `DashboardDataProvider` method with consistent
+  loading/error state — no page calls the provider directly.
+- **The 9 pages** (`web/src/pages/`): `AIBriefing` (landing page),
+  `OpportunityCenter`, `CompanyWorkspace` (`/company/:ticker`),
+  `MarketIntelligence`, `ResearchCenter`, `KnowledgeGraphPage`,
+  `MissionControlPage`, `SourceIntelligence`, `SystemAdministration`.
+  Each composes only from artifacts already described above — **no page
+  computes a value the backend didn't already produce**. Where the
+  9-section spec calls for something no artifact backs yet (market
+  regime classification, market breadth/liquidity, Review Board decision
+  history, Discovery Engine detail, raw log lines), the page renders an
+  honest "not yet available" `EmptyState` naming the gap, never a
+  fabricated number — see `CURRENT_MISSION.md`/`NEXT_MISSIONS.md` for the
+  current list.
+- **Knowledge Graph rendering** (`web/src/lib/forceLayout.ts`): a small,
+  dependency-free Fruchterman-Reingold-style force simulation, computed
+  once per graph load and rendered as plain SVG with hand-rolled pan/zoom.
+  Chosen deliberately over adding a graph-rendering library for a single
+  page — the graph is provenance-derived (small), not a firehose.
+
 ## Data flow
 
 1. `market_memory.MarketMemory.reconstruct(as_of)` (or the lower-level

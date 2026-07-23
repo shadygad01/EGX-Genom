@@ -1,102 +1,63 @@
 # Next Missions
 
-In build order for the Production User Experience mission (see
-`CURRENT_MISSION.md`). Each remaining section is built against
-already-exported dashboard artifacts wherever possible; any that need a
-new thin backend export are called out below.
+All 9 sections of the Production User Experience are now built (see
+`CURRENT_MISSION.md`). What's next, in order:
 
-## 1. Opportunity Center
+## 1. Quality pass across all 9 sections
 
-Every opportunity ranked by confidence, from `getRecommendations()`
-(already exported): ticker, company, confidence, expected return/drawdown,
-investment horizon, supporting/contradicting evidence
-(`Explanation.supporting_evidence`/`invalidation_conditions`), historical
-similar cases (`Explanation.similar_historical_cases`), upcoming
-catalysts, research summary, risk summary. Clicking a row opens the
-Company Research Workspace (`/company/:ticker`, already routed).
+The mission's own quality checklist, re-verified now that every section
+exists rather than assumed page by page:
 
-## 2. Company Research Workspace
+- **Responsive layout** — spot-checked at 1024px and 1700px so far (both
+  clean); a pass at common laptop/ultrawide widths and the sidebar's
+  collapse behavior on narrow viewports is still worth a dedicated look.
+- **Accessibility** — `aria-label`/`role` present on the nav, states, and
+  progress meters; a full keyboard-navigation and screen-reader pass
+  (tab order across master/detail pages, focus trapping, color-contrast
+  check on the Meter/Badge palette) has not been done yet.
+- **Performance** — the Knowledge Graph's force layout is O(n²) per
+  render pass; fine at current data volumes (tens of nodes) but worth
+  re-checking once real provenance data grows the graph substantially.
+- **Cross-page consistency** — every page uses the shared primitives
+  (`Card`, `Badge`, `StatTile`, `DataTable`, `Section`,
+  `EmptyState`/`LoadingState`/`ErrorState`) and the same empty-state
+  honesty pattern; worth a final side-by-side pass once real (non-mock)
+  data exists to compare against.
 
-Per-ticker deep page: current investment thesis (`Recommendation` +
-`Explanation`), knowledge timeline (`getKnowledge()` filtered by
-`affected_assets`), news timeline (`MarketState.dataset_snapshot.news`
-filtered by ticker), financial statements (`getFinancialStatements()`,
-already exported), corporate actions
-(`MarketState.dataset_snapshot.corporate_events`), research papers
-(`getPapers()`, already exported, filtered by `knowledge_id`), genes
-(`getGenes()`, already exported), supporting/contradicting evidence,
-historical similar cases, sector/macro context. Route already wired
-(`/company/:ticker`, currently a placeholder).
+## 2. Known frontend gaps waiting on new backend artifacts
 
-## 3. Market Intelligence
+Each of these was deliberately left as an honest "not yet available" UI
+gap rather than fabricated, per the mission's own anti-fabrication
+constraint:
 
-EGX30/EGX70 breadth, sector rotation, macro dashboard
-(`MarketState.dataset_snapshot.macro_series`), upcoming earnings/corporate
-actions/disclosures, market regime, historical comparison. **Known gap:**
-no "market regime" artifact currently exists — needs an honest empty state
-or a new thin export once a regime classification exists upstream; do not
-fabricate one in the frontend.
+- **Market Regime classification** (Market Intelligence, Company Research
+  Workspace) — no artifact exists upstream yet.
+- **Market Breadth & Liquidity** (Market Intelligence) — needs a
+  backend-computed artifact (advancers/decliners, adjusted volume); the
+  frontend must not compute returns from raw price bars itself.
+- **Review Board decision history** (Research Center) — no repository
+  persists past `BoardDecision`s yet.
+- **Discovery Engine detail** (Mission Control) — `acquisition_intelligence`
+  has no dashboard export yet.
+- **Raw log lines** (System Administration) — no artifact carries them
+  yet.
 
-## 4. Research Center
+None of these block using the platform today — each shows an honest
+empty state explaining what's missing and why, per `CLAUDE.md`'s
+anti-fabrication principle. Building any of them is a small, well-scoped
+follow-up (a thin new export following the same pattern as every other
+artifact) whenever the underlying backend capability exists.
 
-Hypotheses (`getHypotheses()`, already exported), experiments, knowledge
-objects (`getKnowledge()`), scientific papers (`getPapers()`), review
-board, validation queue, discovery history, retired knowledge, active
-research. **Known gap:** no repository persists past `BoardDecision`s from
-`review.ScientificReviewBoard` — the review-board detail view will need an
-honest gap acknowledgment, not fabricated history, unless/until that
-repository is built.
+## 3. Backend/data-acquisition mission — paused, not abandoned
 
-## 5. Knowledge Graph view
-
-Interactive, searchable, zoomable graph from `getKnowledgeGraph()`
-(already exported — nodes + edges, mechanically derived from
-`Provenance` via `graph.edges_from_provenance()`). Needs a rendering
-library decision (e.g. a lightweight force-directed layout) — evaluate
-before adding a new dependency, per the "no over-engineering" ethos.
-
-## 6. Mission Control page
-
-Current mission, project progress, pipeline health
-(`getMissionStatus()`/`getExecutionReport()`, already exported),
-collectors (`getCollectorStatus()`), discovery engine, knowledge/genome
-status, runtime status (`getRuntimeStatus()`), source health, execution
-history, current blockers. Largely a UI composition over artifacts that
-already exist.
-
-## 7. Source Intelligence
-
-Every connected source's health, availability, coverage, freshness,
-latency, qualification, discovery date, last success/failure, collected
-documents, validation score — from `getSourceRegistry()` and
-`getSourceMetrics()` (both already exported).
-
-## 8. System Administration
-
-Runtime, configuration, execution history, replay, logs, artifacts,
-versions, performance. Largely `getExecutionReport()`/
-`getDashboardMetrics()`/`getRuntimeMetrics()` composition; replay/logs may
-need a new thin export if no artifact currently carries that detail.
-
-## Ongoing: Mission Control docs
-
-Update `MISSION_CONTROL.md`, `CURRENT_MISSION.md`, `NEXT_MISSIONS.md`,
-`PROJECT_PROGRESS.md`, `docs/ROADMAP.md`, `CHANGELOG.md` after every
-milestone (each numbered item above), per the mission's explicit
-discipline requirement.
-
-## After all 9 sections: quality pass
-
-Responsive layout, accessibility, performance, loading/error/empty states,
-theme consistency, navigation consistency, cross-page consistency — the
-mission's own quality checklist, re-verified once every section exists
-rather than assumed page by page.
+The prior mission's own next-steps (EGX official connection, richer
+PDF-based extraction, calibration passes once real data exists) remain
+valid but are paused per the project owner's instruction not to do
+backend work during this frontend phase. See `docs/ROADMAP.md`'s
+"Post-1.0" section for where they resume.
 
 ## Beyond this
 
-The backend/data-acquisition mission's own next-steps (EGX official
-connection, richer PDF-based extraction, calibration passes once real data
-exists) remain valid but are explicitly paused per the project owner's
-instruction not to do backend work during this phase — see
-`docs/ROADMAP.md`'s "Post-1.0" section for where they resume once the
-frontend mission completes.
+No further page or section is queued. Future work here should come from
+either the quality pass above, or a genuine gap the project owner
+surfaces after using the platform.

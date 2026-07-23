@@ -25,14 +25,17 @@ commit whenever the fact they state changes.
   Research Center, Knowledge Graph, Mission Control, Source Intelligence,
   System Administration), consuming existing dashboard artifacts only, no
   frontend-side calculation. See `CURRENT_MISSION.md`.
-- **Progress this mission:** Frontend audit complete. Six new backend
-  dashboard artifacts (genes, papers, hypotheses, knowledge graph,
-  financial statements, source reputation) exported to close gaps the
-  9-section spec needed. Design system, primitive component library, and
-  routed application shell built. AI Briefing (the landing page) fully
-  built and verified in both themes. Remaining 8 sections are honest
-  "under construction" placeholders. See `NEXT_MISSIONS.md` for the
-  section-by-section build order.
+- **Progress this mission: all 9 sections built.** Frontend audit
+  complete. Six new backend dashboard artifacts (genes, papers,
+  hypotheses, knowledge graph, financial statements, source reputation)
+  exported to close gaps the 9-section spec needed. Design system,
+  primitive component library, and routed application shell built. Every
+  section is implemented against real dashboard artifacts, verified in a
+  headless browser (dark theme, and light theme for the landing page).
+  A handful of sub-sections are honest "not yet available" gaps where no
+  backend artifact exists yet (market regime, breadth/liquidity, review
+  board history, discovery engine detail, raw logs) — see
+  `NEXT_MISSIONS.md` for the full list and what's next (a quality pass).
 - **Overall completion (backend, unchanged from prior mission):** ~99.5%
   of everything engineering-closeable without a business/vendor decision.
   See `docs/PHASE_STATUS.md`/`docs/ROADMAP.md` for the backend detail —

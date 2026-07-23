@@ -1,5 +1,13 @@
 # Roadmap
 
+**Frontend note:** the Production User Experience mission (see
+`CURRENT_MISSION.md`) has completed a full rebuild of `web/` into a
+routed, 9-section institutional research platform, consuming the
+artifacts described below with zero frontend-side calculation. It changes
+nothing on this roadmap — the backend/business-decision items below
+remain exactly as scoped, paused rather than resumed during the frontend
+phase.
+
 Current engineering state: all 18 systems architecturally complete and
 tested except the business-blocked remainder of 18 (see
 `docs/PHASE_STATUS.md` for per-system detail). The platform runs

@@ -89,8 +89,13 @@ describe("App shell", () => {
     expect(await screen.findByText("No graph data yet")).toBeInTheDocument();
   });
 
-  it("routes to the Mission Control placeholder", async () => {
+  it("routes to Mission Control", async () => {
     await renderApp("/mission-control");
+    expect(await screen.findByText("No mission status yet")).toBeInTheDocument();
+  });
+
+  it("routes to the Source Intelligence placeholder", async () => {
+    await renderApp("/sources");
     expect(await screen.findByText("Under construction")).toBeInTheDocument();
   });
 });

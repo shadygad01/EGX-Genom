@@ -79,8 +79,13 @@ describe("App shell", () => {
     expect(await screen.findByText("No market state yet")).toBeInTheDocument();
   });
 
-  it("routes to the Research Center placeholder", async () => {
+  it("routes to the Research Center", async () => {
     await renderApp("/research");
+    expect(await screen.findByText("No hypotheses yet")).toBeInTheDocument();
+  });
+
+  it("routes to the Knowledge Graph placeholder", async () => {
+    await renderApp("/knowledge-graph");
     expect(await screen.findByText("Under construction")).toBeInTheDocument();
   });
 });

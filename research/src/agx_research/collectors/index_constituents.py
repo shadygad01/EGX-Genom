@@ -19,19 +19,12 @@ import csv
 import io
 
 from agx_research.collectors.base import CollectionBatch, Collector
-from agx_research.collectors.raw import RawDocument, build_raw_document
+from agx_research.collectors.csv_columns import find_column
+from agx_research.collectors.raw import RawDocument, fetch_single_text_document
 from agx_research.universe.constituent import IndexConstituent
 
 _TICKER_HEADER_HINTS = ("ticker", "symbol", "code")
 _NAME_HEADER_HINTS = ("name", "company")
-
-
-def _find_column(header: list[str], hints: tuple[str, ...]) -> int | None:
-    for position, column in enumerate(header):
-        normalized = column.strip().lower()
-        if any(hint in normalized for hint in hints):
-            return position
-    return None
 
 
 class IndexConstituentCollector(Collector):
@@ -43,18 +36,10 @@ class IndexConstituentCollector(Collector):
         self.index = index
 
     def fetch(self) -> list[RawDocument]:
-        text = self.fetcher.fetch_text(self.spec.base_url, self.spec)
-        return [
-            build_raw_document(
-                source_id=self.spec.id,
-                collector=self.name,
-                collector_version=self.version,
-                original_url=self.spec.base_url,
-                content_text=text,
-                schema_version=self.spec.schema_version,
-                license=self.spec.license,
-            )
-        ]
+        return fetch_single_text_document(
+            self.fetcher, self.spec,
+            collector_name=self.name, collector_version=self.version, url=self.spec.base_url,
+        )
 
     def parse(self, document: RawDocument) -> CollectionBatch:
         batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)
@@ -64,8 +49,8 @@ class IndexConstituentCollector(Collector):
             batch.parse_warnings.append("Empty document; nothing parsed.")
             return batch
 
-        ticker_col = _find_column(header, _TICKER_HEADER_HINTS)
-        name_col = _find_column(header, _NAME_HEADER_HINTS)
+        ticker_col = find_column(header, _TICKER_HEADER_HINTS)
+        name_col = find_column(header, _NAME_HEADER_HINTS)
         if ticker_col is None or name_col is None:
             batch.parse_warnings.append(
                 f"Could not identify ticker/name columns in header {header}; nothing parsed."

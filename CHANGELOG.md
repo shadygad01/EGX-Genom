@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.13.2 — Production-readiness audit for merge into main
+Full audit before merging this branch into `main`: all tests green (477
+Python / 14 API / 19 web), `ruff` clean, `contracts/` drift-free, no merge
+conflicts with `main` (confirmed via `git merge-tree` — a clean
+fast-forward, `main` hadn't moved), no TODO/FIXME/debug artifacts, no
+unresolved conflict markers, no architecture-invariant violations found
+(agents never write to `KnowledgeStore` directly; every real fetch goes
+through `HttpFetcher`; no direct `EventRepository` writes bypass
+`EventPlatform.register()`; every schema class defined exactly once).
+
+One real duplication found and fixed: the same four-line header-matching
+helper and the same single-URL-fetch-and-wrap pattern had been written
+three times over (`RssNewsCollector`, plus this mission's
+`IndexConstituentCollector` and `FinancialStatementCollector`).
+Consolidated:
+- `collectors/csv_columns.py` (new): `find_column()`, the shared
+  header-text column matcher.
+- `collectors/raw.py`: `fetch_single_text_document()` (new), the shared
+  "one URL, one text document" `fetch()` body.
+
+All three collectors now call the shared helpers instead of carrying
+their own copies; behavior is unchanged (same tests, same assertions,
+all still passing). No functional changes, no new features — a pure
+deduplication refactor ahead of merge.
+
 ## 0.13.1 — Dashboard observability fix: report every collected record type
 - `production/artifacts.py`'s `export_collector_status()` reported
   `price_bars_written`/`macro_observations_written`/`news_items_written`/

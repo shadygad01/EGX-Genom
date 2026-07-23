@@ -31,7 +31,8 @@ import csv
 import io
 
 from agx_research.collectors.base import CollectionBatch, Collector
-from agx_research.collectors.raw import RawDocument, build_raw_document
+from agx_research.collectors.csv_columns import find_column
+from agx_research.collectors.raw import RawDocument, fetch_single_text_document
 from agx_research.financials.schema import FinancialStatementLineItem
 
 _PERIOD_END_HEADER_HINTS = ("period_end", "period end", "as of", "fiscal period", "date")
@@ -50,14 +51,6 @@ _REQUIRED_COLUMNS = (
 )
 
 
-def _find_column(header: list[str], hints: tuple[str, ...]) -> int | None:
-    for position, column in enumerate(header):
-        normalized = column.strip().lower()
-        if any(hint in normalized for hint in hints):
-            return position
-    return None
-
-
 class FinancialStatementCollector(Collector):
     name = "FinancialStatementCollector"
     version = "1.0.0"
@@ -67,18 +60,10 @@ class FinancialStatementCollector(Collector):
         self.ticker = ticker
 
     def fetch(self) -> list[RawDocument]:
-        text = self.fetcher.fetch_text(self.spec.base_url, self.spec)
-        return [
-            build_raw_document(
-                source_id=self.spec.id,
-                collector=self.name,
-                collector_version=self.version,
-                original_url=self.spec.base_url,
-                content_text=text,
-                schema_version=self.spec.schema_version,
-                license=self.spec.license,
-            )
-        ]
+        return fetch_single_text_document(
+            self.fetcher, self.spec,
+            collector_name=self.name, collector_version=self.version, url=self.spec.base_url,
+        )
 
     def parse(self, document: RawDocument) -> CollectionBatch:
         batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)
@@ -91,12 +76,12 @@ class FinancialStatementCollector(Collector):
         columns: dict[str, int] = {}
         missing: list[str] = []
         for name, hints in _REQUIRED_COLUMNS:
-            position = _find_column(header, hints)
+            position = find_column(header, hints)
             if position is None:
                 missing.append(name)
             else:
                 columns[name] = position
-        currency_col = _find_column(header, _CURRENCY_HEADER_HINTS)
+        currency_col = find_column(header, _CURRENCY_HEADER_HINTS)
         if missing:
             batch.parse_warnings.append(
                 f"Could not identify column(s) {missing} in header {header}; nothing parsed."

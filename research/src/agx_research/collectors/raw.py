@@ -83,6 +83,29 @@ def build_raw_document(
     )
 
 
+def fetch_single_text_document(
+    fetcher, spec, *, collector_name: str, collector_version: str, url: str
+) -> list[RawDocument]:
+    """Shared `Collector.fetch()` body for the common "one URL, one text
+    document" shape (`RssNewsCollector`, `IndexConstituentCollector`,
+    `FinancialStatementCollector`) -- extracted after the same four lines
+    turned up verbatim in three collectors, rather than leaving each as its
+    own copy.
+    """
+    text = fetcher.fetch_text(url, spec)
+    return [
+        build_raw_document(
+            source_id=spec.id,
+            collector=collector_name,
+            collector_version=collector_version,
+            original_url=url,
+            content_text=text,
+            schema_version=spec.schema_version,
+            license=spec.license,
+        )
+    ]
+
+
 def build_binary_raw_document(
     *,
     source_id: str,

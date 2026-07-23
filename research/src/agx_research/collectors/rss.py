@@ -23,7 +23,7 @@ from email.utils import parsedate_to_datetime
 
 from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.corporate_event_classifier import classify_corporate_event_type
-from agx_research.collectors.raw import RawDocument, build_raw_document
+from agx_research.collectors.raw import RawDocument, fetch_single_text_document
 from agx_research.data.schemas import CorporateEvent, NewsItem
 
 
@@ -87,18 +87,10 @@ class RssNewsCollector(Collector):
         self.classify_corporate_events = classify_corporate_events
 
     def fetch(self) -> list[RawDocument]:
-        text = self.fetcher.fetch_text(self.feed_url, self.spec)
-        return [
-            build_raw_document(
-                source_id=self.spec.id,
-                collector=self.name,
-                collector_version=self.version,
-                original_url=self.feed_url,
-                content_text=text,
-                schema_version=self.spec.schema_version,
-                license=self.spec.license,
-            )
-        ]
+        return fetch_single_text_document(
+            self.fetcher, self.spec,
+            collector_name=self.name, collector_version=self.version, url=self.feed_url,
+        )
 
     def parse(self, document: RawDocument) -> CollectionBatch:
         batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)

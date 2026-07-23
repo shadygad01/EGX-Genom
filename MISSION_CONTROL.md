@@ -7,6 +7,12 @@ commit whenever the fact they state changes.
 
 ## Status at a glance
 
+- **Merge readiness:** This branch passed a full production-readiness
+  audit and is a clean merge candidate for `main` — all tests green, no
+  contract drift, no merge conflicts (clean fast-forward), no
+  architecture violations, one real code duplication found and fixed
+  (see `CHANGELOG.md` 0.13.2). No functional changes accompanied the
+  audit.
 - **Where the project is:** All 18 charter systems are architecturally
   complete and tested (17 fully DONE, the 18th DONE for everything
   engineering can close without a cloud/vendor/secrets decision). A real

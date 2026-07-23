@@ -38,6 +38,18 @@ close without a cloud/vendor/secrets decision from the user.**
   + `git diff --exit-code`).
 - Lint: `uv run ruff check` clean.
 
+## Merge readiness
+
+This branch (`claude/agx-data-acquisition-platform-d4ir2t`) passed a full
+production-readiness audit: all tests green, no contract drift, no merge
+conflicts with `main` (a clean fast-forward — `main` hasn't moved since
+this branch's base), no architecture-invariant violations, no debug
+artifacts or blocking TODOs. One real duplication was found and fixed (a
+header-matching helper and a single-URL-fetch helper had each been
+written three times across collectors) — see `CHANGELOG.md` 0.13.2. No
+functional changes accompanied the audit; it is a pure fix-and-verify
+pass ahead of merge.
+
 ## Connected live sources: 0 (blocked, not unbuilt — see below)
 
 Every mechanism needed to connect a live source is built and tested; zero

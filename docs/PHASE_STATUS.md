@@ -497,3 +497,30 @@ a network/business blocker. Fixed by adding
 `agx run` now correctly reports `corporate_events_written: 2`, matching
 the real `COMI/EARNINGS` + `MFPC/DIVIDEND` rows). 2 new tests
 (477 total).
+
+## Production-readiness audit for merge into `main`
+
+Full audit performed before merging this branch into `main`: all tests
+green (477 Python / 14 API / 19 web), `ruff` clean, `contracts/`
+drift-free, no merge conflicts with `main` (`git merge-tree` confirms a
+clean fast-forward — `main` hasn't advanced past this branch's base since
+work began), no TODO/FIXME/HACK markers or debug prints in source, no
+unresolved conflict markers anywhere, no stray scratch files. Spot-checked
+CLAUDE.md's core invariants directly: no agent writes to `KnowledgeStore`
+directly; every real network fetch goes through `HttpFetcher` (no
+`urlopen`/`requests`/`httpx` calls elsewhere); no direct `EventRepository`
+write bypasses `EventPlatform.register()`; every schema class (`PriceBar`,
+`CorporateEvent`, `IndexConstituent`, `FinancialStatementLineItem`, etc.)
+is defined exactly once.
+
+**One real duplication found and fixed**: the same four-line header-
+matching helper, and the same "one URL, one text document" `fetch()`
+body, had each been written three times over — once in the pre-existing
+`RssNewsCollector`, and once more each in this mission's
+`IndexConstituentCollector` and `FinancialStatementCollector`.
+Consolidated into `collectors/csv_columns.py` (`find_column()`) and
+`collectors/raw.py` (`fetch_single_text_document()`); all three
+collectors now call the shared helpers. Purely mechanical — same tests,
+same assertions, all still passing; no behavior change.
+
+No other issues found. This branch is a clean merge candidate.

@@ -1,0 +1,163 @@
+/* AGX design tokens -- institutional, dark-first. Every color/spacing/type
+   value components use comes from here; no component hardcodes a hex
+   value or a pixel size. Light-theme overrides exist for completeness
+   (prefers-color-scheme) but the product is designed dark-first, per the
+   mission's explicit "Dark Theme First" principle. */
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Surfaces, darkest to lightest */
+  --bg-canvas: #0a0b0d;
+  --bg-surface: #131418;
+  --bg-surface-raised: #1a1c21;
+  --bg-hover: #21232a;
+  --bg-selected: #262a35;
+
+  /* Borders */
+  --border-subtle: #202329;
+  --border-default: #2b2e36;
+  --border-strong: #3a3e48;
+
+  /* Text */
+  --text-primary: #e9eaee;
+  --text-secondary: #9aa0ab;
+  --text-tertiary: #676c78;
+  --text-disabled: #4a4e58;
+
+  /* Accent -- a restrained institutional blue, not a consumer-app blue */
+  --accent: #5b8def;
+  --accent-strong: #7ba3f2;
+  --accent-subtle: rgba(91, 141, 239, 0.14);
+  --accent-border: rgba(91, 141, 239, 0.35);
+
+  /* Semantic (return/risk/status) */
+  --positive: #34c77b;
+  --positive-subtle: rgba(52, 199, 123, 0.14);
+  --negative: #ef5350;
+  --negative-subtle: rgba(239, 83, 80, 0.14);
+  --warning: #e0a030;
+  --warning-subtle: rgba(224, 160, 48, 0.14);
+  --neutral: #8b90ea;
+  --neutral-subtle: rgba(139, 144, 234, 0.14);
+
+  /* Typography */
+  --font-ui:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+
+  --text-2xs: 0.6875rem; /* 11px -- micro labels, eyebrow text */
+  --text-xs: 0.75rem; /* 12px -- table cells, secondary labels */
+  --text-sm: 0.8125rem; /* 13px -- body small, nav */
+  --text-base: 0.875rem; /* 14px -- default body */
+  --text-md: 1rem; /* 16px -- section headings */
+  --text-lg: 1.25rem; /* 20px -- page subheadings */
+  --text-xl: 1.5rem; /* 24px -- page titles */
+  --text-2xl: 2rem; /* 32px -- hero numbers */
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+
+  /* Spacing scale, 4px base */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Radius -- crisp, not playful */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Elevation -- subtle, dark-theme-appropriate (no drop shadows that read
+     as "light theme card on white"); a 1px border does most of the work,
+     shadows only deepen it slightly. */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+
+  --transition-fast: 120ms ease;
+
+  --sidebar-width: 232px;
+  --topbar-height: 56px;
+  --content-max-width: 1600px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg-canvas: #f4f5f7;
+    --bg-surface: #ffffff;
+    --bg-surface-raised: #ffffff;
+    --bg-hover: #eef0f3;
+    --bg-selected: #e6ecfb;
+
+    --border-subtle: #e7e9ed;
+    --border-default: #dbdee3;
+    --border-strong: #c5c9d1;
+
+    --text-primary: #14161a;
+    --text-secondary: #565b66;
+    --text-tertiary: #82868f;
+    --text-disabled: #b0b4bb;
+
+    --accent: #2f5fd6;
+    --accent-strong: #1c47b8;
+    --accent-subtle: rgba(47, 95, 214, 0.08);
+    --accent-border: rgba(47, 95, 214, 0.3);
+
+    --positive: #1c8a53;
+    --positive-subtle: rgba(28, 138, 83, 0.1);
+    --negative: #c9302c;
+    --negative-subtle: rgba(201, 48, 44, 0.1);
+    --warning: #a6720f;
+    --warning-subtle: rgba(166, 114, 15, 0.12);
+    --neutral: #5a5fc7;
+    --neutral-subtle: rgba(90, 95, 199, 0.1);
+
+    --shadow-sm: 0 1px 2px rgba(20, 22, 26, 0.06);
+    --shadow-md: 0 4px 16px rgba(20, 22, 26, 0.08);
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-canvas: #f4f5f7;
+  --bg-surface: #ffffff;
+  --bg-surface-raised: #ffffff;
+  --bg-hover: #eef0f3;
+  --bg-selected: #e6ecfb;
+
+  --border-subtle: #e7e9ed;
+  --border-default: #dbdee3;
+  --border-strong: #c5c9d1;
+
+  --text-primary: #14161a;
+  --text-secondary: #565b66;
+  --text-tertiary: #82868f;
+  --text-disabled: #b0b4bb;
+
+  --accent: #2f5fd6;
+  --accent-strong: #1c47b8;
+  --accent-subtle: rgba(47, 95, 214, 0.08);
+  --accent-border: rgba(47, 95, 214, 0.3);
+
+  --positive: #1c8a53;
+  --positive-subtle: rgba(28, 138, 83, 0.1);
+  --negative: #c9302c;
+  --negative-subtle: rgba(201, 48, 44, 0.1);
+  --warning: #a6720f;
+  --warning-subtle: rgba(166, 114, 15, 0.12);
+  --neutral: #5a5fc7;
+  --neutral-subtle: rgba(90, 95, 199, 0.1);
+
+  --shadow-sm: 0 1px 2px rgba(20, 22, 26, 0.06);
+  --shadow-md: 0 4px 16px rgba(20, 22, 26, 0.08);
+}

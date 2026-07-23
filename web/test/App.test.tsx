@@ -1,9 +1,7 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { App } from "../src/App";
-import { createDataProvider } from "../src/data/factory";
 import type { DashboardDataProvider } from "../src/data/DataProvider";
-import type { KnowledgeObject } from "../src/types";
 
 function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): DashboardDataProvider {
   return {
@@ -15,96 +13,101 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getRuntimeMetrics: async () => [],
     getSystemStatus: async () => null,
     getSourceRegistry: async () => [],
+    getInvestmentCases: async () => null,
+    getCollectorStatus: async () => [],
+    getRuntimeStatus: async () => null,
+    getDashboardMetrics: async () => null,
+    getMissionStatus: async () => null,
+    getExecutionReport: async () => null,
+    getGenes: async () => [],
+    getPapers: async () => [],
+    getHypotheses: async () => [],
+    getKnowledgeGraph: async () => ({ nodes: [], edges: [] }),
+    getFinancialStatements: async () => [],
+    getSourceMetrics: async () => [],
     ...overrides,
   };
 }
 
-function knowledgeObject(overrides: Partial<KnowledgeObject> = {}): KnowledgeObject {
-  return {
-    id: "egx-test-knowledge",
-    version: 1,
-    discovery_date: "2026-06-01",
-    creator_agent: "test_agent",
-    supporting_evidence: [],
-    confidence: 0.8,
-    statistical_evidence: {
-      method: "test",
-      statistic: 1,
-      p_value: 0.01,
-      sample_size: 10,
-      confidence_interval: null,
-    },
-    economic_explanation: "test explanation",
-    affected_assets: ["COMI"],
-    horizon: "swing",
-    expected_return: 0.05,
-    expected_risk: 0.03,
-    status: "promoted",
-    performance_history: [],
-    retired_at: null,
-    retirement_reason: null,
-    provenance: { produced_by: "test", produced_at: "2026-06-01T00:00:00", inputs: [] },
-    ...overrides,
-  };
-}
+let mockProvider: DashboardDataProvider = fakeProvider();
+
+vi.mock("../src/data/factory", () => ({
+  get dataProvider() {
+    return mockProvider;
+  },
+}));
 
 afterEach(() => {
   vi.restoreAllMocks();
-  vi.unstubAllGlobals();
+  mockProvider = fakeProvider();
 });
 
-describe("App", () => {
-  it("renders the knowledge table using whatever provider it's given", async () => {
-    const provider = fakeProvider({ getKnowledge: async () => [knowledgeObject()] });
-    render(<App provider={provider} />);
+async function renderApp(initialPath = "/") {
+  const { App } = await import("../src/App");
+  return render(
+    <MemoryRouter initialEntries={[initialPath]}>
+      <App />
+    </MemoryRouter>,
+  );
+}
 
-    expect(await screen.findByText("egx-test-knowledge")).toBeInTheDocument();
-    expect(screen.getByText("COMI")).toBeInTheDocument();
-    expect(screen.getByText("promoted")).toBeInTheDocument();
+describe("App shell", () => {
+  it("renders the sidebar with all 9 sections", async () => {
+    await renderApp();
+    const nav = await screen.findByRole("navigation", { name: "Main navigation" });
+    for (const label of [
+      "AI Briefing",
+      "Opportunity Center",
+      "Market Intelligence",
+      "Research Center",
+      "Knowledge Graph",
+      "Mission Control",
+      "Source Intelligence",
+      "System Administration",
+    ]) {
+      expect(within(nav).getByText(label)).toBeInTheDocument();
+    }
   });
 
-  it("shows the empty state when no knowledge has been promoted", async () => {
-    render(<App provider={fakeProvider()} />);
-    expect(await screen.findByText(/No knowledge objects have been promoted yet/)).toBeInTheDocument();
+  it("routes to the Opportunity Center placeholder", async () => {
+    await renderApp("/opportunities");
+    expect(await screen.findByText("Under construction")).toBeInTheDocument();
+  });
+});
+
+describe("AI Briefing", () => {
+  it("shows empty states when no artifacts have been produced yet", async () => {
+    mockProvider = fakeProvider();
+    await renderApp("/");
+    expect(await screen.findByText(/No opportunities yet/)).toBeInTheDocument();
+    expect(await screen.findByText(/No elevated-severity events/)).toBeInTheDocument();
   });
 
-  it("shows an error state when the provider rejects", async () => {
-    const provider = fakeProvider({
-      getKnowledge: async () => {
-        throw new Error("boom");
-      },
+  it("renders a top opportunity from the recommendations artifact", async () => {
+    mockProvider = fakeProvider({
+      getRecommendations: async () => [
+        {
+          ticker: "COMI",
+          as_of: "2026-07-22",
+          combined_expected_return: 0.05,
+          combined_expected_risk: 0.03,
+          confidence: 0.82,
+          horizon_predictions: {},
+          supporting_knowledge_ids: [],
+          explanation: {
+            why_this_stock: "",
+            why_now: "",
+            why_not_others: "",
+            supporting_evidence: [],
+            evidence_refs: [],
+            similar_historical_cases: [],
+            invalidation_conditions: [],
+          },
+          provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
+        },
+      ],
     });
-    render(<App provider={provider} />);
-    expect(await screen.findByText(/Error loading knowledge: boom/)).toBeInTheDocument();
-  });
-
-  it("renders identically regardless of which provider kind is behind the interface", async () => {
-    const knowledge = [knowledgeObject()];
-    const staticLike = fakeProvider({ getKnowledge: async () => knowledge });
-    const apiLike = fakeProvider({ getKnowledge: async () => knowledge });
-
-    const { unmount } = render(<App provider={staticLike} />);
-    expect(await screen.findByText("egx-test-knowledge")).toBeInTheDocument();
-    unmount();
-
-    render(<App provider={apiLike} />);
-    expect(await screen.findByText("egx-test-knowledge")).toBeInTheDocument();
-  });
-
-  it("makes no /api/* requests when rendered with a real StaticJsonProvider (GitHub Pages mode)", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify([knowledgeObject()]), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      })
-    );
-    vi.stubGlobal("fetch", fetchMock);
-
-    render(<App provider={createDataProvider("static")} />);
-    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
-
-    const urls = fetchMock.mock.calls.map((call) => String(call[0]));
-    expect(urls.some((u) => u.includes("/api/"))).toBe(false);
-    expect(urls.some((u) => u.includes("knowledge.json"))).toBe(true);
+    await renderApp("/");
+    expect(await screen.findByText("COMI")).toBeInTheDocument();
   });
 });

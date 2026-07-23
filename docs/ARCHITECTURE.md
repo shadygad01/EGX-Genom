@@ -72,6 +72,24 @@ web/              TypeScript (Vite + React) — dashboard for knowledge/recs
 contracts/        Generated JSON Schema for API-facing pydantic models
 ```
 
+## Web dashboard deployment (GitHub Pages)
+
+`.github/workflows/deploy-pages.yml` builds `web/` and publishes `web/dist`
+to GitHub Pages on every push to `main` that touches `web/`, at
+`https://shadygad01.github.io/EGX-Genom/`. `web/vite.config.ts` sets
+`base: "/EGX-Genom/"` for production builds only (the dev server still
+serves at `/`) so asset URLs resolve correctly as a project site.
+
+GitHub Pages is static hosting: it can serve `web/`'s built assets but not
+`api/`'s Fastify server. `web/src/api.ts` still calls the relative path
+`/api/knowledge` (the dev-only Vite proxy target), which has nothing to
+resolve to once deployed statically — the page loads and renders correctly,
+but shows its existing "Error loading knowledge" state
+(`web/src/App.tsx`) rather than fabricating data. Making the dashboard
+functional end-to-end on Pages needs `api/` deployed somewhere reachable
+over HTTPS and `web/src/api.ts` pointed at it (e.g. via a build-time env
+var) — a hosting decision out of scope for a static-only deployment target.
+
 ## Data flow
 
 1. `market_memory.MarketMemory.reconstruct(as_of)` (or the lower-level

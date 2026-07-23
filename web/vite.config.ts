@@ -1,7 +1,12 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-export default defineConfig({
+// GitHub Pages serves this as a project site at
+// https://shadygad01.github.io/EGX-Genom/, so production asset URLs must be
+// rooted under /EGX-Genom/. The dev server keeps serving at "/" so local
+// `npm run dev -w web` (and its /api proxy) is unaffected.
+export default defineConfig(({ command }) => ({
+  base: command === "build" ? "/EGX-Genom/" : "/",
   plugins: [react()],
   server: {
     port: 5173,
@@ -12,4 +17,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

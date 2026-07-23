@@ -32,13 +32,13 @@ close without a cloud/vendor/secrets decision from the user.**
 
 ## Test health
 
-- Python: 346 tests, all green (`cd research && uv run pytest`).
+- Python: 397 tests, all green (`cd research && uv run pytest`).
 - TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
   + `git diff --exit-code`).
 - Lint: `uv run ruff check` clean.
 
-## Data Acquisition Platform (this mission)
+## Data Acquisition Platform (prior mission)
 
 - Registry: 51 sources, 5 IMPLEMENTED / 34 PLANNED / 4 NEEDS_KEY /
   8 TOS_REVIEW, across 9 categories.
@@ -48,8 +48,28 @@ close without a cloud/vendor/secrets decision from the user.**
 - Collector types covered: RSS/Atom, REST/JSON API, CSV, Excel, PDF,
   Filesystem, Archive Replay (all real); Browser Automation (honest stub,
   no ToS-cleared target yet).
-- See `CURRENT_MISSION.md` for what's done vs. `NEXT_MISSIONS.md` for
-  what's left, and `COMPLETION_REPORT.md` for this specific build's report.
+
+## Acquisition Intelligence Engine (this mission)
+
+- New package `acquisition_intelligence/`: given only an organization's
+  identity (never a URL), resolves a verified-reachable domain, discovers
+  candidate acquisition methods, verifies legality/stability/historical
+  availability, ranks and selects the best, auto-generates a still-`PLANNED`
+  `SourceSpec`, registers it, begins qualification, and automatically
+  re-discovers alternatives when a source's health goes `DOWN`.
+- Seeded for 12 named target organizations, each linked to its existing
+  registry entry.
+- 51 new tests, all offline (fakes) — every module and the full
+  orchestration pipeline (happy path, every failure branch, re-run
+  idempotency, exclusion-driven alternative selection, continuity
+  recovery) covered.
+- Wired into `cli.py`'s new `discover-sources` subcommand.
+- **Verified directly** that this sandbox has no outbound network egress
+  to arbitrary hosts; a live run against all 12 named targets correctly
+  reports "no reachable domain" for each — the engine working exactly as
+  designed against an environment with no internet to discover from, not a
+  defect. See `CURRENT_MISSION.md` for the full honesty note and
+  `COMPLETION_REPORT.md` for this build's report.
 
 ## The one standing gate on everything downstream
 
@@ -58,4 +78,6 @@ placeholder/free-source data until a licensed EGX market data vendor is
 selected — a business decision reserved for the user (`docs/ROADMAP.md`).
 Nothing about this mission changes that gate; it makes the free-source
 side of the data supply as strong as engineering alone can make it before
-that decision.
+that decision — now including the ability to find its own acquisition
+methods without a human supplying an endpoint, the moment it runs
+somewhere with internet access.

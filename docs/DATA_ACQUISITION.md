@@ -12,11 +12,20 @@ a new source in the future requires implementing only a small adapter
 (a `Collector` subclass and a `SourceSpec` entry, or often just a
 configuration of an existing generic collector) — every other concern
 (registry, discovery, qualification, reputation, health monitoring, raw
-archive, provenance, replay) is shared infrastructure built once.
+archive, provenance, replay, and now *finding the acquisition method itself*
+via the Acquisition Intelligence Engine) is shared infrastructure built once.
 
 ## Architecture
 
 ```
+acquisition_intelligence/
+              TargetOrganization (identity, never a URL) + seed catalog
+              domain_resolution.py -- verified-reachable-domain resolution
+              legality.py / stability.py / historical.py -- per-method verification
+              ranking.py / config_generation.py -- rank, select, auto-generate a SourceSpec
+              engine.py -- AcquisitionIntelligenceEngine orchestrator
+              continuity.py -- AcquisitionContinuityMonitor (re-discover on DOWN)
+              live.py -- real HttpFetcher/Wayback-backed adapters (deployment only)
 sources/      SourceSpec (full charter field set) + SourceRegistry + seed catalog
               qualification.py  -- Candidate/Quarantine/Evaluation/Trusted/Core
               reputation.py     -- SourceMetrics + nine-dimension reputation score
@@ -28,6 +37,94 @@ collectors/   RawDocument (provenance envelope) + RawArchive (binary blob store)
               + quality scoring + CollectionService
               + materialization into the local CSV data layout
 ```
+
+### Acquisition Intelligence Engine (`acquisition_intelligence/`)
+
+The system must never require a manually specified endpoint. This is the
+subsystem that makes that true: for a `TargetOrganization` (an identity —
+name, category, country, and optionally a few publicly-known brand-domain
+hints — never a hand-picked acquisition URL), it autonomously:
+
+1. **Resolves a reachable domain.** `domain_resolution.HeuristicDomainResolver`
+   tries the organization's public brand hints (if any) and, when none
+   exist, name-derived guesses across a bounded set of TLDs — every
+   candidate is independently probed for reachability before being trusted;
+   nothing is asserted as a real domain without a successful probe.
+2. **Discovers acquisition-method candidates** on the verified homepage via
+   the existing `discovery.DiscoveryEngine` (RSS autodiscovery, PDF
+   repositories, structured datasets, sitemaps, API docs) — no new
+   discovery logic duplicated, the same engine System 03 already built.
+3. **Verifies legality** (`legality.py`): robots.txt (three-state — allowed/
+   disallowed/unknown, via `HttpFetcher.robots_status`) plus a terms-of-use
+   red-flag/green-flag keyword scan. `HTML_SCRAPE` can never auto-clear to
+   `ALLOWED` (charter rule: scraping is last-resort, always needs a human
+   ToS read); any ambiguity blocks, exactly like the seed catalog's
+   `TOS_REVIEW` convention.
+4. **Verifies stability** (`stability.py`): URL-shape heuristics (a
+   canonical `.csv`/`.json`/`.rss`/`.pdf` path scores higher; a session
+   token or opaque generated-looking identifier scores lower) plus
+   repeated-probe status-code consistency when more than one probe exists.
+5. **Verifies historical availability** (`historical.py`): the Internet
+   Archive's free, no-key, decades-stable Wayback Machine APIs (`wayback/
+   available` + the CDX API) — same confidence tier as FRED's/World Bank's
+   endpoints already used for real collectors — scored by how long a span
+   of archived snapshots exists, not just whether one exists.
+6. **Ranks and selects** (`ranking.py`): legality is a hard gate — a
+   `BLOCKED`/`AMBIGUOUS` method is excluded from ranking entirely, never
+   scored down and reconsidered; among methods that clear it, the composite
+   is the mean of the stability and historical-availability scores.
+7. **Auto-generates a `SourceSpec`** (`config_generation.py`) for the
+   winning method: category/country from the target, access method and
+   base URL from the discovered candidate, a conflict priority below every
+   hand-verified source (40), a reliability prior scaled by the composite
+   score but capped well below any `IMPLEMENTED` source's declared prior,
+   and a suggested collector class name where one is unambiguous (RSS →
+   `RssNewsCollector`; `.xlsx`/`.xls` → `ExcelSeriesCollector`; `.pdf` →
+   `PdfDocumentCollector`, subclass still required; plain CSV/JSON API
+   left `None` — schema inspection still needed before a generic collector
+   applies). **The generated spec's `status` always stays `PLANNED`, never
+   `IMPLEMENTED`, however high the score** — becoming collectable still
+   requires an engineer to write and test the concrete collector, exactly
+   as `AD-16`'s `IMPLEMENTED` gate already requires for every source. What
+   auto-generation removes is the manual "which URL, which method, is it
+   even legal" research — not the final engineering step.
+8. **Registers and begins qualification**: the spec is added to the
+   `SourceRegistry` (or a new version of an existing catalog entry, if
+   the target links to one via `existing_source_id`), and an initial
+   "reachability confirmed" run is recorded through `sources.reputation`,
+   immediately handed to `sources.qualification.evaluate_promotion` —
+   which, on real evidence, promotes it from `CANDIDATE` to `QUARANTINE`.
+   No later stage is ever reached this way; `TRUSTED`/`CORE` still require
+   real collection-run history, per the qualification pipeline's own rules.
+9. **Continuity** (`continuity.py`): `AcquisitionContinuityMonitor` watches
+   the registry for any source whose `health_status` has gone `DOWN` (as
+   maintained by `sources.health.HealthMonitor` during real collection)
+   and, if it maps to a known `TargetOrganization`, re-runs the engine
+   excluding the failed method's URL — letting ranking surface the next-best
+   alternative automatically. A target with nothing left simply reports why,
+   same as any other result; nothing is fabricated.
+
+Every network-touching step (`prober`, `fetch_text`, `robots_checker`, the
+Wayback client) is an injected callable, so `engine.py`/`continuity.py` have
+no import of `urllib` at all and are fully tested with fakes (20 tests
+covering the happy path, every failure branch, re-run idempotency,
+exclusion-driven alternative selection, and continuity recovery — see
+`research/tests/test_acquisition_engine.py`). `acquisition_intelligence/
+live.py` is the one file that wires the real internet (`HttpFetcher` +
+a live Wayback client) for a deployment with egress; `cli.py`'s
+`discover-sources` subcommand runs it end-to-end.
+
+**This development sandbox has no outbound network egress to arbitrary
+hosts** (confirmed directly: `curl`/`WebFetch` both 403 on every target
+site attempted, egress is allowlisted to PyPI/npm/anthropic.com only — see
+the proxy status output referenced in `CURRENT_MISSION.md`). Running
+`agx discover-sources` against the seed target catalog in this environment
+correctly reports "no reachable domain" for every target — the honest,
+expected result of the domain resolver refusing to trust an unprobed
+domain, not a bug. The engine is complete, tested, and ready; it has not
+yet produced a live-verified acquisition method for any of the twelve named
+organizations because this sandbox cannot reach them, not because the
+engine doesn't work.
 
 ### Source Registry (`sources/`)
 
@@ -284,18 +381,29 @@ AlphaVantage, TradingView News) breaks down as:
   Enterprise, Asharq Business, CNBC Arabia, Trading Economics** — `PLANNED`.
   Every one of these needs a *verified* real endpoint (an exact RSS feed
   URL, an exact CSV/API download path) before a `SourceSpec` can honestly
-  claim `IMPLEMENTED`. This development environment has no outbound
-  network egress to verify a live endpoint against the real site, and this
-  codebase's own explicit rule (see CLAUDE.md, "never guess a URL") forbids
-  fabricating one from memory the way a textbook-stable API like FRED's or
-  the World Bank's can be trusted. **This is the genuine, named external
-  dependency the build order's stop condition anticipates**: the generic
-  collectors that would serve most of these (`RssNewsCollector` for the
-  news outlets, `ExcelSeriesCollector`/`PdfDocumentCollector` for the
-  regulator bulletins, once a source is verified) already exist and are
-  tested — wiring one in, once its endpoint is verified at deployment time
-  or supplied by the user, is exactly the "small adapter" the platform
-  promises, not new engineering.
+  claim `IMPLEMENTED`. This is now the Acquisition Intelligence Engine's
+  job, not a human's: `agx discover-sources` runs exactly this verification
+  for every one of these targets end to end (domain resolution → discovery
+  → legality/stability/historical checks → ranking → auto-generated,
+  still-`PLANNED` `SourceSpec`). It is fully built and tested (20 tests in
+  `test_acquisition_engine.py` covering the complete happy path with fakes)
+  but **this development environment has no outbound network egress to
+  arbitrary hosts** — confirmed directly (`curl`/`WebFetch` 403 on every
+  target site attempted; only PyPI/npm/anthropic.com are allowlisted) — so
+  a live run in this sandbox correctly reports "no reachable domain" for
+  all twelve. This codebase's own explicit rule (see CLAUDE.md, "never
+  guess a URL") also forbids fabricating an endpoint from memory the way a
+  textbook-stable API like FRED's or the World Bank's can be trusted, which
+  is exactly why the engine *verifies* rather than assumes. **This is the
+  genuine, named external dependency the build order's stop condition
+  anticipates**: the moment this platform runs somewhere with egress,
+  `agx discover-sources` (or a scheduled `AcquisitionContinuityMonitor` run)
+  does this verification autonomously, and the generic collectors that
+  would serve most of these (`RssNewsCollector` for the news outlets,
+  `ExcelSeriesCollector`/`PdfDocumentCollector` for the regulator bulletins)
+  already exist and are tested — turning a discovered method into a
+  collectable source is then the "small adapter" the platform promises,
+  not new engineering.
 
 ## Legal compliance (enforced, not aspirational)
 
@@ -311,7 +419,10 @@ AlphaVantage, TradingView News) breaks down as:
 ## Deployment note
 
 This development environment has no outbound network egress for live
-collection (package installs from PyPI do work), so live fetching was
-validated at the parser/protocol level against recorded-format fixtures;
-first live runs happen wherever the runtime is deployed with egress
-(a System-18 deployment decision).
+collection or discovery (package installs from PyPI/npm do work; direct
+`curl`/`WebFetch` to arbitrary hosts return 403 by policy), so live
+fetching and the Acquisition Intelligence Engine were both validated at the
+parser/protocol/orchestration level against recorded-format fixtures and
+fakes; first live runs (`agx collect`, `agx discover-sources`) happen
+wherever the runtime is deployed with egress (a System-18 deployment
+decision).

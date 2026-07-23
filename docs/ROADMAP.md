@@ -35,18 +35,24 @@ Required user/business inputs, in priority order:
 Unlike the Production 1.0 blockers above, these need no business decision —
 they're config/verification work against the now-complete platform
 (registry, discovery, qualification, reputation, health, archive,
-provenance, replay — see `docs/DATA_ACQUISITION.md`):
+provenance, replay, acquisition intelligence — see `docs/DATA_ACQUISITION.md`):
 
-- Verify real endpoint URLs and wire `SourceSpec`s for the `PLANNED`
-  official sources (EGX, FRA, CBE, MoF, CAPMAS, Egypt Open Data) and the
-  `PLANNED` English/Arabic news RSS feeds — each just needs its actual
-  feed/endpoint confirmed and a `SourceSpec` flipped to `IMPLEMENTED`; the
-  generic `RssNewsCollector`/`FredCsvCollector`/`ExcelSeriesCollector`/
-  `PdfDocumentCollector` already serve them. This is the one remaining item
-  from the program's named 16-collector build order that isn't already
-  either done (World Bank, AlphaVantage/FMP) or blocked on a business
-  decision (Yahoo/TradingView ToS review) — see `docs/DATA_ACQUISITION.md`'s
-  "What's still blocked" section for the full breakdown.
+- **Run `agx discover-sources` wherever this deploys with outbound network
+  egress.** The Acquisition Intelligence Engine is complete and tested
+  (`acquisition_intelligence/`); in this development sandbox it correctly
+  reports "no reachable domain" for all 12 named PLANNED official/company/
+  regional-news targets because the sandbox itself has no egress to
+  arbitrary hosts (confirmed directly, not assumed). This single step —
+  not manual endpoint research — is what completes the remaining item from
+  the program's named 16-collector build order that isn't already either
+  done (World Bank, AlphaVantage/FMP) or blocked on a business decision
+  (Yahoo/TradingView ToS review); see `docs/DATA_ACQUISITION.md`'s "What's
+  still blocked" section for the full breakdown.
+- Every `SourceSpec` the engine auto-generates still needs an engineer to
+  write and test the concrete collector before flipping `PLANNED` to
+  `IMPLEMENTED` (by design — see `AD-16`/`AD-24`); the generic
+  `RssNewsCollector`/`ExcelSeriesCollector`/`PdfDocumentCollector` already
+  exist and cover most of what discovery is expected to find.
 - Once a user supplies an AlphaVantage or FMP API key, flip that entry to
   `IMPLEMENTED` — the collector code and tests already exist.
 - Cross-source corroboration measurement: once two IMPLEMENTED sources
@@ -57,13 +63,15 @@ provenance, replay — see `docs/DATA_ACQUISITION.md`):
   into `SourceMetricsRepository.record_run()` (TD-16) — the only reputation
   dimension still unmeasured in practice.
 - Calibration once real run history exists: `qualification.py`'s stage
-  thresholds and `health.py`'s alert thresholds are declared policy today
-  (TD-17), same situation as TD-6's conflict-policy constants.
-- Wire a scheduled `discovery.DiscoveryEngine` run (e.g. against a seed
-  list of known IR/regulator homepages) into a periodic job once any
-  deployment target exists (System 18) — the engine and the
-  candidate→registry bridge are ready; only the "run this on a schedule
-  against these seed URLs" wiring is deployment-shaped, not engineering.
+  thresholds, `health.py`'s alert thresholds, and the Acquisition
+  Intelligence Engine's own thresholds (TD-17, and its legality keyword
+  lists, TD-20) are declared policy today, same situation as TD-6's
+  conflict-policy constants.
+- Wire a scheduled `agx discover-sources` run into a periodic job once any
+  deployment target exists (System 18) — both the fresh-target discovery
+  pass and `AcquisitionContinuityMonitor`'s DOWN-source recovery are ready;
+  only the "run this on a schedule" wiring is deployment-shaped, not
+  engineering (TD-23).
 
 ## Dashboard architecture: next engineering-closeable steps
 

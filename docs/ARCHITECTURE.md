@@ -55,6 +55,24 @@ research/        Python package `agx_research` — the research engine
   adversarial/    AdversarialScientist: attacks against a hypothesis
 
   # Data Acquisition Platform: the free-source collection framework
+  acquisition_intelligence/
+                  Acquisition Intelligence Engine: given only a
+                  TargetOrganization's identity (name/category/country/
+                  optional public-brand domain hints -- never a URL),
+                  autonomously resolves a verified-reachable domain
+                  (domain_resolution.py, probe-gated), discovers candidate
+                  methods via discovery.DiscoveryEngine, verifies legality/
+                  stability/historical-availability (legality.py/
+                  stability.py/historical.py -- the last via the free
+                  Wayback Machine APIs), ranks + selects the best
+                  (ranking.py), auto-generates a still-PLANNED SourceSpec
+                  (config_generation.py), registers it and begins
+                  qualification (engine.py), and re-discovers an
+                  alternative whenever a registered source's health goes
+                  DOWN (continuity.py). live.py is the only file wiring
+                  real network access (HttpFetcher + a live Wayback
+                  client); every other module is network-free and tested
+                  with fakes. Wired into cli.py's `discover-sources`.
   sources/        SourceSpec/SourceRegistry — the declarative catalog of
                   every known data source (id, access method, status,
                   lifecycle_state/health_status/activation_status,

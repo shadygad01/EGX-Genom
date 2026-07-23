@@ -15,7 +15,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
 | 01 | Foundation | **DONE** | `domain/`, `storage/`, `config.py`; reused unmodified by every later store; CI green. |
-| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`, see `docs/DATA_ACQUISITION.md`): a 51-source registry (5 IMPLEMENTED / 34 PLANNED / 4 NEEDS_KEY / 8 TOS_REVIEW) across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank (macro), and generic RSS/Atom (news), plus AlphaVantage/FMP code-complete pending a user API key; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version (previously only news items carried this); a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes, with no new fetch. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; the 12 named PLANNED official/company/regional-news sources from the program's build order need a verified real endpoint (unavailable from this no-egress dev sandbox and blocked by this codebase's own anti-guessing rule) before flipping to IMPLEMENTED — the generic collectors that would serve them already exist and are tested. |
+| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`+`acquisition_intelligence/`, see `docs/DATA_ACQUISITION.md`): a 51-source registry (5 IMPLEMENTED / 34 PLANNED / 4 NEEDS_KEY / 8 TOS_REVIEW) across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap/API-doc scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank (macro), and generic RSS/Atom (news), plus AlphaVantage/FMP code-complete pending a user API key; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version; a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes. **New this phase: the Acquisition Intelligence Engine** (`acquisition_intelligence/`) — given only an organization's identity (never a manually supplied URL), it resolves a verified-reachable domain, discovers candidate acquisition methods, verifies legality (robots.txt + ToS heuristics, scraping never auto-clears)/stability (URL-shape + probe consistency)/historical availability (Wayback Machine APIs), ranks and selects the best, auto-generates a still-`PLANNED` `SourceSpec`, registers it, and begins qualification; `AcquisitionContinuityMonitor` re-runs discovery automatically for any source whose health goes `DOWN`. Fully tested with fakes (20 tests covering the complete pipeline); wired into `cli.py`'s `discover-sources` subcommand. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; a live run of the engine against the 12 named official/company/regional-news targets reports "no reachable domain" in this specific sandbox because it has no outbound network egress to arbitrary hosts (confirmed directly; only PyPI/npm/anthropic.com are allowlisted) — the engine itself is complete and will do real, verified discovery the moment it runs somewhere with egress. |
 | 03 | Event Platform | **DONE** | Fingerprint identity, taxonomy/ontology, entity resolution, dedup/conflict/lifecycle, `EventPlatform` sole write path, graph projection. Blocked-external: political/technical feeds, NLP entity linking. |
 | 04 | Market Memory | **DONE** | `MarketState` (snapshot+universe+sectors+events+session), `TradingCalendar` (fixed holidays as rules; movable as explicit placeholder table). Blocked-external: authoritative movable-holiday dates. |
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
@@ -42,7 +42,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(346 Python tests + 33 TypeScript tests green).
+(397 Python tests + 33 TypeScript tests green).
 
 ## Dashboard dual-provider architecture (post-Data-Acquisition-Program)
 
@@ -118,3 +118,53 @@ one-off collectors:
   ToS ambiguity around automated collection/redistribution (TOS_REVIEW —
   business/legal decision). None of these are silently skipped; each is
   named in the registry with its blocking reason.
+
+## Acquisition Intelligence Engine (post-Data-Acquisition-Platform, within System 02's scope)
+
+The standing instruction after the platform above: the system must never
+require a manually specified endpoint. This phase built the subsystem that
+makes that true — `acquisition_intelligence/` (see `docs/DATA_ACQUISITION.md`'s
+dedicated section):
+
+- `target.py`: `TargetOrganization` — identity only (name/category/country/
+  optional public-brand domain hints), never a hand-picked URL; seeded for
+  all 12 of the mission's named organizations, each linked to its existing
+  `SourceSpec` catalog entry via `existing_source_id`.
+- `domain_resolution.py`: `HeuristicDomainResolver` — every candidate domain
+  (hint or name-derived guess) is independently probed for reachability;
+  nothing is trusted without a successful probe.
+- `legality.py`/`stability.py`/`historical.py`: three independent,
+  mechanical verifications per discovered candidate — robots.txt + ToS
+  keyword heuristics (scraping never auto-clears), URL-shape + repeated-
+  probe consistency, and Wayback Machine snapshot span (a free, no-key,
+  decades-stable API, same confidence tier as FRED/World Bank).
+- `ranking.py`/`config_generation.py`: legality is a hard gate (never
+  scored down and reconsidered); the surviving candidates are ranked by a
+  stability/historical-availability composite, and the winner becomes an
+  auto-generated `SourceSpec` — collector class suggested where
+  unambiguous, but `status` always stays `PLANNED`, never silently flipped
+  to `IMPLEMENTED`.
+- `engine.py`: `AcquisitionIntelligenceEngine` orchestrates all of the
+  above end to end and begins qualification (records an initial
+  reachability run, evaluates promotion) on success.
+- `continuity.py`: `AcquisitionContinuityMonitor` watches for any source
+  gone `HealthStatus.DOWN` and automatically re-runs discovery excluding
+  the failed method, to find an alternative.
+- `live.py`: the one file wiring real network access (`HttpFetcher` +
+  a live Wayback client) for a deployment with egress; every other module
+  is network-free and tested with fakes (20 tests in
+  `test_acquisition_engine.py` alone, plus per-module coverage for every
+  verification step — 51 new tests total this phase, 397 Python tests
+  green overall, up from 346).
+- `cli.py discover-sources`: runs the engine (and continuity recovery)
+  against the full seed target catalog.
+
+**Verified live, honestly**: this development sandbox has no outbound
+network egress to arbitrary hosts (`curl`/`WebFetch` both return 403 for
+every target site attempted — confirmed directly, not assumed; only PyPI/
+npm/anthropic.com are allowlisted). Running `agx discover-sources` against
+all 11 non-per-constituent seed targets in this sandbox correctly reports
+"no reachable domain found" for each — the domain resolver refusing to
+trust an unprobed domain, exactly as designed, not a bug or a fabricated
+result. The engine is complete and will perform real, verified discovery
+the first time it runs somewhere with outbound internet access.

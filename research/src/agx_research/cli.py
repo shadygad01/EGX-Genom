@@ -14,11 +14,21 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from agx_research.acquisition_intelligence.continuity import AcquisitionContinuityMonitor
+from agx_research.acquisition_intelligence.engine import AcquisitionIntelligenceEngine
+from agx_research.acquisition_intelligence.live import (
+    build_live_fetch_text,
+    build_live_prober,
+    build_live_robots_checker,
+    build_live_wayback_client,
+)
+from agx_research.acquisition_intelligence.target import seed_target_organizations
 from agx_research.agents.corporate_events import CorporateEventsAgent
 from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
 from agx_research.agents.market_structure import MarketStructureAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
+from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.service import CollectionService
@@ -37,6 +47,7 @@ from agx_research.orchestration.pipeline import DailyResearchPipeline
 from agx_research.papers.repository import PaperRepository
 from agx_research.runtime.engine import RunRecordRepository, RuntimeEngine
 from agx_research.sources.catalog import seed_registry
+from agx_research.sources.registry import SourceRegistry
 from agx_research.universe.sector import StaticSectorProvider
 from agx_research.universe.static import EGX30_UNIVERSE_PLACEHOLDER, StaticUniverseProvider
 
@@ -118,6 +129,22 @@ def main(argv: list[str] | None = None) -> int:
     collect_parser.add_argument("--ticker-hints", help="rss_generic only: comma-separated tickers to match")
     collect_parser.add_argument("--expected-records", type=int, required=True)
     collect_parser.add_argument("--min-confidence", type=float, default=0.5)
+
+    discover_parser = sub.add_parser(
+        "discover-sources",
+        help="Run the Acquisition Intelligence Engine against the target-organization "
+        "catalog: resolve a domain, discover candidate acquisition methods, verify "
+        "legality/stability/historical availability, rank, select, auto-generate a "
+        "SourceSpec, register it, and begin qualification -- no manually supplied URLs. "
+        "Also recovers any DOWN source by searching for an alternative method.",
+    )
+    discover_parser.add_argument(
+        "--target", help="Only run this target organization id (default: every non-per-constituent target)"
+    )
+    discover_parser.add_argument(
+        "--recover-only", action="store_true",
+        help="Skip fresh targets; only re-run continuity recovery for sources currently DOWN",
+    )
 
     export_dashboard_parser = sub.add_parser(
         "export-dashboard",
@@ -229,6 +256,38 @@ def main(argv: list[str] | None = None) -> int:
             },
             indent=2,
         ))
+        return 0
+
+    if args.command == "discover-sources":
+        args.data_dir.mkdir(parents=True, exist_ok=True)
+        registry = seed_registry(SourceRegistry(args.data_dir / "source_registry.json"))
+        fetcher = HttpFetcher()
+        engine = AcquisitionIntelligenceEngine(
+            prober=build_live_prober(fetcher),
+            fetch_text=build_live_fetch_text(fetcher),
+            robots_checker=build_live_robots_checker(fetcher),
+            registry=registry,
+            wayback=build_live_wayback_client(),
+        )
+        targets = seed_target_organizations()
+
+        results = []
+        if not args.recover_only:
+            fresh_targets = [
+                t for t in targets
+                if not t.per_constituent and (args.target is None or t.id == args.target)
+            ]
+            for target in fresh_targets:
+                results.append(engine.run_for_target(target))
+
+        monitor = AcquisitionContinuityMonitor(engine, targets)
+        results.extend(monitor.check_and_recover(registry))
+
+        for result in results:
+            outcome = "REGISTERED" if result.registered else "no-op"
+            print(f"{result.target_id}: {outcome} -- {result.reason}")
+        if not results:
+            print("No targets selected (check --target and --recover-only).")
         return 0
 
     if args.command == "export-dashboard":

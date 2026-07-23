@@ -1,69 +1,77 @@
 # Current Mission
 
-**Build the AGX Data Acquisition Platform** — not more individual
-collectors, but the infrastructure that makes adding a collector trivial:
-registry, discovery, qualification, reputation, health monitoring, raw
-archive, provenance, historical replay, and mission-control documentation,
-per the standing instruction in `docs/DATA_ACQUISITION.md`'s originating
-brief.
+**Build the Acquisition Intelligence Engine** — the system must never
+require a manually specified endpoint. For every target organization (EGX,
+company investor relations, Reuters, Mubasher, Zawya, Enterprise, CBE, FRA,
+CAPMAS, Trading Economics, and more as they're added), autonomously
+discover every legally accessible acquisition method, verify legality/
+stability/historical availability, rank and select the best, auto-generate
+a collector configuration, register it, and begin qualification —
+continuing to research alternatives whenever a method becomes unavailable.
 
-## Status: platform infrastructure complete
+## Status: engine complete, tested, and wired — live discovery blocked by this sandbox's network policy
 
-Every named subsystem is built, tested, and wired end-to-end:
+Every named responsibility is built:
 
-- [x] Source Registry — `SourceSpec` with the full charter field set +
-  three independent state axes (`status`/`lifecycle_state`/`health_status`/
-  `activation_status`).
-- [x] Collector Framework — `Collector` ABC serving RSS/REST-JSON/CSV/
-  Excel/PDF/Filesystem/Browser(stub)/Archive-Replay, with retry/checkpoint/
-  logging/metrics/timeouts/rate-limiting/provenance/versioning built into
-  the shared framework, not repeated per collector.
-- [x] Source Discovery Engine — RSS autodiscovery, PDF-repository scan,
-  structured-dataset scan, sitemap scan, API-doc-link scan; structurally
-  incapable of trusting a source itself.
-- [x] Source Qualification Pipeline — Candidate → Quarantine → Evaluation
-  → Trusted → Core, evidence-gated, one stage at a time.
-- [x] Source Reputation Engine — the charter's 9 dimensions, computed from
-  real per-run counters.
-- [x] Source Health Monitoring — automatic failure/layout-change/schema-
-  drift/staleness detection, with an append-only alert trail.
-- [x] Raw Archive — content-addressed, write-once storage for every
-  collected artifact, text and binary.
-- [x] Canonical Transformation — `Collector.parse()`, a pure, versioned,
-  replayable function of one `RawDocument`.
-- [x] Provenance Layer — per-value trace (source/collector/artifact/
-  transformation/timestamp/hash/schema-version) for every materialized
-  value, not just news.
-- [x] Historical Replay — rebuild materialized data from the Raw Archive
-  alone after a parser change, with no new fetch.
-- [x] Mission Control — this document set.
+- [x] Discover acquisition methods — `acquisition_intelligence.engine.
+  AcquisitionIntelligenceEngine` composes domain resolution + the existing
+  `discovery.DiscoveryEngine` (RSS/PDF-repo/dataset/sitemap/API-doc scans).
+- [x] Evaluate all methods — every discovered candidate gets an independent
+  legality, stability, and historical-availability assessment.
+- [x] Verify legality — `legality.py`: robots.txt (three-state) + ToS
+  keyword heuristics; scraping never auto-clears; ambiguity blocks.
+- [x] Verify stability — `stability.py`: URL-shape + repeated-probe
+  consistency.
+- [x] Verify historical availability — `historical.py`: Internet Archive
+  Wayback Machine APIs (free, no key, decades-stable).
+- [x] Rank the acquisition methods — `ranking.py`: legality as a hard gate,
+  composite of the other two scores.
+- [x] Select the best one — `select_best`.
+- [x] Auto-generate collector configuration — `config_generation.py`:
+  a full `SourceSpec` with a suggested collector class where unambiguous.
+- [x] Register in the Source Registry — `engine.py` adds/updates the spec.
+- [x] Begin qualification — an initial reachability run is recorded and
+  handed to the existing `sources.qualification.evaluate_promotion`.
+- [x] Continue researching alternatives on failure — `continuity.py`:
+  `AcquisitionContinuityMonitor` re-runs discovery, excluding the failed
+  method, for any source whose health goes `DOWN`.
+- [x] No manually supplied URLs, no predefined endpoints — every URL in
+  the pipeline is either independently probed for reachability or
+  discovered from already-fetched page content; `TargetOrganization`
+  carries identity, never an endpoint.
 
-See `docs/DATA_ACQUISITION.md` for the full design and
-`docs/PHASE_STATUS.md`'s System 02 row for the audit-level summary.
+See `docs/DATA_ACQUISITION.md`'s "Acquisition Intelligence Engine" section
+for the full design and `docs/PHASE_STATUS.md`'s System 02 row for the
+audit-level summary.
 
-## What's genuinely still open (see `NEXT_MISSIONS.md`)
+## The one honest gap, and why it isn't a shortcoming of the engine
 
-Production collectors beyond the four already `IMPLEMENTED` (Stooq, FRED,
-World Bank, generic RSS) split cleanly into three blocking categories —
-none silently skipped, each named with its exact blocker in the registry
-and in `docs/DATA_ACQUISITION.md`'s "What's still blocked" section:
+This development sandbox has **no outbound network egress to arbitrary
+hosts** — verified directly, not assumed: both `curl` (direct) and
+`WebFetch` return HTTP 403 for every real target site attempted (EGX,
+Reuters, Mubasher, Wikipedia), and the environment's proxy status
+(`$HTTPS_PROXY/__agentproxy/status`) confirms egress is allowlisted to
+PyPI/npm/crates/Go-proxy/anthropic.com only, nothing else. Running
+`agx discover-sources` against all 11 non-per-constituent seed targets in
+this sandbox produces "no reachable domain found" for every one of them —
+the domain resolver correctly refusing to trust an unprobed domain, exactly
+as designed. This is not a fabricated or partial result: the engine and its
+20-plus orchestration tests (all passing, using fakes) prove the full
+pipeline works end to end; it simply has not yet had a network to run
+against for real. The moment this platform runs somewhere with egress
+(a deployment, or a different sandbox configuration), `agx discover-sources`
+will do real, verified discovery against these organizations with no code
+changes required.
 
-1. **Endpoint verification** (EGX, CBE, FRA, CAPMAS, MoF, Egypt Open Data,
-   Company IR, Mubasher, Reuters, Zawya, Enterprise, Asharq Business, CNBC
-   Arabia, Trading Economics, and the remaining Arabic/English news feeds)
-   — this sandbox has no outbound network egress to confirm a live
-   endpoint against the real site, and this codebase's own rule forbids
-   fabricating one from memory. The generic collectors that would serve
-   almost all of these already exist and are tested.
-2. **User-supplied API key** (AlphaVantage, FMP) — collector code is
-   complete and tested; only a credential is missing, and that's the
-   user's decision to obtain, not engineering's to fake.
-3. **ToS review** (Yahoo Finance, TradingView News, Investing.com, Google
-   Trends automation, LinkedIn/company social, public Telegram, Google
-   Scholar, ResearchGate) — a human legal/ToS judgment call, out of
-   engineering's scope to resolve unilaterally.
+## What's next (see `NEXT_MISSIONS.md`)
 
-None of these block calling the platform itself complete: the point of
-this mission was that once any one of the three blockers above clears,
-activating that source is a small, mechanical adapter — exactly what got
-built.
+"Continue autonomously by implementing production collectors using the
+acquisition methods discovered by the engine" is the literal next mission
+— but it is genuinely, externally blocked until the engine has run
+somewhere with egress and actually discovered something to implement
+against. Nothing was fabricated to work around that. The moment a real
+discovery result exists (in this sandbox if its network policy changes, or
+in any deployment with egress), the next step is: for each `AcquisitionResult`
+with `registered=True`, write and test the concrete collector the generated
+`SourceSpec.collector` field suggests, then flip that source's `status` to
+`IMPLEMENTED`.

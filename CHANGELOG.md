@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.9.0 — Acquisition Intelligence Engine
+- `acquisition_intelligence/` (new package): given only a `TargetOrganization`'s
+  identity (name/category/country/public-brand domain hints — never a
+  manually supplied URL), autonomously discovers how to legally acquire its
+  data:
+  - `domain_resolution.py`: `HeuristicDomainResolver` probes every hint and
+    name-derived guess for actual reachability before trusting a domain.
+  - `legality.py`: robots.txt (three-state, via new `HttpFetcher.robots_status`)
+    + ToS red/green-flag keyword heuristics -> `ALLOWED`/`AMBIGUOUS`/`BLOCKED`;
+    `HTML_SCRAPE` can never auto-clear to `ALLOWED`.
+  - `stability.py`: URL-shape heuristics (canonical extension vs. session
+    token/opaque id) + repeated-probe status-code consistency.
+  - `historical.py`: Wayback Machine `available`/CDX API client + pure
+    parsers, scored by archived-snapshot span.
+  - `ranking.py`/`config_generation.py`: legality as a hard gate, composite
+    ranking of the rest, auto-generated `SourceSpec` (collector suggested
+    where unambiguous) that always stays `PLANNED` — never silently
+    `IMPLEMENTED`.
+  - `engine.py`: `AcquisitionIntelligenceEngine` orchestrates all of the
+    above and begins qualification (records a reachability run, evaluates
+    promotion) on success.
+  - `continuity.py`: `AcquisitionContinuityMonitor` re-runs discovery,
+    excluding the failed method, for any source whose health goes `DOWN`.
+  - `live.py`: the one file wiring real network access for deployment;
+    every other module is network-free and tested with fakes.
+- `sources.catalog` seeded with 12 `TargetOrganization`s (EGX, Company IR,
+  Reuters, Mubasher, Zawya, Enterprise, Asharq Business, CNBC Arabia, CBE,
+  FRA, CAPMAS, Trading Economics), each linked to its existing `SourceSpec`
+  catalog entry.
+- `cli.py`: new `discover-sources` subcommand runs the engine (and
+  continuity recovery) against the seed target catalog.
+- `collectors/fetcher.py`: `HttpFetcher.robots_status()` — a three-state
+  robots.txt check (allowed/disallowed/unreachable) distinct from the
+  existing permissive-by-default `fetch_bytes` behavior.
+- Verified directly (not assumed) that this development sandbox has no
+  outbound network egress to arbitrary hosts (`curl`/`WebFetch` 403 on
+  every target site attempted); a live `agx discover-sources` run
+  correctly reports "no reachable domain" for all 12 named targets — the
+  engine is complete and will perform real discovery the first time it
+  runs somewhere with egress.
+- 51 new Python tests (397 total, up from 346), all offline (fakes only);
+  33 TypeScript tests unaffected; ruff clean.
+
 ## 0.8.0 — AGX Data Acquisition Platform
 - `sources/`: `SourceSpec` gains three independent state axes —
   `lifecycle_state` (`LifecycleState`: Candidate/Quarantine/Evaluation/

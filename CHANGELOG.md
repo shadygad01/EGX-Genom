@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.1 — GitHub Pages deployment for the web dashboard
+- `.github/workflows/deploy-pages.yml`: builds `web/` and publishes
+  `web/dist` to GitHub Pages on push to `main` (paths-filtered to
+  `web/**`), at `https://shadygad01.github.io/EGX-Genom/`.
+- `web/vite.config.ts`: `base: "/EGX-Genom/"` for production builds only
+  (dev server unaffected) so a GitHub Pages project site resolves assets
+  correctly.
+- Known limitation, documented in `docs/ARCHITECTURE.md`: GitHub Pages is
+  static-only, so `api/`'s Fastify server isn't deployed alongside it —
+  the dashboard renders but its knowledge fetch shows the existing "Error
+  loading knowledge" state until `api/` is hosted somewhere reachable and
+  `web/src/api.ts` is pointed at it.
+
 ## 0.6.0 — Production Data Acquisition Program (System 02 extension)
 - `sources/`: `SourceSpec`/`SourceRegistry` — a 51-source declarative
   catalog spanning all 9 charter categories (Official, Company, Market

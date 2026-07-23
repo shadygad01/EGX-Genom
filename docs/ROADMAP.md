@@ -30,24 +30,40 @@ Required user/business inputs, in priority order:
 3. **Authoritative EGX trading calendar + universe/sector membership
    feeds** (replace the placeholder tables).
 
-## Data Acquisition Program: next engineering-closeable steps
+## Data Acquisition Platform: next engineering-closeable steps
 
 Unlike the Production 1.0 blockers above, these need no business decision —
-they're config/verification work against the existing `Collector`
-framework:
+they're config/verification work against the now-complete platform
+(registry, discovery, qualification, reputation, health, archive,
+provenance, replay — see `docs/DATA_ACQUISITION.md`):
 
 - Verify real endpoint URLs and wire `SourceSpec`s for the `PLANNED`
   official sources (EGX, FRA, CBE, MoF, CAPMAS, Egypt Open Data) and the
   `PLANNED` English/Arabic news RSS feeds — each just needs its actual
   feed/endpoint confirmed and a `SourceSpec` flipped to `IMPLEMENTED`; the
-  generic `RssNewsCollector`/`FredCsvCollector` already serve them.
-- Add a source-specific collector only where no existing generic collector
-  applies (e.g. company IR PDF/XBRL filings, Suez Canal statistics).
+  generic `RssNewsCollector`/`FredCsvCollector`/`ExcelSeriesCollector`/
+  `PdfDocumentCollector` already serve them. This is the one remaining item
+  from the program's named 16-collector build order that isn't already
+  either done (World Bank, AlphaVantage/FMP) or blocked on a business
+  decision (Yahoo/TradingView ToS review) — see `docs/DATA_ACQUISITION.md`'s
+  "What's still blocked" section for the full breakdown.
+- Once a user supplies an AlphaVantage or FMP API key, flip that entry to
+  `IMPLEMENTED` — the collector code and tests already exist.
 - Cross-source corroboration measurement: once two IMPLEMENTED sources
   cover overlapping data (e.g. a second price source alongside Stooq),
   wire `consistency_score` in `collectors.quality.assess_quality()` instead
-  of leaving it `None`, and start feeding `SourceRegistry.record_measured_quality()`
-  from real run history instead of leaving `data_quality_score` unset.
+  of leaving it `None`.
+- Instrument `HttpFetcher` to time requests and feed real `latency_seconds`
+  into `SourceMetricsRepository.record_run()` (TD-16) — the only reputation
+  dimension still unmeasured in practice.
+- Calibration once real run history exists: `qualification.py`'s stage
+  thresholds and `health.py`'s alert thresholds are declared policy today
+  (TD-17), same situation as TD-6's conflict-policy constants.
+- Wire a scheduled `discovery.DiscoveryEngine` run (e.g. against a seed
+  list of known IR/regulator homepages) into a periodic job once any
+  deployment target exists (System 18) — the engine and the
+  candidate→registry bridge are ready; only the "run this on a schedule
+  against these seed URLs" wiring is deployment-shaped, not engineering.
 
 ## Dashboard architecture: next engineering-closeable steps
 

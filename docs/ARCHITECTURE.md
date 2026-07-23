@@ -54,18 +54,47 @@ research/        Python package `agx_research` — the research engine
   review/         Scientific Review Board: reviewers + board decision
   adversarial/    AdversarialScientist: attacks against a hypothesis
 
-  # Data Acquisition Program: the free-source collection framework
+  # Data Acquisition Platform: the free-source collection framework
   sources/        SourceSpec/SourceRegistry — the declarative catalog of
                   every known data source (id, access method, status,
+                  lifecycle_state/health_status/activation_status,
                   reliability/freshness priors, retry/rate-limit policy,
-                  license, conflict priority); see docs/DATA_ACQUISITION.md
-  collectors/     RawDocument provenance envelope, Collector ABC
-                  (fetch -> RawDocument, parse -> CollectionBatch as a pure
-                  function), HttpFetcher (robots.txt + rate limit + retry),
-                  per-source collectors (Stooq, FRED, generic RSS/Atom),
-                  QualityAssessment scoring, CollectionService
-                  (materialize-if-above-confidence-floor, else withhold;
-                  routes derived news events through EventPlatform.register())
+                  license, conflict/scheduling priority); plus:
+                    qualification.py — Candidate->Quarantine->Evaluation->
+                      Trusted->Core promotion, evidence-gated, one stage at
+                      a time, never auto-trusting a discovered source
+                    reputation.py — SourceMetrics counters + the charter's
+                      nine reputation dimensions -> a composite score
+                    health.py — HealthMonitor/HealthAlert: consecutive-
+                      failure/layout-change/schema-drift/staleness detection
+                  see docs/DATA_ACQUISITION.md
+  discovery/      Source Discovery Engine: RSS autodiscovery, PDF-repository
+                  and structured-dataset link scanning, sitemap scanning ->
+                  SourceCandidate. Pure function of already-fetched HTML/XML
+                  (no network, no SourceRegistry import) — structurally
+                  incapable of trusting or registering anything itself;
+                  `qualification.register_candidate` is the only bridge into
+                  the registry, and always at Candidate/PLANNED.
+  collectors/     RawDocument provenance envelope (+ RawArchive: content-
+                  addressed, write-once binary blob store for PDF/Excel/
+                  images), Collector ABC (fetch -> RawDocument, parse ->
+                  CollectionBatch as a pure function), HttpFetcher
+                  (robots.txt + rate limit + retry; fetch_text/fetch_bytes),
+                  per-source collectors (Stooq, FRED, World Bank, generic
+                  RSS/Atom; AlphaVantage/FMP code-complete but NEEDS_KEY) +
+                  generic collector-type frameworks (PdfDocumentCollector,
+                  ExcelSeriesCollector, FilesystemCollector,
+                  BrowserAutomationCollector honest stub,
+                  ArchiveReplayCollector), QualityAssessment scoring,
+                  ProvenanceIndexRepository (per-value source/collector/
+                  raw-document/hash/schema-version trace for materialized
+                  price bars and macro observations, not just news),
+                  HistoricalReplayEngine (rebuild materialized data from
+                  RawDocuments alone, no new fetch), CollectionService
+                  (materialize-if-above-confidence-floor else withhold;
+                  routes derived news events through EventPlatform.register();
+                  records SourceMetrics + HealthMonitor + registry
+                  reputation/health on every run)
   dashboard/      Dashboard artifact export: DashboardSystemStatus schema +
                   export_*()/write_dashboard_artifacts() (model_dump of
                   existing domain models -> the 8 JSON files the dashboard

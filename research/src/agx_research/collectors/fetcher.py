@@ -57,6 +57,9 @@ class HttpFetcher:
         return parser.can_fetch(_USER_AGENT, url)
 
     def fetch_text(self, url: str, spec: SourceSpec) -> str:
+        return self.fetch_bytes(url, spec).decode("utf-8", errors="replace")
+
+    def fetch_bytes(self, url: str, spec: SourceSpec) -> bytes:
         if self.respect_robots and not self._robots_allows(url):
             raise FetchDisallowed(f"robots.txt disallows {url}")
 
@@ -76,7 +79,7 @@ class HttpFetcher:
             try:
                 request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
                 with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
-                    return response.read().decode("utf-8", errors="replace")
+                    return response.read()
             except (urllib.error.URLError, OSError, TimeoutError) as exc:
                 last_error = exc
                 if attempts < spec.retry_policy.max_attempts:

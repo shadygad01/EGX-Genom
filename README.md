@@ -10,11 +10,18 @@ inform a recommendation — each with a full explanation.
 See [`docs/VISION.md`](docs/VISION.md) for the full mission and immutable
 principles, and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for how the
 codebase implements them. [`CLAUDE.md`](CLAUDE.md) has working notes for
-anyone (human or agent) developing here.
+anyone (human or agent) developing here. [`MISSION_CONTROL.md`](MISSION_CONTROL.md)
+indexes every living status document (current work, roadmap, phase status,
+technical debt, risks).
 
-**Status:** foundation scaffold. Interfaces, the knowledge lifecycle, and
-project structure are in place; real data ingestion, statistical validation,
-and modeling are stubs to be built out.
+**Status:** all 18 charter systems architecturally complete and tested
+except the business-blocked remainder of production infrastructure — see
+[`docs/PHASE_STATUS.md`](docs/PHASE_STATUS.md) for the per-system audit.
+The platform runs a real end-to-end daily research cycle on placeholder
+market data plus a real free-source Data Acquisition Platform (see
+[`docs/DATA_ACQUISITION.md`](docs/DATA_ACQUISITION.md)); a licensed EGX
+vendor remains the single gating decision before any output is real
+research.
 
 ## Layout
 

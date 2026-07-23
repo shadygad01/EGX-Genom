@@ -52,6 +52,66 @@ class SourceStatus(str, Enum):
     DISABLED = "disabled"
 
 
+class LifecycleState(str, Enum):
+    """Where a source sits in the qualification pipeline (`sources.qualification`).
+
+    Distinct from `SourceStatus`: `status` gates *whether a collector may run
+    at all* (auth/ToS/config); `lifecycle_state` gates *how much the rest of
+    the platform trusts it* once it can run. A source can be IMPLEMENTED and
+    still only CANDIDATE/QUARANTINE if it hasn't accumulated evidence yet.
+    Promotion only ever moves forward one stage at a time and only on
+    evidence (see `qualification.evaluate_promotion`) — never assigned by
+    fiat, never skipped.
+    """
+
+    CANDIDATE = "candidate"  # discovered, nothing about it verified yet
+    QUARANTINE = "quarantine"  # verified reachable; collecting but unscored
+    EVALUATION = "evaluation"  # enough runs to score reputation, still probationary
+    TRUSTED = "trusted"  # reputation cleared the bar; feeds the platform normally
+    CORE = "core"  # long-running, high-reputation; a load-bearing source
+
+
+class HealthStatus(str, Enum):
+    """Current operational health, maintained by `sources.health`."""
+
+    UNKNOWN = "unknown"  # never run, or no recent run to judge by
+    HEALTHY = "healthy"
+    DEGRADED = "degraded"  # elevated failures/staleness but still producing data
+    DOWN = "down"  # consecutive failures past the alert threshold
+
+
+class ActivationStatus(str, Enum):
+    """Whether this source is switched on for scheduled collection."""
+
+    ACTIVE = "active"
+    PAUSED = "paused"  # held pending an external unblock (health alert, key, ToS review)
+    RETIRED = "retired"  # permanently withdrawn (superseded, dead, ToS revoked)
+
+
+def default_lifecycle_for_status(status: SourceStatus) -> tuple[LifecycleState, ActivationStatus]:
+    """The seed catalog's one honest mapping from access status to platform trust.
+
+    IMPLEMENTED sources were engineering-verified (endpoint confirmed, collector
+    tested against recorded fixtures) rather than autonomously discovered, so
+    they start at TRUSTED rather than walking the CANDIDATE/QUARANTINE stages
+    meant for the discovery engine's output — but never CORE, which is reserved
+    for sources with actual measured run history (`reputation.py`).
+    PLANNED sources are catalogued but nothing about them is verified yet, so
+    they stay CANDIDATE and ACTIVE (engineering work to verify them continues).
+    NEEDS_KEY/TOS_REVIEW are CANDIDATE and PAUSED — genuinely blocked on a
+    credential or legal review, not a collection failure.
+    DISABLED is RETIRED outright.
+    """
+
+    if status == SourceStatus.IMPLEMENTED:
+        return LifecycleState.TRUSTED, ActivationStatus.ACTIVE
+    if status == SourceStatus.DISABLED:
+        return LifecycleState.CANDIDATE, ActivationStatus.RETIRED
+    if status in (SourceStatus.NEEDS_KEY, SourceStatus.TOS_REVIEW):
+        return LifecycleState.CANDIDATE, ActivationStatus.PAUSED
+    return LifecycleState.CANDIDATE, ActivationStatus.ACTIVE
+
+
 class RetryPolicy(BaseModel):
     max_attempts: int = 3
     backoff_seconds: float = 2.0
@@ -68,8 +128,12 @@ class SourceSpec(BaseModel):
     version: int = 1
     name: str
     category: SourceCategory
+    country: str = "EG"
     access_method: AccessMethod
     status: SourceStatus
+    lifecycle_state: LifecycleState = LifecycleState.CANDIDATE
+    health_status: HealthStatus = HealthStatus.UNKNOWN
+    activation_status: ActivationStatus = ActivationStatus.ACTIVE
     base_url: str | None = None
     authentication: str = "none"  # "none" | "api_key(user-supplied)" | description
     reliability_score: float = Field(ge=0.0, le=1.0, description="Declared prior until measured")
@@ -91,10 +155,19 @@ class SourceSpec(BaseModel):
         default=50,
         description="Higher wins ties in cross-source conflict resolution (0-100).",
     )
+    priority: int = Field(
+        default=50,
+        description="Collection scheduling priority (0-100, higher collected/discovered first). "
+        "Distinct from conflict_priority, which only matters at resolution time.",
+    )
     supported_entities: list[str] = Field(default_factory=list)
     supported_event_types: list[str] = Field(default_factory=list)
     supported_languages: list[str] = Field(default_factory=lambda: ["en"])
     data_quality_score: float | None = Field(
         default=None, description="Measured only; never declared."
+    )
+    reputation_score: float | None = Field(
+        default=None,
+        description="Composite score from sources.reputation; measured only, never declared.",
     )
     notes: str = ""

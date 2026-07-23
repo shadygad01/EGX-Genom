@@ -178,3 +178,56 @@ def test_mixed_batches_some_withheld_some_materialized(tmp_path):
     assert result.documents_fetched == 2
     assert result.batches_materialized + result.batches_withheld == 2
     assert result.batches_materialized >= 1  # the clean batch always clears the floor
+
+
+def test_materializing_a_price_bar_writes_a_traceable_provenance_record(tmp_path):
+    from agx_research.collectors.provenance_index import ProvenanceIndexRepository
+
+    provenance_index = ProvenanceIndexRepository()
+    service = CollectionService(tmp_path, provenance_index=provenance_index, min_confidence=0.5)
+    collector = StubCollector(make_spec(), {"https://x/1": good_batch()})
+
+    service.run(collector, expected_records=1)
+
+    record = provenance_index.trace("price", "COMI", date(2026, 6, 1))
+    assert record is not None
+    assert record.source_id == "stub_source"
+    assert record.collector == "StubCollector"
+    assert record.raw_document_id  # traces back to a real RawDocument id
+
+
+def test_run_records_source_metrics_and_updates_registry_health_and_reputation(tmp_path):
+    from agx_research.sources.registry import SourceRegistry
+    from agx_research.sources.reputation import SourceMetricsRepository
+    from agx_research.sources.spec import HealthStatus
+
+    registry = SourceRegistry()
+    registry.add(make_spec())
+    metrics_repo = SourceMetricsRepository()
+    service = CollectionService(
+        tmp_path, registry=registry, metrics=metrics_repo, min_confidence=0.5
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": good_batch()})
+
+    service.run(collector, expected_records=1)
+
+    metrics = metrics_repo.latest("stub_source")
+    assert metrics is not None
+    assert metrics.runs_total == 1
+    updated_spec = registry.latest("stub_source")
+    assert updated_spec.health_status == HealthStatus.HEALTHY
+    assert updated_spec.data_quality_score is not None
+
+
+def test_parser_exception_is_withheld_and_recorded_not_propagated(tmp_path):
+    class RaisingCollector(StubCollector):
+        def parse(self, document):
+            raise ValueError("boom")
+
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    collector = RaisingCollector(make_spec(), {"https://x/1": good_batch()})
+
+    result = service.run(collector, expected_records=1)
+
+    assert result.batches_withheld == 1
+    assert result.batches_materialized == 0

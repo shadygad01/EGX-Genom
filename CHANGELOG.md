@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.8.0 — AGX Data Acquisition Platform
+- `sources/`: `SourceSpec` gains three independent state axes —
+  `lifecycle_state` (`LifecycleState`: Candidate/Quarantine/Evaluation/
+  Trusted/Core), `health_status` (`HealthStatus`), `activation_status`
+  (`ActivationStatus`) — plus `country`, `priority`, `reputation_score`.
+  New `qualification.py` (evidence-gated promotion pipeline, one stage at a
+  time, demoted on a DOWN health signal), `reputation.py` (`SourceMetrics`
+  counters -> the charter's 9 reputation dimensions -> a composite score,
+  finally wiring `SourceRegistry.record_measured_quality()`), `health.py`
+  (`HealthMonitor`/`HealthAlert`: consecutive-failure/layout-change/schema-
+  drift/staleness detection).
+- `discovery/` (new package): `DiscoveryEngine` — RSS autodiscovery,
+  PDF-repository scan, structured-dataset scan, sitemap scan, API-doc-link
+  scan -> `SourceCandidate`. Pure function of already-fetched HTML/XML, no
+  import of `SourceRegistry` — structurally cannot register or trust a
+  source; `qualification.register_candidate` is the only bridge, always at
+  Candidate/PLANNED with conservative priors.
+- `collectors/archive.py` (new): `RawArchive`, a content-addressed,
+  write-once binary blob store for PDF/Excel/image payloads that don't fit
+  `RawDocument.content_text`; `RawDocument` gains `is_binary` and
+  `build_binary_raw_document()`. `HttpFetcher` gains `fetch_bytes()`.
+- `collectors/provenance_index.py` (new): `ProvenanceIndexRepository` — a
+  per-value trace (source/collector/raw-document/hash/schema-version) for
+  every materialized price bar and macro observation, closing the gap
+  where only news items carried this forward. Wired automatically into
+  `CollectionService`.
+- `collectors/replay.py` + `archive_replay.py` (new): `ArchiveReplayCollector`
+  (an ordinary `Collector` whose `fetch()` returns already-archived
+  documents) + `HistoricalReplayEngine` — rebuild materialized data from
+  the Raw Archive alone after a parser change, with no new fetch.
+  `CollectionService.run()` is now idempotent about re-adding an
+  already-stored `RawDocument`, and records `SourceMetrics`/`HealthMonitor`/
+  registry health+reputation on every run (including parser exceptions,
+  now caught and withheld rather than propagated).
+- New generic collector-type frameworks: `PdfDocumentCollector` (pypdf-
+  backed text extraction), `ExcelSeriesCollector` (openpyxl-backed,
+  column-mapped macro series), `FilesystemCollector` (real, network-
+  independent — ingests manually-placed files), `BrowserAutomationCollector`
+  (honest `NotImplementedError` stub, no ToS-cleared target exists yet).
+- New concrete collectors: `WorldBankCollector` (World Bank v2 API,
+  IMPLEMENTED — Egypt macro indicators); `AlphaVantageCollector` and
+  `FmpCollector` (code-complete and tested against each API's documented
+  JSON shape, catalogued `NEEDS_KEY` — no fabricated/bypassed credentials).
+- `contracts/source_spec.schema.json` regenerated; `api/src/types.ts` and
+  `web/src/types.ts` updated to match the new `SourceSpec` fields.
+- New dependencies: `pypdf`, `openpyxl` (both pure/near-pure-Python, no
+  native extensions).
+- 346 Python tests green (up from 273); TypeScript suite unchanged (33).
+
 ## 0.7.0 — Dual-provider dashboard architecture (static + API)
 - `web/src/data/`: `DashboardDataProvider` interface with two
   implementations — `StaticJsonProvider` (reads JSON artifacts published

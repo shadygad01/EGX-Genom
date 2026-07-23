@@ -69,8 +69,13 @@ describe("App shell", () => {
     }
   });
 
-  it("routes to the Opportunity Center placeholder", async () => {
+  it("routes to the Opportunity Center", async () => {
     await renderApp("/opportunities");
+    expect(await screen.findByText("No opportunities yet")).toBeInTheDocument();
+  });
+
+  it("routes to the Market Intelligence placeholder", async () => {
+    await renderApp("/market");
     expect(await screen.findByText("Under construction")).toBeInTheDocument();
   });
 });

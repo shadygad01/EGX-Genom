@@ -82,18 +82,46 @@ integration drops into once that decision is made.
 
 ## 03 — Event Platform
 
-**DoD:** a canonical, versioned `Event` schema covering the named event
-categories, with adapters deriving real events from the data platform
-(not fabricated), and a versioned repository.
+**DoD (expanded by the standalone design audit — see
+`docs/EVENT_PLATFORM_DESIGN.md`):** canonical, versioned `Event` schema;
+controlled subtype taxonomy validated against event categories; impact-
+horizon ontology; entity resolution to canonical refs (not bare strings);
+content-fingerprint event identity; deduplication and cross-source
+corroboration; explicit conflict resolution that surfaces disagreement
+rather than guessing; a full event lifecycle (pending → confirmed →
+corroborated/disputed → retracted/superseded → archived); a single
+sanctioned write path (`EventPlatform`); typed event-to-event
+relationships; and Knowledge Graph projection. Adding a real data provider
+must be a configuration task (one adapter function), not an architectural
+one.
 
-**Status: PARTIAL** (built in Epoch II, ahead of strict order; not
-touched this session since 02 was this session's gate).
+**Status: DONE, engineering-wise** — every component closeable without
+external data is built and tested:
 
-- `events/` — `Event`/`EventType`/`EventSeverity`, `EventRepository`,
-  adapters for Corporate, Macroeconomic, News, and Market events derived
-  from real `DatasetSnapshot` data.
-- **Gap:** Political and Technical event adapters have no data source yet
-  (no political news feed; no computed technical indicators).
+- `events/identity.py` — content-fingerprint identity (same real-world
+  occurrence → same id, regardless of source; optional discriminator for
+  content-keyed kinds like news).
+- `events/entity.py` + `entity_resolver.py` — `EntityRef`/`EntityKind` and
+  mechanical resolution against `UniverseProvider`/`SectorProvider`.
+- `events/taxonomy.py` — ~28-subtype controlled vocabulary, validated
+  against category on every `Event` construction.
+- `events/ontology.py` — subtype → impact-horizon triage classification
+  (research relevance, explicitly not a price-impact prediction).
+- `events/lifecycle.py` — `EventStatus` state machine.
+- `events/conflict.py` — `ConservativeConflictPolicy`: agreement
+  corroborates (confidence rises), disagreement marks DISPUTED with the
+  conflicting keys recorded; the existing value is never silently replaced.
+- `events/service.py` — `EventPlatform`, the sole write path:
+  `register()` (idempotent by identity; same-source replays don't inflate
+  confidence), `retract()`, `supersede()` (a correction is a *new* event
+  linked via SUPERSEDES — mirrors `AlphaGenome.mutate()`).
+- `events/graph_integration.py` — event/entity nodes + typed relationship
+  edges projected into the shared `KnowledgeGraph`.
+
+**Remaining gaps, all blocked on external data (named, not silent):**
+Political and Technical event adapters (no data source); real NLP entity
+linking over unstructured news bodies; calibration of the conflict
+policy's confidence constants against real multi-source data.
 
 ## 04 — Market Memory
 
@@ -286,11 +314,9 @@ anything upstream is real would be pure waste.
 
 ## Immediate next step
 
-Per the strict-order rule, system **03 (Event Platform)** is next: it's
-the earliest PARTIAL system, and its gaps (Political/Technical event
-adapters) are both blocked on data sources that don't exist yet, not
-engineering work that can proceed today — meaning **04 (Market Memory)**
-is next in practice as the earliest phase with closeable, engineering-only
-gaps, once 03 is confirmed to have no other closeable gap. This will be
-reassessed at the start of the next session rather than decided
-speculatively here.
+System **03 (Event Platform)** is now engineering-complete (its remaining
+gaps are all blocked on external data sources, not architecture). Per the
+strict-order rule, **04 (Market Memory)** is next: its known closeable gap
+is the EGX public-holiday calendar (the trading-day rule currently only
+encodes the Friday/Saturday weekend), plus wiring `MarketState` to carry
+the registered `Event`s for its day now that the Event Platform exists.

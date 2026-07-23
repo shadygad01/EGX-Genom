@@ -41,7 +41,10 @@ research/        Python package `agx_research` — the research engine
 
   # Epoch II: scientific core
   orchestration/  Task Graph, Artifacts, ResearchSession, ResearchOrchestrator
-  events/         Canonical Event schema + adapters from raw snapshot data
+  events/         Event Platform: canonical schema, taxonomy/ontology,
+                  entity resolution, fingerprint identity, dedup/conflict
+                  resolution, lifecycle, EventPlatform write path, adapters,
+                  graph projection (see docs/EVENT_PLATFORM_DESIGN.md)
   market_memory/  MarketState + MarketMemory (point-in-time reconstruction)
   features/       (extended) FeatureCandidate + FeatureDiscoveryEngine
   genome/         Gene (immutable lineage) + AlphaGenome service

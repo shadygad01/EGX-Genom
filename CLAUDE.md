@@ -144,9 +144,18 @@ Layout:
   promotion flows as "board reviews, then promote," not by modifying
   `promote()` to take reviewers as an argument.
 - `graph.KnowledgeGraph` edges should come from `graph.edges_from_provenance()`
-  wherever possible, not be hand-constructed from scratch — the graph is a
-  view over `Provenance`, and hand-built edges are exactly the kind of
-  parallel source of truth that drifts.
+  (or, for events, `events.graph_integration.project_event()`) wherever
+  possible, not be hand-constructed from scratch — the graph is a view
+  over `Provenance` and event data, and hand-built edges are exactly the
+  kind of parallel source of truth that drifts.
+- `events.EventPlatform.register()` is the only path for persisting an
+  event. Adapters (and future real data providers) only *build candidates*
+  via `events.service.build_candidate_event()`, which derives the id from
+  a content fingerprint — never mint an event id with `new_id()` or write
+  to `EventRepository` directly, or deduplication and cross-source
+  corroboration silently stop working. A factual correction is
+  `EventPlatform.supersede()` (a new event linked to the old), never an
+  in-place edit.
 
 ## What NOT to do
 

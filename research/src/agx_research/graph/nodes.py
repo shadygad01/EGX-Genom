@@ -32,6 +32,7 @@ class NodeType(str, Enum):
     KNOWLEDGE = "knowledge"
     DATASET_SNAPSHOT = "dataset_snapshot"
     RESEARCH_FINDING = "research_finding"
+    MACRO_SERIES = "macro_series"
 
 
 class GraphNode(BaseModel):

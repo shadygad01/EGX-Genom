@@ -34,8 +34,11 @@ uv run pytest
   / stress test / backtest interfaces.
 - `agx_research.agents` — research agents (propose findings from a
   `DatasetSnapshot`, never publish knowledge).
-- `agx_research.events` — canonical `Event` schema + adapters deriving
-  events from a `DatasetSnapshot`.
+- `agx_research.events` — the Event Platform: canonical `Event` schema,
+  subtype taxonomy + impact-horizon ontology, entity resolution,
+  fingerprint-based identity, dedup/conflict resolution, lifecycle,
+  `EventPlatform` (the sole write path), snapshot adapters, and Knowledge
+  Graph projection.
 - `agx_research.market_memory` — `MarketState` + `MarketMemory`, the
   sanctioned way to reconstruct any historical day.
 - `agx_research.genome` — `Gene` (immutable lineage) + `AlphaGenome` service.

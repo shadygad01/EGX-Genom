@@ -84,8 +84,13 @@ describe("App shell", () => {
     expect(await screen.findByText("No hypotheses yet")).toBeInTheDocument();
   });
 
-  it("routes to the Knowledge Graph placeholder", async () => {
+  it("routes to the Knowledge Graph", async () => {
     await renderApp("/knowledge-graph");
+    expect(await screen.findByText("No graph data yet")).toBeInTheDocument();
+  });
+
+  it("routes to the Mission Control placeholder", async () => {
+    await renderApp("/mission-control");
     expect(await screen.findByText("Under construction")).toBeInTheDocument();
   });
 });

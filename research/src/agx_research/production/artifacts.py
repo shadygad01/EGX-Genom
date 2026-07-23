@@ -67,6 +67,11 @@ def export_collector_status(
                 "price_bars_written": result.price_bars_written,
                 "macro_observations_written": result.macro_observations_written,
                 "news_items_written": result.news_items_written,
+                "corporate_events_written": result.corporate_events_written,
+                "index_constituents_written": result.index_constituents_written,
+                "financial_statement_line_items_written": (
+                    result.financial_statement_line_items_written
+                ),
                 "events_registered": result.events_registered,
                 "lifecycle_state": spec.lifecycle_state.value if spec else None,
                 "health_status": spec.health_status.value if spec else None,

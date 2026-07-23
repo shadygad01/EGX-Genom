@@ -32,7 +32,7 @@ close without a cloud/vendor/secrets decision from the user.**
 
 ## Test health
 
-- Python: 475 tests, all green (`cd research && uv run pytest`).
+- Python: 477 tests, all green (`cd research && uv run pytest`).
 - TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
   + `git diff --exit-code`).
@@ -68,6 +68,13 @@ Production Execution Phase section has the full breakdown.
   logic remains separate, later work.
 - 13 new tests (475 total). See `CURRENT_MISSION.md` and
   `COMPLETION_REPORT.md` for the full report.
+- Follow-up fix while auditing: `production.artifacts.export_collector_status()`
+  silently omitted the three newest record-type counters
+  (`corporate_events_written`, `index_constituents_written`,
+  `financial_statement_line_items_written`) from `collector_status.json` —
+  a real dashboard observability gap, not a network/business blocker.
+  Fixed; verified live (`corporate_events_written` now correctly reports
+  `2` in a mock-mode `agx run`). 2 new tests (477 total).
 
 ## Universe Engine + Corporate Disclosures (earlier this mission)
 

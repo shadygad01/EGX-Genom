@@ -42,7 +42,7 @@ Production 1.0 is the licensed EGX data vendor — a business decision
    fundamentals feed, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
-(475 Python tests + 33 TypeScript tests green).
+(477 Python tests + 33 TypeScript tests green).
 
 ## Dashboard dual-provider architecture (post-Data-Acquisition-Program)
 
@@ -484,3 +484,16 @@ mission (Universe Engine, Corporate Disclosures, Financial Statement
 Collection) is now engineering-complete and ready to execute the moment
 either clears. See `CURRENT_MISSION.md` for the current statement and
 `NEXT_MISSIONS.md` for what's next in the meantime.
+
+**One more genuinely unblocked item, closed while auditing**:
+`production.artifacts.export_collector_status()` reported
+`price_bars_written`/`macro_observations_written`/`news_items_written`/
+`events_registered` but silently omitted the three newest record-type
+counters this mission added — a real dashboard observability gap
+(`collector_status.json` blind to genuine capability already built), not
+a network/business blocker. Fixed by adding
+`corporate_events_written`/`index_constituents_written`/
+`financial_statement_line_items_written`; verified live (a mock-mode
+`agx run` now correctly reports `corporate_events_written: 2`, matching
+the real `COMI/EARNINGS` + `MFPC/DIVIDEND` rows). 2 new tests
+(477 total).

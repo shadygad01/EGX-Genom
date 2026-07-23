@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.13.1 — Dashboard observability fix: report every collected record type
+- `production/artifacts.py`'s `export_collector_status()` reported
+  `price_bars_written`/`macro_observations_written`/`news_items_written`/
+  `events_registered` but silently omitted `corporate_events_written`,
+  `index_constituents_written`, and `financial_statement_line_items_written`
+  — a real observability gap found while auditing for unblocked
+  engineering work after Financial Statement Collection: `collector_status.json`
+  was blind to genuine capability the platform already had (confirmed via
+  a mock-mode `agx run`: `corporate_events_written` now correctly reports
+  `2`, matching the real `COMI/EARNINGS` + `MFPC/DIVIDEND` rows already
+  being written). Fixed by adding all three fields.
+- 2 new tests (477 total); `ruff` clean.
+
 ## 0.13.0 — Financial Statement Collection
 - `financials/` (new package): `FinancialStatementLineItem` — `{ticker,
   period_end_date, period_type, statement_type, line_item, value,

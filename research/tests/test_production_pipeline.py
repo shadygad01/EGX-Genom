@@ -188,7 +188,8 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
         "market_state.json", "runtime_metrics.json", "system_status.json",
         "source_registry.json", "investment_cases.json", "collector_status.json",
         "runtime_status.json", "dashboard_metrics.json", "mission_status.json",
-        "execution_report.json",
+        "execution_report.json", "genes.json", "papers.json", "hypotheses.json",
+        "knowledge_graph.json", "financial_statements.json", "source_metrics.json",
     }
     for filename in expected:
         assert (dashboard_out / filename).exists(), filename

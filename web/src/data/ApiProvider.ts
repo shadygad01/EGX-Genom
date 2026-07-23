@@ -6,13 +6,24 @@
 // and docs/ARCHITECTURE.md) -- that's what makes switching providers safe.
 
 import type {
+  CollectorStatusRow,
+  DashboardMetrics,
   DashboardSystemStatus,
   Event,
+  ExecutionReport,
+  FinancialStatementLineItem,
+  Gene,
+  Hypothesis,
+  InvestmentCases,
+  KnowledgeGraphData,
   KnowledgeObject,
   MarketState,
+  MissionStatus,
   Pattern,
   Recommendation,
+  ResearchPaper,
   RunRecord,
+  SourceMetricsRow,
   SourceSpec,
 } from "../types";
 import type { DashboardDataProvider } from "./DataProvider";
@@ -56,5 +67,53 @@ export class ApiProvider implements DashboardDataProvider {
 
   getSourceRegistry(): Promise<SourceSpec[]> {
     return fetchJson<SourceSpec[]>("/source-registry");
+  }
+
+  getInvestmentCases(): Promise<InvestmentCases | null> {
+    return fetchJson<InvestmentCases | null>("/investment-cases");
+  }
+
+  getCollectorStatus(): Promise<CollectorStatusRow[]> {
+    return fetchJson<CollectorStatusRow[]>("/collector-status");
+  }
+
+  getRuntimeStatus(): Promise<RunRecord | null> {
+    return fetchJson<RunRecord | null>("/runtime-status");
+  }
+
+  getDashboardMetrics(): Promise<DashboardMetrics | null> {
+    return fetchJson<DashboardMetrics | null>("/dashboard-metrics");
+  }
+
+  getMissionStatus(): Promise<MissionStatus | null> {
+    return fetchJson<MissionStatus | null>("/mission-status");
+  }
+
+  getExecutionReport(): Promise<ExecutionReport | null> {
+    return fetchJson<ExecutionReport | null>("/execution-report");
+  }
+
+  getGenes(): Promise<Gene[]> {
+    return fetchJson<Gene[]>("/genes");
+  }
+
+  getPapers(): Promise<ResearchPaper[]> {
+    return fetchJson<ResearchPaper[]>("/papers");
+  }
+
+  getHypotheses(): Promise<Hypothesis[]> {
+    return fetchJson<Hypothesis[]>("/hypotheses");
+  }
+
+  getKnowledgeGraph(): Promise<KnowledgeGraphData> {
+    return fetchJson<KnowledgeGraphData>("/knowledge-graph");
+  }
+
+  getFinancialStatements(): Promise<FinancialStatementLineItem[]> {
+    return fetchJson<FinancialStatementLineItem[]>("/financial-statements");
+  }
+
+  getSourceMetrics(): Promise<SourceMetricsRow[]> {
+    return fetchJson<SourceMetricsRow[]>("/source-metrics");
   }
 }

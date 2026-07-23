@@ -14,9 +14,15 @@ from pathlib import Path
 
 from agx_research.dashboard.schemas import DashboardSystemStatus
 from agx_research.events.event import Event
+from agx_research.financials.schema import FinancialStatementLineItem
+from agx_research.genome.gene import Gene
+from agx_research.graph.edges import GraphEdge
+from agx_research.graph.nodes import GraphNode
+from agx_research.hypotheses.hypothesis import Hypothesis
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import Recommendation
+from agx_research.papers.paper import ResearchPaper
 from agx_research.portfolio.constructor import PortfolioRecommendation
 from agx_research.production.mission_control import MissionControlStatus
 from agx_research.production.report import ExecutionReport
@@ -121,6 +127,14 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
     _validate_optional_collector_status(directory, counts)
     _validate_optional_runtime_status(directory, counts)
     _validate_optional_dashboard_metrics(directory, counts)
+    _validate_optional_model_list(directory, "genes.json", Gene, counts)
+    _validate_optional_model_list(directory, "papers.json", ResearchPaper, counts)
+    _validate_optional_model_list(directory, "hypotheses.json", Hypothesis, counts)
+    _validate_optional_model_list(
+        directory, "financial_statements.json", FinancialStatementLineItem, counts
+    )
+    _validate_optional_knowledge_graph(directory, counts)
+    _validate_optional_source_metrics(directory, counts)
 
     return counts
 
@@ -203,3 +217,49 @@ def _validate_optional_dashboard_metrics(directory: Path, counts: dict[str, int]
     if not isinstance(payload, dict) or "artifacts" not in payload:
         raise DashboardArtifactError("dashboard_metrics.json: expected an object with an 'artifacts' key")
     counts["dashboard_metrics.json"] = 1
+
+
+def _validate_optional_model_list(
+    directory: Path, filename: str, model_cls: type, counts: dict[str, int]
+) -> None:
+    payload, present = _load_optional_json(directory, filename)
+    if not present:
+        return
+    if not isinstance(payload, list):
+        raise DashboardArtifactError(f"{filename}: expected a JSON array, got {type(payload)}")
+    try:
+        for item in payload:
+            model_cls.model_validate(item)
+    except Exception as exc:
+        raise DashboardArtifactError(f"{filename}: {exc}") from exc
+    counts[filename] = len(payload)
+
+
+def _validate_optional_knowledge_graph(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "knowledge_graph.json")
+    if not present:
+        return
+    if not isinstance(payload, dict) or "nodes" not in payload or "edges" not in payload:
+        raise DashboardArtifactError(
+            "knowledge_graph.json: expected an object with 'nodes' and 'edges' keys"
+        )
+    try:
+        for node in payload["nodes"]:
+            GraphNode.model_validate(node)
+        for edge in payload["edges"]:
+            GraphEdge.model_validate(edge)
+    except Exception as exc:
+        raise DashboardArtifactError(f"knowledge_graph.json: {exc}") from exc
+    counts["knowledge_graph.json"] = len(payload["nodes"])
+
+
+def _validate_optional_source_metrics(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "source_metrics.json")
+    if not present:
+        return
+    if not isinstance(payload, list):
+        raise DashboardArtifactError("source_metrics.json: expected a JSON array")
+    for row in payload:
+        if not isinstance(row, dict) or "source_id" not in row:
+            raise DashboardArtifactError("source_metrics.json: expected each row to have 'source_id'")
+    counts["source_metrics.json"] = len(payload)

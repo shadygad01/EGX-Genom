@@ -6,13 +6,24 @@
 // `web/public/data/` before the Vite build ran.
 
 import type {
+  CollectorStatusRow,
+  DashboardMetrics,
   DashboardSystemStatus,
   Event,
+  ExecutionReport,
+  FinancialStatementLineItem,
+  Gene,
+  Hypothesis,
+  InvestmentCases,
+  KnowledgeGraphData,
   KnowledgeObject,
   MarketState,
+  MissionStatus,
   Pattern,
   Recommendation,
+  ResearchPaper,
   RunRecord,
+  SourceMetricsRow,
   SourceSpec,
 } from "../types";
 import type { DashboardDataProvider } from "./DataProvider";
@@ -66,5 +77,54 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getSourceRegistry(): Promise<SourceSpec[]> {
     return fetchList<SourceSpec>("source_registry.json");
+  }
+
+  getInvestmentCases(): Promise<InvestmentCases | null> {
+    return fetchObject<InvestmentCases>("investment_cases.json");
+  }
+
+  getCollectorStatus(): Promise<CollectorStatusRow[]> {
+    return fetchList<CollectorStatusRow>("collector_status.json");
+  }
+
+  getRuntimeStatus(): Promise<RunRecord | null> {
+    return fetchObject<RunRecord>("runtime_status.json");
+  }
+
+  getDashboardMetrics(): Promise<DashboardMetrics | null> {
+    return fetchObject<DashboardMetrics>("dashboard_metrics.json");
+  }
+
+  getMissionStatus(): Promise<MissionStatus | null> {
+    return fetchObject<MissionStatus>("mission_status.json");
+  }
+
+  getExecutionReport(): Promise<ExecutionReport | null> {
+    return fetchObject<ExecutionReport>("execution_report.json");
+  }
+
+  getGenes(): Promise<Gene[]> {
+    return fetchList<Gene>("genes.json");
+  }
+
+  getPapers(): Promise<ResearchPaper[]> {
+    return fetchList<ResearchPaper>("papers.json");
+  }
+
+  getHypotheses(): Promise<Hypothesis[]> {
+    return fetchList<Hypothesis>("hypotheses.json");
+  }
+
+  async getKnowledgeGraph(): Promise<KnowledgeGraphData> {
+    const data = await fetchObject<KnowledgeGraphData>("knowledge_graph.json");
+    return data ?? { nodes: [], edges: [] };
+  }
+
+  getFinancialStatements(): Promise<FinancialStatementLineItem[]> {
+    return fetchList<FinancialStatementLineItem>("financial_statements.json");
+  }
+
+  getSourceMetrics(): Promise<SourceMetricsRow[]> {
+    return fetchList<SourceMetricsRow>("source_metrics.json");
   }
 }

@@ -8,16 +8,34 @@
 // StaticJsonProvider/ApiProvider for the two implementations.
 
 import type {
+  CollectorStatusRow,
+  DashboardMetrics,
   DashboardSystemStatus,
   Event,
+  ExecutionReport,
+  FinancialStatementLineItem,
+  Gene,
+  Hypothesis,
+  InvestmentCases,
+  KnowledgeGraphData,
   KnowledgeObject,
   MarketState,
+  MissionStatus,
   Pattern,
   Recommendation,
+  ResearchPaper,
   RunRecord,
+  SourceMetricsRow,
   SourceSpec,
 } from "../types";
 
+// Every method here mirrors exactly one dashboard artifact file (see
+// docs/ARCHITECTURE.md's "Dashboard data providers" section) -- no
+// component ever computes a value that isn't already one of these fields.
+// The first eight are always present (both StaticJsonProvider's fixed
+// contract and ProductionPipeline produce them); the rest are only
+// produced by the full production pipeline (`agx run`) and resolve to an
+// honest empty/null value when absent, never a fabricated one.
 export interface DashboardDataProvider {
   getKnowledge(): Promise<KnowledgeObject[]>;
   getEvents(): Promise<Event[]>;
@@ -27,4 +45,17 @@ export interface DashboardDataProvider {
   getRuntimeMetrics(): Promise<RunRecord[]>;
   getSystemStatus(): Promise<DashboardSystemStatus | null>;
   getSourceRegistry(): Promise<SourceSpec[]>;
+
+  getInvestmentCases(): Promise<InvestmentCases | null>;
+  getCollectorStatus(): Promise<CollectorStatusRow[]>;
+  getRuntimeStatus(): Promise<RunRecord | null>;
+  getDashboardMetrics(): Promise<DashboardMetrics | null>;
+  getMissionStatus(): Promise<MissionStatus | null>;
+  getExecutionReport(): Promise<ExecutionReport | null>;
+  getGenes(): Promise<Gene[]>;
+  getPapers(): Promise<ResearchPaper[]>;
+  getHypotheses(): Promise<Hypothesis[]>;
+  getKnowledgeGraph(): Promise<KnowledgeGraphData>;
+  getFinancialStatements(): Promise<FinancialStatementLineItem[]>;
+  getSourceMetrics(): Promise<SourceMetricsRow[]>;
 }

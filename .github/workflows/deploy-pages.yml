@@ -72,6 +72,13 @@ jobs:
       # didn't), directly in the job log -- not just the one-line summary
       # `agx run` prints. Genuinely useful for ongoing production
       # monitoring, not only for this phase's own verification.
+      - name: Show per-target Egyptian discovery reasons
+        run: |
+          for t in egx_official cbe enterprise_press mubasher zawya; do
+            uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data \
+              discover-sources --target "$t" || true
+          done
+
       - name: Show per-collector live results
         run: |
           uv run python -c "

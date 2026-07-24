@@ -19,7 +19,7 @@ import time
 import urllib.error
 import urllib.request
 import urllib.robotparser
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit, urlunsplit
 
 from agx_research.sources.spec import SourceSpec
 
@@ -32,6 +32,29 @@ class FetchDisallowed(Exception):
 
 class FetchError(Exception):
     """All retry attempts failed."""
+
+
+_URL_COMPONENT_SAFE_CHARS = "/:@!$&'()*+,;=~%"
+
+
+def _encode_request_url(url: str) -> str:
+    """Percent-encode a URL's path/query/fragment before handing it to
+    `urllib.request.Request`. Some real sites publish links (a sitemap
+    `<loc>` entry, an anchor href) with literal non-ASCII characters
+    instead of percent-encoding them -- `http.client` cannot send that as
+    a request line (`str.encode('ascii')` raises `UnicodeEncodeError`,
+    crashing the fetch outright rather than returning a normal HTTP
+    response). Every RFC 3986 sub-delim plus `%` is kept safe so an
+    already correctly-encoded URL (e.g. Stooq's own `?s=...&i=d#ticker=...`
+    query/fragment) is never double-encoded or mangled.
+    """
+    parts = urlsplit(url)
+    return urlunsplit((
+        parts.scheme, parts.netloc,
+        quote(parts.path, safe=_URL_COMPONENT_SAFE_CHARS),
+        quote(parts.query, safe=_URL_COMPONENT_SAFE_CHARS),
+        quote(parts.fragment, safe=_URL_COMPONENT_SAFE_CHARS),
+    ))
 
 
 class HttpFetcher:
@@ -107,7 +130,9 @@ class HttpFetcher:
             attempts += 1
             self._last_request_at[spec.id] = time.monotonic()
             try:
-                request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+                request = urllib.request.Request(
+                    _encode_request_url(url), headers={"User-Agent": _USER_AGENT}
+                )
                 request_started_at = time.monotonic()
                 with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
                     content = response.read()

@@ -139,6 +139,46 @@ def test_latency_not_recorded_for_a_failed_fetch(monkeypatch):
     assert fetcher.request_latencies == []
 
 
+def test_fetch_handles_url_with_raw_non_ascii_characters(monkeypatch):
+    """Regression test for a real production crash: a live Zawya sitemap
+    <loc> entry contained literal (non-percent-encoded) non-ASCII
+    characters in its path. `urllib.request.Request` passed that straight
+    to `http.client`, which raised `UnicodeEncodeError` deep inside
+    `_encode_request` (`str.encode('ascii')` on the request line) -- an
+    unhandled crash, not a normal HTTP error, so it wasn't even reported as
+    a `FetchError`. `fetch_bytes` must percent-encode the URL first.
+    """
+    fetcher = HttpFetcher(respect_robots=False)
+    seen_urls: list[str] = []
+
+    def _capture_urlopen(request, timeout):
+        seen_urls.append(request.full_url)
+        # The exact failure this reproduces: building the real HTTP
+        # request line must not raise UnicodeEncodeError.
+        request.full_url.encode("ascii")
+        return _FakeResponse("ok")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _capture_urlopen)
+    result = fetcher.fetch_text("https://example.test/أخبار/مقال", make_spec())
+
+    assert result == "ok"
+    assert seen_urls == ["https://example.test/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1/%D9%85%D9%82%D8%A7%D9%84"]
+
+
+def test_fetch_does_not_double_encode_an_already_percent_encoded_url(monkeypatch):
+    fetcher = HttpFetcher(respect_robots=False)
+    seen_urls: list[str] = []
+
+    def _capture_urlopen(request, timeout):
+        seen_urls.append(request.full_url)
+        return _FakeResponse("ok")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _capture_urlopen)
+    fetcher.fetch_text("https://example.test/data?s=comi.eg&i=d#ticker=COMI", make_spec())
+
+    assert seen_urls == ["https://example.test/data?s=comi.eg&i=d#ticker=COMI"]
+
+
 def test_rate_limit_sleeps_between_requests_to_same_source(monkeypatch):
     fetcher = HttpFetcher(respect_robots=False)
     sleeps: list[float] = []

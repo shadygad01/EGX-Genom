@@ -220,23 +220,48 @@ def discover_company_directory_links(
     return found
 
 
+def is_sitemap_index(sitemap_xml: str) -> bool:
+    """A sitemap-index (<sitemapindex> root, per the sitemaps.org protocol)
+    lists further sitemap.xml files, not final content URLs -- the caller
+    (the network-touching orchestration layer) must fetch and re-scan each
+    <loc> entry rather than treat it as a discovered candidate itself. See
+    docs/TECHNICAL_DEBT.md TD-18.
+    """
+    return "<sitemapindex" in sitemap_xml.lower()
+
+
 def discover_sitemap_urls(sitemap_xml: str, page_url: str) -> list[SourceCandidate]:
     """Minimal <loc> extraction from a sitemap.xml -- a lightweight generic
     parse rather than a full XML sitemap schema, since the only thing this
-    engine needs is the list of candidate URLs it points to.
+    engine needs is the list of candidate URLs it points to. Each entry's
+    access method is guessed mechanically from its file extension using the
+    same mapping `discover_structured_datasets` uses (CSV/XLS/JSON/XML);
+    anything else is left as an ordinary page URL (HTML_SCRAPE) -- a sitemap
+    entry is never assumed to be a feed just because it was reachable via a
+    sitemap.
     """
     urls = re.findall(r"<loc>(.*?)</loc>", sitemap_xml, flags=re.IGNORECASE | re.DOTALL)
-    return [
-        SourceCandidate(
-            discovered_url=url.strip(),
-            origin_page_url=page_url,
-            discovery_method=DiscoveryMethod.SITEMAP_SCAN,
-            access_method_guess=AccessMethod.HTML_SCRAPE,
-            evidence="<loc> entry in sitemap.xml",
+    candidates = []
+    for raw_url in urls:
+        url = raw_url.strip()
+        if not url:
+            continue
+        path = urlsplit(url).path.lower()
+        access_method_guess = AccessMethod.HTML_SCRAPE
+        for ext, access_method in _STRUCTURED_EXTENSIONS.items():
+            if path.endswith(ext):
+                access_method_guess = access_method
+                break
+        candidates.append(
+            SourceCandidate(
+                discovered_url=url,
+                origin_page_url=page_url,
+                discovery_method=DiscoveryMethod.SITEMAP_SCAN,
+                access_method_guess=access_method_guess,
+                evidence="<loc> entry in sitemap.xml",
+            )
         )
-        for url in urls
-        if url.strip()
-    ]
+    return candidates
 
 
 class DiscoveryEngine:

@@ -53,7 +53,13 @@ hints — never a hand-picked acquisition URL), it autonomously:
 2. **Discovers acquisition-method candidates** on the verified homepage via
    the existing `discovery.DiscoveryEngine` (RSS autodiscovery, PDF
    repositories, structured datasets, sitemaps, API docs) — no new
-   discovery logic duplicated, the same engine System 03 already built.
+   discovery logic duplicated, the same engine System 03 already built. If
+   the homepage's own markup carries nothing discoverable, `run_for_target`
+   falls back to the sitemaps.org protocol (robots.txt's `Sitemap:`
+   directive, then the conventional `/sitemap.xml` path, following a
+   sitemap-index one level) before giving up — closing the exact
+   "homepage reachable with real content but nothing discoverable" gap a
+   live run evidenced (Zawya); see `docs/ACQUISITION_STRATEGY.md`.
 3. **Verifies legality** (`legality.py`): robots.txt (three-state — allowed/
    disallowed/unknown, via `HttpFetcher.robots_status`) plus a terms-of-use
    red-flag/green-flag keyword scan. `HTML_SCRAPE` can never auto-clear to

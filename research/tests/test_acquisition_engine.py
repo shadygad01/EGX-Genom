@@ -283,6 +283,81 @@ def test_run_catalog_never_overrides_a_targets_own_domain_hints():
     assert company_result.resolved_domain.domain == "real-domain.example"
 
 
+def test_sitemap_fallback_discovers_dataset_when_homepage_has_no_candidates():
+    """The exact Zawya-class gap: a homepage is reachable and returns real
+    content, but its own markup has no RSS/PDF/dataset/API-doc link -- the
+    engine must still try the standards-based sitemap protocol (robots.txt's
+    `Sitemap:` directive here) before giving up.
+    """
+    robots_txt = "User-agent: *\nDisallow: /private\nSitemap: https://testorg.com/my-sitemap.xml\n"
+    sitemap_xml = (
+        '<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        "<url><loc>https://testorg.com/data/prices.csv</loc></url>"
+        "<url><loc>https://testorg.com/about</loc></url>"
+        "</urlset>"
+    )
+    pages = {
+        "https://testorg.com": HOMEPAGE_WITH_NOTHING,
+        "https://testorg.com/robots.txt": robots_txt,
+        "https://testorg.com/my-sitemap.xml": sitemap_xml,
+    }
+    registry = SourceRegistry()
+    engine = AcquisitionIntelligenceEngine(
+        prober=reachable_prober({
+            "https://testorg.com", "https://testorg.com/data/prices.csv", "https://testorg.com/about",
+        }),
+        fetch_text=lambda url: pages.get(url),
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    result = engine.run_for_target(make_target(existing_source_id="testorg"))
+
+    assert result.registered is True
+    assert result.selected.candidate.discovered_url == "https://testorg.com/data/prices.csv"
+
+
+def test_sitemap_index_is_followed_one_level():
+    index_xml = (
+        '<?xml version="1.0"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        "<sitemap><loc>https://testorg.com/sitemap-data.xml</loc></sitemap>"
+        "</sitemapindex>"
+    )
+    nested_xml = (
+        '<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        "<url><loc>https://testorg.com/data/prices.csv</loc></url>"
+        "</urlset>"
+    )
+    pages = {
+        "https://testorg.com": HOMEPAGE_WITH_NOTHING,
+        "https://testorg.com/sitemap.xml": index_xml,
+        "https://testorg.com/sitemap-data.xml": nested_xml,
+    }
+    registry = SourceRegistry()
+    engine = AcquisitionIntelligenceEngine(
+        prober=reachable_prober({"https://testorg.com", "https://testorg.com/data/prices.csv"}),
+        fetch_text=lambda url: pages.get(url),
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    result = engine.run_for_target(make_target(existing_source_id="testorg"))
+
+    assert result.registered is True
+    assert result.selected.candidate.discovered_url == "https://testorg.com/data/prices.csv"
+
+
+def test_no_sitemap_available_still_reports_the_original_reason():
+    registry = SourceRegistry()
+    engine = AcquisitionIntelligenceEngine(
+        prober=reachable_prober({"https://testorg.com"}),
+        fetch_text=lambda url: HOMEPAGE_WITH_NOTHING if url == "https://testorg.com" else None,
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    result = engine.run_for_target(make_target())
+    assert result.registered is False
+    assert "No acquisition-method candidates" in result.reason
+
+
 def test_continuity_monitor_skips_per_constituent_targets():
     registry = SourceRegistry()
     engine = AcquisitionIntelligenceEngine(

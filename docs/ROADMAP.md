@@ -40,6 +40,15 @@ Required user/business inputs, in priority order:
 
 ## Data Acquisition Platform: next engineering-closeable steps
 
+**See `docs/ACQUISITION_STRATEGY.md` first** — a capability-by-capability
+legal acquisition strategy matrix (built after live GitHub Actions runs
+evidenced that "homepage = data source" fails for hardened public sites
+like EGX/CBE, but succeeds for World Bank-style documented APIs). Its
+concrete next steps, not yet done: verify IMF's and OECD's documented
+SDMX/JSON API contracts and catalogue them directly (like World Bank),
+rather than as homepage-discovery targets; explore FMP's financial-
+statement endpoints for EGX coverage once a key exists.
+
 Unlike the Production 1.0 blockers above, these need no business decision —
 they're config/verification work against the now-complete platform
 (registry, discovery, qualification, reputation, health, archive,

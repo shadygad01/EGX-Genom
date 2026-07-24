@@ -9,6 +9,7 @@ from agx_research.discovery.engine import (
     discover_rss_feeds,
     discover_sitemap_urls,
     discover_structured_datasets,
+    is_sitemap_index,
 )
 from agx_research.sources.spec import AccessMethod
 
@@ -62,6 +63,25 @@ def test_discover_sitemap_urls_extracts_loc_entries():
     sitemap = "<urlset><url><loc>https://example.com/a</loc></url><url><loc>https://example.com/b</loc></url></urlset>"
     candidates = discover_sitemap_urls(sitemap, "https://example.com/sitemap.xml")
     assert {c.discovered_url for c in candidates} == {"https://example.com/a", "https://example.com/b"}
+
+
+def test_discover_sitemap_urls_classifies_structured_extensions_not_blanket_scrape():
+    sitemap = (
+        "<urlset>"
+        "<url><loc>https://example.com/data/prices.csv</loc></url>"
+        "<url><loc>https://example.com/about</loc></url>"
+        "</urlset>"
+    )
+    candidates = discover_sitemap_urls(sitemap, "https://example.com/sitemap.xml")
+    by_url = {c.discovered_url: c for c in candidates}
+    assert by_url["https://example.com/data/prices.csv"].access_method_guess == AccessMethod.CSV_DOWNLOAD
+    assert by_url["https://example.com/about"].access_method_guess == AccessMethod.HTML_SCRAPE
+
+
+def test_is_sitemap_index_detects_sitemapindex_root():
+    index = '<sitemapindex><sitemap><loc>https://example.com/sitemap-a.xml</loc></sitemap></sitemapindex>'
+    assert is_sitemap_index(index) is True
+    assert is_sitemap_index("<urlset><url><loc>https://example.com/a</loc></url></urlset>") is False
 
 
 def test_discover_api_documentation_finds_conventional_spec_links():

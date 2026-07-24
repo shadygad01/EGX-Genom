@@ -18,77 +18,85 @@ commit whenever the fact they state changes.
   research engine, production pipeline, and frontend complete; every
   research conclusion the platform can currently produce is still scoped
   to placeholder/mock data — no live source is connected yet.
-- **Current mission:** Activate AGX with real live data — connect the
-  first live production sources in the project owner's named priority
-  order (Tier 1: EGX official, EGX30/EGX70 Investor Relations, CBE;
-  Tier 2-4: Enterprise/Mubasher/Zawya/Asharq Business, then
-  CAPMAS/Trading Economics/World Bank/IMF/FRED, then anything else the
-  Acquisition Intelligence Engine discovers). See `CURRENT_MISSION.md` for
-  this phase's outcome: blocked at the mission's own stop condition (a
-  genuine external dependency), verified directly this session with
-  proxy-log evidence, not assumed.
-- **Progress this mission: all 9 sections built.** Frontend audit
-  complete. Six new backend dashboard artifacts (genes, papers,
-  hypotheses, knowledge graph, financial statements, source reputation)
-  exported to close gaps the 9-section spec needed. Design system,
-  primitive component library, and routed application shell built. Every
-  section is implemented against real dashboard artifacts, verified in a
-  headless browser (dark theme, and light theme for the landing page).
-  A handful of sub-sections are honest "not yet available" gaps where no
-  backend artifact exists yet (market regime, breadth/liquidity, review
-  board history, discovery engine detail, raw logs) — see
-  `NEXT_MISSIONS.md` for the full list and what's next (a quality pass).
+- **Current mission:** Solve the Egyptian data **acquisition strategy**
+  problem, not just connect one more homepage. See `CURRENT_MISSION.md`
+  and `docs/ACQUISITION_STRATEGY.md` for the full capability-by-capability
+  legal strategy matrix and what changed as a result. This mission
+  followed the Egyptian Live Data Sprint, which replaced the mock-only
+  production pipeline with a real `--mode live` default and fixed a
+  genuine health-engine bug (see `CURRENT_MISSION.md`'s "Prior mission"
+  section) — the platform has run live via GitHub Actions (which has real
+  outbound egress, unlike this coding sandbox) multiple times since.
+- **Live-run evidence (superseding the older "0 connected, fully blocked"
+  framing below):** World Bank is `IMPLEMENTED` and has collected 66 real
+  Egypt CPI inflation observations via a live GitHub Actions run. Stooq is
+  reachable but blocked by a Cloudflare-style JS challenge; FRED's live
+  behavior and the five named Egyptian sources (EGX, CBE, Enterprise,
+  Mubasher, Zawya) each fail with a distinct, evidenced, source-side
+  reason (network-level reset, WAF rejection, robots.txt disallow, or —
+  Zawya — a reachable homepage with no discoverable feed, now addressed
+  by this mission's sitemap-fallback fix). Full detail:
+  `docs/ACQUISITION_STRATEGY.md`.
+- **Progress this mission (frontend, prior phase):** all 9 sections built.
+  Frontend audit complete. Six new backend dashboard artifacts (genes,
+  papers, hypotheses, knowledge graph, financial statements, source
+  reputation) exported to close gaps the 9-section spec needed. Design
+  system, primitive component library, and routed application shell built.
+  Every section is implemented against real dashboard artifacts, verified
+  in a headless browser (dark theme, and light theme for the landing
+  page). A handful of sub-sections are honest "not yet available" gaps
+  where no backend artifact exists yet (market regime, breadth/liquidity,
+  review board history, discovery engine detail, raw logs) — see
+  `NEXT_MISSIONS.md` for the full list.
 - **Overall completion (backend, unchanged from prior mission):** ~99.5%
   of everything engineering-closeable without a business/vendor decision.
-  See `docs/PHASE_STATUS.md`/`docs/ROADMAP.md` for the backend detail —
-  paused, not abandoned, during this frontend phase.
-- **Connected live sources: 0** — blocked, not unbuilt. Every mechanism
-  needed (discovery, verification, ranking, registration, qualification,
-  collection, archival, validation, universe membership, corporate-event
-  classification, financial-statement collection) is built and tested;
-  zero are connected because this sandbox has no outbound network egress
-  to arbitrary hosts (confirmed directly and repeatedly across five
-  missions now — this session added proxy-log evidence: every named
-  Tier 1-4 host, including sources already `IMPLEMENTED` like
-  `fred.stlouisfed.org`/`stooq.com`/`api.worldbank.org`, gets an explicit
-  `403` policy denial on the CONNECT tunnel, and a live `agx
-  discover-sources` run against the full 21-target catalog reports
-  "no reachable domain" for every one).
-- **Historical coverage:** 0 real trading days from any live source (same
-  blocker — no source has ever been reachable to backfill from). No
-  separate backfill mechanism is needed or exists; every collector
-  (including `IndexConstituentCollector`/`FinancialStatementCollector`)
-  already fetches a source's full available series by construction, so a
-  source's first live run *is* its backfill.
-- **Knowledge growth:** 0 real `KnowledgeObject`s promoted from live data.
-  The full validation → promotion pipeline is proven correct against mock
-  data (the production pipeline's daily research cycle produces real
-  hypotheses, gates, and — when evidence clears the bar — promotions;
-  it now also produces real, if headline-classified, corporate events),
-  but every promoted object today traces back to placeholder CSVs, not a
-  licensed or verified live feed.
-- **Genome growth:** 0 real `Gene`s from live evidence, for the same
-  reason — `AlphaGenome` correctly creates genes from mock-data knowledge
-  promotions today; nothing yet exists to create one from real EGX
-  evidence.
-- **Known blockers:** (1) No outbound network egress from this development
-  sandbox — an external/environmental dependency, not an engineering gap.
-  (2) No verified, complete EGX30/EGX70 constituent list exists in this
-  codebase (only a 10-company EGX30 placeholder, no EGX70 list at all) —
-  a business decision reserved for the project owner, since fabricating
-  ~90 ticker/company-name pairs from training-data recall would itself
-  violate the platform's anti-fabrication principle. (3) A licensed EGX
-  market data vendor has not been selected — the standing gate on treating
-  any output as real research (`docs/ROADMAP.md`).
-- **Estimated remaining work:** Near-zero engineering effort once either
-  blocker (1) or (2) above clears — `agx discover-sources`,
-  `generate_company_ir_targets()`, `IndexConstituentCollector`, and
-  `FinancialStatementCollector` are all already built to scale
-  automatically. From there, each newly-resolved source needs one concrete
-  collector (small, per-source, following the existing `Collector`
-  pattern) before it's `IMPLEMENTED`. System 18's remaining deployment/
-  secrets/scheduling work is separately blocked on a hosting/vendor
-  decision.
+  See `docs/PHASE_STATUS.md`/`docs/ROADMAP.md` for the backend detail.
+- **Connected live sources: 1 (World Bank), 4 more evidenced-blocked with
+  named reasons, not unbuilt.** Every mechanism needed (discovery,
+  verification, ranking, registration, qualification, collection,
+  archival, validation, universe membership, corporate-event
+  classification, financial-statement collection) is built and tested and
+  has now genuinely run live (GitHub Actions has real outbound egress;
+  this coding sandbox does not — the two are not the same environment,
+  see `CURRENT_MISSION.md`). See `docs/ACQUISITION_STRATEGY.md` for the
+  per-capability breakdown of what's blocked and why.
+- **Historical coverage:** 66 real Egypt CPI observations (World Bank,
+  live). No other source has a real trading-day history yet — every
+  collector (including `IndexConstituentCollector`/
+  `FinancialStatementCollector`) already fetches a source's full available
+  series by construction, so a source's first live run *is* its backfill.
+- **Knowledge growth:** 0 real `KnowledgeObject`s promoted from live data
+  yet. The full validation → promotion pipeline is proven correct against
+  mock data (the production pipeline's daily research cycle produces real
+  hypotheses, gates, and — when evidence clears the bar — promotions; it
+  now also produces real, if headline-classified, corporate events), but
+  every promoted object today traces back to placeholder CSVs or the one
+  live macro source, not a licensed EGX price/disclosure feed.
+- **Genome growth:** 0 real `Gene`s from live EGX-specific evidence, for
+  the same reason — `AlphaGenome` correctly creates genes from mock-data
+  knowledge promotions today; nothing yet exists to create one from real
+  EGX-specific evidence (World Bank is macro, not EGX-specific).
+- **Known blockers:** (1) EGX official, CBE, Enterprise, and Mubasher are
+  each blocked by a genuine source-side defensive measure (network-level
+  reset, WAF rejection, robots.txt disallow) this program's own rules
+  correctly refuse to defeat — not an engineering gap, see
+  `docs/ACQUISITION_STRATEGY.md`. (2) No verified, complete EGX30/EGX70
+  constituent list exists in this codebase (only a 10-company EGX30
+  placeholder, no EGX70 list at all) — a business decision reserved for
+  the project owner, since fabricating ~90 ticker/company-name pairs from
+  training-data recall would itself violate the platform's
+  anti-fabrication principle. (3) A licensed EGX market data vendor has
+  not been selected — the standing gate on treating any output as real
+  research (`docs/ROADMAP.md`).
+- **Estimated remaining work:** Near-zero engineering effort once blocker
+  (2) above clears — `agx discover-sources`, `generate_company_ir_targets()`,
+  `IndexConstituentCollector`, and `FinancialStatementCollector` are all
+  already built to scale automatically. Blocker (1) needs either a
+  business/legal resolution per source (not an engineering fix — a WAF or
+  robots.txt disallow is not something this program will bypass) or
+  reliance on the diversified strategies `docs/ACQUISITION_STRATEGY.md`
+  names per capability. System 18's remaining deployment/secrets/
+  scheduling work is separately blocked on a hosting/vendor decision.
 
 ## Where to look
 

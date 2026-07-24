@@ -1,5 +1,76 @@
 # Current Mission
 
+**Superseded twice since the "no egress" finding below.** That finding was
+specific to *this coding sandbox*; the production deployment target
+(GitHub Actions, `.github/workflows/deploy-pages.yml`) has real outbound
+egress and has since run the pipeline live multiple times, producing
+first-party evidence that changed the picture substantially. The original
+"blocked at the mission's own stop condition" framing is preserved below
+for its own historical accuracy but is **no longer the current state**.
+
+## Latest mission: solve the acquisition *strategy* problem (this phase)
+
+Live runs surfaced a pattern the "connect one more homepage" approach
+wasn't going to fix: four of five named Egyptian sources are blocked by a
+genuine, evidenced defensive measure (EGX: TCP connection actively reset;
+CBE: explicit WAF rejection page; Enterprise/Mubasher: robots.txt
+disallow), and the fifth (Zawya) is reachable with real content but has no
+RSS/PDF/dataset/API link the existing homepage-scan heuristics could find.
+Meanwhile World Bank — never approached via homepage discovery, catalogued
+directly against its documented API — collected 66 real Egypt CPI
+observations live. This mission's job was to determine whether the
+*acquisition strategy itself* (not the platform) was wrong before writing
+another collector.
+
+**Outcome:** produced a full capability-by-capability legal acquisition
+strategy matrix — see **`docs/ACQUISITION_STRATEGY.md`** — covering all 12
+named data requirements (price, corporate disclosures/actions, financial
+statements, IR, news, macro, breadth, calendar, index constituents, sector
+membership, economic releases), ranking every legal strategy per
+capability and comparing it against what's actually catalogued today. Key
+finding: "homepage = data source" is the correct strategy only for
+per-company Investor Relations (no legal aggregator substitute exists);
+everywhere else, a documented API/feed/bulk-download contract should be
+sought and catalogued directly (the World Bank precedent), with homepage
+discovery as the fallback, not the default. IMF/OECD are flagged as
+mismodeled (treated as homepage-discovery targets despite having
+documented SDMX/JSON APIs at the same confidence tier as World Bank) —
+recorded as the next step, not implemented blind, since their exact
+endpoint shape hasn't been verified this session.
+
+**Minimum engineering change implemented** (Step 7 of that document):
+`AcquisitionIntelligenceEngine.run_for_target()` now falls back to the
+sitemaps.org protocol (robots.txt's `Sitemap:` directive, then
+`/sitemap.xml`, following a sitemap-index one level) when the homepage's
+own markup has nothing discoverable — directly closing the Zawya-class gap
+and `docs/TECHNICAL_DEBT.md` TD-18's sitemap-index half. `discover_sitemap_urls()`
+also now classifies entries by file extension instead of blanket
+`HTML_SCRAPE`. Both changes are fully unit-tested with fakes (research/tests/
+test_discovery.py, test_acquisition_engine.py); no network call was added
+that bypasses robots.txt, ToS, or any anti-bot measure, and no endpoint was
+fabricated or guessed.
+
+## Prior mission: Egyptian Live Data Sprint (immediately preceding phase)
+
+Replaced the mock-only production pipeline with a real `--mode live`
+default, fixed a genuine health-engine bug (a collector that downloaded
+data but produced zero parsed/knowledge/event records was previously
+reported HEALTHY — now correctly `DEGRADED`/`FAILED` with an explicit
+reason, connection/parse/yield/knowledge/event metrics surfaced in
+Mission Control), and fixed a second bug where a fetch-level exception
+bypassed health/metrics bookkeeping entirely. Live runs via GitHub
+Actions (which does have egress, unlike this coding sandbox) confirmed:
+World Bank collects real data; Stooq/FRED are reachable but blocked by
+a Cloudflare-style JS challenge / non-responsive respectively; the five
+named Egyptian sources fail with the concrete, source-side reasons this
+phase's `docs/ACQUISITION_STRATEGY.md` documents in full. This is the
+first mission where "the platform has genuinely run live," superseding
+the pure no-egress framing below.
+
+---
+
+## Historical: original "no egress in this coding sandbox" finding
+
 **Superseded by a new mission from the project owner: activate AGX with
 real live data**, connecting the first live production sources in the
 named priority order (Tier 1: EGX official, EGX30/EGX70 company Investor
@@ -8,7 +79,10 @@ Tier 3: CAPMAS, Trading Economics, World Bank, IMF, FRED; Tier 4:
 whatever the Acquisition Intelligence Engine discovers on its own).
 
 **Outcome of this phase, verified directly (not assumed):** every named
-Tier 1-4 host is unreachable from this session. `curl` to
+Tier 1-4 host is unreachable from *this coding session specifically*
+(the sandbox this assistant runs in, not the GitHub Actions deployment
+target — see the two phases above for what running with real egress
+actually found). `curl` to
 `www.egx.com.eg`, `www.cbe.org.eg`, `www.mubasher.info`, `www.zawya.com`,
 `www.tradingeconomics.com`, `fred.stlouisfed.org`, `stooq.com`,
 `api.worldbank.org`, `data.worldbank.org`, `www.imf.org`,
@@ -51,7 +125,9 @@ further until this runs in an environment with real outbound egress (a
 deployment decision, System 18) or the project owner supplies the
 business inputs `MISSION_CONTROL.md` names (a verified EGX30/EGX70
 constituent list; a licensed EGX vendor selection). Nothing was
-fabricated in place of a real connection.
+fabricated in place of a real connection. **Since superseded**: the
+GitHub Actions deployment target does have egress, and the two mission
+phases above describe what actually happened once it ran there.
 
 ---
 

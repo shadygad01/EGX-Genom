@@ -28,6 +28,7 @@ every other source in this platform.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Callable
 from urllib.parse import urlsplit
@@ -49,7 +50,13 @@ from agx_research.acquisition_intelligence.legality import assess_legality
 from agx_research.acquisition_intelligence.ranking import RankedMethod, rank_methods, select_best
 from agx_research.acquisition_intelligence.stability import assess_stability
 from agx_research.acquisition_intelligence.target import TargetOrganization
-from agx_research.discovery.engine import DiscoveryEngine, discover_company_directory_links
+from agx_research.discovery.candidate import SourceCandidate
+from agx_research.discovery.engine import (
+    DiscoveryEngine,
+    discover_company_directory_links,
+    discover_sitemap_urls,
+    is_sitemap_index,
+)
 from agx_research.sources.qualification import apply_promotion, evaluate_promotion
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
@@ -57,6 +64,63 @@ from agx_research.sources.spec import SourceSpec
 
 RobotsChecker = Callable[[str], bool | None]
 FetchText = Callable[[str], str | None]
+
+# The sitemaps.org protocol's own declared-location convention: robots.txt
+# MAY name its sitemap(s) via a `Sitemap:` directive. Reading that directive
+# (and, failing that, trying the conventional `/sitemap.xml` root path) is
+# not a guess about any specific site -- it is the published, standardized
+# way a site is supposed to advertise its sitemap.
+_ROBOTS_SITEMAP_DIRECTIVE = re.compile(r"(?im)^\s*Sitemap:\s*(\S+)\s*$")
+
+
+def _sitemap_fallback_candidates(
+    fetch_text: FetchText, discovery_engine: DiscoveryEngine, homepage_url: str
+) -> list[SourceCandidate]:
+    """Standards-based fallback for when a homepage's own markup carries no
+    discoverable feed/API/dataset link at all (`scan_page` returns nothing --
+    e.g. a news site whose homepage is plain HTML with no RSS autodiscovery
+    tag). Tries robots.txt's declared `Sitemap:` directive first, then the
+    conventional `/sitemap.xml` root path; both are real, verifying fetches
+    through the same injected `fetch_text` already used everywhere else in
+    this engine (which enforces robots.txt via the caller's `HttpFetcher`) --
+    never a fabricated or hardcoded feed URL. A sitemap-index is followed one
+    level (per docs/TECHNICAL_DEBT.md TD-18), since many sites publish an
+    index of per-section sitemaps rather than one flat file.
+    """
+    parsed = urlsplit(homepage_url)
+    root = f"{parsed.scheme}://{parsed.netloc}"
+    sitemap_urls: list[str] = []
+    robots_text = fetch_text(f"{root}/robots.txt")
+    if robots_text:
+        for match in _ROBOTS_SITEMAP_DIRECTIVE.findall(robots_text):
+            if match not in sitemap_urls:
+                sitemap_urls.append(match)
+    default_sitemap = f"{root}/sitemap.xml"
+    if default_sitemap not in sitemap_urls:
+        sitemap_urls.append(default_sitemap)
+
+    for sitemap_url in sitemap_urls:
+        sitemap_text = fetch_text(sitemap_url)
+        if not sitemap_text:
+            continue
+        if is_sitemap_index(sitemap_text):
+            candidates: list[SourceCandidate] = []
+            seen: set[str] = set()
+            for entry in discover_sitemap_urls(sitemap_text, sitemap_url):
+                nested_text = fetch_text(entry.discovered_url)
+                if not nested_text:
+                    continue
+                for candidate in discovery_engine.scan_sitemap(nested_text, entry.discovered_url):
+                    if candidate.fingerprint() not in seen:
+                        seen.add(candidate.fingerprint())
+                        candidates.append(candidate)
+            if candidates:
+                return candidates
+            continue
+        candidates = discovery_engine.scan_sitemap(sitemap_text, sitemap_url)
+        if candidates:
+            return candidates
+    return []
 
 
 @dataclass
@@ -116,9 +180,20 @@ class AcquisitionIntelligenceEngine:
             if c.discovered_url not in exclude_urls
         ]
         if not candidates:
+            # The homepage's own markup had nothing discoverable -- fall back
+            # to the standards-based sitemap protocol before giving up (see
+            # `_sitemap_fallback_candidates`; closes docs/TECHNICAL_DEBT.md
+            # TD-18's "homepage = data source" gap).
+            candidates = [
+                c for c in _sitemap_fallback_candidates(
+                    self.fetch_text, self.discovery_engine, resolved.homepage_url
+                )
+                if c.discovered_url not in exclude_urls
+            ]
+        if not candidates:
             return AcquisitionResult(
                 target_id=target.id, resolved_domain=resolved,
-                reason="No acquisition-method candidates discovered on the homepage.",
+                reason="No acquisition-method candidates discovered on the homepage or its sitemap.",
             )
 
         entries = []

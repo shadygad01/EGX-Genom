@@ -345,6 +345,67 @@ def test_sitemap_index_is_followed_one_level():
     assert result.selected.candidate.discovered_url == "https://testorg.com/data/prices.csv"
 
 
+def test_sitemap_fallback_caps_candidates_from_a_huge_flat_sitemap():
+    """Regression test for a real production hang: a live sitemap can list
+    thousands of URLs, and each one would otherwise be individually probed
+    (a real network round-trip, rate-limited) before ranking -- a run
+    against Zawya's real sitemap hung for over an hour hitting exactly
+    this. The candidate count must be bounded regardless of how large the
+    sitemap actually is.
+    """
+    sitemap_xml = "<urlset>" + "".join(
+        f"<url><loc>https://testorg.com/data/file{i}.csv</loc></url>" for i in range(500)
+    ) + "</urlset>"
+    pages = {
+        "https://testorg.com": HOMEPAGE_WITH_NOTHING,
+        "https://testorg.com/sitemap.xml": sitemap_xml,
+    }
+    probe_calls: list[str] = []
+
+    def counting_prober(url):
+        probe_calls.append(url)
+        return ProbeResult(url=url, reachable=True, status_code=200)
+
+    registry = SourceRegistry()
+    engine = AcquisitionIntelligenceEngine(
+        prober=counting_prober,
+        fetch_text=lambda url: pages.get(url),
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    engine.run_for_target(make_target(existing_source_id="testorg"))
+
+    # One extra prober call for the homepage domain-resolution probe itself.
+    assert len(probe_calls) <= 26
+
+
+def test_sitemap_index_only_follows_a_bounded_number_of_nested_sitemaps():
+    index_xml = '<?xml version="1.0"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(
+        f"<sitemap><loc>https://testorg.com/sitemap-{i}.xml</loc></sitemap>" for i in range(20)
+    ) + "</sitemapindex>"
+    pages = {
+        "https://testorg.com": HOMEPAGE_WITH_NOTHING,
+        "https://testorg.com/sitemap.xml": index_xml,
+    }
+    fetch_calls: list[str] = []
+
+    def counting_fetch_text(url):
+        fetch_calls.append(url)
+        return pages.get(url)
+
+    registry = SourceRegistry()
+    engine = AcquisitionIntelligenceEngine(
+        prober=reachable_prober({"https://testorg.com"}),
+        fetch_text=counting_fetch_text,
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    engine.run_for_target(make_target())
+
+    nested_sitemap_fetches = [c for c in fetch_calls if "sitemap-" in c]
+    assert len(nested_sitemap_fetches) <= 5
+
+
 def test_no_sitemap_available_still_reports_the_original_reason():
     registry = SourceRegistry()
     engine = AcquisitionIntelligenceEngine(

@@ -72,6 +72,22 @@ FetchText = Callable[[str], str | None]
 # way a site is supposed to advertise its sitemap.
 _ROBOTS_SITEMAP_DIRECTIVE = re.compile(r"(?im)^\s*Sitemap:\s*(\S+)\s*$")
 
+# A real sitemap-index's per-section sitemaps (a news site's "pages" or
+# "authors" sitemap, say) routinely list thousands of URLs -- every one of
+# which `run_for_target` would otherwise probe (network round-trip) and
+# assess historically (another two network round-trips via Wayback) before
+# ranking, each spaced by the prober's own rate limit. A live run hung for
+# over an hour hitting exactly this (Zawya's real sitemap-index) before
+# these bounds were added. Capping here is what keeps "verify every
+# candidate the sitemap protocol reveals" from becoming, in practice,
+# unbounded -- it never changes *which* candidate ultimately gets selected
+# (a real RSS/dataset/API link, if one exists, is what `scan_sitemap`
+# classifies specially, not just some arbitrary later entry) so much as it
+# stops evaluating a generic page-URL sitemap well past the point where a
+# useful answer would already have appeared.
+_MAX_NESTED_SITEMAPS_FOLLOWED = 5
+_MAX_SITEMAP_CANDIDATES = 25
+
 
 def _sitemap_fallback_candidates(
     fetch_text: FetchText, discovery_engine: DiscoveryEngine, homepage_url: str
@@ -85,7 +101,10 @@ def _sitemap_fallback_candidates(
     this engine (which enforces robots.txt via the caller's `HttpFetcher`) --
     never a fabricated or hardcoded feed URL. A sitemap-index is followed one
     level (per docs/TECHNICAL_DEBT.md TD-18), since many sites publish an
-    index of per-section sitemaps rather than one flat file.
+    index of per-section sitemaps rather than one flat file -- bounded to at
+    most `_MAX_NESTED_SITEMAPS_FOLLOWED` nested sitemaps and
+    `_MAX_SITEMAP_CANDIDATES` total candidates (see the constants' own
+    docstring-length comment above for why).
     """
     parsed = urlsplit(homepage_url)
     root = f"{parsed.scheme}://{parsed.netloc}"
@@ -106,7 +125,8 @@ def _sitemap_fallback_candidates(
         if is_sitemap_index(sitemap_text):
             candidates: list[SourceCandidate] = []
             seen: set[str] = set()
-            for entry in discover_sitemap_urls(sitemap_text, sitemap_url):
+            nested_entries = discover_sitemap_urls(sitemap_text, sitemap_url)
+            for entry in nested_entries[:_MAX_NESTED_SITEMAPS_FOLLOWED]:
                 nested_text = fetch_text(entry.discovered_url)
                 if not nested_text:
                     continue
@@ -114,12 +134,16 @@ def _sitemap_fallback_candidates(
                     if candidate.fingerprint() not in seen:
                         seen.add(candidate.fingerprint())
                         candidates.append(candidate)
+                    if len(candidates) >= _MAX_SITEMAP_CANDIDATES:
+                        break
+                if len(candidates) >= _MAX_SITEMAP_CANDIDATES:
+                    break
             if candidates:
                 return candidates
             continue
         candidates = discovery_engine.scan_sitemap(sitemap_text, sitemap_url)
         if candidates:
-            return candidates
+            return candidates[:_MAX_SITEMAP_CANDIDATES]
     return []
 
 

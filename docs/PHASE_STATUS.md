@@ -524,3 +524,56 @@ collectors now call the shared helpers. Purely mechanical — same tests,
 same assertions, all still passing; no behavior change.
 
 No other issues found. This branch is a clean merge candidate.
+
+## Live Data Activation mission (post-Production-User-Experience)
+
+The project owner's instruction this phase: stop building UI/architecture,
+connect the first live production data source, in a strict priority order
+(Tier 1: EGX official → EGX30/EGX70 company Investor Relations → CBE;
+Tier 2: Enterprise/Mubasher/Zawya/Asharq Business; Tier 3: CAPMAS/Trading
+Economics/World Bank/IMF/FRED; Tier 4: anything else the Acquisition
+Intelligence Engine discovers), continuing autonomously until blocked by
+a genuine external dependency or a business decision.
+
+**Result: blocked immediately at Tier 1, verified directly rather than
+assumed** (this is the fifth mission to hit the identical block, but the
+first to gather proxy-level evidence rather than relying on curl/WebFetch
+403s alone):
+
+- `curl` to every named Tier 1-3 host (`www.egx.com.eg`, `www.cbe.org.eg`,
+  `www.mubasher.info`, `www.zawya.com`, `www.tradingeconomics.com`,
+  `fred.stlouisfed.org`, `stooq.com`, `api.worldbank.org`,
+  `data.worldbank.org`, `www.imf.org`, `www.capmas.gov.eg`,
+  `www.enterprise.press`, `asharqbusiness.com`) fails identically:
+  `CONNECT tunnel failed, response 403`.
+- The session's own egress-proxy status endpoint
+  (`$HTTPS_PROXY/__agentproxy/status`) logs each attempt as
+  `connect_rejected` — `"gateway answered 403 to CONNECT (policy denial or
+  upstream failure)"` — i.e. an explicit organization egress-policy
+  denial, uniform across every host tested, including sources this
+  registry already lists `IMPLEMENTED` (`fred`/`stooq`/`worldbank`) that
+  prior missions could only test with fixtures.
+- `WebFetch` independently returns HTTP 403 for the same hosts (a
+  different code path than raw `curl`, so this isn't one tool's quirk).
+- Running the platform's own `agx discover-sources` against the full
+  21-target priority catalog (`AcquisitionIntelligenceEngine.run_catalog`)
+  reproduces the same result for all 21: `no-op -- No reachable domain
+  found from public brand hints or name-derived guesses` — the
+  `HeuristicDomainResolver` correctly refusing to trust an unprobed
+  domain, exactly as designed, not a defect.
+- This session's instructions explicitly forbid working around a proxy
+  policy denial (`/root/.ccr/README.md`: "do not retry or route around
+  it — report the blocked host"), so no bypass was attempted.
+
+No engineering-closeable work exists to advance this mission further from
+inside this sandbox: every item in `docs/TECHNICAL_DEBT.md` that touches a
+real source is explicitly gated on a live fetch happening at least once
+(to verify an actual wire format) or a named business decision, and the
+Data Acquisition Platform + Acquisition Intelligence Engine already
+implement everything needed the moment egress exists — nothing was
+rebuilt or changed this phase, matching the "no more architecture" ask.
+No code changed. Live-data activation resumes the moment either this
+platform runs somewhere with real outbound egress (a System-18 deployment
+decision) or the project owner supplies the two named business inputs
+(a verified EGX30/EGX70 constituent list; a licensed EGX vendor
+selection) — see `MISSION_CONTROL.md` and `CURRENT_MISSION.md`.

@@ -1,5 +1,62 @@
 # Current Mission
 
+**Superseded by a new mission from the project owner: activate AGX with
+real live data**, connecting the first live production sources in the
+named priority order (Tier 1: EGX official, EGX30/EGX70 company Investor
+Relations, CBE; Tier 2: Enterprise, Mubasher, Zawya, Asharq Business;
+Tier 3: CAPMAS, Trading Economics, World Bank, IMF, FRED; Tier 4:
+whatever the Acquisition Intelligence Engine discovers on its own).
+
+**Outcome of this phase, verified directly (not assumed):** every named
+Tier 1-4 host is unreachable from this session. `curl` to
+`www.egx.com.eg`, `www.cbe.org.eg`, `www.mubasher.info`, `www.zawya.com`,
+`www.tradingeconomics.com`, `fred.stlouisfed.org`, `stooq.com`,
+`api.worldbank.org`, `data.worldbank.org`, `www.imf.org`,
+`www.capmas.gov.eg`, `www.enterprise.press`, and `asharqbusiness.com` all
+fail identically: `CONNECT tunnel failed, response 403`. The proxy's own
+status endpoint (`$HTTPS_PROXY/__agentproxy/status`) logs each as
+`connect_rejected` — `"gateway answered 403 to CONNECT (policy denial or
+upstream failure)"` — an explicit organization egress-policy denial, not a
+transient failure, and not specific to any one source (it blocks
+`fred.stlouisfed.org`/`stooq.com`/`api.worldbank.org` too, sources this
+codebase's own registry already lists as `IMPLEMENTED`). `WebFetch`
+independently returns HTTP 403 for the same hosts. Running the platform's
+own `agx discover-sources` end to end against the full 21-target priority
+catalog reproduces the same result for every target,
+`no-op -- No reachable domain found from public brand hints or
+name-derived guesses` — the `HeuristicDomainResolver` correctly refusing
+to trust an unprobed domain, not a bug. This is the fifth independent
+confirmation of the same environmental block across missions (see
+`MISSION_CONTROL.md`), now with proxy-level evidence in addition to the
+prior curl/WebFetch checks.
+
+Per this mission's own stated stop conditions ("a genuine external
+dependency blocks implementation"), no live collection could be started
+this phase. The instructions governing this session also explicitly
+forbid working around a proxy policy denial (`/root/.ccr/README.md`:
+"do not retry or route around it — report the blocked host"), so no
+attempt was made to bypass it. Every engineering-closeable prerequisite
+for the moment egress exists — `SourceRegistry`, `CollectionService`,
+the qualification/reputation/health pipeline, and the
+`AcquisitionIntelligenceEngine` that resolves/verifies/ranks/registers a
+source with no hand-picked URL — was already built and tested in prior
+missions and required no changes here. See `docs/TECHNICAL_DEBT.md`: every
+remaining named debt item is gated on either a real fetch happening at
+least once (to verify a wire format) or a business decision (EGX70 list,
+vendor selection) — there is no debt item closeable from inside this
+sandbox.
+
+**This session's actual conclusion:** live-data activation cannot proceed
+further until this runs in an environment with real outbound egress (a
+deployment decision, System 18) or the project owner supplies the
+business inputs `MISSION_CONTROL.md` names (a verified EGX30/EGX70
+constituent list; a licensed EGX vendor selection). Nothing was
+fabricated in place of a real connection.
+
+---
+
+## Prior mission (paused, unchanged by this phase)
+
 **Build the complete AGX Production User Experience — a world-class
 Research Intelligence Platform, not a stock website, dashboard, or CRUD
 app.**

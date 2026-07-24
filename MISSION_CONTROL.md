@@ -8,23 +8,25 @@ commit whenever the fact they state changes.
 ## Status at a glance
 
 - **Merge readiness:** The prior branch (backend/data-acquisition mission)
-  passed a full production-readiness audit and merged into `main`. This
-  branch has since restarted from `main` for the frontend mission below —
-  see `CHANGELOG.md` for what's landed since.
+  passed a full production-readiness audit and merged into `main`. The
+  frontend mission that followed also completed and merged — see
+  `CHANGELOG.md` for what's landed since.
 - **Where the project is:** All 18 charter systems remain architecturally
   complete and tested (17 fully DONE, the 18th DONE for everything
   engineering can close without a cloud/vendor/secrets decision) — see
   `docs/PHASE_STATUS.md`. The project owner has declared the backend,
-  research engine, and production pipeline complete and paused further
-  backend work; every research conclusion the platform can currently
-  produce is still scoped to placeholder/mock data — no live source is
-  connected yet (unchanged from the prior mission).
-- **Current mission:** Complete Production User Experience rebuild — a
-  routed, 9-section institutional research platform (AI Briefing,
-  Opportunity Center, Company Research Workspace, Market Intelligence,
-  Research Center, Knowledge Graph, Mission Control, Source Intelligence,
-  System Administration), consuming existing dashboard artifacts only, no
-  frontend-side calculation. See `CURRENT_MISSION.md`.
+  research engine, production pipeline, and frontend complete; every
+  research conclusion the platform can currently produce is still scoped
+  to placeholder/mock data — no live source is connected yet.
+- **Current mission:** Activate AGX with real live data — connect the
+  first live production sources in the project owner's named priority
+  order (Tier 1: EGX official, EGX30/EGX70 Investor Relations, CBE;
+  Tier 2-4: Enterprise/Mubasher/Zawya/Asharq Business, then
+  CAPMAS/Trading Economics/World Bank/IMF/FRED, then anything else the
+  Acquisition Intelligence Engine discovers). See `CURRENT_MISSION.md` for
+  this phase's outcome: blocked at the mission's own stop condition (a
+  genuine external dependency), verified directly this session with
+  proxy-log evidence, not assumed.
 - **Progress this mission: all 9 sections built.** Frontend audit
   complete. Six new backend dashboard artifacts (genes, papers,
   hypotheses, knowledge graph, financial statements, source reputation)
@@ -45,8 +47,13 @@ commit whenever the fact they state changes.
   collection, archival, validation, universe membership, corporate-event
   classification, financial-statement collection) is built and tested;
   zero are connected because this sandbox has no outbound network egress
-  to arbitrary hosts (confirmed directly and repeatedly across four
-  missions).
+  to arbitrary hosts (confirmed directly and repeatedly across five
+  missions now — this session added proxy-log evidence: every named
+  Tier 1-4 host, including sources already `IMPLEMENTED` like
+  `fred.stlouisfed.org`/`stooq.com`/`api.worldbank.org`, gets an explicit
+  `403` policy denial on the CONNECT tunnel, and a live `agx
+  discover-sources` run against the full 21-target catalog reports
+  "no reachable domain" for every one).
 - **Historical coverage:** 0 real trading days from any live source (same
   blocker — no source has ever been reachable to backfill from). No
   separate backfill mechanism is needed or exists; every collector

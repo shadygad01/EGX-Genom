@@ -67,6 +67,35 @@ jobs:
       - name: Validate dashboard JSON artifacts
         run: uv run python -m agx_research.cli validate-dashboard --dir ../web/public/data
 
+      # Per the mission's verification requirement: for every collector,
+      # show connected/downloaded/parsed/validated (or the exact reason it
+      # didn't), directly in the job log -- not just the one-line summary
+      # `agx run` prints. Genuinely useful for ongoing production
+      # monitoring, not only for this phase's own verification.
+      - name: Show per-collector live results
+        run: |
+          uv run python -c "
+          import json
+          rows = json.load(open('../web/public/data/collector_status.json'))
+          collected = [r for r in rows if r['status'] == 'COLLECTED']
+          unavailable = [r for r in rows if r['status'] == 'UNAVAILABLE']
+          print(f'{len(collected)} collected, {len(unavailable)} unavailable')
+          for r in collected:
+              print(f\"  COLLECTED    {r['source_id']:<15} docs={r['documents_fetched']} \"
+                    f\"prices={r['price_bars_written']} macro={r['macro_observations_written']} \"
+                    f\"health={r['health_status']} quality={r['data_quality_score']}\")
+          for r in unavailable:
+              print(f\"  UNAVAILABLE  {r['source_id']:<15} {r['reason']}\")
+          "
+          echo '--- execution report warnings (per-source failure reasons, if any) ---'
+          uv run python -c "
+          import json
+          report = json.load(open('../web/public/data/execution_report.json'))
+          print('overall_status:', report['overall_status'])
+          for w in report['warnings']:
+              print(' -', w)
+          "
+
       - run: npm install
         working-directory: .
       - run: npm run build -w web

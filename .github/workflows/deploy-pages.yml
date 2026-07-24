@@ -95,6 +95,24 @@ jobs:
           for w in report['warnings']:
               print(' -', w)
           "
+          echo '--- raw stooq response + parse warnings (diagnosing zero price bars) ---'
+          uv run python -c "
+          from agx_research.collectors.raw import RawDocumentRepository
+          from agx_research.collectors.stooq import StooqPriceCollector
+          from agx_research.sources.registry import SourceRegistry
+          from agx_research.sources.catalog import seed_registry
+          docs = RawDocumentRepository('/tmp/agx_dashboard_data/raw_documents.json')
+          stooq_docs = [d for d in docs.all_latest() if d.source_id == 'stooq']
+          print(f'{len(stooq_docs)} stooq raw document(s) archived')
+          registry = seed_registry(SourceRegistry('/tmp/agx_dashboard_data/source_registry.json'))
+          spec = registry.latest('stooq')
+          collector = StooqPriceCollector(spec, symbols={})
+          for d in stooq_docs[:3]:
+              print(f'--- {d.original_url} ---')
+              print(repr(d.content_text[:500]))
+              batch = collector.parse(d)
+              print(f'parsed: {len(batch.price_bars)} price bar(s); warnings: {batch.parse_warnings}')
+          "
 
       - run: npm install
         working-directory: .

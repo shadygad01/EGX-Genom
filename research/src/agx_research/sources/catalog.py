@@ -238,6 +238,23 @@ def seed_sources() -> list[SourceSpec]:
             reliability_score=0.6, freshness_score=0.9, conflict_priority=40,
             notes="ToS restricts automated collection; blocked.",
         ),
+        # ---- Enterprise: IMPLEMENTED -- the one outlet with a verified real
+        # feed URL. Discovered live by the Acquisition Intelligence Engine's
+        # standard RSS-autodiscovery heuristic (a real <link rel="alternate"
+        # type="application/rss+xml"> tag on enterprise.press's own homepage,
+        # not a guess) and confirmed reachable, distinct from every other
+        # named outlet below, which stays PLANNED until its own feed URL is
+        # likewise verified. See docs/ACQUISITION_STRATEGY.md.
+        _spec(
+            id="enterprise_press", name="Enterprise", category=SourceCategory.NEWS,
+            access_method=AccessMethod.RSS_FEED, status=SourceStatus.IMPLEMENTED,
+            base_url="https://enterpriseam.com/egypt/feed/",
+            reliability_score=0.65, freshness_score=0.9,
+            collector="RssNewsCollector", collector_version="1.0.0", conflict_priority=55,
+            supported_event_types=["news", "corporate"],
+            notes="Feed URL verified live via RSS autodiscovery on enterprise.press's "
+            "homepage (see docs/ACQUISITION_STRATEGY.md's Runtime Implementation section).",
+        ),
         # ---- NEWS (English) -- each a config of rss_generic once feed URL verified ----
         *[
             _spec(
@@ -252,7 +269,6 @@ def seed_sources() -> list[SourceSpec]:
                 ("reuters", "Reuters", 0.8, 70),
                 ("zawya", "Zawya", 0.6, 50),
                 ("mubasher", "Mubasher", 0.6, 55),
-                ("enterprise_press", "Enterprise", 0.65, 55),
                 ("asharq_business", "Asharq Business", 0.6, 50),
                 ("cnbc_arabia", "CNBC Arabia", 0.6, 50),
                 ("alarabiya_business", "Al Arabiya Business", 0.55, 45),

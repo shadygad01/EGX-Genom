@@ -73,7 +73,7 @@ LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICAT
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
 # lowballing here never unfairly penalizes a real result, it only avoids
 # guessing at a number this pipeline cannot know in advance.
-EXPECTED_RECORDS_LIVE = {"stooq": 100, "fred": 100, "worldbank": 10}
+EXPECTED_RECORDS_LIVE = {"stooq": 100, "fred": 100, "worldbank": 10, "enterprise_press": 5}
 
 _UNAVAILABLE_REASON_BY_STATUS = {
     SourceStatus.PLANNED: (
@@ -272,6 +272,14 @@ def build_live_collector(
         return FredCsvCollector(spec, series_ids=list(LIVE_FRED_SERIES_IDS), fetcher=fetcher)
     if source_id == "worldbank":
         return WorldBankCollector(spec, indicators=dict(LIVE_WORLDBANK_INDICATORS), fetcher=fetcher)
+    if source_id == "enterprise_press":
+        # spec.base_url is the real feed URL verified live via RSS
+        # autodiscovery (see sources/catalog.py's enterprise_press entry
+        # and docs/ACQUISITION_STRATEGY.md) -- not a guess.
+        return RssNewsCollector(
+            spec, feed_url=spec.base_url, ticker_hints=tickers,
+            classify_corporate_events=True, fetcher=fetcher,
+        )
     # rss_generic and every other source deliberately excluded: no real,
     # verified feed URL/config exists yet (see `unavailable_sources`).
     return None
@@ -292,8 +300,8 @@ def build_collector_plan(
     whose `collector` field names two classes jointly) are left to a future,
     explicit collector plan entry rather than guessed at.
 
-    LIVE mode only builds the fixed three (stooq/fred/worldbank) this
-    function has always built; the production pipeline's own LIVE-mode
+    LIVE mode only builds the fixed set (stooq/fred/worldbank/enterprise_press)
+    this function has always built; the production pipeline's own LIVE-mode
     collector *execution* stage no longer calls this function at all --
     it uses the capability-driven `CapabilityDecisionEngine` instead (see
     `production/pipeline.py`), which ranks every catalogued strategy per
@@ -302,14 +310,14 @@ def build_collector_plan(
     fixtures) and as `build_live_collector`'s original callers may still
     reference it directly.
     """
-    wireable = {"stooq", "fred", "rss_generic", "worldbank"}
+    wireable = {"stooq", "fred", "rss_generic", "worldbank", "enterprise_press"}
     collectable = {s.id: s for s in registry.collectable() if s.id in wireable}
     tickers = tickers or list(_STOOQ_PRICES)
 
     plans: list[PlannedCollector] = []
     if mode == ExecutionMode.LIVE:
         fetcher = HttpFetcher()
-        for source_id in ("stooq", "fred", "worldbank"):
+        for source_id in ("stooq", "fred", "worldbank", "enterprise_press"):
             if source_id not in collectable:
                 continue
             collector = build_live_collector(source_id, collectable[source_id], fetcher=fetcher, tickers=tickers)

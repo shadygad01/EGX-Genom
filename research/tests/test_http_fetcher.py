@@ -179,6 +179,44 @@ def test_fetch_does_not_double_encode_an_already_percent_encoded_url(monkeypatch
     assert seen_urls == ["https://example.test/data?s=comi.eg&i=d#ticker=COMI"]
 
 
+def test_robots_txt_fetch_is_timeout_bounded_not_a_hang(monkeypatch):
+    """Regression test for a real production hang: stdlib
+    `RobotFileParser.read()` calls `urlopen()` with no timeout at all, so a
+    host that accepts the TCP connection but never responds hangs that call
+    -- and the whole sequential discovery run behind it -- indefinitely (a
+    live run was cancelled after 90+ minutes stuck here). Fetching
+    robots.txt through the same timeout-bounded path every other request
+    uses must degrade to allow-all on timeout, not hang or raise.
+    """
+    fetcher = HttpFetcher(timeout_seconds=5.0)
+    seen_timeouts: list[float] = []
+
+    def _times_out(request, timeout):
+        seen_timeouts.append(timeout)
+        raise TimeoutError("simulated: connection accepted, server never responded")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _times_out)
+
+    assert fetcher._robots_allows("https://example.test/data") is True
+    assert seen_timeouts == [5.0]
+
+
+def test_robots_txt_real_disallow_rule_is_still_respected(monkeypatch):
+    """The timeout-bounded refetch (`parser.parse()` on our own fetched
+    lines) must produce the same result `RobotFileParser.read()` would --
+    this isn't just a graceful-degrade path, real Disallow rules still work.
+    """
+    fetcher = HttpFetcher()
+    robots_txt = "User-agent: *\nDisallow: /private\n"
+
+    monkeypatch.setattr(
+        urllib.request, "urlopen", lambda request, timeout: _FakeResponse(robots_txt)
+    )
+
+    assert fetcher._robots_allows("https://example.test/private/page") is False
+    assert fetcher._robots_allows("https://example.test/public/page") is True
+
+
 def test_rate_limit_sleeps_between_requests_to_same_source(monkeypatch):
     fetcher = HttpFetcher(respect_robots=False)
     sleeps: list[float] = []

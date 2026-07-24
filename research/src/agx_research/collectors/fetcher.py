@@ -76,9 +76,23 @@ class HttpFetcher:
         if parser is None:
             parser = urllib.robotparser.RobotFileParser(f"{base}/robots.txt")
             try:
-                parser.read()
+                # Not `parser.read()`: stdlib's `RobotFileParser.read()` calls
+                # `urlopen()` with no timeout at all, so a host that accepts
+                # the TCP connection but never responds (a real anti-bot
+                # behavior, distinct from a fast connection-refused) hangs
+                # this call -- and everything sequentially after it --
+                # indefinitely. Fetching it ourselves through the same
+                # timeout-bounded path every other request already uses, then
+                # feeding the raw lines to `parser.parse()`, gets the same
+                # parsed result without the unbounded wait.
+                request = urllib.request.Request(
+                    f"{base}/robots.txt", headers={"User-Agent": _USER_AGENT}
+                )
+                with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
+                    content = response.read()
+                parser.parse(content.decode("utf-8", errors="replace").splitlines())
                 self._robots_unreachable[base] = False
-            except (urllib.error.URLError, OSError):
+            except (urllib.error.URLError, OSError, TimeoutError):
                 # Unreachable robots.txt: default-allow is the standard
                 # convention; the failure is not treated as a prohibition.
                 parser.allow_all = True

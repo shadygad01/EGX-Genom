@@ -1,0 +1,68 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.positive {
+  background: var(--positive-subtle);
+  color: var(--positive);
+}
+.positive .dot {
+  background: var(--positive);
+}
+
+.negative {
+  background: var(--negative-subtle);
+  color: var(--negative);
+}
+.negative .dot {
+  background: var(--negative);
+}
+
+.warning {
+  background: var(--warning-subtle);
+  color: var(--warning);
+}
+.warning .dot {
+  background: var(--warning);
+}
+
+.accent {
+  background: var(--accent-subtle);
+  color: var(--accent-strong);
+}
+.accent .dot {
+  background: var(--accent);
+}
+
+.neutral {
+  background: var(--neutral-subtle);
+  color: var(--neutral);
+}
+.neutral .dot {
+  background: var(--neutral);
+}
+
+.default {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+.default .dot {
+  background: var(--text-tertiary);
+}

@@ -1,5 +1,111 @@
 # Changelog
 
+## 0.16.0 — Frontend: the remaining 8 sections (Opportunity Center through System Administration)
+Completes the Production User Experience mission's 9-section rollout
+(0.15.0 delivered the shell and AI Briefing). Every section composes only
+from existing dashboard artifacts, per the mission's no-frontend-
+calculation constraint.
+
+- **Opportunity Center** — recommendations ranked by confidence,
+  master/detail: ranked table + full `Explanation` breakdown (research/
+  risk summary, supporting/contradicting evidence, historical similar
+  cases, per-ticker upcoming catalysts) for the selected row.
+- **Company Research Workspace** (`/company/:ticker`) — investment
+  thesis, upcoming catalysts, knowledge timeline, research papers and
+  gene lineage (cross-referenced via knowledge object ids), financial
+  statements, corporate actions, news timeline. Market Regime & Macro
+  Exposure is an honest "not yet available" gap.
+- **Market Intelligence** — universe/sector composition, macro
+  dashboard, market-wide corporate actions. Market Breadth & Liquidity
+  and Market Regime & Historical Comparison are honest gaps — the
+  frontend must not compute returns from raw price bars itself.
+- **Research Center** — the 8-gate hypothesis pipeline (master/detail:
+  ranked list + full stage history), covering "Experiments,"
+  "Validation Queue," "Active Research," and "Discovery History" as
+  views over the same `Hypothesis.stage_history`; Knowledge Objects;
+  Scientific Papers. Review Board is an honest gap.
+- **Knowledge Graph** — interactive, searchable, pan/zoomable rendering
+  of `getKnowledgeGraph()`. New `web/src/lib/forceLayout.ts`: a small,
+  dependency-free Fruchterman-Reingold-style force simulation, chosen
+  over adding a graph-rendering library for a single page.
+- **Mission Control** — mission status, pipeline health (stage-by-
+  stage), knowledge/genome status, collectors, source health rollup,
+  current blockers, execution history. Discovery Engine detail is an
+  honest gap.
+- **Source Intelligence** — every registered source, master/detail:
+  health, lifecycle, reputation dimensions (availability, coverage,
+  freshness, latency, accuracy, schema stability) as meters, joined
+  across the source registry, source metrics, and the most recent
+  collector run.
+- **System Administration** — runtime/versions, configuration, replay
+  capability, artifact inventory, per-stage performance (slowest
+  first), execution history with error/session detail. Logs is an
+  honest gap.
+- Every page verified in a headless browser (dark theme) against real
+  artifacts from a mock-mode `agx run` or a synthetic fixture where the
+  mock pipeline currently produces no data (e.g. zero promoted
+  knowledge/recommendations).
+- 25 web tests total (was 19 after 0.15.0), all green. `npm run build`
+  (`tsc -b && vite build`) passes clean.
+
+## 0.15.0 — Frontend: design system, routed app shell, AI Briefing landing page
+Start of the Production User Experience mission: the backend, research
+engine, and production pipeline are declared complete by the project
+owner; the remaining work is the complete frontend rebuild across 9
+sections (AI Briefing, Opportunity Center, Company Research Workspace,
+Market Intelligence, Research Center, Knowledge Graph, Mission Control,
+Source Intelligence, System Administration).
+
+- New institutional dark-theme-first design token system
+  (`web/src/styles/tokens.css`) plus a shared primitive library: `Card`,
+  `Badge`, `StatTile`, `Meter`, `DataTable`, `Section`,
+  `EmptyState`/`LoadingState`/`ErrorState` — every page builds from these,
+  no bespoke per-page styling.
+- `AppShell`/`Sidebar`/`TopBar` (new): a persistent left-nav-across-9-
+  sections layout with a live system-health status strip, replacing the
+  single hardcoded knowledge table `App.tsx` previously rendered.
+- `react-router-dom` v7.18 wired for all 9 sections; 8 render as honest
+  "under construction" placeholders pending their own milestones.
+- `useArtifact` hook (new): the one seam every page uses to pull data
+  through `DashboardDataProvider` with consistent loading/error states —
+  no page calls the provider directly.
+- **AI Briefing** (landing page, fully built): System Health, Changes
+  Since Yesterday (from `ExecutionReport`'s before/after counts), Market
+  Summary, Top Opportunities, Biggest Risks, Most Important News,
+  Upcoming Catalysts, Knowledge Changes, Scientific Discoveries, and
+  Portfolio — composed entirely from existing dashboard artifacts with no
+  frontend-side calculation, per the mission's explicit constraint.
+- Fixed a real test-infra gap found while rewriting `App.test.tsx`:
+  `@testing-library/react`'s `cleanup()` was never registered as a global
+  `afterEach`, so previous tests' rendered DOM silently accumulated across
+  tests in the same file — invisible before because no two tests' fixtures
+  ever shared literal text. Fixed in `web/test/setup.ts`.
+- 18 web tests green (was 5); `tsc --noEmit` and `vite build` both clean.
+
+## 0.14.0 — Backend: dashboard artifacts for genes, papers, hypotheses, knowledge graph, financial statements, source reputation
+Thin `model_dump(mode="json")` exports (no new calculations) for six
+domain models that already existed but had no dashboard artifact:
+`genes.json`, `papers.json`, `hypotheses.json`, `knowledge_graph.json`,
+`financial_statements.json`, `source_metrics.json`. Wired into
+`production/pipeline.py`'s dashboard-artifact stage and
+`dashboard/validate.py` (optional — absent is not a failure).
+
+- Fixed a real pre-existing bug while wiring the knowledge graph export:
+  `ProductionPipeline._stage_research_pipeline` never passed a persisted
+  `KnowledgeGraph` into `DailyResearchPipeline`, so graph edges were
+  computed every run but silently discarded, never reaching
+  `knowledge_graph.json`. Fixed by pointing it at `<data-dir>/graph_nodes.json`
+  / `graph_edges.json`, matching how `hypothesis_repository`/
+  `paper_repository`/`genome` are already wired.
+- Extended both `StaticJsonProvider` and `ApiProvider` (`web/`/`api/`) with
+  12 new `DashboardDataProvider` methods, and closed a pre-existing parity
+  gap: the 6 "bonus" production-pipeline artifacts from the prior mission
+  (`investment_cases`, `collector_status`, `runtime_status`,
+  `dashboard_metrics`, `mission_status`, `execution_report`) were only ever
+  wired into `StaticJsonProvider`, never into `api/`'s `ArtifactsReader` or
+  routes — both providers now serve the full 18-method interface.
+- 487 Python tests total, all green; `ruff` clean.
+
 ## 0.13.2 — Production-readiness audit for merge into main
 Full audit before merging this branch into `main`: all tests green (477
 Python / 14 API / 19 web), `ruff` clean, `contracts/` drift-free, no merge

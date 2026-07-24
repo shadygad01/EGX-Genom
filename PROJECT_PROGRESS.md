@@ -28,14 +28,55 @@ the "where are we."
 | 18 | Production Infrastructure | PARTIAL (business-blocked remainder) |
 
 **17 of 18 fully DONE; the 18th is DONE for everything engineering can
-close without a cloud/vendor/secrets decision from the user.**
+close without a cloud/vendor/secrets decision from the user.** Backend
+work is paused, not abandoned, during the current frontend mission below.
+
+## Current mission: Production User Experience (frontend rebuild) — all 9 sections complete
+
+See `CURRENT_MISSION.md`/`NEXT_MISSIONS.md` for full detail. Delivered:
+
+- **Frontend audit** — read the entire repo, all architecture/Mission
+  Control docs, the prior single-table `web/App.tsx`, the production
+  pipeline, and every JSON artifact, before writing any code.
+- **Backend: 6 new dashboard artifacts** — `genes.json`, `papers.json`,
+  `hypotheses.json`, `knowledge_graph.json`, `financial_statements.json`,
+  `source_metrics.json`, all thin `model_dump(mode="json")` exports.
+  Fixed a real pre-existing bug: `KnowledgeGraph` edges were computed
+  every pipeline run but never persisted (no path wired to the
+  constructor) — now written to `<data-dir>/graph_nodes.json`/
+  `graph_edges.json`. Closed a pre-existing `api/`/`StaticJsonProvider`
+  parity gap for 6 earlier "bonus" artifacts.
+- **Design system + routed app shell** — dark-theme-first design tokens,
+  a shared primitive library (`Card`, `Badge`, `StatTile`, `Meter`,
+  `DataTable`, `Section`, `EmptyState`/`LoadingState`/`ErrorState`), a
+  persistent `Sidebar`/`TopBar` `AppShell`, `react-router-dom` routes for
+  all 9 sections, and a `useArtifact` hook as the one data-fetching seam.
+- **All 9 sections built**: AI Briefing (landing page), Opportunity
+  Center, Company Research Workspace, Market Intelligence, Research
+  Center, Knowledge Graph (custom dependency-free force layout, see
+  `web/src/lib/forceLayout.ts`), Mission Control, Source Intelligence,
+  System Administration. Every page composes only from existing
+  artifacts — zero frontend-side calculation. A handful of sub-sections
+  are honest "not yet available" gaps (market regime, breadth/liquidity,
+  review board history, discovery engine detail, raw logs) rather than
+  fabricated content.
+- Every page verified in a headless browser (dark theme; light theme too
+  for AI Briefing) against either real artifacts from a mock-mode
+  `agx run` or a synthetic fixture where the mock pipeline currently
+  produces no data.
+- 25 web tests green (was 5) — includes a fix for `@testing-library/react`
+  never having `cleanup()` registered as a global `afterEach`.
 
 ## Test health
 
-- Python: 477 tests, all green (`cd research && uv run pytest`).
-- TypeScript: 33 tests, all green (`npm test -w api`, `npm test -w web`).
+- Python: 487 tests, all green (`cd research && uv run pytest`).
+- TypeScript: 25 web tests green (`npm test -w web`); `api/` unchanged
+  this mission (14 tests). `npm run build -w web` (`tsc -b && vite build`)
+  passes clean.
 - `contracts/` drift check: clean (`uv run python scripts/export_schemas.py`
-  + `git diff --exit-code`).
+  + `git diff --exit-code`) — the 6 new dashboard artifacts are
+  intentionally uncontracted "bonus" artifacts, following the existing
+  `investment_cases.json` precedent.
 - Lint: `uv run ruff check` clean.
 
 ## Merge readiness

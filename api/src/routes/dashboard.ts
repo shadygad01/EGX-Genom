@@ -15,4 +15,17 @@ export async function dashboardRoutes(
   app.get("/market-state", async () => artifacts.marketState());
   app.get("/system-status", async () => artifacts.systemStatus());
   app.get("/source-registry", async () => artifacts.sourceRegistry());
+
+  app.get("/investment-cases", async () => artifacts.investmentCases());
+  app.get("/collector-status", async () => artifacts.collectorStatus());
+  app.get("/runtime-status", async () => artifacts.runtimeStatus());
+  app.get("/dashboard-metrics", async () => artifacts.dashboardMetrics());
+  app.get("/mission-status", async () => artifacts.missionStatus());
+  app.get("/execution-report", async () => artifacts.executionReport());
+  app.get("/genes", async () => artifacts.genes());
+  app.get("/papers", async () => artifacts.papers());
+  app.get("/hypotheses", async () => artifacts.hypotheses());
+  app.get("/knowledge-graph", async () => artifacts.knowledgeGraph());
+  app.get("/financial-statements", async () => artifacts.financialStatements());
+  app.get("/source-metrics", async () => artifacts.sourceMetrics());
 }

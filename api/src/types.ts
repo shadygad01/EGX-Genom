@@ -290,6 +290,294 @@ export interface RateLimit {
   min_seconds_between_requests: number;
 }
 
+// --- investment_cases.json ---
+
+export interface PortfolioPosition {
+  ticker: string;
+  weight: number;
+  score: number;
+  expected_return: number;
+  expected_risk: number;
+  confidence: number;
+  supporting_knowledge_ids: string[];
+}
+
+export interface PortfolioRecommendation {
+  id: string;
+  version: number;
+  as_of: string;
+  positions: PortfolioPosition[];
+  cash_weight: number;
+  explanation: Explanation;
+  provenance: Provenance;
+}
+
+export interface InvestmentCases {
+  as_of: string | null;
+  recommendations: Recommendation[];
+  portfolio: PortfolioRecommendation | null;
+}
+
+// --- collector_status.json ---
+
+export interface CollectorStatusRow {
+  source_id: string;
+  documents_fetched: number;
+  batches_materialized: number;
+  batches_withheld: number;
+  price_bars_written: number;
+  macro_observations_written: number;
+  news_items_written: number;
+  corporate_events_written: number;
+  index_constituents_written: number;
+  financial_statement_line_items_written: number;
+  events_registered: number;
+  lifecycle_state: LifecycleState | null;
+  health_status: HealthStatus | null;
+  reputation_score: number | null;
+  data_quality_score: number | null;
+}
+
+// --- runtime_status.json (same shape as one RunRecord) ---
+export type RuntimeStatus = RunRecord;
+
+// --- dashboard_metrics.json ---
+
+export interface DashboardMetrics {
+  generated_at: string;
+  dashboard_dir: string;
+  artifacts: Record<string, number>;
+  total_artifacts: number;
+}
+
+// --- mission_status.json ---
+
+export interface MissionStatus {
+  generated_at: string;
+  pipeline_status: StageStatus;
+  pipeline_version: string;
+  last_successful_pipeline_id: string | null;
+  last_successful_pipeline_at: string | null;
+  last_failed_pipeline_id: string | null;
+  last_failed_pipeline_at: string | null;
+  current_execution_mode: string;
+  execution_duration_seconds: number;
+  artifacts_produced: Record<string, number>;
+  knowledge_updated: number;
+  genome_updated: number;
+  total_executions: number;
+}
+
+// --- execution_report.json ---
+
+export type StageName =
+  | "entrypoint"
+  | "source_registry"
+  | "discovery_engine"
+  | "collector_selection"
+  | "collector_execution"
+  | "raw_archive"
+  | "canonical_transformation"
+  | "validation"
+  | "event_platform"
+  | "market_memory"
+  | "knowledge_base"
+  | "research_pipeline"
+  | "genome"
+  | "investment_case_generator"
+  | "dashboard_artifact_generator"
+  | "mission_control_update"
+  | "execution_report";
+
+export type StageStatus = "succeeded" | "partial" | "failed" | "skipped";
+
+export interface StageResult {
+  name: StageName;
+  status: StageStatus;
+  started_at: string;
+  completed_at: string;
+  duration_seconds: number;
+  detail: string;
+  error: string | null;
+  warnings: string[];
+}
+
+export interface ExecutionReport {
+  id: string;
+  version: number;
+  pipeline_version: string;
+  execution_mode: string;
+  run_dates: string[];
+  started_at: string;
+  completed_at: string;
+  duration_seconds: number;
+  overall_status: StageStatus;
+  stages: StageResult[];
+  artifacts_generated: Record<string, number>;
+  errors: string[];
+  warnings: string[];
+  skipped_stages: string[];
+  knowledge_before: number;
+  knowledge_after: number;
+  genome_before: number;
+  genome_after: number;
+  events_before: number;
+  events_after: number;
+}
+
+// --- genes.json / Gene ---
+
+export type GeneStatus = "promoted" | "monitoring" | "replaced" | "retired";
+
+export interface Gene {
+  id: string;
+  version: number;
+  knowledge_id: string;
+  generation: number;
+  parent_gene_ids: string[];
+  child_gene_ids: string[];
+  mutation_notes: string;
+  evidence: string[];
+  performance_history: PerformanceRecord[];
+  status: GeneStatus;
+  retired_at: string | null;
+  retirement_reason: string | null;
+  provenance: Provenance;
+}
+
+// --- papers.json / ResearchPaper ---
+
+export interface ResearchPaper {
+  id: string;
+  version: number;
+  title: string;
+  gene_id: string;
+  knowledge_id: string;
+  hypothesis_id: string;
+  problem: string;
+  observation: string;
+  methodology: string;
+  dataset: string;
+  experiments: string;
+  evidence: string;
+  results: string;
+  limitations: string;
+  conclusion: string;
+  future_work: string;
+  published_at: string;
+  provenance: Provenance;
+}
+
+// --- hypotheses.json / Hypothesis ---
+
+export interface GateSpec {
+  name: string;
+  order: number;
+}
+
+export interface HypothesisStageResult {
+  stage_name: string;
+  passed: boolean;
+  evaluated_at: string;
+  notes: string;
+  metrics: Record<string, number>;
+}
+
+export interface Hypothesis {
+  id: string;
+  version: number;
+  statement: string;
+  created_by: string;
+  created_at: string;
+  horizon: Horizon;
+  affected_assets: string[];
+  provenance: Provenance;
+  pipeline: GateSpec[];
+  stage_index: number;
+  stage_history: HypothesisStageResult[];
+}
+
+// --- knowledge_graph.json ---
+
+export type NodeType =
+  | "company"
+  | "sector"
+  | "market"
+  | "event"
+  | "hypothesis"
+  | "experiment"
+  | "feature"
+  | "gene"
+  | "research_paper"
+  | "prediction"
+  | "recommendation"
+  | "knowledge"
+  | "dataset_snapshot"
+  | "research_finding"
+  | "macro_series";
+
+export interface GraphNode {
+  id: string;
+  version: number;
+  node_type: NodeType;
+  label: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface GraphEdge {
+  id: string;
+  version: number;
+  source_id: string;
+  source_type: NodeType;
+  target_id: string;
+  target_type: NodeType;
+  relationship: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface KnowledgeGraphData {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
+// --- financial_statements.json / FinancialStatementLineItem ---
+
+export interface FinancialStatementLineItem {
+  ticker: string;
+  period_end_date: string;
+  period_type: string;
+  statement_type: string;
+  line_item: string;
+  value: number;
+  currency: string;
+}
+
+// --- source_metrics.json ---
+
+export interface ReputationScore {
+  availability: number | null;
+  accuracy: number | null;
+  freshness: number | null;
+  coverage: number | null;
+  latency: number | null;
+  correction_rate: number | null;
+  duplicate_rate: number | null;
+  schema_stability: number | null;
+  historical_usefulness: number | null;
+  composite: number | null;
+  observations: number;
+}
+
+export interface SourceMetricsRow {
+  source_id: string;
+  name: string;
+  category: SourceCategory;
+  runs_total: number;
+  first_run_at: string | null;
+  last_run_at: string | null;
+  reputation: ReputationScore | null;
+}
+
 export interface SourceSpec {
   id: string;
   version: number;

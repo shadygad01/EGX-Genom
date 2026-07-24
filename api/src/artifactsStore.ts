@@ -51,4 +51,56 @@ export class ArtifactsReader {
   sourceRegistry<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("source_registry.json"), []);
   }
+
+  // The following are only produced by the full production pipeline
+  // (`agx run`), not `export-dashboard` alone -- absent means an honest
+  // empty/null value, exactly like the five above when nothing has run yet.
+
+  investmentCases<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("investment_cases.json"), null);
+  }
+
+  collectorStatus<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("collector_status.json"), []);
+  }
+
+  runtimeStatus<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("runtime_status.json"), null);
+  }
+
+  dashboardMetrics<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("dashboard_metrics.json"), null);
+  }
+
+  missionStatus<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("mission_status.json"), null);
+  }
+
+  executionReport<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("execution_report.json"), null);
+  }
+
+  genes<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("genes.json"), []);
+  }
+
+  papers<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("papers.json"), []);
+  }
+
+  hypotheses<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("hypotheses.json"), []);
+  }
+
+  knowledgeGraph<T = unknown>(): Promise<T> {
+    return readJsonOrDefault<T>(this.path("knowledge_graph.json"), { nodes: [], edges: [] } as T);
+  }
+
+  financialStatements<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("financial_statements.json"), []);
+  }
+
+  sourceMetrics<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("source_metrics.json"), []);
+  }
 }

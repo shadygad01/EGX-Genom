@@ -64,6 +64,7 @@ from agx_research.domain.identifiers import new_id
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
 from agx_research.genome.service import AlphaGenome
+from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
@@ -442,6 +443,9 @@ class ProductionPipeline:
             knowledge_store=self.knowledge_store,
             genome=self.genome,
             paper_repository=PaperRepository(self.data_dir / "papers.json"),
+            graph=KnowledgeGraph(
+                self.data_dir / "graph_nodes.json", self.data_dir / "graph_edges.json"
+            ),
         )
         runtime_engine = RuntimeEngine(
             daily_pipeline, run_records=RunRecordRepository(self.data_dir / "runs.json")
@@ -549,6 +553,46 @@ class ProductionPipeline:
             json.dumps(runtime_status, indent=2, sort_keys=True) + "\n"
         )
         counts["runtime_status.json"] = 1 if runtime_status else 0
+
+        genes = production_artifacts.export_genes(self.genome) if self.genome else []
+        (dashboard_out / "genes.json").write_text(json.dumps(genes, indent=2, sort_keys=True) + "\n")
+        counts["genes.json"] = len(genes)
+
+        papers = production_artifacts.export_papers(PaperRepository(self.data_dir / "papers.json"))
+        (dashboard_out / "papers.json").write_text(json.dumps(papers, indent=2, sort_keys=True) + "\n")
+        counts["papers.json"] = len(papers)
+
+        hypotheses = production_artifacts.export_hypotheses(
+            HypothesisRepository(self.data_dir / "hypotheses.json")
+        )
+        (dashboard_out / "hypotheses.json").write_text(
+            json.dumps(hypotheses, indent=2, sort_keys=True) + "\n"
+        )
+        counts["hypotheses.json"] = len(hypotheses)
+
+        knowledge_graph = production_artifacts.export_knowledge_graph(
+            KnowledgeGraph(self.data_dir / "graph_nodes.json", self.data_dir / "graph_edges.json")
+        )
+        (dashboard_out / "knowledge_graph.json").write_text(
+            json.dumps(knowledge_graph, indent=2, sort_keys=True) + "\n"
+        )
+        counts["knowledge_graph.json"] = len(knowledge_graph["nodes"])
+
+        financial_statements = production_artifacts.export_financial_statements(
+            self.data_dir, self.tickers, as_of
+        )
+        (dashboard_out / "financial_statements.json").write_text(
+            json.dumps(financial_statements, indent=2, sort_keys=True) + "\n"
+        )
+        counts["financial_statements.json"] = len(financial_statements)
+
+        source_metrics = production_artifacts.export_source_metrics(
+            self.registry, SourceMetricsRepository(self.data_dir / "source_metrics.json")
+        )
+        (dashboard_out / "source_metrics.json").write_text(
+            json.dumps(source_metrics, indent=2, sort_keys=True) + "\n"
+        )
+        counts["source_metrics.json"] = len(source_metrics)
 
         dashboard_metrics = production_artifacts.export_dashboard_metrics(dashboard_out, counts)
         (dashboard_out / "dashboard_metrics.json").write_text(

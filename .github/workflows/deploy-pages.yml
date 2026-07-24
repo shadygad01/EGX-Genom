@@ -79,6 +79,38 @@ jobs:
               discover-sources --target "$t" || true
           done
 
+      - name: Raw probe of the exact domain hints (diagnosing "no reachable domain")
+        run: |
+          uv run python -c "
+          from agx_research.collectors.fetcher import HttpFetcher, FetchDisallowed, FetchError
+          from agx_research.sources.spec import (
+              AccessMethod, RateLimit, RetryPolicy, SourceCategory, SourceSpec, SourceStatus,
+          )
+          spec = SourceSpec(
+              id='probe_diag', name='probe', category=SourceCategory.RESEARCH,
+              access_method=AccessMethod.HTML_SCRAPE, status=SourceStatus.IMPLEMENTED,
+              reliability_score=0.0, freshness_score=0.0,
+              retry_policy=RetryPolicy(max_attempts=1, backoff_seconds=0.5),
+              rate_limit=RateLimit(requests_per_minute=20, min_seconds_between_requests=1.0),
+          )
+          fetcher = HttpFetcher()
+          for url in [
+              'https://egx.com.eg', 'https://www.egx.com.eg',
+              'https://enterprise.press', 'https://www.enterprise.press',
+              'https://mubasher.info', 'https://www.mubasher.info',
+              'https://cbe.org.eg', 'https://zawya.com',
+          ]:
+              try:
+                  text = fetcher.fetch_text(url, spec)
+                  print(f'{url}: OK, {len(text)} chars, starts: {text[:120]!r}')
+              except FetchDisallowed as exc:
+                  print(f'{url}: ROBOTS_DISALLOWED: {exc}')
+              except FetchError as exc:
+                  print(f'{url}: FETCH_ERROR: {exc}')
+              except Exception as exc:
+                  print(f'{url}: {type(exc).__name__}: {exc}')
+          "
+
       - name: Show per-collector live results
         run: |
           uv run python -c "

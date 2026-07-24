@@ -577,3 +577,66 @@ platform runs somewhere with real outbound egress (a System-18 deployment
 decision) or the project owner supplies the two named business inputs
 (a verified EGX30/EGX70 constituent list; a licensed EGX vendor
 selection) — see `MISSION_CONTROL.md` and `CURRENT_MISSION.md`.
+
+## Egyptian Live Data Sprint + Acquisition Strategy phases (post-above, within System 02's scope)
+
+**Superseding the "no egress" framing above**: the GitHub Pages deployment
+target (`.github/workflows/deploy-pages.yml`, real GitHub Actions egress —
+a different environment from the coding sandbox the section above
+describes) has since run the production pipeline live multiple times.
+Three phases followed, in order:
+
+1. **Egyptian Live Data Sprint**: `--mode live` became the pipeline's real
+   default (was mock-only); fixed a genuine health-engine bug (a collector
+   that downloaded data but produced zero parsed/knowledge/event records
+   was previously reported `HEALTHY` — now correctly `DEGRADED`/`FAILED`
+   with an explicit reason and connection/parse/yield/knowledge/event
+   metrics surfaced in Mission Control) and a second bug where a
+   fetch-level exception bypassed health/metrics bookkeeping entirely.
+   Live evidence: World Bank collects real data (66 Egypt CPI inflation
+   observations); Stooq/FRED reachable but blocked
+   (Cloudflare-style JS challenge / evidenced separately); the five named
+   Egyptian sources (EGX, CBE, Enterprise, Mubasher, Zawya) each fail with
+   a distinct, evidenced, source-side reason.
+2. **Acquisition Strategy analysis** (`docs/ACQUISITION_STRATEGY.md`):
+   given that evidence, determined the acquisition *strategy* itself
+   (not the platform) had one identified flaw — "homepage = data source"
+   is the correct default only for per-company Investor Relations, not
+   for hardened public sites (exchanges, central banks, WAF-protected news
+   portals), where a documented API/feed/bulk-download contract should be
+   sought first (the World Bank precedent). Closed the concrete gap this
+   surfaced: `AcquisitionIntelligenceEngine.run_for_target()` now falls
+   back to the sitemaps.org protocol (robots.txt's `Sitemap:` directive,
+   then `/sitemap.xml`, following a sitemap-index one level) when a
+   homepage's own markup has nothing discoverable — the exact Zawya-class
+   gap, and `docs/TECHNICAL_DEBT.md` TD-18's sitemap-index half.
+3. **Capability-driven acquisition engine** (this phase): turned that
+   analysis into runtime logic. `acquisition_intelligence.capability`
+   defines 13 independent `Capability` values (Price Data, Corporate
+   Disclosures, Corporate Actions, Financial Statements, Investor
+   Relations, News, Macroeconomic, Market Breadth, Trading Calendar,
+   Index Constituents, Sector Membership, Economic Releases, Research
+   Papers) each mapped to a declared, ranked pool of catalogued
+   `SourceSpec` ids — a capability, not a website, is now the primary
+   object. `acquisition_intelligence.capability_engine` ranks every
+   candidate using registry state + measured reputation
+   (`rank_capability_strategies`) and `CapabilityDecisionEngine` executes
+   the best collectable one, falling through automatically to the next on
+   failure or zero yield (Macroeconomic runs every ready strategy, since
+   World Bank's Egypt CPI and FRED's global series are complementary, not
+   redundant). Wired into `production/pipeline.py`'s LIVE-mode Collector
+   Selection/Execution stages, reusing the exact same `CollectionService`,
+   `SourceRegistry`, and reputation engine every mode already used — a
+   live-fixture run reproduces every existing collection-result assertion
+   unchanged for the sources already solved (stooq/fred/worldbank), while
+   every other capability now honestly reports which strategies were
+   ranked and why each was skipped, rather than being silently absent from
+   LIVE mode. Every decision is persisted as a new `acquisition_decisions.json`
+   Mission Control artifact and rendered in the web dashboard's Mission
+   Control page, replacing a previous "not yet available" placeholder. See
+   `docs/ACQUISITION_STRATEGY.md`'s "Runtime Implementation" and
+   "Collector Classification" sections for full detail. 510 backend tests
+   pass (34 new this phase); `ruff check` clean; `web`/`api` typecheck and
+   build clean. No architecture, pipeline stage sequence, or existing
+   collector was redesigned or removed — this phase is additive per its
+   own mission constraints.

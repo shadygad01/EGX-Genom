@@ -41,6 +41,12 @@ import json
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from agx_research.acquisition_intelligence.capability import Capability
+from agx_research.acquisition_intelligence.capability_engine import (
+    CapabilityDecision,
+    CapabilityDecisionEngine,
+    rank_capability_strategies,
+)
 from agx_research.acquisition_intelligence.continuity import AcquisitionContinuityMonitor
 from agx_research.acquisition_intelligence.engine import AcquisitionIntelligenceEngine
 from agx_research.acquisition_intelligence.live import (
@@ -81,6 +87,7 @@ from agx_research.production.collector_plan import (
     LIVE_MACRO_SERIES_IDS,
     ExecutionMode,
     build_collector_plan,
+    build_live_collector,
     unavailable_sources,
 )
 from agx_research.production.mission_control import build_mission_control_status
@@ -149,6 +156,11 @@ class ProductionPipeline:
         self.mode: ExecutionMode = ExecutionMode.LIVE
         self._unavailable: dict[str, str] = {}
         self.collector_failures: dict[str, str] = {}
+        self.metrics: SourceMetricsRepository | None = None
+        # Capability-driven acquisition (LIVE mode only): one decision per
+        # `Capability`, recording every strategy considered -- see
+        # `acquisition_intelligence.capability_engine`.
+        self.capability_decisions: list[CapabilityDecision] = []
 
     # ---- the public entrypoint ----------------------------------------
 
@@ -299,6 +311,7 @@ class ProductionPipeline:
 
     def _stage_source_registry(self):
         self.registry = seed_registry(SourceRegistry(self.data_dir / "source_registry.json"))
+        self.metrics = SourceMetricsRepository(self.data_dir / "source_metrics.json")
         return (
             StageStatus.SUCCEEDED,
             f"{len(self.registry.all_latest())} source(s) catalogued; "
@@ -361,6 +374,30 @@ class ProductionPipeline:
         if self.registry is None:
             return StageStatus.SKIPPED, "No registry available.", []
         self.raw_documents = RawDocumentRepository(self.data_dir / "raw_documents.json")
+
+        if mode == ExecutionMode.LIVE:
+            # Capability-driven selection (mission: acquisition strategy is
+            # ranked per capability, never a fixed per-website list). Actual
+            # collector construction is deferred to Collector Execution,
+            # since a capability's next-ranked strategy is only built if a
+            # higher-ranked one fails or yields nothing -- this stage only
+            # ranks, it never fetches.
+            self._planned = []
+            self._capability_rankings = {
+                capability: rank_capability_strategies(capability, self.registry, self.metrics)
+                for capability in Capability
+            }
+            ready_total = sum(
+                1 for scores in self._capability_rankings.values() for s in scores if s.ready
+            )
+            candidate_total = sum(len(scores) for scores in self._capability_rankings.values())
+            return (
+                StageStatus.SUCCEEDED,
+                f"Ranked {candidate_total} candidate strategy(ies) across "
+                f"{len(self._capability_rankings)} capability(ies); {ready_total} collectable now.",
+                [],
+            )
+
         self._planned = build_collector_plan(
             self.registry, mode=mode, raw_documents=self.raw_documents, tickers=self.tickers,
         )
@@ -383,6 +420,9 @@ class ProductionPipeline:
         )
 
     def _stage_collector_execution(self):
+        if self.mode == ExecutionMode.LIVE:
+            return self._stage_collector_execution_capability_driven()
+
         planned = getattr(self, "_planned", None)
         if not planned:
             return StageStatus.SKIPPED, "No collectors selected.", []
@@ -393,26 +433,22 @@ class ProductionPipeline:
             raw_documents=self.raw_documents,
             event_platform=self.event_platform,
             provenance_index=ProvenanceIndexRepository(self.data_dir / "provenance_index.json"),
-            metrics=SourceMetricsRepository(self.data_dir / "source_metrics.json"),
+            metrics=self.metrics or SourceMetricsRepository(self.data_dir / "source_metrics.json"),
             health_monitor=HealthMonitor(HealthAlertRepository(self.data_dir / "health_alerts.json")),
             registry=self.registry,
             min_confidence=0.5,
         )
 
-        expected_records = EXPECTED_RECORDS_LIVE if self.mode == ExecutionMode.LIVE else EXPECTED_RECORDS
-
         failures: list[str] = []
         for plan in planned:
             try:
                 result = service.run(
-                    plan.collector, expected_records=expected_records.get(plan.source_id, 1)
+                    plan.collector, expected_records=EXPECTED_RECORDS.get(plan.source_id, 1)
                 )
                 self.collection_results[plan.source_id] = result
             except Exception as exc:
-                # The exact reason -- exception type + message (an HTTP/URL
-                # error from `HttpFetcher` in LIVE mode carries the real
-                # status/timeout detail) -- never abort the remaining
-                # collectors for one source's failure.
+                # The exact reason -- exception type + message -- never
+                # abort the remaining collectors for one source's failure.
                 reason = f"{type(exc).__name__}: {exc}"
                 failures.append(f"{plan.source_id}: {reason}")
                 self.collector_failures[plan.source_id] = reason
@@ -428,6 +464,65 @@ class ProductionPipeline:
                 failures,
             )
         return StageStatus.SUCCEEDED, f"{succeeded}/{total} collector(s) succeeded.", []
+
+    def _stage_collector_execution_capability_driven(self):
+        """LIVE mode's Collector Execution: capability-driven, not a fixed
+        per-website list. For every `Capability`, `CapabilityDecisionEngine`
+        ranks catalogued strategies and executes the best collectable one,
+        automatically falling through to the next on failure or zero yield
+        (mission Phase 4) -- reusing the exact same `CollectionService`
+        every mode has always used, so raw archive/canonical transformation/
+        validation/health/reputation bookkeeping is unchanged.
+        """
+        if self.registry is None:
+            return StageStatus.SKIPPED, "No registry available.", []
+
+        self.event_platform = EventPlatform(repository=EventRepository(self.data_dir / "events.json"))
+        service = CollectionService(
+            self.data_dir,
+            raw_documents=self.raw_documents,
+            event_platform=self.event_platform,
+            provenance_index=ProvenanceIndexRepository(self.data_dir / "provenance_index.json"),
+            metrics=self.metrics or SourceMetricsRepository(self.data_dir / "source_metrics.json"),
+            health_monitor=HealthMonitor(HealthAlertRepository(self.data_dir / "health_alerts.json")),
+            registry=self.registry,
+            min_confidence=0.5,
+        )
+        fetcher = HttpFetcher()
+
+        def factory(source_id: str, spec):
+            return build_live_collector(source_id, spec, fetcher=fetcher, tickers=self.tickers)
+
+        engine = CapabilityDecisionEngine(self.registry, factory, metrics=self.metrics)
+
+        self.capability_decisions = []
+        failures: list[str] = []
+        for capability in Capability:
+            decision, results, capability_failures = engine.decide_and_execute(
+                capability, service, expected_records=EXPECTED_RECORDS_LIVE,
+            )
+            self.capability_decisions.append(decision)
+            self.collection_results.update(results)
+            self.collector_failures.update(capability_failures)
+            for source_id, reason in capability_failures.items():
+                failures.append(f"{source_id}: {reason}")
+
+        attempted_ids = set(self.collection_results) | set(self.collector_failures)
+        self._unavailable = unavailable_sources(self.registry, attempted_ids)
+
+        succeeded = len(self.collection_results)
+        attempted = succeeded + len(self.collector_failures)
+        if attempted == 0:
+            return (
+                StageStatus.SKIPPED,
+                "No capability had a collectable strategy ready to attempt this run.",
+                [],
+            )
+        if succeeded == 0:
+            return StageStatus.FAILED, f"All {attempted} attempted collector(s) failed.", failures
+        if failures:
+            return StageStatus.PARTIAL, f"{succeeded}/{attempted} collector(s) succeeded.", failures
+        return StageStatus.SUCCEEDED, f"{succeeded}/{attempted} collector(s) succeeded.", []
 
     def _stage_raw_archive(self):
         if self.raw_documents is None:
@@ -674,8 +769,16 @@ class ProductionPipeline:
         )
         counts["financial_statements.json"] = len(financial_statements)
 
+        acquisition_decisions = production_artifacts.export_acquisition_decisions(
+            self.capability_decisions
+        )
+        (dashboard_out / "acquisition_decisions.json").write_text(
+            json.dumps(acquisition_decisions, indent=2, sort_keys=True) + "\n"
+        )
+        counts["acquisition_decisions.json"] = len(acquisition_decisions)
+
         source_metrics = production_artifacts.export_source_metrics(
-            self.registry, SourceMetricsRepository(self.data_dir / "source_metrics.json")
+            self.registry, self.metrics or SourceMetricsRepository(self.data_dir / "source_metrics.json")
         )
         (dashboard_out / "source_metrics.json").write_text(
             json.dumps(source_metrics, indent=2, sort_keys=True) + "\n"

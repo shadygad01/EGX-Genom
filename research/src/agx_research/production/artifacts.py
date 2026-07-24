@@ -13,7 +13,8 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-from agx_research.collectors.service import CollectionRunResult
+from agx_research.acquisition_intelligence.capability_engine import CapabilityDecision
+from agx_research.collectors.service import CollectionRunResult, collection_yield
 from agx_research.events.service import EventPlatform
 from agx_research.financials.collected import CollectedFinancialStatementProvider
 from agx_research.genome.service import AlphaGenome
@@ -68,11 +69,7 @@ def _collector_status_row(
     result: CollectionRunResult | None = None,
 ) -> dict[str, Any]:
     spec = registry.latest(source_id)
-    yield_count = (
-        result.price_bars_written + result.macro_observations_written
-        + result.news_items_written + result.corporate_events_written
-        + result.index_constituents_written + result.financial_statement_line_items_written
-    ) if result else 0
+    yield_count = collection_yield(result) if result else 0
     return {
         "source_id": source_id,
         "status": status,
@@ -137,11 +134,7 @@ def export_collector_status(
     """
     rows = []
     for source_id, result in results.items():
-        yield_count = (
-            result.price_bars_written + result.macro_observations_written
-            + result.news_items_written + result.corporate_events_written
-            + result.index_constituents_written + result.financial_statement_line_items_written
-        )
+        yield_count = collection_yield(result)
         if yield_count > 0:
             status, reason = "COLLECTED", None
         else:
@@ -228,6 +221,16 @@ def export_financial_statements(
             for item in provider.get_line_items(ticker, _EARLIEST_POSSIBLE_FILING_DATE, as_of)
         )
     return items
+
+
+def export_acquisition_decisions(decisions: list[CapabilityDecision]) -> list[dict[str, Any]]:
+    """Every capability's full acquisition decision this run -- which
+    strategies were ranked, which were attempted, and why the winner (if
+    any) was selected. This is what makes the capability-driven Acquisition
+    Decision Engine's choices explainable in Mission Control, not just its
+    bottom-line collection results (`collector_status.json`).
+    """
+    return [d.model_dump(mode="json") for d in decisions]
 
 
 def export_source_metrics(

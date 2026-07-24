@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from agx_research.acquisition_intelligence.capability_engine import CapabilityDecision
 from agx_research.dashboard.schemas import DashboardSystemStatus
 from agx_research.events.event import Event
 from agx_research.financials.schema import FinancialStatementLineItem
@@ -135,6 +136,9 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
     )
     _validate_optional_knowledge_graph(directory, counts)
     _validate_optional_source_metrics(directory, counts)
+    _validate_optional_model_list(
+        directory, "acquisition_decisions.json", CapabilityDecision, counts
+    )
 
     return counts
 

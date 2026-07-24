@@ -254,6 +254,29 @@ def _mock_url_map(spec_by_id: dict[str, SourceSpec]) -> dict[str, str]:
     return content_by_url
 
 
+def build_live_collector(
+    source_id: str, spec: SourceSpec, *, fetcher: HttpFetcher, tickers: list[str]
+) -> Collector | None:
+    """The one place that knows how to construct a real, network-backed
+    `Collector` for a given source id in LIVE mode -- reused by both the
+    flat collector plan below and the capability-driven decision engine
+    (`acquisition_intelligence.capability_engine.CapabilityDecisionEngine`,
+    injected as its `collector_factory`), so there is exactly one live-
+    wiring definition per source, not two. Returns `None` for any source id
+    this deployment has no live wiring for yet -- never a guess.
+    """
+    if source_id == "stooq":
+        symbols = {t: f"{t.lower()}{LIVE_STOOQ_TICKER_SUFFIX}" for t in tickers}
+        return StooqPriceCollector(spec, symbols=symbols, fetcher=fetcher)
+    if source_id == "fred":
+        return FredCsvCollector(spec, series_ids=list(LIVE_FRED_SERIES_IDS), fetcher=fetcher)
+    if source_id == "worldbank":
+        return WorldBankCollector(spec, indicators=dict(LIVE_WORLDBANK_INDICATORS), fetcher=fetcher)
+    # rss_generic and every other source deliberately excluded: no real,
+    # verified feed URL/config exists yet (see `unavailable_sources`).
+    return None
+
+
 def build_collector_plan(
     registry: SourceRegistry,
     *,
@@ -268,6 +291,16 @@ def build_collector_plan(
     source. Sources this pipeline has no wiring for (e.g. `global_benchmarks`,
     whose `collector` field names two classes jointly) are left to a future,
     explicit collector plan entry rather than guessed at.
+
+    LIVE mode only builds the fixed three (stooq/fred/worldbank) this
+    function has always built; the production pipeline's own LIVE-mode
+    collector *execution* stage no longer calls this function at all --
+    it uses the capability-driven `CapabilityDecisionEngine` instead (see
+    `production/pipeline.py`), which ranks every catalogued strategy per
+    capability rather than a fixed website list. This function stays,
+    unchanged in behavior, for MOCK/REPLAY (testing-only, deterministic
+    fixtures) and as `build_live_collector`'s original callers may still
+    reference it directly.
     """
     wireable = {"stooq", "fred", "rss_generic", "worldbank"}
     collectable = {s.id: s for s in registry.collectable() if s.id in wireable}
@@ -276,35 +309,12 @@ def build_collector_plan(
     plans: list[PlannedCollector] = []
     if mode == ExecutionMode.LIVE:
         fetcher = HttpFetcher()
-        if "stooq" in collectable:
-            symbols = {t: f"{t.lower()}{LIVE_STOOQ_TICKER_SUFFIX}" for t in tickers}
-            plans.append(
-                PlannedCollector(
-                    "stooq", StooqPriceCollector(collectable["stooq"], symbols=symbols, fetcher=fetcher)
-                )
-            )
-        if "fred" in collectable:
-            plans.append(
-                PlannedCollector(
-                    "fred",
-                    FredCsvCollector(
-                        collectable["fred"], series_ids=list(LIVE_FRED_SERIES_IDS), fetcher=fetcher
-                    ),
-                )
-            )
-        if "worldbank" in collectable:
-            plans.append(
-                PlannedCollector(
-                    "worldbank",
-                    WorldBankCollector(
-                        collectable["worldbank"],
-                        indicators=dict(LIVE_WORLDBANK_INDICATORS),
-                        fetcher=fetcher,
-                    ),
-                )
-            )
-        # rss_generic deliberately excluded: no real, verified feed URL
-        # exists for any news outlet yet (see `unavailable_sources`).
+        for source_id in ("stooq", "fred", "worldbank"):
+            if source_id not in collectable:
+                continue
+            collector = build_live_collector(source_id, collectable[source_id], fetcher=fetcher, tickers=tickers)
+            if collector is not None:
+                plans.append(PlannedCollector(source_id, collector))
         return plans
 
     if mode == ExecutionMode.MOCK:

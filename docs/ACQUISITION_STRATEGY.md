@@ -14,6 +14,14 @@ It was written after a live production run (`.github/workflows/deploy-pages.yml`
 exactly how each attempted Egyptian source fails or succeeds — not
 speculation. That evidence is Step 6's input.
 
+**Update (capability-driven runtime engine, this phase):** the analysis
+below was turned into executable runtime logic, not left as narrative —
+see "Runtime Implementation" near the end of this document for what now
+actually runs `agx run --mode live`'s Collector Selection/Execution stages,
+and "Collector Classification" for how every existing collector maps onto
+this model. Nothing in Steps 1-6 below changed; this phase closed the gap
+between the analysis and the code.
+
 ## The corrected assumption
 
 The acquisition program's original mental model, implicit in treating every
@@ -346,3 +354,103 @@ TradingView, Google Trends) — that review is explicitly a human/legal
 action this program has never automated, and remains so. No new API key
 was obtained for AlphaVantage/FMP/Twelve Data/EODHD — acquiring one is a
 user/business action (`docs/ROADMAP.md` already frames this the same way).
+
+## Runtime Implementation (Capability-Driven Acquisition Engine)
+
+This phase turned this document's analysis into executable runtime logic —
+"stop thinking in terms of websites, think only in terms of required
+data" — reusing every existing component (`CollectionService`, the real
+`Collector` subclasses, `SourceRegistry`, `sources.reputation`, Mission
+Control's existing artifact-export pattern) with no new architecture:
+
+- **`acquisition_intelligence.capability.Capability`**: the 12 named data
+  requirements above, plus Research Papers (named by this phase's mission
+  alongside them), as a runtime enum. `CAPABILITY_STRATEGIES` maps each one
+  to its declared candidate pool of *catalogued* `SourceSpec` ids (verified
+  to exist in `sources/catalog.py`, never invented) — a capability is the
+  primary object; a source id is one interchangeable implementation of it.
+  Market Breadth has no independent entry: it is computed from Price Data
+  already collected (Step 8), not fetched from a second feed, so listing
+  price-data ids again here would double-attempt the same collectors for
+  no new information.
+- **`acquisition_intelligence.capability_engine.rank_capability_strategies`**:
+  ranks every candidate for a capability using the registry's own declared
+  priors (`reliability_score`/`freshness_score`), folded evenly against
+  measured reputation (`sources.reputation.compute_reputation`) once real
+  run history exists, with `conflict_priority` breaking close ties — never
+  a fresh network probe (that remains the Acquisition Intelligence Engine's
+  job for *undiscovered* sources reached via homepage/sitemap scanning;
+  this ranks strategies for capabilities whose candidates are already
+  catalogued). A source not catalogued, or catalogued but not
+  `IMPLEMENTED`, still appears with `ready=False` and the concrete reason —
+  never silently dropped.
+- **`acquisition_intelligence.capability_engine.CapabilityDecisionEngine`**:
+  the runtime Acquisition Decision Engine. Given one capability, it ranks,
+  then executes the top-ranked collectable strategy via the same
+  `CollectionService` every mode already uses; if that strategy's fetch
+  raises, or connects but yields zero usable records (`collection_yield`,
+  the single shared "usable output" definition — see
+  `collectors.service.collection_yield`, extracted this phase to remove
+  the duplicate yield-sum formula previously inlined twice in
+  `production/artifacts.py`), it automatically falls through to the next
+  ranked candidate. Macroeconomic is the one capability marked
+  `EXHAUSTIVE`: World Bank's Egypt CPI and FRED's global oil/dollar/
+  treasury series are complementary, not interchangeable alternatives for
+  the same fact, so every ready strategy runs rather than stopping at the
+  first success — every other capability stops at the first strategy that
+  produces usable output, per the mission's fallback-chain model. Every
+  strategy considered (selected, skipped-not-ready, skipped-already-
+  satisfied, failed, or zero-yield) is recorded on the returned
+  `CapabilityDecision`, never just the outcome.
+- **Wired into `production/pipeline.py`, LIVE mode only** (MOCK/REPLAY are
+  deterministic test fixtures and keep the unchanged fixed collector plan
+  — matching how Discovery is already LIVE-only): Collector Selection now
+  ranks every capability's candidates (a pure registry read, no fetch);
+  Collector Execution runs `CapabilityDecisionEngine.decide_and_execute()`
+  per capability, using `production.collector_plan.build_live_collector`
+  (extracted from the old fixed per-source branches so there is exactly
+  one live-wiring definition per source, reused by both the flat plan and
+  this engine — closing the Phase 6 "remove duplicated logic" requirement)
+  as the injected collector factory. `self.collection_results`/
+  `self.collector_failures`/`self._unavailable` — the exact same fields
+  every downstream stage (raw archive, canonical transformation,
+  validation, `collector_status.json`) already reads — are populated
+  identically to before for the sources already solved (stooq, fred,
+  worldbank), verified by a live-fixture run reproducing every existing
+  `test_production_pipeline.py` assertion unchanged. Every decision is
+  additionally persisted as `acquisition_decisions.json` (a new "bonus"
+  dashboard artifact, following the exact `model_dump(mode="json")`
+  pattern every other artifact already uses — no new schema convention)
+  and rendered in Mission Control's "Acquisition Decisions" section,
+  replacing what was previously an honest "not yet available" placeholder.
+- **Verified end to end**: a live-fixture run (real `HttpFetcher`, real
+  collector classes, canned wire-format content, the same technique
+  `test_production_pipeline.py` already uses) shows Price Data correctly
+  skip `egx_official`/`polygon`/`tiingo`/`fmp`/`company_ir` (each with its
+  real not-ready reason) before selecting `stooq`, and Macroeconomic
+  correctly run both `fred` and `worldbank` after skipping `cbe` (not yet
+  verified). All 510 backend tests pass; `ruff check` is clean; `web`/`api`
+  typecheck and build clean.
+
+## Collector Classification (Phase 6)
+
+Every existing collector, reviewed against the capability-driven model.
+None are deprecated or removed — each still serves a real, named
+capability or a real generic access-method base; nothing is fully
+replaced by this phase's work, so nothing is removed (per the mission's
+own "do not remove working code unless fully replaced" rule).
+
+| Collector | Classification | Why |
+|---|---|---|
+| `StooqPriceCollector` | Capability Strategy | Serves Price Data (and Market Breadth, derived); one of several ranked candidates, not a hardcoded default. |
+| `FredCsvCollector` | Capability Strategy | Serves Macroeconomic (global benchmark series); complementary to World Bank, not redundant with it. |
+| `WorldBankCollector` | Capability Strategy | Serves Macroeconomic (Egypt-specific indicators); the precedent this whole model generalizes from. |
+| `RssNewsCollector` | Reusable Strategy | One generic, layout-tolerant class configured per outlet `SourceSpec` — serves News directly and Corporate Actions via its `classify_corporate_events` flag; reusable across many capability candidates, not tied to one. |
+| `AlphaVantageCollector`, `FmpCollector` | Capability Strategy | Code-complete alternates for Price Data (`FmpCollector` also for Financial Statements); `NEEDS_KEY` until a user supplies credentials — a business action, not an engineering gap. |
+| `IndexConstituentCollector` | Capability Strategy | Serves Index Constituents and Sector Membership; code-complete, unwired pending `egx_official` verification. |
+| `FinancialStatementCollector` | Capability Strategy | Serves Financial Statements; code-complete, unwired pending `company_ir` verification. |
+| `ExcelSeriesCollector`, `PdfDocumentCollector` | Reusable Strategy | Generic bases keyed to an access method (XLSX/PDF), not to one capability — any capability whose best strategy is a spreadsheet or PDF repository reuses these. |
+| `FilesystemCollector` | Reusable Strategy | Generic ingestion path for a human-supplied file; the legitimate no-network unblock for Index Constituents/Sector Membership named in `docs/ROADMAP.md`. |
+| `ArchiveReplayCollector` | Reusable Strategy | Wraps any collector to replay archived history; capability-agnostic by construction. |
+| `corporate_event_classifier` (in `RssNewsCollector`) | Reusable Strategy | The only real (headline-only) Corporate Actions signal flowing today; a classifier applied within the generic RSS collector, not a capability-specific one. |
+| `BrowserAutomationCollector` | Legacy stub (unchanged) | An honest `NotImplementedError` — no scripted-browser method has a verified, ToS-cleared target yet. Not deprecated: it is the correct placeholder until one does. |

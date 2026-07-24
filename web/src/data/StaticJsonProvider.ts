@@ -6,6 +6,7 @@
 // `web/public/data/` before the Vite build ran.
 
 import type {
+  AcquisitionDecision,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -126,5 +127,9 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getSourceMetrics(): Promise<SourceMetricsRow[]> {
     return fetchList<SourceMetricsRow>("source_metrics.json");
+  }
+
+  getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {
+    return fetchList<AcquisitionDecision>("acquisition_decisions.json");
   }
 }

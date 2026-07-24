@@ -1,3 +1,11 @@
+from agx_research.acquisition_intelligence.capability import CAPABILITY_STRATEGIES, Capability
+from agx_research.acquisition_intelligence.capability_engine import (
+    CapabilityDecision,
+    CapabilityDecisionEngine,
+    CapabilityStrategyAttempt,
+    CapabilityStrategyScore,
+    rank_capability_strategies,
+)
 from agx_research.acquisition_intelligence.config_generation import (
     generate_source_spec,
     suggest_collector,
@@ -36,6 +44,13 @@ from agx_research.acquisition_intelligence.target import (
 )
 
 __all__ = [
+    "Capability",
+    "CAPABILITY_STRATEGIES",
+    "CapabilityStrategyScore",
+    "rank_capability_strategies",
+    "CapabilityStrategyAttempt",
+    "CapabilityDecision",
+    "CapabilityDecisionEngine",
     "TargetOrganization",
     "seed_target_organizations",
     "generate_company_ir_targets",

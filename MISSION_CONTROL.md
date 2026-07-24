@@ -18,15 +18,22 @@ commit whenever the fact they state changes.
   research engine, production pipeline, and frontend complete; every
   research conclusion the platform can currently produce is still scoped
   to placeholder/mock data — no live source is connected yet.
-- **Current mission:** Solve the Egyptian data **acquisition strategy**
-  problem, not just connect one more homepage. See `CURRENT_MISSION.md`
-  and `docs/ACQUISITION_STRATEGY.md` for the full capability-by-capability
-  legal strategy matrix and what changed as a result. This mission
-  followed the Egyptian Live Data Sprint, which replaced the mock-only
-  production pipeline with a real `--mode live` default and fixed a
-  genuine health-engine bug (see `CURRENT_MISSION.md`'s "Prior mission"
-  section) — the platform has run live via GitHub Actions (which has real
-  outbound egress, unlike this coding sandbox) multiple times since.
+- **Current mission:** Turn the Egyptian data **acquisition strategy**
+  analysis into a **capability-driven runtime engine** — every data
+  requirement (Price Data, Corporate Disclosures, Corporate Actions,
+  Financial Statements, Investor Relations, News, Macroeconomic, Market
+  Breadth, Trading Calendar, Index Constituents, Sector Membership,
+  Economic Releases, Research Papers) is now an independent `Capability`
+  with its own ranked pool of legal acquisition strategies
+  (`acquisition_intelligence.capability`/`capability_engine`), executed
+  with automatic fallback and every decision recorded in Mission Control
+  (`acquisition_decisions.json`). See `CURRENT_MISSION.md` and
+  `docs/ACQUISITION_STRATEGY.md`'s "Runtime Implementation" section for
+  full detail. This followed the acquisition-strategy analysis mission,
+  which itself followed the Egyptian Live Data Sprint (real `--mode live`
+  default, a genuine health-engine bug fix) — the platform has run live
+  via GitHub Actions (which has real outbound egress, unlike this coding
+  sandbox) multiple times since.
 - **Live-run evidence (superseding the older "0 connected, fully blocked"
   framing below):** World Bank is `IMPLEMENTED` and has collected 66 real
   Egypt CPI inflation observations via a live GitHub Actions run. Stooq is

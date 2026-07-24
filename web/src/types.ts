@@ -346,6 +346,27 @@ export interface CollectorStatusRow {
   data_quality_score: number | null;
 }
 
+// --- acquisition_decisions.json ---
+
+export type CapabilityStrategyOutcome = "succeeded" | "zero_yield" | "failed" | "skipped";
+
+export interface CapabilityStrategyAttempt {
+  source_id: string;
+  rank: number;
+  composite_score: number;
+  outcome: CapabilityStrategyOutcome;
+  reason: string;
+  yield_count: number;
+}
+
+export interface AcquisitionDecision {
+  capability: string;
+  decided_at: string;
+  attempts: CapabilityStrategyAttempt[];
+  selected_source_ids: string[];
+  succeeded: boolean;
+}
+
 // --- runtime_status.json (same shape as one RunRecord) ---
 export type RuntimeStatus = RunRecord;
 

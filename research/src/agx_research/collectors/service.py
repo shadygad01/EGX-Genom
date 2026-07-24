@@ -58,6 +58,19 @@ class CollectionRunResult:
     assessments: list[QualityAssessment]
 
 
+def collection_yield(result: CollectionRunResult) -> int:
+    """Total usable canonical records this run actually produced -- the one
+    definition of "yield" every health/status/decision computation in this
+    platform shares, so a collector that fetched successfully but parsed
+    nothing is never mistaken for one that actually produced data.
+    """
+    return (
+        result.price_bars_written + result.macro_observations_written
+        + result.news_items_written + result.corporate_events_written
+        + result.index_constituents_written + result.financial_statement_line_items_written
+    )
+
+
 def _write_price_bars(
     data_dir: Path, ticker: str, bars, *, on_written=None
 ) -> int:

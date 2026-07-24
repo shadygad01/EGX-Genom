@@ -8,6 +8,7 @@
 // StaticJsonProvider/ApiProvider for the two implementations.
 
 import type {
+  AcquisitionDecision,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -58,4 +59,5 @@ export interface DashboardDataProvider {
   getKnowledgeGraph(): Promise<KnowledgeGraphData>;
   getFinancialStatements(): Promise<FinancialStatementLineItem[]>;
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
+  getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
 }

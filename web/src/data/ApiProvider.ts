@@ -6,6 +6,7 @@
 // and docs/ARCHITECTURE.md) -- that's what makes switching providers safe.
 
 import type {
+  AcquisitionDecision,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -115,5 +116,9 @@ export class ApiProvider implements DashboardDataProvider {
 
   getSourceMetrics(): Promise<SourceMetricsRow[]> {
     return fetchJson<SourceMetricsRow[]>("/source-metrics");
+  }
+
+  getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {
+    return fetchJson<AcquisitionDecision[]>("/acquisition-decisions");
   }
 }

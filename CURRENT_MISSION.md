@@ -8,7 +8,40 @@ first-party evidence that changed the picture substantially. The original
 "blocked at the mission's own stop condition" framing is preserved below
 for its own historical accuracy but is **no longer the current state**.
 
-## Latest mission: solve the acquisition *strategy* problem (this phase)
+## Latest mission: capability-driven acquisition engine (this phase)
+
+The prior mission (below) produced `docs/ACQUISITION_STRATEGY.md` as
+analysis; this mission's explicit job was to turn it into executable
+runtime logic — "stop thinking in terms of websites, think only in terms
+of required data."
+
+**Outcome:** `acquisition_intelligence.capability.Capability` (13 values:
+the 12 named data requirements plus Research Papers) with
+`CAPABILITY_STRATEGIES` mapping each to its declared, ranked pool of
+catalogued `SourceSpec` ids — a capability, not a website, is now the
+platform's primary acquisition object. `acquisition_intelligence.
+capability_engine.rank_capability_strategies()` ranks every candidate from
+registry state + measured reputation; `CapabilityDecisionEngine` executes
+the best collectable one and automatically falls through to the next on
+failure or zero yield (Macroeconomic runs every ready strategy, since
+World Bank and FRED cover complementary, not redundant, series). Wired
+into `production/pipeline.py`'s LIVE-mode Collector Selection/Execution —
+reusing the exact same `CollectionService`/`SourceRegistry`/reputation
+engine every mode already used, no new architecture — with every decision
+persisted as a new `acquisition_decisions.json` Mission Control artifact
+and rendered in the web dashboard, replacing a former "not yet available"
+placeholder. A live-fixture run reproduces every existing collection
+assertion unchanged for the sources already solved (stooq/fred/worldbank)
+while every other capability now honestly reports its full ranked
+fallback chain instead of being silently absent. 510 backend tests pass
+(34 new); `ruff check`/`web`+`api` typecheck/build all clean. See
+`docs/ACQUISITION_STRATEGY.md`'s "Runtime Implementation" and "Collector
+Classification" sections, and `docs/PHASE_STATUS.md`'s matching entry, for
+full detail. Deliberately not done: no new collector for IMF/OECD (their
+exact endpoint shape is still unverified — the correct next step per the
+strategy analysis, not implemented blind here either).
+
+## Prior mission: solve the acquisition *strategy* problem
 
 Live runs surfaced a pattern the "connect one more homepage" approach
 wasn't going to fix: four of five named Egyptian sources are blocked by a

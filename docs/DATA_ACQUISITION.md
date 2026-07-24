@@ -23,7 +23,13 @@ acquisition_intelligence/
               domain_resolution.py -- verified-reachable-domain resolution
               legality.py / stability.py / historical.py -- per-method verification
               ranking.py / config_generation.py -- rank, select, auto-generate a SourceSpec
-              engine.py -- AcquisitionIntelligenceEngine orchestrator
+              engine.py -- AcquisitionIntelligenceEngine orchestrator (discovers
+                           NEW candidates via homepage/sitemap scanning)
+              capability.py -- Capability enum + per-capability strategy pools
+                           (docs/ACQUISITION_STRATEGY.md's runtime form)
+              capability_engine.py -- ranks + executes strategies for capabilities
+                           whose candidates are already catalogued, with automatic
+                           fallback (CapabilityDecisionEngine)
               continuity.py -- AcquisitionContinuityMonitor (re-discover on DOWN)
               live.py -- real HttpFetcher/Wayback-backed adapters (deployment only)
 sources/      SourceSpec (full charter field set) + SourceRegistry + seed catalog

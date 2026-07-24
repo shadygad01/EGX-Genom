@@ -1,0 +1,234 @@
+"""Tests for the capability-driven runtime Acquisition Decision Engine:
+`rank_capability_strategies` (pure ranking over registry state) and
+`CapabilityDecisionEngine` (rank -> execute -> automatic fallback), both
+exercised with fakes -- no network, no concrete collector class.
+"""
+
+from __future__ import annotations
+
+from agx_research.acquisition_intelligence.capability import Capability
+from agx_research.acquisition_intelligence.capability_engine import (
+    CapabilityDecisionEngine,
+    rank_capability_strategies,
+)
+from agx_research.collectors.service import CollectionRunResult
+from agx_research.sources.registry import SourceRegistry
+from agx_research.sources.reputation import SourceMetricsRepository
+from agx_research.sources.spec import (
+    AccessMethod,
+    SourceCategory,
+    SourceSpec,
+    SourceStatus,
+)
+
+
+def _spec(source_id: str, *, status: SourceStatus, reliability=0.7, freshness=0.7, conflict_priority=50) -> SourceSpec:
+    return SourceSpec(
+        id=source_id, name=source_id, category=SourceCategory.MARKET_DATA,
+        access_method=AccessMethod.CSV_DOWNLOAD, status=status,
+        reliability_score=reliability, freshness_score=freshness, conflict_priority=conflict_priority,
+    )
+
+
+class _FakeCollector:
+    def __init__(self, source_id: str, *, fetch_error: Exception | None = None):
+        self.spec = _spec(source_id, status=SourceStatus.IMPLEMENTED)
+        self._fetch_error = fetch_error
+        self.name = source_id
+        self.version = "1.0.0"
+        self.fetcher = None
+
+    def fetch(self):
+        if self._fetch_error:
+            raise self._fetch_error
+        return []
+
+
+def _empty_result(source_id: str, *, price_bars=0) -> CollectionRunResult:
+    return CollectionRunResult(
+        source_id=source_id, documents_fetched=1, batches_materialized=0, batches_withheld=0,
+        price_bars_written=price_bars, macro_observations_written=0, news_items_written=0,
+        corporate_events_written=0, index_constituents_written=0,
+        financial_statement_line_items_written=0, events_registered=0, assessments=[],
+    )
+
+
+class _FakeCollectionService:
+    """A stand-in for `CollectionService` that returns pre-scripted results
+    per source id, never touching the real fetch/parse/materialize path --
+    this test suite is about ranking/fallback orchestration, not collection
+    mechanics (already covered by `test_collection_service.py`).
+    """
+
+    def __init__(self, results_by_source: dict[str, CollectionRunResult | Exception]):
+        self.results_by_source = results_by_source
+        self.calls: list[str] = []
+
+    def run(self, collector, *, expected_records: int) -> CollectionRunResult:
+        source_id = collector.spec.id
+        self.calls.append(source_id)
+        outcome = self.results_by_source[source_id]
+        if isinstance(outcome, Exception):
+            raise outcome
+        return outcome
+
+
+def test_rank_capability_strategies_marks_uncatalogued_source_not_ready():
+    registry = SourceRegistry()
+    ranked = rank_capability_strategies(Capability.TRADING_CALENDAR, registry)
+    assert len(ranked) == 1
+    assert ranked[0].source_id == "egx_official"
+    assert ranked[0].ready is False
+    assert "Not catalogued" in ranked[0].reason
+
+
+def test_rank_capability_strategies_orders_by_composite_and_marks_ready():
+    registry = SourceRegistry()
+    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.7, freshness=0.7))
+    registry.add(_spec("fmp", status=SourceStatus.NEEDS_KEY, reliability=0.9, freshness=0.9))
+
+    ranked = rank_capability_strategies(Capability.PRICE_DATA, registry)
+    by_id = {r.source_id: r for r in ranked}
+    assert by_id["stooq"].ready is True
+    assert by_id["fmp"].ready is False
+    assert "API key" in by_id["fmp"].reason
+    # fmp's declared priors score higher, but readiness is reported
+    # independently of score -- both facts are visible, not conflated.
+    assert by_id["fmp"].composite_score > by_id["stooq"].composite_score
+
+
+def test_rank_capability_strategies_uses_measured_reputation_when_available():
+    registry = SourceRegistry()
+    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.5, freshness=0.5))
+    metrics = SourceMetricsRepository()
+    metrics.record_run("stooq", succeeded=True, records_expected=10, records_produced=10)
+    for _ in range(5):
+        metrics.record_run(
+            "stooq", succeeded=True, records_expected=10, records_produced=10, confidence_score=0.95,
+        )
+
+    ranked_without = rank_capability_strategies(Capability.PRICE_DATA, registry)
+    ranked_with = rank_capability_strategies(Capability.PRICE_DATA, registry, metrics)
+    without_score = next(r for r in ranked_without if r.source_id == "stooq").composite_score
+    with_score = next(r for r in ranked_with if r.source_id == "stooq").composite_score
+    assert with_score != without_score
+
+
+def test_decide_and_execute_selects_first_ready_strategy_that_succeeds():
+    registry = SourceRegistry()
+    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("fmp", status=SourceStatus.NEEDS_KEY))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService({"stooq": _empty_result("stooq", price_bars=10)})
+    engine = CapabilityDecisionEngine(registry, factory)
+    decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
+
+    assert decision.succeeded is True
+    assert decision.selected_source_ids == ["stooq"]
+    assert results["stooq"].price_bars_written == 10
+    assert failures == {}
+    outcomes = {a.source_id: a.outcome for a in decision.attempts}
+    assert outcomes["stooq"] == "succeeded"
+    assert outcomes["fmp"] == "skipped"
+    assert service.calls == ["stooq"]  # fmp recorded but never fetched -- already satisfied
+
+
+def test_decide_and_execute_falls_through_on_zero_yield():
+    registry = SourceRegistry()
+    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
+    registry.add(_spec("fmp", status=SourceStatus.IMPLEMENTED, reliability=0.1, freshness=0.1))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService({
+        "stooq": _empty_result("stooq", price_bars=0),  # connected, nothing usable
+        "fmp": _empty_result("fmp", price_bars=5),
+    })
+    engine = CapabilityDecisionEngine(registry, factory)
+    decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
+
+    assert decision.selected_source_ids == ["fmp"]
+    assert "stooq" in results and "fmp" in results  # both attempts recorded
+    outcomes = {a.source_id: a.outcome for a in decision.attempts}
+    assert outcomes["stooq"] == "zero_yield"
+    assert outcomes["fmp"] == "succeeded"
+
+
+def test_decide_and_execute_falls_through_on_exception():
+    registry = SourceRegistry()
+    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
+    registry.add(_spec("fmp", status=SourceStatus.IMPLEMENTED, reliability=0.1, freshness=0.1))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService({
+        "stooq": RuntimeError("simulated fetch failure"),
+        "fmp": _empty_result("fmp", price_bars=3),
+    })
+    engine = CapabilityDecisionEngine(registry, factory)
+    decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
+
+    assert decision.selected_source_ids == ["fmp"]
+    assert failures == {"stooq": "RuntimeError: simulated fetch failure"}
+    assert "stooq" not in results
+    assert results["fmp"].price_bars_written == 3
+
+
+def test_decide_and_execute_reports_failure_when_nothing_succeeds():
+    registry = SourceRegistry()
+    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService({"stooq": _empty_result("stooq", price_bars=0)})
+    engine = CapabilityDecisionEngine(registry, factory)
+    decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
+
+    assert decision.succeeded is False
+    assert decision.selected_source_ids == []
+
+
+def test_decide_and_execute_skips_when_no_live_collector_wiring():
+    registry = SourceRegistry()
+    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED))
+
+    def factory(source_id, spec):
+        return None  # this deployment has no live wiring for anything
+
+    service = _FakeCollectionService({})
+    engine = CapabilityDecisionEngine(registry, factory)
+    decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
+
+    assert decision.succeeded is False
+    assert results == {} and failures == {}
+    assert decision.attempts[0].outcome == "skipped"
+    assert "No live collector wiring" in decision.attempts[0].reason
+    assert service.calls == []
+
+
+def test_macroeconomic_capability_is_exhaustive_not_first_success_only():
+    registry = SourceRegistry()
+    registry.add(_spec("worldbank", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
+    registry.add(_spec("fred", status=SourceStatus.IMPLEMENTED, reliability=0.5, freshness=0.5))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService({
+        "worldbank": _empty_result("worldbank", price_bars=2),
+        "fred": _empty_result("fred", price_bars=1),
+    })
+    engine = CapabilityDecisionEngine(registry, factory)
+    decision, results, failures = engine.decide_and_execute(Capability.MACROECONOMIC, service)
+
+    # Both complementary macro sources run -- this is not a "pick one"
+    # capability (World Bank's Egypt CPI and FRED's global series cover
+    # disjoint data), so both must be selected, not just the top-ranked one.
+    assert set(decision.selected_source_ids) == {"worldbank", "fred"}
+    assert set(results) == {"worldbank", "fred"}

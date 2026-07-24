@@ -57,6 +57,7 @@ export function MissionControlPage() {
   const genes = useArtifact((p) => p.getGenes());
   const sourceRegistry = useArtifact((p) => p.getSourceRegistry());
   const runtimeMetrics = useArtifact((p) => p.getRuntimeMetrics());
+  const acquisitionDecisions = useArtifact((p) => p.getAcquisitionDecisions());
 
   const geneCounts = {
     promoted: (genes.data ?? []).filter((g) => g.status === "promoted").length,
@@ -232,12 +233,51 @@ export function MissionControlPage() {
         />
       </Section>
 
-      <Card title="Discovery Engine">
-        <EmptyState
-          title="Not yet available"
-          detail="The Acquisition Intelligence Engine has no dashboard export yet -- this section will populate once one exists, rather than fabricating discovery activity."
-        />
-      </Card>
+      <Section
+        title="Acquisition Decisions"
+        description="Every capability's ranked acquisition strategies this run -- which source was selected, and why every other candidate was skipped, failed, or produced nothing usable. A capability is never tied to one website: this is the runtime Acquisition Decision Engine's own record of the fallback chain it evaluated."
+      >
+        {acquisitionDecisions.loading && <LoadingState rows={3} />}
+        {acquisitionDecisions.error && (
+          <ErrorState detail={acquisitionDecisions.error.message} onRetry={acquisitionDecisions.reload} />
+        )}
+        {!acquisitionDecisions.loading && !acquisitionDecisions.error && (
+          <DataTable
+            rows={acquisitionDecisions.data ?? []}
+            getRowKey={(d) => d.capability}
+            emptyTitle="No acquisition decisions yet"
+            columns={[
+              { key: "capability", header: "Capability", render: (d) => titleCase(d.capability) },
+              {
+                key: "status",
+                header: "Status",
+                render: (d) => (
+                  <Badge variant={d.succeeded ? "positive" : "neutral"}>
+                    {d.succeeded ? "Satisfied" : "Unsatisfied"}
+                  </Badge>
+                ),
+              },
+              {
+                key: "selected",
+                header: "Selected Strategy",
+                render: (d) => (d.selected_source_ids.length ? d.selected_source_ids.join(", ") : "—"),
+              },
+              {
+                key: "attempts",
+                header: "Strategies Considered",
+                align: "right",
+                render: (d) => d.attempts.length,
+              },
+              {
+                key: "top",
+                header: "Top-Ranked Strategy",
+                render: (d) =>
+                  d.attempts[0] ? `${d.attempts[0].source_id} (${titleCase(d.attempts[0].outcome)})` : "—",
+              },
+            ]}
+          />
+        )}
+      </Section>
     </>
   );
 }

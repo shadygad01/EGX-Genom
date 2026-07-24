@@ -454,3 +454,111 @@ own "do not remove working code unless fully replaced" rule).
 | `ArchiveReplayCollector` | Reusable Strategy | Wraps any collector to replay archived history; capability-agnostic by construction. |
 | `corporate_event_classifier` (in `RssNewsCollector`) | Reusable Strategy | The only real (headline-only) Corporate Actions signal flowing today; a classifier applied within the generic RSS collector, not a capability-specific one. |
 | `BrowserAutomationCollector` | Legacy stub (unchanged) | An honest `NotImplementedError` — no scripted-browser method has a verified, ToS-cleared target yet. Not deprecated: it is the correct placeholder until one does. |
+
+## First Live Egyptian Source (Enterprise, this phase)
+
+A follow-on sprint's explicit mandate was to stop improving the platform
+and obtain real Egyptian data through at least one verified, legal,
+maintainable strategy. Re-running live verification (the same GitHub
+Actions live-run technique used throughout this document) surfaced a real
+discovery: **Enterprise's homepage (`enterprise.press`) is now reachable**
+(it previously failed via robots.txt disallow on the bare domain / a
+broken `www.` certificate — see the Step 6 table above), and its real HTML
+carries a standard RSS autodiscovery tag pointing to
+`https://enterpriseam.com/egypt/feed/` — a different domain from
+`enterprise.press` itself (likely Enterprise's underlying publishing
+platform). The Acquisition Intelligence Engine found this the same way it
+finds every candidate: `discovery.discover_rss_feeds()`'s existing
+`<link rel="alternate" type="application/rss+xml">` heuristic, no new
+code, no guess.
+
+**Verified, not assumed**, per this sprint's explicit rules:
+- **Legal**: robots.txt allows it; access method is `RSS_FEED`, not
+  `HTML_SCRAPE`, so `assess_legality()` could clear it to `ALLOWED`
+  (unlike Zawya's sitemap-derived HTML article candidates, which can
+  never auto-clear).
+- **Reachable and stable**: a real reachability probe succeeded; the
+  engine registered it at `lifecycle_state=QUARANTINE`, composite
+  reputation 0.75 on its first run.
+- **Produces structured, parseable data**: confirmed by an actual live
+  collection run, not just reachability — `RssNewsCollector` (the same
+  generic, already-tested class every other RSS source uses) parsed
+  **6 real news items**, all materialized (`data_quality_score=0.97`),
+  and 6 real events registered in the Event Platform. The registry then
+  promoted it to `lifecycle_state=TRUSTED` on that evidence.
+- **Reproducible**: wired as a static catalog entry
+  (`sources/catalog.py`'s `enterprise_press`, `status=IMPLEMENTED`) plus a
+  three-line addition to `production.collector_plan.build_live_collector()`
+  — every future live pipeline run collects from it the same way, no
+  manual step required.
+
+### Bugs found and fixed getting here
+
+Verifying this candidate experimentally (not trusting documentation
+alone, per this sprint's Step 2) surfaced four real, previously-latent
+bugs — each blocking verification itself, not general platform polish:
+
+1. **`HttpFetcher` crashed on non-ASCII URLs.** Zawya's real sitemap-index
+   (confirmed genuinely reachable and parseable) lists per-section
+   sitemaps whose entries include Arabic-slugged article URLs with literal
+   (non-percent-encoded) non-ASCII characters. `http.client`'s
+   `_encode_request()` calls `.encode('ascii')` on the request line, which
+   raised `UnicodeEncodeError` — an unhandled crash, not a normal
+   `FetchError`, that took down the whole `discover-sources` CLI
+   invocation and the pipeline's own discovery stage. Fixed by
+   percent-encoding a URL's path/query/fragment before constructing the
+   request (`collectors.fetcher._encode_request_url`).
+2. **`HttpFetcher`'s robots.txt fetch had no timeout.** Stdlib
+   `urllib.robotparser.RobotFileParser.read()` calls `urlopen()` with no
+   timeout at all; a host that accepts the TCP connection but never
+   responds (a real anti-bot behavior, distinct from a fast
+   connection-refused) hung that call — and the whole sequential
+   discovery run behind it — indefinitely. One live run had to be
+   cancelled after 90+ minutes stuck here. Fixed by fetching robots.txt
+   through the same timeout-bounded path every other request already
+   uses, then feeding the raw lines to `parser.parse()`.
+3. **Unbounded sitemap-candidate count.** Even after fixing (1), a second
+   live run hung for ~70 minutes: Zawya's sitemap-index's per-section
+   sitemaps (a "pages" or "authors" sitemap) can list thousands of URLs,
+   and the sitemap fallback (added last phase) probed and historically-
+   assessed every single one before ranking — not a true infinite loop,
+   but effectively unbounded at real-world sitemap sizes. Fixed by capping
+   nested-sitemap-index following to 5 sitemaps and total candidates
+   returned to 25.
+4. **Discovery silently regressed an `IMPLEMENTED` source back to
+   `PLANNED`.** The pipeline's own discovery stage re-attempts every named
+   Egyptian priority target on *every* run (including `enterprise_press`),
+   and `run_for_target()` unconditionally registered a fresh spec each
+   time — `generate_source_spec()` always mints one at `status=PLANNED`,
+   per this platform's own AD-16 rule that auto-generation never marks
+   something `IMPLEMENTED`. This meant the very next pipeline run after
+   marking Enterprise `IMPLEMENTED` immediately reset it back to
+   `PLANNED`, before collector execution even ran — Enterprise showed
+   `UNAVAILABLE` in that run's `collector_status.json` despite being
+   correctly catalogued moments earlier. Fixed by skipping re-registration
+   when a target's `existing_source_id` is already `IMPLEMENTED` and not
+   `DOWN` — a healthy, engineered source needs no fresh discovery, while a
+   `DOWN` one still gets rediscovered (preserving
+   `AcquisitionContinuityMonitor`'s recovery path, which depends on
+   exactly this re-discovery happening for a degraded source).
+
+None of these four fixes touched architecture, the pipeline's stage
+sequence, the capability engine's design, or Mission Control — each is a
+narrowly-scoped correctness fix directly blocking verification of a real
+acquisition candidate, consistent with this sprint's "optimize data
+acquisition, not internal systems" framing.
+
+### What's still not flowing
+
+EGX official, CBE, and Mubasher remain blocked by the same genuine,
+evidenced defensive measures documented earlier in this file (network-
+level reset, WAF rejection, robots.txt disallow) — this program's own
+rules correctly refuse to defeat any of them. Zawya's sitemap is now
+confirmed real and fully parseable (no crash, no hang), but every entry
+discovered so far is an ordinary HTML article page (`HTML_SCRAPE`), which
+`assess_legality()` can never auto-clear regardless of robots.txt — Zawya
+has not produced a legally-clearable candidate. The other ~14 named news
+outlets in the `NEWS`/`CORPORATE_DISCLOSURES`/`CORPORATE_ACTIONS`
+capability pools remain unattempted; the same RSS-autodiscovery mechanism
+that found Enterprise's feed applies unchanged to each of them the next
+time discovery runs against them.

@@ -18,32 +18,38 @@ commit whenever the fact they state changes.
   research engine, production pipeline, and frontend complete; every
   research conclusion the platform can currently produce is still scoped
   to placeholder/mock data — no live source is connected yet.
-- **Current mission:** Turn the Egyptian data **acquisition strategy**
-  analysis into a **capability-driven runtime engine** — every data
-  requirement (Price Data, Corporate Disclosures, Corporate Actions,
-  Financial Statements, Investor Relations, News, Macroeconomic, Market
-  Breadth, Trading Calendar, Index Constituents, Sector Membership,
-  Economic Releases, Research Papers) is now an independent `Capability`
-  with its own ranked pool of legal acquisition strategies
-  (`acquisition_intelligence.capability`/`capability_engine`), executed
-  with automatic fallback and every decision recorded in Mission Control
-  (`acquisition_decisions.json`). See `CURRENT_MISSION.md` and
-  `docs/ACQUISITION_STRATEGY.md`'s "Runtime Implementation" section for
-  full detail. This followed the acquisition-strategy analysis mission,
-  which itself followed the Egyptian Live Data Sprint (real `--mode live`
-  default, a genuine health-engine bug fix) — the platform has run live
-  via GitHub Actions (which has real outbound egress, unlike this coding
-  sandbox) multiple times since.
-- **Live-run evidence (superseding the older "0 connected, fully blocked"
-  framing below):** World Bank is `IMPLEMENTED` and has collected 66 real
-  Egypt CPI inflation observations via a live GitHub Actions run. Stooq is
-  reachable but blocked by a Cloudflare-style JS challenge; FRED's live
-  behavior and the five named Egyptian sources (EGX, CBE, Enterprise,
-  Mubasher, Zawya) each fail with a distinct, evidenced, source-side
-  reason (network-level reset, WAF rejection, robots.txt disallow, or —
-  Zawya — a reachable homepage with no discoverable feed, now addressed
-  by this mission's sitemap-fallback fix). Full detail:
-  `docs/ACQUISITION_STRATEGY.md`.
+- **Current mission: first real Egyptian market data flowing live —
+  succeeded.** `enterprise_press` is now `IMPLEMENTED`/`TRUSTED`, collecting
+  real news from `https://enterpriseam.com/egypt/feed/` (found via standard
+  RSS autodiscovery on its own homepage, never guessed). A live GitHub
+  Actions run confirmed: 6 real news items parsed, 6 real events registered
+  in the Event Platform, `data_quality_score=0.97`. `corporate_disclosures`,
+  `corporate_actions`, and `news` capabilities all report `succeeded=True`
+  in `acquisition_decisions.json`. Getting here surfaced and fixed three
+  real bugs — an unhandled crash on non-ASCII URLs, an unbounded robots.txt
+  fetch that hung a run for 90+ minutes, and an unbounded sitemap-candidate
+  count that caused a second ~70-minute hang — plus a fourth correctness
+  bug where discovery silently regressed an `IMPLEMENTED` source back to
+  `PLANNED` on every subsequent run. Full detail: `CURRENT_MISSION.md` and
+  `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section.
+  This followed the capability-driven runtime engine mission (every data
+  requirement is an independent `Capability` with a ranked strategy pool,
+  `acquisition_intelligence.capability`/`capability_engine`), which itself
+  followed the acquisition-strategy analysis and Egyptian Live Data Sprint
+  missions — the platform has run live via GitHub Actions (which has real
+  outbound egress, unlike this coding sandbox) many times since.
+- **Live-run evidence:** World Bank is `IMPLEMENTED` and has collected 66
+  real Egypt CPI inflation observations (macro, not EGX-specific).
+  `enterprise_press` is `IMPLEMENTED` and collecting real EGX news/events
+  (see above — the first genuinely EGX-specific live source). Stooq is
+  reachable but blocked by a Cloudflare-style JS challenge (confirmed at
+  its real CSV endpoint, not just its homepage); FRED's live behavior
+  varies (sometimes succeeds, sometimes times out); the four remaining
+  named Egyptian sources (EGX, CBE, Mubasher, Zawya) each fail with a
+  distinct, evidenced, source-side reason (network-level reset, WAF
+  rejection, robots.txt disallow, or — Zawya — a real, parseable sitemap
+  whose entries are all HTML article pages, not a legally-clearable feed).
+  Full detail: `docs/ACQUISITION_STRATEGY.md`.
 - **Progress this mission (frontend, prior phase):** all 9 sections built.
   Frontend audit complete. Six new backend dashboard artifacts (genes,
   papers, hypotheses, knowledge graph, financial statements, source
@@ -58,43 +64,47 @@ commit whenever the fact they state changes.
 - **Overall completion (backend, unchanged from prior mission):** ~99.5%
   of everything engineering-closeable without a business/vendor decision.
   See `docs/PHASE_STATUS.md`/`docs/ROADMAP.md` for the backend detail.
-- **Connected live sources: 1 (World Bank), 4 more evidenced-blocked with
-  named reasons, not unbuilt.** Every mechanism needed (discovery,
-  verification, ranking, registration, qualification, collection,
-  archival, validation, universe membership, corporate-event
+- **Connected live sources: 2 (World Bank, Enterprise), 4 more
+  evidenced-blocked with named reasons, not unbuilt.** Every mechanism
+  needed (discovery, verification, ranking, registration, qualification,
+  collection, archival, validation, universe membership, corporate-event
   classification, financial-statement collection) is built and tested and
   has now genuinely run live (GitHub Actions has real outbound egress;
   this coding sandbox does not — the two are not the same environment,
   see `CURRENT_MISSION.md`). See `docs/ACQUISITION_STRATEGY.md` for the
   per-capability breakdown of what's blocked and why.
 - **Historical coverage:** 66 real Egypt CPI observations (World Bank,
-  live). No other source has a real trading-day history yet — every
-  collector (including `IndexConstituentCollector`/
-  `FinancialStatementCollector`) already fetches a source's full available
-  series by construction, so a source's first live run *is* its backfill.
+  live) plus 6 real Enterprise news items/events (live, EGX-specific) as
+  of the most recent run. Every collector (including
+  `IndexConstituentCollector`/`FinancialStatementCollector`) already
+  fetches a source's full available series by construction, so a source's
+  first live run *is* its backfill.
 - **Knowledge growth:** 0 real `KnowledgeObject`s promoted from live data
-  yet. The full validation → promotion pipeline is proven correct against
-  mock data (the production pipeline's daily research cycle produces real
-  hypotheses, gates, and — when evidence clears the bar — promotions; it
-  now also produces real, if headline-classified, corporate events), but
-  every promoted object today traces back to placeholder CSVs or the one
-  live macro source, not a licensed EGX price/disclosure feed.
-- **Genome growth:** 0 real `Gene`s from live EGX-specific evidence, for
-  the same reason — `AlphaGenome` correctly creates genes from mock-data
-  knowledge promotions today; nothing yet exists to create one from real
-  EGX-specific evidence (World Bank is macro, not EGX-specific).
-- **Known blockers:** (1) EGX official, CBE, Enterprise, and Mubasher are
-  each blocked by a genuine source-side defensive measure (network-level
-  reset, WAF rejection, robots.txt disallow) this program's own rules
-  correctly refuse to defeat — not an engineering gap, see
-  `docs/ACQUISITION_STRATEGY.md`. (2) No verified, complete EGX30/EGX70
-  constituent list exists in this codebase (only a 10-company EGX30
-  placeholder, no EGX70 list at all) — a business decision reserved for
-  the project owner, since fabricating ~90 ticker/company-name pairs from
-  training-data recall would itself violate the platform's
-  anti-fabrication principle. (3) A licensed EGX market data vendor has
-  not been selected — the standing gate on treating any output as real
-  research (`docs/ROADMAP.md`).
+  yet — the run that first collected Enterprise's real events landed on a
+  non-trading day, so the research pipeline correctly produced zero
+  hypotheses that run (an honest calendar gap, not a strategy failure);
+  the registered events persist and feed the next trading-day run. The
+  full validation → promotion pipeline is proven correct against mock
+  data (the production pipeline's daily research cycle produces real
+  hypotheses, gates, and — when evidence clears the bar — promotions).
+- **Genome growth:** 0 real `Gene`s from live EGX-specific evidence yet,
+  for the same non-trading-day reason above — `AlphaGenome` correctly
+  creates genes from mock-data knowledge promotions today; the first real
+  EGX-specific evidence (Enterprise's events) is now registered and
+  waiting on the next trading-day run to potentially produce one.
+- **Known blockers:** (1) EGX official, CBE, and Mubasher are each blocked
+  by a genuine source-side defensive measure (network-level reset, WAF
+  rejection, robots.txt disallow) this program's own rules correctly
+  refuse to defeat — not an engineering gap; Zawya's sitemap is real and
+  parseable but every entry is an HTML article page, not a legally-
+  clearable feed — see `docs/ACQUISITION_STRATEGY.md`. (2) No verified,
+  complete EGX30/EGX70 constituent list exists in this codebase (only a
+  10-company EGX30 placeholder, no EGX70 list at all) — a business
+  decision reserved for the project owner, since fabricating ~90
+  ticker/company-name pairs from training-data recall would itself
+  violate the platform's anti-fabrication principle. (3) A licensed EGX
+  market data vendor has not been selected — the standing gate on
+  treating any output as real research (`docs/ROADMAP.md`).
 - **Estimated remaining work:** Near-zero engineering effort once blocker
   (2) above clears — `agx discover-sources`, `generate_company_ir_targets()`,
   `IndexConstituentCollector`, and `FinancialStatementCollector` are all

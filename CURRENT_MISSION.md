@@ -1,6 +1,6 @@
 # Current Mission
 
-**Superseded twice since the "no egress" finding below.** That finding was
+**Superseded three times since the "no egress" finding below.** That finding was
 specific to *this coding sandbox*; the production deployment target
 (GitHub Actions, `.github/workflows/deploy-pages.yml`) has real outbound
 egress and has since run the pipeline live multiple times, producing
@@ -8,7 +8,71 @@ first-party evidence that changed the picture substantially. The original
 "blocked at the mission's own stop condition" framing is preserved below
 for its own historical accuracy but is **no longer the current state**.
 
-## Latest mission: capability-driven acquisition engine (this phase)
+## Latest mission: first real Egyptian market data flowing live (this phase)
+
+The prior mission (below) built the capability-driven runtime engine but
+had never produced real EGX-specific data — World Bank (macro) was the
+only thing actually collecting. This mission's explicit job was to stop
+improving the platform and instead obtain real Egyptian data through at
+least one verified, legal, maintainable strategy — "the mission is no
+longer to improve AGX, the mission is to make AGX operational for the
+Egyptian market."
+
+**Outcome: mission succeeded.** `enterprise_press` is now `IMPLEMENTED`
+and `lifecycle_state=TRUSTED`, collecting real news via
+`https://enterpriseam.com/egypt/feed/` — discovered live by the existing
+Acquisition Intelligence Engine's standard RSS-autodiscovery heuristic (a
+real `<link rel="alternate" type="application/rss+xml">` tag on
+enterprise.press's own homepage, never guessed), legally cleared (robots.txt
+allows, `RSS_FEED` access method, no ToS red flags), and verified end to
+end in a live GitHub Actions run: **6 real news items parsed, 6 real
+events registered in the Event Platform**, `data_quality_score=0.97`,
+`health_status=healthy`. `corporate_disclosures`, `corporate_actions`, and
+`news` capabilities all now report `succeeded=True` via this one source in
+`acquisition_decisions.json`. This is the first genuinely EGX-specific
+live source this platform has ever collected from (World Bank's Egypt CPI
+data is macro, not EGX-market-specific).
+
+**Three real, previously-undetected bugs were found and fixed getting
+here** — all directly blocking verification, not general platform
+polish:
+1. `HttpFetcher` crashed outright (`UnicodeEncodeError`) on a URL
+   containing raw non-percent-encoded non-ASCII characters — surfaced by
+   Zawya's real sitemap-index listing Arabic-slugged article URLs.
+2. `HttpFetcher`'s robots.txt fetch had no timeout at all (stdlib
+   `RobotFileParser.read()`'s own `urlopen()` call) — a host that accepts
+   the TCP connection but never responds hung the entire pipeline
+   indefinitely (one run was cancelled after 90+ minutes).
+3. The sitemap-fallback discovery path (added last phase) had no cap on
+   candidate count — a real sitemap-index's per-section sitemap can list
+   thousands of URLs, each individually probed before ranking; this alone
+   caused a second, ~70-minute hang even after fixing (1). Both nested-
+   sitemap-following and total-candidate count are now bounded.
+4. (A fourth, non-hang bug) `AcquisitionIntelligenceEngine.run_for_target()`
+   unconditionally re-registered every named priority target on every
+   pipeline run, including ones already `IMPLEMENTED` — silently
+   regressing `enterprise_press` back to `PLANNED` in the very next run
+   after it was first verified, since `generate_source_spec()` always
+   mints a fresh `PLANNED` spec. Now skipped for any target that's already
+   `IMPLEMENTED` and not `DOWN` (a `DOWN` `IMPLEMENTED` source still gets
+   rediscovered, preserving `AcquisitionContinuityMonitor`'s recovery path).
+
+Full evidence, the acquisition-decisions breakdown, and per-bug detail:
+`docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section.
+518 backend tests pass (8 new this phase); `ruff check` clean.
+
+**Still not flowing** (honest gap, not attempted this phase): every other
+named Egyptian source (EGX official, CBE, Mubasher, Zawya) remains blocked
+by the same evidenced, genuine defensive measures documented in the prior
+two missions (network-level reset, WAF rejection, robots.txt disallow, or
+— Zawya specifically — a sitemap that's real and parseable but whose
+entries are all HTML article pages, not a legally-clearable structured
+feed). No knowledge/genome growth happened this specific run either — the
+run date landed on a non-trading day, so the research pipeline correctly
+produced zero hypotheses; the real events are registered and will feed the
+next trading-day run.
+
+## Prior mission: capability-driven acquisition engine
 
 The prior mission (below) produced `docs/ACQUISITION_STRATEGY.md` as
 analysis; this mission's explicit job was to turn it into executable

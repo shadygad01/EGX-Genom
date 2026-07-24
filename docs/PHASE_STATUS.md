@@ -640,3 +640,25 @@ Three phases followed, in order:
    build clean. No architecture, pipeline stage sequence, or existing
    collector was redesigned or removed — this phase is additive per its
    own mission constraints.
+
+4. **First real Egyptian market data flowing live** (this phase):
+   `enterprise_press` flipped to `IMPLEMENTED`/`TRUSTED`, collecting real
+   news from `https://enterpriseam.com/egypt/feed/` (found via standard
+   RSS autodiscovery on its own now-reachable homepage, never guessed).
+   Verified live: 6 real news items parsed, 6 real events registered in
+   the Event Platform, `data_quality_score=0.97`. This is the platform's
+   first genuinely EGX-specific live source (World Bank, the only other
+   connected source, is macro-level, not EGX-specific). Getting here
+   surfaced and fixed four real bugs, none touching architecture: an
+   unhandled crash on non-percent-encoded non-ASCII URLs; an unbounded
+   `robots.txt` fetch that hung a live run for 90+ minutes
+   (`RobotFileParser.read()` has no timeout); an unbounded sitemap-
+   candidate count that caused a second ~70-minute hang (a real
+   sitemap-index's per-section sitemap can list thousands of URLs); and a
+   correctness bug where the discovery stage silently regressed an
+   already-`IMPLEMENTED` source back to `PLANNED` on every subsequent run.
+   518 backend tests pass (8 new this phase); `ruff check` clean. Every
+   other named Egyptian source remains blocked by the same genuine,
+   evidenced defensive measures documented in phase 2/3 above — see
+   `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section
+   and `CURRENT_MISSION.md` for full detail.

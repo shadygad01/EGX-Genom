@@ -32,6 +32,28 @@ def _all_stage_names_in_order(report):
     return [s.name for s in report.stages]
 
 
+def test_discovery_stage_is_a_real_network_noop_in_mock_mode(tmp_path, monkeypatch):
+    """Discovery (Acquisition Intelligence Engine) is real-network-backed
+    regardless of mode; it must never attempt a real fetch in MOCK/REPLAY
+    (testing-only) mode. Fails loudly if it tries: `urlopen` is patched to
+    raise, so any real network attempt turns into a test failure rather
+    than a silent/slow real call.
+    """
+    import urllib.request
+
+    def _boom(*args, **kwargs):
+        raise AssertionError("Discovery must not touch the network outside LIVE mode.")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _boom)
+
+    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    report = pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
+
+    discovery_stage = report.stage(StageName.DISCOVERY_ENGINE)
+    assert discovery_stage.status == StageStatus.SUCCEEDED
+    assert "not applicable in mock mode" in discovery_stage.detail
+
+
 def test_end_to_end_mock_execution_runs_every_stage_and_succeeds(tmp_path):
     pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)

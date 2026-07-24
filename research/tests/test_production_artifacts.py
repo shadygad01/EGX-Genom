@@ -83,6 +83,66 @@ def test_reports_zero_for_a_source_that_produced_nothing_of_those_types():
     assert row["financial_statement_line_items_written"] == 0
 
 
+def test_zero_yield_is_reported_degraded_not_collected():
+    """A source that connected (documents_fetched > 0) but produced zero
+    usable records must never be reported COLLECTED/healthy -- e.g. Stooq
+    returning an anti-bot challenge page instead of CSV."""
+    registry = SourceRegistry()
+    rows = export_collector_status(
+        registry,
+        {
+            "stooq": make_result(
+                source_id="stooq", documents_fetched=10, price_bars_written=0,
+                news_items_written=0, corporate_events_written=0,
+                index_constituents_written=0, financial_statement_line_items_written=0,
+                events_registered=0,
+            )
+        },
+    )
+    row = rows[0]
+    assert row["status"] == "DEGRADED"
+    assert row["connection_success"] is True
+    assert row["parse_success"] is False
+    assert row["yield"] == 0
+    assert row["reason"] is not None
+
+
+def test_nonzero_yield_is_reported_collected():
+    registry = SourceRegistry()
+    rows = export_collector_status(
+        registry,
+        {
+            "worldbank": make_result(
+                source_id="worldbank", macro_observations_written=66, news_items_written=0,
+                corporate_events_written=0, index_constituents_written=0,
+                financial_statement_line_items_written=0,
+            )
+        },
+    )
+    row = rows[0]
+    assert row["status"] == "COLLECTED"
+    assert row["connection_success"] is True
+    assert row["parse_success"] is True
+    assert row["yield"] == 66
+    assert row["reason"] is None
+
+
+def test_fetch_failure_reported_as_failed_row_with_exact_reason():
+    """A source whose fetch() raised entirely (never reaching results) must
+    still get a visible row -- previously only surfaced in the execution
+    report's warnings, not in collector_status.json at all."""
+    registry = SourceRegistry()
+    rows = export_collector_status(
+        registry, {}, failures={"fred": "FetchError: 3 attempt(s) failed: timed out"}
+    )
+    row = rows[0]
+    assert row["source_id"] == "fred"
+    assert row["status"] == "FAILED"
+    assert row["connection_success"] is False
+    assert row["parse_success"] is False
+    assert "timed out" in row["reason"]
+
+
 def _provenance(**overrides):
     defaults = dict(produced_by="test", produced_at=datetime(2026, 6, 14), inputs=[])
     defaults.update(overrides)

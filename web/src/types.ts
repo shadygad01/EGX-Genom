@@ -324,8 +324,12 @@ export interface InvestmentCases {
 
 export interface CollectorStatusRow {
   source_id: string;
-  status: "COLLECTED" | "UNAVAILABLE";
+  status: "COLLECTED" | "DEGRADED" | "FAILED" | "UNAVAILABLE";
   reason: string | null;
+  connection_success: boolean;
+  parse_success: boolean;
+  yield: number;
+  events_produced: number;
   documents_fetched: number;
   batches_materialized: number;
   batches_withheld: number;

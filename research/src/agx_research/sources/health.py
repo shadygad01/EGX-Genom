@@ -31,6 +31,7 @@ class AlertKind(str, Enum):
     AUTH_FAILURE = "auth_failure"
     SCHEMA_DRIFT = "schema_drift"
     LAYOUT_CHANGE = "layout_change"  # previously-producing source now parses zero records
+    ZERO_YIELD = "zero_yield"  # fetch succeeded but parsing produced zero usable records
     STALENESS = "staleness"
     MISSING_FILE = "missing_file"
     ROBOTS_DISALLOWED = "robots_disallowed"
@@ -128,11 +129,24 @@ class HealthMonitor:
             )
         if parser_raised:
             alert(AlertKind.PARSER_BROKEN, AlertSeverity.CRITICAL, "Parser raised on a fetched document.")
-        elif had_produced_before and fetch_succeeded and records_produced == 0:
+        elif fetch_succeeded and records_produced == 0 and had_produced_before:
             alert(
                 AlertKind.LAYOUT_CHANGE, AlertSeverity.WARNING,
                 "Source previously produced records; this run's parse produced none "
                 "(possible layout/schema change).",
+            )
+        elif fetch_succeeded and records_produced == 0:
+            # Connection succeeded (HTTP-level) but parsing produced zero usable
+            # records -- e.g. an anti-bot challenge page, a wrong endpoint, or an
+            # unexpected format. Unlike LAYOUT_CHANGE this fires even with no
+            # prior successful run, so a source's very first live attempt can
+            # never be silently reported HEALTHY on zero yield (a real gap this
+            # closes: the previous `had_produced_before` gate meant a source's
+            # first-ever run producing zero records raised no alert at all).
+            alert(
+                AlertKind.ZERO_YIELD, AlertSeverity.WARNING,
+                "Fetch succeeded (HTTP-level) but parsing produced zero usable "
+                "records this run.",
             )
         if schema_version_changed:
             alert(AlertKind.SCHEMA_DRIFT, AlertSeverity.WARNING, "Declared schema_version changed.")

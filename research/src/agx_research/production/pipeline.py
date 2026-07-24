@@ -47,8 +47,12 @@ from agx_research.acquisition_intelligence.live import (
     build_live_fetch_text,
     build_live_prober,
     build_live_robots_checker,
+    build_live_wayback_client,
 )
-from agx_research.acquisition_intelligence.target import seed_target_organizations
+from agx_research.acquisition_intelligence.target import (
+    generate_company_ir_targets,
+    seed_target_organizations,
+)
 from agx_research.agents.corporate_events import CorporateEventsAgent
 from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
@@ -98,6 +102,13 @@ from agx_research.universe.static import StaticUniverseProvider
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
 
+# Egyptian Live Data Sprint: fresh discovery is restricted to exactly the
+# project owner's named priority order (EGX official -> EGX30/EGX70
+# Investor Relations -> CBE -> Enterprise -> Mubasher -> Zawya). No other
+# seeded or discovered source is attempted until these are exhausted, per
+# the mission's explicit instruction.
+_EGYPTIAN_PRIORITY_TARGET_IDS = {"egx_official", "cbe", "enterprise_press", "mubasher", "zawya"}
+
 
 class ProductionPipeline:
     def __init__(
@@ -137,6 +148,7 @@ class ProductionPipeline:
         self.dashboard_counts: dict[str, int] = {}
         self.mode: ExecutionMode = ExecutionMode.LIVE
         self._unavailable: dict[str, str] = {}
+        self.collector_failures: dict[str, str] = {}
 
     # ---- the public entrypoint ----------------------------------------
 
@@ -297,19 +309,51 @@ class ProductionPipeline:
     def _stage_discovery_engine(self):
         if self.registry is None:
             return StageStatus.SKIPPED, "No registry available.", []
+        # LIVE-mode only: this stage's engine is real-network-backed
+        # (`HttpFetcher`) regardless of mode, and MOCK/REPLAY are
+        # testing-only and must never touch the real network.
+        if self.mode != ExecutionMode.LIVE:
+            return (
+                StageStatus.SUCCEEDED,
+                f"Discovery is a live-network operation; not applicable in {self.mode.value} mode.",
+                [],
+            )
+
         fetcher = HttpFetcher()
         engine = AcquisitionIntelligenceEngine(
             prober=build_live_prober(fetcher),
             fetch_text=build_live_fetch_text(fetcher),
             robots_checker=build_live_robots_checker(fetcher),
             registry=self.registry,
+            wayback=build_live_wayback_client(),
         )
+
+        # Fresh discovery for never-yet-resolved sources -- previously this
+        # stage only ever ran reactive DOWN-recovery, which never fires for
+        # a source that has simply never been attempted (health_status
+        # starts UNKNOWN, not DOWN), so EGX official/CBE/etc. would never
+        # be discovered at all no matter how many times the pipeline ran.
+        # Restricted to the Egyptian Live Data Sprint's exact named
+        # priority order; every other seeded/discoverable target is
+        # deliberately excluded until these are exhausted.
+        universe = FallbackUniverseProvider(
+            [CollectedUniverseProvider(self.data_dir), StaticUniverseProvider()]
+        ).constituents(date.today())
+        company_ir_targets = generate_company_ir_targets(universe)
+        fresh_targets = [
+            t for t in seed_target_organizations() if t.id in _EGYPTIAN_PRIORITY_TARGET_IDS
+        ] + company_ir_targets
+        discovery_results = engine.run_catalog(fresh_targets, companies=universe)
+        newly_registered = sum(1 for r in discovery_results if r.registered)
+
         monitor = AcquisitionContinuityMonitor(engine, seed_target_organizations())
-        results = monitor.check_and_recover(self.registry)
-        recovered = sum(1 for r in results if r.registered)
+        recovery_results = monitor.check_and_recover(self.registry)
+        recovered = sum(1 for r in recovery_results if r.registered)
         return (
             StageStatus.SUCCEEDED,
-            f"{len(results)} DOWN source(s) needed recovery; {recovered} recovered.",
+            f"{len(fresh_targets)} Egyptian target(s) attempted ({newly_registered} newly "
+            f"registered); {len(recovery_results)} DOWN source(s) needed recovery "
+            f"({recovered} recovered).",
             [],
         )
 
@@ -369,7 +413,9 @@ class ProductionPipeline:
                 # error from `HttpFetcher` in LIVE mode carries the real
                 # status/timeout detail) -- never abort the remaining
                 # collectors for one source's failure.
-                failures.append(f"{plan.source_id}: {type(exc).__name__}: {exc}")
+                reason = f"{type(exc).__name__}: {exc}"
+                failures.append(f"{plan.source_id}: {reason}")
+                self.collector_failures[plan.source_id] = reason
 
         succeeded = len(self.collection_results)
         total = len(planned)
@@ -580,7 +626,8 @@ class ProductionPipeline:
         counts["investment_cases.json"] = len(investment_cases["recommendations"])
 
         collector_status = production_artifacts.export_collector_status(
-            self.registry, self.collection_results, unavailable=self._unavailable
+            self.registry, self.collection_results,
+            unavailable=self._unavailable, failures=self.collector_failures,
         )
         (dashboard_out / "collector_status.json").write_text(
             json.dumps(collector_status, indent=2, sort_keys=True) + "\n"

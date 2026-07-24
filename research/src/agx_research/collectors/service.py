@@ -275,7 +275,18 @@ class CollectionService:
 
     def run(self, collector: Collector, *, expected_records: int) -> CollectionRunResult:
         latencies_before = len(getattr(collector.fetcher, "request_latencies", []))
-        documents = collector.fetch()
+        try:
+            documents = collector.fetch()
+        except Exception as exc:
+            # A fetch-level failure (timeout, DNS, connection refused, ...)
+            # must still be recorded in metrics/health -- previously this
+            # exception propagated straight out of `run()` before any of
+            # `_record_run_outcome`'s bookkeeping ran, so a source whose
+            # `fetch()` always raises never accumulated `consecutive_failures`
+            # and could never reach `HealthStatus.DOWN` no matter how many
+            # times it failed.
+            self._record_fetch_failure(collector, error=f"{type(exc).__name__}: {exc}")
+            raise
         new_latencies = getattr(collector.fetcher, "request_latencies", [])[latencies_before:]
         latency_seconds = sum(new_latencies) / len(new_latencies) if new_latencies else None
         result = CollectionRunResult(
@@ -430,6 +441,20 @@ class CollectionService:
             )
 
         return result
+
+    def _record_fetch_failure(self, collector: Collector, *, error: str) -> None:
+        metrics = self.metrics.record_run(
+            collector.spec.id,
+            succeeded=False,
+            records_expected=0,
+            records_produced=0,
+            schema_version=collector.spec.schema_version,
+        )
+        health, _alerts = self.health_monitor.evaluate_run(
+            collector.spec.id, metrics, fetch_succeeded=False, fetch_error=error,
+        )
+        if self.registry is not None:
+            self.registry.update_health(collector.spec.id, health)
 
     def _trace(self, artifact_type: str, key: str, record_date, collector: Collector, document: RawDocument) -> None:
         self.provenance_index.record(

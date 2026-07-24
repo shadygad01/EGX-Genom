@@ -59,69 +59,103 @@ def export_investment_cases(
     }
 
 
+def _collector_status_row(
+    source_id: str,
+    registry: SourceRegistry,
+    *,
+    status: str,
+    reason: str | None,
+    result: CollectionRunResult | None = None,
+) -> dict[str, Any]:
+    spec = registry.latest(source_id)
+    yield_count = (
+        result.price_bars_written + result.macro_observations_written
+        + result.news_items_written + result.corporate_events_written
+        + result.index_constituents_written + result.financial_statement_line_items_written
+    ) if result else 0
+    return {
+        "source_id": source_id,
+        "status": status,
+        "reason": reason,
+        # Explicit, mission-required metrics -- health is computed from
+        # usable output (yield/events), never from HTTP success alone.
+        "connection_success": bool(result and result.documents_fetched > 0),
+        "parse_success": yield_count > 0,
+        "yield": yield_count,
+        "events_produced": result.events_registered if result else 0,
+        "documents_fetched": result.documents_fetched if result else 0,
+        "batches_materialized": result.batches_materialized if result else 0,
+        "batches_withheld": result.batches_withheld if result else 0,
+        "price_bars_written": result.price_bars_written if result else 0,
+        "macro_observations_written": result.macro_observations_written if result else 0,
+        "news_items_written": result.news_items_written if result else 0,
+        "corporate_events_written": result.corporate_events_written if result else 0,
+        "index_constituents_written": (
+            result.index_constituents_written if result else 0
+        ),
+        "financial_statement_line_items_written": (
+            result.financial_statement_line_items_written if result else 0
+        ),
+        "events_registered": result.events_registered if result else 0,
+        "lifecycle_state": spec.lifecycle_state.value if spec else None,
+        "health_status": spec.health_status.value if spec else None,
+        "reputation_score": spec.reputation_score if spec else None,
+        "data_quality_score": spec.data_quality_score if spec else None,
+    }
+
+
 def export_collector_status(
     registry: SourceRegistry,
     results: dict[str, CollectionRunResult],
     *,
     unavailable: dict[str, str] | None = None,
+    failures: dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
-    """One row per source actually run this execution: what it fetched,
-    materialized, and withheld, plus the registry's current health/lifecycle/
-    reputation state for that source after this run. Plus one row per
-    `unavailable` source (id -> reason) this execution didn't even attempt --
-    `status="UNAVAILABLE"` with the concrete reason, per the mission's
-    graceful-degradation requirement: an unreachable/blocked source must be
-    visible with a reason, never silently omitted.
+    """One row per source this execution knew about, with an explicit,
+    output-based status -- never HTTP success alone:
+
+    - `COLLECTED`: ran, connected, and produced at least one usable
+      canonical record (yield > 0).
+    - `DEGRADED`: ran and connected (HTTP-level success, documents
+      fetched), but parsing produced zero usable records -- e.g. an
+      anti-bot challenge page, a wrong endpoint, or an unexpected format.
+      Never reported as healthy on zero yield, per the mission's explicit
+      rule (a real gap this closes: a source's first-ever zero-yield run
+      previously showed as COLLECTED/healthy with no reason at all).
+    - `FAILED`: the collector was attempted this run but `fetch()` itself
+      raised (timeout, DNS, connection refused, ...) -- `reason` carries
+      the exact exception.
+    - `UNAVAILABLE`: never attempted this run at all (PLANNED/NEEDS_KEY/
+      TOS_REVIEW/no verified config) -- `reason` explains why, per the
+      mission's graceful-degradation requirement: an unreachable/blocked
+      source must be visible with a reason, never silently omitted.
+
+    `health_status`/`reputation_score`/`data_quality_score` are read from
+    the registry *after* this run's `CollectionService` call, which now
+    records metrics/health for a `FAILED` fetch too (previously a fetch
+    exception bypassed the health/reputation system entirely).
     """
     rows = []
     for source_id, result in results.items():
-        spec = registry.latest(source_id)
-        rows.append(
-            {
-                "source_id": source_id,
-                "status": "COLLECTED",
-                "reason": None,
-                "documents_fetched": result.documents_fetched,
-                "batches_materialized": result.batches_materialized,
-                "batches_withheld": result.batches_withheld,
-                "price_bars_written": result.price_bars_written,
-                "macro_observations_written": result.macro_observations_written,
-                "news_items_written": result.news_items_written,
-                "corporate_events_written": result.corporate_events_written,
-                "index_constituents_written": result.index_constituents_written,
-                "financial_statement_line_items_written": (
-                    result.financial_statement_line_items_written
-                ),
-                "events_registered": result.events_registered,
-                "lifecycle_state": spec.lifecycle_state.value if spec else None,
-                "health_status": spec.health_status.value if spec else None,
-                "reputation_score": spec.reputation_score if spec else None,
-                "data_quality_score": spec.data_quality_score if spec else None,
-            }
+        yield_count = (
+            result.price_bars_written + result.macro_observations_written
+            + result.news_items_written + result.corporate_events_written
+            + result.index_constituents_written + result.financial_statement_line_items_written
         )
+        if yield_count > 0:
+            status, reason = "COLLECTED", None
+        else:
+            status = "DEGRADED"
+            reason = (
+                f"Connected and fetched {result.documents_fetched} document(s), but "
+                "parsing produced zero usable records this run (see the raw archived "
+                "document/parse warnings for the exact cause)."
+            )
+        rows.append(_collector_status_row(source_id, registry, status=status, reason=reason, result=result))
+    for source_id, reason in (failures or {}).items():
+        rows.append(_collector_status_row(source_id, registry, status="FAILED", reason=reason))
     for source_id, reason in (unavailable or {}).items():
-        spec = registry.latest(source_id)
-        rows.append(
-            {
-                "source_id": source_id,
-                "status": "UNAVAILABLE",
-                "reason": reason,
-                "documents_fetched": 0,
-                "batches_materialized": 0,
-                "batches_withheld": 0,
-                "price_bars_written": 0,
-                "macro_observations_written": 0,
-                "news_items_written": 0,
-                "corporate_events_written": 0,
-                "index_constituents_written": 0,
-                "financial_statement_line_items_written": 0,
-                "events_registered": 0,
-                "lifecycle_state": spec.lifecycle_state.value if spec else None,
-                "health_status": spec.health_status.value if spec else None,
-                "reputation_score": spec.reputation_score if spec else None,
-                "data_quality_score": spec.data_quality_score if spec else None,
-            }
-        )
+        rows.append(_collector_status_row(source_id, registry, status="UNAVAILABLE", reason=reason))
     return rows
 
 

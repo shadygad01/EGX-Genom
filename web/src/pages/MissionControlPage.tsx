@@ -6,7 +6,7 @@ import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
 import { formatDate, formatDateTime, formatNumber, formatPercent, titleCase } from "../lib/format";
-import type { GeneStatus, HealthStatus, RunStatus, StageStatus } from "../types";
+import type { CollectorStatusRow, GeneStatus, HealthStatus, RunStatus, StageStatus } from "../types";
 import styles from "./MissionControlPage.module.css";
 
 const STAGE_VARIANT: Record<StageStatus, BadgeVariant> = {
@@ -27,6 +27,13 @@ const HEALTH_VARIANT: Record<HealthStatus, BadgeVariant> = {
   degraded: "warning",
   down: "negative",
   unknown: "neutral",
+};
+
+const STATUS_VARIANT: Record<CollectorStatusRow["status"], BadgeVariant> = {
+  COLLECTED: "positive",
+  DEGRADED: "warning",
+  FAILED: "negative",
+  UNAVAILABLE: "neutral",
 };
 
 const GENE_VARIANT: Record<GeneStatus, BadgeVariant> = {
@@ -149,16 +156,26 @@ export function MissionControlPage() {
               {
                 key: "status",
                 header: "Status",
-                render: (c) => <Badge variant={c.status === "UNAVAILABLE" ? "negative" : "positive"}>{titleCase(c.status)}</Badge>,
+                render: (c) => <Badge variant={STATUS_VARIANT[c.status]}>{titleCase(c.status)}</Badge>,
               },
               {
                 key: "health",
                 header: "Health",
                 render: (c) => (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{titleCase(c.health_status)}</Badge> : "—"),
               },
+              {
+                key: "connection",
+                header: "Connected",
+                render: (c) => <Badge variant={c.connection_success ? "positive" : "negative"}>{c.connection_success ? "Yes" : "No"}</Badge>,
+              },
+              {
+                key: "parsed",
+                header: "Parsed",
+                render: (c) => <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? "Yes" : "No"}</Badge>,
+              },
+              { key: "yield", header: "Yield", align: "right", render: (c) => formatNumber(c.yield) },
+              { key: "events", header: "Events", align: "right", render: (c) => formatNumber(c.events_produced) },
               { key: "docs", header: "Documents", align: "right", render: (c) => formatNumber(c.documents_fetched) },
-              { key: "materialized", header: "Materialized", align: "right", render: (c) => formatNumber(c.batches_materialized) },
-              { key: "withheld", header: "Withheld", align: "right", render: (c) => formatNumber(c.batches_withheld) },
               { key: "quality", header: "Quality", align: "right", render: (c) => (c.data_quality_score != null ? formatPercent(c.data_quality_score) : "—") },
               { key: "reason", header: "Reason", render: (c) => c.reason ?? "—" },
             ]}

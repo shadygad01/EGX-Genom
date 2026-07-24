@@ -221,6 +221,48 @@ def test_run_records_source_metrics_and_updates_registry_health_and_reputation(t
     assert updated_spec.data_quality_score is not None
 
 
+class _FetchRaisingCollector(StubCollector):
+    """`fetch()` always raises -- simulates a real connection/timeout
+    failure (e.g. FRED's `fredgraph.csv` timing out), never reaching
+    `parse()` at all."""
+
+    def fetch(self):
+        raise TimeoutError("simulated: connection timed out")
+
+
+def test_fetch_failure_is_recorded_in_metrics_and_health_not_silently_dropped(tmp_path):
+    """The real bug this fixes: previously, an exception from `fetch()`
+    propagated straight out of `CollectionService.run()` before any metrics/
+    health bookkeeping ran, so a source whose `fetch()` always raised never
+    accumulated `consecutive_failures` and could never reach
+    `HealthStatus.DOWN` no matter how many times it failed.
+    """
+    import pytest
+
+    from agx_research.sources.registry import SourceRegistry
+    from agx_research.sources.reputation import SourceMetricsRepository
+    from agx_research.sources.spec import HealthStatus
+
+    registry = SourceRegistry()
+    registry.add(make_spec())
+    metrics_repo = SourceMetricsRepository()
+    service = CollectionService(
+        tmp_path, registry=registry, metrics=metrics_repo, min_confidence=0.5
+    )
+    collector = _FetchRaisingCollector(make_spec(), {})
+
+    for _ in range(3):
+        with pytest.raises(TimeoutError):
+            service.run(collector, expected_records=1)
+
+    metrics = metrics_repo.latest("stub_source")
+    assert metrics is not None
+    assert metrics.runs_total == 3
+    assert metrics.consecutive_failures == 3
+    updated_spec = registry.latest("stub_source")
+    assert updated_spec.health_status == HealthStatus.DOWN
+
+
 class _FakeTimedFetcher:
     """Stands in for `HttpFetcher`: only the `request_latencies` list matters
     to `CollectionService`, which reads new entries appended during

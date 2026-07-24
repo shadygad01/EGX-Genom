@@ -38,6 +38,24 @@ def test_healthy_run_produces_no_alerts():
     assert alerts == []
 
 
+def test_first_ever_run_with_zero_records_is_not_reported_healthy():
+    """The real bug this fixes: a source's very first run (no prior history,
+    `had_produced_before=False`) that connects successfully but parses zero
+    usable records must never be silently reported HEALTHY -- e.g. Stooq
+    returning an anti-bot challenge page instead of CSV on the first live
+    fetch ever attempted (fetch succeeds at the HTTP level, parse produces
+    nothing).
+    """
+    repo = SourceMetricsRepository()
+    metrics = repo.record_run("x", succeeded=True, records_expected=10, records_produced=0)
+    monitor = HealthMonitor(HealthAlertRepository())
+    status, alerts = monitor.evaluate_run(
+        "x", metrics, fetch_succeeded=True, records_produced=0, had_produced_before=False,
+    )
+    assert status != HealthStatus.HEALTHY
+    assert any(a.kind == AlertKind.ZERO_YIELD for a in alerts)
+
+
 def test_previously_producing_source_going_to_zero_records_flags_layout_change():
     repo = SourceMetricsRepository()
     metrics = repo.record_run("x", succeeded=True, records_expected=1, records_produced=1)

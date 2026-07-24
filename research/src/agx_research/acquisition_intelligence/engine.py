@@ -60,7 +60,7 @@ from agx_research.discovery.engine import (
 from agx_research.sources.qualification import apply_promotion, evaluate_promotion
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
-from agx_research.sources.spec import SourceSpec
+from agx_research.sources.spec import HealthStatus, SourceSpec, SourceStatus
 
 RobotsChecker = Callable[[str], bool | None]
 FetchText = Callable[[str], str | None]
@@ -184,6 +184,27 @@ class AcquisitionIntelligenceEngine:
         self, target: TargetOrganization, *, exclude_urls: set[str] | None = None
     ) -> AcquisitionResult:
         exclude_urls = exclude_urls or set()
+
+        # A target already IMPLEMENTED (an engineer wrote and verified a
+        # real collector for it) and not DOWN needs no "fresh discovery" --
+        # `generate_source_spec()` always mints a fresh PLANNED spec, and
+        # registering it here would silently regress an engineered,
+        # verified source back to PLANNED on every subsequent run (a real
+        # bug this closes: Enterprise's real, verified RSS feed was reset
+        # to PLANNED by this exact path immediately after being marked
+        # IMPLEMENTED). A DOWN source still needs rediscovery -- that's
+        # `AcquisitionContinuityMonitor`'s job, and this guard doesn't stop
+        # it, since it only skips the IMPLEMENTED-and-healthy case.
+        if target.existing_source_id:
+            existing = self.registry.latest(target.existing_source_id)
+            if existing is not None and existing.status == SourceStatus.IMPLEMENTED and (
+                existing.health_status != HealthStatus.DOWN
+            ):
+                return AcquisitionResult(
+                    target_id=target.id, resolved_domain=None, registered=False,
+                    reason=f"Already IMPLEMENTED and {existing.health_status.value}; "
+                    "no fresh discovery needed.",
+                )
 
         resolved = self.domain_resolver.resolve(target)
         if resolved is None:

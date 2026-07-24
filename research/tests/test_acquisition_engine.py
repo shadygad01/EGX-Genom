@@ -97,6 +97,71 @@ def test_robots_disallow_blocks_the_only_candidate():
     assert registry.latest("testorg") is None
 
 
+def test_already_implemented_healthy_target_is_not_rediscovered():
+    """Regression test for a real production bug: a live run marked
+    Enterprise IMPLEMENTED with its verified RSS feed, then the very same
+    pipeline run's own discovery stage re-ran `run_for_target` for it (it's
+    a named priority target every run attempts) and silently regressed it
+    back to PLANNED, since `generate_source_spec()` always mints a fresh
+    PLANNED spec and `run_for_target` unconditionally registered it. An
+    already-IMPLEMENTED, non-DOWN source needs no fresh discovery.
+    """
+    registry = SourceRegistry()
+    from agx_research.sources.spec import AccessMethod, HealthStatus, SourceSpec
+
+    registry.add(SourceSpec(
+        id="testorg", name="Test Org", category=SourceCategory.NEWS,
+        access_method=AccessMethod.RSS_FEED, status=SourceStatus.IMPLEMENTED,
+        base_url="https://testorg.com/real-feed.xml",
+        health_status=HealthStatus.HEALTHY,
+        reliability_score=0.7, freshness_score=0.9,
+    ))
+    probed: list[str] = []
+
+    def probe_that_should_not_be_called(url):
+        probed.append(url)
+        return ProbeResult(url=url, reachable=True, status_code=200)
+
+    engine = AcquisitionIntelligenceEngine(
+        prober=probe_that_should_not_be_called,
+        fetch_text=lambda url: HOMEPAGE_WITH_RSS,
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    result = engine.run_for_target(make_target(existing_source_id="testorg"))
+
+    assert result.registered is False
+    assert "Already IMPLEMENTED" in result.reason
+    assert probed == []  # no re-discovery network activity at all
+    spec = registry.latest("testorg")
+    assert spec.status == SourceStatus.IMPLEMENTED  # not regressed to PLANNED
+    assert spec.version == 1  # not overwritten with a new version either
+
+
+def test_already_implemented_but_down_target_still_gets_rediscovered():
+    registry = SourceRegistry()
+    from agx_research.sources.spec import AccessMethod, HealthStatus, SourceSpec
+
+    registry.add(SourceSpec(
+        id="testorg", name="Test Org", category=SourceCategory.NEWS,
+        access_method=AccessMethod.RSS_FEED, status=SourceStatus.IMPLEMENTED,
+        base_url="https://testorg.com/real-feed.xml",
+        health_status=HealthStatus.DOWN,
+        reliability_score=0.7, freshness_score=0.9,
+    ))
+    engine = AcquisitionIntelligenceEngine(
+        prober=reachable_prober({"https://testorg.com", "https://testorg.com/feed.xml"}),
+        fetch_text=lambda url: HOMEPAGE_WITH_RSS,
+        robots_checker=lambda url: True,
+        registry=registry,
+    )
+    result = engine.run_for_target(make_target(existing_source_id="testorg"))
+
+    # DOWN sources are exactly what discovery should still look for an
+    # alternative for -- the guard must not block this case.
+    assert result.registered is True
+
+
 def test_successful_run_registers_planned_spec_and_begins_qualification():
     registry = SourceRegistry()
     wayback = FakeWayback(cdx=[["timestamp"], ["20200101000000"], ["20250101000000"]])

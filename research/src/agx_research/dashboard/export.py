@@ -33,6 +33,7 @@ from agx_research.market_memory.state import MarketState
 from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.runtime.engine import RunRecordRepository, RunStatus
 from agx_research.sources.catalog import seed_sources
+from agx_research.sources.registry import SourceRegistry
 
 ARTIFACT_FILENAMES = (
     "knowledge.json",
@@ -105,7 +106,17 @@ def export_system_status(
     return status.model_dump(mode="json")
 
 
-def export_source_registry() -> list[dict[str, Any]]:
+def export_source_registry(registry: SourceRegistry | None = None) -> list[dict[str, Any]]:
+    """The registry's *current* state -- health/lifecycle/reputation as
+    actually measured by real collection/discovery runs -- when a real,
+    persisted `SourceRegistry` is supplied. Falls back to the static seed
+    catalog only when no registry exists (a real gap this closes: this
+    previously always called `seed_sources()` unconditionally, so
+    `source_registry.json` never reflected a single real collection or
+    discovery run no matter how many had actually happened).
+    """
+    if registry is not None:
+        return [s.model_dump(mode="json") for s in registry.all_latest()]
     return [s.model_dump(mode="json") for s in seed_sources()]
 
 
@@ -118,6 +129,7 @@ def write_dashboard_artifacts(
     tickers: list[str],
     as_of: date | None,
     out_dir: Path,
+    registry: SourceRegistry | None = None,
 ) -> dict[str, int]:
     """Writes every artifact in `ARTIFACT_FILENAMES` to `out_dir` and
     returns a filename -> item-count map (1 for the two single-object
@@ -137,7 +149,7 @@ def write_dashboard_artifacts(
         "system_status.json": export_system_status(
             runs, knowledge_store, pipeline_run_date=as_of
         ),
-        "source_registry.json": export_source_registry(),
+        "source_registry.json": export_source_registry(registry),
     }
 
     counts: dict[str, int] = {}

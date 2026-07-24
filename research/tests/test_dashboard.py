@@ -189,6 +189,25 @@ def test_export_source_registry_matches_catalog_size():
     assert any(s["id"] == "stooq" for s in exported)
 
 
+def test_export_source_registry_reflects_real_registry_when_supplied():
+    """The real gap this closes: previously `export_source_registry()`
+    always called `seed_sources()` unconditionally, so `source_registry.json`
+    never reflected a single real collection/discovery run's health update
+    no matter how many had actually happened. Passing the real registry
+    must surface its actual current health, not the pristine seed value.
+    """
+    from agx_research.sources.catalog import seed_registry
+    from agx_research.sources.registry import SourceRegistry
+    from agx_research.sources.spec import HealthStatus
+
+    registry = seed_registry(SourceRegistry())
+    registry.update_health("stooq", HealthStatus.DOWN)
+
+    exported = export_source_registry(registry)
+    stooq_row = next(s for s in exported if s["id"] == "stooq")
+    assert stooq_row["health_status"] == "down"
+
+
 # --- write_dashboard_artifacts + validate_dashboard_artifacts round trip ---
 
 

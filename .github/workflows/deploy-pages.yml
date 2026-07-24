@@ -77,23 +77,41 @@ jobs:
           uv run python -c "
           import json
           rows = json.load(open('../web/public/data/collector_status.json'))
-          collected = [r for r in rows if r['status'] == 'COLLECTED']
-          unavailable = [r for r in rows if r['status'] == 'UNAVAILABLE']
-          print(f'{len(collected)} collected, {len(unavailable)} unavailable')
-          for r in collected:
-              print(f\"  COLLECTED    {r['source_id']:<15} docs={r['documents_fetched']} \"
-                    f\"prices={r['price_bars_written']} macro={r['macro_observations_written']} \"
-                    f\"health={r['health_status']} quality={r['data_quality_score']}\")
-          for r in unavailable:
-              print(f\"  UNAVAILABLE  {r['source_id']:<15} {r['reason']}\")
+          by_status = {}
+          for r in rows:
+              by_status.setdefault(r['status'], []).append(r)
+          print({k: len(v) for k, v in by_status.items()})
+          for status in ['COLLECTED', 'DEGRADED', 'FAILED']:
+              for r in by_status.get(status, []):
+                  print(f\"  {status:<11} {r['source_id']:<15} connected={r['connection_success']} \"
+                        f\"parsed={r['parse_success']} yield={r['yield']} events={r['events_produced']} \"
+                        f\"health={r['health_status']} quality={r['data_quality_score']} reason={r['reason']}\")
+          for r in by_status.get('UNAVAILABLE', []):
+              print(f\"  UNAVAILABLE {r['source_id']:<15} {r['reason']}\")
           "
-          echo '--- execution report warnings (per-source failure reasons, if any) ---'
+          echo '--- execution report: overall status, stages, warnings ---'
           uv run python -c "
           import json
           report = json.load(open('../web/public/data/execution_report.json'))
           print('overall_status:', report['overall_status'])
+          for s in report['stages']:
+              print(f\"  {s['name']:<28} {s['status']:<10} {s['detail']}\")
+          print('warnings:')
           for w in report['warnings']:
               print(' -', w)
+          "
+          echo '--- Egyptian priority-source registry state after this run ---'
+          uv run python -c "
+          import json
+          registry = json.load(open('../web/public/data/source_registry.json'))
+          by_id = {}
+          for spec in registry:
+              by_id[spec['id']] = spec
+          for source_id in ['egx_official', 'cbe', 'enterprise_press', 'mubasher', 'zawya']:
+              spec = by_id.get(source_id)
+              if spec:
+                  print(f\"  {source_id:<18} status={spec['status']:<10} lifecycle={spec['lifecycle_state']:<10} \"
+                        f\"health={spec['health_status']:<8} base_url={spec['base_url']}\")
           "
           echo '--- raw stooq response + parse warnings (diagnosing zero price bars) ---'
           uv run python -c "
@@ -135,6 +153,14 @@ jobs:
 
   deploy:
     needs: build
+    # The `github-pages` environment's default deployment-branch policy
+    # only allows `main` to deploy; a manual workflow_dispatch test run on
+    # any other branch would otherwise fail this job instantly (0 steps
+    # ever run) with a misleading top-level workflow "failure", even though
+    # `build` (the actual production pipeline run) succeeded. Gate it
+    # explicitly so a feature-branch test run reports an honest "skipped"
+    # deploy instead of a false failure.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

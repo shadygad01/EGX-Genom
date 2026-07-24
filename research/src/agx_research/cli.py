@@ -318,6 +318,7 @@ def main(argv: list[str] | None = None) -> int:
             as_of = max((r.run_date for r in succeeded), default=None)
 
         memory = build_market_memory(args.data_dir, args.mock_data)
+        registry = seed_registry(SourceRegistry(args.data_dir / "source_registry.json"))
         counts = write_dashboard_artifacts(
             knowledge_store=KnowledgeStore(args.data_dir / "knowledge.json"),
             event_repository=EventRepository(args.data_dir / "events.json"),
@@ -326,6 +327,7 @@ def main(argv: list[str] | None = None) -> int:
             tickers=TICKERS,
             as_of=as_of,
             out_dir=args.out,
+            registry=registry,
         )
         print(json.dumps({"as_of": as_of.isoformat() if as_of else None, "counts": counts}, indent=2))
         return 0

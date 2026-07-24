@@ -617,6 +617,7 @@ class ProductionPipeline:
             tickers=self.tickers,
             as_of=as_of,
             out_dir=dashboard_out,
+            registry=self.registry,
         )
 
         investment_cases = self.investment_cases or {"as_of": None, "recommendations": [], "portfolio": None}

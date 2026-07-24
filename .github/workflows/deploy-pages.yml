@@ -171,6 +171,57 @@ jobs:
               print(f'parsed: {len(batch.price_bars)} price bar(s); warnings: {batch.parse_warnings}')
           "
 
+      # This phase's verification requirement: show the capability-driven
+      # Acquisition Decision Engine's full ranked strategy list per
+      # capability (not just the bottom-line collector_status.json rows),
+      # plus a raw, direct check of the sitemaps.org protocol convention
+      # (robots.txt's Sitemap: directive, and the default /sitemap.xml path)
+      # for Zawya specifically -- the one named Egyptian source whose
+      # homepage is reachable with real content but had no discoverable
+      # feed/dataset/API link, which is exactly what the sitemap fallback
+      # added this phase is meant to close. Both bare and www hosts are
+      # checked since `TargetOrganization` carries both as domain hints.
+      - name: Show acquisition decisions + raw sitemap-protocol probe for Zawya
+        run: |
+          echo '--- acquisition_decisions.json: every capability, ranked strategies, outcome ---'
+          uv run python -c "
+          import json
+          decisions = json.load(open('../web/public/data/acquisition_decisions.json'))
+          for d in decisions:
+              print(f\"{d['capability']:<25} succeeded={d['succeeded']} selected={d['selected_source_ids']}\")
+              for a in d['attempts']:
+                  print(f\"    rank={a['rank']:<2} {a['source_id']:<20} {a['outcome']:<10} \"
+                        f\"score={a['composite_score']:.3f} {a['reason']}\")
+          "
+          echo '--- raw sitemaps.org protocol probe: Zawya robots.txt Sitemap: directive + /sitemap.xml ---'
+          uv run python -c "
+          from agx_research.collectors.fetcher import HttpFetcher, FetchDisallowed, FetchError
+          from agx_research.sources.spec import (
+              AccessMethod, RateLimit, RetryPolicy, SourceCategory, SourceSpec, SourceStatus,
+          )
+          spec = SourceSpec(
+              id='probe_diag', name='probe', category=SourceCategory.RESEARCH,
+              access_method=AccessMethod.HTML_SCRAPE, status=SourceStatus.IMPLEMENTED,
+              reliability_score=0.0, freshness_score=0.0,
+              retry_policy=RetryPolicy(max_attempts=1, backoff_seconds=0.5),
+              rate_limit=RateLimit(requests_per_minute=20, min_seconds_between_requests=1.0),
+          )
+          fetcher = HttpFetcher()
+          for url in [
+              'https://zawya.com/robots.txt', 'https://zawya.com/sitemap.xml',
+              'https://www.zawya.com/robots.txt', 'https://www.zawya.com/sitemap.xml',
+          ]:
+              try:
+                  text = fetcher.fetch_text(url, spec)
+                  print(f'{url}: OK, {len(text)} chars, starts: {text[:400]!r}')
+              except FetchDisallowed as exc:
+                  print(f'{url}: ROBOTS_DISALLOWED: {exc}')
+              except FetchError as exc:
+                  print(f'{url}: FETCH_ERROR: {exc}')
+              except Exception as exc:
+                  print(f'{url}: {type(exc).__name__}: {exc}')
+          "
+
       - run: npm install
         working-directory: .
       - run: npm run build -w web

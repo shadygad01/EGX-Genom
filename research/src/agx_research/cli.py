@@ -90,10 +90,15 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--date", required=True, help="ISO date, e.g. 2026-06-14")
     run_parser.add_argument("--end-date", help="Optional ISO end date for a range")
     run_parser.add_argument(
-        "--mode", choices=["mock", "replay"], default="mock",
-        help="mock: fetch through synthetic-but-real-wire-format fixtures (default, always works). "
-        "replay: re-run the exact same pipeline against already-archived RawDocuments from a prior "
-        "run in this --data-dir -- proves the pipeline cannot tell live data from replayed data.",
+        "--mode", choices=["live", "mock", "replay"], default="live",
+        help="live: fetch real data from the network (default, production mode) -- Stooq/FRED/"
+        "World Bank against real endpoints, real robots.txt/rate-limit/retry; a source with no "
+        "verified live endpoint (EGX official, company IR, news outlets, ...) reports UNAVAILABLE "
+        "with its reason rather than being silently skipped, and every other collector keeps "
+        "running regardless. mock/replay are TESTING-ONLY and must never be used by a production "
+        "deployment: mock fetches through synthetic-but-real-wire-format fixtures; replay re-runs "
+        "the exact same pipeline against already-archived RawDocuments from a prior run in this "
+        "--data-dir, proving the pipeline cannot tell live data from replayed data.",
     )
     run_parser.add_argument(
         "--dashboard-out", type=Path,

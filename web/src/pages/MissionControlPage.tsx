@@ -147,6 +147,11 @@ export function MissionControlPage() {
             columns={[
               { key: "source", header: "Source", render: (c) => c.source_id },
               {
+                key: "status",
+                header: "Status",
+                render: (c) => <Badge variant={c.status === "UNAVAILABLE" ? "negative" : "positive"}>{titleCase(c.status)}</Badge>,
+              },
+              {
                 key: "health",
                 header: "Health",
                 render: (c) => (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{titleCase(c.health_status)}</Badge> : "—"),
@@ -155,6 +160,7 @@ export function MissionControlPage() {
               { key: "materialized", header: "Materialized", align: "right", render: (c) => formatNumber(c.batches_materialized) },
               { key: "withheld", header: "Withheld", align: "right", render: (c) => formatNumber(c.batches_withheld) },
               { key: "quality", header: "Quality", align: "right", render: (c) => (c.data_quality_score != null ? formatPercent(c.data_quality_score) : "—") },
+              { key: "reason", header: "Reason", render: (c) => c.reason ?? "—" },
             ]}
           />
         )}

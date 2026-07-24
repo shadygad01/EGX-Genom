@@ -1,24 +1,33 @@
 """Collector Selection + Execution wiring for the production pipeline.
 
-Per the mission brief: "Do NOT implement live production collectors yet.
-Instead implement production-ready execution using mock/replay/archive
-providers... the execution path must be identical to the future live
-path; only the data source changes." This module is exactly that seam:
+`ExecutionMode.LIVE` builds the *real* `Collector` subclasses this platform
+already ships (`StooqPriceCollector`, `FredCsvCollector`, `WorldBankCollector`)
+against a real `HttpFetcher` -- an actual network fetch, real robots.txt
+enforcement, real rate limiting/retry/backoff. This is the production
+default: the mission is "AGX must stop behaving as a demonstration system."
+`rss_generic` is deliberately left unwired in LIVE mode: it is `IMPLEMENTED`
+as a generic collector *class*, but no concrete news outlet in the catalog
+has a verified real feed URL yet (every named outlet stays `PLANNED`) --
+wiring one live would mean guessing a URL, which this codebase's own rule
+forbids. `unavailable_sources()` reports exactly why, per source, for
+Mission Control's graceful-degradation reporting.
 
-- `ExecutionMode.MOCK` builds the *real* `Collector` subclasses this
-  platform already ships (`StooqPriceCollector`, `FredCsvCollector`,
-  `RssNewsCollector`, `WorldBankCollector`) against a `MockFetcher` that
-  returns clearly-synthetic, wire-format-correct content instead of making
-  a network call -- the same numbers `research/data/mock/` already uses,
-  reformatted into each source's real CSV/JSON/RSS shape, so parsing
-  exercises real format-handling logic, not hand-built domain objects.
-- `ExecutionMode.REPLAY` wraps the same real collectors in
-  `ArchiveReplayCollector`, sourcing previously-archived `RawDocument`s
-  from a persisted `RawDocumentRepository` instead of fetching anything.
+`ExecutionMode.MOCK` and `ExecutionMode.REPLAY` remain for testing only
+(never used by a production deployment):
 
-Either way, `CollectionService.run()` is called identically -- the
-pipeline genuinely cannot tell whether its data is live, mocked, or
-replayed, because nothing about the call site changes.
+- `MOCK` builds the same real `Collector` subclasses against a
+  `MockFetcher` that returns clearly-synthetic, wire-format-correct
+  content instead of making a network call -- the same numbers
+  `research/data/mock/` already uses, reformatted into each source's real
+  CSV/JSON/RSS shape, so parsing exercises real format-handling logic, not
+  hand-built domain objects.
+- `REPLAY` wraps the same real collectors in `ArchiveReplayCollector`,
+  sourcing previously-archived `RawDocument`s from a persisted
+  `RawDocumentRepository` instead of fetching anything.
+
+Every mode calls `CollectionService.run()` identically -- the pipeline
+genuinely cannot tell whether its data is live, mocked, or replayed,
+because nothing about the call site changes.
 """
 
 from __future__ import annotations
@@ -28,18 +37,79 @@ from enum import Enum
 
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import Collector
+from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.collectors.worldbank import WorldBankCollector
 from agx_research.sources.registry import SourceRegistry
-from agx_research.sources.spec import SourceSpec
+from agx_research.sources.spec import SourceSpec, SourceStatus
 
 
 class ExecutionMode(str, Enum):
+    LIVE = "live"
     MOCK = "mock"
     REPLAY = "replay"
+
+
+# ---- LIVE mode: real identifiers for the sources this pipeline already
+# knows how to wire, never a guessed URL. Each is a well-established, long-
+# stable public identifier already declared as this source's convention
+# elsewhere in this codebase (never invented for this pipeline alone):
+# Stooq's `.eg` suffix for EGX tickers is documented in `sources/catalog.py`'s
+# own `historical_coverage` field for the `stooq` entry; the World Bank
+# indicator code below is the same one the mock fixture already uses (a
+# real, decades-stable indicator code, not a mock invention); the FRED
+# series below are long-established, textbook-stable US government series
+# (oil, dollar index, treasury yield) -- the same confidence tier this
+# codebase already grants FRED's/World Bank's endpoint *shape*.
+LIVE_STOOQ_TICKER_SUFFIX = ".eg"
+LIVE_FRED_SERIES_IDS = ["DCOILBRENTEU", "DTWEXBGS", "DGS10"]
+LIVE_WORLDBANK_INDICATORS = {"FP.CPI.TOTL.ZG": "egypt_cpi_inflation"}
+LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICATORS.values())
+
+# Conservative floors, not true full-history sizes (unknown until a real
+# fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
+# lowballing here never unfairly penalizes a real result, it only avoids
+# guessing at a number this pipeline cannot know in advance.
+EXPECTED_RECORDS_LIVE = {"stooq": 100, "fred": 100, "worldbank": 10}
+
+_UNAVAILABLE_REASON_BY_STATUS = {
+    SourceStatus.PLANNED: (
+        "Endpoint not yet verified against a real fetch; this codebase's own "
+        "rule forbids wiring a collector against a guessed URL (see "
+        "docs/DATA_ACQUISITION.md)."
+    ),
+    SourceStatus.NEEDS_KEY: (
+        "Collector is code-complete but requires a user-supplied API key that "
+        "has not been provided."
+    ),
+    SourceStatus.TOS_REVIEW: (
+        "Automated collection/redistribution terms are ambiguous; collection "
+        "stays blocked until a human legal/ToS review clears them."
+    ),
+    SourceStatus.DISABLED: "Source explicitly disabled in the registry.",
+}
+
+
+def unavailable_sources(registry: SourceRegistry, wired_ids: set[str]) -> dict[str, str]:
+    """Every registered source *not* collected this execution, with the
+    concrete reason -- so Mission Control can show `UNAVAILABLE` and why,
+    instead of silently omitting a source (the mission's graceful-
+    degradation requirement: unavailable sources must be visible, not
+    invisible, and every remaining collector must keep running regardless).
+    """
+    reasons: dict[str, str] = {}
+    for spec in registry.all_latest():
+        if spec.id in wired_ids:
+            continue
+        reasons[spec.id] = _UNAVAILABLE_REASON_BY_STATUS.get(
+            spec.status,
+            "IMPLEMENTED collector exists, but this pipeline has no verified "
+            "live configuration (e.g. a real per-outlet feed URL) for it yet.",
+        )
+    return reasons
 
 
 class MockFetcher:
@@ -204,6 +274,39 @@ def build_collector_plan(
     tickers = tickers or list(_STOOQ_PRICES)
 
     plans: list[PlannedCollector] = []
+    if mode == ExecutionMode.LIVE:
+        fetcher = HttpFetcher()
+        if "stooq" in collectable:
+            symbols = {t: f"{t.lower()}{LIVE_STOOQ_TICKER_SUFFIX}" for t in tickers}
+            plans.append(
+                PlannedCollector(
+                    "stooq", StooqPriceCollector(collectable["stooq"], symbols=symbols, fetcher=fetcher)
+                )
+            )
+        if "fred" in collectable:
+            plans.append(
+                PlannedCollector(
+                    "fred",
+                    FredCsvCollector(
+                        collectable["fred"], series_ids=list(LIVE_FRED_SERIES_IDS), fetcher=fetcher
+                    ),
+                )
+            )
+        if "worldbank" in collectable:
+            plans.append(
+                PlannedCollector(
+                    "worldbank",
+                    WorldBankCollector(
+                        collectable["worldbank"],
+                        indicators=dict(LIVE_WORLDBANK_INDICATORS),
+                        fetcher=fetcher,
+                    ),
+                )
+            )
+        # rss_generic deliberately excluded: no real, verified feed URL
+        # exists for any news outlet yet (see `unavailable_sources`).
+        return plans
+
     if mode == ExecutionMode.MOCK:
         content_by_url = _mock_url_map(collectable)
         fetcher = MockFetcher(content_by_url)

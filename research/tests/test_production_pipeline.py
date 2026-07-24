@@ -7,11 +7,20 @@ service test suites -- these tests exercise the *wiring*, not the
 individual systems being wired.
 """
 
+import json
+import urllib.error
+import urllib.request
 from datetime import date
 
 import pytest
 
-from agx_research.production.collector_plan import ExecutionMode
+from agx_research.collectors.fetcher import HttpFetcher
+from agx_research.production.collector_plan import (
+    LIVE_FRED_SERIES_IDS,
+    LIVE_STOOQ_TICKER_SUFFIX,
+    LIVE_WORLDBANK_INDICATORS,
+    ExecutionMode,
+)
 from agx_research.production.pipeline import ProductionPipeline
 from agx_research.production.stages import StageName, StageStatus
 
@@ -260,6 +269,114 @@ def test_run_rejects_end_before_start(tmp_path):
     pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
     with pytest.raises(ValueError):
         pipeline.run(RUN_DATE, date(2026, 6, 1))
+
+
+class _FakeResponse:
+    def __init__(self, text: str):
+        self._text = text
+
+    def read(self):
+        return self._text.encode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+
+def _canned_live_urlopen(content_by_url: dict[str, str]):
+    """No live network call: same fakes-over-fixtures pattern as
+    `test_http_fetcher.py`, exercising the exact LIVE-mode code path
+    (real `HttpFetcher`, real collector classes, real URL construction)
+    against real-wire-format content, never against the actual internet.
+    """
+
+    def _urlopen(request, timeout=None):
+        url = request.full_url
+        if url not in content_by_url:
+            raise urllib.error.URLError(f"no canned content for {url!r}")
+        return _FakeResponse(content_by_url[url])
+
+    return _urlopen
+
+
+def _live_content_fixture() -> dict[str, str]:
+    content: dict[str, str] = {}
+    for ticker in TICKERS:
+        stooq_symbol = f"{ticker.lower()}{LIVE_STOOQ_TICKER_SUFFIX}"
+        content[f"https://stooq.com/q/d/l/?s={stooq_symbol}&i=d"] = (
+            "Date,Open,High,Low,Close,Volume\n2026-06-01,68.10,68.90,67.80,68.50,1250000\n"
+        )
+    for series_id in LIVE_FRED_SERIES_IDS:
+        content[f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"] = (
+            f"DATE,{series_id}\n2026-06-01,85.30\n"
+        )
+    for indicator in LIVE_WORLDBANK_INDICATORS:
+        content[
+            f"https://api.worldbank.org/v2/country/EGY/indicator/{indicator}"
+            "?format=json&per_page=1000"
+        ] = (
+            '[{"page": 1, "pages": 1, "per_page": 1000, "total": 1},'
+            '[{"indicator": {"id": "' + indicator + '", "value": "x"},'
+            '"country": {"id": "EG", "value": "Egypt, Arab Rep."}, "countryiso3code": "EGY",'
+            '"date": "2025", "value": 24.4, "unit": "", "obs_status": "", "decimal": 1}]]'
+        )
+    return content
+
+
+def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_path, monkeypatch):
+    monkeypatch.setattr(HttpFetcher, "_robots_allows", lambda self, url: True)
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
+    monkeypatch.setattr(urllib.request, "urlopen", _canned_live_urlopen(_live_content_fixture()))
+
+    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    report = pipeline.run(RUN_DATE, mode=ExecutionMode.LIVE)
+
+    assert report.execution_mode == "live"
+    assert report.overall_status != StageStatus.FAILED
+    assert set(pipeline.collection_results) == {"stooq", "fred", "worldbank"}
+
+    collector_status = json.loads(
+        (tmp_path / "data" / "dashboard" / "collector_status.json").read_text()
+    )
+    by_id = {row["source_id"]: row for row in collector_status}
+    assert by_id["stooq"]["status"] == "COLLECTED"
+    assert by_id["stooq"]["documents_fetched"] == len(TICKERS)
+    # rss_generic is IMPLEMENTED but has no verified real feed URL yet --
+    # must show up as UNAVAILABLE with a reason, never silently omitted.
+    assert by_id["rss_generic"]["status"] == "UNAVAILABLE"
+    assert "feed URL" in by_id["rss_generic"]["reason"]
+    # PLANNED sources (never guessed a URL) are visible too, with why.
+    assert by_id["egx_official"]["status"] == "UNAVAILABLE"
+    assert "not yet verified" in by_id["egx_official"]["reason"]
+
+
+def test_live_mode_fails_loudly_when_every_collector_fails(tmp_path, monkeypatch):
+    """Never silently fall back to mock: if no live source succeeds at
+    all, the pipeline must report FAILED (and the CLI must exit non-zero)
+    rather than the milder PARTIAL a generic per-stage rule would compute
+    once later stages "succeed" vacuously against zero collected data.
+    """
+    monkeypatch.setattr(HttpFetcher, "_robots_allows", lambda self, url: True)
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
+
+    def _always_fails(request, timeout=None):
+        raise urllib.error.URLError("simulated: no route to host")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _always_fails)
+
+    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    report = pipeline.run(RUN_DATE, mode=ExecutionMode.LIVE)
+
+    assert report.overall_status == StageStatus.FAILED
+    assert pipeline.collection_results == {}
+    collector_execution = report.stage(StageName.COLLECTOR_EXECUTION)
+    assert collector_execution.status == StageStatus.FAILED
+    # The exact per-source failure reason is recorded (never a bare "failed"
+    # with no detail) -- collector-level failures are this stage's own
+    # warnings, since the stage itself handles them rather than raising.
+    assert any("no route to host" in w for w in collector_execution.warnings)
 
 
 def test_cli_run_command_executes_full_pipeline(tmp_path, capsys):

@@ -40,24 +40,29 @@ jobs:
 
       - run: uv sync
 
-      # Runs the complete production pipeline -- this is the single entry
-      # point (`agx run`) that will later run unchanged in a live
-      # deployment: Source Registry -> Discovery Engine -> Collector
-      # Selection/Execution -> Raw Archive -> Canonical Transformation ->
-      # Validation -> Event Platform -> Market Memory -> Knowledge Base ->
-      # Research Pipeline -> Genome -> Investment Case Generator ->
-      # Dashboard Artifact Generator -> Mission Control -> Execution Report.
-      # Collector Execution runs in --mode mock (production-ready execution
-      # against clearly-synthetic, wire-format-correct fixtures standing in
-      # for a licensed EGX vendor -- see docs/DATA_ACQUISITION.md); this is
-      # mechanically real pipeline output end to end, only as "real" as the
-      # mock data feeding it (see docs/PHASE_STATUS.md). Default
-      # (non-permissive) gate thresholds are used, so an honest "nothing
-      # promoted yet" is an expected result, not a failure.
-      - name: Run the complete production pipeline
+      # Runs the complete production pipeline against REAL public market
+      # data -- this is the single entry point (`agx run`), unchanged in
+      # shape from every prior mock-mode run: Source Registry -> Discovery
+      # Engine -> Collector Selection/Execution -> Raw Archive -> Canonical
+      # Transformation -> Validation -> Event Platform -> Market Memory ->
+      # Knowledge Base -> Research Pipeline -> Genome -> Investment Case
+      # Generator -> Dashboard Artifact Generator -> Mission Control ->
+      # Execution Report. `--mode live` (the CLI's default) fetches real
+      # Stooq/FRED/World Bank data over the network; a source with no
+      # verified live endpoint yet (EGX official, company IR, news outlets)
+      # reports UNAVAILABLE with its reason in `collector_status.json`
+      # rather than being silently skipped, and every other collector keeps
+      # running regardless (graceful degradation, never a silent mock
+      # fallback -- see docs/DATA_ACQUISITION.md). If zero live sources
+      # succeed, `agx run` exits non-zero and this step -- and the whole
+      # deployment -- fails loudly rather than publish an empty or stale
+      # dashboard. Default (non-permissive) gate thresholds are used, so an
+      # honest "nothing promoted yet" from real data is an expected result,
+      # not a failure.
+      - name: Run the complete production pipeline (live data)
         run: |
           uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data \
-            run --date 2026-06-14 --mode mock --dashboard-out ../web/public/data
+            run --date "$(date -u +%F)" --mode live --dashboard-out ../web/public/data
 
       - name: Validate dashboard JSON artifacts
         run: uv run python -m agx_research.cli validate-dashboard --dir ../web/public/data

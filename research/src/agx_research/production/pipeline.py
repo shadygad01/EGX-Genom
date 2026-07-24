@@ -73,8 +73,11 @@ from agx_research.papers.repository import PaperRepository
 from agx_research.production import artifacts as production_artifacts
 from agx_research.production.collector_plan import (
     EXPECTED_RECORDS,
+    EXPECTED_RECORDS_LIVE,
+    LIVE_MACRO_SERIES_IDS,
     ExecutionMode,
     build_collector_plan,
+    unavailable_sources,
 )
 from agx_research.production.mission_control import build_mission_control_status
 from agx_research.production.report import (
@@ -107,6 +110,10 @@ class ProductionPipeline:
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.tickers = tickers
+        # Deferred to `run()`, which knows the execution mode: LIVE fetches
+        # real FRED/World Bank series ids, which differ from the mock
+        # fixtures' placeholder ids -- an explicit override here always wins.
+        self._macro_series_ids_override = macro_series_ids
         self.macro_series_ids = macro_series_ids or list(_DEFAULT_MACRO_SERIES)
 
         # Populated by stages as they run; downstream stages check these
@@ -128,6 +135,8 @@ class ProductionPipeline:
         self.run_records_this_execution: list[RunRecord] = []
         self.investment_cases: dict | None = None
         self.dashboard_counts: dict[str, int] = {}
+        self.mode: ExecutionMode = ExecutionMode.LIVE
+        self._unavailable: dict[str, str] = {}
 
     # ---- the public entrypoint ----------------------------------------
 
@@ -136,13 +145,20 @@ class ProductionPipeline:
         start: date,
         end: date | None = None,
         *,
-        mode: ExecutionMode = ExecutionMode.MOCK,
+        mode: ExecutionMode = ExecutionMode.LIVE,
         dashboard_out: Path | None = None,
     ) -> ExecutionReport:
         end = end or start
         if end < start:
             raise ValueError("end must be on or after start")
         dashboard_out = dashboard_out or (self.data_dir / "dashboard")
+        self.mode = mode
+        if self._macro_series_ids_override is not None:
+            self.macro_series_ids = list(self._macro_series_ids_override)
+        elif mode == ExecutionMode.LIVE:
+            self.macro_series_ids = list(LIVE_MACRO_SERIES_IDS)
+        else:
+            self.macro_series_ids = list(_DEFAULT_MACRO_SERIES)
 
         started_at = datetime.now()
         stages: list[StageResult] = []
@@ -213,7 +229,7 @@ class ProductionPipeline:
             started_at=started_at,
             completed_at=completed_at,
             duration_seconds=(completed_at - started_at).total_seconds(),
-            overall_status=derive_overall_status(stages),
+            overall_status=self._overall_status(stages),
             stages=list(stages),
             artifacts_generated=dict(self.dashboard_counts),
             errors=list(errors),
@@ -236,7 +252,7 @@ class ProductionPipeline:
         report = report.model_copy(
             update={
                 "stages": list(stages),
-                "overall_status": derive_overall_status(stages),
+                "overall_status": self._overall_status(stages),
                 "skipped_stages": [s.name.value for s in stages if s.status == StageStatus.SKIPPED],
             }
         )
@@ -253,6 +269,19 @@ class ProductionPipeline:
             json.dumps(final_report.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
         )
         return final_report
+
+    def _overall_status(self, stages: list[StageResult]) -> StageStatus:
+        """`derive_overall_status`'s generic per-stage rule, plus the
+        mission's explicit LIVE-mode failure policy: never silently fall
+        back to mock, and if no live source succeeds at all, fail loudly
+        rather than report the milder PARTIAL a generic per-stage rule
+        would otherwise compute (most later stages "succeed" vacuously with
+        zero rows once collection produces nothing).
+        """
+        status = derive_overall_status(stages)
+        if self.mode == ExecutionMode.LIVE and not self.collection_results:
+            return StageStatus.FAILED
+        return status
 
     # ---- individual stages ---------------------------------------------
 
@@ -291,16 +320,21 @@ class ProductionPipeline:
         self._planned = build_collector_plan(
             self.registry, mode=mode, raw_documents=self.raw_documents, tickers=self.tickers,
         )
+        self._unavailable = unavailable_sources(
+            self.registry, {p.source_id for p in self._planned}
+        )
         if not self._planned:
             return (
                 StageStatus.SKIPPED,
-                "No collectable source matched this pipeline's collector plan.",
+                f"No collectable source matched this pipeline's collector plan "
+                f"({len(self._unavailable)} source(s) unavailable).",
                 [],
             )
         return (
             StageStatus.SUCCEEDED,
             f"Selected {len(self._planned)} collector(s): "
-            f"{', '.join(p.source_id for p in self._planned)} (mode={mode.value}).",
+            f"{', '.join(p.source_id for p in self._planned)} (mode={mode.value}); "
+            f"{len(self._unavailable)} source(s) unavailable this run.",
             [],
         )
 
@@ -321,14 +355,20 @@ class ProductionPipeline:
             min_confidence=0.5,
         )
 
+        expected_records = EXPECTED_RECORDS_LIVE if self.mode == ExecutionMode.LIVE else EXPECTED_RECORDS
+
         failures: list[str] = []
         for plan in planned:
             try:
                 result = service.run(
-                    plan.collector, expected_records=EXPECTED_RECORDS.get(plan.source_id, 1)
+                    plan.collector, expected_records=expected_records.get(plan.source_id, 1)
                 )
                 self.collection_results[plan.source_id] = result
             except Exception as exc:
+                # The exact reason -- exception type + message (an HTTP/URL
+                # error from `HttpFetcher` in LIVE mode carries the real
+                # status/timeout detail) -- never abort the remaining
+                # collectors for one source's failure.
                 failures.append(f"{plan.source_id}: {type(exc).__name__}: {exc}")
 
         succeeded = len(self.collection_results)
@@ -540,7 +580,7 @@ class ProductionPipeline:
         counts["investment_cases.json"] = len(investment_cases["recommendations"])
 
         collector_status = production_artifacts.export_collector_status(
-            self.registry, self.collection_results
+            self.registry, self.collection_results, unavailable=self._unavailable
         )
         (dashboard_out / "collector_status.json").write_text(
             json.dumps(collector_status, indent=2, sort_keys=True) + "\n"

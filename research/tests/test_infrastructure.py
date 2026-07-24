@@ -60,7 +60,11 @@ def test_cli_run_and_status_and_backup(tmp_path, capsys):
     data_dir = tmp_path / "agx_data"
     base = ["--data-dir", str(data_dir)]
 
-    assert main([*base, "run", "--date", date(2026, 6, 14).isoformat()]) == 0
+    # This is a CLI-plumbing test (run/status/backup), not a live-collection
+    # test -- unit tests never touch the network (see docs/DATA_ACQUISITION.md),
+    # so it must pass an explicit testing-only mode rather than rely on the
+    # CLI's production default (`--mode live`, which needs real egress).
+    assert main([*base, "run", "--date", date(2026, 6, 14).isoformat(), "--mode", "mock"]) == 0
     out = capsys.readouterr().out
     assert "2026-06-14 succeeded" in out
 

@@ -60,11 +60,18 @@ def export_investment_cases(
 
 
 def export_collector_status(
-    registry: SourceRegistry, results: dict[str, CollectionRunResult]
+    registry: SourceRegistry,
+    results: dict[str, CollectionRunResult],
+    *,
+    unavailable: dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
     """One row per source actually run this execution: what it fetched,
     materialized, and withheld, plus the registry's current health/lifecycle/
-    reputation state for that source after this run.
+    reputation state for that source after this run. Plus one row per
+    `unavailable` source (id -> reason) this execution didn't even attempt --
+    `status="UNAVAILABLE"` with the concrete reason, per the mission's
+    graceful-degradation requirement: an unreachable/blocked source must be
+    visible with a reason, never silently omitted.
     """
     rows = []
     for source_id, result in results.items():
@@ -72,6 +79,8 @@ def export_collector_status(
         rows.append(
             {
                 "source_id": source_id,
+                "status": "COLLECTED",
+                "reason": None,
                 "documents_fetched": result.documents_fetched,
                 "batches_materialized": result.batches_materialized,
                 "batches_withheld": result.batches_withheld,
@@ -84,6 +93,29 @@ def export_collector_status(
                     result.financial_statement_line_items_written
                 ),
                 "events_registered": result.events_registered,
+                "lifecycle_state": spec.lifecycle_state.value if spec else None,
+                "health_status": spec.health_status.value if spec else None,
+                "reputation_score": spec.reputation_score if spec else None,
+                "data_quality_score": spec.data_quality_score if spec else None,
+            }
+        )
+    for source_id, reason in (unavailable or {}).items():
+        spec = registry.latest(source_id)
+        rows.append(
+            {
+                "source_id": source_id,
+                "status": "UNAVAILABLE",
+                "reason": reason,
+                "documents_fetched": 0,
+                "batches_materialized": 0,
+                "batches_withheld": 0,
+                "price_bars_written": 0,
+                "macro_observations_written": 0,
+                "news_items_written": 0,
+                "corporate_events_written": 0,
+                "index_constituents_written": 0,
+                "financial_statement_line_items_written": 0,
+                "events_registered": 0,
                 "lifecycle_state": spec.lifecycle_state.value if spec else None,
                 "health_status": spec.health_status.value if spec else None,
                 "reputation_score": spec.reputation_score if spec else None,

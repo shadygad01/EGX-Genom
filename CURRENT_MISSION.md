@@ -1,6 +1,6 @@
 # Current Mission
 
-**Superseded three times since the "no egress" finding below.** That finding was
+**Superseded five times since the "no egress" finding below.** That finding was
 specific to *this coding sandbox*; the production deployment target
 (GitHub Actions, `.github/workflows/deploy-pages.yml`) has real outbound
 egress and has since run the pipeline live multiple times, producing
@@ -8,7 +8,82 @@ first-party evidence that changed the picture substantially. The original
 "blocked at the mission's own stop condition" framing is preserved below
 for its own historical accuracy but is **no longer the current state**.
 
-## Latest mission: first real Egyptian market data flowing live (this phase)
+## Latest mission: price-data feasibility, evaluated with live evidence (this phase)
+
+Explicit question: can AGX build statistically valid investment research
+using only legally obtainable free Egyptian market price data? If not,
+prove it with evidence after evaluating every realistic free source; if
+so, implement the minimum viable capability.
+
+**Answer: no autonomously-implementable free strategy currently exists —
+demonstrated, not assumed.** Every option engineering can act on
+unilaterally is now evidenced-blocked by a live fetch this phase: Stooq's
+robots.txt disallows its CSV-download mechanism entirely (confirmed
+blanket, not EGX-scoped — an equivalent US-ticker path and even robots.txt
+itself are disallowed identically); Yahoo Finance's actual Terms of
+Service, fetched and quoted directly, explicitly prohibits "automated
+means... robots, spiders, scrapers, data mining tools" (superseding the
+prior "ambiguous" framing with a definitive answer); Investing.com
+returned 403 Forbidden outright; TradingView's real policies page shows
+explicit data-ownership/redistribution restrictions; Mubasher's and
+Zawya's own homepages (508 and 154 links scanned) have zero
+download/historical/export/csv/market-data links — nothing to discover,
+not a legality question; EGX official remains network-level blocked,
+reconfirmed. The one non-wall option (a NEEDS_KEY aggregator's free tier)
+is explicitly a business decision reserved for the project owner, not
+something engineering can supply on its own. Full evidence table:
+`docs/ACQUISITION_STRATEGY.md`'s "Price Data Feasibility Mission" section.
+
+**Nothing was implemented, and that is the correct outcome**: writing a
+collector against any ToS/robots.txt-blocked source would violate this
+program's own hard rules; Mubasher/Zawya have no structured endpoint to
+write one against at all. `Price Data`/`Market Breadth` stay honestly
+`UNAVAILABLE` — no number was fabricated to fill the gap. This confirms,
+with today's direct evidence rather than inherited assumption, the same
+blocker `docs/ROADMAP.md`/`MISSION_CONTROL.md` already named: a licensed
+EGX market data vendor remains a business decision, not an engineering gap.
+
+## Prior mission: coverage expansion (same phase's earlier half)
+
+Explicit job: audit every registered source's real operational state,
+then expand production coverage using only verified, legal, maintainable
+strategies, reusing the existing architecture.
+
+**Two new live sources**, verified with the same rigor as Enterprise:
+`fra_egypt` (Egypt's own Financial Regulatory Authority,
+`fra.gov.eg/feed/` — the first official Egyptian government source this
+platform has connected; 10 real disclosure items, 10 events,
+`data_quality_score=0.95`) and `skynews_arabia_economy`
+(`skynewsarabia.com/rss.xml`, legally cleared, feed independently
+confirmed live, not yet exercised by a live collection cycle since
+`enterprise_press` ranks higher for the same capabilities). Both found by
+the same RSS-autodiscovery heuristic that found Enterprise's feed — no new
+architecture.
+
+**Two real, previously-latent bugs found and fixed by actually running
+expanded discovery live**, not by inspection: (1) nine catalogued-but-
+never-attempted outlets had no `TargetOrganization` entry at all, so
+`agx discover-sources` had nothing to run against them — closed by adding
+one per outlet with its own public brand domain as a hint; (2) the
+production pipeline's own discovery stage separately had its *own*
+hardcoded 5-id allowlist left over from an earlier mission, so even a
+target with a `TargetOrganization` entry was never automatically attempted
+by a real `agx run --mode live` — only reachable via a manual CLI call.
+Fresh discovery now runs every non-per-constituent seeded target every
+live run. Running that expanded discovery immediately surfaced a third
+real bug: `cnbc_arabia`'s real sitemap.xml contains a non-compliant
+relative `<loc>` entry that `discover_sitemap_urls()` had never resolved
+against its own URL (unlike every other discovery function), crashing the
+whole discovery stage with a `ValueError` its own exception handling
+didn't catch. Fixed with `urljoin()` plus a defensive `HttpFetcher`
+widening. Full detail: `docs/ACQUISITION_STRATEGY.md`'s
+"Coverage-Expansion Mission" section.
+
+518→522 backend tests pass (4 new regression tests for the sitemap/fetcher
+bugs); `ruff check` clean; deployed live via GitHub Actions and verified
+serving from `main`.
+
+## Prior mission: first real Egyptian market data flowing live
 
 The prior mission (below) built the capability-driven runtime engine but
 had never produced real EGX-specific data — World Bank (macro) was the

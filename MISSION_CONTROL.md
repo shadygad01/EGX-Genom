@@ -18,38 +18,53 @@ commit whenever the fact they state changes.
   research engine, production pipeline, and frontend complete; every
   research conclusion the platform can currently produce is still scoped
   to placeholder/mock data — no live source is connected yet.
-- **Current mission: first real Egyptian market data flowing live —
-  succeeded.** `enterprise_press` is now `IMPLEMENTED`/`TRUSTED`, collecting
-  real news from `https://enterpriseam.com/egypt/feed/` (found via standard
-  RSS autodiscovery on its own homepage, never guessed). A live GitHub
-  Actions run confirmed: 6 real news items parsed, 6 real events registered
-  in the Event Platform, `data_quality_score=0.97`. `corporate_disclosures`,
-  `corporate_actions`, and `news` capabilities all report `succeeded=True`
-  in `acquisition_decisions.json`. Getting here surfaced and fixed three
-  real bugs — an unhandled crash on non-ASCII URLs, an unbounded robots.txt
-  fetch that hung a run for 90+ minutes, and an unbounded sitemap-candidate
-  count that caused a second ~70-minute hang — plus a fourth correctness
-  bug where discovery silently regressed an `IMPLEMENTED` source back to
-  `PLANNED` on every subsequent run. Full detail: `CURRENT_MISSION.md` and
-  `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section.
-  This followed the capability-driven runtime engine mission (every data
-  requirement is an independent `Capability` with a ranked strategy pool,
-  `acquisition_intelligence.capability`/`capability_engine`), which itself
-  followed the acquisition-strategy analysis and Egyptian Live Data Sprint
-  missions — the platform has run live via GitHub Actions (which has real
-  outbound egress, unlike this coding sandbox) many times since.
-- **Live-run evidence:** World Bank is `IMPLEMENTED` and has collected 66
-  real Egypt CPI inflation observations (macro, not EGX-specific).
-  `enterprise_press` is `IMPLEMENTED` and collecting real EGX news/events
-  (see above — the first genuinely EGX-specific live source). Stooq is
-  reachable but blocked by a Cloudflare-style JS challenge (confirmed at
-  its real CSV endpoint, not just its homepage); FRED's live behavior
-  varies (sometimes succeeds, sometimes times out); the four remaining
-  named Egyptian sources (EGX, CBE, Mubasher, Zawya) each fail with a
-  distinct, evidenced, source-side reason (network-level reset, WAF
-  rejection, robots.txt disallow, or — Zawya — a real, parseable sitemap
-  whose entries are all HTML article pages, not a legally-clearable feed).
-  Full detail: `docs/ACQUISITION_STRATEGY.md`.
+- **Current mission: price-data feasibility — proven impossible
+  autonomously, with live evidence, not assumed.** Evaluated every
+  realistic free source for EGX equity OHLCV this phase: Stooq's
+  robots.txt disallows its CSV-download mechanism as a blanket block (not
+  EGX-scoped — confirmed against a US-ticker path and even robots.txt
+  itself); Yahoo Finance's real Terms of Service, fetched and quoted
+  directly, explicitly prohibits automated collection; Investing.com
+  returned 403 Forbidden outright; TradingView's real policies page shows
+  explicit data-ownership/redistribution restrictions; Mubasher's and
+  Zawya's own homepages (508 and 154 links scanned) have zero structured
+  price-data links to discover; EGX official remains network-level
+  blocked. The only non-wall option (a NEEDS_KEY aggregator's free tier)
+  is a business decision reserved for the project owner. Nothing was
+  implemented — `Price Data`/`Market Breadth` correctly stay
+  `UNAVAILABLE`, no number fabricated to fill the gap. Full evidence:
+  `docs/ACQUISITION_STRATEGY.md`'s "Price Data Feasibility Mission".
+- **Prior mission (same phase): coverage expansion — two new live
+  sources.** `fra_egypt` (Egypt's own Financial Regulatory Authority,
+  `fra.gov.eg/feed/` — the first official Egyptian government source this
+  platform has connected; 10 real disclosure items, 10 events,
+  `data_quality_score=0.95`) and `skynews_arabia_economy`
+  (`skynewsarabia.com/rss.xml`, legally cleared and independently
+  confirmed live, not yet exercised by a live collection cycle since
+  `enterprise_press` ranks higher for the same capabilities). Found the
+  same way Enterprise was — RSS autodiscovery, never guessed. Surfaced and
+  fixed two real gaps (nine catalogued outlets had no `TargetOrganization`
+  entry at all; the production pipeline's own discovery stage separately
+  had its own hardcoded 5-id allowlist) and one real crash
+  (`discover_sitemap_urls()` never resolved a non-compliant relative
+  `<loc>` entry against its own URL, crashing the whole discovery stage).
+  Full detail: `CURRENT_MISSION.md` and `docs/ACQUISITION_STRATEGY.md`'s
+  "Coverage-Expansion Mission" section. Both missions followed the
+  capability-driven runtime engine mission (every data requirement is an
+  independent `Capability` with a ranked strategy pool) and the original
+  Egyptian Live Data Sprint — the platform has run live via GitHub Actions
+  (real outbound egress, unlike this coding sandbox) many times since.
+- **Live-run evidence:** World Bank (66 real Egypt CPI observations,
+  macro), `enterprise_press` (6 real news items/events), and `fra_egypt`
+  (10 real disclosure items/events) are `IMPLEMENTED` and collecting.
+  `skynews_arabia_economy` is `IMPLEMENTED`/legally-cleared but not yet
+  exercised live. Stooq is blocked by a confirmed blanket robots.txt rule
+  (see above); FRED's live behavior varies (sometimes succeeds, sometimes
+  times out); EGX/CBE/Mubasher/Zawya each fail with a distinct, evidenced,
+  source-side reason (network-level reset, WAF rejection, robots.txt
+  disallow, or — Zawya/Mubasher — real, parseable content with zero
+  legally-clearable structured candidates). Full detail:
+  `docs/ACQUISITION_STRATEGY.md`.
 - **Progress this mission (frontend, prior phase):** all 9 sections built.
   Frontend audit complete. Six new backend dashboard artifacts (genes,
   papers, hypotheses, knowledge graph, financial statements, source
@@ -64,8 +79,9 @@ commit whenever the fact they state changes.
 - **Overall completion (backend, unchanged from prior mission):** ~99.5%
   of everything engineering-closeable without a business/vendor decision.
   See `docs/PHASE_STATUS.md`/`docs/ROADMAP.md` for the backend detail.
-- **Connected live sources: 2 (World Bank, Enterprise), 4 more
-  evidenced-blocked with named reasons, not unbuilt.** Every mechanism
+- **Connected live sources: 3 collecting (World Bank, Enterprise, FRA) + 1
+  wired and legally-cleared but not yet exercised (Sky News Arabia), 5+
+  more evidenced-blocked with named reasons, not unbuilt.** Every mechanism
   needed (discovery, verification, ranking, registration, qualification,
   collection, archival, validation, universe membership, corporate-event
   classification, financial-statement collection) is built and tested and
@@ -74,8 +90,9 @@ commit whenever the fact they state changes.
   see `CURRENT_MISSION.md`). See `docs/ACQUISITION_STRATEGY.md` for the
   per-capability breakdown of what's blocked and why.
 - **Historical coverage:** 66 real Egypt CPI observations (World Bank,
-  live) plus 6 real Enterprise news items/events (live, EGX-specific) as
-  of the most recent run. Every collector (including
+  live), 6 real Enterprise news items/events, and 10 real FRA disclosure
+  items/events (live, EGX-specific) as of the most recent run. Every
+  collector (including
   `IndexConstituentCollector`/`FinancialStatementCollector`) already
   fetches a source's full available series by construction, so a source's
   first live run *is* its backfill.
@@ -95,9 +112,15 @@ commit whenever the fact they state changes.
 - **Known blockers:** (1) EGX official, CBE, and Mubasher are each blocked
   by a genuine source-side defensive measure (network-level reset, WAF
   rejection, robots.txt disallow) this program's own rules correctly
-  refuse to defeat — not an engineering gap; Zawya's sitemap is real and
-  parseable but every entry is an HTML article page, not a legally-
-  clearable feed — see `docs/ACQUISITION_STRATEGY.md`. (2) No verified,
+  refuse to defeat — not an engineering gap; Zawya's/Mubasher's sitemaps
+  are real and parseable but every entry is an HTML article page, not a
+  legally-clearable feed — see `docs/ACQUISITION_STRATEGY.md`. (1b) No
+  free, legally-obtainable, autonomously-implementable EGX equity price
+  source exists — proven with live evidence this phase (Stooq: blanket
+  robots.txt block; Yahoo/TradingView: real ToS text explicitly
+  prohibits automation; Investing.com: 403 Forbidden; Mubasher/Zawya:
+  no structured price page exists) — same root cause as blocker (3)
+  below, now demonstrated rather than assumed. (2) No verified,
   complete EGX30/EGX70 constituent list exists in this codebase (only a
   10-company EGX30 placeholder, no EGX70 list at all) — a business
   decision reserved for the project owner, since fabricating ~90

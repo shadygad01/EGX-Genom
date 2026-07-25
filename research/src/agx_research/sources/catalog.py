@@ -61,6 +61,14 @@ def seed_sources() -> list[SourceSpec]:
             conflict_priority=60,
             supported_entities=["EGX tickers", "global indices", "commodities", "FX"],
             supported_event_types=["market"],
+            notes="Price-data feasibility mission: robots.txt now confirmed live to disallow "
+            "the CSV-download mechanism entirely -- not scoped to EGX tickers (an equivalent "
+            "US-ticker path and the bare /q/d/l/ path are disallowed identically; even fetching "
+            "robots.txt itself is disallowed by its own rule). Collector code stays IMPLEMENTED "
+            "(real, tested against recorded fixtures) since a future robots.txt change could "
+            "restore this path, but no live run can legally collect from it today -- "
+            "health_status correctly reflects DEGRADED/FAILED, not a code defect. Supersedes "
+            "the earlier 'Cloudflare challenge on homepage, CSV endpoint unconfirmed' framing.",
         ),
         _spec(
             id="fred",

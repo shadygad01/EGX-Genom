@@ -76,20 +76,24 @@ actual catalog entry (`sources/catalog.py`) or live-run evidence.
 
 | Strategy | Legality | Stability | Automation | Freshness | Coverage | Reliability | Maintenance | Collector type | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| Stooq CSV download (`.eg` suffix) | Free personal use, verify redistribution | Documented URL shape | Full | End-of-day | Broad EGX + global | Medium (aggregator) | Low | CSV download | **Blocked live** — Cloudflare JS challenge observed this session on the homepage; the documented `/q/d/l/` CSV endpoint itself was not confirmed challenged (evidence gap, not a fabricated pass) |
-| EGX official bulk download | Official regulator/exchange terms | Would be highest if reachable | Full (once verified) | Real-time/EOD | Complete, authoritative | Highest | Low once verified | CSV/PDF download | **Blocked** — TCP connection dropped (network-level) |
-| Financial aggregator APIs (AlphaVantage, FMP, Twelve Data, EODHD) | Documented ToS, key-gated free tiers | High (versioned REST) | Full | Real-time to EOD depending on tier | EGX coverage varies by vendor, unverified per-vendor | Medium-high | Low | JSON API (keyed) | AlphaVantage/FMP: **NEEDS_KEY, code-complete**; Twelve Data/EODHD: not yet catalogued, same class |
+| Stooq CSV download (`.eg` suffix) | Free personal use, verify redistribution | Documented URL shape | Full | End-of-day | Broad EGX + global | Medium (aggregator) | Low | CSV download | **Blocked, now confirmed blanket** — robots.txt disallows the CSV-download mechanism entirely (a US-ticker path and the bare `/q/d/l/` path are disallowed identically to the EGX path; even robots.txt itself is disallowed by its own rule) — see "Price Data Feasibility Mission" below |
+| EGX official bulk download | Official regulator/exchange terms | Would be highest if reachable | Full (once verified) | Real-time/EOD | Complete, authoritative | Highest | Low once verified | CSV/PDF download | **Blocked** — TCP connection dropped (network-level), reconfirmed every session including this one |
+| Yahoo Finance (unofficial API) | Ambiguous, assumed | High | Full | Real-time | EGX tickers (`.CA` suffix) | Medium-high | Low | JSON API | **Blocked, now confirmed by real ToS text** — explicitly prohibits "automated means... robots, spiders, scrapers, data mining tools... without express, prior permission" |
+| Investing.com | Ambiguous, assumed | — | — | — | — | — | — | — | **Blocked** — 403 Forbidden even on the ToS page itself |
+| TradingView | Ambiguous, assumed | — | — | — | — | — | — | — | **Blocked, now confirmed by real ToS text** — explicit data-ownership/redistribution restriction language |
+| Mubasher / Zawya (Egyptian financial portals) | N/A | N/A | N/A | N/A | N/A | N/A | N/A | — | **Not suitable** — both reachable, but a full anchor scan of their own homepages (508 and 154 links respectively) found zero download/historical/export/csv/xlsx/market-data links; these are news portals, not price-data providers |
+| Financial aggregator APIs (AlphaVantage, FMP, Twelve Data, EODHD) | Documented ToS, key-gated free tiers | High (versioned REST) | Full | Real-time to EOD depending on tier | EGX coverage varies by vendor, unverified per-vendor | Medium-high | Low | JSON API (keyed) | AlphaVantage/FMP: **NEEDS_KEY, code-complete**; Twelve Data/EODHD: not yet catalogued, same class — the one category that is a business decision, not a legal/technical wall |
 | Company IR direct download (per-listed-company) | Company's own published data | Low (per-site format) | Partial (PDF/HTML) | Irregular | Only that company | Low-medium per company | High (N sites) | PDF/HTML | PLANNED (`company_ir`) |
 
-**Chosen strategy**: keep Stooq as the primary (already `IMPLEMENTED`;
-today's Cloudflare challenge is evidenced against the *homepage*, not
-necessarily the CSV endpoint documented in `docs/DATA_ACQUISITION.md` —
-this is a health/monitoring finding, not a strategy change) and treat a
-keyed aggregator (AlphaVantage or FMP) as the qualified fallback the moment
-a user supplies a key — this is a **diversification** move (two independent
-vendors covering the same capability), not a replacement. EGX official
-stays the long-term target once its network-level block is independently
-resolved (business/legal outreach, not an engineering fix).
+**Chosen strategy, updated by the Price Data Feasibility Mission (see
+below)**: no autonomously-implementable free strategy currently exists for
+EGX equity OHLCV. Every option engineering can act on alone is now
+evidenced-blocked; the only remaining path (a NEEDS_KEY aggregator) is
+explicitly a business decision reserved for the project owner, per this
+program's existing rule that a credential is "a business/user action,
+never fabricated or bypassed." EGX official stays the long-term target
+once its network-level block is independently resolved (business/legal
+outreach, not an engineering fix).
 
 ### 2. Corporate Disclosures (regulatory filings, material announcements)
 
@@ -562,3 +566,130 @@ outlets in the `NEWS`/`CORPORATE_DISCLOSURES`/`CORPORATE_ACTIONS`
 capability pools remain unattempted; the same RSS-autodiscovery mechanism
 that found Enterprise's feed applies unchanged to each of them the next
 time discovery runs against them.
+
+## Coverage-Expansion Mission (post-First-Live-Egyptian-Source)
+
+The explicit job this phase: audit every registered source's real
+operational state, then expand production coverage using only verified,
+legal, maintainable acquisition strategies — reusing the existing
+architecture, never redesigning it.
+
+**Two new live production sources, same rigor as Enterprise's
+verification**: `fra_egypt` (Egypt's own Financial Regulatory Authority,
+`https://fra.gov.eg/feed/`) and `skynews_arabia_economy`
+(`https://skynewsarabia.com/rss.xml`), both found by the same
+RSS-autodiscovery heuristic, both legally cleared (robots.txt allows,
+`RSS_FEED` access method), both confirmed producing real records in a live
+run before being flipped from `PLANNED` to `IMPLEMENTED`. `fra_egypt` is
+the first source from an actual Egyptian government regulator: 10 real
+disclosure items parsed, 10 events registered, `data_quality_score=0.95`,
+`health_status=healthy` — and, at `conflict_priority=98`, the first source
+this platform can treat as primary/authoritative rather than aggregated
+secondary reporting for corporate disclosures.
+
+**Root cause of the coverage gap, found and closed**: nine outlets already
+catalogued in `sources/catalog.py` as `PLANNED`
+(`alarabiya_business`/`marketscreener`/`investing_news`/`almal`/`alborsa`/
+`masrawy_economy`/`youm7_economy`/`skynews_arabia_economy`/
+`asharq_economy`) had never actually been attempted by the Acquisition
+Intelligence Engine — `target.py`'s `seed_target_organizations()` never
+had an entry for them, so `agx discover-sources` had nothing to run
+against those ids. Closed by adding a `TargetOrganization` for each, with
+each outlet's own publicly-known brand domain as a hint (same category of
+public knowledge as the pre-existing Reuters/Asharq Business/CNBC Arabia
+entries, independently re-verified for reachability before anything is
+trusted, never asserted). A second, deeper instance of the same class of
+gap: `production/pipeline.py`'s own `_stage_discovery_engine` had a
+*separate* hardcoded 5-id allowlist (`egx_official`/`cbe`/
+`enterprise_press`/`mubasher`/`zawya`) left over from the original
+Egyptian Live Data Sprint, so even a target with a `TargetOrganization`
+entry was never automatically attempted by a real production run — only
+reachable via a manual `discover-sources --target <id>` CLI call. Fresh
+discovery now runs every non-per-constituent seeded target every live run;
+a newly catalogued target needs no second registration step to actually be
+attempted.
+
+**A real crash, found and fixed by running this expanded discovery
+live**: `cnbc_arabia`'s real sitemap.xml contains a `<loc>` entry that
+isn't a compliant absolute URL (sitemaps.org requires one). Unlike every
+other discovery function, `discover_sitemap_urls()` had never resolved a
+`<loc>` entry against the sitemap's own URL — the malformed string flowed
+straight through to `robots_status()`, which built
+`f"{scheme}://{netloc}/robots.txt"` from a URL with neither, producing
+`":///robots.txt"` and crashing `urllib.request.Request()` with a
+`ValueError` the discovery stage's own exception handling didn't catch,
+taking down the whole stage. Fixed with `urljoin()` (matching every other
+discovery function) plus a `HttpFetcher._get_robots_parser()` widening to
+also catch `ValueError`, since a malformed URL degrading to "robots.txt
+unreachable" is exactly the existing convention for a genuinely
+unreachable host, not a reason to crash the caller.
+
+**Full audit of all 51 registered sources, classified into the mission's
+six categories** (Production Ready / Temporarily Blocked / Technically
+Blocked / Policy Blocked / Not Suitable / Needs Business Decision), with
+per-source evidence, is the `collector_status.json`/`execution_report.json`
+trail from this phase's live runs plus the discovery-reason diagnostics
+added to `deploy-pages.yml` — see `CURRENT_MISSION.md` for the consolidated
+summary. Live result this phase: 3 sources `COLLECTED` (`enterprise_press`,
+`fra_egypt`, `worldbank`), 2 `FAILED` with an evidenced reason each
+(`stooq` — robots.txt, `fred` — intermittent timeout), 47 `UNAVAILABLE`
+each with a concrete, non-fabricated reason (`NEEDS_KEY`, `TOS_REVIEW`, or
+"endpoint not yet verified"). `skynews_arabia_economy` is wired identically
+but not yet exercised by a live collection cycle in production — the
+capability engine's fallback chain stops at `enterprise_press`, which
+ranks higher for the same capabilities (`corporate_disclosures`/
+`corporate_actions`/`news`), so `skynews_arabia_economy` would only be
+selected if `enterprise_press` degrades or fails; its feed URL and legal
+clearance are independently verified (a raw fetch confirmed the endpoint
+resolves), but its own collector's yield is unconfirmed until it actually
+gets a turn.
+
+## Price Data Feasibility Mission (post-Coverage-Expansion)
+
+The explicit question this phase: can AGX build statistically valid
+investment research using *only* legally obtainable free Egyptian market
+price data? If not, prove it with live evidence after evaluating every
+realistic free source; if so, implement the minimum viable price-data
+capability.
+
+**Verdict: no autonomously-implementable free strategy currently exists.**
+Every option this program's own rules allow it to act on unilaterally is
+now evidenced-blocked by a live fetch this phase, not by inherited
+assumption:
+
+| Source | What was actually checked | Result |
+|---|---|---|
+| Stooq | Full `robots.txt` fetched; `robots_status()` checked for the exact failing EGX ticker path, an equivalent US-ticker path, and the bare `/q/d/l/` path | **All three disallowed identically** — a blanket block on the CSV-download mechanism, not scoped to EGX at all. Even fetching `robots.txt` itself is disallowed by its own rule. Settles the prior "evidence gap" (Cloudflare-challenge-on-homepage-only) framing: the real cause is a total robots.txt block on the whole mechanism. |
+| Yahoo Finance | Homepage reachable; its real Terms of Service fetched (`https://guce.yahoo.com/terms`) | **Explicit prohibition**, quoted directly: *"access or collect data... using any automated means, devices, programs, algorithms or methodologies, including but not limited to robots, spiders, scrapers, data mining tools, or data gathering or extraction tools, for any purpose without our express, prior permission."* Not "ambiguous" — this program's own `TOS_REVIEW` status is superseded by a definitive Policy Blocked. |
+| Investing.com | Homepage/ToS page fetch attempted | **403 Forbidden** outright — couldn't even reach the terms page. |
+| TradingView | Homepage reachable; its real policies page fetched (`https://www.tradingview.com/policies/`) | Explicit **data-ownership/redistribution restriction** language found ("Ownership of information; license to use TradingView; redistribution of data; non-display usage..."). Confirms the existing `TOS_REVIEW` classification with real evidence instead of assumption. |
+| Mubasher / Zawya | Every anchor on both homepages (508 and 154 links respectively) scanned for `download`/`historical`/`export`/`.csv`/`.xlsx`/`market data` | **Zero matches on either.** These are news portals; no structured price-data page exists to discover. Not a legality question — there is nothing there. |
+| EGX official | Reconfirmed | **`Connection reset by peer`** on both `egx.com.eg` and `www.egx.com.eg` — the same network-level block this program has now confirmed independently across six-plus sessions. |
+| FMP / AlphaVantage / Polygon / Tiingo | Not re-probed this phase (already `NEEDS_KEY`, code-complete) | The one candidate that is **not** a legal/technical wall — it's explicitly a business decision (the project owner registering for a free-tier key), which this program's own rules already forbid engineering from doing unilaterally ("a business/user action, never fabricated or bypassed"). EGX-specific ticker coverage on any of these free tiers remains unverified either way. |
+| FRED, World Bank, IMF, OECD | N/A | Structurally out of scope — global macro/commodity/FX series, not EGX-listed equity OHLCV, regardless of legality. |
+
+**What this means for "statistically valid investment research"**: nothing
+changes about the platform's honesty posture — `Price Data`/`Market
+Breadth` stay correctly `UNAVAILABLE` in `collector_status.json`, no
+collector was written against a source that can't legally supply it, and
+no number was fabricated to fill the gap. The corporate-disclosure/news
+side of the pipeline gained real EGX-relevant evidence this mission
+(`fra_egypt`, `enterprise_press`) — but per `CLAUDE.md`'s own "returns
+always go through `adjusted_returns_for_ticker()`, never a raw close-price
+diff" rule and the charter's statistical-validation gate, correlating a
+real event with subsequent market behavior requires real market behavior
+to correlate it against, which no free, legally-obtainable, autonomously-
+implementable source currently supplies. This is not a new blocker
+`docs/ROADMAP.md`/`MISSION_CONTROL.md` didn't already name (a licensed EGX
+market data vendor decision) — this phase replaces the inherited framing
+with today's direct, quoted, live evidence for every realistic
+alternative, so the conclusion is demonstrated rather than assumed.
+
+**Not implemented, and why that is the correct outcome**: writing a
+collector against Stooq/Yahoo/Investing.com/TradingView would violate this
+program's own hard rules (never bypass robots.txt, never bypass ToS) that
+exist specifically to prevent exactly this kind of pressure-driven
+shortcut. Writing one against Mubasher/Zawya is impossible — there is no
+structured endpoint to write it against. The only remaining path (a
+NEEDS_KEY vendor) requires the project owner's own action; it isn't
+engineering's decision to make on their behalf.

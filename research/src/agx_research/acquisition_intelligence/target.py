@@ -135,6 +135,61 @@ def seed_target_organizations() -> list[TargetOrganization]:
             domain_hints=["cnbcarabia.com", "www.cnbcarabia.com"],
             existing_source_id="cnbc_arabia", priority=PRIORITY_ADDITIONAL_DISCOVERED,
         ),
+        # ---- Coverage-expansion mission: nine outlets already catalogued in
+        # sources/catalog.py (status=PLANNED) but never given a
+        # TargetOrganization entry, so the engine had never actually attempted
+        # discovery against them -- a real, closeable gap distinct from a
+        # target that was tried and failed. Domain hints below are each
+        # outlet's own publicly-known brand domain (same category of public
+        # knowledge as "reuters.com" above), independently re-verified for
+        # reachability by HeuristicDomainResolver before anything is trusted;
+        # nothing here is asserted as a working endpoint.
+        TargetOrganization(
+            id="alarabiya_business", name="Al Arabiya Business", category=SourceCategory.NEWS, country="AE",
+            domain_hints=["alarabiya.net", "www.alarabiya.net"],
+            existing_source_id="alarabiya_business", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="marketscreener", name="MarketScreener", category=SourceCategory.NEWS, country="FR",
+            domain_hints=["marketscreener.com", "www.marketscreener.com"],
+            existing_source_id="marketscreener", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="investing_news", name="Investing.com News", category=SourceCategory.NEWS, country="US",
+            domain_hints=["investing.com", "www.investing.com"],
+            existing_source_id="investing_news", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="almal", name="Al Mal", category=SourceCategory.ARABIC_NEWS, country="EG",
+            domain_hints=["almalnews.com", "www.almalnews.com"],
+            existing_source_id="almal", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="alborsa", name="Al Borsa News", category=SourceCategory.ARABIC_NEWS, country="EG",
+            domain_hints=["alborsanews.com", "www.alborsanews.com"],
+            existing_source_id="alborsa", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="masrawy_economy", name="Masrawy Economy", category=SourceCategory.ARABIC_NEWS, country="EG",
+            domain_hints=["masrawy.com", "www.masrawy.com"],
+            existing_source_id="masrawy_economy", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="youm7_economy", name="Youm7 Economy", category=SourceCategory.ARABIC_NEWS, country="EG",
+            domain_hints=["youm7.com", "www.youm7.com"],
+            existing_source_id="youm7_economy", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="skynews_arabia_economy", name="Sky News Arabia Economy",
+            category=SourceCategory.ARABIC_NEWS, country="AE",
+            domain_hints=["skynewsarabia.com", "www.skynewsarabia.com"],
+            existing_source_id="skynews_arabia_economy", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="asharq_economy", name="Asharq Economy", category=SourceCategory.ARABIC_NEWS, country="SA",
+            domain_hints=["asharq.com", "www.asharq.com"],
+            existing_source_id="asharq_economy", priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
     ]
 
 

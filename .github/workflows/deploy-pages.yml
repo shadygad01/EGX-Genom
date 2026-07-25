@@ -74,10 +74,61 @@ jobs:
       # monitoring, not only for this phase's own verification.
       - name: Show per-target Egyptian discovery reasons
         run: |
-          for t in egx_official cbe enterprise_press mubasher zawya; do
+          for t in egx_official cbe enterprise_press mubasher zawya \
+                   alarabiya_business marketscreener investing_news \
+                   almal alborsa masrawy_economy youm7_economy \
+                   skynews_arabia_economy asharq_economy; do
             uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data \
               discover-sources --target "$t" || true
           done
+
+      # Coverage-expansion mission: IMF/OECD are catalogued PLANNED but
+      # modeled today as homepage-discovery targets, which is the wrong
+      # model for an organization with a documented SDMX/JSON API (the same
+      # "incorrect assumption" docs/ACQUISITION_STRATEGY.md already found for
+      # World Bank's precedent). This probes each org's own publicly
+      # documented API endpoint shape directly -- never a guessed or hidden
+      # URL, the exact published contract from imf.org's/oecd.org's own API
+      # documentation, same tier of "public knowledge" as
+      # WorldBankCollector's api.worldbank.org endpoint was before it became
+      # IMPLEMENTED. A collector is only written in a follow-up commit if
+      # this run's real response confirms the shape -- never implemented
+      # blind ahead of live evidence.
+      - name: Probe IMF/OECD documented API endpoints for Egypt coverage
+        run: |
+          uv run python -c "
+          from agx_research.collectors.fetcher import HttpFetcher, FetchDisallowed, FetchError
+          from agx_research.sources.spec import (
+              AccessMethod, RateLimit, RetryPolicy, SourceCategory, SourceSpec, SourceStatus,
+          )
+          spec = SourceSpec(
+              id='probe_diag', name='probe', category=SourceCategory.RESEARCH,
+              access_method=AccessMethod.JSON_API, status=SourceStatus.IMPLEMENTED,
+              reliability_score=0.0, freshness_score=0.0,
+              retry_policy=RetryPolicy(max_attempts=1, backoff_seconds=0.5),
+              rate_limit=RateLimit(requests_per_minute=20, min_seconds_between_requests=1.0),
+          )
+          fetcher = HttpFetcher()
+          for url in [
+              # IMF SDMX JSON API, documented at http://data.imf.org/en/Resource-Pages/IMF-API
+              # -- CompactData/{database}/{key}; IFS is the International
+              # Financial Statistics database, M.EG.PCPI_IX = monthly Egypt CPI index.
+              'https://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/IFS/M.EG.PCPI_IX',
+              'https://dataservices.imf.org/REST/SDMX_JSON.svc/DataStructure/IFS',
+              # OECD's current SDMX API (migrated off stats.oecd.org in 2024,
+              # documented at https://data.oecd.org/api/sdmx-json-documentation/).
+              'https://sdmx.oecd.org/public/rest/dataflow/OECD/ALL/latest?references=none',
+          ]:
+              try:
+                  text = fetcher.fetch_text(url, spec)
+                  print(f'{url}: OK, {len(text)} chars, starts: {text[:300]!r}')
+              except FetchDisallowed as exc:
+                  print(f'{url}: ROBOTS_DISALLOWED: {exc}')
+              except FetchError as exc:
+                  print(f'{url}: FETCH_ERROR: {exc}')
+              except Exception as exc:
+                  print(f'{url}: {type(exc).__name__}: {exc}')
+          "
 
       - name: Raw probe of the exact domain hints (diagnosing "no reachable domain")
         run: |
@@ -146,7 +197,10 @@ jobs:
           by_id = {}
           for spec in registry:
               by_id[spec['id']] = spec
-          for source_id in ['egx_official', 'cbe', 'enterprise_press', 'mubasher', 'zawya']:
+          for source_id in ['egx_official', 'cbe', 'enterprise_press', 'mubasher', 'zawya',
+                            'alarabiya_business', 'marketscreener', 'investing_news',
+                            'almal', 'alborsa', 'masrawy_economy', 'youm7_economy',
+                            'skynews_arabia_economy', 'asharq_economy']:
               spec = by_id.get(source_id)
               if spec:
                   print(f\"  {source_id:<18} status={spec['status']:<10} lifecycle={spec['lifecycle_state']:<10} \"

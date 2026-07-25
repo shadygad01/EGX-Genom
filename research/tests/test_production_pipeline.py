@@ -55,6 +55,19 @@ def test_discovery_stage_is_a_real_network_noop_in_mock_mode(tmp_path, monkeypat
     assert "not applicable in mock mode" in discovery_stage.detail
 
 
+def test_live_discovery_honors_acquisition_freeze_and_only_checks_recovery(tmp_path):
+    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline.mode = ExecutionMode.LIVE
+    pipeline._stage_source_registry()
+
+    status, detail, warnings = pipeline._stage_discovery_engine()
+
+    assert status == StageStatus.SUCCEEDED
+    assert "Acquisition freeze active" in detail
+    assert "0 DOWN source(s)" in detail
+    assert warnings == []
+
+
 def test_end_to_end_mock_execution_runs_every_stage_and_succeeds(tmp_path):
     pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)

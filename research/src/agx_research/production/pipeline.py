@@ -56,7 +56,6 @@ from agx_research.acquisition_intelligence.live import (
     build_live_wayback_client,
 )
 from agx_research.acquisition_intelligence.target import (
-    generate_company_ir_targets,
     seed_target_organizations,
 )
 from agx_research.agents.corporate_events import CorporateEventsAgent
@@ -358,31 +357,19 @@ class ProductionPipeline:
             wayback=build_live_wayback_client(),
         )
 
-        # Fresh discovery for never-yet-resolved sources -- previously this
-        # stage only ever ran reactive DOWN-recovery, which never fires for
-        # a source that has simply never been attempted (health_status
-        # starts UNKNOWN, not DOWN), so EGX official/CBE/etc. would never
-        # be discovered at all no matter how many times the pipeline ran.
-        # Every non-per-constituent seeded target is attempted (see the
-        # module comment above); `TargetOrganization.priority` still governs
-        # the order they're processed in.
-        universe = FallbackUniverseProvider(
-            [CollectedUniverseProvider(self.data_dir), StaticUniverseProvider()]
-        ).constituents(date.today())
-        company_ir_targets = generate_company_ir_targets(universe)
-        fresh_targets = [
-            t for t in seed_target_organizations() if not t.per_constituent
-        ] + company_ir_targets
-        discovery_results = engine.run_catalog(fresh_targets, companies=universe)
-        newly_registered = sum(1 for r in discovery_results if r.registered)
-
+        # Acquisition is frozen: routine Pages deployments must collect from
+        # already-approved sources, not spend ~57 minutes rediscovering every
+        # blocked/planned target. Continuity recovery remains live so an
+        # IMPLEMENTED source marked DOWN can still be repaired automatically.
+        # A future named acquisition sprint can call `discover-sources`
+        # explicitly and promote its verified result into the catalog.
         monitor = AcquisitionContinuityMonitor(engine, seed_target_organizations())
         recovery_results = monitor.check_and_recover(self.registry)
         recovered = sum(1 for r in recovery_results if r.registered)
         return (
             StageStatus.SUCCEEDED,
-            f"{len(fresh_targets)} target(s) attempted ({newly_registered} newly "
-            f"registered); {len(recovery_results)} DOWN source(s) needed recovery "
+            "Acquisition freeze active: fresh discovery skipped; "
+            f"{len(recovery_results)} DOWN source(s) needed recovery "
             f"({recovered} recovered).",
             [],
         )

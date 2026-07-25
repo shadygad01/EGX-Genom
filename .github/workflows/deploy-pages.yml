@@ -70,15 +70,17 @@ jobs:
       # Per the mission's verification requirement: for every collector,
       # show connected/downloaded/parsed/validated (or the exact reason it
       # didn't), directly in the job log -- not just the one-line summary
-      # `agx run` prints. Genuinely useful for ongoing production
-      # monitoring, not only for this phase's own verification.
-      - name: Show per-target Egyptian discovery reasons
+      # `agx run` prints. The step above (`agx run --mode live`) now already
+      # runs fresh discovery against every non-per-constituent target every
+      # run (see pipeline.py), so re-attempting the 14 targets this mission
+      # already has an evidenced reason for would only repeat the same real
+      # network calls for no new information -- this loop is scoped to the
+      # 6 previously-undiagnosed legacy targets only (registered in
+      # target.py before this mission but never individually verbose-
+      # printed), closing the audit's last reason-level evidence gap.
+      - name: Show per-target discovery reasons (previously-undiagnosed legacy targets)
         run: |
-          for t in egx_official cbe fra_egypt capmas enterprise_press mubasher zawya \
-                   reuters trading_economics asharq_business cnbc_arabia \
-                   alarabiya_business marketscreener investing_news \
-                   almal alborsa masrawy_economy youm7_economy \
-                   skynews_arabia_economy asharq_economy; do
+          for t in fra_egypt capmas reuters trading_economics asharq_business cnbc_arabia; do
             uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data \
               discover-sources --target "$t" || true
           done

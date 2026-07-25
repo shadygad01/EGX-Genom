@@ -74,7 +74,8 @@ jobs:
       # monitoring, not only for this phase's own verification.
       - name: Show per-target Egyptian discovery reasons
         run: |
-          for t in egx_official cbe enterprise_press mubasher zawya \
+          for t in egx_official cbe fra_egypt capmas enterprise_press mubasher zawya \
+                   reuters trading_economics asharq_business cnbc_arabia \
                    alarabiya_business marketscreener investing_news \
                    almal alborsa masrawy_economy youm7_economy \
                    skynews_arabia_economy asharq_economy; do

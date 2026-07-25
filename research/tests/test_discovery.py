@@ -78,6 +78,37 @@ def test_discover_sitemap_urls_classifies_structured_extensions_not_blanket_scra
     assert by_url["https://example.com/about"].access_method_guess == AccessMethod.HTML_SCRAPE
 
 
+def test_discover_sitemap_urls_resolves_a_relative_loc_entry():
+    # Non-compliant real-world sitemap (sitemaps.org requires absolute
+    # <loc> entries, but a live run against a real site's sitemap found one
+    # that wasn't) -- resolved against page_url the same way every other
+    # discovery function resolves a relative href, not passed through raw.
+    sitemap = "<urlset><url><loc>/relative/path</loc></url></urlset>"
+    candidates = discover_sitemap_urls(sitemap, "https://example.com/sitemap.xml")
+    assert {c.discovered_url for c in candidates} == {"https://example.com/relative/path"}
+
+
+def test_discover_sitemap_urls_recovers_a_scheme_and_host_free_loc_entry():
+    # A live run against a real site's real sitemap crashed several stages
+    # downstream (robots_status building "f'{scheme}://{netloc}/robots.txt'"
+    # from a <loc> entry with neither, since this function previously passed
+    # the raw <loc> text through with no resolution at all) on exactly this
+    # shape. urljoin recovers it against the sitemap's own URL instead of
+    # producing a malformed candidate no caller could safely fetch.
+    sitemap = "<urlset><url><loc>///not-a-real-url</loc></url></urlset>"
+    candidates = discover_sitemap_urls(sitemap, "https://example.com/sitemap.xml")
+    assert {c.discovered_url for c in candidates} == {"https://example.com/not-a-real-url"}
+
+
+def test_discover_sitemap_urls_skips_an_entry_urljoin_cannot_resolve_to_a_fetchable_url():
+    # A scheme urllib has no fetch handler for (no relative-URL semantics
+    # to fall back to) is a genuinely unresolvable entry, not a malformed-
+    # but-recoverable one -- skipped rather than turned into a candidate.
+    sitemap = "<urlset><url><loc>javascript:void(0)</loc></url></urlset>"
+    candidates = discover_sitemap_urls(sitemap, "https://example.com/sitemap.xml")
+    assert candidates == []
+
+
 def test_is_sitemap_index_detects_sitemapindex_root():
     index = '<sitemapindex><sitemap><loc>https://example.com/sitemap-a.xml</loc></sitemap></sitemapindex>'
     assert is_sitemap_index(index) is True

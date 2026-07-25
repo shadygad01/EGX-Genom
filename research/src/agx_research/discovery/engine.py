@@ -239,14 +239,30 @@ def discover_sitemap_urls(sitemap_xml: str, page_url: str) -> list[SourceCandida
     anything else is left as an ordinary page URL (HTML_SCRAPE) -- a sitemap
     entry is never assumed to be a feed just because it was reachable via a
     sitemap.
+
+    The sitemaps.org spec requires every <loc> to be a fully-qualified
+    absolute URL, but a real-world sitemap isn't guaranteed to comply (a
+    live run against a real site's real sitemap crashed downstream --
+    `robots_status()` building `f"{scheme}://{netloc}/robots.txt"` from a
+    <loc> entry with neither -- because this function trusted the spec
+    instead of verifying it). `urljoin` resolves a relative/malformed entry
+    against the sitemap's own URL the same way every other discovery
+    function already resolves a page's relative hrefs; an entry that still
+    has no scheme+netloc after that (empty, a bare fragment, anything not a
+    real URL) is skipped rather than turned into a candidate no caller could
+    safely fetch.
     """
     urls = re.findall(r"<loc>(.*?)</loc>", sitemap_xml, flags=re.IGNORECASE | re.DOTALL)
     candidates = []
     for raw_url in urls:
-        url = raw_url.strip()
-        if not url:
+        stripped = raw_url.strip()
+        if not stripped:
             continue
-        path = urlsplit(url).path.lower()
+        url = urljoin(page_url, stripped)
+        parsed = urlsplit(url)
+        if not parsed.scheme or not parsed.netloc:
+            continue
+        path = parsed.path.lower()
         access_method_guess = AccessMethod.HTML_SCRAPE
         for ext, access_method in _STRUCTURED_EXTENSIONS.items():
             if path.endswith(ext):

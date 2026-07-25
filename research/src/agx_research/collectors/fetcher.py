@@ -92,9 +92,21 @@ class HttpFetcher:
                     content = response.read()
                 parser.parse(content.decode("utf-8", errors="replace").splitlines())
                 self._robots_unreachable[base] = False
-            except (urllib.error.URLError, OSError, TimeoutError):
+            except (urllib.error.URLError, OSError, TimeoutError, ValueError):
                 # Unreachable robots.txt: default-allow is the standard
                 # convention; the failure is not treated as a prohibition.
+                # `ValueError` ("unknown url type") is included alongside the
+                # network-level exceptions because `base` isn't always one
+                # this class controls -- it's built from a caller-supplied
+                # URL (e.g. a discovered candidate), and a malformed one
+                # (no scheme+netloc, or a scheme urllib has no handler for
+                # like "javascript:") must degrade the same way a genuinely
+                # unreachable host does, not crash the caller. `robots_status`
+                # (unlike this permissive default) already surfaces that as
+                # `None`/unknown to a stricter caller like the Acquisition
+                # Intelligence Engine's legality gate, so "never bypass
+                # robots.txt" still holds -- unknown is never treated as
+                # allowed there.
                 parser.allow_all = True
                 self._robots_unreachable[base] = True
             self._robots_cache[base] = parser

@@ -217,6 +217,20 @@ def test_robots_txt_real_disallow_rule_is_still_respected(monkeypatch):
     assert fetcher._robots_allows("https://example.test/public/page") is True
 
 
+def test_robots_status_degrades_instead_of_crashing_on_a_malformed_url():
+    """Regression test for a real production crash: a discovered candidate
+    with no scheme+netloc (e.g. from a non-compliant sitemap <loc> entry)
+    made `urllib.request.Request(f"{base}/robots.txt")` raise
+    `ValueError: unknown url type` -- not `URLError`/`OSError`, so it wasn't
+    caught, and took down the whole discovery_engine pipeline stage. A
+    malformed URL must degrade the same way a genuinely unreachable host
+    does (robots_status returns None -- unknown, not confirmed-allowed).
+    """
+    fetcher = HttpFetcher()
+    assert fetcher.robots_status(":///not-a-real-url") is None
+    assert fetcher.robots_status("javascript:void(0)") is None
+
+
 def test_rate_limit_sleeps_between_requests_to_same_source(monkeypatch):
     fetcher = HttpFetcher(respect_robots=False)
     sleeps: list[float] = []

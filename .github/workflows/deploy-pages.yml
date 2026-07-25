@@ -196,12 +196,12 @@ jobs:
           echo '--- Named-target registry state (LIVE data-dir, reflects the discovery loop above -- not the earlier dashboard snapshot) ---'
           uv run python -c "
           import json
-          registry = json.load(open('/tmp/agx_dashboard_data/source_registry.json'))
-          by_id = {}
-          for spec in registry:
-              by_id.setdefault(spec['id'], spec)
-              if spec['version'] >= by_id[spec['id']]['version']:
-                  by_id[spec['id']] = spec
+          # JsonFileRepository persists {entity_id: [revision, ...]} -- a
+          # dict of revision lists, not the flat list the dashboard export
+          # (model_dump of all_latest()) produces. The latest revision is
+          # the last element of each id's list.
+          raw = json.load(open('/tmp/agx_dashboard_data/source_registry.json'))
+          by_id = {entity_id: revisions[-1] for entity_id, revisions in raw.items() if revisions}
           for source_id in ['egx_official', 'cbe', 'fra_egypt', 'capmas', 'enterprise_press',
                             'mubasher', 'zawya', 'reuters', 'trading_economics',
                             'asharq_business', 'cnbc_arabia',

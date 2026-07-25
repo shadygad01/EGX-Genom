@@ -10,6 +10,10 @@ from agx_research.agents.market_structure import MarketStructureAgent
 from agx_research.config import Horizon
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.domain.provenance import Provenance
+from agx_research.events.entity import EntityKind, EntityRef
+from agx_research.events.event import EventSeverity, EventType
+from agx_research.events.service import EventPlatform, build_candidate_event
+from agx_research.events.taxonomy import EventSubtype
 from agx_research.genome.gene import GeneStatus
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 from agx_research.knowledge.schema import KnowledgeObject
@@ -41,8 +45,12 @@ def make_memory() -> MarketMemory:
 
 def permissive_pipeline() -> DailyResearchPipeline:
     config = PipelineConfig(
-        alpha=1.01, min_observations=5, min_sample_size_for_review=5,
-        max_expected_risk=1.0, min_hit_rate=0.0, min_sharpe=-100.0,
+        alpha=1.01,
+        min_observations=5,
+        min_sample_size_for_review=5,
+        max_expected_risk=1.0,
+        min_hit_rate=0.0,
+        min_sharpe=-100.0,
         adversarial_min_sample_size=2,
     )
     agent = MarketStructureAgent(ticker_pairs=[("COMI", "MFPC")], correlation_threshold=0.0)
@@ -112,6 +120,33 @@ def test_no_knowledge_means_no_prediction():
     assert model.predict("COMI", date(2026, 6, 14), []) is None
 
 
+def test_recent_source_event_reduces_confidence_and_is_in_decision_provenance():
+    store = promoted_store()
+    baseline = RecommendationService(store).recommend(["COMI"], date(2026, 6, 14))[0]
+    events = EventPlatform()
+    event = events.register(
+        build_candidate_event(
+            event_type=EventType.NEWS,
+            subtype=EventSubtype.COMPANY_NEWS,
+            entities=[EntityRef(kind=EntityKind.COMPANY, canonical_id="COMI", raw_mention="COMI")],
+            event_date=date(2026, 6, 13),
+            source="gdelt",
+            confidence=0.8,
+            severity=EventSeverity.HIGH,
+            provenance=Provenance(produced_by="GdeltDocCollector", produced_at=datetime.now()),
+        )
+    )
+    adjusted = RecommendationService(store, event_platform=events).recommend(
+        ["COMI"], date(2026, 6, 14)
+    )[0]
+    assert adjusted.confidence < baseline.confidence
+    assert adjusted.combined_expected_risk > baseline.combined_expected_risk
+    assert any(
+        ref.kind == "event" and ref.ref_id == event.id for ref in adjusted.explanation.evidence_refs
+    )
+    assert any("sources=gdelt" in item for item in adjusted.explanation.supporting_evidence)
+
+
 def test_portfolio_construction_allocates_and_explains():
     store = promoted_store()
     recommendations = RecommendationService(store).recommend(["COMI", "MFPC"], date(2026, 6, 14))
@@ -165,8 +200,9 @@ def test_monitor_records_performance_and_retires_wrong_sign_knowledge():
     # Force a wrong-sign expectation so the retirement branch is exercised
     # honestly: the realized data is real; only the expectation is inverted.
     realized_positive = knowledge.expected_return > 0
-    wrong = _knowledge("know-wrong", knowledge.affected_assets[0],
-                       -0.05 if realized_positive else 0.05)
+    wrong = _knowledge(
+        "know-wrong", knowledge.affected_assets[0], -0.05 if realized_positive else 0.05
+    )
     store._repo.add(wrong)  # test-only injection of a pre-existing object
     wrong_gene = genome.promote_to_gene(wrong)
 

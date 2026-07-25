@@ -20,6 +20,8 @@ from datetime import date, datetime
 
 from agx_research.config import Horizon
 from agx_research.domain.provenance import Provenance, ProvenanceRef
+from agx_research.events.event import EventSeverity
+from agx_research.events.lifecycle import EventStatus
 from agx_research.events.service import EventPlatform
 from agx_research.explainability import Explanation
 from agx_research.explainability.historical_cases import find_similar_cases
@@ -63,6 +65,28 @@ class KnowledgeWeightedHorizonModel(HorizonModel):
             if self.event_platform is not None
             else []
         )
+        active_events = []
+        if self.event_platform is not None:
+            active_events = [
+                event
+                for event in self.event_platform.events_for_entity(ticker)
+                if event.event_date <= as_of
+                and (as_of - event.event_date).days <= 30
+                and self.horizon in event.impact_horizons
+                and event.status in (EventStatus.CONFIRMED, EventStatus.CORROBORATED)
+            ]
+        severity_penalty = {
+            EventSeverity.LOW: 0.02,
+            EventSeverity.MEDIUM: 0.05,
+            EventSeverity.HIGH: 0.12,
+            EventSeverity.CRITICAL: 0.25,
+        }
+        event_risk = min(
+            0.50,
+            sum(severity_penalty[event.severity] * event.confidence for event in active_events),
+        )
+        expected_risk *= 1.0 + event_risk
+        confidence *= 1.0 - event_risk
         explanation = Explanation(
             why_this_stock=(
                 f"{len(relevant)} validated knowledge object(s) cover {ticker} on the "
@@ -79,15 +103,25 @@ class KnowledgeWeightedHorizonModel(HorizonModel):
                 f"expected_return={k.expected_return:.4f}, "
                 f"p_value={k.statistical_evidence.p_value:.4g}"
                 for k in relevant
+            ]
+            + [
+                f"event {event.id}: {event.subtype}, severity={event.severity.value}, "
+                f"confidence={event.confidence:.2f}, sources={','.join(event.sources)}"
+                for event in active_events
             ],
             evidence_refs=[
                 ProvenanceRef(kind="knowledge", ref_id=k.id, ref_version=k.version)
                 for k in relevant
+            ]
+            + [
+                ProvenanceRef(kind="event", ref_id=event.id, ref_version=event.version)
+                for event in active_events
             ],
             similar_historical_cases=similar_cases,
             invalidation_conditions=[
                 "Any supporting knowledge object is retired or its monitored "
                 "performance degrades below its retirement threshold.",
+                "A new high-severity source event can raise expected risk and reduce confidence.",
             ],
         )
         return Prediction(
@@ -107,6 +141,10 @@ class KnowledgeWeightedHorizonModel(HorizonModel):
                 inputs=[
                     ProvenanceRef(kind="knowledge", ref_id=k.id, ref_version=k.version)
                     for k in relevant
+                ]
+                + [
+                    ProvenanceRef(kind="event", ref_id=event.id, ref_version=event.version)
+                    for event in active_events
                 ],
             ),
         )

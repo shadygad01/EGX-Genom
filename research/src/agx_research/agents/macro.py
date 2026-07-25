@@ -37,16 +37,21 @@ class MacroAgent(ResearchAgent):
         for series_id, observations in snapshot.macro_series.items():
             if len(observations) < 4:
                 continue
-            macro_changes = [
-                (curr.value - prev.value) / prev.value
+            macro_changes_by_date = {
+                curr.observation_date: (curr.value - prev.value) / prev.value
                 for prev, curr in zip(observations, observations[1:])
                 if prev.value != 0
-            ]
+            }
             for ticker in sorted(snapshot.tickers):
+                bars = snapshot.price_history.get(ticker, [])
                 returns = adjusted_returns_for_ticker(snapshot, ticker)
-                if len(returns) < 4:
+                returns_by_date = {bar.trade_date: value for bar, value in zip(bars[1:], returns)}
+                common_dates = sorted(set(macro_changes_by_date) & set(returns_by_date))
+                if len(common_dates) < 4:
                     continue
-                correlation = pearson_correlation(macro_changes, returns)
+                aligned_macro = [macro_changes_by_date[d] for d in common_dates]
+                aligned_returns = [returns_by_date[d] for d in common_dates]
+                correlation = pearson_correlation(aligned_macro, aligned_returns)
                 if correlation is None or abs(correlation) < self.correlation_threshold:
                     continue
                 mechanism = _SERIES_MECHANISMS.get(series_id, f"sensitivity to {series_id}")
@@ -72,7 +77,7 @@ class MacroAgent(ResearchAgent):
                         evidence=[
                             f"macro_correlation={correlation:.4f}",
                             f"series={series_id}",
-                            f"observations={min(len(macro_changes), len(returns))}",
+                            f"observations={len(common_dates)}",
                         ],
                         provenance=Provenance(
                             produced_by=f"{self.name}@{self.version}",

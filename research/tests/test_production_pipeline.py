@@ -23,6 +23,7 @@ from agx_research.production.collector_plan import (
 )
 from agx_research.production.pipeline import ProductionPipeline
 from agx_research.production.stages import StageName, StageStatus
+from agx_research.sources.catalog import seed_sources
 
 TICKERS = ["COMI", "MFPC", "EAST", "ETEL"]  # small universe: fast tests, still exercises pairing
 RUN_DATE = date(2026, 6, 14)
@@ -215,12 +216,26 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
     pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
 
     expected = {
-        "knowledge.json", "events.json", "patterns.json", "recommendations.json",
-        "market_state.json", "runtime_metrics.json", "system_status.json",
-        "source_registry.json", "investment_cases.json", "collector_status.json",
-        "runtime_status.json", "dashboard_metrics.json", "mission_status.json",
-        "execution_report.json", "genes.json", "papers.json", "hypotheses.json",
-        "knowledge_graph.json", "financial_statements.json", "source_metrics.json",
+        "knowledge.json",
+        "events.json",
+        "patterns.json",
+        "recommendations.json",
+        "market_state.json",
+        "runtime_metrics.json",
+        "system_status.json",
+        "source_registry.json",
+        "investment_cases.json",
+        "collector_status.json",
+        "runtime_status.json",
+        "dashboard_metrics.json",
+        "mission_status.json",
+        "execution_report.json",
+        "genes.json",
+        "papers.json",
+        "hypotheses.json",
+        "knowledge_graph.json",
+        "financial_statements.json",
+        "source_metrics.json",
     }
     for filename in expected:
         assert (dashboard_out / filename).exists(), filename
@@ -234,7 +249,7 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
 
     counts = validate_dashboard_artifacts(dashboard_out)
-    assert counts["source_registry.json"] == 51
+    assert counts["source_registry.json"] == len(seed_sources())
     assert "execution_report.json" in counts
     assert "mission_status.json" in counts
 

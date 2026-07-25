@@ -90,6 +90,7 @@ from agx_research.production.collector_plan import (
     build_live_collector,
     unavailable_sources,
 )
+from agx_research.production.decision_lineage import export_decision_routes
 from agx_research.production.mission_control import build_mission_control_status
 from agx_research.production.report import (
     PIPELINE_VERSION,
@@ -209,29 +210,38 @@ class ProductionPipeline:
                 errors.append(f"{name.value}: {error}")
                 stage_completed = datetime.now()
                 result = StageResult(
-                    name=name, status=status, started_at=stage_started,
+                    name=name,
+                    status=status,
+                    started_at=stage_started,
                     completed_at=stage_completed,
                     duration_seconds=(stage_completed - stage_started).total_seconds(),
-                    detail=detail, error=error,
+                    detail=detail,
+                    error=error,
                 )
                 stages.append(result)
                 return result
             stage_completed = datetime.now()
             warnings.extend(stage_warnings)
             result = StageResult(
-                name=name, status=status, started_at=stage_started,
+                name=name,
+                status=status,
+                started_at=stage_started,
                 completed_at=stage_completed,
                 duration_seconds=(stage_completed - stage_started).total_seconds(),
-                detail=detail, warnings=stage_warnings,
+                detail=detail,
+                warnings=stage_warnings,
             )
             stages.append(result)
             return result
 
-        execute(StageName.ENTRYPOINT, lambda: (
-            StageStatus.SUCCEEDED,
-            f"Production pipeline v{PIPELINE_VERSION} started for {start}..{end}, mode={mode.value}.",
-            [],
-        ))
+        execute(
+            StageName.ENTRYPOINT,
+            lambda: (
+                StageStatus.SUCCEEDED,
+                f"Production pipeline v{PIPELINE_VERSION} started for {start}..{end}, mode={mode.value}.",
+                [],
+            ),
+        )
         execute(StageName.SOURCE_REGISTRY, self._stage_source_registry)
         execute(StageName.DISCOVERY_ENGINE, self._stage_discovery_engine)
         execute(StageName.COLLECTOR_SELECTION, lambda: self._stage_collector_selection(mode))
@@ -255,8 +265,7 @@ class ProductionPipeline:
             id=new_id("execution"),
             execution_mode=mode.value,
             run_dates=[
-                (start + timedelta(days=i)).isoformat()
-                for i in range((end - start).days + 1)
+                (start + timedelta(days=i)).isoformat() for i in range((end - start).days + 1)
             ],
             started_at=started_at,
             completed_at=completed_at,
@@ -407,11 +416,12 @@ class ProductionPipeline:
             )
 
         self._planned = build_collector_plan(
-            self.registry, mode=mode, raw_documents=self.raw_documents, tickers=self.tickers,
+            self.registry,
+            mode=mode,
+            raw_documents=self.raw_documents,
+            tickers=self.tickers,
         )
-        self._unavailable = unavailable_sources(
-            self.registry, {p.source_id for p in self._planned}
-        )
+        self._unavailable = unavailable_sources(self.registry, {p.source_id for p in self._planned})
         if not self._planned:
             return (
                 StageStatus.SKIPPED,
@@ -435,14 +445,18 @@ class ProductionPipeline:
         if not planned:
             return StageStatus.SKIPPED, "No collectors selected.", []
 
-        self.event_platform = EventPlatform(repository=EventRepository(self.data_dir / "events.json"))
+        self.event_platform = EventPlatform(
+            repository=EventRepository(self.data_dir / "events.json")
+        )
         service = CollectionService(
             self.data_dir,
             raw_documents=self.raw_documents,
             event_platform=self.event_platform,
             provenance_index=ProvenanceIndexRepository(self.data_dir / "provenance_index.json"),
             metrics=self.metrics or SourceMetricsRepository(self.data_dir / "source_metrics.json"),
-            health_monitor=HealthMonitor(HealthAlertRepository(self.data_dir / "health_alerts.json")),
+            health_monitor=HealthMonitor(
+                HealthAlertRepository(self.data_dir / "health_alerts.json")
+            ),
             registry=self.registry,
             min_confidence=0.5,
         )
@@ -485,14 +499,18 @@ class ProductionPipeline:
         if self.registry is None:
             return StageStatus.SKIPPED, "No registry available.", []
 
-        self.event_platform = EventPlatform(repository=EventRepository(self.data_dir / "events.json"))
+        self.event_platform = EventPlatform(
+            repository=EventRepository(self.data_dir / "events.json")
+        )
         service = CollectionService(
             self.data_dir,
             raw_documents=self.raw_documents,
             event_platform=self.event_platform,
             provenance_index=ProvenanceIndexRepository(self.data_dir / "provenance_index.json"),
             metrics=self.metrics or SourceMetricsRepository(self.data_dir / "source_metrics.json"),
-            health_monitor=HealthMonitor(HealthAlertRepository(self.data_dir / "health_alerts.json")),
+            health_monitor=HealthMonitor(
+                HealthAlertRepository(self.data_dir / "health_alerts.json")
+            ),
             registry=self.registry,
             min_confidence=0.5,
         )
@@ -507,7 +525,9 @@ class ProductionPipeline:
         failures: list[str] = []
         for capability in Capability:
             decision, results, capability_failures = engine.decide_and_execute(
-                capability, service, expected_records=EXPECTED_RECORDS_LIVE,
+                capability,
+                service,
+                expected_records=EXPECTED_RECORDS_LIVE,
             )
             self.capability_decisions.append(decision)
             self.collection_results.update(results)
@@ -536,7 +556,11 @@ class ProductionPipeline:
         if self.raw_documents is None:
             return StageStatus.SKIPPED, "No raw document repository available.", []
         count = len(self.raw_documents.all_latest())
-        return StageStatus.SUCCEEDED, f"{count} raw document(s) archived (content-addressed, write-once).", []
+        return (
+            StageStatus.SUCCEEDED,
+            f"{count} raw document(s) archived (content-addressed, write-once).",
+            [],
+        )
 
     def _stage_canonical_transformation(self):
         if not self.collection_results:
@@ -687,7 +711,10 @@ class ProductionPipeline:
         )
         as_of = succeeded_dates[-1] if succeeded_dates else None
         self.investment_cases = production_artifacts.export_investment_cases(
-            self.knowledge_store, self.event_platform, tickers=self.tickers, as_of=as_of,
+            self.knowledge_store,
+            self.event_platform,
+            tickers=self.tickers,
+            as_of=as_of,
         )
         if as_of is None:
             return (
@@ -723,22 +750,30 @@ class ProductionPipeline:
             registry=self.registry,
         )
 
-        investment_cases = self.investment_cases or {"as_of": None, "recommendations": [], "portfolio": None}
+        investment_cases = self.investment_cases or {
+            "as_of": None,
+            "recommendations": [],
+            "portfolio": None,
+        }
         (dashboard_out / "investment_cases.json").write_text(
             json.dumps(investment_cases, indent=2, sort_keys=True) + "\n"
         )
         counts["investment_cases.json"] = len(investment_cases["recommendations"])
 
         collector_status = production_artifacts.export_collector_status(
-            self.registry, self.collection_results,
-            unavailable=self._unavailable, failures=self.collector_failures,
+            self.registry,
+            self.collection_results,
+            unavailable=self._unavailable,
+            failures=self.collector_failures,
         )
         (dashboard_out / "collector_status.json").write_text(
             json.dumps(collector_status, indent=2, sort_keys=True) + "\n"
         )
         counts["collector_status.json"] = len(collector_status)
 
-        last_record = self.run_records_this_execution[-1] if self.run_records_this_execution else None
+        last_record = (
+            self.run_records_this_execution[-1] if self.run_records_this_execution else None
+        )
         runtime_status = production_artifacts.export_runtime_status(last_record)
         (dashboard_out / "runtime_status.json").write_text(
             json.dumps(runtime_status, indent=2, sort_keys=True) + "\n"
@@ -746,11 +781,15 @@ class ProductionPipeline:
         counts["runtime_status.json"] = 1 if runtime_status else 0
 
         genes = production_artifacts.export_genes(self.genome) if self.genome else []
-        (dashboard_out / "genes.json").write_text(json.dumps(genes, indent=2, sort_keys=True) + "\n")
+        (dashboard_out / "genes.json").write_text(
+            json.dumps(genes, indent=2, sort_keys=True) + "\n"
+        )
         counts["genes.json"] = len(genes)
 
         papers = production_artifacts.export_papers(PaperRepository(self.data_dir / "papers.json"))
-        (dashboard_out / "papers.json").write_text(json.dumps(papers, indent=2, sort_keys=True) + "\n")
+        (dashboard_out / "papers.json").write_text(
+            json.dumps(papers, indent=2, sort_keys=True) + "\n"
+        )
         counts["papers.json"] = len(papers)
 
         hypotheses = production_artifacts.export_hypotheses(
@@ -786,12 +825,19 @@ class ProductionPipeline:
         counts["acquisition_decisions.json"] = len(acquisition_decisions)
 
         source_metrics = production_artifacts.export_source_metrics(
-            self.registry, self.metrics or SourceMetricsRepository(self.data_dir / "source_metrics.json")
+            self.registry,
+            self.metrics or SourceMetricsRepository(self.data_dir / "source_metrics.json"),
         )
         (dashboard_out / "source_metrics.json").write_text(
             json.dumps(source_metrics, indent=2, sort_keys=True) + "\n"
         )
         counts["source_metrics.json"] = len(source_metrics)
+
+        decision_routes = export_decision_routes(self.registry)
+        (dashboard_out / "decision_source_routes.json").write_text(
+            json.dumps(decision_routes, indent=2, sort_keys=True) + "\n"
+        )
+        counts["decision_source_routes.json"] = len(decision_routes)
 
         dashboard_metrics = production_artifacts.export_dashboard_metrics(dashboard_out, counts)
         (dashboard_out / "dashboard_metrics.json").write_text(

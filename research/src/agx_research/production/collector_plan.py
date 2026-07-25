@@ -39,6 +39,7 @@ from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import Collector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
+from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.stooq import StooqPriceCollector
@@ -65,8 +66,29 @@ class ExecutionMode(str, Enum):
 # (oil, dollar index, treasury yield) -- the same confidence tier this
 # codebase already grants FRED's/World Bank's endpoint *shape*.
 LIVE_STOOQ_TICKER_SUFFIX = ".eg"
-LIVE_FRED_SERIES_IDS = ["DCOILBRENTEU", "DTWEXBGS", "DGS10"]
-LIVE_WORLDBANK_INDICATORS = {"FP.CPI.TOTL.ZG": "egypt_cpi_inflation"}
+LIVE_FRED_SERIES_IDS = [
+    "DCOILBRENTEU",  # Brent: exporters, fertilizers, transport and inflation
+    "DCOILWTICO",  # second oil benchmark for dislocation checks
+    "DTWEXBGS",  # broad USD pressure
+    "VIXCLS",  # global risk aversion
+    "GOLDAMGBD228NLBM",  # gold safe-haven / local inflation proxy
+    "DGS2",  # front of the US yield curve
+    "DGS10",  # global discount-rate anchor
+    "BAMLH0A0HYM2",  # high-yield credit stress
+]
+LIVE_WORLDBANK_INDICATORS = {
+    "FP.CPI.TOTL.ZG": "egypt_cpi_inflation",
+    "NY.GDP.MKTP.KD.ZG": "egypt_real_gdp_growth",
+    "BN.CAB.XOKA.GD.ZS": "egypt_current_account_pct_gdp",
+    "FI.RES.TOTL.CD": "egypt_total_reserves_usd",
+    "PA.NUS.FCRF": "egypt_official_fx_egp_per_usd",
+    "FR.INR.LEND": "egypt_lending_rate",
+    "SL.UEM.TOTL.ZS": "egypt_unemployment_rate",
+    "NE.EXP.GNFS.ZS": "egypt_exports_pct_gdp",
+    "NE.IMP.GNFS.ZS": "egypt_imports_pct_gdp",
+    "BX.KLT.DINV.WD.GD.ZS": "egypt_fdi_net_inflows_pct_gdp",
+    "DT.DOD.DECT.CD": "egypt_external_debt_usd",
+}
 LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICATORS.values())
 
 # Conservative floors, not true full-history sizes (unknown until a real
@@ -74,8 +96,13 @@ LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICAT
 # lowballing here never unfairly penalizes a real result, it only avoids
 # guessing at a number this pipeline cannot know in advance.
 EXPECTED_RECORDS_LIVE = {
-    "stooq": 100, "fred": 100, "worldbank": 10,
-    "enterprise_press": 5, "fra_egypt": 5, "skynews_arabia_economy": 5,
+    "stooq": 100,
+    "fred": 100,
+    "worldbank": 10,
+    "gdelt": 10,
+    "enterprise_press": 5,
+    "fra_egypt": 5,
+    "skynews_arabia_economy": 5,
 }
 
 _UNAVAILABLE_REASON_BY_STATUS = {
@@ -275,6 +302,13 @@ def build_live_collector(
         return FredCsvCollector(spec, series_ids=list(LIVE_FRED_SERIES_IDS), fetcher=fetcher)
     if source_id == "worldbank":
         return WorldBankCollector(spec, indicators=dict(LIVE_WORLDBANK_INDICATORS), fetcher=fetcher)
+    if source_id == "gdelt":
+        return GdeltDocCollector(
+            spec,
+            query='(Egypt OR Egyptian OR "Egyptian Exchange" OR EGX)',
+            ticker_hints=tickers,
+            fetcher=fetcher,
+        )
     if source_id in ("enterprise_press", "fra_egypt", "skynews_arabia_economy"):
         # spec.base_url is a real feed URL verified live via RSS
         # autodiscovery (see sources/catalog.py's entry for this id and
@@ -283,8 +317,11 @@ def build_live_collector(
         # the same terms enterprise_press's does (see TD-29: informational
         # corporate-action signal, never a numeric detail).
         return RssNewsCollector(
-            spec, feed_url=spec.base_url, ticker_hints=tickers,
-            classify_corporate_events=True, fetcher=fetcher,
+            spec,
+            feed_url=spec.base_url,
+            ticker_hints=tickers,
+            classify_corporate_events=True,
+            fetcher=fetcher,
         )
     # rss_generic and every other source deliberately excluded: no real,
     # verified feed URL/config exists yet (see `unavailable_sources`).
@@ -326,7 +363,9 @@ def build_collector_plan(
         for source_id in ("stooq", "fred", "worldbank", "enterprise_press"):
             if source_id not in collectable:
                 continue
-            collector = build_live_collector(source_id, collectable[source_id], fetcher=fetcher, tickers=tickers)
+            collector = build_live_collector(
+                source_id, collectable[source_id], fetcher=fetcher, tickers=tickers
+            )
             if collector is not None:
                 plans.append(PlannedCollector(source_id, collector))
         return plans
@@ -338,7 +377,8 @@ def build_collector_plan(
             symbols = {t: f"{t.lower()}.eg" for t in tickers if t in _STOOQ_PRICES}
             plans.append(
                 PlannedCollector(
-                    "stooq", StooqPriceCollector(collectable["stooq"], symbols=symbols, fetcher=fetcher)
+                    "stooq",
+                    StooqPriceCollector(collectable["stooq"], symbols=symbols, fetcher=fetcher),
                 )
             )
         if "fred" in collectable:
@@ -355,8 +395,11 @@ def build_collector_plan(
                 PlannedCollector(
                     "rss_generic",
                     RssNewsCollector(
-                        collectable["rss_generic"], feed_url=_MOCK_FEED_URL,
-                        ticker_hints=tickers, classify_corporate_events=True, fetcher=fetcher,
+                        collectable["rss_generic"],
+                        feed_url=_MOCK_FEED_URL,
+                        ticker_hints=tickers,
+                        classify_corporate_events=True,
+                        fetcher=fetcher,
                     ),
                 )
             )
@@ -384,15 +427,16 @@ def build_collector_plan(
             real = FredCsvCollector(spec, series_ids=list(_FRED_SERIES))
         elif source_id == "rss_generic":
             real = RssNewsCollector(
-                spec, feed_url=_MOCK_FEED_URL, ticker_hints=tickers, classify_corporate_events=True,
+                spec,
+                feed_url=_MOCK_FEED_URL,
+                ticker_hints=tickers,
+                classify_corporate_events=True,
             )
         elif source_id == "worldbank":
             real = WorldBankCollector(spec, indicators={_WORLDBANK_INDICATOR: _WORLDBANK_SERIES_ID})
         else:
             continue
-        plans.append(
-            PlannedCollector(source_id, ArchiveReplayCollector(real, raw_documents))
-        )
+        plans.append(PlannedCollector(source_id, ArchiveReplayCollector(real, raw_documents)))
     return plans
 
 

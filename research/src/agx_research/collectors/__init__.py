@@ -8,6 +8,7 @@ from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFet
 from agx_research.collectors.filesystem import FilesystemCollector
 from agx_research.collectors.fmp import FmpCollector
 from agx_research.collectors.fred import FredCsvCollector
+from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.pdf import PdfDocumentCollector
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository, ProvenanceRecord
 from agx_research.collectors.quality import QualityAssessment, assess_quality
@@ -43,6 +44,7 @@ __all__ = [
     "assess_quality",
     "StooqPriceCollector",
     "FredCsvCollector",
+    "GdeltDocCollector",
     "RssNewsCollector",
     "CollectionService",
     "CollectionRunResult",

@@ -101,10 +101,21 @@ class MetaDecisionEngine:
                 f"{h.value}: expected_return={p.expected_return:.4f}, "
                 f"expected_risk={p.expected_risk:.4f}, confidence={p.confidence:.2f}"
                 for h, p in predictions.items()
+            ]
+            + [
+                evidence
+                for prediction in predictions.values()
+                for evidence in prediction.explanation.supporting_evidence
             ],
             evidence_refs=[
                 ProvenanceRef(kind="knowledge", ref_id=knowledge_id)
                 for knowledge_id in sorted(set(knowledge_ids))
+            ]
+            + [
+                ref
+                for prediction in predictions.values()
+                for ref in prediction.explanation.evidence_refs
+                if ref.kind != "knowledge"
             ],
             similar_historical_cases=[],
             invalidation_conditions=[
@@ -125,9 +136,20 @@ class MetaDecisionEngine:
                 produced_by="meta_decision_engine",
                 produced_at=datetime.now(),
                 inputs=[
-                    ProvenanceRef(kind="prediction", ref_id=f"{p.model_id}@{p.model_version}:{h.value}")
+                    ProvenanceRef(
+                        kind="prediction", ref_id=f"{p.model_id}@{p.model_version}:{h.value}"
+                    )
                     for h, p in predictions.items()
                 ]
-                + [ProvenanceRef(kind="knowledge", ref_id=kid) for kid in sorted(set(knowledge_ids))],
+                + [
+                    ProvenanceRef(kind="knowledge", ref_id=kid)
+                    for kid in sorted(set(knowledge_ids))
+                ]
+                + [
+                    ref
+                    for prediction in predictions.values()
+                    for ref in prediction.provenance.inputs
+                    if ref.kind != "knowledge"
+                ],
             ),
         )

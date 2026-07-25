@@ -40,14 +40,17 @@ def create_backup(data_dir: Path | str, backup_path: Path | str) -> dict:
     manifest = {
         "created_at": datetime.now().isoformat(),
         "data_dir": str(data_dir),
-        "files": {str(p.relative_to(data_dir)): _sha256(p) for p in files},
+        # Tar member names are POSIX paths on every platform. Keeping the
+        # manifest in that same canonical form makes Windows backups
+        # verifiable and portable to Linux runners (and vice versa).
+        "files": {p.relative_to(data_dir).as_posix(): _sha256(p) for p in files},
     }
     backup_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_bytes = json.dumps(manifest, indent=2, sort_keys=True).encode()
 
     with tarfile.open(backup_path, "w:gz") as tar:
         for p in files:
-            tar.add(p, arcname=str(p.relative_to(data_dir)))
+            tar.add(p, arcname=p.relative_to(data_dir).as_posix())
         info = tarfile.TarInfo(_MANIFEST_NAME)
         info.size = len(manifest_bytes)
         import io
@@ -89,5 +92,7 @@ def restore_backup(backup_path: Path | str, target_dir: Path | str) -> dict:
             destination = target_dir / rel_path
             destination.parent.mkdir(parents=True, exist_ok=True)
             member = tar.extractfile(rel_path)
+            if member is None:  # verify_backup already checked; defensive against archive mutation
+                raise ValueError(f"{backup_path} is missing {rel_path}")
             destination.write_bytes(member.read())
     return manifest

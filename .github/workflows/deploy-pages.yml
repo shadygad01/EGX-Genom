@@ -191,21 +191,27 @@ jobs:
           for w in report['warnings']:
               print(' -', w)
           "
-          echo '--- Egyptian priority-source registry state after this run ---'
+          echo '--- Named-target registry state (LIVE data-dir, reflects the discovery loop above -- not the earlier dashboard snapshot) ---'
           uv run python -c "
           import json
-          registry = json.load(open('../web/public/data/source_registry.json'))
+          registry = json.load(open('/tmp/agx_dashboard_data/source_registry.json'))
           by_id = {}
           for spec in registry:
-              by_id[spec['id']] = spec
-          for source_id in ['egx_official', 'cbe', 'enterprise_press', 'mubasher', 'zawya',
+              by_id.setdefault(spec['id'], spec)
+              if spec['version'] >= by_id[spec['id']]['version']:
+                  by_id[spec['id']] = spec
+          for source_id in ['egx_official', 'cbe', 'fra_egypt', 'capmas', 'enterprise_press',
+                            'mubasher', 'zawya', 'reuters', 'trading_economics',
+                            'asharq_business', 'cnbc_arabia',
                             'alarabiya_business', 'marketscreener', 'investing_news',
                             'almal', 'alborsa', 'masrawy_economy', 'youm7_economy',
                             'skynews_arabia_economy', 'asharq_economy']:
               spec = by_id.get(source_id)
               if spec:
                   print(f\"  {source_id:<18} status={spec['status']:<10} lifecycle={spec['lifecycle_state']:<10} \"
-                        f\"health={spec['health_status']:<8} base_url={spec['base_url']}\")
+                        f\"access={spec['access_method']:<14} health={spec['health_status']:<8} base_url={spec['base_url']}\")
+              else:
+                  print(f\"  {source_id:<18} NOT IN REGISTRY\")
           "
           echo '--- raw stooq response + parse warnings (diagnosing zero price bars) ---'
           uv run python -c "

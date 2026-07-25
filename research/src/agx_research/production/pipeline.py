@@ -109,12 +109,20 @@ from agx_research.universe.static import StaticUniverseProvider
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
 
-# Egyptian Live Data Sprint: fresh discovery is restricted to exactly the
-# project owner's named priority order (EGX official -> EGX30/EGX70
-# Investor Relations -> CBE -> Enterprise -> Mubasher -> Zawya). No other
-# seeded or discovered source is attempted until these are exhausted, per
-# the mission's explicit instruction.
-_EGYPTIAN_PRIORITY_TARGET_IDS = {"egx_official", "cbe", "enterprise_press", "mubasher", "zawya"}
+# Egyptian Live Data Sprint (original): fresh discovery started restricted
+# to exactly the project owner's first named priority order (EGX official ->
+# EGX30/EGX70 Investor Relations -> CBE -> Enterprise -> Mubasher -> Zawya).
+# Coverage-expansion mission: that allowlist meant every target added to
+# target.py's seed catalog afterward (Reuters, Trading Economics, Asharq
+# Business, CNBC Arabia, and the nine outlets this mission added) was
+# catalogued but never actually attempted by a real production run -- only
+# reachable via a manual `discover-sources --target <id>` CLI call, which is
+# how this mission itself found `skynews_arabia_economy`'s live feed. Fresh
+# discovery now runs every non-per-constituent seeded target every live run
+# (still governed by `TargetOrganization.priority` for processing order, and
+# still real-network-verified/legality-gated per target, same as always) so
+# a newly catalogued target is automatically covered with no second
+# registration step required.
 
 
 class ProductionPipeline:
@@ -346,15 +354,15 @@ class ProductionPipeline:
         # a source that has simply never been attempted (health_status
         # starts UNKNOWN, not DOWN), so EGX official/CBE/etc. would never
         # be discovered at all no matter how many times the pipeline ran.
-        # Restricted to the Egyptian Live Data Sprint's exact named
-        # priority order; every other seeded/discoverable target is
-        # deliberately excluded until these are exhausted.
+        # Every non-per-constituent seeded target is attempted (see the
+        # module comment above); `TargetOrganization.priority` still governs
+        # the order they're processed in.
         universe = FallbackUniverseProvider(
             [CollectedUniverseProvider(self.data_dir), StaticUniverseProvider()]
         ).constituents(date.today())
         company_ir_targets = generate_company_ir_targets(universe)
         fresh_targets = [
-            t for t in seed_target_organizations() if t.id in _EGYPTIAN_PRIORITY_TARGET_IDS
+            t for t in seed_target_organizations() if not t.per_constituent
         ] + company_ir_targets
         discovery_results = engine.run_catalog(fresh_targets, companies=universe)
         newly_registered = sum(1 for r in discovery_results if r.registered)
@@ -364,7 +372,7 @@ class ProductionPipeline:
         recovered = sum(1 for r in recovery_results if r.registered)
         return (
             StageStatus.SUCCEEDED,
-            f"{len(fresh_targets)} Egyptian target(s) attempted ({newly_registered} newly "
+            f"{len(fresh_targets)} target(s) attempted ({newly_registered} newly "
             f"registered); {len(recovery_results)} DOWN source(s) needed recovery "
             f"({recovered} recovered).",
             [],

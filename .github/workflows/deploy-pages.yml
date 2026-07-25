@@ -304,6 +304,135 @@ jobs:
         with:
           path: web/dist
 
+  # Price-data feasibility mission: does not depend on `build` and doesn't
+  # touch /tmp/agx_dashboard_data, so it runs in parallel rather than
+  # waiting behind the ~1-hour full pipeline run -- fast, independent
+  # evidence-gathering only, no production artifacts, nothing deployed.
+  # Verifies, with real live fetches (never a guessed/fabricated URL,
+  # never a robots.txt/ToS bypass): (1) whether Stooq's robots.txt disallow
+  # is a blanket block on its CSV-download mechanism or scoped to specific
+  # parameters, (2) whether Mubasher/Zawya's own homepage links to any
+  # structured historical/export price-data page the existing generic
+  # discovery might not have surfaced, (3) the *actual* Terms of Service
+  # text for Yahoo Finance/Investing.com/TradingView (reading a public
+  # legal document is not "using" the service under it), and (4) EGX
+  # official's current reachability, for a single consolidated evidence
+  # trail this mission's audit cites directly.
+  price_data_feasibility_probe:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: research
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync
+      - name: Evaluate every realistic free Egyptian price-data source
+        run: |
+          cat > /tmp/price_probe.py <<'PYEOF'
+          import re
+          from urllib.parse import urljoin
+          from agx_research.collectors.fetcher import HttpFetcher, FetchDisallowed, FetchError
+          from agx_research.discovery.engine import _parse_page
+          from agx_research.sources.spec import (
+              AccessMethod, RateLimit, RetryPolicy, SourceCategory, SourceSpec, SourceStatus,
+          )
+
+          spec = SourceSpec(
+              id="probe_diag", name="probe", category=SourceCategory.RESEARCH,
+              access_method=AccessMethod.HTML_SCRAPE, status=SourceStatus.IMPLEMENTED,
+              reliability_score=0.0, freshness_score=0.0,
+              retry_policy=RetryPolicy(max_attempts=1, backoff_seconds=0.5),
+              rate_limit=RateLimit(requests_per_minute=20, min_seconds_between_requests=1.0),
+          )
+          fetcher = HttpFetcher()
+
+
+          def fetch(url):
+              try:
+                  return fetcher.fetch_text(url, spec)
+              except FetchDisallowed as exc:
+                  return f"ROBOTS_DISALLOWED: {exc}"
+              except FetchError as exc:
+                  return f"FETCH_ERROR: {exc}"
+              except Exception as exc:
+                  return f"{type(exc).__name__}: {exc}"
+
+
+          def ok(text):
+              return isinstance(text, str) and not text.startswith(
+                  ("ROBOTS_DISALLOWED:", "FETCH_ERROR:", "ValueError:", "TypeError:")
+              )
+
+
+          print("=== 1. Stooq: complete robots.txt (total block, or scoped to certain params?) ===")
+          print(fetch("https://stooq.com/robots.txt"))
+
+          print()
+          print("=== 2. Stooq: robots_status() for the exact failing EGX path vs. an equivalent US-ticker path ===")
+          print("EGX (abuk.eg):", fetcher.robots_status("https://stooq.com/q/d/l/?s=abuk.eg&i=d"))
+          print("US (aapl.us): ", fetcher.robots_status("https://stooq.com/q/d/l/?s=aapl.us&i=d"))
+          print("bare /q/d/l/:  ", fetcher.robots_status("https://stooq.com/q/d/l/"))
+
+          print()
+          print("=== 3. Mubasher/Zawya homepage: any anchor hinting at a historical/download/export price-data page? ===")
+          for url in ["https://mubasher.info", "https://zawya.com"]:
+              html = fetch(url)
+              if not ok(html):
+                  print(f"{url}: could not fetch: {html[:200]}")
+                  continue
+              parser = _parse_page(html)
+              hits = [
+                  a for a in parser.anchors
+                  if re.search(r"download|historical|export|\.csv|\.xlsx|market.?data", (a.get("href", "") + " " + a.get("text", "")).lower())
+              ]
+              print(f"{url}: {len(parser.anchors)} anchors total, {len(hits)} matching download/historical/export/csv/xlsx/market-data")
+              for a in hits[:15]:
+                  print("  ", repr(a.get("text", "").strip()[:60]), "->", urljoin(url, a.get("href", "")))
+
+          print()
+          print("=== 4. Yahoo Finance / Investing.com / TradingView: reachability + real Terms-of-Service text ===")
+          for base in ["https://finance.yahoo.com", "https://www.investing.com", "https://www.tradingview.com"]:
+              html = fetch(base)
+              if not ok(html):
+                  print(f"{base}: could not fetch: {html}")
+                  continue
+              parser = _parse_page(html)
+              terms_links = [
+                  a for a in parser.anchors
+                  if re.search(r"\bterms\b", (a.get("href", "") + " " + a.get("text", "")).lower())
+              ]
+              print(f"{base}: reachable, {len(parser.anchors)} anchors, {len(terms_links)} terms-like link(s)")
+              seen_terms_urls = set()
+              for a in terms_links[:5]:
+                  terms_url = urljoin(base, a["href"])
+                  if terms_url in seen_terms_urls:
+                      continue
+                  seen_terms_urls.add(terms_url)
+                  print("  terms link:", terms_url)
+                  terms_html = fetch(terms_url)
+                  if ok(terms_html):
+                      text = re.sub("<[^>]+>", " ", terms_html)
+                      text = re.sub(r"\s+", " ", text)
+                      found_any = False
+                      for kw in ["scrape", "crawl", "automat", "robot", "redistribut", "data mining", "harvest"]:
+                          idx = text.lower().find(kw)
+                          if idx != -1:
+                              found_any = True
+                              print(f"    ...[{kw}]...", text[max(0, idx - 100):idx + 200])
+                      if not found_any:
+                          print("    (no scrape/crawl/automat/robot/redistribut/data-mining/harvest keyword found in fetched text)")
+                  else:
+                      print("    terms page fetch failed:", terms_html[:200])
+
+          print()
+          print("=== 5. EGX official: final confirmation this pass (network-level block, already evidenced repeatedly) ===")
+          for url in ["https://egx.com.eg", "https://www.egx.com.eg"]:
+              print(f"{url}:", fetch(url)[:200])
+          PYEOF
+          sed -i 's/^          //' /tmp/price_probe.py
+          uv run python /tmp/price_probe.py
+
   deploy:
     needs: build
     # The `github-pages` environment's default deployment-branch policy

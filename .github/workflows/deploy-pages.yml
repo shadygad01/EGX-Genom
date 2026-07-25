@@ -304,6 +304,76 @@ jobs:
         with:
           path: web/dist
 
+  # Final Data Acquisition sprint: independent of `build`, runs in
+  # parallel. (1) Verifies skynews_arabia_economy's own wired collector
+  # directly -- it's IMPLEMENTED and legally cleared but the capability
+  # engine's fallback ranking always stops at enterprise_press for the
+  # same capabilities, so it has never actually been exercised by a live
+  # collection cycle; this closes that gap definitively rather than
+  # leaving it ambiguous. (2) Probes IMF's real DataMapper API
+  # (imf.org/external/datamapper -- documented, public, keyless, distinct
+  # from the deprecated dataservices.imf.org SDMX endpoint the previous
+  # probe found doesn't resolve) for genuine Egypt macro coverage. A
+  # collector is only written in a follow-up commit if this run's real
+  # response confirms the shape.
+  final_acquisition_probe:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: research
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync
+      - name: Verify skynews_arabia_economy directly + probe IMF DataMapper API
+        run: |
+          cat > /tmp/final_probe.py <<'PYEOF'
+          from agx_research.collectors.fetcher import HttpFetcher, FetchDisallowed, FetchError
+          from agx_research.collectors.rss import RssNewsCollector
+          from agx_research.sources.catalog import seed_registry
+          from agx_research.sources.registry import SourceRegistry
+
+          print("=== 1. Direct verification: does skynews_arabia_economy's own wired collector produce real records? ===")
+          print("(bypasses the capability engine's fallback ranking, which stops at enterprise_press for the same capabilities)")
+          registry = seed_registry(SourceRegistry())
+          spec = registry.latest("skynews_arabia_economy")
+          print(f"spec: status={spec.status} base_url={spec.base_url}")
+          fetcher = HttpFetcher()
+          collector = RssNewsCollector(spec, feed_url=spec.base_url, classify_corporate_events=True, fetcher=fetcher)
+          try:
+              docs = collector.fetch()
+              print(f"fetch(): {len(docs)} document(s)")
+              for doc in docs:
+                  batch = collector.parse(doc)
+                  print(f"parse(): {len(batch.news_items)} news item(s), {len(batch.corporate_events)} corporate event(s), warnings={batch.parse_warnings}")
+                  for item in batch.news_items[:3]:
+                      print(f"  - {item.headline!r} ({item.published_at})")
+          except (FetchDisallowed, FetchError) as exc:
+              print(f"FAILED: {type(exc).__name__}: {exc}")
+          except Exception as exc:
+              print(f"FAILED: {type(exc).__name__}: {exc}")
+
+          print()
+          print("=== 2. IMF DataMapper API: real, documented, keyless public endpoint (imf.org/external/datamapper) ===")
+          diag_spec = registry.latest("worldbank")
+          diag_fetcher = HttpFetcher()
+          for url in [
+              "https://www.imf.org/external/datamapper/api/v1/PCPIPCH/EGY",
+              "https://www.imf.org/external/datamapper/api/v1/NGDP_RPCH/EGY",
+              "https://www.imf.org/external/datamapper/api/v1/indicators",
+          ]:
+              try:
+                  text = diag_fetcher.fetch_text(url, diag_spec)
+                  print(f"{url}: OK, {len(text)} chars, starts: {text[:300]!r}")
+              except FetchDisallowed as exc:
+                  print(f"{url}: ROBOTS_DISALLOWED: {exc}")
+              except FetchError as exc:
+                  print(f"{url}: FETCH_ERROR: {exc}")
+              except Exception as exc:
+                  print(f"{url}: {type(exc).__name__}: {exc}")
+          PYEOF
+          uv run python /tmp/final_probe.py
+
   # Price-data feasibility mission: does not depend on `build` and doesn't
   # touch /tmp/agx_dashboard_data, so it runs in parallel rather than
   # waiting behind the ~1-hour full pipeline run -- fast, independent

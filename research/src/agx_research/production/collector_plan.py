@@ -73,7 +73,10 @@ LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICAT
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
 # lowballing here never unfairly penalizes a real result, it only avoids
 # guessing at a number this pipeline cannot know in advance.
-EXPECTED_RECORDS_LIVE = {"stooq": 100, "fred": 100, "worldbank": 10, "enterprise_press": 5}
+EXPECTED_RECORDS_LIVE = {
+    "stooq": 100, "fred": 100, "worldbank": 10,
+    "enterprise_press": 5, "fra_egypt": 5, "skynews_arabia_economy": 5,
+}
 
 _UNAVAILABLE_REASON_BY_STATUS = {
     SourceStatus.PLANNED: (
@@ -272,10 +275,13 @@ def build_live_collector(
         return FredCsvCollector(spec, series_ids=list(LIVE_FRED_SERIES_IDS), fetcher=fetcher)
     if source_id == "worldbank":
         return WorldBankCollector(spec, indicators=dict(LIVE_WORLDBANK_INDICATORS), fetcher=fetcher)
-    if source_id == "enterprise_press":
-        # spec.base_url is the real feed URL verified live via RSS
-        # autodiscovery (see sources/catalog.py's enterprise_press entry
-        # and docs/ACQUISITION_STRATEGY.md) -- not a guess.
+    if source_id in ("enterprise_press", "fra_egypt", "skynews_arabia_economy"):
+        # spec.base_url is a real feed URL verified live via RSS
+        # autodiscovery (see sources/catalog.py's entry for this id and
+        # docs/ACQUISITION_STRATEGY.md) -- not a guess. FRA is Egypt's
+        # official financial regulator, so its headline classifier stays on
+        # the same terms enterprise_press's does (see TD-29: informational
+        # corporate-action signal, never a numeric detail).
         return RssNewsCollector(
             spec, feed_url=spec.base_url, ticker_hints=tickers,
             classify_corporate_events=True, fetcher=fetcher,

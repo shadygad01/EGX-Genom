@@ -139,12 +139,19 @@ def seed_sources() -> list[SourceSpec]:
             supported_event_types=["corporate", "market"], supported_languages=["ar", "en"],
             notes="Official downloads exist (indices, disclosures); exact endpoints to be verified from egx.com.eg before a collector is written -- never guessed.",
         ),
+        # Coverage-expansion mission: the Acquisition Intelligence Engine's
+        # standard RSS-autodiscovery heuristic found a real feed on FRA's own
+        # homepage (fra.gov.eg) -- the same mechanism, same rigor, that
+        # verified enterprise_press. See docs/ACQUISITION_STRATEGY.md.
         _spec(
             id="fra_egypt", name="Financial Regulatory Authority (FRA)", category=SourceCategory.OFFICIAL,
-            access_method=AccessMethod.HTML_SCRAPE, status=SourceStatus.PLANNED,
+            access_method=AccessMethod.RSS_FEED, status=SourceStatus.IMPLEMENTED,
+            base_url="https://fra.gov.eg/feed/",
             reliability_score=0.95, freshness_score=0.6, conflict_priority=98,
+            collector="RssNewsCollector", collector_version="1.0.0",
             supported_event_types=["corporate"], supported_languages=["ar"],
-            notes="Regulatory decisions/disclosures; check for structured feeds before any scraping.",
+            notes="Feed URL verified live via RSS autodiscovery on fra.gov.eg's homepage "
+            "(see docs/ACQUISITION_STRATEGY.md).",
         ),
         _spec(
             id="cbe", name="Central Bank of Egypt", category=SourceCategory.OFFICIAL,
@@ -277,6 +284,20 @@ def seed_sources() -> list[SourceSpec]:
             ]
         ],
         # ---- ARABIC NEWS ----
+        # Coverage-expansion mission: RSS autodiscovery found a real,
+        # legally-cleared feed on Sky News Arabia's own homepage -- same
+        # mechanism as enterprise_press/fra_egypt above.
+        _spec(
+            id="skynews_arabia_economy", name="Sky News Arabia Economy",
+            category=SourceCategory.ARABIC_NEWS,
+            access_method=AccessMethod.RSS_FEED, status=SourceStatus.IMPLEMENTED,
+            base_url="https://skynewsarabia.com/rss.xml",
+            reliability_score=0.5, freshness_score=0.9,
+            collector="RssNewsCollector", collector_version="1.0.0", conflict_priority=40,
+            supported_event_types=["news"], supported_languages=["ar"],
+            notes="Feed URL verified live via RSS autodiscovery on skynewsarabia.com's "
+            "homepage (see docs/ACQUISITION_STRATEGY.md).",
+        ),
         *[
             _spec(
                 id=source_id, name=name, category=SourceCategory.ARABIC_NEWS,
@@ -291,7 +312,6 @@ def seed_sources() -> list[SourceSpec]:
                 ("alborsa", "Al Borsa News"),
                 ("masrawy_economy", "Masrawy Economy"),
                 ("youm7_economy", "Youm7 Economy"),
-                ("skynews_arabia_economy", "Sky News Arabia Economy"),
                 ("asharq_economy", "Asharq Economy"),
             ]
         ],

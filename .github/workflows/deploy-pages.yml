@@ -430,7 +430,6 @@ jobs:
           for url in ["https://egx.com.eg", "https://www.egx.com.eg"]:
               print(f"{url}:", fetch(url)[:200])
           PYEOF
-          sed -i 's/^          //' /tmp/price_probe.py
           uv run python /tmp/price_probe.py
 
   deploy:

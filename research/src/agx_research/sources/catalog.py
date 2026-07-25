@@ -298,13 +298,17 @@ def seed_sources() -> list[SourceSpec]:
         _spec(
             id="skynews_arabia_economy", name="Sky News Arabia Economy",
             category=SourceCategory.ARABIC_NEWS,
-            access_method=AccessMethod.RSS_FEED, status=SourceStatus.IMPLEMENTED,
+            access_method=AccessMethod.RSS_FEED, status=SourceStatus.PLANNED,
             base_url="https://skynewsarabia.com/rss.xml",
             reliability_score=0.5, freshness_score=0.9,
             collector="RssNewsCollector", collector_version="1.0.0", conflict_priority=40,
             supported_event_types=["news"], supported_languages=["ar"],
-            notes="Feed URL verified live via RSS autodiscovery on skynewsarabia.com's "
-            "homepage (see docs/ACQUISITION_STRATEGY.md).",
+            notes="Corrected finding, Final Data Acquisition sprint: discovered live via "
+            "RSS autodiscovery and briefly promoted to IMPLEMENTED on reachability alone, "
+            "but a direct collector run against this exact URL returned HTTP 404 -- it was "
+            "promoted before an actual successful collection confirmed it, unlike "
+            "enterprise_press/fra_egypt. Reverted to PLANNED until the feed URL is "
+            "re-verified and a real collection run confirms real yield.",
         ),
         *[
             _spec(

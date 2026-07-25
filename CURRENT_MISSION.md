@@ -1,6 +1,6 @@
 # Current Mission
 
-**Superseded five times since the "no egress" finding below.** That finding was
+**Superseded six times since the "no egress" finding below.** That finding was
 specific to *this coding sandbox*; the production deployment target
 (GitHub Actions, `.github/workflows/deploy-pages.yml`) has real outbound
 egress and has since run the pipeline live multiple times, producing
@@ -8,7 +8,39 @@ first-party evidence that changed the picture substantially. The original
 "blocked at the mission's own stop condition" framing is preserved below
 for its own historical accuracy but is **no longer the current state**.
 
-## Latest mission: price-data feasibility, evaluated with live evidence (this phase)
+## Current mission: acquisition architecture frozen — engineering effort shifts to explainable investment intelligence
+
+The project owner's explicit instruction this phase: complete the
+highest-value legally obtainable Egyptian data coverage, then **freeze
+the acquisition architecture** — no further `TargetOrganization` entries,
+collectors, or source-discovery engineering without a new named business
+input clearing a standing blocker. Every subsequent sprint must increase
+AGX's ability to **generate, validate, rank, and explain** investment
+decisions, not merely collect more data.
+
+**Closing verification before the freeze, not just a declaration**: (1) a
+real self-correction — `skynews_arabia_economy` had been promoted to
+`IMPLEMENTED` last phase on reachability/legal-clearance alone, without
+confirming an actual successful collection (unlike `enterprise_press`/
+`fra_egypt`); directly exercising its collector this sprint returned
+`HTTP 404` on its only known feed URL, so it's reverted to `PLANNED` with
+the finding recorded. (2) IMF's real current public API (the DataMapper,
+distinct from the deprecated SDMX endpoint the prior phase found
+unresolvable) returns `403 Forbidden` on every real indicator probed — a
+WAF block, evidenced rather than assumed. Full detail:
+`docs/ACQUISITION_STRATEGY.md`'s "Final Data Acquisition Sprint" section.
+
+**Verdict: no further real source remains to connect right now.** Every
+named candidate is either connected-and-verified (World Bank, Enterprise,
+FRA), evidence-blocked (EGX official, CBE, IMF, Stooq, Yahoo Finance,
+Investing.com, TradingView, Mubasher, Zawya, and every other named news
+outlet), or gated on a business decision this program won't make
+unilaterally (a NEEDS_KEY vendor's key, a verified EGX30/EGX70 constituent
+list, a licensed EGX vendor). **The freeze is therefore in effect as of
+this commit.** See `NEXT_MISSIONS.md` for what the next sprint actually
+builds.
+
+## Prior mission: price-data feasibility, evaluated with live evidence
 
 Explicit question: can AGX build statistically valid investment research
 using only legally obtainable free Egyptian market price data? If not,

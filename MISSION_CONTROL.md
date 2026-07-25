@@ -15,56 +15,54 @@ commit whenever the fact they state changes.
   complete and tested (17 fully DONE, the 18th DONE for everything
   engineering can close without a cloud/vendor/secrets decision) — see
   `docs/PHASE_STATUS.md`. The project owner has declared the backend,
-  research engine, production pipeline, and frontend complete; every
-  research conclusion the platform can currently produce is still scoped
-  to placeholder/mock data — no live source is connected yet.
-- **Current mission: price-data feasibility — proven impossible
-  autonomously, with live evidence, not assumed.** Evaluated every
-  realistic free source for EGX equity OHLCV this phase: Stooq's
-  robots.txt disallows its CSV-download mechanism as a blanket block (not
-  EGX-scoped — confirmed against a US-ticker path and even robots.txt
-  itself); Yahoo Finance's real Terms of Service, fetched and quoted
-  directly, explicitly prohibits automated collection; Investing.com
-  returned 403 Forbidden outright; TradingView's real policies page shows
-  explicit data-ownership/redistribution restrictions; Mubasher's and
-  Zawya's own homepages (508 and 154 links scanned) have zero structured
-  price-data links to discover; EGX official remains network-level
-  blocked. The only non-wall option (a NEEDS_KEY aggregator's free tier)
-  is a business decision reserved for the project owner. Nothing was
-  implemented — `Price Data`/`Market Breadth` correctly stay
-  `UNAVAILABLE`, no number fabricated to fill the gap. Full evidence:
-  `docs/ACQUISITION_STRATEGY.md`'s "Price Data Feasibility Mission".
-- **Prior mission (same phase): coverage expansion — two new live
-  sources.** `fra_egypt` (Egypt's own Financial Regulatory Authority,
-  `fra.gov.eg/feed/` — the first official Egyptian government source this
-  platform has connected; 10 real disclosure items, 10 events,
-  `data_quality_score=0.95`) and `skynews_arabia_economy`
-  (`skynewsarabia.com/rss.xml`, legally cleared and independently
-  confirmed live, not yet exercised by a live collection cycle since
-  `enterprise_press` ranks higher for the same capabilities). Found the
-  same way Enterprise was — RSS autodiscovery, never guessed. Surfaced and
-  fixed two real gaps (nine catalogued outlets had no `TargetOrganization`
-  entry at all; the production pipeline's own discovery stage separately
-  had its own hardcoded 5-id allowlist) and one real crash
-  (`discover_sitemap_urls()` never resolved a non-compliant relative
-  `<loc>` entry against its own URL, crashing the whole discovery stage).
-  Full detail: `CURRENT_MISSION.md` and `docs/ACQUISITION_STRATEGY.md`'s
-  "Coverage-Expansion Mission" section. Both missions followed the
-  capability-driven runtime engine mission (every data requirement is an
-  independent `Capability` with a ranked strategy pool) and the original
-  Egyptian Live Data Sprint — the platform has run live via GitHub Actions
-  (real outbound egress, unlike this coding sandbox) many times since.
+  research engine, production pipeline, and frontend complete. Three real
+  live sources are connected and collecting (World Bank, Enterprise, FRA
+  — see below); every *research conclusion* the platform produces is
+  still scoped to mock data pending the promotion pipeline's first real
+  trading-day run, and no output is claimed as real research until a
+  licensed EGX price vendor exists (`docs/ROADMAP.md`).
+- **Current mission: acquisition architecture frozen.** Per the project
+  owner's explicit instruction, this phase completed the highest-value
+  legally obtainable coverage, then froze further acquisition
+  engineering — no new `TargetOrganization`/collector/discovery work
+  without a new named business input. Closing verification, not just a
+  declaration: a real self-correction (`skynews_arabia_economy` was
+  promoted to `IMPLEMENTED` last phase without confirming an actual
+  successful collection; directly exercising it this phase returned
+  `HTTP 404`, reverted to `PLANNED`) and a real IMF probe (its current
+  DataMapper API, distinct from the deprecated endpoint found unresolvable
+  last phase, returns `403 Forbidden` — a WAF block, evidenced not
+  assumed). Verdict: no further real source remains to connect right now
+  — every named candidate is connected-and-verified, evidence-blocked, or
+  gated on a business decision. **Every subsequent sprint's engineering
+  effort goes toward generating, validating, ranking, and explaining
+  investment decisions from the evidence already flowing — not collecting
+  more data.** Full detail: `CURRENT_MISSION.md`,
+  `docs/ACQUISITION_STRATEGY.md`'s "Final Data Acquisition Sprint"
+  section, and `NEXT_MISSIONS.md` for what's next.
+- **Prior missions (same overall phase): price-data feasibility (proven
+  impossible autonomously, with live evidence — Stooq's robots.txt is a
+  confirmed blanket block, Yahoo Finance's real ToS explicitly prohibits
+  automation, Investing.com/TradingView are blocked, Mubasher/Zawya have
+  no structured price page) and coverage expansion (`fra_egypt` — Egypt's
+  own Financial Regulatory Authority, the first official government
+  source this platform has connected, 10 real disclosure items/events;
+  plus two real bugs found and fixed: nine catalogued outlets had no
+  discovery target at all, and the production pipeline had its own
+  separate hardcoded 5-source allowlist excluding everything else from
+  ever being auto-attempted). Full detail:
+  `docs/ACQUISITION_STRATEGY.md`'s "Price Data Feasibility Mission" and
+  "Coverage-Expansion Mission" sections.
 - **Live-run evidence:** World Bank (66 real Egypt CPI observations,
   macro), `enterprise_press` (6 real news items/events), and `fra_egypt`
   (10 real disclosure items/events) are `IMPLEMENTED` and collecting.
-  `skynews_arabia_economy` is `IMPLEMENTED`/legally-cleared but not yet
-  exercised live. Stooq is blocked by a confirmed blanket robots.txt rule
-  (see above); FRED's live behavior varies (sometimes succeeds, sometimes
-  times out); EGX/CBE/Mubasher/Zawya each fail with a distinct, evidenced,
-  source-side reason (network-level reset, WAF rejection, robots.txt
-  disallow, or — Zawya/Mubasher — real, parseable content with zero
-  legally-clearable structured candidates). Full detail:
-  `docs/ACQUISITION_STRATEGY.md`.
+  Stooq is blocked by a confirmed blanket robots.txt rule; IMF is blocked
+  by a confirmed WAF rule; FRED's live behavior varies (sometimes
+  succeeds, sometimes times out); EGX/CBE/Mubasher/Zawya each fail with a
+  distinct, evidenced, source-side reason (network-level reset, WAF
+  rejection, robots.txt disallow, or — Zawya/Mubasher — real, parseable
+  content with zero legally-clearable structured candidates). Full
+  detail: `docs/ACQUISITION_STRATEGY.md`.
 - **Progress this mission (frontend, prior phase):** all 9 sections built.
   Frontend audit complete. Six new backend dashboard artifacts (genes,
   papers, hypotheses, knowledge graph, financial statements, source
@@ -79,9 +77,8 @@ commit whenever the fact they state changes.
 - **Overall completion (backend, unchanged from prior mission):** ~99.5%
   of everything engineering-closeable without a business/vendor decision.
   See `docs/PHASE_STATUS.md`/`docs/ROADMAP.md` for the backend detail.
-- **Connected live sources: 3 collecting (World Bank, Enterprise, FRA) + 1
-  wired and legally-cleared but not yet exercised (Sky News Arabia), 5+
-  more evidenced-blocked with named reasons, not unbuilt.** Every mechanism
+- **Connected live sources: 3 collecting (World Bank, Enterprise, FRA),
+  6+ more evidenced-blocked with named reasons, not unbuilt.** Every mechanism
   needed (discovery, verification, ranking, registration, qualification,
   collection, archival, validation, universe membership, corporate-event
   classification, financial-statement collection) is built and tested and
@@ -128,15 +125,17 @@ commit whenever the fact they state changes.
   violate the platform's anti-fabrication principle. (3) A licensed EGX
   market data vendor has not been selected — the standing gate on
   treating any output as real research (`docs/ROADMAP.md`).
-- **Estimated remaining work:** Near-zero engineering effort once blocker
-  (2) above clears — `agx discover-sources`, `generate_company_ir_targets()`,
+- **Estimated remaining acquisition work: none, by design — frozen.**
+  `agx discover-sources`, `generate_company_ir_targets()`,
   `IndexConstituentCollector`, and `FinancialStatementCollector` are all
-  already built to scale automatically. Blocker (1) needs either a
-  business/legal resolution per source (not an engineering fix — a WAF or
-  robots.txt disallow is not something this program will bypass) or
-  reliance on the diversified strategies `docs/ACQUISITION_STRATEGY.md`
-  names per capability. System 18's remaining deployment/secrets/
-  scheduling work is separately blocked on a hosting/vendor decision.
+  already built to scale automatically the moment blocker (2) clears, so
+  no further acquisition engineering is needed in the meantime either.
+  Blocker (1) needs a business/legal resolution per source (a WAF or
+  robots.txt disallow is not something this program will bypass) — not
+  an engineering fix, and not this program's decision to make. System
+  18's remaining deployment/secrets/scheduling work is separately blocked
+  on a hosting/vendor decision. **All engineering effort now goes toward
+  `NEXT_MISSIONS.md`'s explainable-investment-intelligence work instead.**
 
 ## Where to look
 

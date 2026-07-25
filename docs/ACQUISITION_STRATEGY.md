@@ -179,8 +179,8 @@ untried outlets, the next step is simply running discovery against them
 |---|---|---|---|---|---|---|---|---|---|
 | World Bank Open Data API | CC-BY 4.0, documented | Very high (versioned public API) | Full | Annual | Broad Egypt macro indicators | High | Low | JSON API | **IMPLEMENTED, live-verified this session** (66 real Egypt CPI observations collected) |
 | CBE bulletins/time series | Official central bank | Unverified (homepage is WAF-blocked) | Unverified | Unverified | Highest for EGP-specific rates | Highest | Low once verified | CSV/PDF, or possibly a documented API distinct from the WAF-protected homepage | **Blocked at the homepage**; **the WAF blocking cbe.org.eg does not necessarily block a separate documented data-API subdomain/endpoint if one exists — unverified, not assumed either way** |
-| IMF SDMX/JSON API | Free, documented, no key | Very high (standardized SDMX, same tier as World Bank) | Full | Varies by series | Broad, incl. Egypt | High | Low | JSON API | **PLANNED in catalog, but currently modeled as a homepage-discovery `TargetOrganization` — this is the wrong model for it** (see Step 6) |
-| OECD SDMX API | Free, documented, no key | High | Full | Varies | Partial Egypt coverage | Medium-high | Low | JSON API | Same mismodeling as IMF |
+| IMF DataMapper API | Free, documented, no key | High | Full (blocked in practice) | Varies by series | Broad, incl. Egypt | High | Low | JSON API | **Verified and blocked, Final Data Acquisition sprint**: `imf.org/external/datamapper/api/v1/{indicator}/EGY`, the real current public endpoint (the older `dataservices.imf.org/REST/SDMX_JSON.svc` this document previously flagged as "mismodeled" doesn't resolve at all — DNS failure), returns `403 Forbidden` on every real indicator probed — a WAF/bot-detection block, the same class as CBE's, not an engineering gap this program will defeat |
+| OECD SDMX API | Free, documented, no key | High | Full | Varies | Partial Egypt coverage | Medium-high | Low | JSON API | Unverified this pass — the specific dataflow-listing path probed earlier returned 404 (wrong path, not proof of blockage); deprioritized given IMF's WAF result and this sprint's freeze |
 | Trading Economics API | Free tier limited, ToS/key unreviewed | Medium | Partial | Daily | Broad | Medium | Low-medium | JSON API | PLANNED, ToS review pending |
 
 **Chosen strategy**: World Bank remains primary and is already proven live.
@@ -693,3 +693,62 @@ shortcut. Writing one against Mubasher/Zawya is impossible — there is no
 structured endpoint to write it against. The only remaining path (a
 NEEDS_KEY vendor) requires the project owner's own action; it isn't
 engineering's decision to make on their behalf.
+
+## Final Data Acquisition Sprint — closing verification, then freeze
+
+Two closing questions before declaring this program's acquisition
+architecture frozen: is there a real, working source left to add, and is
+everything currently claimed as "connected" actually verified, not just
+plausible?
+
+**A real self-correction**: `skynews_arabia_economy` was promoted to
+`IMPLEMENTED` in the Coverage-Expansion Mission on the strength of
+reachability and legal clearance alone — the same qualification bar
+`AcquisitionIntelligenceEngine` uses to reach `lifecycle_state=QUARANTINE`
+— without first confirming an actual successful collection run, unlike
+`enterprise_press`/`fra_egypt`, both of which were only promoted after a
+live run proved real yield. Directly exercising its collector this sprint
+(bypassing the capability engine's fallback ranking, which always
+prefers `enterprise_press` for the same capabilities and so had never
+given `skynews_arabia_economy` a real turn) returned `HTTP 404 Not Found`
+on its only known feed URL — a clear, non-transient failure. **Reverted
+to `PLANNED`** with the finding recorded in its catalog notes. This is
+exactly the class of mistake `sources.qualification`'s stricter
+`QUARANTINE → EVALUATION → TRUSTED` gates exist to catch given enough run
+history; this correction closes it immediately rather than leaving a
+false "connected" claim standing.
+
+**IMF, verified rather than left as a documented-but-unmodeled gap**: the
+`dataservices.imf.org` SDMX endpoint this document previously flagged as
+"mismodeled" doesn't resolve at all (DNS failure, confirmed in the Price
+Data Feasibility Mission above) — IMF has moved off it. The real current
+public endpoint, IMF's DataMapper API
+(`imf.org/external/datamapper/api/v1/{indicator}/EGY`), is genuinely
+documented and keyless — but returns `403 Forbidden` on every real
+indicator probed this sprint, a WAF/bot-detection block in the same class
+as CBE's, not an engineering gap. IMF is now definitively evidenced-
+blocked, not merely unattempted.
+
+**Verdict: no further real, working, legally-obtainable source remains to
+connect right now.** Every named candidate across all twelve capabilities
+has now been either connected and verified (World Bank, Enterprise, FRA),
+attempted and evidence-blocked (EGX official, CBE, IMF, Stooq, Yahoo
+Finance, Investing.com, TradingView, Mubasher, Zawya, and the sixteen
+other named news outlets), or is explicitly gated on a business decision
+this program's own rules correctly refuse to make unilaterally (a
+NEEDS_KEY vendor's key, a verified EGX30/EGX70 constituent list, a
+licensed EGX vendor). Continuing to probe would mean either re-testing
+already-stable negative findings or reaching for a workaround this
+program's charter forbids.
+
+**Acquisition architecture is now frozen.** No further `TargetOrganization`
+entries, collectors, or source-discovery engineering should be added
+without a new, named business input clearing one of the standing
+blockers above (see `MISSION_CONTROL.md`'s "Known blockers" and
+`docs/ROADMAP.md`). Every subsequent sprint's engineering effort goes
+toward turning the evidence already flowing (`enterprise_press`,
+`fra_egypt`, `worldbank`) into validated, ranked, explainable investment
+intelligence — the hypothesis/validation/genome/explainability/Meta
+Decision Engine side of the pipeline — not toward collecting more data.
+See `CURRENT_MISSION.md` and `NEXT_MISSIONS.md` for what that means
+concretely.

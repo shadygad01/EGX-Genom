@@ -21,6 +21,7 @@ from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.spec import (
     AccessMethod,
     RateLimit,
+    RetryPolicy,
     SourceCategory,
     SourceSpec,
     SourceStatus,
@@ -56,6 +57,9 @@ def seed_sources() -> list[SourceSpec]:
             update_frequency="daily",
             collector="EgxCompositePriceCollector",
             collector_version="1.0.0",
+            retry_policy=RetryPolicy(
+                max_attempts=2, backoff_seconds=0.5, backoff_multiplier=2.0
+            ),
             rate_limit=RateLimit(requests_per_minute=60, min_seconds_between_requests=0.25),
             license=(
                 "Operational collection authorized by the repository owner; upstream terms "

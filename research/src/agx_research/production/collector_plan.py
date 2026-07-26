@@ -326,7 +326,10 @@ def build_live_collector(
         # that override scoped to this price adapter; every other live source
         # continues to use the shared robots-enforcing fetcher.
         price_fetcher = (
-            HttpFetcher(respect_robots=False, timeout_seconds=fetcher.timeout_seconds)
+            HttpFetcher(
+                respect_robots=False,
+                timeout_seconds=min(fetcher.timeout_seconds, 8.0),
+            )
             if isinstance(fetcher, HttpFetcher)
             else fetcher
         )

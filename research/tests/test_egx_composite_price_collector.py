@@ -151,6 +151,7 @@ def test_live_wiring_scopes_owner_authorized_robots_override_to_price_collector(
     assert collector.fetcher.respect_robots is False
     assert collector.fetcher.timeout_seconds == 7
     assert shared.respect_robots is True
+    assert collector.spec.retry_policy.max_attempts == 2
 
 
 def test_collected_prices_reach_market_memory_and_decision_readiness(tmp_path: Path):

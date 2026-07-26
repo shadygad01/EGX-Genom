@@ -2,8 +2,9 @@
 `data.mock_provider.LocalCsvDataProvider`'s "collected data reads through
 the same interface as everything else" pattern.
 
-Reads `<data_dir>/universe/<INDEX>.csv` (columns: ticker,company_name,
-as_of_date) -- the layout `collectors.service.CollectionService` writes
+Reads `<data_dir>/universe/<INDEX>.csv` (required columns: ticker,
+company_name,as_of_date; optional provenance fields are ignored) -- the layout
+`collectors.service.CollectionService` writes
 whenever a batch carries `IndexConstituent`s. Point-in-time correct: for a
 given `as_of` date, returns the constituent set from the latest collected
 snapshot at or before that date, never a later one -- the same no-look-

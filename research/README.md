@@ -13,12 +13,26 @@ uv sync
 uv run pytest
 ```
 
+## Universe data
+
+`data/universe/EGX30.csv` and `EGX70.csv` contain the reviewed snapshot dated
+2026-07-26. The accompanying `source_manifest.json` records the official EGX
+pages, row counts, collection method, and the source workbook. The CLI merges
+these rows into `<data-dir>/universe` before `run`, `export-dashboard`, and
+`discover-sources`; `CollectedUniverseProvider` then remains the only source
+read by Market Memory, the research pipeline, and dashboard artifact export.
+
+The snapshot contains 31 EGX30 rows because it preserves both `VLMR` and
+`VLMRA` exactly as supplied by the official-page transcription. Their distinct
+ISINs and a 100% aggregate EGX30 weight are asserted by tests; the system does
+not silently force the index name to equal a hard-coded row count.
+
 ## Package layout
 
 - `agx_research.config` — the stable `Horizon` enum only.
 - `agx_research.domain` — cross-cutting primitives: `new_id()`, `Provenance`/`ProvenanceRef`.
 - `agx_research.storage` — generic, versioned `Repository[T]` / `JsonFileRepository[T]`.
-- `agx_research.universe` — `UniverseProvider`/`SectorProvider` interfaces + placeholder data.
+- `agx_research.universe` — point-in-time `UniverseProvider` plus reviewed/collected CSV ingestion; no embedded ticker list.
 - `agx_research.data` — `DataProvider` interface, `MockDataProvider`,
   `FallbackDataProvider` (multi-source composition), `DatasetSnapshot` +
   `DatasetSnapshotRepository`, `quality` (mechanical OHLCV sanity checks),

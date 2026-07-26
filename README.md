@@ -1,7 +1,7 @@
 # AGX — Project Alpha Genome
 
 An autonomous quantitative research platform dedicated exclusively to the
-Egyptian Stock Exchange (EGX), focused on EGX30. AGX behaves as a research
+Egyptian Stock Exchange (EGX), focused on EGX30 and EGX70. AGX behaves as a research
 organization, not a signal generator: every discovered relationship is
 proposed by a research agent, validated statistically, stress-tested,
 backtested, peer-validated, and only then promoted into knowledge that can

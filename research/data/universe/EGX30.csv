@@ -1,0 +1,32 @@
+ticker,company_name,as_of_date,isin,reuters_code,weight_percent,source_url
+ABUK,Abou Kir Fertilizers,2026-07-26,EGS38191C010,ABUK.CA,2.76,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+ADIB,Abu Dhabi Islamic Bank- Egypt,2026-07-26,EGS60111C019,ADIB.CA,2.9,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+AMOC,Alexandria Mineral Oils Company,2026-07-26,EGS380P1C010,AMOC.CA,0.82,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+ARCC,Arabian Cement Company,2026-07-26,EGS3C0O1C016,ARCC.CA,0.37,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+BTFH,Beltone Holding,2026-07-26,EGS691G1C015,BTFH.CA,1.5,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+COMI,Commercial International Bank-Egypt (CIB),2026-07-26,EGS60121C018,COMI.CA,32.37,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+EAST,Eastern Company,2026-07-26,EGS37091C013,EAST.CA,6.5,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+EFID,Edita Food Industries S.A.E,2026-07-26,EGS305I1C011,EFID.CA,1.91,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+HRHO,EFG Holding,2026-07-26,EGS69101C011,HRHO.CA,3.16,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+EFIH,E-finance For Digital and Financial Investments,2026-07-26,EGS743O1C013,EFIH.CA,4.85,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+EGAL,Egypt Aluminum,2026-07-26,EGS3E181C010,EGAL.CA,1.17,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+EGCH,Egyptian Chemical Industries (Kima),2026-07-26,EGS38201C017,EGCH.CA,0.3,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+EMFD,Emaar Misr for Development,2026-07-26,EGS673Y1C015,EMFD.CA,0.71,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+FWRY,Fawry For Banking Technology And Electronic Payment,2026-07-26,EGS745L1C014,FWRY.CA,5.83,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+GBCO,GB Corp,2026-07-26,EGS673T1C012,GBCO.CA,1.47,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+HELI,Heliopolis Housing,2026-07-26,EGS65591C017,HELI.CA,1.08,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+ISPH,Ibnsina Pharma,2026-07-26,EGS512O1C012,ISPH.CA,0.98,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+JUFO,Juhayna Food Industries,2026-07-26,EGS30901C010,JUFO.CA,0.89,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+MCQE,Misr Cement (Qena),2026-07-26,EGS3C391C017,MCQE.CA,0.95,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+ORAS,Orascom Construction PLC,2026-07-26,EGS95001C011,ORAS.CA,2.08,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+ORHD,Orascom Development Egypt,2026-07-26,EGS70321C012,ORHD.CA,1.34,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+OIH,Orascom Investment Holding,2026-07-26,EGS693V1C014,OIH.CA,0.42,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+ORWE,Oriental Weavers,2026-07-26,EGS33041C012,ORWE.CA,0.62,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+PHDC,Palm Hills Development Company,2026-07-26,EGS655L1C012,PHDC.CA,1.76,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+CCAP,QALAA For Financial Investments,2026-07-26,EGS73541C012,CCAP.CA,1.84,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+RAYA,Raya Holding For Financial Investments,2026-07-26,EGS690C1C010,RAYA.CA,0.83,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+TMGH,T M G Holding,2026-07-26,EGS691S1C011,TMGH.CA,11.52,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+ETEL,Telecom Egypt,2026-07-26,EGS48031C016,ETEL.CA,6.23,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+RMDA,Tenth Of Ramadan Pharmaceutical Industries&Diagnostic-Rameda,2026-07-26,EGS381B1C015,RMDA.CA,0.65,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+VLMR,Valmore Holding,2026-07-26,EGS69082C013,VLMR.CA,1.58,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1
+VLMRA,Valmore Holding-EGP,2026-07-26,EGS69081C023,VLMRA.CA,0.61,https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1

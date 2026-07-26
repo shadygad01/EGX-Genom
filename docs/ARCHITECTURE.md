@@ -27,7 +27,8 @@ research/        Python package `agx_research` — the research engine
   # Epoch I: foundation
   domain/         Cross-cutting primitives: id minting, Provenance
   storage/        Generic versioned Repository[T] used by every store
-  universe/       UniverseProvider + SectorProvider interfaces (placeholder data)
+  universe/       Point-in-time UniverseProvider, reviewed snapshot ingestion,
+                  and the separate SectorProvider interface
   data/           DataProvider/FallbackDataProvider, mock impl, point-in-time
                   DatasetSnapshot(+repository), quality checks, split/dividend
                   adjustment
@@ -398,8 +399,10 @@ until the schema surface is large enough to justify full codegen.
   `data.FallbackDataProvider` is the composition seam a real vendor drops
   into. *Which* vendor to license is a business decision (cost, coverage,
   contract terms), not an engineering one — see `docs/PHASE_STATUS.md`.
-  Same caveat for `universe.StaticUniverseProvider`/`SectorProvider` —
-  placeholders for live EGX30 membership/sector feeds.
+  `SectorProvider` remains incomplete, but index membership no longer uses a
+  static provider: reviewed EGX30/EGX70 snapshots and later collector outputs
+  are materialized into one runtime directory read only by
+  `CollectedUniverseProvider`.
 - Actual statistical tests beyond `SignificanceThresholdValidator` and the
   four real `ExperimentFactory` experiments — `SensitivityAnalysisExperiment`
   and `MonteCarloExperiment` are explicit placeholders; `stress_test.py`/

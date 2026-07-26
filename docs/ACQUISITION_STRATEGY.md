@@ -222,13 +222,14 @@ offers no reliability advantage.
 | Strategy | Legality | Stability | Automation | Freshness | Coverage | Reliability | Maintenance | Collector type | Status |
 |---|---|---|---|---|---|---|---|---|---|
 | EGX official constituent list | Official | Unverified | Unverified | Rebalance events | Complete | Highest | Low once verified | CSV/structured page | Blocked (network-level); `IndexConstituentCollector` **code-complete**, column layout unverified (TD-30) |
-| User-supplied verified list | N/A — human-provided | High (static until user updates) | Manual | As often as user updates it | Complete if kept current | High if sourced carefully by the user | Low | `FilesystemCollector` | Available today, real and tested, but requires the user to supply and refresh it — a legitimate immediate unblock named in `docs/ROADMAP.md` |
+| User-supplied, official-page-reviewed list | Official URLs + human transcription | High (static until the next review) | Manual ingestion | As often as the snapshot is reviewed | 31 EGX30 rows + 70 EGX70 rows | High with ISIN/weight/count tests | Low | Versioned CSV bootstrap → collected runtime directory | **Connected** on 2026-07-26; source manifest and regression tests included |
 
-**Chosen strategy**: unchanged from `docs/ROADMAP.md`'s existing framing —
-either EGX's official feed clears, or the user supplies a verified list via
-the already-real `FilesystemCollector` path. Both are legitimate; the first
-needs no user action once EGX is reachable, the second needs no network at
-all.
+**Chosen strategy**: the reviewed bootstrap is the production input while EGX
+continues blocking automated retrieval. It is ingested into the same runtime
+directory used by live constituent collection, so `CollectedUniverseProvider`
+remains the sole reader and a future verified automated snapshot needs no
+pipeline or frontend change. The bootstrap must be refreshed at each index
+review; it is not presented as a live scraper.
 
 ### 11. Sector Membership
 

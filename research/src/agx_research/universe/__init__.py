@@ -1,3 +1,4 @@
+from agx_research.universe.bootstrap import materialize_universe_seed
 from agx_research.universe.collected import CollectedUniverseProvider
 from agx_research.universe.constituent import IndexConstituent
 from agx_research.universe.provider import (
@@ -20,4 +21,5 @@ __all__ = [
     "StaticSectorProvider",
     "UniverseArtifact",
     "UniverseProvider",
+    "materialize_universe_seed",
 ]

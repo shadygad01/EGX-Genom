@@ -208,7 +208,11 @@ def _write_index_constituents(
         if on_written:
             on_written(constituent.ticker, constituent.as_of_date)
     with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["ticker", "company_name", "as_of_date"])
+        optional_fields = ("isin", "reuters_code", "weight_percent", "source_url")
+        discovered = {field for row in existing.values() for field in row}
+        fieldnames = ["ticker", "company_name", "as_of_date"]
+        fieldnames.extend(field for field in optional_fields if field in discovered)
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()
         for key in sorted(existing):
             writer.writerow(existing[key])

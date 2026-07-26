@@ -1,9 +1,9 @@
 """The AGX command-line entry point: `python -m agx_research.cli ...`.
 
 Transport/operations only — every research decision lives in the modules
-this invokes. Uses the mock data provider and placeholder universe until a
-real vendor is licensed (a business decision); the `--data-dir` stores
-persist every repository so runs accumulate and are replayable.
+this invokes. Reviewed universe snapshots are ingested into `--data-dir`,
+then the collected-data provider is the only membership source read by the
+pipeline. The stores persist so runs accumulate and are replayable.
 """
 
 from __future__ import annotations
@@ -43,10 +43,12 @@ from agx_research.production import ExecutionMode, ProductionPipeline, StageStat
 from agx_research.runtime.engine import RunRecordRepository
 from agx_research.sources.catalog import seed_registry
 from agx_research.sources.registry import SourceRegistry
+from agx_research.universe.bootstrap import materialize_universe_seed
 from agx_research.universe.collected import CollectedUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
 
 _DEFAULT_MOCK_DATA = Path(__file__).resolve().parents[2] / "data" / "mock"
+_DEFAULT_UNIVERSE_SEED = Path(__file__).resolve().parents[2] / "data" / "universe"
 
 MACRO_SERIES_IDS = ["BRENT_USD", "EGP_USD"]
 
@@ -75,6 +77,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="agx", description="AGX research platform runtime")
     parser.add_argument("--data-dir", type=Path, default=Path("agx_data"))
     parser.add_argument("--mock-data", type=Path, default=_DEFAULT_MOCK_DATA)
+    parser.add_argument(
+        "--universe-seed-dir",
+        type=Path,
+        default=_DEFAULT_UNIVERSE_SEED,
+        help="Reviewed CSV snapshots to ingest into <data-dir>/universe before use",
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     run_parser = sub.add_parser(
@@ -174,6 +182,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "run":
         args.data_dir.mkdir(parents=True, exist_ok=True)
+        materialize_universe_seed(args.universe_seed_dir, args.data_dir)
         start = date.fromisoformat(args.date)
         end = date.fromisoformat(args.end_date) if args.end_date else start
         pipeline = ProductionPipeline(data_dir=args.data_dir)
@@ -283,6 +292,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "discover-sources":
         args.data_dir.mkdir(parents=True, exist_ok=True)
+        materialize_universe_seed(args.universe_seed_dir, args.data_dir)
         registry = seed_registry(SourceRegistry(args.data_dir / "source_registry.json"))
         fetcher = HttpFetcher()
         engine = AcquisitionIntelligenceEngine(
@@ -294,9 +304,9 @@ def main(argv: list[str] | None = None) -> int:
         )
         # Every EGX30 constituent gets its own Investor Relations target --
         # Priority 2/3, expanded from the `company_ir` marker entry. Prefers
-        # a real collected universe (Universe Engine, `universe.collected`)
-        # over the static placeholder the moment one has been materialized
-        # into `--data-dir`; scales automatically, no code change needed.
+        # the collected universe (Universe Engine, `universe.collected`)
+        # materialized into `--data-dir`; scales automatically, no code
+        # change needed.
         universe_provider = CollectedUniverseProvider(args.data_dir)
         universe = universe_provider.constituents(date.today())
         all_targets = [*seed_target_organizations(), *generate_company_ir_targets(universe)]
@@ -324,6 +334,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "export-dashboard":
+        materialize_universe_seed(args.universe_seed_dir, args.data_dir)
         if args.date:
             as_of = date.fromisoformat(args.date)
         else:

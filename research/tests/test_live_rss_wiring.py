@@ -1,5 +1,5 @@
 from agx_research.collectors.rss import RssNewsCollector
-from agx_research.production.collector_plan import build_live_collector
+from agx_research.production.collector_plan import build_live_collector, live_wired_source_ids
 from agx_research.sources.catalog import seed_registry
 
 
@@ -35,3 +35,11 @@ def test_masrawy_economy_is_promoted_and_uses_the_same_generic_wiring():
         ),
         RssNewsCollector,
     )
+
+
+def test_live_wiring_topology_includes_stooq_even_before_it_is_selected():
+    wired = live_wired_source_ids(seed_registry())
+
+    assert "egx_price_composite" in wired
+    assert "stooq" in wired
+    assert "rss_generic" not in wired

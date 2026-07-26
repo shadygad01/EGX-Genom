@@ -380,6 +380,34 @@ def build_live_collector(
     return None
 
 
+def live_wired_source_ids(registry: SourceRegistry) -> set[str]:
+    """Sources this deployment can construct in LIVE mode right now.
+
+    This is wiring topology, not execution state: a fallback such as Stooq
+    remains wired even when a higher-ranked price strategy satisfies the
+    capability before Stooq needs to run.
+    """
+    explicitly_wired = {
+        "egx_price_composite",
+        "stooq",
+        "fred",
+        "worldbank",
+        "undata",
+        "capmas",
+        "gdelt",
+    }
+    return {
+        spec.id
+        for spec in registry.collectable()
+        if spec.id in explicitly_wired
+        or (
+            spec.access_method.value == "rss_feed"
+            and spec.collector == "RssNewsCollector"
+            and bool(spec.base_url)
+        )
+    }
+
+
 def build_collector_plan(
     registry: SourceRegistry,
     *,

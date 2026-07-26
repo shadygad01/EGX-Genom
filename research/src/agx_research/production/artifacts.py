@@ -110,6 +110,7 @@ def export_collector_status(
     *,
     unavailable: dict[str, str] | None = None,
     failures: dict[str, str] | None = None,
+    standby: dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
     """One row per source this execution knew about, with an explicit,
     output-based status -- never HTTP success alone:
@@ -195,6 +196,8 @@ def export_collector_status(
             ))
     for source_id, reason in (failures or {}).items():
         rows.append(_collector_status_row(source_id, registry, status="FAILED", reason=reason))
+    for source_id, reason in (standby or {}).items():
+        rows.append(_collector_status_row(source_id, registry, status="STANDBY", reason=reason))
     for source_id, reason in (unavailable or {}).items():
         rows.append(_collector_status_row(source_id, registry, status="UNAVAILABLE", reason=reason))
     return rows

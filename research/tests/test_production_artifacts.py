@@ -187,6 +187,21 @@ def test_fetch_failure_reported_as_failed_row_with_exact_reason():
     assert "timed out" in row["reason"]
 
 
+def test_wired_unselected_source_is_reported_standby_not_unavailable():
+    registry = seed_registry(SourceRegistry())
+    rows = export_collector_status(
+        registry,
+        {},
+        standby={"stooq": "Live collector is wired but a higher-ranked strategy won."},
+    )
+
+    [row] = rows
+    assert row["source_id"] == "stooq"
+    assert row["status"] == "STANDBY"
+    assert row["connection_success"] is False
+    assert "wired" in row["reason"]
+
+
 def _provenance(**overrides):
     defaults = dict(produced_by="test", produced_at=datetime(2026, 6, 14), inputs=[])
     defaults.update(overrides)

@@ -90,6 +90,7 @@ from agx_research.production.collector_plan import (
     ExecutionMode,
     build_collector_plan,
     build_live_collector,
+    live_wired_source_ids,
     unavailable_sources,
 )
 from agx_research.production.decision_lineage import export_decision_routes
@@ -167,6 +168,7 @@ class ProductionPipeline:
         self.dashboard_counts: dict[str, int] = {}
         self.mode: ExecutionMode = ExecutionMode.LIVE
         self._unavailable: dict[str, str] = {}
+        self._standby: dict[str, str] = {}
         self.collector_failures: dict[str, str] = {}
         self.metrics: SourceMetricsRepository | None = None
         # Capability-driven acquisition (LIVE mode only): one decision per
@@ -601,7 +603,17 @@ class ProductionPipeline:
             | set(self.materialized_source_results)
             | set(self.collector_failures)
         )
-        self._unavailable = unavailable_sources(self.registry, attempted_ids)
+        wired_ids = live_wired_source_ids(self.registry)
+        self._standby = {
+            source_id: (
+                "Live collector is wired and ready as a fallback, but was not selected "
+                "because a higher-ranked strategy already satisfied its capability this run."
+            )
+            for source_id in sorted(wired_ids - attempted_ids)
+        }
+        self._unavailable = unavailable_sources(
+            self.registry, attempted_ids | set(self._standby)
+        )
 
         succeeded = len(self.collection_results)
         attempted = succeeded + len(self.collector_failures)
@@ -826,6 +838,7 @@ class ProductionPipeline:
             {**self.collection_results, **self.materialized_source_results},
             unavailable=self._unavailable,
             failures=self.collector_failures,
+            standby=self._standby,
         )
         (dashboard_out / "collector_status.json").write_text(
             json.dumps(collector_status, indent=2, sort_keys=True) + "\n"

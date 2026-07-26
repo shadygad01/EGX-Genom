@@ -176,17 +176,23 @@ export function MissionControlPage() {
               {
                 key: "health",
                 header: "Health",
-                render: (c) => (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{titleCase(c.health_status)}</Badge> : "—"),
+                render: (c) => c.status === "STANDBY"
+                  ? <Badge variant="accent">Not Measured</Badge>
+                  : (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{titleCase(c.health_status)}</Badge> : "—"),
               },
               {
                 key: "connection",
                 header: "Connected",
-                render: (c) => <Badge variant={c.connection_success ? "positive" : "negative"}>{c.connection_success ? "Yes" : "No"}</Badge>,
+                render: (c) => c.status === "STANDBY"
+                  ? <Badge variant="neutral">Not Run</Badge>
+                  : <Badge variant={c.connection_success ? "positive" : "negative"}>{c.connection_success ? "Yes" : "No"}</Badge>,
               },
               {
                 key: "parsed",
                 header: "Parsed",
-                render: (c) => <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? "Yes" : "No"}</Badge>,
+                render: (c) => c.status === "STANDBY"
+                  ? <Badge variant="neutral">Not Run</Badge>
+                  : <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? "Yes" : "No"}</Badge>,
               },
               { key: "yield", header: "Yield", align: "right", render: (c) => formatNumber(c.yield) },
               { key: "events", header: "Events", align: "right", render: (c) => formatNumber(c.events_produced) },

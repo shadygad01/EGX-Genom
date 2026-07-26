@@ -81,7 +81,7 @@ export function SourceIntelligence() {
                 { key: "status", header: "Status", render: (s) => collectorById.get(s.id)?.status === "COLLECTED" ? <Badge variant="positive">Integrated / Collected</Badge> : collectorById.get(s.id)?.status === "STANDBY" ? <Badge variant="accent">Integrated / Standby</Badge> : <Badge variant={STATUS_VARIANT[s.status]}>{titleCase(s.status)}</Badge> },
                 { key: "integration", header: "Integration", render: (s) => s.integrated_via ? `Via ${s.integrated_via}` : (s.collector ?? "—") },
                 { key: "lifecycle", header: "Lifecycle", render: (s) => <Badge variant={LIFECYCLE_VARIANT[s.lifecycle_state]}>{titleCase(s.lifecycle_state)}</Badge> },
-                { key: "health", header: "Health", render: (s) => <Badge variant={HEALTH_VARIANT[s.health_status]}>{titleCase(s.health_status)}</Badge> },
+                { key: "health", header: "Health", render: (s) => collectorById.get(s.id)?.status === "STANDBY" ? <Badge variant="accent">Not Measured</Badge> : <Badge variant={HEALTH_VARIANT[s.health_status]}>{titleCase(s.health_status)}</Badge> },
                 {
                   key: "quality",
                   header: "Validation Score",
@@ -106,7 +106,9 @@ export function SourceIntelligence() {
                     {effectiveCollected ? titleCase(selectedCollector!.status) : titleCase(selected.status)}
                   </Badge>
                   <Badge variant={LIFECYCLE_VARIANT[selected.lifecycle_state]}>{titleCase(selected.lifecycle_state)}</Badge>
-                  <Badge variant={HEALTH_VARIANT[selected.health_status]}>{titleCase(selected.health_status)}</Badge>
+                  {selectedCollector?.status === "STANDBY"
+                    ? <Badge variant="accent">Not Measured</Badge>
+                    : <Badge variant={HEALTH_VARIANT[selected.health_status]}>{titleCase(selected.health_status)}</Badge>}
                   <Badge variant={ACTIVATION_VARIANT[selected.activation_status]}>{titleCase(selected.activation_status)}</Badge>
                 </div>
 

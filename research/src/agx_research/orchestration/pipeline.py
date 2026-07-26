@@ -34,18 +34,22 @@ import statistics as _stats
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
+from pydantic import BaseModel, Field
+
 from agx_research.adversarial.scientist import AdversarialScientist, apply_adversarial_review
 from agx_research.agents.base import ResearchAgent, ResearchFinding
 from agx_research.causal.assessment import CandidateCause
 from agx_research.causal.reasoner import EconomicRationaleGate
 from agx_research.domain.identifiers import new_id
 from agx_research.domain.provenance import Provenance
+from agx_research.events.graph_integration import project_events
 from agx_research.genome.service import AlphaGenome
 from agx_research.graph.builder import edges_from_provenance
 from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.graph.nodes import GraphNode, NodeType
 from agx_research.hypotheses.experiment_factory import ExperimentFactory
 from agx_research.hypotheses.hypothesis import Hypothesis, StageResult
+from agx_research.hypotheses.pipeline import StageName
 from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.hypotheses.statistic import series_for_hypothesis
 from agx_research.knowledge.store import KnowledgeStore
@@ -66,10 +70,6 @@ from agx_research.review.reviewers import (
 from agx_research.validation.backtest import NaiveDirectionalBacktester
 from agx_research.validation.statistical import SignificanceThresholdValidator, StatisticalEvidence
 from agx_research.validation.stress_test import HistoricalWorstWindowStressTester
-
-from agx_research.events.graph_integration import project_events
-from agx_research.hypotheses.pipeline import StageName
-from pydantic import BaseModel, Field
 
 
 @dataclass
@@ -130,32 +130,40 @@ class DailyResearchPipeline:
 
     def run(self, as_of: date) -> PipelineResult:
         started_at = datetime.now()
-        market_state = self.market_memory.reconstruct(as_of)
-        snapshot = market_state.dataset_snapshot
-        project_events(self.graph, market_state.events)
+        try:
+            market_state = self.market_memory.reconstruct(as_of)
+            snapshot = market_state.dataset_snapshot
+            project_events(self.graph, market_state.events)
 
-        findings: list[ResearchFinding] = []
-        for agent in self.agents:
-            findings.extend(agent.research(snapshot))
+            findings: list[ResearchFinding] = []
+            for agent in self.agents:
+                findings.extend(agent.research(snapshot))
 
-        artifact_ids: list[str] = []
-        outcomes = [
-            self._process_finding(finding, market_state, artifact_ids) for finding in findings
-        ]
+            artifact_ids: list[str] = []
+            outcomes = [
+                self._process_finding(finding, market_state, artifact_ids) for finding in findings
+            ]
 
-        session = ResearchSession(
-            id=new_id("session"),
-            run_date=as_of,
-            dataset_snapshot_id=snapshot.id,
-            agent_versions={agent.name: agent.version for agent in self.agents},
-            findings=findings,
-            hypothesis_ids=[o.hypothesis_id for o in outcomes],
-            knowledge_ids=[o.knowledge_id for o in outcomes if o.knowledge_id],
-            artifact_ids=artifact_ids,
-            started_at=started_at,
-            completed_at=datetime.now(),
-        )
-        return PipelineResult(session=session, outcomes=outcomes)
+            session = ResearchSession(
+                id=new_id("session"),
+                run_date=as_of,
+                dataset_snapshot_id=snapshot.id,
+                agent_versions={agent.name: agent.version for agent in self.agents},
+                findings=findings,
+                hypothesis_ids=[o.hypothesis_id for o in outcomes],
+                knowledge_ids=[o.knowledge_id for o in outcomes if o.knowledge_id],
+                artifact_ids=artifact_ids,
+                started_at=started_at,
+                completed_at=datetime.now(),
+            )
+            return PipelineResult(session=session, outcomes=outcomes)
+        finally:
+            # A full EGX30+EGX70 run creates hundreds of hypotheses and
+            # experiment artifacts. Preserve every revision, but persist the
+            # daily transaction once instead of rewriting growing JSON files
+            # after every gate/artifact (quadratic at production scale).
+            self.hypotheses.flush()
+            self.artifacts.flush()
 
     # ---- per-hypothesis gate walk -------------------------------------
 
@@ -180,7 +188,7 @@ class DailyResearchPipeline:
                     metrics=metrics,
                 )
             )
-            self.hypotheses.add(hypothesis)
+            self.hypotheses.add(hypothesis, persist=False)
             return passed
 
         def rejected(reason: str) -> HypothesisOutcome:
@@ -237,6 +245,7 @@ class DailyResearchPipeline:
                     produced_at=datetime.now(),
                     inputs=hypothesis.provenance.inputs,
                 ),
+                persist=False,
             )
             artifact_ids.append(stored.id)
         ok = advance(
@@ -367,6 +376,7 @@ class DailyResearchPipeline:
             kind=ArtifactKind.KNOWLEDGE_PUBLICATION,
             payload=knowledge,
             provenance=knowledge.provenance,
+            persist=False,
         )
         artifact_ids.append(publication.id)
 

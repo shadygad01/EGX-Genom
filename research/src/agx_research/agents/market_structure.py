@@ -29,57 +29,67 @@ class MarketStructureAgent(ResearchAgent):
     name = "market_structure_agent"
     version = "0.1.0"
 
-    def __init__(self, ticker_pairs: list[tuple[str, str]], correlation_threshold: float = 0.5):
+    def __init__(
+        self,
+        ticker_pairs: list[tuple[str, str]],
+        correlation_threshold: float = 0.5,
+        max_findings: int | None = None,
+    ):
+        if max_findings is not None and max_findings < 1:
+            raise ValueError("max_findings must be positive when provided")
         self.ticker_pairs = ticker_pairs
         self.correlation_threshold = correlation_threshold
+        self.max_findings = max_findings
 
     def research(self, snapshot: DatasetSnapshot) -> list[ResearchFinding]:
-        findings: list[ResearchFinding] = []
+        ranked_findings: list[tuple[float, str, ResearchFinding]] = []
         for ticker_a, ticker_b in self.ticker_pairs:
             correlation = compute_pairwise_return_correlation(snapshot, ticker_a, ticker_b)
             if correlation is None or abs(correlation) < self.correlation_threshold:
                 continue
-            findings.append(
-                ResearchFinding(
-                    agent_name=self.name,
-                    agent_version=self.version,
-                    observed_at=snapshot.as_of,
-                    observation=(
-                        f"{ticker_a} and {ticker_b} daily returns show "
-                        f"{correlation:+.2f} correlation over the last {snapshot.lookback_days} days"
-                    ),
-                    proposed_hypothesis_statement=(
-                        f"{ticker_a} return co-movement with {ticker_b} predicts "
-                        f"short-horizon direction beyond chance"
-                    ),
-                    proposed_economic_rationale=(
-                        f"{ticker_a} and {ticker_b} are large-cap EGX names plausibly "
-                        "exposed to shared market-wide capital flows and index-tracking "
-                        "activity, which would produce genuine (not coincidental) "
-                        "return co-movement."
-                    ),
-                    proposed_candidate_cause=(
-                        "Shared exposure to EGX-wide fund flows and index membership"
-                    ),
-                    affected_assets=[ticker_a, ticker_b],
-                    horizon=Horizon.MICRO,
-                    evidence=[
-                        f"{PAIRWISE_RETURN_CORRELATION.id}"
-                        f"_v{PAIRWISE_RETURN_CORRELATION.version}={correlation:.4f}",
-                        f"lookback_days={snapshot.lookback_days}",
+            finding = ResearchFinding(
+                agent_name=self.name,
+                agent_version=self.version,
+                observed_at=snapshot.as_of,
+                observation=(
+                    f"{ticker_a} and {ticker_b} daily returns show "
+                    f"{correlation:+.2f} correlation over the last {snapshot.lookback_days} days"
+                ),
+                proposed_hypothesis_statement=(
+                    f"{ticker_a} return co-movement with {ticker_b} predicts "
+                    f"short-horizon direction beyond chance"
+                ),
+                proposed_economic_rationale=(
+                    f"{ticker_a} and {ticker_b} are large-cap EGX names plausibly "
+                    "exposed to shared market-wide capital flows and index-tracking "
+                    "activity, which would produce genuine (not coincidental) "
+                    "return co-movement."
+                ),
+                proposed_candidate_cause=(
+                    "Shared exposure to EGX-wide fund flows and index membership"
+                ),
+                affected_assets=[ticker_a, ticker_b],
+                horizon=Horizon.MICRO,
+                evidence=[
+                    f"{PAIRWISE_RETURN_CORRELATION.id}"
+                    f"_v{PAIRWISE_RETURN_CORRELATION.version}={correlation:.4f}",
+                    f"lookback_days={snapshot.lookback_days}",
+                ],
+                provenance=Provenance(
+                    produced_by=f"{self.name}@{self.version}",
+                    produced_at=datetime.now(),
+                    inputs=[
+                        ProvenanceRef(kind="dataset_snapshot", ref_id=snapshot.id),
+                        ProvenanceRef(
+                            kind="feature",
+                            ref_id=PAIRWISE_RETURN_CORRELATION.id,
+                            ref_version=PAIRWISE_RETURN_CORRELATION.version,
+                        ),
                     ],
-                    provenance=Provenance(
-                        produced_by=f"{self.name}@{self.version}",
-                        produced_at=datetime.now(),
-                        inputs=[
-                            ProvenanceRef(kind="dataset_snapshot", ref_id=snapshot.id),
-                            ProvenanceRef(
-                                kind="feature",
-                                ref_id=PAIRWISE_RETURN_CORRELATION.id,
-                                ref_version=PAIRWISE_RETURN_CORRELATION.version,
-                            ),
-                        ],
-                    ),
-                )
+                ),
             )
-        return findings
+            ranked_findings.append((abs(correlation), f"{ticker_a}|{ticker_b}", finding))
+        ranked_findings.sort(key=lambda row: (-row[0], row[1]))
+        if self.max_findings is not None:
+            ranked_findings = ranked_findings[: self.max_findings]
+        return [finding for _score, _pair, finding in ranked_findings]

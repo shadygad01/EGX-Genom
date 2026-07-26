@@ -51,3 +51,16 @@ def test_no_finding_for_ticker_with_insufficient_history():
     findings = agent.research(snapshot)
 
     assert findings == []
+
+
+def test_daily_validation_budget_caps_findings_after_screening_all_pairs():
+    snapshot = make_snapshot(["COMI", "MFPC"])
+    agent = MarketStructureAgent(
+        ticker_pairs=[("COMI", "MFPC"), ("MFPC", "COMI")],
+        correlation_threshold=0.0,
+        max_findings=1,
+    )
+
+    findings = agent.research(snapshot)
+
+    assert len(findings) == 1

@@ -53,6 +53,7 @@ class ArtifactRepository(JsonFileRepository[Artifact]):
         provenance: Provenance,
         artifact_id: str | None = None,
         produced_by_task_id: str | None = None,
+        persist: bool = True,
     ) -> Artifact:
         """Wrap `payload` as a new artifact revision and persist it.
 
@@ -71,4 +72,4 @@ class ArtifactRepository(JsonFileRepository[Artifact]):
             payload=payload_dict,
             provenance=provenance,
         )
-        return self.add(artifact)
+        return self.add(artifact, persist=persist)

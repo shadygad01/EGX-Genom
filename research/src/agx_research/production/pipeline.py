@@ -640,7 +640,8 @@ class ProductionPipeline:
         tickers = self._tickers(end)
         agents = [
             MarketStructureAgent(
-                ticker_pairs=[(a, b) for i, a in enumerate(tickers) for b in tickers[i + 1 :]]
+                ticker_pairs=[(a, b) for i, a in enumerate(tickers) for b in tickers[i + 1 :]],
+                max_findings=250,
             ),
             MacroAgent(),
             CorporateEventsAgent(),

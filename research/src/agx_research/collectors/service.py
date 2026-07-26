@@ -443,7 +443,6 @@ class CollectionService:
                                 ),
                             )
                         )
-                self.provenance_index.flush()
             else:
                 result.batches_withheld += 1
 
@@ -454,6 +453,11 @@ class CollectionService:
                 latency_seconds=latency_seconds,
             )
 
+        # One persisted snapshot per source run, not once per document.
+        # FRED currently returns seven large series documents; flushing the
+        # 35MB provenance index after each one multiplies deployment I/O with
+        # no durability benefit because the source run is the transaction.
+        self.provenance_index.flush()
         return result
 
     def _record_fetch_failure(self, collector: Collector, *, error: str) -> None:

@@ -500,7 +500,18 @@ def seed_sources() -> list[SourceSpec]:
                 name=name,
                 category=SourceCategory.MACROECONOMIC,
                 access_method=access,
-                status=SourceStatus.PLANNED,
+                status=(
+                    SourceStatus.IMPLEMENTED if source_id == "undata" else SourceStatus.PLANNED
+                ),
+                base_url=(
+                    "https://unstats.un.org/SDGAPI/v1/sdg" if source_id == "undata" else ""
+                ),
+                collector="UnSdgCollector" if source_id == "undata" else "",
+                collector_version="1.0.0" if source_id == "undata" else "",
+                license="UN public statistical data" if source_id == "undata" else "",
+                terms_of_use_url=(
+                    "https://unstats.un.org/SDGAPI/swagger/" if source_id == "undata" else ""
+                ),
                 reliability_score=0.9,
                 freshness_score=0.5,
                 conflict_priority=85,
@@ -515,7 +526,15 @@ def seed_sources() -> list[SourceSpec]:
                     "IMF SDMX/JSON APIs are free; series mapping pending.",
                 ),
                 ("oecd", "OECD", AccessMethod.JSON_API, "SDMX API free; Egypt coverage partial."),
-                ("undata", "UN Data", AccessMethod.CSV_DOWNLOAD, "Bulk downloads free."),
+                (
+                    "undata",
+                    "UN Statistics SDG API",
+                    AccessMethod.JSON_API,
+                    (
+                        "Official no-key SDG API verified live for Egypt; aggregate series are "
+                        "mapped explicitly by indicator and UN series code."
+                    ),
+                ),
                 (
                     "trading_economics",
                     "Trading Economics",

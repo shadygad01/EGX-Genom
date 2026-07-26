@@ -43,6 +43,7 @@ from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.stooq import StooqPriceCollector
+from agx_research.collectors.un_sdg import UnSdgCollector
 from agx_research.collectors.worldbank import WorldBankCollector
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.spec import SourceSpec, SourceStatus
@@ -88,7 +89,17 @@ LIVE_WORLDBANK_INDICATORS = {
     "BX.KLT.DINV.WD.GD.ZS": "egypt_fdi_net_inflows_pct_gdp",
     "DT.DOD.DECT.CD": "egypt_external_debt_usd",
 }
+LIVE_UN_SDG_SERIES = {
+    "8.1.1": {"NY_GDP_PCAP": "un_real_gdp_per_capita_growth"},
+    "8.2.1": {"SL_EMP_PCAP": "un_labour_productivity_growth"},
+    "9.2.1": {"NV_IND_MANF": "un_manufacturing_value_added_pct_gdp"},
+    "10.4.1": {"SL_EMP_GTOTL": "un_labour_income_share_pct_gdp"},
+    "7.3.1": {"EG_EGY_PRIM": "un_energy_intensity"},
+}
 LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICATORS.values())
+LIVE_MACRO_SERIES_IDS += [
+    local_id for mappings in LIVE_UN_SDG_SERIES.values() for local_id in mappings.values()
+]
 
 # Conservative floors, not true full-history sizes (unknown until a real
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
@@ -98,6 +109,7 @@ EXPECTED_RECORDS_LIVE = {
     "stooq": 100,
     "fred": 100,
     "worldbank": 10,
+    "undata": 10,
     "gdelt": 10,
     "enterprise_press": 5,
     "fra_egypt": 5,
@@ -303,6 +315,8 @@ def build_live_collector(
         return FredCsvCollector(spec, series_ids=list(LIVE_FRED_SERIES_IDS), fetcher=fetcher)
     if source_id == "worldbank":
         return WorldBankCollector(spec, indicators=dict(LIVE_WORLDBANK_INDICATORS), fetcher=fetcher)
+    if source_id == "undata":
+        return UnSdgCollector(spec, series=dict(LIVE_UN_SDG_SERIES), fetcher=fetcher)
     if source_id == "gdelt":
         return GdeltDocCollector(
             spec,

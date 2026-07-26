@@ -32,6 +32,7 @@ from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import Recommendation
 from agx_research.runtime.engine import RunRecord
 from agx_research.sources.spec import SourceSpec
+from agx_research.universe.provider import UniverseArtifact
 
 CONTRACTS_DIR = Path(__file__).resolve().parents[2] / "contracts"
 
@@ -40,6 +41,7 @@ MODELS = {
     "event.schema.json": Event,
     "recommendation.schema.json": Recommendation,
     "market_state.schema.json": MarketState,
+    "universe.schema.json": UniverseArtifact,
     "run_record.schema.json": RunRecord,
     "source_spec.schema.json": SourceSpec,
     "dashboard_system_status.schema.json": DashboardSystemStatus,

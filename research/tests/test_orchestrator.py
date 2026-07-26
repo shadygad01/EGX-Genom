@@ -4,6 +4,7 @@ from pathlib import Path
 from agx_research.agents.market_structure import MarketStructureAgent
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.orchestration.orchestrator import ResearchOrchestrator
+from agx_research.universe.provider import MappingUniverseProvider
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 
@@ -14,7 +15,7 @@ def test_orchestrator_runs_agents_against_one_snapshot_and_records_lineage():
     orchestrator = ResearchOrchestrator(
         agents=[agent],
         data_provider=provider,
-        tickers=["COMI", "MFPC"],
+        universe_provider=MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
         macro_series_ids=["BRENT_USD"],
         lookback_days=30,
     )
@@ -36,7 +37,10 @@ def test_orchestrator_runs_agents_against_one_snapshot_and_records_lineage():
 def test_orchestrator_with_no_agents_produces_empty_findings():
     provider = MockDataProvider(MOCK_ROOT)
     orchestrator = ResearchOrchestrator(
-        agents=[], data_provider=provider, tickers=["COMI"], macro_series_ids=[]
+        agents=[],
+        data_provider=provider,
+        universe_provider=MappingUniverseProvider({"COMI": "COMI"}),
+        macro_series_ids=[],
     )
 
     cycle = orchestrator.run(date(2026, 6, 14))
@@ -54,7 +58,7 @@ def test_run_session_builds_an_explicit_task_graph_and_persists_snapshot_artifac
     orchestrator = ResearchOrchestrator(
         agents=[agent],
         data_provider=provider,
-        tickers=["COMI", "MFPC"],
+        universe_provider=MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
         macro_series_ids=["BRENT_USD"],
         lookback_days=30,
     )

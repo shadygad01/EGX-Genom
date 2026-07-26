@@ -25,8 +25,8 @@ from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.orchestration.pipeline import DailyResearchPipeline, PipelineConfig
 from agx_research.portfolio.constructor import PortfolioConstructor
 from agx_research.runtime.engine import RunStatus, RuntimeEngine
+from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import StaticUniverseProvider
 from agx_research.validation.statistical import StatisticalEvidence
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
@@ -35,9 +35,8 @@ MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 def make_memory() -> MarketMemory:
     return MarketMemory(
         MockDataProvider(MOCK_ROOT),
-        StaticUniverseProvider(),
+        MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
         StaticSectorProvider(),
-        tickers=["COMI", "MFPC"],
         macro_series_ids=["BRENT_USD"],
         lookback_days=30,
     )

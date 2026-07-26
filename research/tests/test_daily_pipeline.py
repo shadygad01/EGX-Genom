@@ -1,4 +1,4 @@
-"""End-to-end test of the daily research pipeline — the integration proof
+"""End-to-end test of the daily research pipeline â€” the integration proof
 that every subsystem (market memory, events, agents, experiments,
 validators, causal gate, review board, adversarial scientist, knowledge
 store, genome, papers, graph) actually works together."""
@@ -12,8 +12,8 @@ from agx_research.genome.gene import GeneStatus
 from agx_research.hypotheses.pipeline import StageName
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.orchestration.pipeline import DailyResearchPipeline, PipelineConfig
+from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import StaticUniverseProvider
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 
@@ -21,9 +21,8 @@ MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 def make_pipeline(config: PipelineConfig) -> DailyResearchPipeline:
     memory = MarketMemory(
         MockDataProvider(MOCK_ROOT),
-        StaticUniverseProvider(),
+        MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
         StaticSectorProvider(),
-        tickers=["COMI", "MFPC"],
         macro_series_ids=["BRENT_USD"],
         lookback_days=30,
     )
@@ -33,7 +32,7 @@ def make_pipeline(config: PipelineConfig) -> DailyResearchPipeline:
 
 def permissive_config() -> PipelineConfig:
     """Thresholds loose enough that the mock data's weak correlation can
-    clear every gate — for exercising the full promotion path."""
+    clear every gate â€” for exercising the full promotion path."""
     return PipelineConfig(
         alpha=1.01,  # accept any p-value
         min_observations=5,

@@ -26,8 +26,8 @@ from agx_research.events.entity_resolver import EntityResolver
 from agx_research.events.event import Event, EventSeverity, EventType
 from agx_research.events.service import build_candidate_event
 from agx_research.events.taxonomy import EventSubtype
+from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import StaticUniverseProvider
 
 _ADAPTER_NAME = "events.adapters"
 EGX_MARKET_ENTITY_ID = "EGX"
@@ -58,7 +58,7 @@ _MACRO_SERIES_SUBTYPES: dict[str, EventSubtype] = {
 
 def default_resolver(snapshot: DatasetSnapshot) -> EntityResolver:
     return EntityResolver(
-        StaticUniverseProvider(),
+        MappingUniverseProvider({ticker: ticker for ticker in snapshot.tickers}),
         StaticSectorProvider(),
         as_of=snapshot.as_of,
         known_macro_series_ids=snapshot.macro_series_ids,
@@ -154,7 +154,9 @@ def events_from_macro_series(
     return events
 
 
-def events_from_news(snapshot: DatasetSnapshot, resolver: EntityResolver | None = None) -> list[Event]:
+def events_from_news(
+    snapshot: DatasetSnapshot, resolver: EntityResolver | None = None
+) -> list[Event]:
     resolver = resolver or default_resolver(snapshot)
     events: list[Event] = []
     for item in snapshot.news:

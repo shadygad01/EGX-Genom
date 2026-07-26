@@ -1,0 +1,36 @@
+{
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "constituents": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Constituents",
+      "type": "object"
+    },
+    "count": {
+      "minimum": 0,
+      "title": "Count",
+      "type": "integer"
+    },
+    "tickers": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tickers",
+      "type": "array"
+    }
+  },
+  "required": [
+    "as_of",
+    "count",
+    "tickers",
+    "constituents"
+  ],
+  "title": "UniverseArtifact",
+  "type": "object"
+}

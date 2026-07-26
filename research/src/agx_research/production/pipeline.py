@@ -105,9 +105,9 @@ from agx_research.sources.catalog import seed_registry
 from agx_research.sources.health import HealthAlertRepository, HealthMonitor
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
-from agx_research.universe.collected import CollectedUniverseProvider, FallbackUniverseProvider
+from agx_research.universe.collected import CollectedUniverseProvider
+from agx_research.universe.provider import UniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import StaticUniverseProvider
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
 
@@ -132,12 +132,12 @@ class ProductionPipeline:
         self,
         *,
         data_dir: Path | str,
-        tickers: list[str],
+        universe_provider: UniverseProvider | None = None,
         macro_series_ids: list[str] | None = None,
     ):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        self.tickers = tickers
+        self.universe_provider = universe_provider or CollectedUniverseProvider(self.data_dir)
         # Deferred to `run()`, which knows the execution mode: LIVE fetches
         # real FRED/World Bank series ids, which differ from the mock
         # fixtures' placeholder ids -- an explicit override here always wins.
@@ -172,6 +172,10 @@ class ProductionPipeline:
         # `acquisition_intelligence.capability_engine`.
         self.capability_decisions: list[CapabilityDecision] = []
 
+    def _tickers(self, as_of: date) -> list[str]:
+        """Resolve membership at use time; the provider is the only source of truth."""
+        return sorted(self.universe_provider.constituents(as_of))
+
     # ---- the public entrypoint ----------------------------------------
 
     def run(
@@ -187,6 +191,7 @@ class ProductionPipeline:
             raise ValueError("end must be on or after start")
         dashboard_out = dashboard_out or (self.data_dir / "dashboard")
         self.mode = mode
+        self._run_as_of = end
         if self._macro_series_ids_override is not None:
             self.macro_series_ids = list(self._macro_series_ids_override)
         elif mode == ExecutionMode.LIVE:
@@ -245,7 +250,10 @@ class ProductionPipeline:
         )
         execute(StageName.SOURCE_REGISTRY, self._stage_source_registry)
         execute(StageName.DISCOVERY_ENGINE, self._stage_discovery_engine)
-        execute(StageName.COLLECTOR_SELECTION, lambda: self._stage_collector_selection(mode))
+        execute(
+            StageName.COLLECTOR_SELECTION,
+            lambda: self._stage_collector_selection(mode, end),
+        )
         execute(StageName.COLLECTOR_EXECUTION, self._stage_collector_execution)
         execute(StageName.RAW_ARCHIVE, self._stage_raw_archive)
         execute(StageName.CANONICAL_TRANSFORMATION, self._stage_canonical_transformation)
@@ -376,7 +384,7 @@ class ProductionPipeline:
             [],
         )
 
-    def _stage_collector_selection(self, mode: ExecutionMode):
+    def _stage_collector_selection(self, mode: ExecutionMode, as_of: date | None = None):
         if self.registry is None:
             return StageStatus.SKIPPED, "No registry available.", []
         self.raw_documents = RawDocumentRepository(self.data_dir / "raw_documents.json")
@@ -408,7 +416,7 @@ class ProductionPipeline:
             self.registry,
             mode=mode,
             raw_documents=self.raw_documents,
-            tickers=self.tickers,
+            tickers=self._tickers(as_of or self._run_as_of),
         )
         self._unavailable = unavailable_sources(self.registry, {p.source_id for p in self._planned})
         if not self._planned:
@@ -506,7 +514,12 @@ class ProductionPipeline:
         fetcher = HttpFetcher()
 
         def factory(source_id: str, spec):
-            return build_live_collector(source_id, spec, fetcher=fetcher, tickers=self.tickers)
+            return build_live_collector(
+                source_id,
+                spec,
+                fetcher=fetcher,
+                tickers=self._tickers(self._run_as_of),
+            )
 
         engine = CapabilityDecisionEngine(self.registry, factory, metrics=self.metrics)
 
@@ -596,11 +609,8 @@ class ProductionPipeline:
             )
         self.market_memory = MarketMemory(
             LocalCsvDataProvider(self.data_dir),
-            FallbackUniverseProvider(
-                [CollectedUniverseProvider(self.data_dir), StaticUniverseProvider()]
-            ),
+            self.universe_provider,
             StaticSectorProvider(),
-            tickers=self.tickers,
             macro_series_ids=self.macro_series_ids,
             lookback_days=30,
             event_platform=self.event_platform,
@@ -627,11 +637,10 @@ class ProductionPipeline:
         if self.market_memory is None or self.knowledge_store is None or self.genome is None:
             return StageStatus.SKIPPED, "Market memory or knowledge base not ready.", []
 
+        tickers = self._tickers(end)
         agents = [
             MarketStructureAgent(
-                ticker_pairs=[
-                    (a, b) for i, a in enumerate(self.tickers) for b in self.tickers[i + 1 :]
-                ]
+                ticker_pairs=[(a, b) for i, a in enumerate(tickers) for b in tickers[i + 1 :]]
             ),
             MacroAgent(),
             CorporateEventsAgent(),
@@ -702,7 +711,7 @@ class ProductionPipeline:
         self.investment_cases = production_artifacts.export_investment_cases(
             self.knowledge_store,
             self.event_platform,
-            tickers=self.tickers,
+            tickers=self._tickers(as_of),
             as_of=as_of,
         )
         if as_of is None:
@@ -733,7 +742,6 @@ class ProductionPipeline:
             event_repository=self.event_platform.repository,
             runs=RunRecordRepository(self.data_dir / "runs.json"),
             memory=self.market_memory,
-            tickers=self.tickers,
             as_of=as_of,
             out_dir=dashboard_out,
             registry=self.registry,
@@ -798,7 +806,7 @@ class ProductionPipeline:
         counts["knowledge_graph.json"] = len(knowledge_graph["nodes"])
 
         financial_statements = production_artifacts.export_financial_statements(
-            self.data_dir, self.tickers, as_of
+            self.data_dir, self._tickers(as_of), as_of
         )
         (dashboard_out / "financial_statements.json").write_text(
             json.dumps(financial_statements, indent=2, sort_keys=True) + "\n"
@@ -878,4 +886,4 @@ class ProductionPipeline:
         return StageStatus.SUCCEEDED, f"Execution report written to {path}.", []
 
 
-__all__ = ["ProductionPipeline", "ExecutionMode", "ARTIFACT_FILENAMES"]
+__all__ = ["ARTIFACT_FILENAMES", "ExecutionMode", "ProductionPipeline"]

@@ -128,6 +128,13 @@ describe("dashboard artifact routes", () => {
     expect(response.json()).toBeNull();
   });
 
+  it("GET /universe returns null when no artifact directory exists", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/universe" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
   it("GET /system-status returns null when no artifact directory exists", async () => {
     const app = testApp();
     const response = await app.inject({ method: "GET", url: "/system-status" });

@@ -9,11 +9,8 @@ given `as_of` date, returns the constituent set from the latest collected
 snapshot at or before that date, never a later one -- the same no-look-
 ahead guarantee every other point-in-time query in this platform gives.
 
-Empty (never fabricated) when nothing has been collected yet for that
-index, or when every collected snapshot postdates `as_of`. Callers that
-want a placeholder fallback should compose this with
-`StaticUniverseProvider` via `FallbackUniverseProvider`, not rely on this
-class inventing one.
+Empty (never fabricated) when nothing has been collected yet, or when every
+collected snapshot postdates `as_of`.
 """
 
 from __future__ import annotations
@@ -26,42 +23,27 @@ from agx_research.universe.provider import UniverseProvider
 
 
 class CollectedUniverseProvider(UniverseProvider):
-    def __init__(self, data_dir: Path | str, *, index: str = "EGX30"):
+    def __init__(self, data_dir: Path | str, *, index: str | None = None):
         self.data_dir = Path(data_dir)
         self.index = index
 
     def constituents(self, as_of: date) -> dict[str, str]:
-        path = self.data_dir / "universe" / f"{self.index}.csv"
-        if not path.exists():
-            return {}
-
-        by_date: dict[date, dict[str, str]] = {}
-        with path.open(newline="") as f:
-            for row in csv.DictReader(f):
-                snapshot_date = date.fromisoformat(row["as_of_date"])
-                by_date.setdefault(snapshot_date, {})[row["ticker"]] = row["company_name"]
-
-        eligible_dates = [d for d in by_date if d <= as_of]
-        if not eligible_dates:
-            return {}
-        return dict(by_date[max(eligible_dates)])
-
-
-class FallbackUniverseProvider(UniverseProvider):
-    """Tries each provider in order, returning the first non-empty result --
-    mirrors `data.composite_provider.FallbackDataProvider` exactly, so a
-    real collected universe (once one exists) is preferred over the
-    placeholder without either caller-side branching or a new interface.
-    """
-
-    def __init__(self, providers: list[UniverseProvider]):
-        if not providers:
-            raise ValueError("FallbackUniverseProvider requires at least one provider")
-        self.providers = providers
-
-    def constituents(self, as_of: date) -> dict[str, str]:
-        for provider in self.providers:
-            result = provider.constituents(as_of)
-            if result:
-                return result
-        return {}
+        universe_dir = self.data_dir / "universe"
+        paths = (
+            [universe_dir / f"{self.index}.csv"]
+            if self.index is not None
+            else sorted(universe_dir.glob("*.csv"))
+        )
+        combined: dict[str, str] = {}
+        for path in paths:
+            if not path.exists():
+                continue
+            by_date: dict[date, dict[str, str]] = {}
+            with path.open(newline="") as f:
+                for row in csv.DictReader(f):
+                    snapshot_date = date.fromisoformat(row["as_of_date"])
+                    by_date.setdefault(snapshot_date, {})[row["ticker"]] = row["company_name"]
+            eligible_dates = [d for d in by_date if d <= as_of]
+            if eligible_dates:
+                combined.update(by_date[max(eligible_dates)])
+        return combined

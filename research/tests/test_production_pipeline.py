@@ -7,6 +7,7 @@ service test suites -- these tests exercise the *wiring*, not the
 individual systems being wired.
 """
 
+import csv
 import json
 import urllib.error
 import urllib.request
@@ -24,13 +25,66 @@ from agx_research.production.collector_plan import (
 from agx_research.production.pipeline import ProductionPipeline
 from agx_research.production.stages import StageName, StageStatus
 from agx_research.sources.catalog import seed_sources
+from agx_research.universe.provider import MappingUniverseProvider
 
 TICKERS = ["COMI", "MFPC", "EAST", "ETEL"]  # small universe: fast tests, still exercises pairing
 RUN_DATE = date(2026, 6, 14)
 
 
+def make_pipeline(data_dir, tickers=TICKERS):
+    return ProductionPipeline(
+        data_dir=data_dir,
+        universe_provider=MappingUniverseProvider({ticker: ticker for ticker in tickers}),
+    )
+
+
+def write_universe(data_dir, tickers):
+    path = data_dir / "universe" / "EGX30.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["ticker", "company_name", "as_of_date"])
+        writer.writerows((ticker, ticker, RUN_DATE.isoformat()) for ticker in tickers)
+
+
 def _all_stage_names_in_order(report):
     return [s.name for s in report.stages]
+
+
+def test_universe_change_flows_through_memory_pipeline_and_dashboard_artifacts(tmp_path):
+    """There is no parallel ticker input: changing the provider data alone
+    changes Market Memory, the research run, and every ticker-level artifact.
+    """
+    data_dir = tmp_path / "data"
+    dashboard_out = tmp_path / "dashboard"
+
+    write_universe(data_dir, ["COMI"])
+    first = ProductionPipeline(data_dir=data_dir)
+    first_report = first.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+    assert first_report.stage(StageName.RESEARCH_PIPELINE).status == StageStatus.SUCCEEDED
+    assert first.market_memory.reconstruct(RUN_DATE).dataset_snapshot.tickers == ["COMI"]
+    assert json.loads((dashboard_out / "universe.json").read_text())["tickers"] == ["COMI"]
+    assert json.loads((dashboard_out / "market_state.json").read_text())["dataset_snapshot"][
+        "tickers"
+    ] == ["COMI"]
+    assert [
+        row["ticker"] for row in json.loads((dashboard_out / "decision_readiness.json").read_text())
+    ] == ["COMI"]
+
+    write_universe(data_dir, ["COMI", "MFPC"])
+    second = ProductionPipeline(data_dir=data_dir)
+    second_report = second.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+    expected = ["COMI", "MFPC"]
+    assert second_report.stage(StageName.RESEARCH_PIPELINE).status == StageStatus.SUCCEEDED
+    assert second.market_memory.reconstruct(RUN_DATE).dataset_snapshot.tickers == expected
+    assert json.loads((dashboard_out / "universe.json").read_text())["tickers"] == expected
+    assert (
+        json.loads((dashboard_out / "market_state.json").read_text())["dataset_snapshot"]["tickers"]
+        == expected
+    )
+    assert [
+        row["ticker"] for row in json.loads((dashboard_out / "decision_readiness.json").read_text())
+    ] == expected
 
 
 def test_discovery_stage_is_a_real_network_noop_in_mock_mode(tmp_path, monkeypatch):
@@ -47,7 +101,7 @@ def test_discovery_stage_is_a_real_network_noop_in_mock_mode(tmp_path, monkeypat
 
     monkeypatch.setattr(urllib.request, "urlopen", _boom)
 
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     discovery_stage = report.stage(StageName.DISCOVERY_ENGINE)
@@ -56,7 +110,7 @@ def test_discovery_stage_is_a_real_network_noop_in_mock_mode(tmp_path, monkeypat
 
 
 def test_live_discovery_honors_acquisition_freeze_and_only_checks_recovery(tmp_path):
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     pipeline.mode = ExecutionMode.LIVE
     pipeline._stage_source_registry()
 
@@ -69,7 +123,7 @@ def test_live_discovery_honors_acquisition_freeze_and_only_checks_recovery(tmp_p
 
 
 def test_end_to_end_mock_execution_runs_every_stage_and_succeeds(tmp_path):
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     assert report.overall_status == StageStatus.SUCCEEDED
@@ -85,7 +139,7 @@ def test_end_to_end_execution_produces_a_real_hypothesis_from_collected_data(tmp
     the exact gap this pipeline was built to close (previously `agx collect`
     and `agx run` used two disconnected data roots).
     """
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     research_stage = report.stage(StageName.RESEARCH_PIPELINE)
@@ -96,7 +150,7 @@ def test_end_to_end_execution_produces_a_real_hypothesis_from_collected_data(tmp
 
 def test_collector_execution_writes_data_dir_that_market_memory_reads(tmp_path):
     data_dir = tmp_path / "data"
-    pipeline = ProductionPipeline(data_dir=data_dir, tickers=TICKERS)
+    pipeline = make_pipeline(data_dir)
     pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     assert (data_dir / "prices" / "COMI.csv").exists()
@@ -111,11 +165,11 @@ def test_replay_mode_reproduces_the_same_research_outcome(tmp_path):
     hypothesis count.
     """
     data_dir = tmp_path / "data"
-    mock_pipeline = ProductionPipeline(data_dir=data_dir, tickers=TICKERS)
+    mock_pipeline = make_pipeline(data_dir)
     mock_report = mock_pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
     mock_hypotheses = mock_pipeline.run_records_this_execution[0].hypotheses
 
-    replay_pipeline = ProductionPipeline(data_dir=data_dir, tickers=TICKERS)
+    replay_pipeline = make_pipeline(data_dir)
     replay_report = replay_pipeline.run(RUN_DATE, mode=ExecutionMode.REPLAY)
     replay_hypotheses = replay_pipeline.run_records_this_execution[0].hypotheses
 
@@ -126,13 +180,13 @@ def test_replay_mode_reproduces_the_same_research_outcome(tmp_path):
 
 def test_replay_does_not_duplicate_raw_documents(tmp_path):
     data_dir = tmp_path / "data"
-    ProductionPipeline(data_dir=data_dir, tickers=TICKERS).run(RUN_DATE, mode=ExecutionMode.MOCK)
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     from agx_research.collectors.raw import RawDocumentRepository
 
     count_after_mock = len(RawDocumentRepository(data_dir / "raw_documents.json").all_latest())
 
-    ProductionPipeline(data_dir=data_dir, tickers=TICKERS).run(RUN_DATE, mode=ExecutionMode.REPLAY)
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.REPLAY)
     count_after_replay = len(RawDocumentRepository(data_dir / "raw_documents.json").all_latest())
 
     assert count_after_replay == count_after_mock
@@ -142,7 +196,7 @@ def test_replay_with_no_prior_archive_is_honest_not_fabricated(tmp_path):
     """A fresh data_dir has nothing archived yet; replay mode must report
     that honestly rather than fabricate collected data.
     """
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.REPLAY)
 
     execution_stage = report.stage(StageName.COLLECTOR_EXECUTION)
@@ -153,9 +207,9 @@ def test_replay_with_no_prior_archive_is_honest_not_fabricated(tmp_path):
 
 
 def test_deterministic_execution_same_inputs_same_collected_values(tmp_path):
-    pipeline_a = ProductionPipeline(data_dir=tmp_path / "a", tickers=TICKERS)
+    pipeline_a = make_pipeline(tmp_path / "a")
     pipeline_a.run(RUN_DATE, mode=ExecutionMode.MOCK)
-    pipeline_b = ProductionPipeline(data_dir=tmp_path / "b", tickers=TICKERS)
+    pipeline_b = make_pipeline(tmp_path / "b")
     pipeline_b.run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     comi_a = (tmp_path / "a" / "prices" / "COMI.csv").read_text()
@@ -169,7 +223,7 @@ def test_deterministic_execution_same_inputs_same_collected_values(tmp_path):
 
 
 def test_failure_isolation_one_stage_failing_does_not_stop_later_stages(tmp_path, monkeypatch):
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
 
     def _broken_market_memory(as_of):
         raise RuntimeError("simulated market memory failure")
@@ -196,12 +250,12 @@ def test_failure_isolation_one_stage_failing_does_not_stop_later_stages(tmp_path
 
 
 def test_failure_isolation_collector_failure_marks_partial_not_total(tmp_path, monkeypatch):
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
 
     original_selection = pipeline._stage_collector_selection
 
-    def _selection_with_one_broken(mode):
-        status, detail, warnings = original_selection(mode)
+    def _selection_with_one_broken(mode, as_of):
+        status, detail, warnings = original_selection(mode, as_of)
 
         class _BrokenCollector:
             def fetch(self):
@@ -225,7 +279,7 @@ def test_failure_isolation_collector_failure_marks_partial_not_total(tmp_path, m
 
 def test_artifact_generation_writes_every_expected_file(tmp_path):
     dashboard_out = tmp_path / "dashboard"
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
 
     expected = {
@@ -233,6 +287,7 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
         "events.json",
         "patterns.json",
         "recommendations.json",
+        "universe.json",
         "market_state.json",
         "runtime_metrics.json",
         "system_status.json",
@@ -258,7 +313,7 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     from agx_research.dashboard.validate import validate_dashboard_artifacts
 
     dashboard_out = tmp_path / "dashboard"
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
 
     counts = validate_dashboard_artifacts(dashboard_out)
@@ -273,9 +328,7 @@ def test_mission_control_tracks_pipeline_execution_across_runs(tmp_path):
     data_dir = tmp_path / "data"
     dashboard_out = tmp_path / "dashboard"
 
-    ProductionPipeline(data_dir=data_dir, tickers=TICKERS).run(
-        RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out
-    )
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
     first_status = json.loads((dashboard_out / "mission_status.json").read_text())
     assert first_status["pipeline_status"] == "succeeded"
     assert first_status["total_executions"] == 1
@@ -283,16 +336,14 @@ def test_mission_control_tracks_pipeline_execution_across_runs(tmp_path):
     assert first_status["last_failed_pipeline_id"] is None
     assert first_status["current_execution_mode"] == "mock"
 
-    ProductionPipeline(data_dir=data_dir, tickers=TICKERS).run(
-        RUN_DATE, mode=ExecutionMode.REPLAY, dashboard_out=dashboard_out
-    )
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.REPLAY, dashboard_out=dashboard_out)
     second_status = json.loads((dashboard_out / "mission_status.json").read_text())
     assert second_status["total_executions"] == 2
     assert second_status["current_execution_mode"] == "replay"
 
 
 def test_execution_report_captures_knowledge_and_genome_deltas(tmp_path):
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     assert report.knowledge_before == 0
@@ -306,8 +357,8 @@ def test_pipeline_execution_repository_persists_history(tmp_path):
     from agx_research.production.report import PipelineExecutionRepository
 
     data_dir = tmp_path / "data"
-    ProductionPipeline(data_dir=data_dir, tickers=TICKERS).run(RUN_DATE, mode=ExecutionMode.MOCK)
-    ProductionPipeline(data_dir=data_dir, tickers=TICKERS).run(RUN_DATE, mode=ExecutionMode.MOCK)
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK)
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK)
 
     history = PipelineExecutionRepository(data_dir / "pipeline_executions.json")
     assert len(history.all_latest()) == 2
@@ -316,7 +367,7 @@ def test_pipeline_execution_repository_persists_history(tmp_path):
 
 
 def test_run_rejects_end_before_start(tmp_path):
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     with pytest.raises(ValueError):
         pipeline.run(RUN_DATE, date(2026, 6, 1))
 
@@ -380,7 +431,7 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
     monkeypatch.setattr("time.sleep", lambda seconds: None)
     monkeypatch.setattr(urllib.request, "urlopen", _canned_live_urlopen(_live_content_fixture()))
 
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.LIVE)
 
     assert report.execution_mode == "live"
@@ -416,7 +467,7 @@ def test_live_mode_fails_loudly_when_every_collector_fails(tmp_path, monkeypatch
 
     monkeypatch.setattr(urllib.request, "urlopen", _always_fails)
 
-    pipeline = ProductionPipeline(data_dir=tmp_path / "data", tickers=TICKERS)
+    pipeline = make_pipeline(tmp_path / "data")
     report = pipeline.run(RUN_DATE, mode=ExecutionMode.LIVE)
 
     assert report.overall_status == StageStatus.FAILED

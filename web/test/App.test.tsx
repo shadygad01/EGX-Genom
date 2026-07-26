@@ -10,6 +10,7 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getPatterns: async () => [],
     getRecommendations: async () => [],
     getMarketState: async () => null,
+    getUniverse: async () => null,
     getRuntimeMetrics: async () => [],
     getSystemStatus: async () => null,
     getSourceRegistry: async () => [],
@@ -104,6 +105,42 @@ describe("App shell", () => {
   it("routes to System Administration", async () => {
     await renderApp("/admin");
     expect(await screen.findByText("No execution report yet")).toBeInTheDocument();
+  });
+});
+
+describe("Universe propagation", () => {
+  it("renders every Decision Readiness row when the universe grows beyond ten", async () => {
+    const tickers = Array.from({ length: 12 }, (_, index) => `T${String(index + 1).padStart(2, "0")}`);
+    mockProvider = fakeProvider({
+      getUniverse: async () => ({
+        as_of: "2026-07-26",
+        count: tickers.length,
+        tickers,
+        constituents: Object.fromEntries(tickers.map((ticker) => [ticker, ticker])),
+      }),
+      getDecisionReadiness: async () =>
+        tickers.map((ticker) => ({
+          ticker,
+          as_of: "2026-07-26",
+          status: "blocked" as const,
+          decision: "abstain" as const,
+          ready_horizons: [],
+          price_observations: 0,
+          latest_price_date: null,
+          news_items: 0,
+          corporate_events: 0,
+          financial_periods: 0,
+          macro_series: 0,
+          active_knowledge: 0,
+          blockers: ["No data"],
+          next_actions: [],
+        })),
+    });
+
+    await renderApp("/opportunities");
+
+    expect(await screen.findByText("T12")).toBeInTheDocument();
+    expect(screen.getAllByRole("row")).toHaveLength(13);
   });
 });
 

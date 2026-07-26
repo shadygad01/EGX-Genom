@@ -36,16 +36,17 @@ describe("ApiProvider", () => {
     ]);
   });
 
-  it("getMarketState/getSystemStatus hit /api/market-state and /api/system-status", async () => {
+  it("object artifacts use their matching API endpoints", async () => {
     const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(null)));
     vi.stubGlobal("fetch", fetchMock);
     const provider = new ApiProvider();
 
     await provider.getMarketState();
+    await provider.getUniverse();
     await provider.getSystemStatus();
 
     const urls = fetchMock.mock.calls.map((call) => call[0] as string);
-    expect(urls).toEqual(["/api/market-state", "/api/system-status"]);
+    expect(urls).toEqual(["/api/market-state", "/api/universe", "/api/system-status"]);
   });
 
   it("returns parsed JSON on success", async () => {

@@ -13,6 +13,7 @@ export async function dashboardRoutes(
   app.get("/patterns", async () => artifacts.patterns());
   app.get("/recommendations", async () => artifacts.recommendations());
   app.get("/market-state", async () => artifacts.marketState());
+  app.get("/universe", async () => artifacts.universe());
   app.get("/system-status", async () => artifacts.systemStatus());
   app.get("/source-registry", async () => artifacts.sourceRegistry());
 

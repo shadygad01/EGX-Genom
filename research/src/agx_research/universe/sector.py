@@ -2,8 +2,7 @@
 
 The placeholder mapping below is scaffolding, not authoritative EGX sector
 data — replace `StaticSectorProvider`'s default before any research
-conclusion depends on sector membership, same caveat as
-`universe.static.EGX30_UNIVERSE_PLACEHOLDER`.
+conclusion depends on sector membership.
 """
 
 from __future__ import annotations

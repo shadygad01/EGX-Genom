@@ -43,13 +43,11 @@ from agx_research.production import ExecutionMode, ProductionPipeline, StageStat
 from agx_research.runtime.engine import RunRecordRepository
 from agx_research.sources.catalog import seed_registry
 from agx_research.sources.registry import SourceRegistry
-from agx_research.universe.collected import CollectedUniverseProvider, FallbackUniverseProvider
+from agx_research.universe.collected import CollectedUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import EGX30_UNIVERSE_PLACEHOLDER, StaticUniverseProvider
 
 _DEFAULT_MOCK_DATA = Path(__file__).resolve().parents[2] / "data" / "mock"
 
-TICKERS = sorted(EGX30_UNIVERSE_PLACEHOLDER)
 MACRO_SERIES_IDS = ["BRENT_USD", "EGP_USD"]
 
 
@@ -65,9 +63,8 @@ def build_market_memory(data_dir: Path, mock_data: Path) -> MarketMemory:
     """
     return MarketMemory(
         MockDataProvider(mock_data),
-        StaticUniverseProvider(),
+        CollectedUniverseProvider(data_dir),
         StaticSectorProvider(),
-        tickers=TICKERS,
         macro_series_ids=MACRO_SERIES_IDS,
         lookback_days=30,
         event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
@@ -90,7 +87,9 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--date", required=True, help="ISO date, e.g. 2026-06-14")
     run_parser.add_argument("--end-date", help="Optional ISO end date for a range")
     run_parser.add_argument(
-        "--mode", choices=["live", "mock", "replay"], default="live",
+        "--mode",
+        choices=["live", "mock", "replay"],
+        default="live",
         help="live: fetch real data from the network (default, production mode) -- Stooq/FRED/"
         "World Bank against real endpoints, real robots.txt/rate-limit/retry; a source with no "
         "verified live endpoint (EGX official, company IR, news outlets, ...) reports UNAVAILABLE "
@@ -101,7 +100,8 @@ def main(argv: list[str] | None = None) -> int:
         "--data-dir, proving the pipeline cannot tell live data from replayed data.",
     )
     run_parser.add_argument(
-        "--dashboard-out", type=Path,
+        "--dashboard-out",
+        type=Path,
         help="Where to write dashboard/Mission Control/execution-report JSON artifacts "
         "(default: <data-dir>/dashboard)",
     )
@@ -121,13 +121,17 @@ def main(argv: list[str] | None = None) -> int:
     collect_parser = sub.add_parser(
         "collect", help="Run a single IMPLEMENTED source's collector and materialize its data"
     )
-    collect_parser.add_argument("--source", required=True, help="Source id, e.g. stooq, fred, rss_generic")
+    collect_parser.add_argument(
+        "--source", required=True, help="Source id, e.g. stooq, fred, rss_generic"
+    )
     collect_parser.add_argument(
         "--symbols", help="stooq only: AGX_TICKER=stooq_symbol,... e.g. COMI=comi.eg,MFPC=mfpc.eg"
     )
     collect_parser.add_argument("--series", help="fred only: comma-separated FRED series ids")
     collect_parser.add_argument("--feed-url", help="rss_generic only: the feed URL to collect")
-    collect_parser.add_argument("--ticker-hints", help="rss_generic only: comma-separated tickers to match")
+    collect_parser.add_argument(
+        "--ticker-hints", help="rss_generic only: comma-separated tickers to match"
+    )
     collect_parser.add_argument("--expected-records", type=int, required=True)
     collect_parser.add_argument("--min-confidence", type=float, default=0.5)
 
@@ -140,10 +144,12 @@ def main(argv: list[str] | None = None) -> int:
         "Also recovers any DOWN source by searching for an alternative method.",
     )
     discover_parser.add_argument(
-        "--target", help="Only run this target organization id (default: every non-per-constituent target)"
+        "--target",
+        help="Only run this target organization id (default: every non-per-constituent target)",
     )
     discover_parser.add_argument(
-        "--recover-only", action="store_true",
+        "--recover-only",
+        action="store_true",
         help="Skip fresh targets; only re-run continuity recovery for sources currently DOWN",
     )
 
@@ -170,9 +176,12 @@ def main(argv: list[str] | None = None) -> int:
         args.data_dir.mkdir(parents=True, exist_ok=True)
         start = date.fromisoformat(args.date)
         end = date.fromisoformat(args.end_date) if args.end_date else start
-        pipeline = ProductionPipeline(data_dir=args.data_dir, tickers=TICKERS)
+        pipeline = ProductionPipeline(data_dir=args.data_dir)
         report = pipeline.run(
-            start, end, mode=ExecutionMode(args.mode), dashboard_out=args.dashboard_out,
+            start,
+            end,
+            mode=ExecutionMode(args.mode),
+            dashboard_out=args.dashboard_out,
         )
         print(
             f"Production pipeline v{report.pipeline_version} [{args.mode}]: "
@@ -189,19 +198,21 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "status":
         runs = RunRecordRepository(args.data_dir / "runs.json").all_latest()
         knowledge = KnowledgeStore(args.data_dir / "knowledge.json").all_latest()
-        print(json.dumps(
-            {
-                "runs": len(runs),
-                "succeeded": sum(1 for r in runs if r.status.value == "succeeded"),
-                "failed": sum(1 for r in runs if r.status.value == "failed"),
-                "knowledge_objects": len(knowledge),
-                "by_status": {
-                    status: sum(1 for k in knowledge if k.status.value == status)
-                    for status in {k.status.value for k in knowledge}
+        print(
+            json.dumps(
+                {
+                    "runs": len(runs),
+                    "succeeded": sum(1 for r in runs if r.status.value == "succeeded"),
+                    "failed": sum(1 for r in runs if r.status.value == "failed"),
+                    "knowledge_objects": len(knowledge),
+                    "by_status": {
+                        status: sum(1 for k in knowledge if k.status.value == status)
+                        for status in {k.status.value for k in knowledge}
+                    },
                 },
-            },
-            indent=2,
-        ))
+                indent=2,
+            )
+        )
         return 0
 
     if args.command == "backup":
@@ -245,24 +256,29 @@ def main(argv: list[str] | None = None) -> int:
             hints = args.ticker_hints.split(",") if args.ticker_hints else None
             collector = RssNewsCollector(spec, feed_url=args.feed_url, ticker_hints=hints)
         else:
-            print(f"No collector wired for source {args.source} (status={spec.status.value})", file=sys.stderr)
+            print(
+                f"No collector wired for source {args.source} (status={spec.status.value})",
+                file=sys.stderr,
+            )
             return 1
 
         service = CollectionService(args.data_dir, min_confidence=args.min_confidence)
         result = service.run(collector, expected_records=args.expected_records)
-        print(json.dumps(
-            {
-                "source_id": result.source_id,
-                "documents_fetched": result.documents_fetched,
-                "batches_materialized": result.batches_materialized,
-                "batches_withheld": result.batches_withheld,
-                "price_bars_written": result.price_bars_written,
-                "macro_observations_written": result.macro_observations_written,
-                "news_items_written": result.news_items_written,
-                "events_registered": result.events_registered,
-            },
-            indent=2,
-        ))
+        print(
+            json.dumps(
+                {
+                    "source_id": result.source_id,
+                    "documents_fetched": result.documents_fetched,
+                    "batches_materialized": result.batches_materialized,
+                    "batches_withheld": result.batches_withheld,
+                    "price_bars_written": result.price_bars_written,
+                    "macro_observations_written": result.macro_observations_written,
+                    "news_items_written": result.news_items_written,
+                    "events_registered": result.events_registered,
+                },
+                indent=2,
+            )
+        )
         return 0
 
     if args.command == "discover-sources":
@@ -281,9 +297,7 @@ def main(argv: list[str] | None = None) -> int:
         # a real collected universe (Universe Engine, `universe.collected`)
         # over the static placeholder the moment one has been materialized
         # into `--data-dir`; scales automatically, no code change needed.
-        universe_provider = FallbackUniverseProvider(
-            [CollectedUniverseProvider(args.data_dir), StaticUniverseProvider()]
-        )
+        universe_provider = CollectedUniverseProvider(args.data_dir)
         universe = universe_provider.constituents(date.today())
         all_targets = [*seed_target_organizations(), *generate_company_ir_targets(universe)]
 
@@ -324,12 +338,13 @@ def main(argv: list[str] | None = None) -> int:
             event_repository=EventRepository(args.data_dir / "events.json"),
             runs=RunRecordRepository(args.data_dir / "runs.json"),
             memory=memory,
-            tickers=TICKERS,
             as_of=as_of,
             out_dir=args.out,
             registry=registry,
         )
-        print(json.dumps({"as_of": as_of.isoformat() if as_of else None, "counts": counts}, indent=2))
+        print(
+            json.dumps({"as_of": as_of.isoformat() if as_of else None, "counts": counts}, indent=2)
+        )
         return 0
 
     if args.command == "validate-dashboard":

@@ -8,8 +8,8 @@ from agx_research.features.discovery import (
     PairwiseCorrelationGenerator,
 )
 from agx_research.market_memory.memory import MarketMemory
+from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import StaticUniverseProvider
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 
@@ -17,9 +17,8 @@ MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 def make_market_state():
     memory = MarketMemory(
         MockDataProvider(MOCK_ROOT),
-        StaticUniverseProvider(),
+        MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
         StaticSectorProvider(),
-        tickers=["COMI", "MFPC"],
         macro_series_ids=[],
         lookback_days=30,
     )

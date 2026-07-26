@@ -179,7 +179,7 @@ Both implementations return exactly the same shapes, defined once in
   `EventRepository`, `RunRecordRepository`, `MarketMemory`,
   `RecommendationService`, and `SourceRegistry` outputs, writing
   `knowledge.json`, `events.json`, `patterns.json`, `recommendations.json`,
-  `market_state.json`, `runtime_metrics.json`, `system_status.json`, and
+  `universe.json`, `market_state.json`, `runtime_metrics.json`, `system_status.json`, and
   `source_registry.json`. `agx_research.dashboard.validate.validate_dashboard_artifacts()`
   re-parses every file back through its owning model before anything is
   published — a schema drift or truncated write fails the build, not the
@@ -188,7 +188,7 @@ Both implementations return exactly the same shapes, defined once in
 - **API side**: `api/src/routes/dashboard.ts` serves `/events` and
   `/runtime-metrics` by flattening the same raw versioned-repository files
   (`events.json`/`runs.json`) `KnowledgeStoreReader` already flattens for
-  `/knowledge`. `/patterns`, `/recommendations`, `/market-state`,
+  `/knowledge`. `/patterns`, `/recommendations`, `/universe`, `/market-state`,
   `/system-status`, and `/source-registry` have no live TypeScript-side
   recomputation (three are computed on demand by the research engine, one
   is a static Python catalog, one is reserved for an unimplemented agent)

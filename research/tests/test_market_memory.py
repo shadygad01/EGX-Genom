@@ -3,8 +3,8 @@ from pathlib import Path
 
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.market_memory.memory import MarketMemory, is_egx_trading_day
+from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import StaticUniverseProvider
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 
@@ -12,9 +12,8 @@ MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 def make_memory() -> MarketMemory:
     return MarketMemory(
         MockDataProvider(MOCK_ROOT),
-        StaticUniverseProvider(),
+        MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
         StaticSectorProvider(),
-        tickers=["COMI", "MFPC"],
         macro_series_ids=["BRENT_USD"],
         lookback_days=30,
     )
@@ -38,7 +37,9 @@ def test_reconstruct_bundles_snapshot_universe_and_sectors():
 
 def test_reconstruct_never_sees_data_after_as_of():
     state = make_memory().reconstruct(date(2026, 6, 9))
-    assert all(bar.trade_date <= date(2026, 6, 9) for bar in state.dataset_snapshot.price_history["COMI"])
+    assert all(
+        bar.trade_date <= date(2026, 6, 9) for bar in state.dataset_snapshot.price_history["COMI"]
+    )
 
 
 def test_reconstruct_is_deterministic():

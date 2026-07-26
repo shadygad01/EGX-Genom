@@ -34,8 +34,8 @@ from agx_research.knowledge.schema import KnowledgeObject, StatisticalEvidence
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.runtime.engine import RunRecord, RunRecordRepository, RunStatus
+from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
-from agx_research.universe.static import StaticUniverseProvider
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 
@@ -62,9 +62,8 @@ def _knowledge(ticker: str = "COMI") -> KnowledgeObject:
 def _memory(event_platform: EventPlatform | None = None) -> MarketMemory:
     return MarketMemory(
         MockDataProvider(MOCK_ROOT),
-        StaticUniverseProvider(),
+        MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
         StaticSectorProvider(),
-        tickers=["COMI", "MFPC"],
         macro_series_ids=["BRENT_USD"],
         lookback_days=30,
         event_platform=event_platform or EventPlatform(),
@@ -231,7 +230,6 @@ def test_write_and_validate_round_trip(tmp_path):
         event_repository=event_repo,
         runs=runs,
         memory=_memory(EventPlatform(repository=event_repo)),
-        tickers=["COMI", "MFPC"],
         as_of=date(2026, 6, 14),
         out_dir=tmp_path,
     )
@@ -252,6 +250,10 @@ def _write_valid_empty_artifacts(directory: Path) -> None:
     for filename in ARTIFACT_FILENAMES:
         if filename == "market_state.json":
             directory.joinpath(filename).write_text("null")
+        elif filename == "universe.json":
+            directory.joinpath(filename).write_text(
+                '{"as_of":"2026-06-14","count":0,"tickers":[],"constituents":{}}'
+            )
         elif filename == "system_status.json":
             directory.joinpath(filename).write_text('{"generated_at": "2026-06-14T00:00:00"}')
         else:

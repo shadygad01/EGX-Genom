@@ -10,14 +10,14 @@ from agx_research.events.graph_integration import project_events
 from agx_research.events.service import EventPlatform
 from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.graph.nodes import NodeType
-from agx_research.universe.static import StaticUniverseProvider
+from agx_research.universe.provider import MappingUniverseProvider
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 
 
 def resolver(macro_ids=("BRENT_USD", "EGP_USD")) -> EntityResolver:
     return EntityResolver(
-        StaticUniverseProvider(),
+        MappingUniverseProvider({"COMI": "Commercial International Bank", "MFPC": "MOPCO"}),
         as_of=date(2026, 6, 14),
         known_macro_series_ids=list(macro_ids),
     )

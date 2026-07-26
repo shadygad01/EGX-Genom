@@ -1,6 +1,6 @@
 // Reads pre-computed dashboard artifact snapshots -- the exact same files
 // `agx_research.cli export-dashboard` writes for the static GitHub Pages
-// build (patterns.json, recommendations.json, market_state.json,
+// build (patterns.json, recommendations.json, universe.json, market_state.json,
 // system_status.json, source_registry.json). These five aren't simple
 // versioned repositories: recommendations/market_state are computed
 // on-demand by the research engine, source_registry is a static Python
@@ -42,6 +42,10 @@ export class ArtifactsReader {
 
   marketState<T = unknown>(): Promise<T | null> {
     return readJsonOrDefault<T | null>(this.path("market_state.json"), null);
+  }
+
+  universe<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("universe.json"), null);
   }
 
   systemStatus<T = unknown>(): Promise<T | null> {

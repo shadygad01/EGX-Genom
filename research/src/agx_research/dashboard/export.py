@@ -34,12 +34,14 @@ from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.runtime.engine import RunRecordRepository, RunStatus
 from agx_research.sources.catalog import seed_sources
 from agx_research.sources.registry import SourceRegistry
+from agx_research.universe.provider import UniverseArtifact
 
 ARTIFACT_FILENAMES = (
     "knowledge.json",
     "events.json",
     "patterns.json",
     "recommendations.json",
+    "universe.json",
     "market_state.json",
     "runtime_metrics.json",
     "system_status.json",
@@ -77,6 +79,19 @@ def export_market_state(memory: MarketMemory, as_of: date | None) -> dict[str, A
         return None
     state: MarketState = memory.reconstruct(as_of)
     return state.model_dump(mode="json")
+
+
+def export_universe(memory: MarketMemory, as_of: date | None) -> dict[str, Any] | None:
+    """Publish the exact point-in-time universe used by every downstream stage."""
+    if as_of is None:
+        return None
+    constituents = memory.universe_provider.constituents(as_of)
+    return UniverseArtifact(
+        as_of=as_of,
+        count=len(constituents),
+        tickers=sorted(constituents),
+        constituents=dict(sorted(constituents.items())),
+    ).model_dump(mode="json")
 
 
 def export_runtime_metrics(runs: RunRecordRepository) -> list[dict[str, Any]]:
@@ -126,7 +141,6 @@ def write_dashboard_artifacts(
     event_repository: EventRepository,
     runs: RunRecordRepository,
     memory: MarketMemory,
-    tickers: list[str],
     as_of: date | None,
     out_dir: Path,
     registry: SourceRegistry | None = None,
@@ -142,18 +156,23 @@ def write_dashboard_artifacts(
         "events.json": export_events(event_repository),
         "patterns.json": export_patterns(),
         "recommendations.json": export_recommendations(
-            knowledge_store, event_platform, tickers=tickers, as_of=as_of
+            knowledge_store,
+            event_platform,
+            tickers=memory.tickers(as_of) if as_of is not None else [],
+            as_of=as_of,
         ),
+        "universe.json": export_universe(memory, as_of),
         "market_state.json": export_market_state(memory, as_of),
         "runtime_metrics.json": export_runtime_metrics(runs),
-        "system_status.json": export_system_status(
-            runs, knowledge_store, pipeline_run_date=as_of
-        ),
+        "system_status.json": export_system_status(runs, knowledge_store, pipeline_run_date=as_of),
         "source_registry.json": export_source_registry(registry),
     }
 
     counts: dict[str, int] = {}
     for filename, payload in artifacts.items():
         (out_dir / filename).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-        counts[filename] = len(payload) if isinstance(payload, list) else (1 if payload else 0)
+        if filename == "universe.json" and payload is not None:
+            counts[filename] = payload["count"]
+        else:
+            counts[filename] = len(payload) if isinstance(payload, list) else (1 if payload else 0)
     return counts

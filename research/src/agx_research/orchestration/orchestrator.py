@@ -21,6 +21,7 @@ from agx_research.orchestration.artifacts import ArtifactKind, ArtifactRepositor
 from agx_research.orchestration.cycle import ResearchCycle
 from agx_research.orchestration.session import ResearchSession
 from agx_research.orchestration.task_graph import Task, TaskGraph
+from agx_research.universe.provider import UniverseProvider
 
 
 class ResearchOrchestrator:
@@ -28,15 +29,15 @@ class ResearchOrchestrator:
         self,
         agents: list[ResearchAgent],
         data_provider: DataProvider,
+        universe_provider: UniverseProvider,
         *,
-        tickers: list[str],
         macro_series_ids: list[str] | None = None,
         lookback_days: int = 30,
         artifact_repository: ArtifactRepository | None = None,
     ):
         self.agents = agents
         self.data_provider = data_provider
-        self.tickers = tickers
+        self.universe_provider = universe_provider
         self.macro_series_ids = macro_series_ids or []
         self.lookback_days = lookback_days
         self.artifact_repository = artifact_repository or ArtifactRepository()
@@ -45,7 +46,7 @@ class ResearchOrchestrator:
         started_at = datetime.now()
         snapshot = build_snapshot(
             self.data_provider,
-            tickers=self.tickers,
+            tickers=sorted(self.universe_provider.constituents(as_of)),
             macro_series_ids=self.macro_series_ids,
             as_of=as_of,
             lookback_days=self.lookback_days,
@@ -78,7 +79,7 @@ class ResearchOrchestrator:
         def _build_snapshot(_deps: dict) -> DatasetSnapshot:
             return build_snapshot(
                 self.data_provider,
-                tickers=self.tickers,
+                tickers=sorted(self.universe_provider.constituents(as_of)),
                 macro_series_ids=self.macro_series_ids,
                 as_of=as_of,
                 lookback_days=self.lookback_days,

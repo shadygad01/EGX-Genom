@@ -38,7 +38,6 @@ class MarketMemory:
         universe_provider: UniverseProvider,
         sector_provider: SectorProvider,
         *,
-        tickers: list[str],
         macro_series_ids: list[str] | None = None,
         lookback_days: int = 30,
         calendar: TradingCalendar | None = None,
@@ -47,24 +46,24 @@ class MarketMemory:
         self.data_provider = data_provider
         self.universe_provider = universe_provider
         self.sector_provider = sector_provider
-        self.tickers = tickers
         self.macro_series_ids = macro_series_ids or []
         self.lookback_days = lookback_days
         self.calendar = calendar or StaticEGXCalendar()
         self.event_platform = event_platform or EventPlatform()
 
     def reconstruct(self, as_of: date) -> MarketState:
+        constituents = self.universe_provider.constituents(as_of)
+        tickers = sorted(constituents)
         snapshot = build_snapshot(
             self.data_provider,
-            tickers=self.tickers,
+            tickers=tickers,
             macro_series_ids=self.macro_series_ids,
             as_of=as_of,
             lookback_days=self.lookback_days,
         )
-        constituents = self.universe_provider.constituents(as_of)
         sectors = {
             ticker: sector
-            for ticker in self.tickers
+            for ticker in tickers
             for sector in [self.sector_provider.sector_of(ticker, as_of)]
             if sector is not None
         }
@@ -82,3 +81,7 @@ class MarketMemory:
             trading_session=trading_session,
             events=events,
         )
+
+    def tickers(self, as_of: date) -> list[str]:
+        """Return the provider-backed ticker set for a point in time."""
+        return sorted(self.universe_provider.constituents(as_of))

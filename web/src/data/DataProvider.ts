@@ -29,12 +29,13 @@ import type {
   RunRecord,
   SourceMetricsRow,
   SourceSpec,
+  UniverseArtifact,
 } from "../types";
 
 // Every method here mirrors exactly one dashboard artifact file (see
 // docs/ARCHITECTURE.md's "Dashboard data providers" section) -- no
 // component ever computes a value that isn't already one of these fields.
-// The first eight are always present (both StaticJsonProvider's fixed
+// The core artifacts are always present (both StaticJsonProvider's fixed
 // contract and ProductionPipeline produce them); the rest are only
 // produced by the full production pipeline (`agx run`) and resolve to an
 // honest empty/null value when absent, never a fabricated one.
@@ -44,6 +45,7 @@ export interface DashboardDataProvider {
   getPatterns(): Promise<Pattern[]>;
   getRecommendations(): Promise<Recommendation[]>;
   getMarketState(): Promise<MarketState | null>;
+  getUniverse(): Promise<UniverseArtifact | null>;
   getRuntimeMetrics(): Promise<RunRecord[]>;
   getSystemStatus(): Promise<DashboardSystemStatus | null>;
   getSourceRegistry(): Promise<SourceSpec[]>;

@@ -12,8 +12,8 @@ Two holiday classes, treated differently on purpose:
   data — observed EGX closures also vary with official announcements — so
   they live in an explicit per-year table that must be maintained from an
   authoritative source. `EGX_MOVABLE_HOLIDAYS_PLACEHOLDER` follows the
-  same convention as `EGX30_UNIVERSE_PLACEHOLDER`: real structure,
-  placeholder content, replace before real research depends on it.
+  a real structure with placeholder content that must be replaced before
+  real research depends on it.
 
 `TradingCalendar` is an interface (like `UniverseProvider`) so a real
 exchange-published calendar feed can replace the static one without

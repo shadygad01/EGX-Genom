@@ -126,7 +126,7 @@ jobs:
         working-directory: .
         run: |
           test -f web/dist/index.html
-          for f in knowledge events patterns recommendations market_state runtime_metrics \
+          for f in knowledge events patterns recommendations universe market_state runtime_metrics \
                    system_status source_registry investment_cases collector_status \
                    runtime_status dashboard_metrics mission_status execution_report \
                    decision_readiness; do

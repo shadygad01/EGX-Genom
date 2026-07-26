@@ -26,7 +26,7 @@ describe("StaticJsonProvider", () => {
     expect(url).not.toContain("/api/");
   });
 
-  it("fetches every one of the eight resources", async () => {
+  it("fetches the core list resources", async () => {
     const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse([])));
     vi.stubGlobal("fetch", fetchMock);
     const provider = new StaticJsonProvider();
@@ -57,6 +57,7 @@ describe("StaticJsonProvider", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(null, 404)));
     const provider = new StaticJsonProvider();
     await expect(provider.getMarketState()).resolves.toBeNull();
+    await expect(provider.getUniverse()).resolves.toBeNull();
     await expect(provider.getSystemStatus()).resolves.toBeNull();
   });
 

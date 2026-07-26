@@ -27,6 +27,7 @@ import type {
   RunRecord,
   SourceMetricsRow,
   SourceSpec,
+  UniverseArtifact,
 } from "../types";
 import type { DashboardDataProvider } from "./DataProvider";
 
@@ -57,6 +58,10 @@ export class ApiProvider implements DashboardDataProvider {
 
   getMarketState(): Promise<MarketState | null> {
     return fetchJson<MarketState | null>("/market-state");
+  }
+
+  getUniverse(): Promise<UniverseArtifact | null> {
+    return fetchJson<UniverseArtifact | null>("/universe");
   }
 
   getRuntimeMetrics(): Promise<RunRecord[]> {

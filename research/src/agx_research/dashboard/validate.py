@@ -30,6 +30,7 @@ from agx_research.production.mission_control import MissionControlStatus
 from agx_research.production.report import ExecutionReport
 from agx_research.runtime.engine import RunRecord
 from agx_research.sources.spec import SourceSpec
+from agx_research.universe.provider import UniverseArtifact
 
 _LIST_MODELS = {
     "knowledge.json": KnowledgeObject,
@@ -96,12 +97,36 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
         payload = json.loads(market_state_path.read_text())
     except json.JSONDecodeError as exc:
         raise DashboardArtifactError(f"market_state.json: invalid JSON ({exc})") from exc
-    if payload is not None:
+    market_state_payload = payload
+    if market_state_payload is not None:
         try:
-            MarketState.model_validate(payload)
+            MarketState.model_validate(market_state_payload)
         except Exception as exc:
             raise DashboardArtifactError(f"market_state.json: {exc}") from exc
-    counts["market_state.json"] = 0 if payload is None else 1
+    counts["market_state.json"] = 0 if market_state_payload is None else 1
+
+    universe_path = directory / "universe.json"
+    if not universe_path.exists():
+        raise DashboardArtifactError("universe.json: missing")
+    try:
+        universe_payload = json.loads(universe_path.read_text())
+    except json.JSONDecodeError as exc:
+        raise DashboardArtifactError(f"universe.json: invalid JSON ({exc})") from exc
+    if universe_payload is not None:
+        try:
+            universe = UniverseArtifact.model_validate(universe_payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"universe.json: {exc}") from exc
+        counts["universe.json"] = universe.count
+        if market_state_payload is not None:
+            market_constituents = sorted(market_state_payload["constituents"])
+            snapshot_tickers = market_state_payload["dataset_snapshot"]["tickers"]
+            if market_constituents != universe.tickers or snapshot_tickers != universe.tickers:
+                raise DashboardArtifactError(
+                    "universe.json: membership differs from market_state.json"
+                )
+    else:
+        counts["universe.json"] = 0
 
     patterns_path = directory / "patterns.json"
     if not patterns_path.exists():
@@ -140,9 +165,14 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
     _validate_optional_model_list(
         directory, "acquisition_decisions.json", CapabilityDecision, counts
     )
-    _validate_optional_model_list(
-        directory, "decision_readiness.json", DecisionReadiness, counts
-    )
+    _validate_optional_model_list(directory, "decision_readiness.json", DecisionReadiness, counts)
+    readiness_path = directory / "decision_readiness.json"
+    if readiness_path.exists() and universe_payload is not None:
+        readiness_tickers = sorted(row["ticker"] for row in json.loads(readiness_path.read_text()))
+        if readiness_tickers != universe.tickers:
+            raise DashboardArtifactError(
+                "decision_readiness.json: membership differs from universe.json"
+            )
 
     return counts
 
@@ -223,7 +253,9 @@ def _validate_optional_dashboard_metrics(directory: Path, counts: dict[str, int]
     if not present:
         return
     if not isinstance(payload, dict) or "artifacts" not in payload:
-        raise DashboardArtifactError("dashboard_metrics.json: expected an object with an 'artifacts' key")
+        raise DashboardArtifactError(
+            "dashboard_metrics.json: expected an object with an 'artifacts' key"
+        )
     counts["dashboard_metrics.json"] = 1
 
 
@@ -269,5 +301,7 @@ def _validate_optional_source_metrics(directory: Path, counts: dict[str, int]) -
         raise DashboardArtifactError("source_metrics.json: expected a JSON array")
     for row in payload:
         if not isinstance(row, dict) or "source_id" not in row:
-            raise DashboardArtifactError("source_metrics.json: expected each row to have 'source_id'")
+            raise DashboardArtifactError(
+                "source_metrics.json: expected each row to have 'source_id'"
+            )
     counts["source_metrics.json"] = len(payload)

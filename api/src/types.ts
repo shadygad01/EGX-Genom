@@ -219,6 +219,13 @@ export interface MarketState {
   events: Event[];
 }
 
+export interface UniverseArtifact {
+  as_of: string;
+  count: number;
+  tickers: string[];
+  constituents: Record<string, string>;
+}
+
 // --- runtime_metrics.json / RunRecord ---
 
 export type RunStatus = "succeeded" | "failed" | "skipped_non_trading";

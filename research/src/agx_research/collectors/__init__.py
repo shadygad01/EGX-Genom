@@ -5,6 +5,7 @@ from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.browser import BrowserAutomationCollector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.excel import ExcelSeriesCollector
+from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
 from agx_research.collectors.filesystem import FilesystemCollector
 from agx_research.collectors.fmp import FmpCollector
@@ -39,6 +40,7 @@ __all__ = [
     "CollectionService",
     "Collector",
     "ExcelSeriesCollector",
+    "EgxCompositePriceCollector",
     "FetchDisallowed",
     "FetchError",
     "FilesystemCollector",

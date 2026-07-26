@@ -40,6 +40,49 @@ def seed_sources() -> list[SourceSpec]:
     return [
         # ---- IMPLEMENTED (tested collectors exist) ----
         _spec(
+            id="egx_price_composite",
+            name="EGX price provider (Yahoo + StockAnalysis + Mubasher fallback)",
+            category=SourceCategory.MARKET_DATA,
+            access_method=AccessMethod.JSON_API,
+            status=SourceStatus.IMPLEMENTED,
+            base_url="https://query1.finance.yahoo.com/v8/finance/chart/",
+            reliability_score=0.75,
+            freshness_score=0.9,
+            historical_coverage=(
+                "Yahoo maximum daily history plus StockAnalysis recent daily overlap; "
+                "Mubasher post-close snapshot fallback"
+            ),
+            expected_latency="end-of-day",
+            update_frequency="daily",
+            collector="EgxCompositePriceCollector",
+            collector_version="1.0.0",
+            rate_limit=RateLimit(requests_per_minute=60, min_seconds_between_requests=0.25),
+            license=(
+                "Operational collection authorized by the repository owner; upstream terms "
+                "and endpoint stability remain provider-specific and must be monitored."
+            ),
+            validation_rules=["data.quality.validate_price_bars"],
+            normalization_rules=[
+                "UniverseProvider ticker + .CA vendor mapping",
+                "dates ISO-8601",
+                "OHLCV floats/ints",
+                "StockAnalysis overwrites overlapping Yahoo dates",
+                "Mubasher snapshots materialize only after Cairo market close",
+            ],
+            conflict_priority=70,
+            priority=100,
+            supported_entities=["UniverseProvider EGX tickers"],
+            supported_event_types=["market", "corporate"],
+            notes=(
+                "Live feasibility probes dated 2026-07-26 measured Yahoo at 91/101 and "
+                "StockAnalysis at 99/101, with union coverage 101/101. The single composite "
+                "adapter is deliberate: fallback is evaluated per ticker, so partial success "
+                "cannot cause the capability engine to abandon uncovered constituents. Raw "
+                "document URLs retain provider=ticker provenance. No constituent list is "
+                "embedded; production injects the current UniverseProvider symbols."
+            ),
+        ),
+        _spec(
             id="stooq",
             name="Stooq",
             category=SourceCategory.MARKET_DATA,

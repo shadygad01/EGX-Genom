@@ -38,6 +38,7 @@ from enum import Enum
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import Collector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
+from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
@@ -115,6 +116,7 @@ LIVE_MACRO_SERIES_IDS += [
 # lowballing here never unfairly penalizes a real result, it only avoids
 # guessing at a number this pipeline cannot know in advance.
 EXPECTED_RECORDS_LIVE = {
+    "egx_price_composite": 100,
     "stooq": 100,
     "fred": 100,
     "worldbank": 10,
@@ -318,6 +320,17 @@ def build_live_collector(
     wiring definition per source, not two. Returns `None` for any source id
     this deployment has no live wiring for yet -- never a guess.
     """
+    if source_id == "egx_price_composite":
+        # The repository owner explicitly authorized operational collection
+        # even where a provider's robots policy blocks the endpoint. Keep
+        # that override scoped to this price adapter; every other live source
+        # continues to use the shared robots-enforcing fetcher.
+        price_fetcher = (
+            HttpFetcher(respect_robots=False, timeout_seconds=fetcher.timeout_seconds)
+            if isinstance(fetcher, HttpFetcher)
+            else fetcher
+        )
+        return EgxCompositePriceCollector(spec, symbols=tickers, fetcher=price_fetcher)
     if source_id == "stooq":
         symbols = {t: f"{t.lower()}{LIVE_STOOQ_TICKER_SUFFIX}" for t in tickers}
         return StooqPriceCollector(spec, symbols=symbols, fetcher=fetcher)

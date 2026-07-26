@@ -72,7 +72,7 @@ def assess_decision_readiness(
         next_actions: list[str] = []
         if not prices:
             blockers.append("No trustworthy price history is available.")
-            next_actions.append("Connect a legal EGX OHLCV source.")
+            next_actions.append("Connect a working EGX OHLCV source.")
         elif not price_is_fresh:
             blockers.append("Latest price observation is stale.")
             next_actions.append("Refresh the price collector and verify market-date coverage.")

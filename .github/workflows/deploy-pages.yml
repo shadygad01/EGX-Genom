@@ -48,7 +48,9 @@ jobs:
       # Knowledge Base -> Research Pipeline -> Genome -> Investment Case
       # Generator -> Dashboard Artifact Generator -> Mission Control ->
       # Execution Report. `--mode live` (the CLI's default) fetches real
-      # Stooq/FRED/World Bank data over the network; a source with no
+      # EGX composite price provider/FRED/World Bank data over the network;
+      # price fallback is evaluated per UniverseProvider ticker across
+      # Yahoo, StockAnalysis and a post-close Mubasher snapshot. A source with no
       # verified live endpoint yet (EGX official, company IR, news outlets)
       # reports UNAVAILABLE with its reason in `collector_status.json`
       # rather than being silently skipped, and every other collector keeps

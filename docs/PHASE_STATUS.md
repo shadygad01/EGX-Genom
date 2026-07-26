@@ -667,3 +667,86 @@ Three phases followed, in order:
    evidenced defensive measures documented in phase 2/3 above — see
    `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section
    and `CURRENT_MISSION.md` for full detail.
+
+## Ticker Data Gap Report (post-acquisition-freeze, System 02 + 13 dashboard layer)
+
+The project owner supplied a fresh, detailed completion plan (in Arabic)
+covering EGX disclosures, financial statements, entity resolution, macro
+alignment, decision-engine explainability, and source monitoring — framed
+around one question per ticker: exactly what evidence is missing, and what
+does it take to reach Swing/Investment readiness. Before writing anything
+new, this phase audited what the plan asked for against what already
+exists, since several items turned out already engineering-complete:
+
+- **Already built, confirmed by re-reading the code, not re-implemented**:
+  `meta.readiness.assess_decision_readiness` already computes exactly the
+  per-ticker MICRO/SWING/INVESTMENT gates the plan's item 6 asks for
+  (price freshness/volume, financial periods, macro series count, news/
+  corporate-event presence, active knowledge), with named blockers and
+  next actions, exported as `decision_readiness.json` and rendered in the
+  Opportunity Center. The plan's item 3 (Financial Statement Collector)
+  and item 2 (EGX disclosures → `CorporateEvent`) both already exist
+  end to end (`financials/`, `collectors/financial_statements.py`,
+  `collectors/corporate_event_classifier.py` — see the "Financial
+  Statement Collection" and "Universe Engine + Corporate Disclosures"
+  phases above) and are blocked on exactly the same two named business
+  inputs every phase since has named: a verified real source endpoint
+  (`company_ir` stays `PLANNED`) and this sandbox's lack of network
+  egress — not missing engineering. The plan's item 1 (a 101-ticker
+  universe) was also already connected (`universe/`, the reviewed
+  EGX30+EGX70 seed, 31+70 tickers).
+- **The real, closeable gap this phase found**: nothing decomposed
+  `decision_readiness.json`'s counts into the plan's own five named
+  layers (Financials/Disclosures/News/Macro/Knowledge) with an explicit
+  completeness percentage per layer, and nothing published it as a
+  reviewable artifact. Closed with `meta.readiness.build_ticker_data_gap_report`
+  (`TickerDataGapReport`/`DataLayerGap` models) — a pure re-derivation of
+  `assess_decision_readiness`'s own counts and gate thresholds (never a
+  second, possibly-disagreeing set of thresholds), exported as
+  `production.artifacts.export_ticker_data_gap_report` and wired into
+  `ProductionPipeline._stage_dashboard_artifact_generator` right after
+  `decision_readiness.json`, writing `ticker_data_gap_report.json` (one
+  row per universe ticker, validated in `dashboard/validate.py` for
+  schema + universe-membership parity, same as `decision_readiness.json`).
+  5 new tests (`test_ticker_data_gap_report.py`); 560 backend tests pass;
+  `ruff check` clean.
+- **Verified with a real mock-mode run**: `agx run --mode mock` against
+  the full 101-ticker EGX30+EGX70 universe honestly shows 99 tickers
+  `blocked` (no price history at all in this sandbox's synthetic
+  fixtures, which only ever cover COMI/MFPC) and COMI/MFPC `degraded`
+  at 53.3% average layer completeness (disclosures/news present,
+  financials/knowledge absent, macro at 2 of the required 3 series) —
+  0 tickers Swing-ready, 0 Investment-ready, exactly the honest starting
+  point the plan's own success criteria describe ("raise Swing-ready
+  from zero"). Rendered as a published, filterable/sortable Artifact
+  (per-ticker layer completion bars, status pills, primary blocker) so
+  the gap is reviewable at a glance without reading raw JSON.
+- **Named, deliberately not done this phase**: web/API wiring
+  (`api/src/routes/dashboard.ts`, `ApiProvider`/`StaticJsonProvider`,
+  `web/src/types.ts`, a dashboard UI section) — see new TD-34. Also not
+  done: the plan's item 4 (Arabic/English company-alias entity resolution
+  for news) and item 5 (macro frequency alignment/point-in-time
+  publication-date discipline) — both real, scoped engineering tasks,
+  neither started this phase; named as the next queued items in
+  `NEXT_MISSIONS.md` rather than attempted speculatively in the same
+  sitting as the gap-report work.
+   `enterprise_press` flipped to `IMPLEMENTED`/`TRUSTED`, collecting real
+   news from `https://enterpriseam.com/egypt/feed/` (found via standard
+   RSS autodiscovery on its own now-reachable homepage, never guessed).
+   Verified live: 6 real news items parsed, 6 real events registered in
+   the Event Platform, `data_quality_score=0.97`. This is the platform's
+   first genuinely EGX-specific live source (World Bank, the only other
+   connected source, is macro-level, not EGX-specific). Getting here
+   surfaced and fixed four real bugs, none touching architecture: an
+   unhandled crash on non-percent-encoded non-ASCII URLs; an unbounded
+   `robots.txt` fetch that hung a live run for 90+ minutes
+   (`RobotFileParser.read()` has no timeout); an unbounded sitemap-
+   candidate count that caused a second ~70-minute hang (a real
+   sitemap-index's per-section sitemap can list thousands of URLs); and a
+   correctness bug where the discovery stage silently regressed an
+   already-`IMPLEMENTED` source back to `PLANNED` on every subsequent run.
+   518 backend tests pass (8 new this phase); `ruff check` clean. Every
+   other named Egyptian source remains blocked by the same genuine,
+   evidenced defensive measures documented in phase 2/3 above — see
+   `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section
+   and `CURRENT_MISSION.md` for full detail.

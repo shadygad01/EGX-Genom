@@ -21,6 +21,7 @@ from agx_research.genome.service import AlphaGenome
 from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.knowledge.store import KnowledgeStore
+from agx_research.meta.readiness import DecisionReadiness, build_ticker_data_gap_report
 from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.papers.repository import PaperRepository
 from agx_research.portfolio.constructor import PortfolioConstructor
@@ -221,6 +222,20 @@ def export_financial_statements(
             for item in provider.get_line_items(ticker, _EARLIEST_POSSIBLE_FILING_DATE, as_of)
         )
     return items
+
+
+def export_ticker_data_gap_report(
+    readiness_rows: list[DecisionReadiness],
+) -> list[dict[str, Any]]:
+    """Per-ticker breakdown of `decision_readiness.json` into five named
+    data layers (Financials/Disclosures/News/Macro/Knowledge), each with a
+    completeness percentage -- so it's visible at a glance exactly which
+    layer blocks a given ticker's Swing/Investment readiness. Derived
+    entirely from `assess_decision_readiness`'s own counts and gates
+    (`meta.readiness.build_ticker_data_gap_report`); never a second set of
+    thresholds that could disagree with `decision_readiness.json`.
+    """
+    return [r.model_dump(mode="json") for r in build_ticker_data_gap_report(readiness_rows)]
 
 
 def export_acquisition_decisions(decisions: list[CapabilityDecision]) -> list[dict[str, Any]]:

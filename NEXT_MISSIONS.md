@@ -1,5 +1,41 @@
 # Next Missions
 
+## Immediately next: from the project owner's data-sources completion plan
+
+The project owner's latest plan (see `CURRENT_MISSION.md`'s "Ticker Data
+Gap Report" entry) named two real, scoped engineering tasks this phase
+deliberately left for next, having closed the gap-report item first:
+
+1. **Entity resolution for news** (plan item 4): build Arabic + English
+   alias lists per EGX30/EGX70 company (legal name, trading name, ticker,
+   ISIN) so a headline mentioning a company is matched to the right
+   ticker and not a similarly-named one (the plan's own example: VLMR vs.
+   VLMRA). Today, ticker matching is whatever hint list a collector was
+   configured with (`RssNewsCollector`'s `ticker_hints`) — there is no
+   shared alias registry a news/disclosure classifier consults. Success
+   criterion per the plan: every news item lands on the correct ticker,
+   raising real news/event coverage.
+2. **Macro frequency alignment + no-look-ahead discipline** (plan item
+   5): `agents/macro.py` already correlates macro series against ticker
+   returns, but nothing yet normalizes daily/monthly/quarterly/annual
+   series onto a common comparison calendar, and nothing yet distinguishes
+   a macro/financial value's `period_end_date` from its real publication
+   date (the plan's explicit warning: a quarter's results can't be used
+   as of the quarter's end if they weren't actually announced until weeks
+   later). This is a real look-ahead-bias risk worth closing before more
+   macro series are connected, independent of any new data source.
+3. **Web/API wiring for `ticker_data_gap_report.json`** (TD-34): route +
+   provider + types, following `financial_statements.json`'s exact
+   existing pattern, then a dashboard UI surface (likely an addition to
+   Opportunity Center or a new "Data Coverage" view) once the artifact
+   itself has been reviewed.
+
+None of these require a new `TargetOrganization`, collector, or
+source-discovery change — the freeze below still applies to acquisition
+architecture specifically.
+
+---
+
 **Acquisition architecture is frozen as of this commit** (see
 `CURRENT_MISSION.md` and `docs/ACQUISITION_STRATEGY.md`'s "Final Data
 Acquisition Sprint" section). Every mission from here forward must

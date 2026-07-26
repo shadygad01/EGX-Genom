@@ -1,5 +1,45 @@
 # Current Mission
 
+## Current mission: Ticker Data Gap Report (supersedes the acquisition freeze below for this one item)
+
+The project owner supplied a new, detailed completion plan (in Arabic)
+prioritizing whichever data source removes a decision blocker directly,
+starting with an explicit per-ticker gap report ("know exactly what
+prevents each of the 101 tickers from Swing/Investment readiness") before
+anything else in the plan. This is **not** a re-opening of the acquisition
+architecture freeze below (no new `TargetOrganization`, collector, or
+source-discovery engineering happened) — it is the same "generate,
+validate, rank, and explain" mandate the freeze itself called for, applied
+to data-gap visibility specifically.
+
+**Outcome**: most of the plan's own items turned out already
+engineering-complete on inspection — `meta.readiness.assess_decision_readiness`
+already computes the exact MICRO/SWING/INVESTMENT gates the plan asks for
+(item 6); the Financial Statement Collector (item 3) and EGX-disclosure
+classifier (item 2) already exist end to end, blocked only on the same
+two named business inputs every phase since has named (a verified real
+`company_ir` endpoint; this sandbox's lack of network egress); the
+101-ticker EGX30+EGX70 universe (item 1's prerequisite) was already
+connected. The one real, closeable gap: nothing decomposed
+`decision_readiness.json` into the plan's five named layers
+(Financials/Disclosures/News/Macro/Knowledge) with a completeness
+percentage, and nothing published it as a reviewable artifact. Closed
+this phase — see `docs/PHASE_STATUS.md`'s "Ticker Data Gap Report"
+section for full detail, including the honest mock-mode evidence (99 of
+101 tickers `blocked`, 2 `degraded`, 0 Swing-ready, 0 Investment-ready —
+the correct starting point the plan itself describes) and a published
+Artifact rendering it.
+
+**Not done this phase, named as next** (see `NEXT_MISSIONS.md`): web/API
+wiring for the new artifact (TD-34); the plan's item 4 (Arabic/English
+company-alias entity resolution for news-to-ticker matching) and item 5
+(macro series frequency alignment + point-in-time publication-date
+discipline, avoiding look-ahead on financial/macro releases) — both real,
+scoped engineering tasks, deliberately not started in the same sitting as
+the gap-report work.
+
+---
+
 **Superseded six times since the "no egress" finding below.** That finding was
 specific to *this coding sandbox*; the production deployment target
 (GitHub Actions, `.github/workflows/deploy-pages.yml`) has real outbound

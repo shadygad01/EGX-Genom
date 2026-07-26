@@ -23,7 +23,7 @@ from agx_research.hypotheses.hypothesis import Hypothesis
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import Recommendation
-from agx_research.meta.readiness import DecisionReadiness
+from agx_research.meta.readiness import DecisionReadiness, TickerDataGapReport
 from agx_research.papers.paper import ResearchPaper
 from agx_research.portfolio.constructor import PortfolioRecommendation
 from agx_research.production.mission_control import MissionControlStatus
@@ -172,6 +172,19 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
         if readiness_tickers != universe.tickers:
             raise DashboardArtifactError(
                 "decision_readiness.json: membership differs from universe.json"
+            )
+
+    _validate_optional_model_list(
+        directory, "ticker_data_gap_report.json", TickerDataGapReport, counts
+    )
+    gap_report_path = directory / "ticker_data_gap_report.json"
+    if gap_report_path.exists() and universe_payload is not None:
+        gap_report_tickers = sorted(
+            row["ticker"] for row in json.loads(gap_report_path.read_text())
+        )
+        if gap_report_tickers != universe.tickers:
+            raise DashboardArtifactError(
+                "ticker_data_gap_report.json: membership differs from universe.json"
             )
 
     return counts

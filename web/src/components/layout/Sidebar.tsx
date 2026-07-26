@@ -40,7 +40,7 @@ export function Sidebar() {
           </NavLink>
         ))}
       </div>
-      <div className={styles.footer}>EGX30 · Research Only</div>
+      <div className={styles.footer}>EGX30 + EGX70 · Research Only</div>
     </nav>
   );
 }

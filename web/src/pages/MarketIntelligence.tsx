@@ -67,7 +67,7 @@ export function MarketIntelligence() {
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Sector Composition" subtitle="EGX30 constituents grouped by sector">
+        <Card title="Sector Composition" subtitle="Covered constituents with known sectors">
           {bySector.size === 0 ? (
             <EmptyState title="No sector data yet" />
           ) : (

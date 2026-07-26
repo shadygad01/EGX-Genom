@@ -35,6 +35,10 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
         "records": ["macro_observations"],
         "consumers": ["macro_agent", "validation", "meta_decision_engine"],
     },
+    "capmas": {
+        "records": ["macro_observations"],
+        "consumers": ["macro_agent", "validation", "meta_decision_engine"],
+    },
     "rss_generic": {
         "records": ["news_items", "events"],
         "consumers": ["event_risk_overlay", "meta_decision_engine"],

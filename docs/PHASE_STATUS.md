@@ -12,6 +12,11 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 (cost/coverage/contract) explicitly reserved for the user. See
 `docs/ROADMAP.md`.
 
+Current acquisition registry after the live UN Statistics and CAPMAS API
+connections: **52 sources (12 IMPLEMENTED / 28 PLANNED / 4 NEEDS_KEY /
+8 TOS_REVIEW)**. This current count supersedes older counts embedded in the
+long-form phase evidence below.
+
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
 | 01 | Foundation | **DONE** | `domain/`, `storage/`, `config.py`; reused unmodified by every later store; CI green. |

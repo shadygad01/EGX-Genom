@@ -3,6 +3,7 @@ from agx_research.collectors.archive import RawArchive
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.browser import BrowserAutomationCollector
+from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.excel import ExcelSeriesCollector
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
 from agx_research.collectors.filesystem import FilesystemCollector
@@ -32,6 +33,7 @@ __all__ = [
     "AlphaVantageCollector",
     "ArchiveReplayCollector",
     "BrowserAutomationCollector",
+    "CapmasIndicatorCollector",
     "CollectionBatch",
     "CollectionRunResult",
     "CollectionService",

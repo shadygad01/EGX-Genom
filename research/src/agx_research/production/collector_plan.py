@@ -37,6 +37,7 @@ from enum import Enum
 
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import Collector
+from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
@@ -96,6 +97,14 @@ LIVE_UN_SDG_SERIES = {
     "10.4.1": {"SL_EMP_GTOTL": "un_labour_income_share_pct_gdp"},
     "7.3.1": {"EG_EGY_PRIM": "un_energy_intensity"},
 }
+LIVE_CAPMAS_INDICATORS = {
+    2156: {"Urban Egypt": "egypt_urban_cpi_index"},
+    2264: {
+        "Urban Egypt": "egypt_urban_cpi_yoy",
+        "Total Egypt": "egypt_total_cpi_yoy",
+    },
+    2268: {"Urban Egypt": "egypt_urban_cpi_mom"},
+}
 LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICATORS.values())
 LIVE_MACRO_SERIES_IDS += [
     local_id for mappings in LIVE_UN_SDG_SERIES.values() for local_id in mappings.values()
@@ -110,6 +119,7 @@ EXPECTED_RECORDS_LIVE = {
     "fred": 100,
     "worldbank": 10,
     "undata": 10,
+    "capmas": 10,
     "gdelt": 10,
     "enterprise_press": 5,
     "fra_egypt": 5,
@@ -317,6 +327,10 @@ def build_live_collector(
         return WorldBankCollector(spec, indicators=dict(LIVE_WORLDBANK_INDICATORS), fetcher=fetcher)
     if source_id == "undata":
         return UnSdgCollector(spec, series=dict(LIVE_UN_SDG_SERIES), fetcher=fetcher)
+    if source_id == "capmas":
+        return CapmasIndicatorCollector(
+            spec, indicators=dict(LIVE_CAPMAS_INDICATORS), fetcher=fetcher
+        )
     if source_id == "gdelt":
         return GdeltDocCollector(
             spec,

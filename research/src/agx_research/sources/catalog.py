@@ -208,13 +208,25 @@ def seed_sources() -> list[SourceSpec]:
             id="capmas",
             name="CAPMAS",
             category=SourceCategory.OFFICIAL,
-            access_method=AccessMethod.PDF_DOWNLOAD,
-            status=SourceStatus.PLANNED,
+            access_method=AccessMethod.JSON_API,
+            status=SourceStatus.IMPLEMENTED,
+            base_url="https://www.capmas.gov.eg:8080/api",
+            collector="CapmasIndicatorCollector",
+            collector_version="1.0.0",
+            license=(
+                "Research/general use with CAPMAS attribution; no resale or direct commercial "
+                "exploitation of extracted data."
+            ),
+            terms_of_use_url="https://www.capmas.gov.eg:8080/api/UsageRightAndTerm",
             reliability_score=0.9,
-            freshness_score=0.4,
+            freshness_score=0.8,
             conflict_priority=90,
             supported_event_types=["macroeconomic"],
             supported_languages=["ar"],
+            notes=(
+                "Official unauthenticated JSON API used by the CAPMAS public web application; "
+                "CPI aggregate filters verified live. Raw extracted data must not be sold."
+            ),
         ),
         _spec(
             id="egypt_open_data",

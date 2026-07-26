@@ -325,7 +325,7 @@ class CollectionService:
             # Idempotent: a document already archived (e.g. replayed via
             # ArchiveReplayCollector) is not re-appended as a duplicate version.
             if self.raw_documents.latest(document.id) is None:
-                self.raw_documents.add(document)
+                self.raw_documents.add(document, persist=False)
 
             parser_raised = False
             try:
@@ -356,7 +356,9 @@ class CollectionService:
                 performed_at=datetime.now(),
                 detail=f"confidence={assessment.confidence_score:.3f}: {assessment.notes}",
             )
-            self.raw_documents.record_step(document.id, kind="validation", step=step)
+            self.raw_documents.record_step(
+                document.id, kind="validation", step=step, persist=False
+            )
 
             produced = (
                 len(batch.price_bars) + len(batch.macro_observations) + len(batch.news_items)
@@ -457,7 +459,12 @@ class CollectionService:
                 latency_seconds=latency_seconds,
             )
 
-        # One persisted snapshot per source run, not once per document.
+        # One persisted snapshot per source run, not once per document. A
+        # full-Universe price source can return hundreds of large raw pages;
+        # rewriting the growing JSON repository for every add/validation
+        # revision is quadratic and can dominate a production deployment.
+        self.raw_documents.flush()
+        # Provenance follows the same run-level transaction boundary.
         # FRED currently returns seven large series documents; flushing the
         # 35MB provenance index after each one multiplies deployment I/O with
         # no durability benefit because the source run is the transaction.

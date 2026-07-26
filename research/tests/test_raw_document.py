@@ -89,3 +89,22 @@ def test_record_step_unknown_document_raises():
     step = ProcessingStep(step="x", performed_by="tester", performed_at=datetime.now())
     with pytest.raises(KeyError):
         repo.record_step("rawdoc_missing", kind="validation", step=step)
+
+
+def test_repository_can_flush_a_source_run_once(tmp_path):
+    path = tmp_path / "raw_documents.json"
+    repo = RawDocumentRepository(path)
+    document = repo.add(make_document(), persist=False)
+    repo.record_step(
+        document.id,
+        kind="validation",
+        step=ProcessingStep(
+            step="quality_assessment", performed_by="tester", performed_at=datetime.now()
+        ),
+        persist=False,
+    )
+    assert not path.exists()
+
+    repo.flush()
+    reloaded = RawDocumentRepository(path)
+    assert reloaded.latest(document.id).version == 2

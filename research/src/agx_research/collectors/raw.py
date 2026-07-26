@@ -144,7 +144,7 @@ class RawDocumentRepository(JsonFileRepository[RawDocument]):
         super().__init__(RawDocument, persist_path)
 
     def record_step(
-        self, document_id: str, *, kind: str, step: ProcessingStep
+        self, document_id: str, *, kind: str, step: ProcessingStep, persist: bool = True
     ) -> RawDocument:
         current = self.latest(document_id)
         if current is None:
@@ -156,5 +156,6 @@ class RawDocumentRepository(JsonFileRepository[RawDocument]):
                     "version": current.version + 1,
                     field: [*getattr(current, field), step],
                 }
-            )
+            ),
+            persist=persist,
         )

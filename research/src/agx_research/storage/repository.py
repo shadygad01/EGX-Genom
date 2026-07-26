@@ -70,10 +70,15 @@ class JsonFileRepository(Repository[T]):
         if self.persist_path and self.persist_path.exists():
             self._load()
 
-    def add(self, entity: T) -> T:
+    def add(self, entity: T, *, persist: bool = True) -> T:
         self._revisions.setdefault(entity.id, []).append(entity)
-        self._save()
+        if persist:
+            self._save()
         return entity
+
+    def flush(self) -> None:
+        """Persist revisions accumulated with ``persist=False`` atomically."""
+        self._save()
 
     def latest(self, entity_id: str) -> T | None:
         revisions = self._revisions.get(entity_id)

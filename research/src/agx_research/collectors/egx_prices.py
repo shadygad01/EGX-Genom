@@ -12,6 +12,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime, time
 from urllib.parse import parse_qs, urlencode, urlsplit
 from zoneinfo import ZoneInfo
@@ -87,41 +88,50 @@ class EgxCompositePriceCollector(Collector):
         except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError):
             return None
 
-    def fetch(self) -> list[RawDocument]:
+    def _fetch_symbol(self, ticker: str, now: datetime) -> list[RawDocument]:
         documents: list[RawDocument] = []
+        yahoo_latest = None
+        yahoo = self._try_fetch(ticker, "yahoo", (self.yahoo_url(ticker),))
+        if yahoo:
+            url, payload = yahoo
+            yahoo_latest = self._latest_yahoo_date(payload)
+            documents.append(self._document("yahoo", ticker, url, payload))
+
+        stock = self._try_fetch(ticker, "stockanalysis", self.stockanalysis_urls(ticker))
+        if stock:
+            url, payload = stock
+            documents.append(self._document("stockanalysis", ticker, url, payload))
+
+        # Mubasher exposes an intraday snapshot, not a dated historical API.
+        # Only infer today's trading date after the Sun-Thu session closes,
+        # and only when Yahoo is missing/stale and StockAnalysis is absent.
+        stale_yahoo = yahoo_latest is None or (now.date() - yahoo_latest).days > 3
+        market_closed = now.weekday() in {6, 0, 1, 2, 3} and now.time() >= _MARKET_CLOSE
+        if stock is None and stale_yahoo and market_closed:
+            mubasher = self._try_fetch(ticker, "mubasher", (self.mubasher_url(ticker),))
+            if mubasher:
+                url, payload = mubasher
+                documents.append(
+                    self._document(
+                        "mubasher", ticker, url, payload,
+                        trade_date=now.date().isoformat(), market_complete="true",
+                    )
+                )
+        return documents
+
+    def fetch(self) -> list[RawDocument]:
         now = self._now()
         if now.tzinfo is None:
             now = now.replace(tzinfo=_CAIRO)
         now = now.astimezone(_CAIRO)
 
-        for ticker in self.symbols:
-            yahoo_latest = None
-            yahoo = self._try_fetch(ticker, "yahoo", (self.yahoo_url(ticker),))
-            if yahoo:
-                url, payload = yahoo
-                yahoo_latest = self._latest_yahoo_date(payload)
-                documents.append(self._document("yahoo", ticker, url, payload))
-
-            stock = self._try_fetch(ticker, "stockanalysis", self.stockanalysis_urls(ticker))
-            if stock:
-                url, payload = stock
-                documents.append(self._document("stockanalysis", ticker, url, payload))
-
-            # Mubasher exposes an intraday snapshot, not a dated historical API.
-            # Only infer today's trading date after the Sun-Thu session closes,
-            # and only when Yahoo is missing/stale and StockAnalysis is absent.
-            stale_yahoo = yahoo_latest is None or (now.date() - yahoo_latest).days > 3
-            market_closed = now.weekday() in {6, 0, 1, 2, 3} and now.time() >= _MARKET_CLOSE
-            if stock is None and stale_yahoo and market_closed:
-                mubasher = self._try_fetch(ticker, "mubasher", (self.mubasher_url(ticker),))
-                if mubasher:
-                    url, payload = mubasher
-                    documents.append(
-                        self._document(
-                            "mubasher", ticker, url, payload,
-                            trade_date=now.date().isoformat(), market_complete="true",
-                        )
-                    )
+        # Network latency dominates a 101-symbol run. Fetch a small bounded
+        # number of symbols concurrently, then consume futures in Universe
+        # order so each ticker's provider overwrite order and the archive are
+        # deterministic.
+        with ThreadPoolExecutor(max_workers=min(6, max(1, len(self.symbols)))) as executor:
+            futures = [executor.submit(self._fetch_symbol, ticker, now) for ticker in self.symbols]
+            documents = [document for future in futures for document in future.result()]
         if not documents:
             raise RuntimeError(
                 "Every Yahoo, StockAnalysis and eligible Mubasher request failed; "

@@ -36,6 +36,93 @@ class DecisionReadiness(BaseModel):
     next_actions: list[str] = Field(default_factory=list)
 
 
+_GAP_LAYER_THRESHOLDS: dict[str, int] = {
+    "financials": 2,
+    "disclosures": 1,
+    "news": 1,
+    "macro": 3,
+    "knowledge": 1,
+}
+
+
+class DataLayerGap(BaseModel):
+    layer: str
+    count: int
+    threshold: int
+    complete: bool
+    completeness_pct: float
+
+
+class TickerDataGapReport(BaseModel):
+    ticker: str
+    as_of: date
+    status: ReadinessStatus
+    decision: str
+    ready_horizons: list[Horizon] = Field(default_factory=list)
+    swing_ready: bool
+    investment_ready: bool
+    price_observations: int
+    latest_price_date: date | None
+    layers: list[DataLayerGap]
+    overall_completeness_pct: float
+    blockers: list[str] = Field(default_factory=list)
+    next_actions: list[str] = Field(default_factory=list)
+
+
+def build_ticker_data_gap_report(
+    readiness_rows: list[DecisionReadiness],
+) -> list[TickerDataGapReport]:
+    """Decompose each `DecisionReadiness` row into the five named data
+    layers (Financials/Disclosures/News/Macro/Knowledge) with an explicit
+    completeness percentage per layer, so it's visible at a glance exactly
+    which layer blocks a given ticker's Swing/Investment readiness.
+
+    This is a pure re-derivation of `assess_decision_readiness`'s own
+    counts and thresholds -- it introduces no second set of gates that
+    could ever disagree with the readiness this report is describing.
+    """
+    reports: list[TickerDataGapReport] = []
+    for row in readiness_rows:
+        layer_counts = {
+            "financials": row.financial_periods,
+            "disclosures": row.corporate_events,
+            "news": row.news_items,
+            "macro": row.macro_series,
+            "knowledge": row.active_knowledge,
+        }
+        layers = [
+            DataLayerGap(
+                layer=layer,
+                count=count,
+                threshold=_GAP_LAYER_THRESHOLDS[layer],
+                complete=count >= _GAP_LAYER_THRESHOLDS[layer],
+                completeness_pct=round(
+                    min(count / _GAP_LAYER_THRESHOLDS[layer], 1.0) * 100, 1
+                ),
+            )
+            for layer, count in layer_counts.items()
+        ]
+        overall_pct = round(sum(layer.completeness_pct for layer in layers) / len(layers), 1)
+        reports.append(
+            TickerDataGapReport(
+                ticker=row.ticker,
+                as_of=row.as_of,
+                status=row.status,
+                decision=row.decision,
+                ready_horizons=row.ready_horizons,
+                swing_ready=Horizon.SWING in row.ready_horizons,
+                investment_ready=Horizon.INVESTMENT in row.ready_horizons,
+                price_observations=row.price_observations,
+                latest_price_date=row.latest_price_date,
+                layers=layers,
+                overall_completeness_pct=overall_pct,
+                blockers=row.blockers,
+                next_actions=row.next_actions,
+            )
+        )
+    return reports
+
+
 def assess_decision_readiness(
     market_state: MarketState,
     financials: FinancialStatementProvider,

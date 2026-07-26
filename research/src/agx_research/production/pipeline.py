@@ -814,21 +814,27 @@ class ProductionPipeline:
         )
         counts["financial_statements.json"] = len(financial_statements)
 
-        decision_readiness = []
+        decision_readiness_rows = []
         if as_of is not None:
             state = self.market_memory.reconstruct(as_of)
-            decision_readiness = [
-                row.model_dump(mode="json")
-                for row in assess_decision_readiness(
-                    state,
-                    CollectedFinancialStatementProvider(self.data_dir),
-                    self.knowledge_store.all_latest(),
-                )
-            ]
+            decision_readiness_rows = assess_decision_readiness(
+                state,
+                CollectedFinancialStatementProvider(self.data_dir),
+                self.knowledge_store.all_latest(),
+            )
+        decision_readiness = [row.model_dump(mode="json") for row in decision_readiness_rows]
         (dashboard_out / "decision_readiness.json").write_text(
             json.dumps(decision_readiness, indent=2, sort_keys=True) + "\n"
         )
         counts["decision_readiness.json"] = len(decision_readiness)
+
+        ticker_data_gap_report = production_artifacts.export_ticker_data_gap_report(
+            decision_readiness_rows
+        )
+        (dashboard_out / "ticker_data_gap_report.json").write_text(
+            json.dumps(ticker_data_gap_report, indent=2, sort_keys=True) + "\n"
+        )
+        counts["ticker_data_gap_report.json"] = len(ticker_data_gap_report)
 
         acquisition_decisions = production_artifacts.export_acquisition_decisions(
             self.capability_decisions

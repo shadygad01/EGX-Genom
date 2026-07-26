@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.17.0 — Ticker Data Gap Report
+
+- `meta.readiness.build_ticker_data_gap_report` decomposes
+  `assess_decision_readiness`'s per-ticker counts into five named data
+  layers (Financials/Disclosures/News/Macro/Knowledge), each with an
+  explicit completeness percentage — a pure re-derivation of the existing
+  readiness gates, never a second set of thresholds.
+- New `ticker_data_gap_report.json` dashboard artifact
+  (`production.artifacts.export_ticker_data_gap_report`), wired into
+  `ProductionPipeline._stage_dashboard_artifact_generator` and validated
+  in `dashboard/validate.py` for schema + universe-membership parity.
+- Verified with a real mock-mode run against the full 101-ticker
+  EGX30+EGX70 universe: 99 tickers `blocked`, 2 `degraded`, 0 Swing-ready,
+  0 Investment-ready — the honest starting point, published as a
+  filterable/sortable Artifact.
+- 5 new tests (`test_ticker_data_gap_report.py`); 560 backend tests pass.
+- New debt: TD-34 (no web/API wiring for the new artifact yet).
+
 ## 0.16.0 — Frontend: the remaining 8 sections (Opportunity Center through System Administration)
 Completes the Production User Experience mission's 9-section rollout
 (0.15.0 delivered the shell and AI Briefing). Every section composes only

@@ -211,6 +211,26 @@
       "title": "Id",
       "type": "string"
     },
+    "integrated_capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Integrated Capabilities",
+      "type": "array"
+    },
+    "integrated_via": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source is an operational provider leg inside this parent collector.",
+      "title": "Integrated Via"
+    },
     "license": {
       "default": "unknown",
       "title": "License",

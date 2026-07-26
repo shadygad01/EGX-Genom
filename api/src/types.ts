@@ -633,6 +633,8 @@ export interface SourceSpec {
   schema_version: string;
   collector: string | null;
   collector_version: string | null;
+  integrated_via: string | null;
+  integrated_capabilities: string[];
   retry_policy: RetryPolicy;
   rate_limit: RateLimit;
   license: string;

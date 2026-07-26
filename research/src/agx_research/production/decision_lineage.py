@@ -13,6 +13,16 @@ from typing import Any
 from agx_research.sources.registry import SourceRegistry
 
 DECISION_ROUTES: dict[str, dict[str, Any]] = {
+    "egx_universe_seed": {
+        "records": ["index_constituents"],
+        "consumers": [
+            "universe_provider",
+            "market_memory",
+            "research_pipeline",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
     "egx_price_composite": {
         "records": ["price_bars", "corporate_events"],
         "providers": ["yahoo_finance", "stockanalysis", "mubasher"],

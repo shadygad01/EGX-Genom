@@ -165,6 +165,16 @@ class EgxCompositePriceCollector(Collector):
         values = parse_qs(urlsplit(url).fragment)
         return {key: items[-1] for key, items in values.items() if items}
 
+    @classmethod
+    def provider_for_document(cls, document: RawDocument) -> str | None:
+        """Return the registry id of the provider leg that produced a raw document."""
+        provider = cls._metadata(document.original_url).get("provider")
+        return {
+            "yahoo": "yahoo_finance",
+            "stockanalysis": "stockanalysis",
+            "mubasher": "mubasher",
+        }.get(provider)
+
     @staticmethod
     def _parse_yahoo(document: RawDocument, ticker: str, batch: CollectionBatch) -> None:
         try:

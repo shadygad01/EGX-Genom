@@ -159,6 +159,8 @@ def unavailable_sources(registry: SourceRegistry, wired_ids: set[str]) -> dict[s
     for spec in registry.all_latest():
         if spec.id in wired_ids:
             continue
+        if spec.integrated_via and spec.integrated_via in wired_ids:
+            continue
         reasons[spec.id] = _UNAVAILABLE_REASON_BY_STATUS.get(
             spec.status,
             "IMPLEMENTED collector exists, but this pipeline has no verified "

@@ -113,7 +113,7 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     ],
     Capability.MARKET_BREADTH: [],
     Capability.TRADING_CALENDAR: ["egx_official"],
-    Capability.INDEX_CONSTITUENTS: ["egx_official"],
+    Capability.INDEX_CONSTITUENTS: ["egx_universe_seed", "egx_official"],
     Capability.SECTOR_MEMBERSHIP: ["egx_official"],
     Capability.ECONOMIC_RELEASES: ["trading_economics", "cbe", "capmas", "mof_egypt"],
     Capability.RESEARCH_PAPERS: ["arxiv", "ssrn", "nber"],

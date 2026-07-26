@@ -3,6 +3,8 @@
 from datetime import date
 from pathlib import Path
 
+import pytest
+
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.sources.catalog import seed_sources
 
@@ -29,6 +31,36 @@ def test_fetch_one_document_per_series():
     documents = collector.fetch()
     assert len(documents) == 2
     assert all("id=" in url for url in fetcher.calls)
+
+
+def test_fetch_isolates_one_failed_series_and_keeps_successful_series():
+    class PartialFetcher:
+        def fetch_text(self, url, spec):
+            if "id=FAIL" in url:
+                raise TimeoutError("simulated timeout")
+            return "observation_date,OK\n2026-07-25,4.42\n"
+
+    collector = FredCsvCollector(
+        fred_spec(), series_ids=["FAIL", "OK"], fetcher=PartialFetcher()
+    )
+
+    documents = collector.fetch()
+
+    assert len(documents) == 1
+    assert collector.fetch_warnings == ["FAIL: TimeoutError: simulated timeout"]
+
+
+def test_fetch_raises_only_when_every_series_fails():
+    class FailedFetcher:
+        def fetch_text(self, url, spec):
+            raise TimeoutError("simulated timeout")
+
+    collector = FredCsvCollector(
+        fred_spec(), series_ids=["FAIL_A", "FAIL_B"], fetcher=FailedFetcher()
+    )
+
+    with pytest.raises(RuntimeError, match="Every configured FRED series failed"):
+        collector.fetch()
 
 
 def test_parse_drops_missing_observations_with_warning_never_imputed():

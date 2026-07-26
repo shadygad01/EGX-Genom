@@ -23,12 +23,18 @@ class FredCsvCollector(Collector):
     def __init__(self, spec, series_ids: list[str], fetcher=None):
         super().__init__(spec, fetcher)
         self.series_ids = series_ids
+        self.fetch_warnings: list[str] = []
 
     def fetch(self) -> list[RawDocument]:
         documents = []
+        self.fetch_warnings = []
         for series_id in sorted(self.series_ids):
             url = f"{self.spec.base_url}?id={series_id}"
-            text = self.fetcher.fetch_text(url, self.spec)
+            try:
+                text = self.fetcher.fetch_text(url, self.spec)
+            except Exception as exc:  # noqa: BLE001 - fetchers share no exception base
+                self.fetch_warnings.append(f"{series_id}: {type(exc).__name__}: {exc}")
+                continue
             documents.append(
                 build_raw_document(
                     source_id=self.spec.id,
@@ -39,6 +45,10 @@ class FredCsvCollector(Collector):
                     schema_version=self.spec.schema_version,
                     license=self.spec.license,
                 )
+            )
+        if not documents:
+            raise RuntimeError(
+                "Every configured FRED series failed: " + "; ".join(self.fetch_warnings)
             )
         return documents
 

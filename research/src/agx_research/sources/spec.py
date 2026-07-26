@@ -144,6 +144,11 @@ class SourceSpec(BaseModel):
     schema_version: str = "1.0"
     collector: str | None = None  # collector class name serving this spec
     collector_version: str | None = None
+    integrated_via: str | None = Field(
+        default=None,
+        description="Source is an operational provider leg inside this parent collector.",
+    )
+    integrated_capabilities: list[str] = Field(default_factory=list)
     retry_policy: RetryPolicy = Field(default_factory=RetryPolicy)
     rate_limit: RateLimit = Field(default_factory=RateLimit)
     license: str = "unknown"

@@ -33,6 +33,7 @@ from agx_research.production.artifacts import (
     export_papers,
     export_source_metrics,
 )
+from agx_research.sources.catalog import seed_registry
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
 from agx_research.sources.spec import AccessMethod, SourceCategory, SourceSpec, SourceStatus
@@ -125,6 +126,49 @@ def test_nonzero_yield_is_reported_collected():
     assert row["parse_success"] is True
     assert row["yield"] == 66
     assert row["reason"] is None
+
+
+def test_composite_provider_legs_are_reported_as_collected_sources():
+    registry = seed_registry(SourceRegistry())
+    result = make_result(
+        source_id="egx_price_composite",
+        price_bars_written=30,
+        news_items_written=0,
+        corporate_events_written=0,
+        index_constituents_written=0,
+        financial_statement_line_items_written=0,
+        provider_documents={"yahoo_finance": 2, "stockanalysis": 3},
+        provider_yields={"yahoo_finance": 20, "stockanalysis": 10},
+    )
+
+    rows = export_collector_status(registry, {"egx_price_composite": result})
+    by_id = {row["source_id"]: row for row in rows}
+
+    assert by_id["yahoo_finance"]["status"] == "COLLECTED"
+    assert by_id["yahoo_finance"]["yield"] == 20
+    assert by_id["stockanalysis"]["documents_fetched"] == 3
+    assert by_id["stockanalysis"]["integration_via"] == "egx_price_composite"
+    assert by_id["mubasher"]["status"] == "STANDBY"
+    assert "fallback" in by_id["mubasher"]["reason"]
+
+
+def test_partial_fetch_with_usable_output_is_degraded_not_failed():
+    registry = SourceRegistry()
+    result = make_result(
+        source_id="fred",
+        macro_observations_written=2,
+        news_items_written=0,
+        corporate_events_written=0,
+        index_constituents_written=0,
+        financial_statement_line_items_written=0,
+        fetch_warnings=["SERIES_X: TimeoutError: timeout"],
+    )
+
+    [row] = export_collector_status(registry, {"fred": result})
+
+    assert row["status"] == "DEGRADED"
+    assert row["yield"] == 2
+    assert "SERIES_X" in row["reason"]
 
 
 def test_fetch_failure_reported_as_failed_row_with_exact_reason():

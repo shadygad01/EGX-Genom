@@ -451,6 +451,12 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
     # PLANNED sources (never guessed a URL) are visible too, with why.
     assert by_id["egx_official"]["status"] == "UNAVAILABLE"
     assert "not yet verified" in by_id["egx_official"]["reason"]
+    assert by_id["egx_universe_seed"]["status"] == "COLLECTED"
+    assert by_id["egx_universe_seed"]["index_constituents_written"] == len(TICKERS)
+
+    decisions = {decision.capability: decision for decision in pipeline.capability_decisions}
+    assert decisions["index_constituents"].succeeded is True
+    assert decisions["index_constituents"].selected_source_ids == ["egx_universe_seed"]
 
 
 def test_live_mode_fails_loudly_when_every_collector_fails(tmp_path, monkeypatch):

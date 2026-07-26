@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import csv
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
@@ -56,6 +56,9 @@ class CollectionRunResult:
     financial_statement_line_items_written: int
     events_registered: int
     assessments: list[QualityAssessment]
+    provider_documents: dict[str, int] = field(default_factory=dict)
+    provider_yields: dict[str, int] = field(default_factory=dict)
+    fetch_warnings: list[str] = field(default_factory=list)
 
 
 def collection_yield(result: CollectionRunResult) -> int:
@@ -319,7 +322,19 @@ class CollectionService:
             financial_statement_line_items_written=0,
             events_registered=0,
             assessments=[],
+            provider_documents={},
+            provider_yields={},
+            fetch_warnings=list(getattr(collector, "fetch_warnings", [])),
         )
+
+        provider_for_document = getattr(collector, "provider_for_document", None)
+        if callable(provider_for_document):
+            for document in documents:
+                provider = provider_for_document(document)
+                if provider:
+                    result.provider_documents[provider] = (
+                        result.provider_documents.get(provider, 0) + 1
+                    )
 
         for document in documents:
             # Idempotent: a document already archived (e.g. replayed via
@@ -371,6 +386,12 @@ class CollectionService:
             new_candidates = 0
             if materialized:
                 result.batches_materialized += 1
+                if callable(provider_for_document):
+                    provider = provider_for_document(document)
+                    if provider:
+                        result.provider_yields[provider] = (
+                            result.provider_yields.get(provider, 0) + produced
+                        )
                 by_ticker: dict[str, list] = {}
                 for bar in batch.price_bars:
                     by_ticker.setdefault(bar.ticker, []).append(bar)

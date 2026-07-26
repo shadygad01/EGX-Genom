@@ -99,6 +99,8 @@ def _collector_status_row(
         "health_status": spec.health_status.value if spec else None,
         "reputation_score": spec.reputation_score if spec else None,
         "data_quality_score": spec.data_quality_score if spec else None,
+        "integration_via": spec.integrated_via if spec else None,
+        "integrated_capabilities": spec.integrated_capabilities if spec else [],
     }
 
 
@@ -137,7 +139,11 @@ def export_collector_status(
     for source_id, result in results.items():
         yield_count = collection_yield(result)
         if yield_count > 0:
-            status, reason = "COLLECTED", None
+            if result.fetch_warnings:
+                status = "DEGRADED"
+                reason = "Partial fetch: " + "; ".join(result.fetch_warnings)
+            else:
+                status, reason = "COLLECTED", None
         else:
             status = "DEGRADED"
             reason = (
@@ -146,6 +152,47 @@ def export_collector_status(
                 "document/parse warnings for the exact cause)."
             )
         rows.append(_collector_status_row(source_id, registry, status=status, reason=reason, result=result))
+
+        # Provider legs inside a composite are first-class operational sources.
+        # They get their own rows without pretending that a standalone collector ran.
+        for provider_id, documents in sorted(result.provider_documents.items()):
+            provider_spec = registry.latest(provider_id)
+            if provider_spec is None or provider_spec.integrated_via != source_id:
+                continue
+            provider_yield = result.provider_yields.get(provider_id, 0)
+            row = _collector_status_row(
+                provider_id,
+                registry,
+                status="COLLECTED" if provider_yield > 0 else "DEGRADED",
+                reason=f"Integrated via {source_id} for {', '.join(provider_spec.integrated_capabilities)}.",
+            )
+            row.update({
+                "connection_success": documents > 0,
+                "parse_success": provider_yield > 0,
+                "yield": provider_yield,
+                "documents_fetched": documents,
+                "health_status": (
+                    registry.latest(source_id).health_status.value
+                    if registry.latest(source_id) else None
+                ),
+            })
+            rows.append(row)
+    emitted_ids = {row["source_id"] for row in rows}
+    for spec in registry.all_latest():
+        if (
+            spec.integrated_via
+            and spec.integrated_via in results
+            and spec.id not in emitted_ids
+        ):
+            rows.append(_collector_status_row(
+                spec.id,
+                registry,
+                status="STANDBY",
+                reason=(
+                    f"Wired as a fallback via {spec.integrated_via}; the primary provider "
+                    "covered this run, so no request was needed."
+                ),
+            ))
     for source_id, reason in (failures or {}).items():
         rows.append(_collector_status_row(source_id, registry, status="FAILED", reason=reason))
     for source_id, reason in (unavailable or {}).items():

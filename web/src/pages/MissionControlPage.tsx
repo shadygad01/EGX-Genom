@@ -32,6 +32,7 @@ const HEALTH_VARIANT: Record<HealthStatus, BadgeVariant> = {
 const STATUS_VARIANT: Record<CollectorStatusRow["status"], BadgeVariant> = {
   COLLECTED: "positive",
   DEGRADED: "warning",
+  STANDBY: "accent",
   FAILED: "negative",
   UNAVAILABLE: "neutral",
 };
@@ -69,6 +70,11 @@ export function MissionControlPage() {
   const sourceHealthCounts: Record<HealthStatus, number> = { healthy: 0, degraded: 0, down: 0, unknown: 0 };
   for (const s of sourceRegistry.data ?? []) sourceHealthCounts[s.health_status] += 1;
   const implementedCount = (sourceRegistry.data ?? []).filter((s) => s.status === "implemented").length;
+  const collectedCount = (collectorStatus.data ?? []).filter((s) => s.status === "COLLECTED").length;
+  const degradedCount = (collectorStatus.data ?? []).filter((s) => s.status === "DEGRADED").length;
+  const standbyCount = (collectorStatus.data ?? []).filter((s) => s.status === "STANDBY").length;
+  const failedCount = (collectorStatus.data ?? []).filter((s) => s.status === "FAILED").length;
+  const unavailableCount = (collectorStatus.data ?? []).filter((s) => s.status === "UNAVAILABLE").length;
 
   const runHistory = [...(runtimeMetrics.data ?? [])].sort((a, b) => (a.run_date < b.run_date ? 1 : -1));
 
@@ -145,6 +151,14 @@ export function MissionControlPage() {
       </div>
 
       <Section title="Collectors" description="Output of each source's most recent collection run.">
+        <div className={styles.grid}>
+          <StatTile label="Catalogued" value={(sourceRegistry.data ?? []).length} />
+          <StatTile label="Collected" value={collectedCount} />
+          <StatTile label="Degraded" value={degradedCount} />
+          <StatTile label="Wired Standby" value={standbyCount} />
+          <StatTile label="Failed" value={failedCount} />
+          <StatTile label="Not Yet Wired" value={unavailableCount} />
+        </div>
         {collectorStatus.loading && <LoadingState rows={3} />}
         {collectorStatus.error && <ErrorState detail={collectorStatus.error.message} onRetry={collectorStatus.reload} />}
         {!collectorStatus.loading && !collectorStatus.error && (

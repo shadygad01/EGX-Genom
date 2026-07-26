@@ -350,7 +350,7 @@ export interface InvestmentCases {
 
 export interface CollectorStatusRow {
   source_id: string;
-  status: "COLLECTED" | "DEGRADED" | "FAILED" | "UNAVAILABLE";
+  status: "COLLECTED" | "DEGRADED" | "STANDBY" | "FAILED" | "UNAVAILABLE";
   reason: string | null;
   connection_success: boolean;
   parse_success: boolean;
@@ -370,6 +370,8 @@ export interface CollectorStatusRow {
   health_status: HealthStatus | null;
   reputation_score: number | null;
   data_quality_score: number | null;
+  integration_via: string | null;
+  integrated_capabilities: string[];
 }
 
 // --- acquisition_decisions.json ---
@@ -654,6 +656,8 @@ export interface SourceSpec {
   schema_version: string;
   collector: string | null;
   collector_version: string | null;
+  integrated_via: string | null;
+  integrated_capabilities: string[];
   retry_policy: RetryPolicy;
   rate_limit: RateLimit;
   license: string;

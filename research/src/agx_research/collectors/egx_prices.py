@@ -25,8 +25,8 @@ _CAIRO = ZoneInfo("Africa/Cairo")
 _MARKET_CLOSE = time(14, 30)
 _NUMBER = r"-?(?:\d+(?:\.\d*)?|\.\d+)"
 _SA_ROW = re.compile(
-    rf'\{{a:(?P<adjusted>{_NUMBER}),c:(?P<close>{_NUMBER}),'
-    rf'h:(?P<high>{_NUMBER}),l:(?P<low>{_NUMBER}),o:(?P<open>{_NUMBER}),'
+    rf"\{{a:(?P<adjusted>{_NUMBER}),c:(?P<close>{_NUMBER}),"
+    rf"h:(?P<high>{_NUMBER}),l:(?P<low>{_NUMBER}),o:(?P<open>{_NUMBER}),"
     rf't:"(?P<date>\d{{4}}-\d{{2}}-\d{{2}})",v:(?P<volume>{_NUMBER})'
 )
 
@@ -57,7 +57,9 @@ class EgxCompositePriceCollector(Collector):
     def mubasher_url(ticker: str) -> str:
         return f"https://english.mubasher.info/markets/EGX/stocks/{ticker}/"
 
-    def _document(self, provider: str, ticker: str, url: str, payload: str, **metadata) -> RawDocument:
+    def _document(
+        self, provider: str, ticker: str, url: str, payload: str, **metadata
+    ) -> RawDocument:
         fragment = urlencode({"provider": provider, "ticker": ticker, **metadata})
         return build_raw_document(
             source_id=self.spec.id,
@@ -84,7 +86,22 @@ class EgxCompositePriceCollector(Collector):
         try:
             result = json.loads(payload)["chart"]["result"][0]
             timestamps = result.get("timestamp") or []
-            return datetime.fromtimestamp(max(timestamps), UTC).date() if timestamps else None
+            quote = result["indicators"]["quote"][0]
+            fields = ("open", "high", "low", "close", "volume")
+            arrays = {field: quote.get(field) or [] for field in fields}
+            complete_timestamps = [
+                timestamp
+                for index, timestamp in enumerate(timestamps)
+                if all(
+                    index < len(arrays[field]) and arrays[field][index] is not None
+                    for field in fields
+                )
+            ]
+            return (
+                datetime.fromtimestamp(max(complete_timestamps), UTC).date()
+                if complete_timestamps
+                else None
+            )
         except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError):
             return None
 
@@ -113,8 +130,12 @@ class EgxCompositePriceCollector(Collector):
                 url, payload = mubasher
                 documents.append(
                     self._document(
-                        "mubasher", ticker, url, payload,
-                        trade_date=now.date().isoformat(), market_complete="true",
+                        "mubasher",
+                        ticker,
+                        url,
+                        payload,
+                        trade_date=now.date().isoformat(),
+                        market_complete="true",
                     )
                 )
         return documents
@@ -165,8 +186,10 @@ class EgxCompositePriceCollector(Collector):
                     PriceBar(
                         ticker=ticker,
                         trade_date=datetime.fromtimestamp(timestamp, UTC).date(),
-                        open=float(values["open"]), high=float(values["high"]),
-                        low=float(values["low"]), close=float(values["close"]),
+                        open=float(values["open"]),
+                        high=float(values["high"]),
+                        low=float(values["low"]),
+                        close=float(values["close"]),
                         volume=int(values["volume"]),
                     )
                 )
@@ -187,7 +210,9 @@ class EgxCompositePriceCollector(Collector):
                 }
                 batch.corporate_events.append(
                     CorporateEvent(
-                        ticker=ticker, event_date=event_date, event_type=event_type,
+                        ticker=ticker,
+                        event_date=event_date,
+                        event_type=event_type,
                         description=f"Yahoo Finance reported {event_type.replace('_', ' ')}",
                         details=details,
                     )
@@ -199,9 +224,12 @@ class EgxCompositePriceCollector(Collector):
             try:
                 batch.price_bars.append(
                     PriceBar(
-                        ticker=ticker, trade_date=date.fromisoformat(match["date"]),
-                        open=float(match["open"]), high=float(match["high"]),
-                        low=float(match["low"]), close=float(match["close"]),
+                        ticker=ticker,
+                        trade_date=date.fromisoformat(match["date"]),
+                        open=float(match["open"]),
+                        high=float(match["high"]),
+                        low=float(match["low"]),
+                        close=float(match["close"]),
                         volume=int(float(match["volume"])),
                     )
                 )
@@ -227,21 +255,31 @@ class EgxCompositePriceCollector(Collector):
         cls, document: RawDocument, ticker: str, metadata: dict[str, str], batch: CollectionBatch
     ) -> None:
         close_match = re.search(
-            r'market-summary__last-price[^>]*>\s*([\d,.]+)', document.content_text,
+            r"market-summary__last-price[^>]*>\s*([\d,.]+)",
+            document.content_text,
             re.IGNORECASE,
         )
-        values = {key: cls._mubasher_value(document.content_text, label) for key, label in (
-            ("open", "Open"), ("high", "High"), ("low", "Low"), ("volume", "Volume"),
-        )}
+        values = {
+            key: cls._mubasher_value(document.content_text, label)
+            for key, label in (
+                ("open", "Open"),
+                ("high", "High"),
+                ("low", "Low"),
+                ("volume", "Volume"),
+            )
+        }
         if not close_match or any(value is None for value in values.values()):
             batch.parse_warnings.append("Mubasher market summary fields were incomplete.")
             return
         try:
             batch.price_bars.append(
                 PriceBar(
-                    ticker=ticker, trade_date=date.fromisoformat(metadata["trade_date"]),
-                    open=float(values["open"]), high=float(values["high"]),
-                    low=float(values["low"]), close=float(close_match.group(1).replace(",", "")),
+                    ticker=ticker,
+                    trade_date=date.fromisoformat(metadata["trade_date"]),
+                    open=float(values["open"]),
+                    high=float(values["high"]),
+                    low=float(values["low"]),
+                    close=float(close_match.group(1).replace(",", "")),
                     volume=int(float(values["volume"])),
                 )
             )

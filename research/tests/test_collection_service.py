@@ -165,6 +165,32 @@ def test_news_items_materialized_and_registered_as_events(tmp_path):
     assert len(event_platform.repository.all_latest()) == 1
 
 
+def test_arabic_news_is_persisted_as_utf8(tmp_path):
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    headline = "البورصة المصرية ترتفع في ختام التعاملات"
+    batch = good_batch(
+        price_bars=[],
+        news_items=[
+            NewsItem(
+                published_at=date(2026, 7, 26),
+                source="alborsa",
+                headline=headline,
+                tickers=["COMI"],
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/ar": batch})
+
+    result = service.run(collector, expected_records=1)
+
+    assert result.news_items_written == 1
+    assert headline in (tmp_path / "news.csv").read_text(encoding="utf-8")
+    [stored] = LocalCsvDataProvider(tmp_path).get_news(
+        "COMI", date(2026, 7, 26), date(2026, 7, 26)
+    )
+    assert stored.headline == headline
+
+
 def test_mixed_batches_some_withheld_some_materialized(tmp_path):
     service = CollectionService(tmp_path, min_confidence=0.6)
     collector = StubCollector(

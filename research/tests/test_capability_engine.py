@@ -232,3 +232,25 @@ def test_macroeconomic_capability_is_exhaustive_not_first_success_only():
     # disjoint data), so both must be selected, not just the top-ranked one.
     assert set(decision.selected_source_ids) == {"worldbank", "fred"}
     assert set(results) == {"worldbank", "fred"}
+
+
+def test_news_capability_collects_every_ready_outlet_for_corroboration():
+    registry = SourceRegistry()
+    registry.add(_spec("enterprise_press", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("alborsa", status=SourceStatus.IMPLEMENTED))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService(
+        {
+            "enterprise_press": _empty_result("enterprise_press", price_bars=2),
+            "alborsa": _empty_result("alborsa", price_bars=3),
+        }
+    )
+    engine = CapabilityDecisionEngine(registry, factory)
+
+    decision, results, _ = engine.decide_and_execute(Capability.NEWS, service)
+
+    assert set(decision.selected_source_ids) == {"enterprise_press", "alborsa"}
+    assert set(results) == {"enterprise_press", "alborsa"}

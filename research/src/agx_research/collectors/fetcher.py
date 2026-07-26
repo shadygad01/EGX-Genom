@@ -15,6 +15,8 @@ exercised live only in deployed environments with egress.
 
 from __future__ import annotations
 
+import ssl
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -70,6 +72,31 @@ class HttpFetcher:
         # each `Collector.fetch()` call to feed `reputation.py`'s `latency`
         # dimension (see TD-16).
         self.request_latencies: list[float] = []
+        self._windows_ssl_opener = None
+
+    def _open_with_windows_trust(self, request):
+        """Retry certificate failures against the Windows trust store.
+
+        The bundled Python runtime uses its own OpenSSL roots while Windows
+        browsers/PowerShell use the OS certificate store. Some Egyptian
+        government sites chain to a root trusted by Windows but absent from
+        that bundle. This imports only OS-trusted roots; verification stays
+        fully enabled and no certificate error is bypassed.
+        """
+        if sys.platform != "win32" or not hasattr(ssl, "enum_certificates"):
+            raise ssl.SSLCertVerificationError("Windows trust store is unavailable")
+        if self._windows_ssl_opener is None:
+            context = ssl.create_default_context()
+            for store_name in ("ROOT", "CA"):
+                for certificate, encoding, _trust in ssl.enum_certificates(store_name):
+                    if encoding == "x509_asn":
+                        context.load_verify_locations(
+                            cadata=ssl.DER_cert_to_PEM_cert(certificate)
+                        )
+            self._windows_ssl_opener = urllib.request.build_opener(
+                urllib.request.HTTPSHandler(context=context)
+            )
+        return self._windows_ssl_opener.open(request, timeout=self.timeout_seconds)
 
     def _get_robots_parser(self, base: str) -> urllib.robotparser.RobotFileParser:
         parser = self._robots_cache.get(base)
@@ -164,7 +191,21 @@ class HttpFetcher:
                     content = response.read()
                 self.request_latencies.append(time.monotonic() - request_started_at)
                 return content
-            except (urllib.error.URLError, OSError, TimeoutError) as exc:
+            except urllib.error.URLError as exc:
+                if "CERTIFICATE_VERIFY_FAILED" in str(exc):
+                    try:
+                        request_started_at = time.monotonic()
+                        with self._open_with_windows_trust(request) as response:
+                            content = response.read()
+                        self.request_latencies.append(time.monotonic() - request_started_at)
+                        return content
+                    except (urllib.error.URLError, OSError, TimeoutError) as fallback_exc:
+                        exc = fallback_exc
+                last_error = exc
+                if attempts < spec.retry_policy.max_attempts:
+                    time.sleep(delay)
+                    delay *= spec.retry_policy.backoff_multiplier
+            except (OSError, TimeoutError) as exc:
                 last_error = exc
                 if attempts < spec.retry_policy.max_attempts:
                     time.sleep(delay)

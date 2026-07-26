@@ -71,7 +71,6 @@ LIVE_FRED_SERIES_IDS = [
     "DCOILWTICO",  # second oil benchmark for dislocation checks
     "DTWEXBGS",  # broad USD pressure
     "VIXCLS",  # global risk aversion
-    "GOLDAMGBD228NLBM",  # gold safe-haven / local inflation proxy
     "DGS2",  # front of the US yield curve
     "DGS10",  # global discount-rate anchor
     "BAMLH0A0HYM2",  # high-yield credit stress
@@ -102,6 +101,8 @@ EXPECTED_RECORDS_LIVE = {
     "gdelt": 10,
     "enterprise_press": 5,
     "fra_egypt": 5,
+    "alborsa": 5,
+    "masrawy_economy": 5,
     "skynews_arabia_economy": 5,
 }
 
@@ -268,8 +269,8 @@ def _mock_url_map(spec_by_id: dict[str, SourceSpec]) -> dict[str, str]:
     content_by_url: dict[str, str] = {}
     if "stooq" in spec_by_id:
         base = spec_by_id["stooq"].base_url
-        for ticker in _STOOQ_PRICES:
-            content_by_url[f"{base}?s={ticker.lower()}.eg&i=d"] = _STOOQ_PRICES[ticker]
+        for ticker, content in _STOOQ_PRICES.items():
+            content_by_url[f"{base}?s={ticker.lower()}.eg&i=d"] = content
     if "fred" in spec_by_id:
         base = spec_by_id["fred"].base_url
         for series_id, content in _FRED_SERIES.items():
@@ -307,15 +308,20 @@ def build_live_collector(
             spec,
             query='(Egypt OR Egyptian OR "Egyptian Exchange" OR EGX)',
             ticker_hints=tickers,
+            max_records=50,
             fetcher=fetcher,
         )
-    if source_id in ("enterprise_press", "fra_egypt", "skynews_arabia_economy"):
-        # spec.base_url is a real feed URL verified live via RSS
-        # autodiscovery (see sources/catalog.py's entry for this id and
-        # docs/ACQUISITION_STRATEGY.md) -- not a guess. FRA is Egypt's
-        # official financial regulator, so its headline classifier stays on
-        # the same terms enterprise_press's does (see TD-29: informational
-        # corporate-action signal, never a numeric detail).
+    if (
+        spec.access_method.value == "rss_feed"
+        and spec.collector == "RssNewsCollector"
+        and spec.base_url
+    ):
+        # Every configured RSS source has an endpoint recorded only after a
+        # direct fetch and robots check.  Keeping this adapter generic means a
+        # newly-qualified outlet needs catalog evidence, not another hardcoded
+        # branch. Headline-classified corporate events remain informational
+        # only (details={}); they can affect event risk but never price or
+        # dividend adjustments.
         return RssNewsCollector(
             spec,
             feed_url=spec.base_url,

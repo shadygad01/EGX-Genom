@@ -383,6 +383,45 @@ def seed_sources() -> list[SourceSpec]:
             "Lower conflict priority than first-party and established direct publishers.",
         ),
         # ---- NEWS (English) -- each a config of rss_generic once feed URL verified ----
+        _spec(
+            id="alborsa",
+            name="Al Borsa News",
+            category=SourceCategory.ARABIC_NEWS,
+            access_method=AccessMethod.RSS_FEED,
+            status=SourceStatus.IMPLEMENTED,
+            base_url="https://www.alborsaanews.com/feed",
+            reliability_score=0.5,
+            freshness_score=0.9,
+            collector="RssNewsCollector",
+            collector_version="1.0.0",
+            conflict_priority=40,
+            supported_event_types=["news"],
+            supported_languages=["ar"],
+            notes="Verified live on 2026-07-26: the publisher homepage advertises this "
+            "RSS endpoint, a direct fetch returned application/rss+xml with real items, "
+            "and robots.txt explicitly leaves collection allowed.",
+        ),
+        _spec(
+            id="masrawy_economy",
+            name="Masrawy Economy",
+            category=SourceCategory.ARABIC_NEWS,
+            access_method=AccessMethod.RSS_FEED,
+            status=SourceStatus.IMPLEMENTED,
+            base_url=(
+                "https://www.masrawy.com/rss/feed/206/"
+                "%D8%A5%D9%82%D8%AA%D8%B5%D8%A7%D8%AF"
+            ),
+            reliability_score=0.5,
+            freshness_score=0.9,
+            collector="RssNewsCollector",
+            collector_version="1.0.0",
+            conflict_priority=40,
+            supported_event_types=["news"],
+            supported_languages=["ar"],
+            notes="Verified live on 2026-07-26: Masrawy's own RSS directory links this "
+            "economy feed, a direct fetch returned parseable XML with dated real items, "
+            "and its robots.txt does not disallow the endpoint.",
+        ),
         *[
             _spec(
                 id=source_id,
@@ -450,8 +489,6 @@ def seed_sources() -> list[SourceSpec]:
             )
             for source_id, name in [
                 ("almal", "Al Mal"),
-                ("alborsa", "Al Borsa News"),
-                ("masrawy_economy", "Masrawy Economy"),
                 ("youm7_economy", "Youm7 Economy"),
                 ("asharq_economy", "Asharq Economy"),
             ]

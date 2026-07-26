@@ -40,7 +40,7 @@ class MockDataProvider(DataProvider):
         if not path.exists():
             return []
         bars = []
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 trade_date = _parse_date(row["date"])
                 if start <= trade_date <= end:
@@ -64,7 +64,7 @@ class MockDataProvider(DataProvider):
         if not path.exists():
             return []
         events = []
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 if row["ticker"] != ticker:
                     continue
@@ -89,7 +89,7 @@ class MockDataProvider(DataProvider):
         if not path.exists():
             return []
         observations = []
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 observation_date = _parse_date(row["date"])
                 if start <= observation_date <= end:
@@ -107,7 +107,7 @@ class MockDataProvider(DataProvider):
         if not path.exists():
             return []
         items = []
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 published_at = _parse_date(row["date"])
                 if not (start <= published_at <= end):

@@ -10,6 +10,7 @@ import type {
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
+  DecisionReadiness,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -131,5 +132,9 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {
     return fetchList<AcquisitionDecision>("acquisition_decisions.json");
+  }
+
+  getDecisionReadiness(): Promise<DecisionReadiness[]> {
+    return fetchList<DecisionReadiness>("decision_readiness.json");
   }
 }

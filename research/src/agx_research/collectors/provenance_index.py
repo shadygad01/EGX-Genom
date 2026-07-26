@@ -62,25 +62,38 @@ class ProvenanceIndexRepository(JsonFileRepository[ProvenanceRecord]):
         content_hash: str,
         schema_version: str,
         materialized_at: datetime | None = None,
+        persist: bool = True,
     ) -> ProvenanceRecord:
         record_id = provenance_record_id(artifact_type, key, record_date)
         current = self.latest(record_id)
-        return self.add(
-            ProvenanceRecord(
-                id=record_id,
-                version=(current.version + 1) if current else 1,
-                artifact_type=artifact_type,
-                key=key,
-                record_date=record_date,
-                source_id=source_id,
-                collector=collector,
-                collector_version=collector_version,
-                raw_document_id=raw_document_id,
-                content_hash=content_hash,
-                schema_version=schema_version,
-                materialized_at=materialized_at or datetime.now(),
-            )
+        record = ProvenanceRecord(
+            id=record_id,
+            version=(current.version + 1) if current else 1,
+            artifact_type=artifact_type,
+            key=key,
+            record_date=record_date,
+            source_id=source_id,
+            collector=collector,
+            collector_version=collector_version,
+            raw_document_id=raw_document_id,
+            content_hash=content_hash,
+            schema_version=schema_version,
+            materialized_at=materialized_at or datetime.now(),
         )
+        if persist:
+            return self.add(record)
+        self._revisions.setdefault(record.id, []).append(record)
+        return record
+
+    def flush(self) -> None:
+        """Persist records accumulated with ``persist=False`` in one write.
+
+        Macro APIs can materialize hundreds of observations per document.
+        Rewriting the complete JSON index for every cell is quadratic and
+        eventually fails on Windows; CollectionService batches those writes
+        and flushes once after the materialized batch is complete.
+        """
+        self._save()
 
     def trace(self, artifact_type: str, key: str, record_date: date) -> ProvenanceRecord | None:
         return self.latest(provenance_record_id(artifact_type, key, record_date))

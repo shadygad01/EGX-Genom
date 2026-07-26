@@ -62,6 +62,24 @@ def test_parse_atom_entries():
     assert item.tickers == ["MFPC"]
 
 
+def test_parse_month_day_year_timestamp_used_by_arabic_feed():
+    feed = """<?xml version="1.0" encoding="utf-8"?>
+    <rss version="2.0"><channel><item>
+      <title>خبر اقتصادي مصري</title>
+      <link>https://example.test/economy/1</link>
+      <pubDate>7/26/2026 4:49:21 AM</pubDate>
+    </item></channel></rss>"""
+    collector = RssNewsCollector(
+        rss_spec(), feed_url="https://example.test/economy.xml", fetcher=FakeFetcher(feed)
+    )
+
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+
+    assert batch.parse_warnings == []
+    assert batch.news_items[0].published_at == date(2026, 7, 26)
+
+
 def test_no_ticker_hint_match_leaves_tickers_empty():
     fetcher = FakeFetcher((FIXTURES / "atom_synthetic.xml").read_text())
     collector = RssNewsCollector(

@@ -12,6 +12,7 @@ import type {
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
+  DecisionReadiness,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -60,4 +61,5 @@ export interface DashboardDataProvider {
   getFinancialStatements(): Promise<FinancialStatementLineItem[]>;
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
+  getDecisionReadiness(): Promise<DecisionReadiness[]>;
 }

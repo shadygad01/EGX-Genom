@@ -16,6 +16,9 @@ touching any of the call sites that already depend on this interface.
 from __future__ import annotations
 
 import json
+import os
+import tempfile
+import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Generic, Protocol, TypeVar, runtime_checkable
@@ -90,10 +93,43 @@ class JsonFileRepository(Repository[T]):
             entity_id: [json.loads(rev.model_dump_json()) for rev in revisions]
             for entity_id, revisions in self._revisions.items()
         }
-        self.persist_path.write_text(json.dumps(payload, indent=2))
+        # Write a sibling temp file and atomically replace the snapshot.
+        # Reopening a large, rapidly-growing JSON file in place repeatedly
+        # produced intermittent EINVAL failures on Windows during FRED's
+        # 50k+ provenance writes; a unique temp path also guarantees readers
+        # never observe a partially-truncated repository.
+        temp_path: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=self.persist_path.parent,
+                prefix=f".{self.persist_path.name}.",
+                suffix=".tmp",
+                delete=False,
+            ) as handle:
+                json.dump(payload, handle, indent=2)
+                temp_path = Path(handle.name)
+            delay = 0.05
+            for attempt in range(8):
+                try:
+                    os.replace(temp_path, self.persist_path)
+                    break
+                except PermissionError:
+                    if attempt == 7:
+                        raise
+                    # Windows indexing/antivirus can briefly retain a read
+                    # handle on a large JSON snapshot. Retrying replacement
+                    # preserves atomicity; deleting the destination first
+                    # would not.
+                    time.sleep(delay)
+                    delay *= 2
+        finally:
+            if temp_path is not None and temp_path.exists():
+                temp_path.unlink()
 
     def _load(self) -> None:
-        payload = json.loads(self.persist_path.read_text())
+        payload = json.loads(self.persist_path.read_text(encoding="utf-8"))
         self._revisions = {
             entity_id: [self._model_cls.model_validate(rev) for rev in revisions]
             for entity_id, revisions in payload.items()

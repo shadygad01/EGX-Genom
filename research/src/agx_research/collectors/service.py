@@ -78,7 +78,7 @@ def _write_price_bars(
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[str, dict] = {}
     if path.exists():
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 existing[row["date"]] = row
     for bar in bars:
@@ -92,7 +92,7 @@ def _write_price_bars(
         }
         if on_written:
             on_written(bar.trade_date)
-    with path.open("w", newline="") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["date", "open", "high", "low", "close", "volume"])
         writer.writeheader()
         for date_key in sorted(existing):
@@ -107,14 +107,14 @@ def _write_macro_observations(
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[str, str] = {}
     if path.exists():
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 existing[row["date"]] = row["value"]
     for obs in observations:
         existing[obs.observation_date.isoformat()] = str(obs.value)
         if on_written:
             on_written(obs.observation_date)
-    with path.open("w", newline="") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["date", "value"])
         for date_key in sorted(existing):
@@ -129,7 +129,7 @@ def _write_corporate_events(
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[tuple[str, str, str], dict] = {}
     if path.exists():
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 existing[(row["ticker"], row["date"], row["event_type"])] = row
     for event in events:
@@ -143,7 +143,7 @@ def _write_corporate_events(
         }
         if on_written:
             on_written(event.event_type, event.event_date)
-    with path.open("w", newline="") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f, fieldnames=["ticker", "date", "event_type", "description", "details_json"]
         )
@@ -160,7 +160,7 @@ def _write_financial_statement_line_items(
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[tuple[str, str, str], dict] = {}
     if path.exists():
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 existing[(row["period_end_date"], row["statement_type"], row["line_item"])] = row
     for item in items:
@@ -175,7 +175,7 @@ def _write_financial_statement_line_items(
         }
         if on_written:
             on_written(item.statement_type, item.line_item, item.period_end_date)
-    with path.open("w", newline="") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f,
             fieldnames=[
@@ -195,7 +195,7 @@ def _write_index_constituents(
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[tuple[str, str], dict] = {}
     if path.exists():
-        with path.open(newline="") as f:
+        with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 existing[(row["ticker"], row["as_of_date"])] = row
     for constituent in constituents:
@@ -207,7 +207,7 @@ def _write_index_constituents(
         }
         if on_written:
             on_written(constituent.ticker, constituent.as_of_date)
-    with path.open("w", newline="") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["ticker", "company_name", "as_of_date"])
         writer.writeheader()
         for key in sorted(existing):
@@ -219,7 +219,7 @@ def _append_news(data_dir: Path, items) -> int:
     path = data_dir / "news.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
     is_new = not path.exists()
-    with path.open("a", newline="") as f:
+    with path.open("a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         if is_new:
             writer.writerow(["date", "source", "headline", "tickers", "body"])
@@ -443,6 +443,7 @@ class CollectionService:
                                 ),
                             )
                         )
+                self.provenance_index.flush()
             else:
                 result.batches_withheld += 1
 
@@ -480,6 +481,7 @@ class CollectionService:
             raw_document_id=document.id,
             content_hash=document.content_hash,
             schema_version=document.schema_version,
+            persist=False,
         )
 
     def _record_run_outcome(

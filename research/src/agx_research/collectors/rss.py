@@ -61,7 +61,12 @@ def _entry_date(element: ET.Element) -> date | None:
         try:
             return datetime.fromisoformat(raw.replace("Z", "+00:00")).date()  # ISO (Atom)
         except ValueError:
-            continue
+            pass
+        for pattern in ("%m/%d/%Y %I:%M:%S %p", "%m/%d/%Y %H:%M:%S"):
+            try:
+                return datetime.strptime(raw, pattern).date()
+            except ValueError:
+                continue
     return None
 
 

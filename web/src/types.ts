@@ -11,6 +11,25 @@
 
 export type Horizon = "micro" | "swing" | "investment";
 
+export type ReadinessStatus = "ready" | "degraded" | "blocked";
+
+export interface DecisionReadiness {
+  ticker: string;
+  as_of: string;
+  status: ReadinessStatus;
+  decision: "researchable" | "abstain";
+  ready_horizons: Horizon[];
+  price_observations: number;
+  latest_price_date: string | null;
+  news_items: number;
+  corporate_events: number;
+  financial_periods: number;
+  macro_series: number;
+  active_knowledge: number;
+  blockers: string[];
+  next_actions: string[];
+}
+
 export interface ProvenanceRef {
   kind: string;
   ref_id: string;

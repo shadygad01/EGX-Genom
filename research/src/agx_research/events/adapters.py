@@ -21,7 +21,7 @@ from datetime import datetime
 
 from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.domain.provenance import Provenance, ProvenanceRef
-from agx_research.events.entity import EntityKind
+from agx_research.events.entity import EntityKind, EntityRef
 from agx_research.events.entity_resolver import EntityResolver
 from agx_research.events.event import Event, EventSeverity, EventType
 from agx_research.events.service import build_candidate_event
@@ -30,6 +30,7 @@ from agx_research.universe.sector import StaticSectorProvider
 from agx_research.universe.static import StaticUniverseProvider
 
 _ADAPTER_NAME = "events.adapters"
+EGX_MARKET_ENTITY_ID = "EGX"
 
 # Raw corporate-event type strings (as they appear in provider data) mapped
 # into the controlled taxonomy. Unrecognized strings become UNKNOWN rather
@@ -158,6 +159,19 @@ def events_from_news(snapshot: DatasetSnapshot, resolver: EntityResolver | None 
     events: list[Event] = []
     for item in snapshot.news:
         entities = resolver.resolve_many(item.tickers)
+        if not entities:
+            # Untagged headlines are market-level evidence, not evidence
+            # about a guessed company. This gives broad Egyptian news a
+            # conservative route into every EGX decision while preserving
+            # the distinction from ticker-linked company news.
+            entities = [
+                EntityRef(
+                    kind=EntityKind.MARKET,
+                    canonical_id=EGX_MARKET_ENTITY_ID,
+                    display_name="Egyptian Exchange",
+                    raw_mention="market-wide headline",
+                )
+            ]
         has_company = any(entity.kind == EntityKind.COMPANY for entity in entities)
         events.append(
             build_candidate_event(

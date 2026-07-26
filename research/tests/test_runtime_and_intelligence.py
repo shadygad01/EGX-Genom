@@ -147,6 +147,37 @@ def test_recent_source_event_reduces_confidence_and_is_in_decision_provenance():
     assert any("sources=gdelt" in item for item in adjusted.explanation.supporting_evidence)
 
 
+def test_recent_market_wide_event_reduces_every_egx_ticker_confidence():
+    store = promoted_store()
+    baseline = RecommendationService(store).recommend(["COMI"], date(2026, 6, 14))[0]
+    events = EventPlatform()
+    events.register(
+        build_candidate_event(
+            event_type=EventType.NEWS,
+            subtype=EventSubtype.MACRO_NEWS,
+            entities=[
+                EntityRef(
+                    kind=EntityKind.MARKET,
+                    canonical_id="EGX",
+                    raw_mention="market-wide headline",
+                )
+            ],
+            event_date=date(2026, 6, 13),
+            source="alborsa",
+            confidence=0.6,
+            severity=EventSeverity.MEDIUM,
+            provenance=Provenance(produced_by="RssNewsCollector", produced_at=datetime.now()),
+        )
+    )
+
+    adjusted = RecommendationService(store, event_platform=events).recommend(
+        ["COMI"], date(2026, 6, 14)
+    )[0]
+
+    assert adjusted.confidence < baseline.confidence
+    assert any("sources=alborsa" in item for item in adjusted.explanation.supporting_evidence)
+
+
 def test_portfolio_construction_allocates_and_explains():
     store = promoted_store()
     recommendations = RecommendationService(store).recommend(["COMI", "MFPC"], date(2026, 6, 14))

@@ -72,11 +72,13 @@ from agx_research.data.mock_provider import LocalCsvDataProvider
 from agx_research.domain.identifiers import new_id
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
+from agx_research.financials.collected import CollectedFinancialStatementProvider
 from agx_research.genome.service import AlphaGenome
 from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
+from agx_research.meta.readiness import assess_decision_readiness
 from agx_research.orchestration.pipeline import DailyResearchPipeline
 from agx_research.papers.repository import PaperRepository
 from agx_research.production import artifacts as production_artifacts
@@ -802,6 +804,22 @@ class ProductionPipeline:
             json.dumps(financial_statements, indent=2, sort_keys=True) + "\n"
         )
         counts["financial_statements.json"] = len(financial_statements)
+
+        decision_readiness = []
+        if as_of is not None:
+            state = self.market_memory.reconstruct(as_of)
+            decision_readiness = [
+                row.model_dump(mode="json")
+                for row in assess_decision_readiness(
+                    state,
+                    CollectedFinancialStatementProvider(self.data_dir),
+                    self.knowledge_store.all_latest(),
+                )
+            ]
+        (dashboard_out / "decision_readiness.json").write_text(
+            json.dumps(decision_readiness, indent=2, sort_keys=True) + "\n"
+        )
+        counts["decision_readiness.json"] = len(decision_readiness)
 
         acquisition_decisions = production_artifacts.export_acquisition_decisions(
             self.capability_decisions

@@ -54,6 +54,18 @@ def test_parse_values_and_series_id_correct():
     assert first.value == 4.25
 
 
+def test_parse_current_observation_date_header():
+    fetcher = FakeFetcher("observation_date,DGS10\n2026-07-25,4.42\n")
+    collector = FredCsvCollector(fred_spec(), series_ids=["DGS10"], fetcher=fetcher)
+
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+
+    assert batch.parse_warnings == []
+    assert batch.macro_observations[0].observation_date == date(2026, 7, 25)
+    assert batch.macro_observations[0].value == 4.42
+
+
 def test_parse_unexpected_header_recorded_as_warning():
     fetcher = FakeFetcher("NOT,A,HEADER\n1,2,3\n")
     collector = FredCsvCollector(fred_spec(), series_ids=["X"], fetcher=fetcher)

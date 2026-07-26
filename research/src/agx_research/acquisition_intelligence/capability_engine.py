@@ -47,11 +47,11 @@ if TYPE_CHECKING:
 
 # Capabilities whose catalogued strategies are complementary -- each covers
 # genuinely different data within the capability (e.g. World Bank's Egypt
-# CPI vs FRED's global oil/dollar/treasury series), not interchangeable
-# alternatives for the same fact. These run every ready strategy instead of
+# CPI vs FRED's global oil/dollar/treasury series, or independent publishers
+# needed to corroborate a headline). These run every ready strategy instead of
 # stopping at the first success; every other capability stops at the first
 # strategy that produces usable output (the mission's fallback-chain model).
-EXHAUSTIVE_CAPABILITIES = {Capability.MACROECONOMIC}
+EXHAUSTIVE_CAPABILITIES = {Capability.NEWS, Capability.MACROECONOMIC}
 
 _NOT_CATALOGUED_REASON = "Not catalogued in the source registry."
 _NOT_READY_REASON_BY_STATUS = {

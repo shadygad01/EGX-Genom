@@ -128,7 +128,8 @@ jobs:
           test -f web/dist/index.html
           for f in knowledge events patterns recommendations market_state runtime_metrics \
                    system_status source_registry investment_cases collector_status \
-                   runtime_status dashboard_metrics mission_status execution_report; do
+                   runtime_status dashboard_metrics mission_status execution_report \
+                   decision_readiness; do
             test -f "web/dist/data/$f.json"
           done
 

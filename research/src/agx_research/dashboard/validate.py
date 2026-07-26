@@ -23,6 +23,7 @@ from agx_research.hypotheses.hypothesis import Hypothesis
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import Recommendation
+from agx_research.meta.readiness import DecisionReadiness
 from agx_research.papers.paper import ResearchPaper
 from agx_research.portfolio.constructor import PortfolioRecommendation
 from agx_research.production.mission_control import MissionControlStatus
@@ -138,6 +139,9 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
     _validate_optional_source_metrics(directory, counts)
     _validate_optional_model_list(
         directory, "acquisition_decisions.json", CapabilityDecision, counts
+    )
+    _validate_optional_model_list(
+        directory, "decision_readiness.json", DecisionReadiness, counts
     )
 
     return counts

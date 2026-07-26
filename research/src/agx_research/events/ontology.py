@@ -46,7 +46,10 @@ DEFAULT_IMPACT_HORIZONS: dict[EventSubtype, list[Horizon]] = {
     EventSubtype.TREND_REVERSAL: [Horizon.SWING, Horizon.INVESTMENT],
     EventSubtype.COMPANY_NEWS: [Horizon.MICRO, Horizon.SWING],
     EventSubtype.SECTOR_NEWS: [Horizon.SWING],
-    EventSubtype.MACRO_NEWS: [Horizon.SWING, Horizon.INVESTMENT],
+    # Market-wide headlines can reprice the index intraday as well as affect
+    # longer horizons. Severity/confidence still determine the size of the
+    # overlay; adding MICRO here only makes the evidence reachable.
+    EventSubtype.MACRO_NEWS: [Horizon.MICRO, Horizon.SWING, Horizon.INVESTMENT],
     EventSubtype.RUMOR: [Horizon.MICRO],
     EventSubtype.UNKNOWN: [],
 }

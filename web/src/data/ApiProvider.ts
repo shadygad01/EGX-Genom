@@ -10,6 +10,7 @@ import type {
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
+  DecisionReadiness,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -120,5 +121,9 @@ export class ApiProvider implements DashboardDataProvider {
 
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {
     return fetchJson<AcquisitionDecision[]>("/acquisition-decisions");
+  }
+
+  getDecisionReadiness(): Promise<DecisionReadiness[]> {
+    return fetchJson<DecisionReadiness[]>("/decision-readiness");
   }
 }

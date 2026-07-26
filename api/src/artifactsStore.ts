@@ -107,4 +107,8 @@ export class ArtifactsReader {
   acquisitionDecisions<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("acquisition_decisions.json"), []);
   }
+
+  decisionReadiness<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("decision_readiness.json"), []);
+  }
 }

@@ -1,7 +1,7 @@
 """FRED CSV collector for global macro series.
 
 Endpoint: `https://fred.stlouisfed.org/graph/fredgraph.csv?id={SERIES}`
-returns `DATE,{SERIES}` CSV where `.` marks a missing observation
+returns `observation_date,{SERIES}` CSV (historically `DATE,{SERIES}`) where `.` marks a missing observation
 (dropped with a warning, never imputed).
 """
 
@@ -46,8 +46,11 @@ class FredCsvCollector(Collector):
         batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)
         reader = csv.reader(io.StringIO(document.content_text))
         header = next(reader, None)
-        if not header or len(header) != 2 or header[0].upper() != "DATE":
-            batch.parse_warnings.append(f"Unexpected header {header}; expected [DATE, <SERIES>].")
+        date_header = header[0].strip().lower() if header else ""
+        if not header or len(header) != 2 or date_header not in {"date", "observation_date"}:
+            batch.parse_warnings.append(
+                f"Unexpected header {header}; expected [DATE|observation_date, <SERIES>]."
+            )
             return batch
         series_id = header[1].strip()
 

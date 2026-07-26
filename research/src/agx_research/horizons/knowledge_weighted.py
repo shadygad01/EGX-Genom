@@ -29,6 +29,8 @@ from agx_research.horizons.base import HorizonModel, Prediction
 from agx_research.knowledge import KnowledgeObject
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 
+_EGX_MARKET_ENTITY_ID = "EGX"
+
 
 class KnowledgeWeightedHorizonModel(HorizonModel):
     model_id = "knowledge_weighted"
@@ -67,9 +69,14 @@ class KnowledgeWeightedHorizonModel(HorizonModel):
         )
         active_events = []
         if self.event_platform is not None:
+            candidate_events = {
+                event.id: event
+                for canonical_id in (ticker, _EGX_MARKET_ENTITY_ID)
+                for event in self.event_platform.events_for_entity(canonical_id)
+            }.values()
             active_events = [
                 event
-                for event in self.event_platform.events_for_entity(ticker)
+                for event in candidate_events
                 if event.event_date <= as_of
                 and (as_of - event.event_date).days <= 30
                 and self.horizon in event.impact_horizons

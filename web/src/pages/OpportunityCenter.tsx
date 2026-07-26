@@ -9,7 +9,7 @@ import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
 import { formatDate, formatPercent, formatSignedPercent, titleCase } from "../lib/format";
-import type { CorporateEvent, Horizon, Recommendation } from "../types";
+import type { CorporateEvent, DecisionReadiness, Horizon, Recommendation } from "../types";
 import styles from "./OpportunityCenter.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
@@ -21,6 +21,7 @@ const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
 export function OpportunityCenter() {
   const recommendations = useArtifact((p) => p.getRecommendations());
   const marketState = useArtifact((p) => p.getMarketState());
+  const readiness = useArtifact((p) => p.getDecisionReadiness());
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
   const ranked = [...(recommendations.data ?? [])].sort((a, b) => b.confidence - a.confidence);
@@ -105,6 +106,36 @@ export function OpportunityCenter() {
           </Card>
         </div>
       )}
+
+      <Card title="Decision Readiness" subtitle="Why AGX can research or must abstain for every ticker" dense>
+        {readiness.loading && <LoadingState rows={4} />}
+        {readiness.error && <ErrorState detail={readiness.error.message} onRetry={readiness.reload} />}
+        {!readiness.loading && !readiness.error && (
+          <DataTable<DecisionReadiness>
+            rows={readiness.data ?? []}
+            getRowKey={(row) => row.ticker}
+            emptyTitle="No readiness assessment yet"
+            emptyDetail="The production pipeline must run before evidence readiness can be assessed."
+            columns={[
+              { key: "ticker", header: "Ticker", render: (row) => <span className={styles.tickerCode}>{row.ticker}</span> },
+              {
+                key: "status",
+                header: "Status",
+                render: (row) => (
+                  <Badge variant={row.status === "ready" ? "positive" : row.status === "degraded" ? "warning" : "negative"}>
+                    {titleCase(row.status)}
+                  </Badge>
+                ),
+              },
+              { key: "decision", header: "Decision", render: (row) => titleCase(row.decision) },
+              { key: "prices", header: "Prices", align: "right", render: (row) => <span className="num">{row.price_observations}</span> },
+              { key: "financials", header: "Financial Periods", align: "right", render: (row) => <span className="num">{row.financial_periods}</span> },
+              { key: "knowledge", header: "Knowledge", align: "right", render: (row) => <span className="num">{row.active_knowledge}</span> },
+              { key: "blocker", header: "Primary Blocker", render: (row) => row.blockers[0] ?? "None" },
+            ]}
+          />
+        )}
+      </Card>
     </Section>
   );
 }

@@ -12,6 +12,7 @@ from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
 from agx_research.agents.news_intelligence import NewsIntelligenceAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
+from agx_research.config import Horizon
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.data.snapshot import build_snapshot
 
@@ -78,9 +79,36 @@ def test_technical_structure_agent_rejects_bad_windows():
 
 
 def test_data_blocked_agents_remain_honest_stubs():
-    for agent in (NewsIntelligenceAgent(), FinancialPerformanceAgent(), HistoricalPatternsAgent()):
+    for agent in (FinancialPerformanceAgent(), HistoricalPatternsAgent()):
         with pytest.raises(NotImplementedError):
             agent.research(snapshot())
+
+
+def test_news_intelligence_agent_relates_sentiment_to_drift():
+    findings = NewsIntelligenceAgent(min_shift=0.0).research(snapshot())
+    assert findings
+    tickers = {f.affected_assets[0] for f in findings}
+    assert tickers <= {"COMI", "MFPC"}
+    for finding in findings:
+        assert finding.agent_name == "news_intelligence_agent"
+        assert finding.horizon == Horizon.MICRO
+        assert "drift" in finding.proposed_hypothesis_statement
+        assert any(e.startswith("sentiment=") for e in finding.evidence)
+
+
+def test_news_intelligence_agent_threshold_filters():
+    assert NewsIntelligenceAgent(min_shift=10.0).research(snapshot()) == []
+
+
+def test_news_intelligence_agent_skips_unclassifiable_headlines():
+    # "Brent crude climbs on supply concerns" (mock news.csv) is tagged to
+    # MFPC but is macro commentary, not a company-sentiment headline -- it
+    # still matches "climbs" in the declared positive-phrase list, so this
+    # test only asserts the agent never fabricates a sentiment for a
+    # headline matching none of the declared phrases.
+    from agx_research.agents.news_sentiment import classify_headline_sentiment
+
+    assert classify_headline_sentiment("EGX30 index closes flat in quiet trading") is None
 
 
 def test_all_agent_findings_carry_snapshot_provenance():
@@ -90,6 +118,7 @@ def test_all_agent_findings_carry_snapshot_provenance():
         CorporateEventsAgent(min_shift=0.0),
         LiquidityAgent(correlation_threshold=0.0),
         TechnicalStructureAgent(min_gap=0.0),
+        NewsIntelligenceAgent(min_shift=0.0),
     ):
         for finding in agent.research(snap):
             assert finding.provenance.inputs[0].ref_id == snap.id

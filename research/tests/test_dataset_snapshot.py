@@ -78,3 +78,35 @@ def test_macro_lookback_days_windows_macro_series_independently_of_price_history
     assert any(
         obs.observation_date < date(2026, 6, 9) for obs in snapshot.macro_series["BRENT_USD"]
     )
+
+
+def test_macro_series_sources_drops_not_yet_knowable_observations():
+    # Mock BRENT_USD has observations through 2026-06-14; a declared
+    # 30-day "worldbank" publication lag means only observations dated on
+    # or before as_of - 30 days are knowable yet.
+    without_lag = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    with_lag = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+        macro_series_sources={"BRENT_USD": "worldbank"},
+    )
+    assert len(with_lag.macro_series["BRENT_USD"]) < len(without_lag.macro_series["BRENT_USD"])
+    assert all(
+        obs.observation_date <= date(2026, 5, 15) for obs in with_lag.macro_series["BRENT_USD"]
+    )
+
+
+def test_macro_series_sources_unmapped_series_id_unaffected():
+    with_map = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+        macro_series_sources={"SOME_OTHER_SERIES": "worldbank"},
+    )
+    without_map = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    assert with_map.macro_series["BRENT_USD"] == without_map.macro_series["BRENT_USD"]

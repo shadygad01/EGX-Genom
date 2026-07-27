@@ -1,5 +1,134 @@
 # Changelog
 
+## 0.28.0 — `ticker_data_gap_report.json` web/API wiring (TD-34)
+
+Closes the last purely-engineering item on the post-freeze punch list.
+The backend artifact (`meta.readiness.build_ticker_data_gap_report`) was
+correct and tested but had no route, provider method, TS type, or UI
+surface. Wired following `financial_statements.json`'s exact existing
+pattern: `api/src/artifactsStore.ts`/`routes/dashboard.ts`
+(`GET /ticker-data-gap-report`), `web/src/data/{DataProvider,ApiProvider,
+StaticJsonProvider}.ts`, `web/src/types.ts` (`TickerDataGapReport`/
+`DataLayerGap`).
+
+UI: Opportunity Center's "Decision Readiness" table gained `onRowClick`
+paired with a new "Data Coverage" detail card — the same click-to-select
+pattern the Opportunities table above it already uses — showing the
+5-layer completeness breakdown, blockers, and next actions per ticker.
+
+Verified in a real headless browser against a real mock-mode `agx run`
+output served through a production Vite build: clicking a Decision
+Readiness row correctly populates the detail panel. `npm run lint`/
+`build`/`test` clean for both workspaces.
+
+## 0.27.0 — Monte Carlo stress simulator (block bootstrap)
+
+Closes the one Experiment Factory gap docs had explicitly named as a
+design decision rather than a data blocker: `MonteCarloExperiment` had
+been a `NotImplementedError` placeholder since System 10 was built. New
+`validation.stress_test.MonteCarloBlockBootstrapStressTester` stays
+faithful to the existing stress tester's "locate/derive from real data,
+never simulate" philosophy — every simulated path resamples contiguous
+blocks of the hypothesis's real observed returns with replacement
+(preserving real autocorrelation, unlike `BootstrapExperiment`'s
+single-observation resampling), never a parametric distribution.
+
+`MonteCarloExperiment` is now a real adapter over this tester (mirroring
+`StressTestExperiment`'s shape); `DailyResearchPipeline`'s STRESS_TEST
+gate now requires both the historical worst-window and the Monte Carlo
+tester to pass. Verified: an identical mock-mode run produces the same 5
+hypotheses as before this change.
+
+8 new tests (616 total, up from 608); `ruff check` clean.
+
+## 0.26.0 — Macro frequency alignment + no-look-ahead discipline
+
+`MacroAgent` aligned macro observations to trading days by exact date
+equality, silently starving every lower-frequency series (monthly/
+quarterly/annual) of correlation evidence since their dates almost never
+land on a trading day. Fixed with `agents/macro.py`'s
+`_forward_fill_onto()` — standard last-observation-carried-forward step
+alignment, never assigning a change to a trading day before the
+observation that produced it.
+
+Separately, nothing distinguished a macro value's `observation_date`
+(the period it describes) from when it actually became known —
+real look-ahead bias. New `data/point_in_time.py` (`is_knowable`) applies
+a declared, deliberately conservative per-source publication-lag floor
+(new debt TD-37); `data.snapshot.build_snapshot()`'s new
+`macro_series_sources` param drops any not-yet-knowable observation
+before it reaches an agent, wired in `ProductionPipeline` for LIVE mode
+only (mock/replay default to no filtering change).
+
+An initial 365-day World Bank/UN SDG lag assumption was caught
+contradicting this codebase's own live-verified evidence (a real
+collected observation only ~165 days old) before merging — scaled back
+to a 30-day floor.
+
+8 new tests (608 total, up from 600); `ruff check` clean.
+
+## 0.25.0 — Real entity resolution for news-to-ticker matching
+
+`RssNewsCollector`/`GdeltDocCollector` attributed news to a ticker via a
+bare case-insensitive substring check (`ticker.lower() in
+title.lower()`) — the exact "VLMR matches inside VLMRA" false-positive
+risk named in the project owner's own completion plan. New module
+`universe/entity_resolution.py` (`resolve_ticker_mentions`) fixes this:
+ticker matching is now a real word/token match, and when a real company
+display name is available, the full name is matched too via the same
+conservative "every significant token present" discipline
+`discover_company_directory_links()` already uses (shared
+`significant_tokens()` helper, not a parallel implementation).
+
+`production.pipeline.ProductionPipeline._ticker_companies()` threads real
+company names from `research/data/universe/EGX30.csv`/`EGX70.csv` (the
+already-reviewed, EGX-sourced 101-ticker seed with real English names and
+ISINs) through `collector_plan.build_collector_plan`/`build_live_collector`
+into both news collectors, so live/mock runs get genuine entity
+resolution, not a ticker-only guess. Both collectors stay backward
+compatible with a plain `ticker_hints: list[str]` for callers with no
+company-name data (still upgraded from substring to exact-token
+matching). No Arabic alias list yet — no verified Arabic-language EGX
+source exists in this codebase (new debt, TD-36); inventing
+transliterations would risk a wrong match, worse than a missed one.
+
+8 new tests (600 total, up from 592); `ruff check` clean.
+
+## 0.24.0 — NewsIntelligenceAgent: real news sentiment now produces findings
+
+`agents.news_intelligence.NewsIntelligenceAgent` was an honest
+`NotImplementedError` stub since System 08 was built, correctly deferred
+because no real Egyptian news flow existed to research. That stopped being
+true once `enterprise_press`/`fra_egypt` started producing real, dated
+`NewsItem` records every live run (see `docs/PHASE_STATUS.md`'s "Egyptian
+Live Data Sprint" phase) — this was the most directly-unblocked stub in
+the codebase, named explicitly in `NEXT_MISSIONS.md`.
+
+Implemented as a real, mechanical event-study-lite, mirroring
+`CorporateEventsAgent` exactly: `agents.news_sentiment.classify_headline_sentiment()`
+is a declared, headline-only keyword heuristic (positive/negative phrase
+lists, negative checked first) — the same honesty tier as
+`collectors.corporate_event_classifier`, never a fabricated NLP/sentiment
+score (new debt, TD-35). For each ticker's sentiment-classified news item
+with enough return history on both sides, the agent compares mean adjusted
+return after the item to before it and proposes a MICRO-horizon
+post-news-drift hypothesis when the shift clears a threshold. Wired into
+`production.pipeline.ProductionPipeline`'s Research Pipeline stage
+alongside the other five real agents.
+
+Building this surfaced and fixed a real, previously-latent bug:
+`collectors.service._append_news` was the only per-record materialization
+writer that blindly appended instead of merging idempotently by natural
+key (unlike prices/macro/corporate-events/index-constituents) — collecting
+the same feed twice (e.g. a mock run followed by a replay run reading the
+same archive) silently duplicated every news row. Harmless while nothing
+consumed `news.csv` for hypothesis generation; caught immediately once
+`NewsIntelligenceAgent` did, via `test_production_pipeline.py`'s existing
+mock/replay-determinism test (5 vs. 7 hypotheses on the same input). Fixed
+by merging on `(date, source, headline)`, matching every sibling writer.
+
+24 new tests (592 total, up from 568); `ruff check` clean.
+
 ## 0.23.0 — Macro data now reaches the decision engine in live runs
 
 A live production run's `investment_cases.json` showed all 62 published

@@ -88,22 +88,33 @@ def test_sensitivity_analysis_reports_sign_stability_across_windows():
     assert result.p_value == result.details["sign_flips"] / result.details["settings"]
 
 
-def test_monte_carlo_is_an_explicit_placeholder():
-    with pytest.raises(NotImplementedError):
-        MonteCarloExperiment().run(hypothesis(), snapshot())
+def test_monte_carlo_runs_a_real_block_bootstrap_simulation():
+    result = MonteCarloExperiment().run(hypothesis(), snapshot())
+    assert "scenario_results" in result.details
+    assert "worst_percentile_statistic" in result.details["scenario_results"]
+    assert 0.0 <= result.p_value <= 1.0
 
 
-def test_factory_run_all_skips_placeholders_and_returns_real_results():
+def test_monte_carlo_is_deterministic_given_a_seed():
+    from agx_research.validation.stress_test import MonteCarloBlockBootstrapStressTester
+
+    a = MonteCarloExperiment(MonteCarloBlockBootstrapStressTester(seed=7)).run(hypothesis(), snapshot())
+    b = MonteCarloExperiment(MonteCarloBlockBootstrapStressTester(seed=7)).run(hypothesis(), snapshot())
+    assert a.statistic == b.statistic
+    assert a.p_value == b.p_value
+
+
+def test_factory_run_all_includes_every_real_experiment():
     factory = ExperimentFactory()
     results = factory.run_all(hypothesis(), snapshot())
 
-    assert "MonteCarloExperiment" not in results
     for name in (
         "CrossValidationExperiment",
         "BootstrapExperiment",
         "WalkForwardExperiment",
         "OutOfSampleExperiment",
         "SensitivityAnalysisExperiment",
+        "MonteCarloExperiment",
     ):
         assert name in results
 

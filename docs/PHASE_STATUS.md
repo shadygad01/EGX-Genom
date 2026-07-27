@@ -28,9 +28,9 @@ below.
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
 | 06 | Alpha Genome | **DONE** | Immutable genes, `mutate()` (single-parent), `merge()` (multi-parent synthesis), lineage walk, status machine; never overwrites. |
 | 07 | Research OS | **DONE** | TaskGraph/Artifacts/Sessions plus `DailyResearchPipeline` — the full 8-gate walk wired to real validators, board, causal gate, adversarial scientist, genome, papers, graph. End-to-end tested incl. rejection honesty and determinism. |
-| 08 | Scientist Framework | **DONE** (5 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure real; News/FinancialPerformance/HistoricalPatterns are honest stubs, all data-blocked (NLP, fundamentals feed, long history). Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
+| 08 | Scientist Framework | **DONE** (6 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure, NewsIntelligence real; FinancialPerformance/HistoricalPatterns remain honest stubs, both genuinely data-blocked (fundamentals feed, long history — see "NewsIntelligenceAgent" phase below for why News is no longer in that list). Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
 | 09 | Feature Discovery | **DONE** | Three autonomous generators (pairwise correlation, momentum, volatility) over three registered feature definitions; candidates versioned+evidenced. |
-| 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo an explicit placeholder (needs a simulator — research decision). |
+| 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo now a real block-bootstrap simulator (`MonteCarloBlockBootstrapStressTester`), not a placeholder. |
 | 11 | Validation Framework | **DONE** | `SignificanceThresholdValidator`, `NaiveDirectionalBacktester` (costs explicitly out of scope, stated), `HistoricalWorstWindowStressTester` (scenario located in real data, not simulated). Deferred: cost-aware portfolio-level backtesting (with 15's future optimizer). |
 | 12 | Review Board | **DONE** (4 of 5 reviewers real) | Statistician, Risk, Economist (structural coherence, not economic truth — stated), PeerValidator (independent replication). Historical reviewer data-blocked. Board wired into the pipeline before `promote()`. |
 | 13 | Runtime Engine | **DONE** | `RuntimeEngine.run_range`: deterministic, per-day failure isolation, non-trading days recorded not skipped silently, persistent run ledger. Now the core of `production.pipeline.ProductionPipeline`'s Research Pipeline stage — see "Production Execution Pipeline" below. OS-level scheduling = deployment config (18). |
@@ -888,6 +888,209 @@ present (a plain file copy, not a Python re-export, since the Discovery
 workflow already writes them in final shape). `npm run build`/`test`
 clean for both `api` and `web` workspaces (required a fresh `npm install`
 in this session first — `node_modules` had never been installed).
+
+## TD-34: `ticker_data_gap_report.json` web/API wiring (System 13 dashboard layer)
+
+Closes the last purely-engineering item on the post-freeze punch list
+(TD-34): the backend artifact existed and was tested, but had no route,
+no provider method, no TS type, and no UI surface.
+
+Closed, following `financial_statements.json`'s exact existing wiring as
+the template: `api/src/artifactsStore.ts`'s `tickerDataGapReport()`,
+`api/src/routes/dashboard.ts`'s `GET /ticker-data-gap-report`,
+`web/src/data/{DataProvider,ApiProvider,StaticJsonProvider}.ts`'s
+`getTickerDataGapReport()`, and `web/src/types.ts`'s
+`TickerDataGapReport`/`DataLayerGap` interfaces (hand-mirrored from
+`meta.readiness`'s pydantic models — no `contracts/` schema exists for
+this artifact, matching `financial_statements.json`'s own precedent).
+
+UI: rather than a new page, Opportunity Center's existing "Decision
+Readiness" table gained `onRowClick`, paired with a new "Data Coverage"
+detail `Card` — the same click-to-select-plus-detail-panel pattern the
+Opportunities table above it already uses for its "Evidence" panel. The
+detail card renders the 5 named layers (Financials/Disclosures/News/
+Macro/Knowledge) as meter cards, plus overall completeness,
+Swing/Investment readiness flags, blockers, and next actions.
+
+**Verified live in a real headless browser** (not just `tsc`/build/test
+green): a real mock-mode `agx run` output was served through a
+production Vite build, and clicking a Decision Readiness row (`ABUK`)
+correctly populated the Data Coverage panel with its real 5-layer
+breakdown (each showing 0% / "Below the readiness threshold for this
+layer" — the honest current state of this sandbox's own data, not a
+placeholder). `npm run lint`/`build`/`test` clean for both `api` and
+`web` workspaces (added `getTickerDataGapReport` to the test suite's
+`fakeProvider` fixture, the one other place implementing the full
+`DashboardDataProvider` contract).
+
+## Monte Carlo stress simulator (System 10, Experiment Factory)
+
+Closes the one Experiment Factory gap `docs/PHASE_STATUS.md`/
+`NEXT_MISSIONS.md` had explicitly named as a design decision, not a data
+blocker: `MonteCarloExperiment` had been an honest `NotImplementedError`
+placeholder since Experiment Factory was built.
+
+Closed: `validation.stress_test.MonteCarloBlockBootstrapStressTester` —
+a real block bootstrap, staying faithful to
+`HistoricalWorstWindowStressTester`'s own stated philosophy ("the
+adverse scenario is not simulated... but located"). Every simulated path
+is built by resampling contiguous *blocks* (not single observations, the
+distinction from the existing `BootstrapExperiment`) of the hypothesis's
+real observed returns with replacement, preserving real short-run
+autocorrelation the way actual bad runs cluster — never a parametric or
+fabricated distribution. Recomputes the hypothesis's statistic over many
+simulated paths and checks whether the adverse-tail percentile keeps the
+full-sample statistic's sign. `block_size` auto-shrinks to fit short
+series (mirroring the historical tester's own `window = min(self.window,
+n)`), so it never raises for any series length the DATA_COLLECTION gate
+already admitted; `seed` makes every run deterministic, the same
+convention `BootstrapExperiment` already uses.
+
+Wired in two places: `MonteCarloExperiment` (`hypotheses/
+experiment_factory.py`) is now a real adapter over this tester (mirroring
+`StressTestExperiment`'s exact adapter shape) instead of raising, so it
+now counts toward the EXPERIMENT stage's real-results total and is stored
+as a versioned artifact like every other experiment; `orchestration.
+pipeline.DailyResearchPipeline`'s STRESS_TEST gate now requires *both* the
+historical worst-window and the Monte Carlo block-bootstrap tester to pass
+— surviving one adverse method isn't evidence the other wouldn't flip it.
+
+**Verified**: a real mock-mode `agx run` against the same 4-ticker
+scenario earlier phases used produces the identical 5 hypotheses as
+before this change — the combined gate doesn't regress what already
+passed. 8 new tests (616 total, up from 608); `ruff check` clean.
+
+## Macro frequency alignment + no-look-ahead discipline (System 08/14)
+
+Closes `NEXT_MISSIONS.md` item 2 (the project owner's own completion
+plan item 5): `MacroAgent` aligned macro observations to trading days by
+*exact date equality* — since daily/monthly/quarterly/annual series
+almost never land on the same date as a trading day, every
+lower-frequency macro series was silently starved of correlation
+evidence entirely (a distinct gap from the earlier "Item 5" fix, which
+only widened the *lookback window* size, not the *alignment* method).
+Separately, nothing distinguished a macro value's `observation_date`
+(the period it describes) from when it actually became publicly known —
+treating a value as usable starting on its own period-end date is real
+look-ahead bias.
+
+Closed, as two independent pieces:
+
+- **Frequency alignment**: `agents/macro.py`'s `_forward_fill_onto()`
+  carries each macro observation's percentage change forward onto every
+  trading day up to (never before) the next observation — standard
+  last-observation-carried-forward step alignment, replacing the exact
+  date-equality intersection. Never looks ahead: a trading day is only
+  ever assigned a change from an observation dated on or before it.
+- **No-look-ahead discipline**: new `data/point_in_time.py`
+  (`is_knowable`/`known_as_of`) applies a declared, deliberately
+  conservative per-source-class publication-lag floor (new debt, TD-37 —
+  not a cited real average, picked low enough to never contradict this
+  codebase's own live-verified evidence of a ~165-day-old real World Bank
+  observation being collectible) and `data.snapshot.build_snapshot()`
+  gained an optional `macro_series_sources` param that drops any
+  observation not yet knowable as of the snapshot's own `as_of` before it
+  ever reaches an agent. `production.pipeline.ProductionPipeline` wires
+  the real mapping (`production.collector_plan.LIVE_MACRO_SERIES_SOURCES`,
+  built from the same series-id groupings `LIVE_MACRO_SERIES_IDS` already
+  uses) only in LIVE mode; mock/replay default to no filtering change
+  (0 assumed lag), so no existing test's behavior shifted unless it
+  explicitly opts in.
+
+**One real regression caught and fixed before merging**: an initial,
+more aggressive 365-day World Bank/UN SDG lag assumption directly
+contradicted this codebase's own already-live-verified evidence (a real
+collected World Bank observation only ~165 days old) — it would have
+silently discarded genuinely-available real data, the opposite of the
+goal. Scaled back to a 30-day floor, verified against the exact
+regression test that first caught it
+(`test_live_mode_collects_real_endpoints_and_reports_unavailable_sources`).
+
+8 new tests (608 total, up from 600); `ruff check` clean.
+
+## Entity resolution for news-to-ticker matching (System 02/08)
+
+Immediate follow-up to NewsIntelligenceAgent, closing `NEXT_MISSIONS.md`
+item 1: `RssNewsCollector`/`GdeltDocCollector`'s ticker attribution was a
+bare case-insensitive **substring** check (`ticker.lower() in
+title.lower()`), the exact "VLMR matches inside VLMRA" false-positive risk
+the project owner's own completion plan named.
+
+Closed: `universe.entity_resolution.resolve_ticker_mentions()` (new
+module) matches a ticker only as its own word/token (never a substring of
+a longer one) and, when a real company display name is available, also
+matches the company's full name via the same conservative
+"every-significant-token-present" discipline `discover_company_directory_links()`
+already uses (reusing its exact `significant_tokens()` helper — one
+definition, not a parallel one). `RssNewsCollector`/`GdeltDocCollector`
+now accept `ticker_hints` as either a `{ticker: company_name}` mapping
+(full entity resolution) or a plain `list[str]` (ticker-only, still
+upgraded from substring to exact-token matching) — fully backward
+compatible. `production.pipeline.ProductionPipeline` gained
+`_ticker_companies()` (reads the same `UniverseProvider` `_tickers()`
+already uses) and threads real company names from
+`research/data/universe/EGX30.csv`/`EGX70.csv` (the reviewed, EGX-sourced
+101-ticker seed — real English display names + ISINs, already present in
+this codebase) all the way through `production.collector_plan.
+build_collector_plan`/`build_live_collector` into both news collectors.
+
+Deliberately no Arabic alias list (new debt, TD-36) — no verified
+Arabic-language source for EGX30/EGX70 names exists in this codebase, and
+guessing transliterations would risk a wrong match, worse than a missed
+one.
+
+**Verified live** (mock mode, real seed data): a real `agx run` against
+the actual `research/data/universe/EGX30.csv` seed correctly resolves
+"COMI reports strong Q2 net income growth" → `COMI` via the seeded
+constituent list's real English name path, honestly reports `[]` for the
+same news item when queried at a date before the seed's own `as_of_date`
+(no look-ahead — `CollectedUniverseProvider`'s existing point-in-time
+guarantee, not a regression). 600 backend tests pass (8 new, up from
+592); `ruff check` clean.
+
+## NewsIntelligenceAgent: real news sentiment now produces findings (System 08)
+
+`NEXT_MISSIONS.md` named `agents.news_intelligence.NewsIntelligenceAgent`
+as "the most directly-unblocked stub in the codebase" — it had been an
+honest `NotImplementedError` stub only because no real Egyptian news flow
+existed to research, and that stopped being true once `enterprise_press`/
+`fra_egypt` started producing real, dated `NewsItem`/`CorporateEvent`
+records every live run (see "First real Egyptian market data flowing
+live" above).
+
+Closed: implemented as a real, mechanical event-study-lite, mirroring
+`CorporateEventsAgent`'s exact structure — for each ticker's news item,
+`agents.news_sentiment.classify_headline_sentiment()` (a declared,
+headline-only positive/negative keyword heuristic, same honesty tier as
+`collectors.corporate_event_classifier`, new debt TD-35) classifies
+sentiment; unclassifiable headlines are silently skipped, never guessed.
+For sentiment-classified items with enough return history on both sides,
+the agent compares mean adjusted return after the item to before it and
+proposes a MICRO-horizon post-news-drift hypothesis when the shift clears
+a threshold. Wired into `production.pipeline.ProductionPipeline`'s
+Research Pipeline stage alongside the other five real agents (System 08 is
+now 6 of 8 agents real).
+
+**One real, previously-latent bug found and fixed while building this**:
+`collectors.service._append_news` was the only per-record materialization
+writer that blindly appended instead of merging idempotently by natural
+key, unlike every sibling writer (`_write_price_bars`/
+`_write_macro_observations`/`_write_corporate_events`/index constituents)
+— collecting the same feed twice (a mock run followed by a replay run
+reading the same archive, the exact scenario `test_production_pipeline.py`'s
+mock/replay-determinism test exercises) silently duplicated every news
+row. Harmless as long as nothing consumed `news.csv` for hypothesis
+generation; caught immediately once `NewsIntelligenceAgent` did (the
+existing determinism test failed 5 vs. 7 hypotheses on identical input
+the moment the agent was wired in). Fixed by merging on
+`(date, source, headline)`, matching every sibling writer exactly.
+
+**Verified live** (mock mode): a real MFPC finding ("MFPC exhibits
+downward price drift following positive news") flowed all the way through
+`DailyResearchPipeline` into `hypotheses.json`, sourced from the existing
+mock RSS headline "MFPC board declares dividend" — a genuine, if
+uncalibrated, new research signal, not a fabricated one. 24 new tests (592
+total, up from 568); `ruff check` clean.
 
 ## TargetOrganization coverage: 14 of 20 untargeted PLANNED sources (System 02)
 

@@ -9,10 +9,23 @@ import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
 import { formatDate, formatPercent, formatSignedPercent, titleCase } from "../lib/format";
-import type { CorporateEvent, DecisionReadiness, Horizon, Recommendation } from "../types";
+import type {
+  CorporateEvent,
+  DecisionReadiness,
+  Horizon,
+  Recommendation,
+  TickerDataGapReport,
+} from "../types";
 import styles from "./OpportunityCenter.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
+const LAYER_LABELS: Record<string, string> = {
+  financials: "Financials",
+  disclosures: "Disclosures",
+  news: "News",
+  macro: "Macro",
+  knowledge: "Knowledge",
+};
 
 /** Every opportunity AGX currently sees, ranked by confidence -- the
  * mission's "heart of AGX." Selecting a row shows the full explanation
@@ -22,7 +35,9 @@ export function OpportunityCenter() {
   const recommendations = useArtifact((p) => p.getRecommendations());
   const marketState = useArtifact((p) => p.getMarketState());
   const readiness = useArtifact((p) => p.getDecisionReadiness());
+  const gapReport = useArtifact((p) => p.getTickerDataGapReport());
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const [selectedGapTicker, setSelectedGapTicker] = useState<string | null>(null);
 
   const ranked = [...(recommendations.data ?? [])].sort((a, b) => b.confidence - a.confidence);
   const companyNames = marketState.data?.constituents ?? {};
@@ -33,6 +48,9 @@ export function OpportunityCenter() {
         .filter((ce) => (marketState.data ? ce.event_date >= marketState.data.as_of : true))
         .sort((a, b) => (a.event_date > b.event_date ? 1 : -1))
     : [];
+
+  const gapReports = gapReport.data ?? [];
+  const selectedGap = gapReports.find((g) => g.ticker === selectedGapTicker) ?? null;
 
   return (
     <Section
@@ -114,36 +132,110 @@ export function OpportunityCenter() {
         </div>
       )}
 
-      <Card title="Decision Readiness" subtitle="Why AGX can research or must abstain for every ticker" dense>
-        {readiness.loading && <LoadingState rows={4} />}
-        {readiness.error && <ErrorState detail={readiness.error.message} onRetry={readiness.reload} />}
-        {!readiness.loading && !readiness.error && (
-          <DataTable<DecisionReadiness>
-            rows={readiness.data ?? []}
-            getRowKey={(row) => row.ticker}
-            emptyTitle="No readiness assessment yet"
-            emptyDetail="The production pipeline must run before evidence readiness can be assessed."
-            columns={[
-              { key: "ticker", header: "Ticker", render: (row) => <span className={styles.tickerCode}>{row.ticker}</span> },
-              {
-                key: "status",
-                header: "Status",
-                render: (row) => (
-                  <Badge variant={row.status === "ready" ? "positive" : row.status === "degraded" ? "warning" : "negative"}>
-                    {titleCase(row.status)}
-                  </Badge>
-                ),
-              },
-              { key: "decision", header: "Decision", render: (row) => titleCase(row.decision) },
-              { key: "prices", header: "Prices", align: "right", render: (row) => <span className="num">{row.price_observations}</span> },
-              { key: "financials", header: "Financial Periods", align: "right", render: (row) => <span className="num">{row.financial_periods}</span> },
-              { key: "knowledge", header: "Knowledge", align: "right", render: (row) => <span className="num">{row.active_knowledge}</span> },
-              { key: "blocker", header: "Primary Blocker", render: (row) => row.blockers[0] ?? "None" },
-            ]}
-          />
-        )}
-      </Card>
+      <div className={styles.layout}>
+        <Card title="Decision Readiness" subtitle="Why AGX can research or must abstain for every ticker" dense>
+          {readiness.loading && <LoadingState rows={4} />}
+          {readiness.error && <ErrorState detail={readiness.error.message} onRetry={readiness.reload} />}
+          {!readiness.loading && !readiness.error && (
+            <DataTable<DecisionReadiness>
+              rows={readiness.data ?? []}
+              getRowKey={(row) => row.ticker}
+              onRowClick={(row) => setSelectedGapTicker(row.ticker)}
+              emptyTitle="No readiness assessment yet"
+              emptyDetail="The production pipeline must run before evidence readiness can be assessed."
+              columns={[
+                { key: "ticker", header: "Ticker", render: (row) => <span className={styles.tickerCode}>{row.ticker}</span> },
+                {
+                  key: "status",
+                  header: "Status",
+                  render: (row) => (
+                    <Badge variant={row.status === "ready" ? "positive" : row.status === "degraded" ? "warning" : "negative"}>
+                      {titleCase(row.status)}
+                    </Badge>
+                  ),
+                },
+                { key: "decision", header: "Decision", render: (row) => titleCase(row.decision) },
+                { key: "prices", header: "Prices", align: "right", render: (row) => <span className="num">{row.price_observations}</span> },
+                { key: "financials", header: "Financial Periods", align: "right", render: (row) => <span className="num">{row.financial_periods}</span> },
+                { key: "knowledge", header: "Knowledge", align: "right", render: (row) => <span className="num">{row.active_knowledge}</span> },
+                { key: "blocker", header: "Primary Blocker", render: (row) => row.blockers[0] ?? "None" },
+              ]}
+            />
+          )}
+        </Card>
+
+        <Card title={selectedGap ? `${selectedGap.ticker} — Data Coverage` : "Data Coverage"} dense>
+          {gapReport.loading && <LoadingState rows={4} />}
+          {gapReport.error && <ErrorState detail={gapReport.error.message} onRetry={gapReport.reload} />}
+          {!gapReport.loading && !gapReport.error && !selectedGap && (
+            <EmptyState
+              title="No ticker selected"
+              detail="Select a row in Decision Readiness to see its per-layer data-completeness breakdown."
+            />
+          )}
+          {!gapReport.loading && !gapReport.error && selectedGap && <TickerGapDetail gap={selectedGap} />}
+        </Card>
+      </div>
     </Section>
+  );
+}
+
+function TickerGapDetail({ gap }: { gap: TickerDataGapReport }) {
+  return (
+    <div>
+      <div className={styles.detailStats}>
+        <StatTile label="Overall Completeness" value={formatPercent(gap.overall_completeness_pct / 100)} />
+        <StatTile label="Swing Ready" value={gap.swing_ready ? "Yes" : "No"} />
+        <StatTile label="Investment Ready" value={gap.investment_ready ? "Yes" : "No"} />
+      </div>
+
+      <div className={styles.block}>
+        <div className={styles.blockTitle}>Data Layers</div>
+        <div className={styles.horizonGrid}>
+          {gap.layers.map((layer) => (
+            <div key={layer.layer} className={styles.horizonCard}>
+              <div className={styles.horizonCardHeader}>
+                <span className={styles.horizonCardTitle}>{LAYER_LABELS[layer.layer] ?? titleCase(layer.layer)}</span>
+                <Meter value={layer.completeness_pct / 100} label={`${layer.completeness_pct}%`} />
+              </div>
+              <div className={styles.horizonCardStats}>
+                <span className="num">{layer.count}</span>
+                <span className={styles.horizonCardStatLabel}>of {layer.threshold} required</span>
+              </div>
+              {!layer.complete && (
+                <p className={styles.horizonCardWhy}>Below the readiness threshold for this layer.</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.block}>
+        <div className={styles.blockTitle}>Blockers</div>
+        {gap.blockers.length === 0 ? (
+          <span className={styles.blockText}>None recorded.</span>
+        ) : (
+          <ul className={styles.bulletList}>
+            {gap.blockers.map((b, i) => (
+              <li key={i}>{b}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className={styles.block}>
+        <div className={styles.blockTitle}>Next Actions</div>
+        {gap.next_actions.length === 0 ? (
+          <span className={styles.blockText}>None recorded.</span>
+        ) : (
+          <ul className={styles.bulletList}>
+            {gap.next_actions.map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 

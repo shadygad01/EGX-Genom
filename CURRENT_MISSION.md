@@ -1,6 +1,137 @@
 # Current Mission
 
-## Current mission: target the closeable half of "not_targeted", explain the rest honestly
+## Current mission: TD-34 — `ticker_data_gap_report.json` web/API wiring
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: the last purely-engineering item on
+`NEXT_MISSIONS.md`'s punch list.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s "TD-34" section: wired
+following `financial_statements.json`'s exact existing pattern (API
+route/provider method, both web providers, TS types); UI reuses
+Opportunity Center's existing click-to-select pattern for a new "Data
+Coverage" detail card on the Decision Readiness table, rather than a new
+page. Verified in a real headless browser against real mock-mode `agx
+run` output served through a production build — clicking a row correctly
+populates the 5-layer breakdown. `npm run lint`/`build`/`test` clean for
+both `api` and `web`.
+
+**All five items from the project owner's "continue all remaining
+legal/free directions" instruction are now closed**: NewsIntelligenceAgent,
+entity resolution for news-to-ticker matching, macro frequency alignment
++ no-look-ahead discipline, the Monte Carlo stress simulator, and this
+TD-34 wiring. See `NEXT_MISSIONS.md` for what's genuinely next.
+
+---
+
+## Prior mission: Monte Carlo stress simulator
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: `NEXT_MISSIONS.md`'s Monte Carlo
+item — the one Experiment Factory gap named as a pure design decision,
+not a data blocker.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s matching section: new
+`validation.stress_test.MonteCarloBlockBootstrapStressTester` (block
+bootstrap over real observed returns, matching the existing stress
+tester's "locate/derive from real data, never simulate" philosophy);
+`MonteCarloExperiment` is now a real adapter over it instead of raising;
+`DailyResearchPipeline`'s STRESS_TEST gate now requires both testers to
+pass. Verified an identical mock run still produces the same 5
+hypotheses as before. 616 backend tests pass (8 new); `ruff check`
+clean.
+
+---
+
+## Prior mission: macro frequency alignment + no-look-ahead discipline
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: `NEXT_MISSIONS.md` item 2.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s matching section for full
+detail: `agents/macro.py` now forward-fills a macro series' step changes
+onto every trading day instead of requiring exact date equality (closing
+the frequency-mismatch half); `data/point_in_time.py` + `data.snapshot.
+build_snapshot()`'s new `macro_series_sources` param drop any
+observation not yet knowable given a declared, conservative per-source
+publication-lag floor (new debt TD-37), wired into `ProductionPipeline`
+for LIVE mode. Caught and fixed a real near-miss before merging: an
+initial 365-day World Bank/UN SDG lag assumption contradicted this
+codebase's own live-verified evidence (a real ~165-day-old collected
+observation) — scaled back to a 30-day floor, verified against the
+regression test that caught it. 608 backend tests pass (8 new); `ruff
+check` clean.
+
+---
+
+## Prior mission: entity resolution for news-to-ticker matching
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: `NEXT_MISSIONS.md` item 1,
+strengthening `NewsIntelligenceAgent`'s (and every RSS/GDELT-sourced
+event's) own ticker attribution.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s "Entity resolution for
+news-to-ticker matching" section for full detail: replaced
+`RssNewsCollector`/`GdeltDocCollector`'s substring ticker match with real
+word/token + company-name matching (`universe/entity_resolution.py`,
+reusing `discovery.engine.significant_tokens()`), and threaded real
+company names already present in this codebase
+(`research/data/universe/EGX30.csv`/`EGX70.csv`) through the production
+pipeline into both collectors. Deliberately no Arabic aliases (TD-36) —
+no verified source exists, and this codebase does not fabricate one. 600
+backend tests pass (8 new); `ruff check` clean.
+
+---
+
+## Prior mission: NewsIntelligenceAgent — turn already-connected real news into a real signal
+
+The project owner asked why Opportunity Center recommendations still
+aren't "real research," and, once the honest answer (99 of 101 tickers
+have zero real price history; every remaining free/legal acquisition
+avenue is either ToS/robots.txt-blocked, network-blocked, or gated on a
+named business decision — see `docs/ACQUISITION_STRATEGY.md`) was given,
+explicitly refused to have the ToS/robots.txt-compliance rule removed from
+the codebase (a correct call: that rule is a legal/ethical line, not a
+configurable preference) and instead asked to pursue every remaining
+*legal, free* direction, prioritizing real results.
+
+Per the standing acquisition-architecture freeze (`NEXT_MISSIONS.md`), no
+new `TargetOrganization`/collector/source-discovery work was in scope
+without a new named business input clearing a standing blocker — but the
+freeze explicitly names non-acquisition work (turning already-connected
+real evidence into research signal) as exactly what should happen instead.
+`NewsIntelligenceAgent` (`NEXT_MISSIONS.md` item 2) was the named,
+genuinely-unblocked next item: `enterprise_press`/`fra_egypt` have been
+producing real dated `NewsItem` records every live run since the
+"Egyptian Live Data Sprint" phase, and nothing turned that into a research
+finding.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s "NewsIntelligenceAgent" section
+for full detail: implemented as a real headline-keyword sentiment
+classifier (`agents/news_sentiment.py`, new debt TD-35) feeding a
+mechanical event-study-lite agent (`agents/news_intelligence.py`,
+mirroring `CorporateEventsAgent`'s exact structure), wired into
+`production.pipeline.ProductionPipeline`. Found and fixed one genuine,
+previously-latent bug along the way: `collectors.service._append_news`
+never deduped by natural key (unlike every sibling materialization
+writer), silently duplicating news rows on repeated collection of the
+same feed — caught by the existing mock/replay-determinism test the
+moment a real agent started consuming `news.csv`. 592 backend tests pass
+(24 new); `ruff check` clean.
+
+**Not done this phase, named as genuinely next** (all legal/free, no
+acquisition-architecture work): entity resolution for news-to-ticker
+matching (`NEXT_MISSIONS.md` item 1, "Immediately next" section — directly
+strengthens `NewsIntelligenceAgent`'s own ticker attribution); macro
+frequency alignment + no-look-ahead discipline (item 2); the Monte Carlo
+stress simulator (the one Experiment Factory gap that's a design decision,
+not a data blocker); `ticker_data_gap_report.json` web/API wiring (TD-34).
+See `NEXT_MISSIONS.md` for the full prioritized list.
+
+---
+
+## Prior mission: target the closeable half of "not_targeted", explain the rest honestly
 
 The project owner looked at the live `/sources` page after the first real
 Discovery run and asked, pointedly, why `PLANNED` sources still aren't

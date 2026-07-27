@@ -18,6 +18,7 @@ from datetime import date, timedelta
 
 from pydantic import BaseModel, Field
 
+from agx_research.data.point_in_time import is_knowable
 from agx_research.data.provider import DataProvider
 from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem, PriceBar
 
@@ -51,6 +52,7 @@ def build_snapshot(
     as_of: date,
     lookback_days: int,
     macro_lookback_days: int | None = None,
+    macro_series_sources: dict[str, str] | None = None,
 ) -> DatasetSnapshot:
     """Materialize a content-hashed snapshot of everything available as of `as_of`.
 
@@ -60,14 +62,32 @@ def build_snapshot(
     window to ever contain an observation at all; using one shared window
     for both silently starved every macro series (a real, live-confirmed
     gap, not a hypothetical one).
+
+    `macro_series_sources` (series_id -> source, e.g. `"worldbank"`),
+    when given, additionally drops any macro observation not yet
+    knowable as of `as_of` per `data.point_in_time.is_knowable` — closing
+    a distinct gap from the window above: being inside the lookback
+    *window* doesn't mean a value was actually *known* yet (an annual
+    figure isn't published the instant its year ends). Omitted or an
+    unmapped series id defaults to 0 assumed lag (no filtering change),
+    so existing callers (tests, mock data with no real publication delay
+    to model) are unaffected.
     """
     start = as_of - timedelta(days=lookback_days)
     macro_lookback_days = lookback_days if macro_lookback_days is None else macro_lookback_days
     macro_start = as_of - timedelta(days=macro_lookback_days)
+    macro_series_sources = macro_series_sources or {}
 
     price_history = {t: provider.get_price_history(t, start, as_of) for t in tickers}
     corporate_events = {t: provider.get_corporate_events(t, start, as_of) for t in tickers}
-    macro_series = {s: provider.get_macro_series(s, macro_start, as_of) for s in macro_series_ids}
+    macro_series = {
+        s: [
+            obs
+            for obs in provider.get_macro_series(s, macro_start, as_of)
+            if is_knowable(obs.observation_date, as_of, source=macro_series_sources.get(s))
+        ]
+        for s in macro_series_ids
+    }
     news = provider.get_news(None, start, as_of)
 
     canonical = json.dumps(

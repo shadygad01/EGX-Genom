@@ -30,6 +30,7 @@ import type {
   RunRecord,
   SourceMetricsRow,
   SourceSpec,
+  TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
 import type { DashboardDataProvider } from "./DataProvider";
@@ -133,6 +134,10 @@ export class ApiProvider implements DashboardDataProvider {
 
   getDecisionReadiness(): Promise<DecisionReadiness[]> {
     return fetchJson<DecisionReadiness[]>("/decision-readiness");
+  }
+
+  getTickerDataGapReport(): Promise<TickerDataGapReport[]> {
+    return fetchJson<TickerDataGapReport[]>("/ticker-data-gap-report");
   }
 
   getDiscoveryReport(): Promise<DiscoveryOutcome[]> {

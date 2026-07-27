@@ -32,6 +32,7 @@ import type {
   RunRecord,
   SourceMetricsRow,
   SourceSpec,
+  TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
 
@@ -67,6 +68,7 @@ export interface DashboardDataProvider {
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;
+  getTickerDataGapReport(): Promise<TickerDataGapReport[]>;
   getDiscoveryReport(): Promise<DiscoveryOutcome[]>;
   getDiscoveryMetrics(): Promise<DiscoveryMetrics | null>;
   getEndpointCandidates(): Promise<EndpointCandidate[]>;

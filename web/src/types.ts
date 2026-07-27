@@ -30,6 +30,30 @@ export interface DecisionReadiness {
   next_actions: string[];
 }
 
+export interface DataLayerGap {
+  layer: string;
+  count: number;
+  threshold: number;
+  complete: boolean;
+  completeness_pct: number;
+}
+
+export interface TickerDataGapReport {
+  ticker: string;
+  as_of: string;
+  status: ReadinessStatus;
+  decision: string;
+  ready_horizons: Horizon[];
+  swing_ready: boolean;
+  investment_ready: boolean;
+  price_observations: number;
+  latest_price_date: string | null;
+  layers: DataLayerGap[];
+  overall_completeness_pct: number;
+  blockers: string[];
+  next_actions: string[];
+}
+
 export interface ProvenanceRef {
   kind: string;
   ref_id: string;

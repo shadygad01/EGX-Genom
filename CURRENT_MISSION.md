@@ -1,5 +1,40 @@
 # Current Mission
 
+## Current mission: no-API-key-sources decision — remove `NEEDS_KEY` entirely
+
+Immediate follow-up to the mission below: the project owner made an
+explicit, permanent policy call — the platform is scoped exclusively to
+genuinely free sources, so any source whose only route needs a
+user-registered API key serves no goal ("لا انتظار" — no waiting on a
+key that will never come, and if the only solution for a capability is a
+keyed API, delete it rather than leave it catalogued and idle).
+
+**Closed**: removed all four `NEEDS_KEY` seed catalog entries (`fmp`,
+`alphavantage`, `polygon`, `tiingo`) from `sources/catalog.py`, deleted
+`AlphaVantageCollector`/`FmpCollector` (`collectors/alphavantage.py`,
+`collectors/fmp.py`) and their tests, and dropped their ids from
+`acquisition_intelligence/capability.py`'s `CAPABILITY_STRATEGIES` pools
+for `Capability.PRICE_DATA`/`Capability.FINANCIAL_STATEMENTS`. Updated
+`test_capability_engine.py`'s synthetic fallback tests to use a still-
+catalogued candidate id instead of the removed `fmp` placeholder (the
+tests exercise the ranking/fallback engine generically, not FMP itself).
+Registry is now 51 sources (14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY /
+0 TOS_REVIEW). Updated `docs/DATA_ACQUISITION.md` ("No API-key sources"
+section, replacing the old NEEDS_KEY policy description),
+`docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md`
+(TD-21's repayment trigger no longer suggests a keyed resolver), and
+`docs/ACQUISITION_STRATEGY.md` (an inline "Update" note over the
+now-historical FMP/AlphaVantage analysis, preserving the original
+analysis for accuracy rather than rewriting it). `SourceStatus.NEEDS_KEY`
+stays in the enum as a structural classification — nothing currently
+uses it, and any future source proposal needing a credential should be
+rejected the same way, not silently re-added.
+
+`NEXT_MISSIONS.md`'s "Paid/`NEEDS_KEY` sources" item is now closed
+outright rather than deferred (see its updated entry).
+
+---
+
 ## Current mission: provider-leg health measurement accuracy (System 02 accuracy review)
 
 The project owner reviewed the platform's own source dashboards (as

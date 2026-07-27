@@ -181,7 +181,7 @@ Collector *types* covered, per the charter's list:
 | Type | How it's served |
 |---|---|
 | RSS/Atom | `RssNewsCollector` — one generic collector serving every feed-publishing outlet via `SourceSpec` configuration |
-| REST/JSON API | `WorldBankCollector`, `AlphaVantageCollector`, `FmpCollector` — one class per API shape (shapes differ enough that a single generic JSON collector would either be too rigid or reinvent per-source mapping) |
+| REST/JSON API | `WorldBankCollector` — one class per API shape (shapes differ enough that a single generic JSON collector would either be too rigid or reinvent per-source mapping) |
 | CSV download | `StooqPriceCollector`, `FredCsvCollector` |
 | Excel (XLSX) | `ExcelSeriesCollector` — generic, column-mapped (openpyxl-backed) |
 | PDF | `PdfDocumentCollector` — generic fetch/archive/text-extraction base (pypdf-backed); `parse()` stays source-specific by necessity |
@@ -333,12 +333,20 @@ an explicit status:
 - **PLANNED** — catalogued with known access details; collector not yet
   written (most are one configuration of an existing generic collector,
   e.g. an RSS feed URL). Seeded at `LifecycleState.CANDIDATE`, `ACTIVE`.
-- **NEEDS_KEY** — free tier requires a user-registered API key
-  (AlphaVantage, FMP, Polygon, Tiingo). Keys are credentials: a business/
-  user action, never fabricated or bypassed. Collector *code* can exist and
-  be fully tested against the API's public documented shape (see
-  AlphaVantage/FMP below) without the source becoming collectable — seeded
-  at `CANDIDATE`/`PAUSED`.
+- **NEEDS_KEY** — reserved for a source whose only access route requires a
+  user-registered credential. **No seed source currently uses this
+  status.** The project owner's explicit decision: this platform is
+  scoped to sources collectable with no registration/credential of any
+  kind, so a capability whose only real strategy needs a key is left
+  honestly uncovered rather than catalogued and left waiting indefinitely.
+  `AlphaVantageCollector`/`FmpCollector` and the `alphavantage`/`fmp`/
+  `polygon`/`tiingo` catalog entries existed under this status and were
+  removed for exactly this reason (see "No API-key sources" below) — not
+  because their collector code was wrong. The status value itself stays
+  in `SourceStatus` as a structural classification (a source that turns
+  out to be genuinely free but happens to require a no-cost registration
+  step is a decision to revisit explicitly, not a status this codebase
+  auto-assigns).
 - **TOS_REVIEW** — access exists but redistribution/automation terms are
   ambiguous (Yahoo Finance unofficial API, Investing.com, TradingView,
   Google Trends automation, LinkedIn). Not collected until the review
@@ -367,16 +375,23 @@ check for HTML-ish fetches; it is exercised in deployment, not in unit
 tests (this sandbox has no outbound egress for live collection, only for
 package installs).
 
-### Code-complete but not yet collectable
+### No API-key sources
 
-`AlphaVantageCollector` and `FmpCollector` are fully implemented and
-unit-tested against each API's documented public JSON response shape
-(`Meta Data`/`Time Series (Daily)` for AlphaVantage; `symbol`/`historical`
-for FMP) — but their seed catalog entries stay `NEEDS_KEY` because no API
-key exists to actually collect with. This is the platform's "small
-adapter" promise made concrete: once a user supplies their own free-tier
-key, activating the source is a `SourceSpec.status` flip plus passing the
-key into the constructor — no new parsing code.
+Earlier phases carried `AlphaVantageCollector`/`FmpCollector` — fully
+implemented and unit-tested against each API's documented public JSON
+response shape — with their seed catalog entries (`alphavantage`, `fmp`)
+staying `NEEDS_KEY` pending a user-supplied key, plus two further
+placeholder entries (`polygon`, `tiingo`) with no collector code at all.
+The project owner's explicit decision: the platform relies exclusively on
+genuinely free, no-registration sources, so waiting on a key indefinitely
+serves no goal, and a capability whose only real strategy requires one
+should be dropped rather than left permanently blocked. All four catalog
+entries and the two collector classes (plus their tests) were removed.
+`Capability.PRICE_DATA`/`Capability.FINANCIAL_STATEMENTS`'s declared
+candidate pools (`acquisition_intelligence/capability.py`) no longer name
+them either. Any future capability gap must be closed with a genuinely
+free source (no registration step of any kind), or left honestly
+uncovered — never with a `NEEDS_KEY` catalog entry.
 
 ## What's still blocked
 
@@ -385,7 +400,8 @@ The 16-collector build order in the program's implementation policy
 CNBC Arabia, Trading Economics, CBE, FRA, CAPMAS, Yahoo Finance, FMP,
 AlphaVantage, TradingView News) breaks down as:
 
-- **FMP, AlphaVantage** — code-complete, `NEEDS_KEY` (above).
+- **FMP, AlphaVantage** — removed from the catalog per the no-API-key
+  policy above; no longer part of this program at all.
 - **Yahoo Finance, TradingView News** — `TOS_REVIEW`; automation terms are
   ambiguous, so collection stays blocked until a human legal/ToS review
   clears them. Not a coding gap.
@@ -421,7 +437,8 @@ AlphaVantage, TradingView News) breaks down as:
 
 - `FetchPolicy.respect_robots` blocks fetches disallowed by robots.txt.
 - No collector authenticates, bypasses paywalls, or touches restricted
-  data; NEEDS_KEY sources idle until the user supplies their own key.
+  data; per the project owner's decision, no source is catalogued at all
+  if its only route requires a credential (see "No API-key sources").
 - Every `SourceSpec` records `license` and `terms_of_use_url`; TOS_REVIEW
   status blocks collection outright.
 - Rate limits are per-source configuration honored by the fetcher.

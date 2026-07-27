@@ -22,6 +22,18 @@ and "Collector Classification" for how every existing collector maps onto
 this model. Nothing in Steps 1-6 below changed; this phase closed the gap
 between the analysis and the code.
 
+**Update (no-API-key sources decision, later phase):** the project owner
+decided the platform relies exclusively on genuinely free, no-registration
+sources — waiting indefinitely on a `NEEDS_KEY` credential serves no goal.
+Every reference below to AlphaVantage/FMP/Polygon/Tiingo as `NEEDS_KEY,
+code-complete` describes the historical state at the time this document
+was written; all four were subsequently removed from the seed catalog,
+along with `AlphaVantageCollector`/`FmpCollector` and their tests (see
+`docs/DATA_ACQUISITION.md`'s "No API-key sources" section and
+`CURRENT_MISSION.md`). The rest of this document's analysis (which legal
+strategies exist per capability, the live-evidence findings) is otherwise
+unaffected and preserved below for its historical accuracy.
+
 ## The corrected assumption
 
 The acquisition program's original mental model, implicit in treating every

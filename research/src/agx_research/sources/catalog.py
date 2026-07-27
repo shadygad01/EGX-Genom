@@ -13,6 +13,14 @@ collector exists; PLANNED means catalogued pending collector/config
 for the source's own free API key; TOS_REVIEW means automation or
 redistribution terms are ambiguous and collection is blocked until
 reviewed — ambiguity blocks, per the program's legal rules.
+
+Per the project owner's explicit decision, this catalog seeds no
+NEEDS_KEY sources: the platform is scoped to sources collectable with no
+registration/credential of any kind, so a capability whose only real
+strategy would require one is left honestly uncovered rather than
+catalogued and left waiting indefinitely (see `docs/DATA_ACQUISITION.md`'s
+"No API-key sources" note; FMP/AlphaVantage/Polygon/Tiingo were removed
+for exactly this reason, not because their collector code was wrong).
 """
 
 from __future__ import annotations
@@ -348,65 +356,6 @@ def seed_sources() -> list[SourceSpec]:
             integrated_via="egx_price_composite",
             integrated_capabilities=["price_data"],
             notes="Live recent-history provider leg inside EgxCompositePriceCollector.",
-        ),
-        _spec(
-            id="fmp",
-            name="Financial Modeling Prep (free tier)",
-            category=SourceCategory.MARKET_DATA,
-            access_method=AccessMethod.JSON_API,
-            status=SourceStatus.NEEDS_KEY,
-            base_url="https://financialmodelingprep.com/api/v3",
-            reliability_score=0.65,
-            freshness_score=0.8,
-            conflict_priority=50,
-            authentication="api_key(user-supplied)",
-            collector="FmpCollector",
-            collector_version="1.0.0",
-            validation_rules=["data.quality.validate_price_bars"],
-            notes="Collector code is complete and tested against FMP's documented JSON "
-            "shape; status stays NEEDS_KEY until a user supplies their own API key and "
-            "an operator flips this entry to IMPLEMENTED.",
-        ),
-        _spec(
-            id="alphavantage",
-            name="AlphaVantage (free tier)",
-            category=SourceCategory.MARKET_DATA,
-            access_method=AccessMethod.JSON_API,
-            status=SourceStatus.NEEDS_KEY,
-            base_url="https://www.alphavantage.co/query",
-            reliability_score=0.65,
-            freshness_score=0.7,
-            conflict_priority=50,
-            authentication="api_key(user-supplied)",
-            collector="AlphaVantageCollector",
-            collector_version="1.0.0",
-            validation_rules=["data.quality.validate_price_bars"],
-            rate_limit=RateLimit(requests_per_minute=5, min_seconds_between_requests=15.0),
-            notes="Collector code is complete and tested against AlphaVantage's documented "
-            "JSON shape; status stays NEEDS_KEY until a user supplies their own API key and "
-            "an operator flips this entry to IMPLEMENTED.",
-        ),
-        _spec(
-            id="polygon",
-            name="Polygon.io (free tier)",
-            category=SourceCategory.MARKET_DATA,
-            access_method=AccessMethod.JSON_API,
-            status=SourceStatus.NEEDS_KEY,
-            reliability_score=0.7,
-            freshness_score=0.8,
-            conflict_priority=55,
-            authentication="api_key(user-supplied)",
-        ),
-        _spec(
-            id="tiingo",
-            name="Tiingo (free tier)",
-            category=SourceCategory.MARKET_DATA,
-            access_method=AccessMethod.JSON_API,
-            status=SourceStatus.NEEDS_KEY,
-            reliability_score=0.7,
-            freshness_score=0.8,
-            conflict_priority=55,
-            authentication="api_key(user-supplied)",
         ),
         _spec(
             id="investing_com",

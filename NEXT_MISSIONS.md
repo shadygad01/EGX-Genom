@@ -17,10 +17,13 @@ have this codebase guess or fabricate around them:
   `CURRENT_MISSION.md`'s "Superseded six times" note). Converting one to
   `IMPLEMENTED` is real, source-by-source acquisition work the standing
   freeze (below) explicitly defers pending a new named business input.
-- **Paid/`NEEDS_KEY` sources** (FMP, AlphaVantage, Polygon, Tiingo) are
-  code-complete and only need the project owner to supply their own
-  free-tier API key, then flip the catalog entry's `status` — a
-  credential/business action, never something to fabricate or bypass.
+- **`NEEDS_KEY` sources (FMP, AlphaVantage, Polygon, Tiingo)** — the
+  project owner reviewed this and decided against it explicitly: the
+  platform is scoped to genuinely free, no-registration sources only, so
+  waiting on a key serves no goal. All four catalog entries and the two
+  collector classes (`AlphaVantageCollector`, `FmpCollector`) plus their
+  tests were removed this phase — see `docs/DATA_ACQUISITION.md`'s "No
+  API-key sources" section. This is now closed, not deferred.
 - **No scheduled recurring discovery/collection run** exists yet because
   it needs System 18's managed-scheduling decision (cloud target +
   secrets + scheduler) — named in `docs/ROADMAP.md` and TD-23's own

@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.19.0 — No-API-key-sources policy: remove NEEDS_KEY entirely
+
+The project owner made an explicit, permanent policy call: the platform
+relies exclusively on genuinely free, no-registration sources, so waiting
+on a `NEEDS_KEY` credential serves no goal — if a capability's only real
+solution is a keyed API, drop it rather than leave it catalogued and idle.
+
+- Removed the four `NEEDS_KEY` seed catalog entries (`fmp`,
+  `alphavantage`, `polygon`, `tiingo`) from `sources/catalog.py`.
+- Deleted `AlphaVantageCollector`/`FmpCollector` and their tests — dead
+  code once their only catalog entries were removed.
+- Dropped their ids from `acquisition_intelligence/capability.py`'s
+  `CAPABILITY_STRATEGIES` pools (`PRICE_DATA`, `FINANCIAL_STATEMENTS`).
+- Updated `test_capability_engine.py`'s synthetic fallback tests to use a
+  still-catalogued id instead of the removed `fmp` placeholder (those
+  tests exercise the generic ranking/fallback engine, not FMP itself).
+- Registry is now 51 sources (14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY /
+  0 TOS_REVIEW). `SourceStatus.NEEDS_KEY` stays in the enum as a
+  structural classification — no seed source uses it, and any future
+  source proposal needing a credential should be rejected the same way.
+- Updated `docs/DATA_ACQUISITION.md`, `docs/ARCHITECTURE.md`,
+  `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md` (TD-21), and
+  `docs/ACQUISITION_STRATEGY.md` (an inline note over the now-historical
+  FMP/AlphaVantage analysis, preserving the original text).
+- 559 backend tests pass; `ruff check` clean.
+
 ## 0.18.0 — Provider-leg health/reputation measured directly
 
 The project owner flagged, from a review of the live source dashboards,

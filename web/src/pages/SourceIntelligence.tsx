@@ -41,22 +41,27 @@ const ACTIVATION_VARIANT: Record<ActivationStatus, BadgeVariant> = {
 };
 
 /** Every source AGX knows about -- health, availability, coverage,
- * freshness, latency, qualification, and validation score, joined across
- * the source registry, source reputation metrics, and the most recent
- * collector run. */
+ * freshness, latency, qualification, validation score, and (for a still-
+ * PLANNED source) the weekly Discovery workflow's own evidenced attempt to
+ * verify a real endpoint -- joined across the source registry, source
+ * reputation metrics, the most recent collector run, and the discovery
+ * report. */
 export function SourceIntelligence() {
   const sourceRegistry = useArtifact((p) => p.getSourceRegistry());
   const sourceMetrics = useArtifact((p) => p.getSourceMetrics());
   const collectorStatus = useArtifact((p) => p.getCollectorStatus());
+  const discoveryReport = useArtifact((p) => p.getDiscoveryReport());
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const metricsById = new Map((sourceMetrics.data ?? []).map((m) => [m.source_id, m]));
   const collectorById = new Map((collectorStatus.data ?? []).map((c) => [c.source_id, c]));
+  const discoveryById = new Map((discoveryReport.data ?? []).map((d) => [d.source_id, d]));
 
   const sorted = [...(sourceRegistry.data ?? [])].sort((a, b) => a.priority - b.priority);
   const selected = sorted.find((s) => s.id === selectedId) ?? sorted[0] ?? null;
   const selectedMetrics = selected ? metricsById.get(selected.id) : undefined;
   const selectedCollector = selected ? collectorById.get(selected.id) : undefined;
+  const selectedDiscovery = selected ? discoveryById.get(selected.id) : undefined;
   const effectiveCollected = selectedCollector?.status === "COLLECTED" || selectedCollector?.status === "DEGRADED" || selectedCollector?.status === "STANDBY";
 
   return (
@@ -124,6 +129,10 @@ export function SourceIntelligence() {
                     label="Validation Score"
                     value={selected.data_quality_score != null ? formatPercent(selected.data_quality_score) : "—"}
                   />
+                  <StatTile
+                    label="Composite Reputation"
+                    value={selectedMetrics?.reputation?.composite != null ? formatPercent(selectedMetrics.reputation.composite) : "—"}
+                  />
                 </div>
 
                 <div className={styles.block}>
@@ -140,6 +149,9 @@ export function SourceIntelligence() {
                           ["latency", "Latency"],
                           ["accuracy", "Accuracy"],
                           ["schema_stability", "Schema Stability"],
+                          ["correction_rate", "Correction Rate"],
+                          ["duplicate_rate", "Duplicate Rate"],
+                          ["historical_usefulness", "Historical Usefulness"],
                         ] as const
                       ).map(([key, label]) => {
                         const value = selectedMetrics.reputation![key];
@@ -155,6 +167,24 @@ export function SourceIntelligence() {
                     </>
                   )}
                 </div>
+
+                {selectedDiscovery && (
+                  <div className={styles.block}>
+                    <div className={styles.blockTitle}>Discovery Evidence</div>
+                    <p className={styles.notes}>
+                      {titleCase(selectedDiscovery.verification_result)}
+                      {selectedDiscovery.from_cache ? " (cached result)" : ""} —{" "}
+                      {selectedDiscovery.reason_for_failure ?? "Endpoint verified."}
+                    </p>
+                    {selectedDiscovery.discovered_endpoints.length > 0 && (
+                      <p className={styles.notes}>Discovered: {selectedDiscovery.discovered_endpoints.join(", ")}</p>
+                    )}
+                    {selectedDiscovery.evidence.length > 0 && (
+                      <p className={styles.notes}>Evidence: {selectedDiscovery.evidence.join("; ")}</p>
+                    )}
+                    <p className={styles.notes}>{selectedDiscovery.recommendation}</p>
+                  </div>
+                )}
 
                 {selected.notes && (
                   <div className={styles.block}>

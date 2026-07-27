@@ -115,4 +115,20 @@ export class ArtifactsReader {
   decisionReadiness<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("decision_readiness.json"), []);
   }
+
+  // Written by the weekly Discovery workflow (.github/workflows/discovery.yml),
+  // not by agx run/export-dashboard -- absent until the first scheduled run's
+  // PR merges. See docs/DATA_ACQUISITION.md's "Discovery workflow" section.
+
+  discoveryReport<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("discovery_report.json"), []);
+  }
+
+  discoveryMetrics<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("discovery_metrics.json"), null);
+  }
+
+  endpointCandidates<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("endpoint_candidates.json"), []);
+  }
 }

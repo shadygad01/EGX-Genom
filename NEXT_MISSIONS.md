@@ -186,10 +186,14 @@ new data collection:
   frontend must not compute returns from raw price bars itself.
 - **Review Board decision history** (Research Center) — no repository
   persists past `BoardDecision`s yet.
-- **Discovery Engine detail** (Mission Control) — `acquisition_intelligence`
-  has no dashboard export yet; low priority now that acquisition is
-  frozen, but the artifact would still be useful for showing *why* each
-  connected source is trusted.
+- ~~**Discovery Engine detail** (Mission Control) — `acquisition_intelligence`
+  has no dashboard export yet~~ **Closed**: the weekly Discovery
+  workflow's `discovery_report.json`/`discovery_metrics.json`/
+  `endpoint_candidates.json` are now wired into Mission Control's "Weekly
+  Discovery" section and Source Intelligence's "Discovery Evidence"
+  block — see `CURRENT_MISSION.md`'s "surface already-computed data"
+  entry. Renders an honest empty state until the first scheduled run's PR
+  merges.
 - **Raw log lines** (System Administration) — no artifact carries them
   yet.
 

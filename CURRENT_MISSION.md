@@ -1,5 +1,48 @@
 # Current Mission
 
+## Current mission: surface already-computed data the dashboard was hiding
+
+The project owner looked at the live Mission Control (`/mission-control`)
+and Source Intelligence (`/sources`) pages and reported "these pages have
+unexploited capabilities" — asked for a plain-language summary first
+(not asserting technical field names as the primary explanation), then to
+fix it once the summary made sense.
+
+Verified by reading the actual React components against the backend
+artifacts feeding them (not guessing): `collector_status.json` computes
+per-record-type counts and a composite reputation score per source per
+run that the UI collapsed into one "Yield" number and never rendered at
+all, respectively; `compute_reputation()`'s 9 charter dimensions were
+only 6-of-9 rendered in Source Intelligence's meters (missing
+`correction_rate`/`duplicate_rate`/`historical_usefulness` and the
+composite); and the weekly Discovery workflow built in the mission below
+had zero frontend wiring — its own artifacts existed on disk (once a PR
+merges) with no `DashboardDataProvider` method, API route, or UI section
+to reach them.
+
+**Closed**:
+- Mission Control's Collectors table: new Breakdown/Withheld/Reputation
+  columns from fields `collector_status.json` already carried.
+- Source Intelligence: 3 missing reputation dimensions + composite score
+  added to the meters block.
+- Discovery workflow wired end to end: `web/src/types.ts`
+  (`DiscoveryOutcome`/`EndpointCandidate`/`DiscoveryMetrics`),
+  `DashboardDataProvider`/`StaticJsonProvider`/`ApiProvider`
+  (`getDiscoveryReport`/`getDiscoveryMetrics`/`getEndpointCandidates`),
+  `api/src/artifactsStore.ts`/`api/src/routes/dashboard.ts` (3 new
+  routes), a new "Weekly Discovery" section on Mission Control, and a
+  "Discovery Evidence" block on Source Intelligence's detail panel.
+  `deploy-pages.yml` copies `research/data/discovery/*.json` into the
+  dashboard data directory when present (plain file copy, no
+  reprocessing — see the mission below for why those files are already
+  final-shaped). Renders an honest empty state until the first Discovery
+  PR actually merges.
+- `npm install` was needed first (fresh session, `node_modules` never
+  installed) — `npm run build`/`test` clean for both `api` and `web`
+  afterward.
+
+---
+
 ## Current mission: weekly Discovery workflow — verify PLANNED sources continuously
 
 The project owner pushed back on "37 sources stay PLANNED pending network

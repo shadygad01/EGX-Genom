@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.21.0 — Surface already-computed data the dashboard was hiding
+
+The project owner reviewed the live Mission Control and Source
+Intelligence pages and found real, already-computed backend data with no
+frontend path to it at all.
+
+- **Mission Control's Collectors table**: added a "Breakdown" column
+  (`collector_status.json`'s per-record-type counts -- price bars, macro
+  observations, news, corporate events, index constituents, financial
+  statement line items -- previously collapsed into one summed "Yield"
+  number), a "Withheld" column (quality-rejected batches, previously
+  shown nowhere), and a "Reputation" column (the composite score,
+  previously computed but never rendered).
+- **Source Intelligence's Reputation Dimensions**: added the 3 of the
+  charter's 9 dimensions that were computed (`compute_reputation()`) and
+  typed but never rendered (`correction_rate`, `duplicate_rate`,
+  `historical_usefulness`), plus a "Composite Reputation" stat tile for
+  the overall score.
+- **Weekly Discovery workflow wired into both pages** (previously zero
+  frontend path at all): new `discovery_report.json`/`discovery_metrics.json`/
+  `endpoint_candidates.json` types, `DashboardDataProvider` methods,
+  `ArtifactsReader`/API routes, `StaticJsonProvider`/`ApiProvider`
+  implementations. Mission Control gets a new "Weekly Discovery" section
+  (metrics + per-source verification table); Source Intelligence's detail
+  panel gets a "Discovery Evidence" block for the selected source, when
+  available. `deploy-pages.yml` copies the three files from
+  `research/data/discovery/` into the dashboard data directory if present
+  (a plain file copy -- they're already final-shaped JSON committed by
+  the Discovery workflow's PR, not reprocessed); an honest empty state
+  renders until the first such PR merges.
+- `npm run build`/`test` clean for both `api` and `web` workspaces.
+
 ## 0.20.0 — Weekly Discovery workflow
 
 Closes "dozens of sources stay PLANNED, waiting on network egress" for

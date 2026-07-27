@@ -846,3 +846,28 @@ full design, `CURRENT_MISSION.md` for the mission narrative, and
 `AcquisitionContinuityMonitor`'s DOWN-recovery into the same schedule;
 reviewing the first real scheduled run's PR once GitHub Actions produces
 one, which this session cannot verify directly).
+
+## Frontend accuracy pass: surfacing already-computed data (Mission Control + Source Intelligence)
+
+The project owner reviewed the live `/mission-control` and `/sources`
+pages and reported real, computed backend data with no frontend path to
+it at all — verified by reading the React components against the exact
+artifacts feeding them, not by guessing.
+
+Closed: Mission Control's Collectors table gained Breakdown (per-record-
+type counts `collector_status.json` already carried, previously summed
+into one "Yield" number)/Withheld/Reputation columns; Source
+Intelligence's Reputation Dimensions block gained the 3 of 9 charter
+dimensions that were computed but never rendered (`correction_rate`,
+`duplicate_rate`, `historical_usefulness`) plus a composite-score stat
+tile; and the weekly Discovery workflow (see the "Weekly Discovery
+Workflow" section above) is now wired end to end — new TS types, new
+`DashboardDataProvider`/`ArtifactsReader`/API-route methods, a new
+"Weekly Discovery" Mission Control section, and a "Discovery Evidence"
+block on Source Intelligence's detail panel — where it previously had
+zero frontend path despite existing on disk. `deploy-pages.yml` copies
+`research/data/discovery/*.json` into the dashboard data directory when
+present (a plain file copy, not a Python re-export, since the Discovery
+workflow already writes them in final shape). `npm run build`/`test`
+clean for both `api` and `web` workspaces (required a fresh `npm install`
+in this session first — `node_modules` had never been installed).

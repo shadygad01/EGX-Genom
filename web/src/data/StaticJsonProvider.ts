@@ -11,6 +11,9 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  DiscoveryMetrics,
+  DiscoveryOutcome,
+  EndpointCandidate,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -141,5 +144,17 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getDecisionReadiness(): Promise<DecisionReadiness[]> {
     return fetchList<DecisionReadiness>("decision_readiness.json");
+  }
+
+  getDiscoveryReport(): Promise<DiscoveryOutcome[]> {
+    return fetchList<DiscoveryOutcome>("discovery_report.json");
+  }
+
+  getDiscoveryMetrics(): Promise<DiscoveryMetrics | null> {
+    return fetchObject<DiscoveryMetrics>("discovery_metrics.json");
+  }
+
+  getEndpointCandidates(): Promise<EndpointCandidate[]> {
+    return fetchList<EndpointCandidate>("endpoint_candidates.json");
   }
 }

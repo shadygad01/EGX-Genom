@@ -95,12 +95,15 @@ def build_live_wayback_client(*, timeout_seconds: float = 15.0) -> WaybackAvaila
     return WaybackAvailabilityClient(fetch_json)
 
 
-def build_live_wikidata_client(*, timeout_seconds: float = 30.0) -> WikidataOfficialWebsiteClient:
+def build_live_wikidata_client(*, timeout_seconds: float = 55.0) -> WikidataOfficialWebsiteClient:
     """Wikidata's own SPARQL endpoint requires `Accept:
     application/sparql-results+json` (unlike Wayback's APIs, which are
     JSON by default) -- otherwise it may reply with an HTML results page
-    instead. A longer default timeout than Wayback's: a P17+P31/P279*+P856
-    query over all Wikidata is a heavier query than a single-URL lookup.
+    instead. A longer default timeout than Wayback's, just under
+    Wikidata's own ~60s public-endpoint server-side execution limit: a
+    P17+P856 scan is still a heavier query than a single-URL lookup, and a
+    client-side timeout shorter than the server's own limit would abort a
+    query that was about to legitimately succeed.
     """
     def fetch_json(url: str):
         request = urllib.request.Request(

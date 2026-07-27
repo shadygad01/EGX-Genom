@@ -36,17 +36,30 @@ FetchJson = Callable[[str], object]
 
 WIKIDATA_SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
 
-# Q79 = Egypt (P17 = country of the entity); Q4830453 = business (P31/P279*
-# = instance of a subclass of business) -- both stable, widely-documented
-# Wikidata IDs, not a guess. SERVICE wikibase:label pulls each hit's best
+# Q79 = Egypt (P17 = country of the entity) -- a stable, widely-documented
+# Wikidata ID, not a guess. SERVICE wikibase:label pulls each hit's best
 # English label so it can be matched against `companies`' display names.
+#
+# Deliberately NOT filtered by entity type (no `P31/wdt:P279* wd:Q4830453`
+# "instance of a subclass of business" traversal): a live run against two
+# real EGX30 constituents (Telecom Egypt, Commercial International Bank --
+# both with real, well-documented Wikidata/Wikipedia entries) returned zero
+# matches with that filter in place. A `P31/P279*` property-path traversal
+# is exactly the query shape Wikidata's public endpoint's own documentation
+# warns is prone to server-side timeout, and both companies failing
+# identically despite genuinely existing points at the query itself never
+# completing, not at missing data. Matching every Egypt-linked entity with
+# a declared P856 instead is a cheaper, single-hop query; the existing
+# name-token-overlap matching in `match_wikidata_websites_to_companies`
+# already filters the larger result set down to real company-name hits, so
+# broadening this query adds noise-filtered-out-later, not false trust.
 EGYPT_COMPANIES_WEBSITES_QUERY = """
 SELECT ?companyLabel ?website WHERE {
   ?company wdt:P17 wd:Q79.
-  ?company wdt:P31/wdt:P279* wd:Q4830453.
   ?company wdt:P856 ?website.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
+LIMIT 20000
 """.strip()
 
 

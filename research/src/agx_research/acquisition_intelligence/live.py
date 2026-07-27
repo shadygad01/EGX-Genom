@@ -96,6 +96,10 @@ def build_live_wayback_client(*, timeout_seconds: float = 15.0) -> WaybackAvaila
     return WaybackAvailabilityClient(fetch_json)
 
 
+_WIKIDATA_MAX_429_RETRIES = 4
+_WIKIDATA_DEFAULT_RETRY_AFTER_SECONDS = 5.0
+
+
 def build_live_wikidata_client(
     *, timeout_seconds: float = 30.0, min_seconds_between_requests: float = 0.3,
 ) -> WikidataOfficialWebsiteClient:
@@ -105,35 +109,59 @@ def build_live_wikidata_client(
     ~100-company sprint run stays a reasonable, well-behaved client rather
     than a request burst, matching the spirit (not the exact mechanism) of
     `collectors.fetcher.HttpFetcher`'s per-source rate limiting.
+
+    Live-verified failure mode this retries: a shared GitHub Actions
+    runner IP hitting Wikidata's action API got a real `HTTP 429 Too Many
+    Requests` ("You are making too many requests to the API") on the very
+    first call, despite `min_seconds_between_requests` already pacing this
+    client's own calls -- the contention is from *other* traffic sharing
+    that IP range, not this client's own request rate, so only backing off
+    and retrying (honoring a `Retry-After` header when the response
+    supplies one) can recover from it.
     """
     last_request_at = 0.0
 
     def fetch_json(url: str):
         nonlocal last_request_at
-        elapsed = time.monotonic() - last_request_at
-        if elapsed < min_seconds_between_requests:
-            time.sleep(min_seconds_between_requests - elapsed)
-        last_request_at = time.monotonic()
+        for attempt in range(_WIKIDATA_MAX_429_RETRIES + 1):
+            elapsed = time.monotonic() - last_request_at
+            if elapsed < min_seconds_between_requests:
+                time.sleep(min_seconds_between_requests - elapsed)
+            last_request_at = time.monotonic()
 
-        request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
-        try:
-            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-                return json.loads(response.read().decode("utf-8", errors="replace"))
-        except urllib.error.HTTPError as exc:
-            # Diagnostic only: `WikidataOfficialWebsiteClient.lookup` still
-            # degrades to "no hint" on any failure either way (never raises
-            # to the caller) -- this is purely so a live run's logs can
-            # distinguish "the endpoint rejected/rate-limited the request"
-            # from "no matching entity/claim exists", which looked
-            # identical with no logging at all (see AD-33's follow-up).
-            body = exc.read().decode("utf-8", errors="replace")[:300]
-            print(
-                f"Wikidata API request failed: HTTP {exc.code} {exc.reason}: {body}",
-                file=sys.stderr,
-            )
-            return {}
-        except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError) as exc:
-            print(f"Wikidata API request failed: {exc!r}", file=sys.stderr)
-            return {}
+            request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+            try:
+                with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+                    return json.loads(response.read().decode("utf-8", errors="replace"))
+            except urllib.error.HTTPError as exc:
+                body = exc.read().decode("utf-8", errors="replace")[:300]
+                if exc.code == 429 and attempt < _WIKIDATA_MAX_429_RETRIES:
+                    retry_after = exc.headers.get("Retry-After") if exc.headers else None
+                    try:
+                        delay = float(retry_after) if retry_after else _WIKIDATA_DEFAULT_RETRY_AFTER_SECONDS
+                    except ValueError:
+                        delay = _WIKIDATA_DEFAULT_RETRY_AFTER_SECONDS
+                    print(
+                        f"Wikidata API rate-limited (attempt {attempt + 1}/"
+                        f"{_WIKIDATA_MAX_429_RETRIES + 1}); retrying in {delay:.1f}s.",
+                        file=sys.stderr,
+                    )
+                    time.sleep(delay)
+                    continue
+                # Diagnostic only: `WikidataOfficialWebsiteClient.lookup`
+                # still degrades to "no hint" on any failure either way
+                # (never raises to the caller) -- this is purely so a live
+                # run's logs can distinguish "the endpoint rejected/
+                # rate-limited the request" from "no matching entity/claim
+                # exists" (see AD-33/AD-34's follow-up).
+                print(
+                    f"Wikidata API request failed: HTTP {exc.code} {exc.reason}: {body}",
+                    file=sys.stderr,
+                )
+                return {}
+            except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError) as exc:
+                print(f"Wikidata API request failed: {exc!r}", file=sys.stderr)
+                return {}
+        return {}
 
     return WikidataOfficialWebsiteClient(fetch_json)

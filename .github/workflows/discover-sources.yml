@@ -1,0 +1,50 @@
+name: Manual acquisition sprint (discover-sources)
+
+# Ad hoc, manually-triggered only -- distinct from the weekly org-catalog
+# discovery.yml (schedule + discover-planned-report, no per-company
+# targets) and from deploy-pages.yml's frozen continuity-only discovery
+# stage. This is the "future named acquisition sprint" referenced in
+# production/pipeline.py's `_stage_discovery_engine` comment: it runs the
+# full Acquisition Intelligence Engine catalog, including every EGX30/EGX70
+# company_ir target (generate_company_ir_targets), which the other two
+# workflows deliberately never touch. Verified results only ever land in
+# the run's own logs -- this workflow does not write to sources/catalog.py
+# or any tracked file; promoting a verified result into the catalog stays
+# a separate, reviewed, human commit.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: >-
+          Optional: run only this one target organization id (e.g.
+          african_markets_egx, or company_ir_comi for a single EGX30
+          constituent). Leave blank to run the full catalog (org targets +
+          every EGX30/EGX70 company_ir target) -- this can take well over
+          an hour due to per-source rate limiting.
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  discover-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Install research package
+        working-directory: research
+        run: uv sync
+
+      - name: Run discover-sources
+        working-directory: research
+        run: |
+          TARGET_ARGS=()
+          if [ -n "${{ github.event.inputs.target }}" ]; then
+            TARGET_ARGS=(--target "${{ github.event.inputs.target }}")
+          fi
+          uv run python -m agx_research.cli --data-dir /tmp/agx_discovery_sources_data \
+            discover-sources "${TARGET_ARGS[@]}"

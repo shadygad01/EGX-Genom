@@ -98,6 +98,13 @@ def build_live_wayback_client(*, timeout_seconds: float = 15.0) -> WaybackAvaila
 
 _WIKIDATA_MAX_429_RETRIES = 4
 _WIKIDATA_DEFAULT_RETRY_AFTER_SECONDS = 5.0
+# A real live run hung for 9+ minutes on a single company before this cap
+# existed: Wikidata's own `Retry-After` value is honored, but nothing
+# upstream bounds how large it can be, and un-capped it turns "back off
+# and retry" into "block this whole sprint run for however long a
+# rate-limiter feels like." Capping is what keeps a large-but-honest
+# `Retry-After` from becoming an effectively unbounded wait.
+_WIKIDATA_MAX_RETRY_DELAY_SECONDS = 15.0
 
 
 def build_live_wikidata_client(
@@ -117,7 +124,8 @@ def build_live_wikidata_client(
     client's own calls -- the contention is from *other* traffic sharing
     that IP range, not this client's own request rate, so only backing off
     and retrying (honoring a `Retry-After` header when the response
-    supplies one) can recover from it.
+    supplies one, capped at `_WIKIDATA_MAX_RETRY_DELAY_SECONDS`) can
+    recover from it.
     """
     last_request_at = 0.0
 
@@ -141,6 +149,7 @@ def build_live_wikidata_client(
                         delay = float(retry_after) if retry_after else _WIKIDATA_DEFAULT_RETRY_AFTER_SECONDS
                     except ValueError:
                         delay = _WIKIDATA_DEFAULT_RETRY_AFTER_SECONDS
+                    delay = min(delay, _WIKIDATA_MAX_RETRY_DELAY_SECONDS)
                     print(
                         f"Wikidata API rate-limited (attempt {attempt + 1}/"
                         f"{_WIKIDATA_MAX_429_RETRIES + 1}); retrying in {delay:.1f}s.",

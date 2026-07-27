@@ -134,6 +134,19 @@ def build_live_wikidata_client(*, timeout_seconds: float = 55.0) -> WikidataOffi
 
         bindings = (payload.get("results") or {}).get("bindings", []) if isinstance(payload, dict) else []
         print(f"Wikidata SPARQL request succeeded: {len(bindings)} binding(s) returned.", file=sys.stderr)
+        # Temporary extra diagnostic (AD-33 follow-up): the query itself
+        # demonstrably works (2404 real bindings on a live run) yet
+        # match_wikidata_websites_to_companies still found zero matches for
+        # Telecom Egypt -- so the remaining question is what the raw labels
+        # actually look like, not whether data exists. Printing every label
+        # containing a fixed substring is a cheap way to see the real label
+        # text/shape without dumping all ~2400 rows.
+        sample = [
+            (b.get("companyLabel", {}).get("value"), b.get("website", {}).get("value"))
+            for b in bindings
+            if "telecom" in (b.get("companyLabel", {}).get("value") or "").lower()
+        ]
+        print(f"Wikidata labels containing 'telecom': {sample}", file=sys.stderr)
         return payload
 
     return WikidataOfficialWebsiteClient(fetch_json)

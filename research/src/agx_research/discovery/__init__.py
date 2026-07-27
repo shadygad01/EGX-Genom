@@ -8,6 +8,13 @@ from agx_research.discovery.engine import (
     discover_sitemap_urls,
     discover_structured_datasets,
     is_sitemap_index,
+    significant_tokens,
+)
+from agx_research.discovery.wikidata_lookup import (
+    WikidataOfficialWebsiteClient,
+    build_wikidata_query_url,
+    match_wikidata_websites_to_companies,
+    parse_wikidata_company_websites,
 )
 
 __all__ = [
@@ -21,4 +28,9 @@ __all__ = [
     "is_sitemap_index",
     "discover_api_documentation",
     "discover_company_directory_links",
+    "significant_tokens",
+    "WikidataOfficialWebsiteClient",
+    "build_wikidata_query_url",
+    "parse_wikidata_company_websites",
+    "match_wikidata_websites_to_companies",
 ]

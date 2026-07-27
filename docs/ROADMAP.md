@@ -26,12 +26,20 @@ component needs to know which is active.
 
 Required user/business inputs, in priority order:
 
-1. **EGX market data vendor selection** (the gating decision). Candidates
-   to evaluate on cost/coverage/latency/licensing: EGX official feeds,
-   Mubasher, Refinitiv/LSEG, Bloomberg. Engineering integration after the
-   decision: one `DataProvider` implementation + `FallbackDataProvider`
-   configuration + re-run of `data.quality` calibration. Estimated
-   engineering: small — the seam exists.
+1. ~~EGX market data vendor selection~~ — **decided (2026-07-27, see
+   `docs/ARCHITECTURE_DECISIONS.md`'s AD-32): no paid/licensed vendor of
+   any kind, permanently.** The `DataProvider` real-vendor seam stays
+   unused; real EGX data (prices, macro, news, and per-company
+   fundamentals alike) must come exclusively from the free-source
+   Acquisition Program (`sources/`+`collectors/`+`acquisition_intelligence/`,
+   see `docs/DATA_ACQUISITION.md`). Remaining engineering work under this
+   constraint is tracked below under "Data Acquisition Platform" —
+   principally widening `IMPLEMENTED` coverage and closing the per-company
+   `company_ir` domain-resolution gap that gates real financial-statement
+   data, now via two independent hint sources (`egx_official`'s own
+   directory once reachable, and `discovery.wikidata_lookup` regardless of
+   whether it is — AD-33) rather than depending solely on the exchange's
+   own site.
 2. **Deployment target** (cloud provider + payment), which unlocks:
    secrets management, managed scheduling of `RuntimeEngine`, monitoring/
    alerting, API authentication context, backup storage/retention.

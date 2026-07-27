@@ -379,6 +379,26 @@ def seed_sources() -> list[SourceSpec]:
             conflict_priority=40,
             notes="Standalone collector not implemented; upstream automation policy must be monitored operationally.",
         ),
+        # Coverage-expansion mission: a free, independent third-party EGX
+        # listed-companies directory (found via public web search, not
+        # training-data recall), targeted primarily as a company-directory
+        # hint supplier for the `company_ir` chain -- see
+        # `acquisition_intelligence.target`'s `PRIORITY_COMPANY_DIRECTORY`
+        # and AD-33. Not asserted reachable or legal to scrape; that's the
+        # Acquisition Intelligence Engine's job on its next real run.
+        _spec(
+            id="african_markets_egx",
+            name="African Markets -- EGX Listed Companies",
+            category=SourceCategory.MARKET_DATA,
+            access_method=AccessMethod.HTML_SCRAPE,
+            status=SourceStatus.PLANNED,
+            reliability_score=0.5,
+            freshness_score=0.6,
+            conflict_priority=35,
+            notes="Third-party pan-African exchange directory listing EGX-listed companies; "
+            "candidate company-directory hint source for company_ir, independent of egx_official. "
+            "Standalone price/news collector not planned.",
+        ),
         # ---- Enterprise: IMPLEMENTED -- the one outlet with a verified real
         # feed URL. Discovered live by the Acquisition Intelligence Engine's
         # standard RSS-autodiscovery heuristic (a real <link rel="alternate"

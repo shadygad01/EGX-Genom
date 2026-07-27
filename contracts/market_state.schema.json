@@ -61,6 +61,10 @@
           "title": "Lookback Days",
           "type": "integer"
         },
+        "macro_lookback_days": {
+          "title": "Macro Lookback Days",
+          "type": "integer"
+        },
         "macro_series": {
           "additionalProperties": {
             "items": {
@@ -112,6 +116,7 @@
         "id",
         "as_of",
         "lookback_days",
+        "macro_lookback_days",
         "tickers",
         "macro_series_ids"
       ],

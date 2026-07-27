@@ -732,11 +732,22 @@ exists, since several items turned out already engineering-complete:
   (`api/src/routes/dashboard.ts`, `ApiProvider`/`StaticJsonProvider`,
   `web/src/types.ts`, a dashboard UI section) — see new TD-34. Also not
   done: the plan's item 4 (Arabic/English company-alias entity resolution
-  for news) and item 5 (macro frequency alignment/point-in-time
-  publication-date discipline) — both real, scoped engineering tasks,
-  neither started this phase; named as the next queued items in
-  `NEXT_MISSIONS.md` rather than attempted speculatively in the same
-  sitting as the gap-report work.
+  for news); item 5 (macro frequency alignment) was later closed — see
+  below.
+- **Item 5 closed, live-verified**: a live production run showed every one
+  of the 23 `LIVE_MACRO_SERIES_IDS` (FRED/World Bank/UN SDG) with zero
+  observations — `_stage_market_memory`'s single `lookback_days=30`
+  windowed World Bank/UN SDG's annual (often 1-2 year publication lag) and
+  CAPMAS's monthly observations the same as daily prices, so an annual
+  point almost never falls inside the last 30 days. `data.snapshot.build_snapshot`
+  now takes an independent `macro_lookback_days` (`DatasetSnapshot` gained
+  the field for explainability); `MarketMemory` and `ProductionPipeline`
+  thread it through, with LIVE mode using a new `LIVE_MACRO_LOOKBACK_DAYS`
+  constant (900 days). Also closed the separate gap where
+  `LIVE_CAPMAS_INDICATORS`' local ids were never added to
+  `LIVE_MACRO_SERIES_IDS` at all. `MacroAgent` (the only agent turning
+  macro data into SWING-horizon knowledge) now has real macro observations
+  to correlate against in a live run.
    `enterprise_press` flipped to `IMPLEMENTED`/`TRUSTED`, collecting real
    news from `https://enterpriseam.com/egypt/feed/` (found via standard
    RSS autodiscovery on its own now-reachable homepage, never guessed).

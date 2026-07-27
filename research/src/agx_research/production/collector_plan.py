@@ -110,6 +110,18 @@ LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICAT
 LIVE_MACRO_SERIES_IDS += [
     local_id for mappings in LIVE_UN_SDG_SERIES.values() for local_id in mappings.values()
 ]
+LIVE_MACRO_SERIES_IDS += [
+    local_id for mappings in LIVE_CAPMAS_INDICATORS.values() for local_id in mappings.values()
+]
+
+# World Bank/UN SDG report annually (often with a 1-2 year publication lag)
+# and CAPMAS monthly -- the 30-day window used for prices/news/events would
+# starve all of them of any observation almost always (a live-confirmed gap:
+# every one of `LIVE_MACRO_SERIES_IDS` showed zero observations in a real
+# run). ~2.5 years comfortably covers typical reporting lag for the annual
+# sources while still being a bounded, explainable window rather than "all
+# history".
+LIVE_MACRO_LOOKBACK_DAYS = 900
 
 # Conservative floors, not true full-history sizes (unknown until a real
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so

@@ -40,6 +40,7 @@ class MarketMemory:
         *,
         macro_series_ids: list[str] | None = None,
         lookback_days: int = 30,
+        macro_lookback_days: int | None = None,
         calendar: TradingCalendar | None = None,
         event_platform: EventPlatform | None = None,
     ):
@@ -48,6 +49,7 @@ class MarketMemory:
         self.sector_provider = sector_provider
         self.macro_series_ids = macro_series_ids or []
         self.lookback_days = lookback_days
+        self.macro_lookback_days = macro_lookback_days
         self.calendar = calendar or StaticEGXCalendar()
         self.event_platform = event_platform or EventPlatform()
 
@@ -60,6 +62,7 @@ class MarketMemory:
             macro_series_ids=self.macro_series_ids,
             as_of=as_of,
             lookback_days=self.lookback_days,
+            macro_lookback_days=self.macro_lookback_days,
         )
         sectors = {
             ticker: sector

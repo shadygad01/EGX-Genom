@@ -51,3 +51,30 @@ def test_bundles_corporate_events_and_macro_and_news():
     assert len(snapshot.corporate_events["MFPC"]) == 1
     assert len(snapshot.macro_series["BRENT_USD"]) > 0
     assert len(snapshot.news) > 0
+
+
+def test_macro_lookback_days_defaults_to_lookback_days():
+    snapshot = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    assert snapshot.macro_lookback_days == 30
+
+
+def test_macro_lookback_days_windows_macro_series_independently_of_price_history():
+    # Mock BRENT_USD/COMI both start 2026-06-01 -- a 5-day price window (start
+    # 2026-06-09) drops the early bars, but a 30-day macro window still
+    # covers the whole mock fixture. This is the exact independence that a
+    # single shared window doesn't give annual/quarterly macro sources.
+    snapshot = build_snapshot(
+        provider(),
+        tickers=["COMI"],
+        macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14),
+        lookback_days=5,
+        macro_lookback_days=30,
+    )
+    assert all(bar.trade_date >= date(2026, 6, 9) for bar in snapshot.price_history["COMI"])
+    assert any(
+        obs.observation_date < date(2026, 6, 9) for obs in snapshot.macro_series["BRENT_USD"]
+    )

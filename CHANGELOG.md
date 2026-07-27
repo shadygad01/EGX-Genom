@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.23.0 — Macro data now reaches the decision engine in live runs
+
+A live production run's `investment_cases.json` showed all 62 published
+recommendations at MICRO horizon only, and the Macro Dashboard showed all
+23 `LIVE_MACRO_SERIES_IDS` (FRED/World Bank/UN SDG) with zero observations.
+Root cause: `_stage_market_memory` used one `lookback_days=30` window for
+prices, news, corporate events, *and* macro series — but World Bank/UN
+SDG report annually (often with a 1-2 year publication lag) and CAPMAS
+monthly, so an annual observation almost never falls inside the last 30
+days. Since `DailyResearchPipeline` (the agents feeding the Meta Decision
+Engine) reconstructs from this exact same snapshot, `MacroAgent` — the
+only agent that turns macro data into SWING-horizon knowledge — had
+nothing to correlate against in any live run.
+
+`data.snapshot.build_snapshot()` now takes an independent
+`macro_lookback_days` (default: `lookback_days`, so mock-mode callers are
+unaffected); `DatasetSnapshot` gained the field so the window actually used
+is explainable, not just assumed. `MarketMemory` and `ProductionPipeline`
+thread it through; LIVE mode uses a new `LIVE_MACRO_LOOKBACK_DAYS = 900`
+constant. Also closed a separate, independent gap: `LIVE_CAPMAS_INDICATORS`'
+local ids were never added to `LIVE_MACRO_SERIES_IDS` at all, so CAPMAS
+data was structurally excluded regardless of window size.
+
+This does not create SWING/INVESTMENT recommendations by itself — it
+removes the specific reason `MacroAgent` was structurally starved of data.
+INVESTMENT horizon still has no agent implemented at all
+(`FinancialPerformanceAgent` remains an honest `NotImplementedError`,
+blocked on a fundamentals data source).
+
+`contracts/market_state.schema.json` regenerated; `api/src/types.ts` and
+`web/src/types.ts` updated to match. 4 new/extended backend tests; 584
+backend tests pass.
+
 ## 0.22.0 — TargetOrganization entries for 14 previously-untargeted sources
 
 The first real, live `agx discover-planned-report` run (2026-07-27, manual

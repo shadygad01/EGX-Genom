@@ -1,0 +1,79 @@
+{
+  "systemHealth": {
+    "title": "System Health",
+    "description": "Pipeline execution status as of the most recent research cycle.",
+    "lastCycle": "Last Cycle",
+    "runs": "Runs",
+    "succeeded": "Succeeded",
+    "failedCount": "{{count}} failed",
+    "allClear": "all clear",
+    "knowledgeObjects": "Knowledge Objects"
+  },
+  "changesSinceYesterday": {
+    "title": "Changes Since Yesterday",
+    "description": "Net movement in knowledge and discoveries produced by the last full pipeline execution.",
+    "knowledgeObjects": "Knowledge Objects",
+    "genes": "Genes",
+    "events": "Events",
+    "sinceLastRun": "{{delta}} since last run",
+    "pipelineStatus": "Pipeline Status",
+    "error": "Error"
+  },
+  "marketSummary": {
+    "title": "Market Summary",
+    "description": "Trading session and universe snapshot as of the last cycle.",
+    "emptyTitle": "No market state yet",
+    "emptyDetail": "Available once the first research cycle runs.",
+    "asOf": "As Of",
+    "tradingSession": "Trading Session",
+    "open": "Open",
+    "closed": "Closed",
+    "constituents": "Constituents",
+    "sectors": "Sectors"
+  },
+  "topOpportunities": {
+    "title": "Top Opportunities",
+    "subtitle": "Ranked by AGX confidence",
+    "emptyTitle": "No opportunities yet",
+    "emptyDetail": "Recommendations appear once the Meta Decision Engine has combined horizon predictions."
+  },
+  "biggestRisks": {
+    "title": "Biggest Risks",
+    "subtitle": "High and critical severity events currently on watch",
+    "emptyTitle": "No elevated-severity events",
+    "emptyDetail": "Nothing rated high or critical severity right now."
+  },
+  "mostImportantNews": {
+    "title": "Most Important News",
+    "subtitle": "Latest headlines from AGX's monitored sources",
+    "emptyTitle": "No news yet",
+    "emptyDetail": "News items appear once a collection cycle ingests them."
+  },
+  "upcomingCatalysts": {
+    "title": "Upcoming Catalysts",
+    "subtitle": "Scheduled corporate events on or after the last cycle date",
+    "emptyTitle": "No scheduled catalysts",
+    "emptyDetail": "No known corporate events are upcoming for the covered universe."
+  },
+  "knowledgeChanges": {
+    "title": "Knowledge Changes",
+    "subtitle": "Most recently discovered or updated knowledge objects",
+    "emptyTitle": "No knowledge objects yet",
+    "emptyDetail": "Promoted or monitored knowledge will appear here once discovered."
+  },
+  "scientificDiscoveries": {
+    "title": "Scientific Discoveries",
+    "subtitle": "Most recently published research papers",
+    "emptyTitle": "No papers yet",
+    "emptyDetail": "Papers are produced once a hypothesis is promoted to knowledge."
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "description": "Current portfolio-level recommendation, if the Meta Decision Engine has produced one.",
+    "emptyTitle": "No portfolio recommendation yet",
+    "emptyDetail": "A portfolio recommendation appears once produced by a full pipeline run.",
+    "weight": "Weight",
+    "cashWeight": "Cash Weight",
+    "positions": "Positions"
+  }
+}

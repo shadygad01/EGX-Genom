@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Badge } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
@@ -8,7 +9,9 @@ import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
-import { formatDate, formatPercent, formatSignedPercent, titleCase } from "../lib/format";
+import { useEnumLabel } from "../hooks/useEnumLabel";
+import { useFormatters } from "../hooks/useFormatters";
+import { formatPercent, formatSignedPercent } from "../lib/format";
 import type {
   CorporateEvent,
   DecisionReadiness,
@@ -19,19 +22,16 @@ import type {
 import styles from "./OpportunityCenter.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
-const LAYER_LABELS: Record<string, string> = {
-  financials: "Financials",
-  disclosures: "Disclosures",
-  news: "News",
-  macro: "Macro",
-  knowledge: "Knowledge",
-};
 
 /** Every opportunity AGX currently sees, ranked by confidence -- the
  * mission's "heart of AGX." Selecting a row shows the full explanation
  * inline; "Open full research workspace" goes to the per-company deep
  * page (Company Research Workspace, a later milestone). */
 export function OpportunityCenter() {
+  const { t } = useTranslation("opportunityCenter");
+  const { t: tCommon } = useTranslation("common");
+  const label = useEnumLabel();
+  const { formatDate } = useFormatters();
   const recommendations = useArtifact((p) => p.getRecommendations());
   const marketState = useArtifact((p) => p.getMarketState());
   const readiness = useArtifact((p) => p.getDecisionReadiness());
@@ -53,10 +53,7 @@ export function OpportunityCenter() {
   const selectedGap = gapReports.find((g) => g.ticker === selectedGapTicker) ?? null;
 
   return (
-    <Section
-      title="Opportunity Center"
-      description="Every opportunity AGX currently sees, ranked by confidence, with the evidence behind it."
-    >
+    <Section title={t("title")} description={t("description")}>
       {recommendations.loading && <LoadingState rows={4} />}
       {recommendations.error && <ErrorState detail={recommendations.error.message} onRetry={recommendations.reload} />}
 
@@ -67,27 +64,27 @@ export function OpportunityCenter() {
               rows={ranked}
               getRowKey={(r) => r.ticker}
               onRowClick={(r) => setSelectedTicker(r.ticker)}
-              emptyTitle="No opportunities yet"
-              emptyDetail="Recommendations appear once the Meta Decision Engine has combined horizon predictions."
+              emptyTitle={t("emptyTitle")}
+              emptyDetail={t("emptyDetail")}
               columns={[
                 {
                   key: "ticker",
-                  header: "Opportunity",
+                  header: t("columns.opportunity"),
                   render: (r) => (
                     <div className={styles.tickerCell}>
-                      <span className={styles.tickerCode}>{r.ticker}</span>
+                      <span className={`${styles.tickerCode} num`}>{r.ticker}</span>
                       <span className={styles.tickerCompany}>{companyNames[r.ticker] ?? ""}</span>
                     </div>
                   ),
                 },
                 {
                   key: "confidence",
-                  header: "Confidence",
+                  header: tCommon("table.confidence"),
                   render: (r) => <Meter value={r.confidence} label={formatPercent(r.confidence)} />,
                 },
                 {
                   key: "return",
-                  header: "Exp. Return",
+                  header: tCommon("table.expReturn"),
                   align: "right",
                   render: (r) => (
                     <span className="num" style={{ color: r.combined_expected_return >= 0 ? "var(--positive)" : "var(--negative)" }}>
@@ -97,13 +94,13 @@ export function OpportunityCenter() {
                 },
                 {
                   key: "risk",
-                  header: "Exp. Risk",
+                  header: tCommon("table.expRisk"),
                   align: "right",
                   render: (r) => <span className="num">{formatPercent(r.combined_expected_risk)}</span>,
                 },
                 {
                   key: "horizons",
-                  header: "Horizons",
+                  header: t("columns.horizons"),
                   render: (r) => (
                     <div className={styles.horizonBadges}>
                       {HORIZON_ORDER.filter((h) => r.horizon_predictions[h]).map((h) => {
@@ -112,9 +109,13 @@ export function OpportunityCenter() {
                           <Badge
                             key={h}
                             variant={prediction.expected_return >= 0 ? "positive" : "negative"}
-                            title={`${titleCase(h)}: ${formatSignedPercent(prediction.expected_return)} exp. return, ${formatPercent(prediction.confidence)} confidence`}
+                            title={t("badgeTitle", {
+                              horizon: label("horizon", h),
+                              return: formatSignedPercent(prediction.expected_return),
+                              confidence: formatPercent(prediction.confidence),
+                            })}
                           >
-                            {titleCase(h)} {formatSignedPercent(prediction.expected_return)}
+                            {label("horizon", h)} <span className="num">{formatSignedPercent(prediction.expected_return)}</span>
                           </Badge>
                         );
                       })}
@@ -125,15 +126,15 @@ export function OpportunityCenter() {
             />
           </Card>
 
-          <Card title={selected ? `${selected.ticker} — Evidence` : "Evidence"} dense>
-            {!selected && <EmptyState title="No opportunity selected" detail="Select a row to see its full explanation." />}
+          <Card title={selected ? t("evidenceTitle", { ticker: selected.ticker }) : t("evidence")} dense>
+            {!selected && <EmptyState title={t("noOpportunitySelected")} detail={t("selectRowDetail")} />}
             {selected && <OpportunityDetail recommendation={selected} companyName={companyNames[selected.ticker]} catalysts={catalystsForSelected} />}
           </Card>
         </div>
       )}
 
       <div className={styles.layout}>
-        <Card title="Decision Readiness" subtitle="Why AGX can research or must abstain for every ticker" dense>
+        <Card title={t("decisionReadiness.title")} subtitle={t("decisionReadiness.subtitle")} dense>
           {readiness.loading && <LoadingState rows={4} />}
           {readiness.error && <ErrorState detail={readiness.error.message} onRetry={readiness.reload} />}
           {!readiness.loading && !readiness.error && (
@@ -141,37 +142,34 @@ export function OpportunityCenter() {
               rows={readiness.data ?? []}
               getRowKey={(row) => row.ticker}
               onRowClick={(row) => setSelectedGapTicker(row.ticker)}
-              emptyTitle="No readiness assessment yet"
-              emptyDetail="The production pipeline must run before evidence readiness can be assessed."
+              emptyTitle={t("decisionReadiness.emptyTitle")}
+              emptyDetail={t("decisionReadiness.emptyDetail")}
               columns={[
-                { key: "ticker", header: "Ticker", render: (row) => <span className={styles.tickerCode}>{row.ticker}</span> },
+                { key: "ticker", header: tCommon("table.ticker"), render: (row) => <span className={`${styles.tickerCode} num`}>{row.ticker}</span> },
                 {
                   key: "status",
-                  header: "Status",
+                  header: tCommon("table.status"),
                   render: (row) => (
                     <Badge variant={row.status === "ready" ? "positive" : row.status === "degraded" ? "warning" : "negative"}>
-                      {titleCase(row.status)}
+                      {label("readinessStatus", row.status)}
                     </Badge>
                   ),
                 },
-                { key: "decision", header: "Decision", render: (row) => titleCase(row.decision) },
-                { key: "prices", header: "Prices", align: "right", render: (row) => <span className="num">{row.price_observations}</span> },
-                { key: "financials", header: "Financial Periods", align: "right", render: (row) => <span className="num">{row.financial_periods}</span> },
-                { key: "knowledge", header: "Knowledge", align: "right", render: (row) => <span className="num">{row.active_knowledge}</span> },
-                { key: "blocker", header: "Primary Blocker", render: (row) => row.blockers[0] ?? "None" },
+                { key: "decision", header: tCommon("table.decision"), render: (row) => label("decision", row.decision) },
+                { key: "prices", header: t("columns.prices"), align: "right", render: (row) => <span className="num">{row.price_observations}</span> },
+                { key: "financials", header: t("columns.financialPeriods"), align: "right", render: (row) => <span className="num">{row.financial_periods}</span> },
+                { key: "knowledge", header: t("columns.knowledge"), align: "right", render: (row) => <span className="num">{row.active_knowledge}</span> },
+                { key: "blocker", header: t("columns.primaryBlocker"), render: (row) => row.blockers[0] ?? t("columns.none") },
               ]}
             />
           )}
         </Card>
 
-        <Card title={selectedGap ? `${selectedGap.ticker} — Data Coverage` : "Data Coverage"} dense>
+        <Card title={selectedGap ? t("dataCoverage.titleForTicker", { ticker: selectedGap.ticker }) : t("dataCoverage.title")} dense>
           {gapReport.loading && <LoadingState rows={4} />}
           {gapReport.error && <ErrorState detail={gapReport.error.message} onRetry={gapReport.reload} />}
           {!gapReport.loading && !gapReport.error && !selectedGap && (
-            <EmptyState
-              title="No ticker selected"
-              detail="Select a row in Decision Readiness to see its per-layer data-completeness breakdown."
-            />
+            <EmptyState title={t("dataCoverage.noTickerSelected")} detail={t("dataCoverage.selectRowDetail")} />
           )}
           {!gapReport.loading && !gapReport.error && selectedGap && <TickerGapDetail gap={selectedGap} />}
         </Card>
@@ -181,29 +179,31 @@ export function OpportunityCenter() {
 }
 
 function TickerGapDetail({ gap }: { gap: TickerDataGapReport }) {
+  const { t } = useTranslation("opportunityCenter");
+  const { t: tCommon } = useTranslation("common");
   return (
     <div>
       <div className={styles.detailStats}>
-        <StatTile label="Overall Completeness" value={formatPercent(gap.overall_completeness_pct / 100)} />
-        <StatTile label="Swing Ready" value={gap.swing_ready ? "Yes" : "No"} />
-        <StatTile label="Investment Ready" value={gap.investment_ready ? "Yes" : "No"} />
+        <StatTile label={t("dataCoverage.overallCompleteness")} value={formatPercent(gap.overall_completeness_pct / 100)} />
+        <StatTile label={t("dataCoverage.swingReady")} value={gap.swing_ready ? t("dataCoverage.yes") : t("dataCoverage.no")} />
+        <StatTile label={t("dataCoverage.investmentReady")} value={gap.investment_ready ? t("dataCoverage.yes") : t("dataCoverage.no")} />
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Data Layers</div>
+        <div className={styles.blockTitle}>{t("dataCoverage.dataLayers")}</div>
         <div className={styles.horizonGrid}>
           {gap.layers.map((layer) => (
             <div key={layer.layer} className={styles.horizonCard}>
               <div className={styles.horizonCardHeader}>
-                <span className={styles.horizonCardTitle}>{LAYER_LABELS[layer.layer] ?? titleCase(layer.layer)}</span>
+                <span className={styles.horizonCardTitle}>{t(`layers.${layer.layer}`, { defaultValue: layer.layer })}</span>
                 <Meter value={layer.completeness_pct / 100} label={`${layer.completeness_pct}%`} />
               </div>
               <div className={styles.horizonCardStats}>
                 <span className="num">{layer.count}</span>
-                <span className={styles.horizonCardStatLabel}>of {layer.threshold} required</span>
+                <span className={styles.horizonCardStatLabel}>{t("dataCoverage.ofRequired", { threshold: layer.threshold })}</span>
               </div>
               {!layer.complete && (
-                <p className={styles.horizonCardWhy}>Below the readiness threshold for this layer.</p>
+                <p className={styles.horizonCardWhy}>{t("dataCoverage.belowThreshold")}</p>
               )}
             </div>
           ))}
@@ -211,9 +211,9 @@ function TickerGapDetail({ gap }: { gap: TickerDataGapReport }) {
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Blockers</div>
+        <div className={styles.blockTitle}>{tCommon("table.blockers")}</div>
         {gap.blockers.length === 0 ? (
-          <span className={styles.blockText}>None recorded.</span>
+          <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
         ) : (
           <ul className={styles.bulletList}>
             {gap.blockers.map((b, i) => (
@@ -224,9 +224,9 @@ function TickerGapDetail({ gap }: { gap: TickerDataGapReport }) {
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Next Actions</div>
+        <div className={styles.blockTitle}>{tCommon("table.nextActions")}</div>
         {gap.next_actions.length === 0 ? (
-          <span className={styles.blockText}>None recorded.</span>
+          <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
         ) : (
           <ul className={styles.bulletList}>
             {gap.next_actions.map((a, i) => (
@@ -248,37 +248,41 @@ function OpportunityDetail({
   companyName: string | undefined;
   catalysts: CorporateEvent[];
 }) {
+  const { t } = useTranslation("opportunityCenter");
+  const { t: tCommon } = useTranslation("common");
+  const label = useEnumLabel();
+  const { formatDate } = useFormatters();
   const { explanation } = recommendation;
   return (
     <div>
       <div className={styles.detailHeader}>
-        <span className={styles.detailTicker}>{recommendation.ticker}</span>
+        <span className={`${styles.detailTicker} num`}>{recommendation.ticker}</span>
         {companyName && <span className={styles.detailCompany}>{companyName}</span>}
       </div>
 
       <div className={styles.detailStats}>
-        <StatTile label="Confidence" value={formatPercent(recommendation.confidence)} />
+        <StatTile label={tCommon("table.confidence")} value={formatPercent(recommendation.confidence)} />
         <StatTile
-          label="Exp. Return"
+          label={tCommon("table.expReturn")}
           value={formatSignedPercent(recommendation.combined_expected_return)}
           deltaSign={recommendation.combined_expected_return >= 0 ? 1 : -1}
         />
-        <StatTile label="Exp. Risk" value={formatPercent(recommendation.combined_expected_risk)} />
+        <StatTile label={tCommon("table.expRisk")} value={formatPercent(recommendation.combined_expected_risk)} />
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Horizon Breakdown</div>
+        <div className={styles.blockTitle}>{t("detail.horizonBreakdown")}</div>
         <div className={styles.horizonGrid}>
           {HORIZON_ORDER.map((h) => {
             const prediction = recommendation.horizon_predictions[h];
             return (
               <div key={h} className={styles.horizonCard}>
                 <div className={styles.horizonCardHeader}>
-                  <span className={styles.horizonCardTitle}>{titleCase(h)}</span>
+                  <span className={styles.horizonCardTitle}>{label("horizon", h)}</span>
                   {prediction ? (
                     <Meter value={prediction.confidence} label={formatPercent(prediction.confidence)} />
                   ) : (
-                    <Badge variant="neutral">No signal</Badge>
+                    <Badge variant="neutral">{tCommon("table.noSignal")}</Badge>
                   )}
                 </div>
                 {prediction ? (
@@ -290,16 +294,16 @@ function OpportunityDetail({
                       >
                         {formatSignedPercent(prediction.expected_return)}
                       </span>
-                      <span className={styles.horizonCardStatLabel}>exp. return</span>
+                      <span className={styles.horizonCardStatLabel}>{t("detail.expReturnShort")}</span>
                       <span className="num">{formatPercent(prediction.expected_risk)}</span>
-                      <span className={styles.horizonCardStatLabel}>exp. risk</span>
+                      <span className={styles.horizonCardStatLabel}>{t("detail.expRiskShort")}</span>
                     </div>
                     <p className={styles.horizonCardWhy}>
                       {prediction.explanation.why_this_stock} {prediction.explanation.why_now}
                     </p>
                   </>
                 ) : (
-                  <p className={styles.horizonCardWhy}>No model prediction for this horizon yet.</p>
+                  <p className={styles.horizonCardWhy}>{t("detail.noModelPrediction")}</p>
                 )}
               </div>
             );
@@ -308,19 +312,19 @@ function OpportunityDetail({
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Research Summary</div>
+        <div className={styles.blockTitle}>{t("detail.researchSummary")}</div>
         <p className={styles.blockText}>{explanation.why_this_stock} {explanation.why_now}</p>
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Risk Summary</div>
+        <div className={styles.blockTitle}>{t("detail.riskSummary")}</div>
         <p className={styles.blockText}>{explanation.why_not_others}</p>
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Supporting Evidence</div>
+        <div className={styles.blockTitle}>{t("detail.supportingEvidence")}</div>
         {explanation.supporting_evidence.length === 0 ? (
-          <span className={styles.blockText}>None recorded.</span>
+          <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
         ) : (
           <ul className={styles.bulletList}>
             {explanation.supporting_evidence.map((e, i) => (
@@ -331,9 +335,9 @@ function OpportunityDetail({
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Contradicting Evidence / Invalidation Conditions</div>
+        <div className={styles.blockTitle}>{t("detail.contradictingEvidence")}</div>
         {explanation.invalidation_conditions.length === 0 ? (
-          <span className={styles.blockText}>None recorded.</span>
+          <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
         ) : (
           <ul className={styles.bulletList}>
             {explanation.invalidation_conditions.map((e, i) => (
@@ -344,9 +348,9 @@ function OpportunityDetail({
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Historical Similar Cases</div>
+        <div className={styles.blockTitle}>{t("detail.historicalSimilarCases")}</div>
         {explanation.similar_historical_cases.length === 0 ? (
-          <span className={styles.blockText}>None recorded.</span>
+          <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
         ) : (
           <ul className={styles.bulletList}>
             {explanation.similar_historical_cases.map((e, i) => (
@@ -357,14 +361,18 @@ function OpportunityDetail({
       </div>
 
       <div className={styles.block}>
-        <div className={styles.blockTitle}>Upcoming Catalysts</div>
+        <div className={styles.blockTitle}>{t("detail.upcomingCatalysts")}</div>
         {catalysts.length === 0 ? (
-          <span className={styles.blockText}>No scheduled catalysts.</span>
+          <span className={styles.blockText}>{t("detail.noScheduledCatalysts")}</span>
         ) : (
           <ul className={styles.bulletList}>
             {catalysts.map((c, i) => (
               <li key={i}>
-                {formatDate(c.event_date)} — {titleCase(c.event_type)}: {c.description}
+                {t("detail.catalystLine", {
+                  date: formatDate(c.event_date),
+                  eventType: label("corporateEventType", c.event_type),
+                  description: c.description,
+                })}
               </li>
             ))}
           </ul>
@@ -372,7 +380,7 @@ function OpportunityDetail({
       </div>
 
       <Link className={styles.workspaceLink} to={`/company/${recommendation.ticker}`}>
-        Open full research workspace →
+        {t("detail.openWorkspace")} <span className="icon-forward" aria-hidden="true">→</span>
       </Link>
     </div>
   );

@@ -1,0 +1,19 @@
+{
+  "title": "Knowledge Graph",
+  "description": "Every relationship AGX has recorded between companies, events, knowledge, genes, and research -- mechanically derived from provenance, not hand-built.",
+  "emptyTitle": "No graph data yet",
+  "emptyDetail": "The knowledge graph populates as entities are created and their provenance links are projected.",
+  "searchPlaceholder": "Search nodes by label…",
+  "hint": "Scroll to zoom · drag to pan · click a node for detail",
+  "nodeDetail": {
+    "title": "Node Detail",
+    "emptyTitle": "No node selected",
+    "emptyDetail": "Click a node to see its metadata and relationships.",
+    "openWorkspace": "Open research workspace",
+    "metadata": "Metadata",
+    "relationships": "Relationships ({{count}})",
+    "noConnectedEdges": "No connected edges",
+    "edgeTo": "to",
+    "edgeFrom": "from"
+  }
+}

@@ -71,6 +71,21 @@ research engine's real output to reach a static deployment target with no
 backend, which the charter's System 18 (Production Infrastructure) never
 required in the first place.
 
+## Bilingual EN/AR dashboard, full RTL (post-Data-Acquisition-Program)
+
+Also a presentation-layer capability, not a new charter system: the web
+dashboard now ships an EN/AR language toggle (`i18next`/`react-i18next`,
+one JSON namespace per page under `web/src/i18n/locales/`) with full RTL
+layout for Arabic, achieved mostly through CSS logical properties rather
+than per-component overrides. Translation is scoped to UI chrome and
+closed backend enum vocabularies (`web/src/types.ts` unions, via
+`useEnumLabel()`); free-form backend-generated prose (explanations,
+evidence, headlines, notes, company names, macro series ids,
+financial-statement line items) intentionally stays English rather than
+risk fabricating financial/legal Arabic terminology. Numeric/ticker data
+always renders LTR regardless of language. See `CHANGELOG.md`'s 0.29.0
+entry for the full design.
+
 ## Data Acquisition Platform (post-Epoch-II, within System 02's scope)
 
 Per the standing charter, the next objective after all 18 systems reached

@@ -1,0 +1,48 @@
+{
+  "pipeline": {
+    "title": "Hypothesis Pipeline",
+    "description": "Discovery History, Active Research, and the Validation Queue are all this same 8-gate pipeline, viewed by stage.",
+    "totalHypotheses": "Total Hypotheses",
+    "activeResearch": "Active Research",
+    "emptyTitle": "No hypotheses yet",
+    "emptyDetail": "Hypotheses appear once an agent's research finding enters the validation pipeline.",
+    "statement": "Statement",
+    "horizon": "Horizon",
+    "status": "Status",
+    "created": "Created",
+    "failedAt": "Failed at {{stage}}",
+    "completedAllGates": "Completed all gates",
+    "stageOf": "Stage {{index}} of {{total}}"
+  },
+  "stageHistory": {
+    "title": "Stage History",
+    "emptyTitle": "No hypothesis selected",
+    "emptyDetail": "Select a row to see its full gate history.",
+    "noStagesYet": "No stages evaluated yet",
+    "passed": "Passed",
+    "failed": "Failed"
+  },
+  "knowledgeObjects": {
+    "title": "Knowledge Objects",
+    "description": "Every knowledge object the validation pipeline has promoted, monitored, or retired.",
+    "promoted": "Promoted",
+    "monitoring": "Monitoring",
+    "retired": "Retired",
+    "emptyTitle": "No knowledge objects yet",
+    "assets": "Assets",
+    "status": "Status",
+    "horizon": "Horizon",
+    "confidence": "Confidence",
+    "discovered": "Discovered"
+  },
+  "papers": {
+    "title": "Scientific Papers",
+    "subtitle": "Every paper published from promoted knowledge",
+    "emptyTitle": "No papers yet"
+  },
+  "reviewBoard": {
+    "title": "Review Board",
+    "emptyTitle": "Not yet available",
+    "emptyDetail": "No repository persists past ScientificReviewBoard decisions yet -- this section will populate once one exists (see docs/TECHNICAL_DEBT.md), never a fabricated review history."
+  }
+}

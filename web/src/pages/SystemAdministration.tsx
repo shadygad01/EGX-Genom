@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
@@ -5,7 +6,9 @@ import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
-import { formatDateTime, formatNumber, titleCase } from "../lib/format";
+import { useEnumLabel } from "../hooks/useEnumLabel";
+import { useFormatters } from "../hooks/useFormatters";
+import { formatNumber } from "../lib/format";
 import type { RunStatus, StageStatus } from "../types";
 import styles from "./SystemAdministration.module.css";
 
@@ -28,6 +31,9 @@ const RUN_VARIANT: Record<RunStatus, BadgeVariant> = {
  * Mission Control's business-facing history omits). Logs streaming is an
  * honest gap -- no artifact carries raw log lines yet. */
 export function SystemAdministration() {
+  const { t } = useTranslation("systemAdministration");
+  const label = useEnumLabel();
+  const { formatDateTime } = useFormatters();
   const executionReport = useArtifact((p) => p.getExecutionReport());
   const dashboardMetrics = useArtifact((p) => p.getDashboardMetrics());
   const runtimeMetrics = useArtifact((p) => p.getRuntimeMetrics());
@@ -38,106 +44,106 @@ export function SystemAdministration() {
 
   return (
     <>
-      <Section title="Runtime & Versions" description="The pipeline version and mode behind the most recent execution.">
+      <Section title={t("runtime.title")} description={t("runtime.description")}>
         {executionReport.loading && <LoadingState rows={2} />}
         {executionReport.error && <ErrorState detail={executionReport.error.message} onRetry={executionReport.reload} />}
         {!executionReport.loading && !executionReport.error && !executionReport.data && (
-          <EmptyState title="No execution report yet" />
+          <EmptyState title={t("runtime.emptyTitle")} />
         )}
         {executionReport.data && (
           <div className={styles.grid}>
-            <StatTile label="Pipeline Version" value={executionReport.data.pipeline_version} />
-            <StatTile label="Execution Mode" value={titleCase(executionReport.data.execution_mode)} />
-            <StatTile label="Overall Status" value={<Badge variant={STAGE_VARIANT[executionReport.data.overall_status]}>{titleCase(executionReport.data.overall_status)}</Badge>} />
-            <StatTile label="Run Dates" value={executionReport.data.run_dates.length} />
-            <StatTile label="Started" value={formatDateTime(executionReport.data.started_at)} />
-            <StatTile label="Completed" value={formatDateTime(executionReport.data.completed_at)} />
-            <StatTile label="Duration" value={`${formatNumber(executionReport.data.duration_seconds, 2)}s`} />
+            <StatTile label={t("runtime.pipelineVersion")} value={<span className="num">{executionReport.data.pipeline_version}</span>} />
+            <StatTile label={t("runtime.executionMode")} value={label("executionMode", executionReport.data.execution_mode)} />
+            <StatTile label={t("runtime.overallStatus")} value={<Badge variant={STAGE_VARIANT[executionReport.data.overall_status]}>{label("stageStatus", executionReport.data.overall_status)}</Badge>} />
+            <StatTile label={t("runtime.runDates")} value={executionReport.data.run_dates.length} />
+            <StatTile label={t("runtime.started")} value={formatDateTime(executionReport.data.started_at)} />
+            <StatTile label={t("runtime.completed")} value={formatDateTime(executionReport.data.completed_at)} />
+            <StatTile label={t("runtime.duration")} value={<span className="num">{`${formatNumber(executionReport.data.duration_seconds, 2)}s`}</span>} />
           </div>
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Configuration" subtitle="Where this run's artifacts were written, and which stages were skipped">
+        <Card title={t("configuration.title")} subtitle={t("configuration.subtitle")}>
           {!executionReport.data && !dashboardMetrics.data ? (
-            <EmptyState title="No configuration data yet" />
+            <EmptyState title={t("configuration.emptyTitle")} />
           ) : (
             <div>
               {dashboardMetrics.data && (
                 <div className={styles.listItem}>
-                  <strong>Dashboard directory:</strong> <span className={styles.path}>{dashboardMetrics.data.dashboard_dir}</span>
+                  <strong>{t("configuration.dashboardDirectory")}</strong> <span className={styles.path}>{dashboardMetrics.data.dashboard_dir}</span>
                 </div>
               )}
               {executionReport.data && executionReport.data.skipped_stages.length > 0 && (
                 <div className={styles.listItem}>
-                  <strong>Skipped stages:</strong> {executionReport.data.skipped_stages.map((s) => titleCase(s)).join(", ")}
+                  <strong>{t("configuration.skippedStages")}</strong> {executionReport.data.skipped_stages.map((s) => label("stageName", s)).join(", ")}
                 </div>
               )}
               {executionReport.data && executionReport.data.skipped_stages.length === 0 && (
-                <div className={styles.listItem}>No stages were skipped in the most recent run.</div>
+                <div className={styles.listItem}>{t("configuration.noSkippedStages")}</div>
               )}
             </div>
           )}
         </Card>
 
-        <Card title="Replay">
+        <Card title={t("replay.title")}>
           <EmptyState
-            title={executionReport.data ? `Current mode: ${titleCase(executionReport.data.execution_mode)}` : "Not yet run"}
-            detail="Replay mode re-executes the identical pipeline against already-archived RawDocuments from a prior run, proving the pipeline cannot distinguish live data from replayed data. No dedicated replay-history artifact exists separately from Execution History below."
+            title={executionReport.data ? t("replay.currentMode", { mode: label("executionMode", executionReport.data.execution_mode) }) : t("replay.notYetRun")}
+            detail={t("replay.detail")}
           />
         </Card>
       </div>
 
-      <Section title="Artifacts" description="Every dashboard artifact file written by the most recent run, and how many records it holds.">
+      <Section title={t("artifacts.title")} description={t("artifacts.description")}>
         {dashboardMetrics.error && <ErrorState detail={dashboardMetrics.error.message} onRetry={dashboardMetrics.reload} />}
         {!dashboardMetrics.error && dashboardMetrics.data && (
-          <StatTile label="Total Artifacts" value={dashboardMetrics.data.total_artifacts} caption={formatDateTime(dashboardMetrics.data.generated_at)} />
+          <StatTile label={t("artifacts.totalArtifacts")} value={dashboardMetrics.data.total_artifacts} caption={formatDateTime(dashboardMetrics.data.generated_at)} />
         )}
         <div style={{ marginTop: "var(--space-4)" }}>
           <DataTable
             rows={artifactRows}
             getRowKey={([name]) => name}
-            emptyTitle="No artifacts recorded yet"
+            emptyTitle={t("artifacts.emptyTitle")}
             columns={[
-              { key: "name", header: "Artifact", render: ([name]) => name },
-              { key: "count", header: "Records", align: "right", render: ([, count]) => formatNumber(count) },
+              { key: "name", header: t("artifacts.artifact"), render: ([name]) => name },
+              { key: "count", header: t("artifacts.records"), align: "right", render: ([, count]) => <span className="num">{formatNumber(count)}</span> },
             ]}
           />
         </div>
       </Section>
 
-      <Section title="Performance" description="Every stage of the most recent execution, slowest first.">
+      <Section title={t("performance.title")} description={t("performance.description")}>
         <DataTable
           rows={stagesByDuration}
           getRowKey={(s) => s.name}
-          emptyTitle="No stage timing recorded yet"
+          emptyTitle={t("performance.emptyTitle")}
           columns={[
-            { key: "name", header: "Stage", render: (s) => titleCase(s.name) },
-            { key: "status", header: "Status", render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{titleCase(s.status)}</Badge> },
-            { key: "duration", header: "Duration", align: "right", render: (s) => `${formatNumber(s.duration_seconds, 3)}s` },
+            { key: "name", header: t("performance.stage"), render: (s) => label("stageName", s.name) },
+            { key: "status", header: t("performance.status"), render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{label("stageStatus", s.status)}</Badge> },
+            { key: "duration", header: t("performance.duration"), align: "right", render: (s) => <span className="num">{`${formatNumber(s.duration_seconds, 3)}s`}</span> },
           ]}
         />
       </Section>
 
-      <Section title="Execution History" description="Every research-cycle run, including error and session detail.">
+      <Section title={t("executionHistory.title")} description={t("executionHistory.description")}>
         <DataTable
           rows={runHistory}
           getRowKey={(r) => r.id}
-          emptyTitle="No runs recorded yet"
+          emptyTitle={t("executionHistory.emptyTitle")}
           columns={[
-            { key: "date", header: "Run Date", render: (r) => r.run_date },
-            { key: "status", header: "Status", render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{titleCase(r.status)}</Badge> },
-            { key: "session", header: "Session", render: (r) => r.session_id ?? "—" },
-            { key: "error", header: "Error", render: (r) => r.error ?? "—" },
-            { key: "completed", header: "Completed", align: "right", render: (r) => formatDateTime(r.completed_at) },
+            { key: "date", header: t("executionHistory.runDate"), render: (r) => <span className="num">{r.run_date}</span> },
+            { key: "status", header: t("executionHistory.status"), render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{label("runStatus", r.status)}</Badge> },
+            { key: "session", header: t("executionHistory.session"), render: (r) => r.session_id ?? "—" },
+            { key: "error", header: t("executionHistory.error"), render: (r) => r.error ?? "—" },
+            { key: "completed", header: t("executionHistory.completed"), align: "right", render: (r) => formatDateTime(r.completed_at) },
           ]}
         />
       </Section>
 
-      <Card title="Logs">
+      <Card title={t("logs.title")}>
         <EmptyState
-          title="Not yet available"
-          detail="No artifact carries raw log lines yet -- this section will populate once one exists, rather than fabricating a log stream."
+          title={t("logs.notYetAvailable")}
+          detail={t("logs.detail")}
         />
       </Card>
     </>

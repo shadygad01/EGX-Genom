@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
@@ -7,13 +8,9 @@ import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
-import {
-  formatDate,
-  formatDateTime,
-  formatSignedPercent,
-  formatPercent,
-  titleCase,
-} from "../lib/format";
+import { useEnumLabel } from "../hooks/useEnumLabel";
+import { useFormatters } from "../hooks/useFormatters";
+import { formatSignedPercent, formatPercent, titleCase } from "../lib/format";
 import type { CorporateEvent, Event, EventSeverity, KnowledgeStatus, NewsItem } from "../types";
 import styles from "./AIBriefing.module.css";
 
@@ -34,6 +31,10 @@ const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
  * manager needs to know before the market opens, generated entirely from
  * already-produced AGX artifacts -- no calculation happens on this page. */
 export function AIBriefing() {
+  const { t } = useTranslation("aiBriefing");
+  const { t: tCommon } = useTranslation("common");
+  const label = useEnumLabel();
+  const { formatDate, formatDateTime } = useFormatters();
   const navigate = useNavigate();
   const systemStatus = useArtifact((p) => p.getSystemStatus());
   const marketState = useArtifact((p) => p.getMarketState());
@@ -76,67 +77,74 @@ export function AIBriefing() {
 
   return (
     <>
-      <Section
-        title="System Health"
-        description="Pipeline execution status as of the most recent research cycle."
-      >
+      <Section title={t("systemHealth.title")} description={t("systemHealth.description")}>
         {systemStatus.loading && <LoadingState rows={1} />}
         {systemStatus.error && <ErrorState detail={systemStatus.error.message} onRetry={systemStatus.reload} />}
         {systemStatus.data && (
           <div className={styles.statGrid}>
-            <StatTile label="Last Cycle" value={formatDate(systemStatus.data.pipeline_run_date)} />
-            <StatTile label="Runs" value={systemStatus.data.runs} />
+            <StatTile label={t("systemHealth.lastCycle")} value={formatDate(systemStatus.data.pipeline_run_date)} />
+            <StatTile label={t("systemHealth.runs")} value={systemStatus.data.runs} />
             <StatTile
-              label="Succeeded"
+              label={t("systemHealth.succeeded")}
               value={systemStatus.data.succeeded}
               deltaSign={systemStatus.data.failed > 0 ? -1 : 1}
-              delta={systemStatus.data.failed > 0 ? `${systemStatus.data.failed} failed` : "all clear"}
+              delta={
+                systemStatus.data.failed > 0
+                  ? t("systemHealth.failedCount", { count: systemStatus.data.failed })
+                  : t("systemHealth.allClear")
+              }
             />
-            <StatTile label="Knowledge Objects" value={systemStatus.data.knowledge_objects} />
+            <StatTile label={t("systemHealth.knowledgeObjects")} value={systemStatus.data.knowledge_objects} />
             {Object.entries(systemStatus.data.by_status).map(([status, count]) => (
-              <StatTile key={status} label={titleCase(status)} value={count} />
+              <StatTile key={status} label={label("knowledgeStatus", status)} value={count} />
             ))}
           </div>
         )}
       </Section>
 
       {executionReport.data && (
-        <Section
-          title="Changes Since Yesterday"
-          description="Net movement in knowledge and discoveries produced by the last full pipeline execution."
-        >
+        <Section title={t("changesSinceYesterday.title")} description={t("changesSinceYesterday.description")}>
           <div className={styles.statGrid}>
             <StatTile
-              label="Knowledge Objects"
+              label={t("changesSinceYesterday.knowledgeObjects")}
               value={executionReport.data.knowledge_after}
               deltaSign={Math.sign(executionReport.data.knowledge_after - executionReport.data.knowledge_before)}
-              delta={`${executionReport.data.knowledge_after - executionReport.data.knowledge_before >= 0 ? "+" : ""}${
-                executionReport.data.knowledge_after - executionReport.data.knowledge_before
-              } since last run`}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.knowledge_after - executionReport.data.knowledge_before >= 0 ? "+" : ""}${
+                  executionReport.data.knowledge_after - executionReport.data.knowledge_before
+                }`,
+              })}
             />
             <StatTile
-              label="Genes"
+              label={t("changesSinceYesterday.genes")}
               value={executionReport.data.genome_after}
               deltaSign={Math.sign(executionReport.data.genome_after - executionReport.data.genome_before)}
-              delta={`${executionReport.data.genome_after - executionReport.data.genome_before >= 0 ? "+" : ""}${
-                executionReport.data.genome_after - executionReport.data.genome_before
-              } since last run`}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.genome_after - executionReport.data.genome_before >= 0 ? "+" : ""}${
+                  executionReport.data.genome_after - executionReport.data.genome_before
+                }`,
+              })}
             />
             <StatTile
-              label="Events"
+              label={t("changesSinceYesterday.events")}
               value={executionReport.data.events_after}
               deltaSign={Math.sign(executionReport.data.events_after - executionReport.data.events_before)}
-              delta={`${executionReport.data.events_after - executionReport.data.events_before >= 0 ? "+" : ""}${
-                executionReport.data.events_after - executionReport.data.events_before
-              } since last run`}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.events_after - executionReport.data.events_before >= 0 ? "+" : ""}${
+                  executionReport.data.events_after - executionReport.data.events_before
+                }`,
+              })}
             />
-            <StatTile label="Pipeline Status" value={titleCase(executionReport.data.overall_status)} />
+            <StatTile
+              label={t("changesSinceYesterday.pipelineStatus")}
+              value={label("stageStatus", executionReport.data.overall_status)}
+            />
           </div>
           {executionReport.data.errors.length > 0 && (
             <div className={styles.list} style={{ marginTop: "var(--space-4)" }}>
               {executionReport.data.errors.map((e, i) => (
                 <div key={i} className={styles.listItemDetail}>
-                  <Badge variant="negative">Error</Badge> {e}
+                  <Badge variant="negative">{t("changesSinceYesterday.error")}</Badge> {e}
                 </div>
               ))}
             </div>
@@ -144,28 +152,28 @@ export function AIBriefing() {
         </Section>
       )}
 
-      <Section title="Market Summary" description="Trading session and universe snapshot as of the last cycle.">
+      <Section title={t("marketSummary.title")} description={t("marketSummary.description")}>
         {marketState.loading && <LoadingState rows={1} />}
         {marketState.error && <ErrorState detail={marketState.error.message} onRetry={marketState.reload} />}
         {marketState.data === null && !marketState.loading && !marketState.error && (
-          <EmptyState title="No market state yet" detail="Available once the first research cycle runs." />
+          <EmptyState title={t("marketSummary.emptyTitle")} detail={t("marketSummary.emptyDetail")} />
         )}
         {marketState.data && (
           <div className={styles.statGrid}>
-            <StatTile label="As Of" value={formatDate(marketState.data.as_of)} />
+            <StatTile label={t("marketSummary.asOf")} value={formatDate(marketState.data.as_of)} />
             <StatTile
-              label="Trading Session"
-              value={marketState.data.trading_session.is_trading_day ? "Open" : "Closed"}
+              label={t("marketSummary.tradingSession")}
+              value={marketState.data.trading_session.is_trading_day ? t("marketSummary.open") : t("marketSummary.closed")}
               caption={marketState.data.trading_session.holiday_name ?? undefined}
             />
-            <StatTile label="Constituents" value={Object.keys(marketState.data.constituents).length} />
-            <StatTile label="Sectors" value={new Set(Object.values(marketState.data.sectors)).size} />
+            <StatTile label={t("marketSummary.constituents")} value={Object.keys(marketState.data.constituents).length} />
+            <StatTile label={t("marketSummary.sectors")} value={new Set(Object.values(marketState.data.sectors)).size} />
           </div>
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Top Opportunities" subtitle="Ranked by AGX confidence">
+        <Card title={t("topOpportunities.title")} subtitle={t("topOpportunities.subtitle")}>
           {recommendations.loading && <LoadingState />}
           {recommendations.error && <ErrorState detail={recommendations.error.message} onRetry={recommendations.reload} />}
           {!recommendations.loading && !recommendations.error && (
@@ -173,18 +181,18 @@ export function AIBriefing() {
               rows={topOpportunities}
               getRowKey={(r) => r.ticker}
               onRowClick={(r) => navigate(`/company/${r.ticker}`)}
-              emptyTitle="No opportunities yet"
-              emptyDetail="Recommendations appear once the Meta Decision Engine has combined horizon predictions."
+              emptyTitle={t("topOpportunities.emptyTitle")}
+              emptyDetail={t("topOpportunities.emptyDetail")}
               columns={[
                 {
                   key: "ticker",
-                  header: "Ticker",
-                  render: (r) => <span style={{ color: "var(--accent-strong)", fontWeight: 600 }}>{r.ticker}</span>,
+                  header: tCommon("table.ticker"),
+                  render: (r) => <span className="num" style={{ color: "var(--accent-strong)", fontWeight: 600 }}>{r.ticker}</span>,
                 },
-                { key: "confidence", header: "Confidence", render: (r) => <Meter value={r.confidence} label={formatPercent(r.confidence)} /> },
+                { key: "confidence", header: tCommon("table.confidence"), render: (r) => <Meter value={r.confidence} label={formatPercent(r.confidence)} /> },
                 {
                   key: "return",
-                  header: "Exp. Return",
+                  header: tCommon("table.expReturn"),
                   align: "right",
                   render: (r) => (
                     <span className="num" style={{ color: r.combined_expected_return >= 0 ? "var(--positive)" : "var(--negative)" }}>
@@ -192,17 +200,17 @@ export function AIBriefing() {
                     </span>
                   ),
                 },
-                { key: "risk", header: "Exp. Risk", align: "right", render: (r) => <span className="num">{formatPercent(r.combined_expected_risk)}</span> },
+                { key: "risk", header: tCommon("table.expRisk"), align: "right", render: (r) => <span className="num">{formatPercent(r.combined_expected_risk)}</span> },
               ]}
             />
           )}
         </Card>
 
-        <Card title="Biggest Risks" subtitle="High and critical severity events currently on watch">
+        <Card title={t("biggestRisks.title")} subtitle={t("biggestRisks.subtitle")}>
           {events.loading && <LoadingState />}
           {events.error && <ErrorState detail={events.error.message} onRetry={events.reload} />}
           {!events.loading && !events.error && elevatedEvents.length === 0 && (
-            <EmptyState title="No elevated-severity events" detail="Nothing rated high or critical severity right now." />
+            <EmptyState title={t("biggestRisks.emptyTitle")} detail={t("biggestRisks.emptyDetail")} />
           )}
           {elevatedEvents.length > 0 && (
             <div className={styles.list}>
@@ -215,20 +223,20 @@ export function AIBriefing() {
                     <span className={styles.listItemMeta}>{formatDate(e.event_date)}</span>
                   </div>
                   <div className={styles.badgeRow}>
-                    <Badge variant={SEVERITY_VARIANT[e.severity]}>{titleCase(e.severity)}</Badge>
-                    <Badge variant="neutral">{titleCase(e.event_type)}</Badge>
+                    <Badge variant={SEVERITY_VARIANT[e.severity]}>{label("eventSeverity", e.severity)}</Badge>
+                    <Badge variant="neutral">{label("eventType", e.event_type)}</Badge>
                   </div>
-                  <span className={styles.listItemDetail}>{titleCase(e.subtype)} · {titleCase(e.status)}</span>
+                  <span className={styles.listItemDetail}>{titleCase(e.subtype)} · {label("eventStatus", e.status)}</span>
                 </div>
               ))}
             </div>
           )}
         </Card>
 
-        <Card title="Most Important News" subtitle="Latest headlines from AGX's monitored sources">
+        <Card title={t("mostImportantNews.title")} subtitle={t("mostImportantNews.subtitle")}>
           {marketState.loading && <LoadingState />}
           {!marketState.loading && news.length === 0 && (
-            <EmptyState title="No news yet" detail="News items appear once a collection cycle ingests them." />
+            <EmptyState title={t("mostImportantNews.emptyTitle")} detail={t("mostImportantNews.emptyDetail")} />
           )}
           {news.length > 0 && (
             <div className={styles.list}>
@@ -248,17 +256,19 @@ export function AIBriefing() {
           )}
         </Card>
 
-        <Card title="Upcoming Catalysts" subtitle="Scheduled corporate events on or after the last cycle date">
+        <Card title={t("upcomingCatalysts.title")} subtitle={t("upcomingCatalysts.subtitle")}>
           {marketState.loading && <LoadingState />}
           {!marketState.loading && upcomingCatalysts.length === 0 && (
-            <EmptyState title="No scheduled catalysts" detail="No known corporate events are upcoming for the covered universe." />
+            <EmptyState title={t("upcomingCatalysts.emptyTitle")} detail={t("upcomingCatalysts.emptyDetail")} />
           )}
           {upcomingCatalysts.length > 0 && (
             <div className={styles.list}>
               {upcomingCatalysts.map((ce, i) => (
                 <div key={i} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{ce.ticker} — {titleCase(ce.event_type)}</span>
+                    <span className={styles.listItemTitle}>
+                      <span className="num">{ce.ticker}</span> — {label("corporateEventType", ce.event_type)}
+                    </span>
                     <span className={styles.listItemMeta}>{formatDate(ce.event_date)}</span>
                   </div>
                   <span className={styles.listItemDetail}>{ce.description}</span>
@@ -268,23 +278,23 @@ export function AIBriefing() {
           )}
         </Card>
 
-        <Card title="Knowledge Changes" subtitle="Most recently discovered or updated knowledge objects">
+        <Card title={t("knowledgeChanges.title")} subtitle={t("knowledgeChanges.subtitle")}>
           {knowledge.loading && <LoadingState />}
           {knowledge.error && <ErrorState detail={knowledge.error.message} onRetry={knowledge.reload} />}
           {!knowledge.loading && !knowledge.error && recentKnowledge.length === 0 && (
-            <EmptyState title="No knowledge objects yet" detail="Promoted or monitored knowledge will appear here once discovered." />
+            <EmptyState title={t("knowledgeChanges.emptyTitle")} detail={t("knowledgeChanges.emptyDetail")} />
           )}
           {recentKnowledge.length > 0 && (
             <div className={styles.list}>
               {recentKnowledge.map((k) => (
                 <div key={k.id} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{k.affected_assets.join(", ")}</span>
+                    <span className={`${styles.listItemTitle} num`}>{k.affected_assets.join(", ")}</span>
                     <span className={styles.listItemMeta}>{formatDate(k.discovery_date)}</span>
                   </div>
                   <div className={styles.badgeRow}>
-                    <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{titleCase(k.status)}</Badge>
-                    <Badge variant="neutral">{titleCase(k.horizon)}</Badge>
+                    <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{label("knowledgeStatus", k.status)}</Badge>
+                    <Badge variant="neutral">{label("horizon", k.horizon)}</Badge>
                   </div>
                   <span className={styles.listItemDetail}>{k.economic_explanation}</span>
                 </div>
@@ -293,11 +303,11 @@ export function AIBriefing() {
           )}
         </Card>
 
-        <Card title="Scientific Discoveries" subtitle="Most recently published research papers">
+        <Card title={t("scientificDiscoveries.title")} subtitle={t("scientificDiscoveries.subtitle")}>
           {papers.loading && <LoadingState />}
           {papers.error && <ErrorState detail={papers.error.message} onRetry={papers.reload} />}
           {!papers.loading && !papers.error && recentPapers.length === 0 && (
-            <EmptyState title="No papers yet" detail="Papers are produced once a hypothesis is promoted to knowledge." />
+            <EmptyState title={t("scientificDiscoveries.emptyTitle")} detail={t("scientificDiscoveries.emptyDetail")} />
           )}
           {recentPapers.length > 0 && (
             <div className={styles.list}>
@@ -315,11 +325,11 @@ export function AIBriefing() {
         </Card>
       </div>
 
-      <Section title="Portfolio" description="Current portfolio-level recommendation, if the Meta Decision Engine has produced one.">
+      <Section title={t("portfolio.title")} description={t("portfolio.description")}>
         {investmentCases.loading && <LoadingState />}
         {investmentCases.error && <ErrorState detail={investmentCases.error.message} onRetry={investmentCases.reload} />}
         {!investmentCases.loading && !investmentCases.error && investmentCases.data?.portfolio == null && (
-          <EmptyState title="No portfolio recommendation yet" detail="A portfolio recommendation appears once produced by a full pipeline run." />
+          <EmptyState title={t("portfolio.emptyTitle")} detail={t("portfolio.emptyDetail")} />
         )}
         {investmentCases.data?.portfolio && (
           <DataTable
@@ -328,18 +338,18 @@ export function AIBriefing() {
             columns={[
               {
                 key: "ticker",
-                header: "Ticker",
+                header: tCommon("table.ticker"),
                 render: (p) => (
-                  <Link to={`/company/${p.ticker}`} style={{ color: "var(--accent-strong)", fontWeight: 600 }}>
+                  <Link to={`/company/${p.ticker}`} className="num" style={{ color: "var(--accent-strong)", fontWeight: 600 }}>
                     {p.ticker}
                   </Link>
                 ),
               },
-              { key: "weight", header: "Weight", align: "right", render: (p) => <span className="num">{formatPercent(p.weight)}</span> },
-              { key: "confidence", header: "Confidence", render: (p) => <Meter value={p.confidence} label={formatPercent(p.confidence)} /> },
+              { key: "weight", header: t("portfolio.weight"), align: "right", render: (p) => <span className="num">{formatPercent(p.weight)}</span> },
+              { key: "confidence", header: tCommon("table.confidence"), render: (p) => <Meter value={p.confidence} label={formatPercent(p.confidence)} /> },
               {
                 key: "return",
-                header: "Exp. Return",
+                header: tCommon("table.expReturn"),
                 align: "right",
                 render: (p) => (
                   <span className="num" style={{ color: p.expected_return >= 0 ? "var(--positive)" : "var(--negative)" }}>
@@ -352,8 +362,8 @@ export function AIBriefing() {
         )}
         {investmentCases.data?.portfolio && (
           <div className={styles.statGrid} style={{ marginTop: "var(--space-4)" }}>
-            <StatTile label="Cash Weight" value={formatPercent(investmentCases.data.portfolio.cash_weight)} />
-            <StatTile label="Positions" value={investmentCases.data.portfolio.positions.length} />
+            <StatTile label={t("portfolio.cashWeight")} value={formatPercent(investmentCases.data.portfolio.cash_weight)} />
+            <StatTile label={t("portfolio.positions")} value={investmentCases.data.portfolio.positions.length} />
           </div>
         )}
       </Section>

@@ -1,20 +1,15 @@
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
-import { Meter } from "../components/primitives/Meter";
 import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
-import {
-  formatDate,
-  formatDateTime,
-  formatNumber,
-  formatPercent,
-  formatSignedPercent,
-  titleCase,
-} from "../lib/format";
+import { useEnumLabel } from "../hooks/useEnumLabel";
+import { useFormatters } from "../hooks/useFormatters";
+import { formatNumber, formatPercent, formatSignedPercent, titleCase } from "../lib/format";
 import type { GeneStatus, KnowledgeStatus } from "../types";
 import styles from "./CompanyWorkspace.module.css";
 
@@ -35,6 +30,10 @@ const GENE_VARIANT: Record<GeneStatus, BadgeVariant> = {
  * this page assembles everything AGX knows about one ticker from already-
  * exported artifacts -- no calculation happens here either. */
 export function CompanyWorkspace() {
+  const { t } = useTranslation("companyWorkspace");
+  const { t: tCommon } = useTranslation("common");
+  const label = useEnumLabel();
+  const { formatDate, formatDateTime } = useFormatters();
   const { ticker = "" } = useParams<{ ticker: string }>();
 
   const marketState = useArtifact((p) => p.getMarketState());
@@ -83,7 +82,7 @@ export function CompanyWorkspace() {
     <>
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <span className={styles.ticker}>{ticker}</span>
+          <span className={`${styles.ticker} num`}>{ticker}</span>
           {companyName && <span className={styles.company}>{companyName}</span>}
         </div>
         <div className={styles.headerMeta}>
@@ -94,41 +93,38 @@ export function CompanyWorkspace() {
       {loading && <LoadingState rows={4} />}
 
       <div className={styles.twoCol}>
-        <Card title="Current Investment Thesis">
+        <Card title={t("thesis.title")}>
           {!recommendation && !recommendations.loading && (
-            <EmptyState
-              title="No active recommendation"
-              detail="AGX has no current recommendation for this ticker -- it may not yet have cleared the validation pipeline, or no supporting knowledge exists."
-            />
+            <EmptyState title={t("thesis.emptyTitle")} detail={t("thesis.emptyDetail")} />
           )}
           {recommendation && (
             <div>
               <div className={styles.grid}>
-                <StatTile label="Confidence" value={formatPercent(recommendation.confidence)} />
+                <StatTile label={tCommon("table.confidence")} value={formatPercent(recommendation.confidence)} />
                 <StatTile
-                  label="Exp. Return"
+                  label={tCommon("table.expReturn")}
                   value={formatSignedPercent(recommendation.combined_expected_return)}
                   deltaSign={recommendation.combined_expected_return >= 0 ? 1 : -1}
                 />
-                <StatTile label="Exp. Risk" value={formatPercent(recommendation.combined_expected_risk)} />
+                <StatTile label={tCommon("table.expRisk")} value={formatPercent(recommendation.combined_expected_risk)} />
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Research Summary</div>
+                <div className={styles.blockTitle}>{t("thesis.researchSummary")}</div>
                 <p className={styles.blockText}>
                   {recommendation.explanation.why_this_stock} {recommendation.explanation.why_now}
                 </p>
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Risk Summary</div>
+                <div className={styles.blockTitle}>{t("thesis.riskSummary")}</div>
                 <p className={styles.blockText}>{recommendation.explanation.why_not_others}</p>
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Supporting Evidence</div>
+                <div className={styles.blockTitle}>{t("thesis.supportingEvidence")}</div>
                 {recommendation.explanation.supporting_evidence.length === 0 ? (
-                  <span className={styles.blockText}>None recorded.</span>
+                  <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
                 ) : (
                   <ul className={styles.bulletList}>
                     {recommendation.explanation.supporting_evidence.map((e, i) => (
@@ -139,9 +135,9 @@ export function CompanyWorkspace() {
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Contradicting Evidence / Invalidation Conditions</div>
+                <div className={styles.blockTitle}>{t("thesis.contradictingEvidence")}</div>
                 {recommendation.explanation.invalidation_conditions.length === 0 ? (
-                  <span className={styles.blockText}>None recorded.</span>
+                  <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
                 ) : (
                   <ul className={styles.bulletList}>
                     {recommendation.explanation.invalidation_conditions.map((e, i) => (
@@ -152,9 +148,9 @@ export function CompanyWorkspace() {
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Historical Similar Cases</div>
+                <div className={styles.blockTitle}>{t("thesis.historicalSimilarCases")}</div>
                 {recommendation.explanation.similar_historical_cases.length === 0 ? (
-                  <span className={styles.blockText}>None recorded.</span>
+                  <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
                 ) : (
                   <ul className={styles.bulletList}>
                     {recommendation.explanation.similar_historical_cases.map((e, i) => (
@@ -167,15 +163,15 @@ export function CompanyWorkspace() {
           )}
         </Card>
 
-        <Card title="Upcoming Catalysts" subtitle="Scheduled corporate events on or after the last cycle date">
+        <Card title={t("upcomingCatalysts.title")} subtitle={t("upcomingCatalysts.subtitle")}>
           {upcomingCatalysts.length === 0 ? (
-            <EmptyState title="No scheduled catalysts" detail="No known corporate events are upcoming for this ticker." />
+            <EmptyState title={t("upcomingCatalysts.emptyTitle")} detail={t("upcomingCatalysts.emptyDetail")} />
           ) : (
             <div className={styles.list}>
               {upcomingCatalysts.map((ce, i) => (
                 <div key={i} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{titleCase(ce.event_type)}</span>
+                    <span className={styles.listItemTitle}>{label("corporateEventType", ce.event_type)}</span>
                     <span className={styles.listItemMeta}>{formatDate(ce.event_date)}</span>
                   </div>
                   <span className={styles.listItemDetail}>{ce.description}</span>
@@ -186,23 +182,23 @@ export function CompanyWorkspace() {
         </Card>
       </div>
 
-      <Section title="Knowledge Timeline" description="Knowledge objects that name this ticker as an affected asset.">
+      <Section title={t("knowledgeTimeline.title")} description={t("knowledgeTimeline.description")}>
         {knowledge.error && <ErrorState detail={knowledge.error.message} onRetry={knowledge.reload} />}
         {!knowledge.error && tickerKnowledge.length === 0 && !knowledge.loading && (
-          <EmptyState title="No knowledge objects yet" detail="No promoted or monitored knowledge names this ticker." />
+          <EmptyState title={t("knowledgeTimeline.emptyTitle")} detail={t("knowledgeTimeline.emptyDetail")} />
         )}
         {tickerKnowledge.length > 0 && (
           <div className={styles.list}>
             {tickerKnowledge.map((k) => (
               <div key={k.id} className={styles.listItem}>
                 <div className={styles.listItemHead}>
-                  <span className={styles.listItemTitle}>{k.id}</span>
+                  <span className={`${styles.listItemTitle} num`}>{k.id}</span>
                   <span className={styles.listItemMeta}>{formatDate(k.discovery_date)}</span>
                 </div>
                 <div className={styles.badgeRow}>
-                  <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{titleCase(k.status)}</Badge>
-                  <Badge variant="neutral">{titleCase(k.horizon)}</Badge>
-                  <Badge variant="neutral">{formatPercent(k.confidence)} confidence</Badge>
+                  <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{label("knowledgeStatus", k.status)}</Badge>
+                  <Badge variant="neutral">{label("horizon", k.horizon)}</Badge>
+                  <Badge variant="neutral">{t("knowledgeTimeline.confidencePct", { value: formatPercent(k.confidence) })}</Badge>
                 </div>
                 <span className={styles.listItemDetail}>{k.economic_explanation}</span>
               </div>
@@ -212,9 +208,9 @@ export function CompanyWorkspace() {
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Research Papers" subtitle="Papers published from knowledge naming this ticker">
+        <Card title={t("researchPapers.title")} subtitle={t("researchPapers.subtitle")}>
           {tickerPapers.length === 0 ? (
-            <EmptyState title="No papers yet" detail="No published research paper traces back to this ticker's knowledge." />
+            <EmptyState title={t("researchPapers.emptyTitle")} detail={t("researchPapers.emptyDetail")} />
           ) : (
             <div className={styles.list}>
               {tickerPapers.map((p) => (
@@ -230,18 +226,20 @@ export function CompanyWorkspace() {
           )}
         </Card>
 
-        <Card title="Genes" subtitle="Lineage of this ticker's knowledge as it mutates over time">
+        <Card title={t("genes.title")} subtitle={t("genes.subtitle")}>
           {tickerGenes.length === 0 ? (
-            <EmptyState title="No genes yet" detail="No gene lineage exists for this ticker's knowledge." />
+            <EmptyState title={t("genes.emptyTitle")} detail={t("genes.emptyDetail")} />
           ) : (
             <div className={styles.list}>
               {tickerGenes.map((g) => (
                 <div key={g.id} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{g.id} · gen {g.generation}</span>
+                    <span className={`${styles.listItemTitle} num`}>
+                      {t("genes.generationLabel", { id: g.id, generation: g.generation })}
+                    </span>
                   </div>
                   <div className={styles.badgeRow}>
-                    <Badge variant={GENE_VARIANT[g.status]}>{titleCase(g.status)}</Badge>
+                    <Badge variant={GENE_VARIANT[g.status]}>{label("geneStatus", g.status)}</Badge>
                   </div>
                   {g.mutation_notes && <span className={styles.listItemDetail}>{g.mutation_notes}</span>}
                 </div>
@@ -251,20 +249,20 @@ export function CompanyWorkspace() {
         </Card>
       </div>
 
-      <Section title="Financial Statements" description="Line items collected for this ticker.">
+      <Section title={t("financialStatements.title")} description={t("financialStatements.description")}>
         <DataTable
           rows={tickerStatements}
           getRowKey={(f, i) => `${f.period_end_date}-${f.statement_type}-${f.line_item}-${i}`}
-          emptyTitle="No financial statements collected"
-          emptyDetail="Financial statement collection is built but not yet wired to a live, verified filing source (see docs/TECHNICAL_DEBT.md)."
+          emptyTitle={t("financialStatements.emptyTitle")}
+          emptyDetail={t("financialStatements.emptyDetail")}
           columns={[
-            { key: "period", header: "Period End", render: (f) => formatDate(f.period_end_date) },
-            { key: "type", header: "Type", render: (f) => titleCase(f.period_type) },
-            { key: "statement", header: "Statement", render: (f) => titleCase(f.statement_type) },
-            { key: "item", header: "Line Item", render: (f) => titleCase(f.line_item) },
+            { key: "period", header: t("financialStatements.periodEnd"), render: (f) => formatDate(f.period_end_date) },
+            { key: "type", header: t("financialStatements.type"), render: (f) => label("periodType", f.period_type) },
+            { key: "statement", header: t("financialStatements.statement"), render: (f) => label("statementType", f.statement_type) },
+            { key: "item", header: t("financialStatements.lineItem"), render: (f) => titleCase(f.line_item) },
             {
               key: "value",
-              header: "Value",
+              header: t("financialStatements.value"),
               align: "right",
               render: (f) => (
                 <span className="num">
@@ -277,15 +275,15 @@ export function CompanyWorkspace() {
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Corporate Actions" subtitle="Past corporate events for this ticker">
+        <Card title={t("corporateActions.title")} subtitle={t("corporateActions.subtitle")}>
           {pastActions.length === 0 ? (
-            <EmptyState title="No corporate actions recorded" />
+            <EmptyState title={t("corporateActions.emptyTitle")} />
           ) : (
             <div className={styles.list}>
               {pastActions.map((ce, i) => (
                 <div key={i} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{titleCase(ce.event_type)}</span>
+                    <span className={styles.listItemTitle}>{label("corporateEventType", ce.event_type)}</span>
                     <span className={styles.listItemMeta}>{formatDate(ce.event_date)}</span>
                   </div>
                   <span className={styles.listItemDetail}>{ce.description}</span>
@@ -295,9 +293,9 @@ export function CompanyWorkspace() {
           )}
         </Card>
 
-        <Card title="News Timeline" subtitle="Headlines mentioning this ticker">
+        <Card title={t("newsTimeline.title")} subtitle={t("newsTimeline.subtitle")}>
           {news.length === 0 ? (
-            <EmptyState title="No news yet" />
+            <EmptyState title={t("newsTimeline.emptyTitle")} />
           ) : (
             <div className={styles.list}>
               {news.map((n, i) => (
@@ -314,11 +312,8 @@ export function CompanyWorkspace() {
         </Card>
       </div>
 
-      <Card title="Market Regime & Macro Exposure">
-        <EmptyState
-          title="Not yet available"
-          detail="No market regime classification or per-ticker macro-exposure artifact exists yet upstream -- this section will populate once the research engine produces one, per the platform's anti-fabrication principle."
-        />
+      <Card title={t("marketRegime.title")}>
+        <EmptyState title={t("marketRegime.emptyTitle")} detail={t("marketRegime.emptyDetail")} />
       </Card>
     </>
   );

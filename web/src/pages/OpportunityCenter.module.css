@@ -68,14 +68,14 @@
   font-size: var(--text-sm);
   color: var(--text-primary);
   line-height: var(--leading-normal);
-  padding-left: var(--space-4);
+  padding-inline-start: var(--space-4);
   position: relative;
 }
 
 .bulletList li::before {
   content: "";
   position: absolute;
-  left: 2px;
+  inset-inline-start: 2px;
   top: 0.55em;
   width: 4px;
   height: 4px;

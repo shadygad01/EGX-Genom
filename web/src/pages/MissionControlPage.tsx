@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
@@ -5,7 +7,9 @@ import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
-import { formatDate, formatDateTime, formatNumber, formatPercent, titleCase } from "../lib/format";
+import { useEnumLabel } from "../hooks/useEnumLabel";
+import { useFormatters } from "../hooks/useFormatters";
+import { formatNumber, formatPercent } from "../lib/format";
 import type { CollectorStatusRow, DiscoveryOutcome, GeneStatus, HealthStatus, RunStatus, StageStatus } from "../types";
 import styles from "./MissionControlPage.module.css";
 
@@ -60,14 +64,15 @@ const GENE_VARIANT: Record<GeneStatus, BadgeVariant> = {
  * otherwise hides -- e.g. a source producing prices but zero news, or
  * vice versa. Only non-zero categories are shown, so a single-purpose
  * source's row stays short. */
-function describeYieldBreakdown(row: CollectorStatusRow): string {
+function describeYieldBreakdown(row: CollectorStatusRow, t: TFunction<"missionControl">): string {
   const parts: string[] = [
-    row.price_bars_written && `${formatNumber(row.price_bars_written)} price`,
-    row.macro_observations_written && `${formatNumber(row.macro_observations_written)} macro`,
-    row.news_items_written && `${formatNumber(row.news_items_written)} news`,
-    row.corporate_events_written && `${formatNumber(row.corporate_events_written)} corp. actions`,
-    row.index_constituents_written && `${formatNumber(row.index_constituents_written)} index`,
-    row.financial_statement_line_items_written && `${formatNumber(row.financial_statement_line_items_written)} financials`,
+    row.price_bars_written && t("collectors.yieldParts.price", { count: formatNumber(row.price_bars_written) }),
+    row.macro_observations_written && t("collectors.yieldParts.macro", { count: formatNumber(row.macro_observations_written) }),
+    row.news_items_written && t("collectors.yieldParts.news", { count: formatNumber(row.news_items_written) }),
+    row.corporate_events_written && t("collectors.yieldParts.corporateActions", { count: formatNumber(row.corporate_events_written) }),
+    row.index_constituents_written && t("collectors.yieldParts.index", { count: formatNumber(row.index_constituents_written) }),
+    row.financial_statement_line_items_written &&
+      t("collectors.yieldParts.financials", { count: formatNumber(row.financial_statement_line_items_written) }),
   ].filter((part): part is string => Boolean(part));
   return parts.length ? parts.join(" · ") : "—";
 }
@@ -78,6 +83,9 @@ function describeYieldBreakdown(row: CollectorStatusRow): string {
  * current blockers, and the weekly Discovery workflow's own verification
  * report -- all composed from existing artifacts. */
 export function MissionControlPage() {
+  const { t } = useTranslation("missionControl");
+  const label = useEnumLabel();
+  const { formatDate, formatDateTime } = useFormatters();
   const missionStatus = useArtifact((p) => p.getMissionStatus());
   const executionReport = useArtifact((p) => p.getExecutionReport());
   const systemStatus = useArtifact((p) => p.getSystemStatus());
@@ -109,84 +117,84 @@ export function MissionControlPage() {
 
   return (
     <>
-      <Section title="Mission Status" description="The current production pipeline's status, per the most recent Mission Control update.">
+      <Section title={t("missionStatus.title")} description={t("missionStatus.description")}>
         {missionStatus.loading && <LoadingState rows={2} />}
         {missionStatus.error && <ErrorState detail={missionStatus.error.message} onRetry={missionStatus.reload} />}
         {!missionStatus.loading && !missionStatus.error && !missionStatus.data && (
-          <EmptyState title="No mission status yet" detail="Available once the full production pipeline (agx run) executes." />
+          <EmptyState title={t("missionStatus.emptyTitle")} detail={t("missionStatus.emptyDetail")} />
         )}
         {missionStatus.data && (
           <div className={styles.grid}>
-            <StatTile label="Pipeline Status" value={<Badge variant={STAGE_VARIANT[missionStatus.data.pipeline_status]}>{titleCase(missionStatus.data.pipeline_status)}</Badge>} />
-            <StatTile label="Pipeline Version" value={missionStatus.data.pipeline_version} />
-            <StatTile label="Execution Mode" value={titleCase(missionStatus.data.current_execution_mode)} />
-            <StatTile label="Duration" value={`${formatNumber(missionStatus.data.execution_duration_seconds, 2)}s`} />
-            <StatTile label="Total Executions" value={missionStatus.data.total_executions} />
-            <StatTile label="Last Successful Run" value={formatDate(missionStatus.data.last_successful_pipeline_at)} />
-            <StatTile label="Last Failed Run" value={formatDate(missionStatus.data.last_failed_pipeline_at)} />
+            <StatTile label={t("missionStatus.pipelineStatus")} value={<Badge variant={STAGE_VARIANT[missionStatus.data.pipeline_status]}>{label("stageStatus", missionStatus.data.pipeline_status)}</Badge>} />
+            <StatTile label={t("missionStatus.pipelineVersion")} value={<span className="num">{missionStatus.data.pipeline_version}</span>} />
+            <StatTile label={t("missionStatus.executionMode")} value={label("executionMode", missionStatus.data.current_execution_mode)} />
+            <StatTile label={t("missionStatus.duration")} value={<span className="num">{formatNumber(missionStatus.data.execution_duration_seconds, 2)}s</span>} />
+            <StatTile label={t("missionStatus.totalExecutions")} value={missionStatus.data.total_executions} />
+            <StatTile label={t("missionStatus.lastSuccessfulRun")} value={formatDate(missionStatus.data.last_successful_pipeline_at)} />
+            <StatTile label={t("missionStatus.lastFailedRun")} value={formatDate(missionStatus.data.last_failed_pipeline_at)} />
           </div>
         )}
       </Section>
 
-      <Section title="Pipeline Health" description="Every stage of the most recent execution, in order.">
+      <Section title={t("pipelineHealth.title")} description={t("pipelineHealth.description")}>
         {executionReport.loading && <LoadingState rows={3} />}
         {executionReport.error && <ErrorState detail={executionReport.error.message} onRetry={executionReport.reload} />}
         {!executionReport.loading && !executionReport.error && !executionReport.data && (
-          <EmptyState title="No execution report yet" />
+          <EmptyState title={t("pipelineHealth.emptyTitle")} />
         )}
         {executionReport.data && (
           <DataTable
             rows={executionReport.data.stages}
             getRowKey={(s) => s.name}
-            emptyTitle="No stages recorded"
+            emptyTitle={t("pipelineHealth.emptyTitleStages")}
             columns={[
-              { key: "name", header: "Stage", render: (s) => titleCase(s.name) },
-              { key: "status", header: "Status", render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{titleCase(s.status)}</Badge> },
-              { key: "duration", header: "Duration", align: "right", render: (s) => `${formatNumber(s.duration_seconds, 2)}s` },
-              { key: "detail", header: "Detail", render: (s) => s.detail },
-              { key: "warnings", header: "Warnings", align: "right", render: (s) => s.warnings.length },
+              { key: "name", header: t("pipelineHealth.stage"), render: (s) => label("stageName", s.name) },
+              { key: "status", header: t("pipelineHealth.status"), render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{label("stageStatus", s.status)}</Badge> },
+              { key: "duration", header: t("pipelineHealth.duration"), align: "right", render: (s) => <span className="num">{formatNumber(s.duration_seconds, 2)}s</span> },
+              { key: "detail", header: t("pipelineHealth.detail"), render: (s) => s.detail },
+              { key: "warnings", header: t("pipelineHealth.warnings"), align: "right", render: (s) => s.warnings.length },
             ]}
           />
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Knowledge Status" subtitle="Knowledge objects by lifecycle status">
+        <Card title={t("knowledgeStatus.title")} subtitle={t("knowledgeStatus.subtitle")}>
           {systemStatus.data ? (
             <div className={styles.grid}>
-              <StatTile label="Total" value={systemStatus.data.knowledge_objects} />
+              <StatTile label={t("knowledgeStatus.total")} value={systemStatus.data.knowledge_objects} />
               {Object.entries(systemStatus.data.by_status).map(([status, count]) => (
-                <StatTile key={status} label={titleCase(status)} value={count} />
+                <StatTile key={status} label={label("knowledgeStatus", status)} value={count} />
               ))}
             </div>
           ) : (
-            <EmptyState title="No knowledge status yet" />
+            <EmptyState title={t("knowledgeStatus.emptyTitle")} />
           )}
         </Card>
 
-        <Card title="Genome Status" subtitle="Genes by lifecycle status">
+        <Card title={t("genomeStatus.title")} subtitle={t("genomeStatus.subtitle")}>
           {(genes.data ?? []).length === 0 ? (
-            <EmptyState title="No genes yet" />
+            <EmptyState title={t("genomeStatus.emptyTitle")} />
           ) : (
             <div className={styles.grid}>
-              <StatTile label="Total" value={genes.data!.length} />
-              <StatTile label="Promoted" value={geneCounts.promoted} />
-              <StatTile label="Monitoring" value={geneCounts.monitoring} />
-              <StatTile label="Replaced" value={geneCounts.replaced} />
-              <StatTile label="Retired" value={geneCounts.retired} />
+              <StatTile label={t("genomeStatus.total")} value={genes.data!.length} />
+              <StatTile label={t("genomeStatus.promoted")} value={geneCounts.promoted} />
+              <StatTile label={t("genomeStatus.monitoring")} value={geneCounts.monitoring} />
+              <StatTile label={t("genomeStatus.replaced")} value={geneCounts.replaced} />
+              <StatTile label={t("genomeStatus.retired")} value={geneCounts.retired} />
             </div>
           )}
         </Card>
       </div>
 
-      <Section title="Collectors" description="Output of each source's most recent collection run.">
+      <Section title={t("collectors.title")} description={t("collectors.description")}>
         <div className={styles.grid}>
-          <StatTile label="Catalogued" value={(sourceRegistry.data ?? []).length} />
-          <StatTile label="Collected" value={collectedCount} />
-          <StatTile label="Degraded" value={degradedCount} />
-          <StatTile label="Wired Standby" value={standbyCount} />
-          <StatTile label="Failed" value={failedCount} />
-          <StatTile label="Not Yet Wired" value={unavailableCount} />
+          <StatTile label={t("collectors.catalogued")} value={(sourceRegistry.data ?? []).length} />
+          <StatTile label={t("collectors.collected")} value={collectedCount} />
+          <StatTile label={t("collectors.degraded")} value={degradedCount} />
+          <StatTile label={t("collectors.wiredStandby")} value={standbyCount} />
+          <StatTile label={t("collectors.failed")} value={failedCount} />
+          <StatTile label={t("collectors.notYetWired")} value={unavailableCount} />
         </div>
         {collectorStatus.loading && <LoadingState rows={3} />}
         {collectorStatus.error && <ErrorState detail={collectorStatus.error.message} onRetry={collectorStatus.reload} />}
@@ -194,80 +202,80 @@ export function MissionControlPage() {
           <DataTable
             rows={collectorStatus.data ?? []}
             getRowKey={(c) => c.source_id}
-            emptyTitle="No collector runs yet"
+            emptyTitle={t("collectors.emptyTitle")}
             columns={[
-              { key: "source", header: "Source", render: (c) => c.source_id },
+              { key: "source", header: t("collectors.source"), render: (c) => <span className="num">{c.source_id}</span> },
               {
                 key: "status",
-                header: "Status",
-                render: (c) => <Badge variant={STATUS_VARIANT[c.status]}>{titleCase(c.status)}</Badge>,
+                header: t("collectors.status"),
+                render: (c) => <Badge variant={STATUS_VARIANT[c.status]}>{label("collectorStatus", c.status)}</Badge>,
               },
               {
                 key: "health",
-                header: "Health",
+                header: t("collectors.health"),
                 render: (c) => c.status === "STANDBY"
-                  ? <Badge variant="accent">Not Measured</Badge>
-                  : (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{titleCase(c.health_status)}</Badge> : "—"),
+                  ? <Badge variant="accent">{t("collectors.notMeasured")}</Badge>
+                  : (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{label("healthStatus", c.health_status)}</Badge> : "—"),
               },
               {
                 key: "connection",
-                header: "Connected",
+                header: t("collectors.connected"),
                 render: (c) => c.status === "STANDBY"
-                  ? <Badge variant="neutral">Not Run</Badge>
-                  : <Badge variant={c.connection_success ? "positive" : "negative"}>{c.connection_success ? "Yes" : "No"}</Badge>,
+                  ? <Badge variant="neutral">{t("collectors.notRun")}</Badge>
+                  : <Badge variant={c.connection_success ? "positive" : "negative"}>{c.connection_success ? t("collectors.yes") : t("collectors.no")}</Badge>,
               },
               {
                 key: "parsed",
-                header: "Parsed",
+                header: t("collectors.parsed"),
                 render: (c) => c.status === "STANDBY"
-                  ? <Badge variant="neutral">Not Run</Badge>
-                  : <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? "Yes" : "No"}</Badge>,
+                  ? <Badge variant="neutral">{t("collectors.notRun")}</Badge>
+                  : <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? t("collectors.yes") : t("collectors.no")}</Badge>,
               },
-              { key: "yield", header: "Yield", align: "right", render: (c) => formatNumber(c.yield) },
-              { key: "breakdown", header: "Breakdown", render: (c) => describeYieldBreakdown(c) },
-              { key: "events", header: "Events", align: "right", render: (c) => formatNumber(c.events_produced) },
-              { key: "docs", header: "Documents", align: "right", render: (c) => formatNumber(c.documents_fetched) },
+              { key: "yield", header: t("collectors.yield"), align: "right", render: (c) => <span className="num">{formatNumber(c.yield)}</span> },
+              { key: "breakdown", header: t("collectors.breakdown"), render: (c) => describeYieldBreakdown(c, t) },
+              { key: "events", header: t("collectors.events"), align: "right", render: (c) => <span className="num">{formatNumber(c.events_produced)}</span> },
+              { key: "docs", header: t("collectors.documents"), align: "right", render: (c) => <span className="num">{formatNumber(c.documents_fetched)}</span> },
               {
                 key: "withheld",
-                header: "Withheld",
+                header: t("collectors.withheld"),
                 align: "right",
                 render: (c) => (c.batches_withheld > 0 ? <Badge variant="warning">{formatNumber(c.batches_withheld)}</Badge> : "0"),
               },
-              { key: "reputation", header: "Reputation", align: "right", render: (c) => (c.reputation_score != null ? formatPercent(c.reputation_score) : "—") },
-              { key: "quality", header: "Quality", align: "right", render: (c) => (c.data_quality_score != null ? formatPercent(c.data_quality_score) : "—") },
-              { key: "reason", header: "Reason", render: (c) => c.reason ?? "—" },
+              { key: "reputation", header: t("collectors.reputation"), align: "right", render: (c) => (c.reputation_score != null ? formatPercent(c.reputation_score) : "—") },
+              { key: "quality", header: t("collectors.quality"), align: "right", render: (c) => (c.data_quality_score != null ? formatPercent(c.data_quality_score) : "—") },
+              { key: "reason", header: t("collectors.reason"), render: (c) => c.reason ?? "—" },
             ]}
           />
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Source Health" subtitle="Rollup across the full source registry -- see Source Intelligence for per-source detail">
+        <Card title={t("sourceHealth.title")} subtitle={t("sourceHealth.subtitle")}>
           {(sourceRegistry.data ?? []).length === 0 ? (
-            <EmptyState title="No source registry yet" />
+            <EmptyState title={t("sourceHealth.emptyTitle")} />
           ) : (
             <div className={styles.grid}>
-              <StatTile label="Implemented" value={implementedCount} />
-              <StatTile label="Healthy" value={sourceHealthCounts.healthy} />
-              <StatTile label="Degraded" value={sourceHealthCounts.degraded} />
-              <StatTile label="Down" value={sourceHealthCounts.down} />
+              <StatTile label={t("sourceHealth.implemented")} value={implementedCount} />
+              <StatTile label={t("sourceHealth.healthy")} value={sourceHealthCounts.healthy} />
+              <StatTile label={t("sourceHealth.degraded")} value={sourceHealthCounts.degraded} />
+              <StatTile label={t("sourceHealth.down")} value={sourceHealthCounts.down} />
             </div>
           )}
         </Card>
 
-        <Card title="Current Blockers">
+        <Card title={t("currentBlockers.title")}>
           {!executionReport.data || (executionReport.data.errors.length === 0 && executionReport.data.warnings.length === 0) ? (
-            <EmptyState title="No blockers" detail="The most recent execution reported no errors or warnings." />
+            <EmptyState title={t("currentBlockers.emptyTitle")} detail={t("currentBlockers.emptyDetail")} />
           ) : (
             <div className={styles.list}>
               {executionReport.data.errors.map((e, i) => (
                 <div key={`e-${i}`} className={styles.listItem}>
-                  <Badge variant="negative">Error</Badge> {e}
+                  <Badge variant="negative">{t("currentBlockers.error")}</Badge> {e}
                 </div>
               ))}
               {executionReport.data.warnings.map((w, i) => (
                 <div key={`w-${i}`} className={styles.listItem}>
-                  <Badge variant="warning">Warning</Badge> {w}
+                  <Badge variant="warning">{t("currentBlockers.warning")}</Badge> {w}
                 </div>
               ))}
             </div>
@@ -275,25 +283,22 @@ export function MissionControlPage() {
         </Card>
       </div>
 
-      <Section title="Execution History" description="Every research-cycle run recorded.">
+      <Section title={t("executionHistory.title")} description={t("executionHistory.description")}>
         <DataTable
           rows={runHistory}
           getRowKey={(r) => r.id}
-          emptyTitle="No runs recorded yet"
+          emptyTitle={t("executionHistory.emptyTitle")}
           columns={[
-            { key: "date", header: "Run Date", render: (r) => formatDate(r.run_date) },
-            { key: "status", header: "Status", render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{titleCase(r.status)}</Badge> },
-            { key: "hypotheses", header: "Hypotheses", align: "right", render: (r) => r.hypotheses },
-            { key: "promoted", header: "Promoted", align: "right", render: (r) => r.promoted },
-            { key: "completed", header: "Completed", align: "right", render: (r) => formatDateTime(r.completed_at) },
+            { key: "date", header: t("executionHistory.runDate"), render: (r) => formatDate(r.run_date) },
+            { key: "status", header: t("executionHistory.status"), render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{label("runStatus", r.status)}</Badge> },
+            { key: "hypotheses", header: t("executionHistory.hypotheses"), align: "right", render: (r) => r.hypotheses },
+            { key: "promoted", header: t("executionHistory.promoted"), align: "right", render: (r) => r.promoted },
+            { key: "completed", header: t("executionHistory.completed"), align: "right", render: (r) => formatDateTime(r.completed_at) },
           ]}
         />
       </Section>
 
-      <Section
-        title="Acquisition Decisions"
-        description="Every capability's ranked acquisition strategies this run -- which source was selected, and why every other candidate was skipped, failed, or produced nothing usable. A capability is never tied to one website: this is the runtime Acquisition Decision Engine's own record of the fallback chain it evaluated."
-      >
+      <Section title={t("acquisitionDecisions.title")} description={t("acquisitionDecisions.description")}>
         {acquisitionDecisions.loading && <LoadingState rows={3} />}
         {acquisitionDecisions.error && (
           <ErrorState detail={acquisitionDecisions.error.message} onRetry={acquisitionDecisions.reload} />
@@ -302,51 +307,48 @@ export function MissionControlPage() {
           <DataTable
             rows={acquisitionDecisions.data ?? []}
             getRowKey={(d) => d.capability}
-            emptyTitle="No acquisition decisions yet"
+            emptyTitle={t("acquisitionDecisions.emptyTitle")}
             columns={[
-              { key: "capability", header: "Capability", render: (d) => titleCase(d.capability) },
+              { key: "capability", header: t("acquisitionDecisions.capability"), render: (d) => label("capability", d.capability) },
               {
                 key: "status",
-                header: "Status",
+                header: t("acquisitionDecisions.status"),
                 render: (d) => (
                   <Badge variant={d.succeeded ? "positive" : "neutral"}>
-                    {d.succeeded ? "Satisfied" : "Unsatisfied"}
+                    {d.succeeded ? t("acquisitionDecisions.satisfied") : t("acquisitionDecisions.unsatisfied")}
                   </Badge>
                 ),
               },
               {
                 key: "selected",
-                header: "Selected Strategy",
-                render: (d) => (d.selected_source_ids.length ? d.selected_source_ids.join(", ") : "—"),
+                header: t("acquisitionDecisions.selectedStrategy"),
+                render: (d) => (d.selected_source_ids.length ? <span className="num">{d.selected_source_ids.join(", ")}</span> : "—"),
               },
               {
                 key: "attempts",
-                header: "Strategies Considered",
+                header: t("acquisitionDecisions.strategiesConsidered"),
                 align: "right",
                 render: (d) => d.attempts.length,
               },
               {
                 key: "top",
-                header: "Top-Ranked Strategy",
+                header: t("acquisitionDecisions.topRankedStrategy"),
                 render: (d) =>
-                  d.attempts[0] ? `${d.attempts[0].source_id} (${titleCase(d.attempts[0].outcome)})` : "—",
+                  d.attempts[0] ? <span className="num">{d.attempts[0].source_id} ({label("capabilityStrategyOutcome", d.attempts[0].outcome)})</span> : "—",
               },
             ]}
           />
         )}
       </Section>
 
-      <Section
-        title="Weekly Discovery"
-        description="The Acquisition Intelligence Engine's own scheduled, evidenced attempt to verify a real endpoint for every catalogued PLANNED/CANDIDATE source (see .github/workflows/discovery.yml) -- never an automatic promotion, always a human-reviewed pull request."
-      >
+      <Section title={t("weeklyDiscovery.title")} description={t("weeklyDiscovery.description")}>
         {discoveryMetrics.data && (
           <div className={styles.grid}>
-            <StatTile label="Sources In Report" value={discoveryMetrics.data.sources_in_report} />
-            <StatTile label="Verified Reachable" value={discoveryMetrics.data.sources_verified_reachable} />
-            <StatTile label="Checked Fresh" value={discoveryMetrics.data.sources_checked_fresh_this_run} />
-            <StatTile label="Served From Cache" value={discoveryMetrics.data.sources_served_from_cache} />
-            <StatTile label="Last Run" value={formatDateTime(discoveryMetrics.data.finished_at)} />
+            <StatTile label={t("weeklyDiscovery.sourcesInReport")} value={discoveryMetrics.data.sources_in_report} />
+            <StatTile label={t("weeklyDiscovery.verifiedReachable")} value={discoveryMetrics.data.sources_verified_reachable} />
+            <StatTile label={t("weeklyDiscovery.checkedFresh")} value={discoveryMetrics.data.sources_checked_fresh_this_run} />
+            <StatTile label={t("weeklyDiscovery.servedFromCache")} value={discoveryMetrics.data.sources_served_from_cache} />
+            <StatTile label={t("weeklyDiscovery.lastRun")} value={formatDateTime(discoveryMetrics.data.finished_at)} />
           </div>
         )}
         {discoveryReport.loading && <LoadingState rows={3} />}
@@ -355,27 +357,27 @@ export function MissionControlPage() {
           <DataTable
             rows={discoveryReport.data ?? []}
             getRowKey={(r) => r.source_id}
-            emptyTitle="No discovery report yet"
-            emptyDetail="Published once the weekly workflow's pull request merges -- see docs/DATA_ACQUISITION.md's Discovery workflow section."
+            emptyTitle={t("weeklyDiscovery.emptyTitle")}
+            emptyDetail={t("weeklyDiscovery.emptyDetail")}
             columns={[
-              { key: "source", header: "Source", render: (r: DiscoveryOutcome) => r.source_id },
+              { key: "source", header: t("weeklyDiscovery.source"), render: (r: DiscoveryOutcome) => <span className="num">{r.source_id}</span> },
               {
                 key: "result",
-                header: "Result",
+                header: t("weeklyDiscovery.result"),
                 render: (r) => (
                   <Badge variant={DISCOVERY_RESULT_VARIANT[r.verification_result] ?? "neutral"}>
-                    {titleCase(r.verification_result)}
+                    {label("discoveryResult", r.verification_result)}
                   </Badge>
                 ),
               },
-              { key: "endpoint", header: "Endpoint", render: (r) => r.discovered_endpoints[0] ?? "—" },
-              { key: "confidence", header: "Confidence", align: "right", render: (r) => formatPercent(r.confidence) },
+              { key: "endpoint", header: t("weeklyDiscovery.endpoint"), render: (r) => <span className="num">{r.discovered_endpoints[0] ?? "—"}</span> },
+              { key: "confidence", header: t("weeklyDiscovery.confidence"), align: "right", render: (r) => formatPercent(r.confidence) },
               {
                 key: "cache",
-                header: "Cache",
-                render: (r) => (r.from_cache ? <Badge variant="accent">Cached</Badge> : <Badge variant="neutral">Fresh</Badge>),
+                header: t("weeklyDiscovery.cache"),
+                render: (r) => (r.from_cache ? <Badge variant="accent">{t("weeklyDiscovery.cached")}</Badge> : <Badge variant="neutral">{t("weeklyDiscovery.fresh")}</Badge>),
               },
-              { key: "recommendation", header: "Recommendation", render: (r) => r.recommendation },
+              { key: "recommendation", header: t("weeklyDiscovery.recommendation"), render: (r) => r.recommendation },
             ]}
           />
         )}

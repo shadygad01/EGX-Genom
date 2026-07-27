@@ -1,0 +1,62 @@
+{
+  "title": "مركز الفرص",
+  "description": "كل فرصة يراها AGX حاليًا، مرتبة حسب الثقة، مع الأدلة الداعمة لها.",
+  "emptyTitle": "لا توجد فرص بعد",
+  "emptyDetail": "تظهر التوصيات بعد أن يجمع محرك القرار الرئيسي توقعات الآفاق الزمنية.",
+  "columns": {
+    "opportunity": "الفرصة",
+    "horizons": "الآفاق الزمنية",
+    "prices": "الأسعار",
+    "financialPeriods": "الفترات المالية",
+    "knowledge": "المعرفة",
+    "primaryBlocker": "المعوق الرئيسي",
+    "none": "لا يوجد"
+  },
+  "badgeTitle": "{{horizon}}: عائد متوقع {{return}}، ثقة {{confidence}}",
+  "evidenceTitle": "{{ticker}} — الأدلة",
+  "evidence": "الأدلة",
+  "noOpportunitySelected": "لم يتم اختيار فرصة",
+  "selectRowDetail": "اختر صفًا لعرض تفسيره الكامل.",
+  "decisionReadiness": {
+    "title": "جاهزية القرار",
+    "subtitle": "سبب قدرة AGX على البحث أو وجوب الامتناع لكل رمز",
+    "emptyTitle": "لا يوجد تقييم جاهزية بعد",
+    "emptyDetail": "يجب تشغيل خط الإنتاج قبل إمكانية تقييم جاهزية الأدلة."
+  },
+  "dataCoverage": {
+    "title": "تغطية البيانات",
+    "titleForTicker": "{{ticker}} — تغطية البيانات",
+    "noTickerSelected": "لم يتم اختيار رمز",
+    "selectRowDetail": "اختر صفًا في جاهزية القرار لعرض تفصيل اكتمال البيانات لكل طبقة.",
+    "overallCompleteness": "الاكتمال الإجمالي",
+    "swingReady": "جاهز للمدى المتوسط",
+    "investmentReady": "جاهز للاستثمار طويل المدى",
+    "yes": "نعم",
+    "no": "لا",
+    "dataLayers": "طبقات البيانات",
+    "ofRequired": "من {{threshold}} المطلوبة",
+    "belowThreshold": "أقل من حد الجاهزية لهذه الطبقة."
+  },
+  "layers": {
+    "financials": "البيانات المالية",
+    "disclosures": "الإفصاحات",
+    "news": "الأخبار",
+    "macro": "الاقتصاد الكلي",
+    "knowledge": "المعرفة"
+  },
+  "detail": {
+    "horizonBreakdown": "تفصيل الآفاق الزمنية",
+    "expReturnShort": "العائد المتوقع",
+    "expRiskShort": "المخاطرة المتوقعة",
+    "noModelPrediction": "لا يوجد تنبؤ نموذجي لهذا الأفق الزمني بعد.",
+    "researchSummary": "ملخص البحث",
+    "riskSummary": "ملخص المخاطر",
+    "supportingEvidence": "الأدلة الداعمة",
+    "contradictingEvidence": "الأدلة المعارضة / شروط الإبطال",
+    "historicalSimilarCases": "حالات تاريخية مشابهة",
+    "upcomingCatalysts": "المحفزات القادمة",
+    "noScheduledCatalysts": "لا توجد محفزات مجدولة.",
+    "catalystLine": "{{date}} — {{eventType}}: {{description}}",
+    "openWorkspace": "فتح مساحة البحث الكاملة"
+  }
+}

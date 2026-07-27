@@ -1,0 +1,46 @@
+{
+  "marketSummary": {
+    "title": "Market Summary",
+    "description": "Universe and trading session snapshot as of the last research cycle.",
+    "emptyTitle": "No market state yet",
+    "emptyDetail": "Available once the first research cycle runs.",
+    "asOf": "As Of",
+    "tradingSession": "Trading Session",
+    "open": "Open",
+    "closed": "Closed",
+    "constituents": "Constituents",
+    "sectors": "Sectors"
+  },
+  "sectorComposition": {
+    "title": "Sector Composition",
+    "subtitle": "Covered constituents with known sectors",
+    "emptyTitle": "No sector data yet"
+  },
+  "macroDashboard": {
+    "title": "Macro Dashboard",
+    "subtitle": "Latest observation per tracked macro series",
+    "emptyTitle": "No macro data yet",
+    "noObservations": "No observations"
+  },
+  "upcomingEvents": {
+    "title": "Upcoming Earnings, Corporate Actions & Disclosures",
+    "subtitle": "Scheduled events across the covered universe",
+    "emptyTitle": "No scheduled events",
+    "emptyDetail": "No known corporate events are upcoming for the covered universe."
+  },
+  "recentActions": {
+    "title": "Recent Corporate Actions",
+    "subtitle": "Past corporate events across the covered universe",
+    "emptyTitle": "No corporate actions recorded"
+  },
+  "breadthLiquidity": {
+    "title": "Market Breadth & Liquidity",
+    "emptyTitle": "Not yet available",
+    "emptyDetail": "Breadth and liquidity require a backend-computed artifact (advancers/decliners, adjusted volume) this platform doesn't export yet -- the frontend never computes returns from raw price bars directly, per the platform's data.adjustments rule."
+  },
+  "marketRegime": {
+    "title": "Market Regime & Historical Comparison",
+    "emptyTitle": "Not yet available",
+    "emptyDetail": "No market regime classification or historical-comparison artifact exists upstream yet. This section will populate once the research engine produces one."
+  }
+}

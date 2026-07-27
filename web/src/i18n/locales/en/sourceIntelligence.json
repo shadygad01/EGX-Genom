@@ -1,0 +1,57 @@
+{
+  "title": "Source Intelligence",
+  "description": "Health, availability, coverage, freshness, latency, qualification, and validation score for every source AGX tracks.",
+  "emptyTitle": "No sources registered yet",
+  "columns": {
+    "source": "Source",
+    "category": "Category",
+    "status": "Status",
+    "integratedCollected": "Integrated / Collected",
+    "integratedStandby": "Integrated / Standby",
+    "integration": "Integration",
+    "integratedVia": "Via {{name}}",
+    "lifecycle": "Lifecycle",
+    "health": "Health",
+    "notMeasured": "Not Measured",
+    "validationScore": "Validation Score"
+  },
+  "detail": {
+    "title": "Source Detail",
+    "emptyTitle": "No source selected",
+    "emptyDetail": "Select a row to see its full health and reputation detail.",
+    "priorityMeta": "{{category}} · {{country}} · priority {{priority}}",
+    "discoveredFirstRun": "Discovered / First Run",
+    "lastRun": "Last Run",
+    "totalRuns": "Total Runs",
+    "documentsLastRun": "Documents (Last Run)",
+    "integratedVia": "Integrated Via",
+    "decisionCapabilities": "Decision Capabilities",
+    "expectedLatency": "Expected Latency",
+    "validationScore": "Validation Score",
+    "compositeReputation": "Composite Reputation"
+  },
+  "reputation": {
+    "title": "Reputation Dimensions",
+    "emptyTitle": "No reputation data yet",
+    "emptyDetail": "Reputation dimensions populate once this source has run at least once.",
+    "availability": "Availability",
+    "coverage": "Coverage",
+    "freshness": "Freshness",
+    "latency": "Latency",
+    "accuracy": "Accuracy",
+    "schemaStability": "Schema Stability",
+    "correctionRate": "Correction Rate",
+    "duplicateRate": "Duplicate Rate",
+    "historicalUsefulness": "Historical Usefulness"
+  },
+  "discoveryEvidence": {
+    "title": "Discovery Evidence",
+    "cachedResult": " (cached result)",
+    "endpointVerified": "Endpoint verified.",
+    "discovered": "Discovered: {{endpoints}}",
+    "evidence": "Evidence: {{items}}"
+  },
+  "notes": {
+    "title": "Notes"
+  }
+}

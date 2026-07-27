@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.30.0 — Free daily automatic refresh (GitHub Actions cron)
+
+`.github/workflows/deploy-pages.yml` gains a `schedule:` trigger (`30 15
+* * 0-4` UTC — after EGX's Sun-Thu close) alongside its existing
+push/`workflow_dispatch` triggers. The dashboard now re-runs the full live
+production pipeline and redeploys once a day automatically, at zero cost
+(GitHub Actions cron is free for a public repository) and with no
+deployment target or paid scheduler required. Closes the GitHub-Pages half
+of ROADMAP.md's "Schedule `agx run` itself" item; a hosted `api/`'s own
+periodic refresh (TD-14) still needs a real deployment target, unchanged.
+
 ## 0.29.0 — Bilingual EN/AR dashboard with full RTL layout
 
 The web dashboard is now bilingual: an EN/AR toggle in the top bar

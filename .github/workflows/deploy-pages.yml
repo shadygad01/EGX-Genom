@@ -10,6 +10,12 @@ on:
       - "package-lock.json"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
+  # Free daily refresh (no deployment target/scheduler required -- GitHub
+  # Actions cron is free for a public repo): 15:30 UTC is after EGX's
+  # Sun-Thu close (Africa/Cairo, UTC+2/+3) so each day's run picks up that
+  # session's close before the next one opens, without waiting on a push.
+  schedule:
+    - cron: "30 15 * * 0-4"
 
 permissions:
   contents: read

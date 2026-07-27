@@ -184,11 +184,15 @@ production entrypoint. What's next, in priority order:
   Engine section above.
 - Expand `collector_plan.py`'s mock/replay fixture coverage beyond
   COMI/MFPC once more tickers matter for research breadth.
-- Schedule `agx run` itself (System 18, business-blocked in general, but
-  the command is deployment-ready today) once any deployment target
-  exists — this is the "runs unchanged under GitHub Actions and
-  Cloudflare" the mission specified; `.github/workflows/deploy-pages.yml`
-  already proves the GitHub Actions half.
+- ~~Schedule `agx run` itself~~ **Closed for the GitHub Pages target**:
+  `.github/workflows/deploy-pages.yml` now also fires on a daily
+  `schedule:` cron (15:30 UTC, Sun-Thu, matching EGX's post-close window),
+  not just on push — free on a public repo, no deployment target or paid
+  scheduler needed. The dashboard now refreshes with real live data once a
+  day even with zero commits. What's still open: a hosted `api/`'s own
+  `DASHBOARD_ARTIFACTS_DIR` refresh (TD-14) needs a real deployment target
+  to have anything to schedule against — this closes only the
+  GitHub-Pages/`StaticJsonProvider` half.
 
 ## Dashboard architecture: next engineering-closeable steps
 

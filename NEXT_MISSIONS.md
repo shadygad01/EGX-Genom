@@ -1,6 +1,24 @@
 # Next Missions
 
-## Closed this phase: macro frequency alignment + no-look-ahead discipline
+## Closed this phase: Monte Carlo stress simulator
+
+Item 2 from the "Genuinely next now" list below is now closed — see
+`CURRENT_MISSION.md`'s "Monte Carlo stress simulator" entry and
+`docs/PHASE_STATUS.md`'s matching section.
+
+**Genuinely next now** (in priority order):
+
+1. **`ticker_data_gap_report.json` web/API wiring** (TD-34) — the last
+   item on this list that's pure engineering, not waiting on external
+   evidence.
+2. **Calibrate `agents.news_sentiment.classify_headline_sentiment()`'s
+   phrase lists** (TD-35), source a verified Arabic-language EGX
+   constituent list (TD-36), and consult a real publication-schedule
+   source to replace `data.point_in_time`'s declared lag floors with
+   cited figures (TD-37) — all three wait on real accumulated evidence
+   or an external source, not more engineering right now.
+
+## Closed prior phase: macro frequency alignment + no-look-ahead discipline
 
 Item 2 from the "Genuinely next now" list below is now closed — see
 `CURRENT_MISSION.md`'s "macro frequency alignment + no-look-ahead
@@ -197,19 +215,12 @@ Enterprise, FRA) — not collect additional data. Grounded in
 architecturally DONE), here is what that actually means, in priority
 order:
 
-## 1. Monte Carlo stress simulator (System 10, Experiment Factory)
+## 1. ~~Monte Carlo stress simulator (System 10, Experiment Factory)~~ — Closed
 
-`docs/PHASE_STATUS.md` names this the one Experiment Factory gap that is
-**not data-blocked** — an explicit placeholder "needs a simulator, a
-research decision," unlike every other named gap in the validation stack
-(which genuinely need more real trading history first). This is the
-highest-leverage closeable item: a real Monte Carlo stress test would
-strengthen every hypothesis that reaches Stress Testing, using data the
-platform already has (real and mock alike) — no new source required.
-Scope it as a design decision first (which simulation methodology —
-block bootstrap, parametric, historical-resampling — matches the
-existing `HistoricalWorstWindowStressTester`'s "locate a real scenario in
-real data, never a simulated one" philosophy) before writing code.
+See the "Closed this phase" section at the top of this document and
+`docs/PHASE_STATUS.md`'s "Monte Carlo stress simulator" section — block
+bootstrap over real observed returns was the methodology chosen, matching
+`HistoricalWorstWindowStressTester`'s exact philosophy.
 
 ## 2. ~~NewsIntelligenceAgent (System 08, Scientist Framework)~~ — Closed
 

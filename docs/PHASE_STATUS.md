@@ -30,7 +30,7 @@ below.
 | 07 | Research OS | **DONE** | TaskGraph/Artifacts/Sessions plus `DailyResearchPipeline` — the full 8-gate walk wired to real validators, board, causal gate, adversarial scientist, genome, papers, graph. End-to-end tested incl. rejection honesty and determinism. |
 | 08 | Scientist Framework | **DONE** (6 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure, NewsIntelligence real; FinancialPerformance/HistoricalPatterns remain honest stubs, both genuinely data-blocked (fundamentals feed, long history — see "NewsIntelligenceAgent" phase below for why News is no longer in that list). Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
 | 09 | Feature Discovery | **DONE** | Three autonomous generators (pairwise correlation, momentum, volatility) over three registered feature definitions; candidates versioned+evidenced. |
-| 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo an explicit placeholder (needs a simulator — research decision). |
+| 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo now a real block-bootstrap simulator (`MonteCarloBlockBootstrapStressTester`), not a placeholder. |
 | 11 | Validation Framework | **DONE** | `SignificanceThresholdValidator`, `NaiveDirectionalBacktester` (costs explicitly out of scope, stated), `HistoricalWorstWindowStressTester` (scenario located in real data, not simulated). Deferred: cost-aware portfolio-level backtesting (with 15's future optimizer). |
 | 12 | Review Board | **DONE** (4 of 5 reviewers real) | Statistician, Risk, Economist (structural coherence, not economic truth — stated), PeerValidator (independent replication). Historical reviewer data-blocked. Board wired into the pipeline before `promote()`. |
 | 13 | Runtime Engine | **DONE** | `RuntimeEngine.run_range`: deterministic, per-day failure isolation, non-trading days recorded not skipped silently, persistent run ledger. Now the core of `production.pipeline.ProductionPipeline`'s Research Pipeline stage — see "Production Execution Pipeline" below. OS-level scheduling = deployment config (18). |
@@ -888,6 +888,43 @@ present (a plain file copy, not a Python re-export, since the Discovery
 workflow already writes them in final shape). `npm run build`/`test`
 clean for both `api` and `web` workspaces (required a fresh `npm install`
 in this session first — `node_modules` had never been installed).
+
+## Monte Carlo stress simulator (System 10, Experiment Factory)
+
+Closes the one Experiment Factory gap `docs/PHASE_STATUS.md`/
+`NEXT_MISSIONS.md` had explicitly named as a design decision, not a data
+blocker: `MonteCarloExperiment` had been an honest `NotImplementedError`
+placeholder since Experiment Factory was built.
+
+Closed: `validation.stress_test.MonteCarloBlockBootstrapStressTester` —
+a real block bootstrap, staying faithful to
+`HistoricalWorstWindowStressTester`'s own stated philosophy ("the
+adverse scenario is not simulated... but located"). Every simulated path
+is built by resampling contiguous *blocks* (not single observations, the
+distinction from the existing `BootstrapExperiment`) of the hypothesis's
+real observed returns with replacement, preserving real short-run
+autocorrelation the way actual bad runs cluster — never a parametric or
+fabricated distribution. Recomputes the hypothesis's statistic over many
+simulated paths and checks whether the adverse-tail percentile keeps the
+full-sample statistic's sign. `block_size` auto-shrinks to fit short
+series (mirroring the historical tester's own `window = min(self.window,
+n)`), so it never raises for any series length the DATA_COLLECTION gate
+already admitted; `seed` makes every run deterministic, the same
+convention `BootstrapExperiment` already uses.
+
+Wired in two places: `MonteCarloExperiment` (`hypotheses/
+experiment_factory.py`) is now a real adapter over this tester (mirroring
+`StressTestExperiment`'s exact adapter shape) instead of raising, so it
+now counts toward the EXPERIMENT stage's real-results total and is stored
+as a versioned artifact like every other experiment; `orchestration.
+pipeline.DailyResearchPipeline`'s STRESS_TEST gate now requires *both* the
+historical worst-window and the Monte Carlo block-bootstrap tester to pass
+— surviving one adverse method isn't evidence the other wouldn't flip it.
+
+**Verified**: a real mock-mode `agx run` against the same 4-ticker
+scenario earlier phases used produces the identical 5 hypotheses as
+before this change — the combined gate doesn't regress what already
+passed. 8 new tests (616 total, up from 608); `ruff check` clean.
 
 ## Macro frequency alignment + no-look-ahead discipline (System 08/14)
 

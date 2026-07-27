@@ -5,9 +5,10 @@ real, deliberately simple statistics over the hypothesis's claim statistic
 (`hypotheses/statistic.py` — correlation for pairs, mean return for single
 assets): cross-validation, bootstrap, walk-forward, in/out-of-sample, and
 sensitivity analysis over the estimation window. `StressTestExperiment`
-adapts the `StressTester` interface. `MonteCarloExperiment` remains an
-explicit placeholder — a market simulator is a research decision, not
-scaffolding.
+and `MonteCarloExperiment` both adapt a `StressTester` into a versioned
+Experiment/artifact — the located historical worst window and the
+block-bootstrap Monte Carlo simulation respectively (see
+`validation.stress_test`'s module docstring for the methodology).
 
 Callers that want each `ExperimentResult` recorded as a versioned Artifact
 should wrap it via `orchestration.artifacts.ArtifactRepository.store()`.
@@ -28,7 +29,7 @@ from agx_research.hypotheses.statistic import (
     series_for_hypothesis,
     slice_series,
 )
-from agx_research.validation.stress_test import StressTester
+from agx_research.validation.stress_test import MonteCarloBlockBootstrapStressTester, StressTester
 
 
 class CrossValidationExperiment(Experiment):
@@ -257,11 +258,29 @@ class StressTestExperiment(Experiment):
 
 
 class MonteCarloExperiment(Experiment):
-    """Explicit placeholder interface — no market simulator is implemented yet."""
+    """Adapts `MonteCarloBlockBootstrapStressTester` (a real block-bootstrap
+    Monte Carlo simulation over the hypothesis's own observed returns) into
+    a versioned Experiment/artifact, mirroring `StressTestExperiment`'s
+    adapter shape exactly. Defaults to a fresh tester so `ExperimentFactory.
+    build()`'s unconditional inclusion of this class needs no constructor
+    argument at every call site."""
+
+    def __init__(self, stress_tester: StressTester | None = None):
+        self.stress_tester = stress_tester or MonteCarloBlockBootstrapStressTester()
 
     def run(self, hypothesis: Hypothesis, snapshot: DatasetSnapshot) -> ExperimentResult:
-        raise NotImplementedError(
-            "MonteCarloExperiment is a placeholder interface; no simulator is implemented yet"
+        result = self.stress_tester.run(hypothesis, snapshot)
+        return ExperimentResult(
+            statistic=result.scenario_results.get(
+                "worst_percentile_statistic", 1.0 if result.passed else 0.0
+            ),
+            p_value=0.0 if result.passed else 1.0,
+            sample_size=int(result.scenario_results.get("iterations", 0)),
+            details={
+                "scenario_results": result.scenario_results,
+                "notes": result.notes,
+                "passed": result.passed,
+            },
         )
 
 

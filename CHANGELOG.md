@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.27.0 — Monte Carlo stress simulator (block bootstrap)
+
+Closes the one Experiment Factory gap docs had explicitly named as a
+design decision rather than a data blocker: `MonteCarloExperiment` had
+been a `NotImplementedError` placeholder since System 10 was built. New
+`validation.stress_test.MonteCarloBlockBootstrapStressTester` stays
+faithful to the existing stress tester's "locate/derive from real data,
+never simulate" philosophy — every simulated path resamples contiguous
+blocks of the hypothesis's real observed returns with replacement
+(preserving real autocorrelation, unlike `BootstrapExperiment`'s
+single-observation resampling), never a parametric distribution.
+
+`MonteCarloExperiment` is now a real adapter over this tester (mirroring
+`StressTestExperiment`'s shape); `DailyResearchPipeline`'s STRESS_TEST
+gate now requires both the historical worst-window and the Monte Carlo
+tester to pass. Verified: an identical mock-mode run produces the same 5
+hypotheses as before this change.
+
+8 new tests (616 total, up from 608); `ruff check` clean.
+
 ## 0.26.0 — Macro frequency alignment + no-look-ahead discipline
 
 `MacroAgent` aligned macro observations to trading days by exact date

@@ -1,6 +1,25 @@
 # Current Mission
 
-## Current mission: macro frequency alignment + no-look-ahead discipline
+## Current mission: Monte Carlo stress simulator
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: `NEXT_MISSIONS.md`'s Monte Carlo
+item — the one Experiment Factory gap named as a pure design decision,
+not a data blocker.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s matching section: new
+`validation.stress_test.MonteCarloBlockBootstrapStressTester` (block
+bootstrap over real observed returns, matching the existing stress
+tester's "locate/derive from real data, never simulate" philosophy);
+`MonteCarloExperiment` is now a real adapter over it instead of raising;
+`DailyResearchPipeline`'s STRESS_TEST gate now requires both testers to
+pass. Verified an identical mock run still produces the same 5
+hypotheses as before. 616 backend tests pass (8 new); `ruff check`
+clean.
+
+---
+
+## Prior mission: macro frequency alignment + no-look-ahead discipline
 
 Immediate follow-up, per the project owner's "continue all remaining
 legal/free directions" instruction: `NEXT_MISSIONS.md` item 2.

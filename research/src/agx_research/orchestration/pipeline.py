@@ -69,7 +69,10 @@ from agx_research.review.reviewers import (
 )
 from agx_research.validation.backtest import NaiveDirectionalBacktester
 from agx_research.validation.statistical import SignificanceThresholdValidator, StatisticalEvidence
-from agx_research.validation.stress_test import HistoricalWorstWindowStressTester
+from agx_research.validation.stress_test import (
+    HistoricalWorstWindowStressTester,
+    MonteCarloBlockBootstrapStressTester,
+)
 
 
 @dataclass
@@ -271,11 +274,17 @@ class DailyResearchPipeline:
         if not ok:
             return rejected(f"Not statistically significant: {validation.notes}")
 
-        # 6. STRESS_TEST
-        stress = HistoricalWorstWindowStressTester().run(hypothesis, snapshot)
-        ok = advance(StageName.STRESS_TEST, stress.passed, stress.notes)
+        # 6. STRESS_TEST: both a located historical worst-case window and
+        # randomized Monte Carlo block-bootstrap scenarios must keep the
+        # hypothesis's statistic sign -- surviving one adverse method isn't
+        # enough evidence surviving another wouldn't flip it.
+        historical_stress = HistoricalWorstWindowStressTester().run(hypothesis, snapshot)
+        monte_carlo_stress = MonteCarloBlockBootstrapStressTester().run(hypothesis, snapshot)
+        stress_passed = historical_stress.passed and monte_carlo_stress.passed
+        stress_notes = f"Historical: {historical_stress.notes} | Monte Carlo: {monte_carlo_stress.notes}"
+        ok = advance(StageName.STRESS_TEST, stress_passed, stress_notes)
         if not ok:
-            return rejected(f"Failed stress test: {stress.notes}")
+            return rejected(f"Failed stress test: {stress_notes}")
 
         # 7. BACKTEST
         backtest = NaiveDirectionalBacktester(
@@ -326,7 +335,7 @@ class DailyResearchPipeline:
                 *finding.evidence,
                 f"backtest_hit_rate={backtest.hit_rate:.3f}",
                 f"backtest_sharpe={backtest.sharpe_ratio:.3f}",
-                f"stress={stress.notes}",
+                f"stress={stress_notes}",
             ],
         )
 

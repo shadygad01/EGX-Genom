@@ -1,0 +1,49 @@
+name: Inspect a dashboard artifact
+
+# Ad hoc, manually-triggered only. deploy-pages.yml already prints a
+# collector/execution/acquisition summary to its own logs, but not the
+# per-ticker dashboard JSON content itself (investment_cases.json,
+# decision_readiness.json, ...) -- this downloads one specific past run's
+# already-produced "github-pages" artifact (no pipeline re-run, no new
+# network fetch of market data) and prints the requested file(s) to the
+# log for inspection. Read-only: never writes to any tracked file or
+# re-publishes anything.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "The deploy-pages.yml run id whose github-pages artifact to inspect"
+        required: true
+      files:
+        description: "Space-separated data/*.json filenames (no path) to print"
+        required: false
+        default: "investment_cases.json decision_readiness.json"
+
+permissions:
+  actions: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: ${{ github.event.inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: artifact
+
+      - name: Extract and print requested files
+        run: |
+          mkdir -p extracted
+          tar -xf artifact/artifact.tar -C extracted
+          for f in ${{ github.event.inputs.files }}; do
+            echo "===== data/$f ====="
+            if [ -f "extracted/data/$f" ]; then
+              cat "extracted/data/$f"
+            else
+              echo "(not found)"
+            fi
+            echo
+          done

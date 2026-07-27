@@ -889,6 +889,40 @@ workflow already writes them in final shape). `npm run build`/`test`
 clean for both `api` and `web` workspaces (required a fresh `npm install`
 in this session first — `node_modules` had never been installed).
 
+## TD-34: `ticker_data_gap_report.json` web/API wiring (System 13 dashboard layer)
+
+Closes the last purely-engineering item on the post-freeze punch list
+(TD-34): the backend artifact existed and was tested, but had no route,
+no provider method, no TS type, and no UI surface.
+
+Closed, following `financial_statements.json`'s exact existing wiring as
+the template: `api/src/artifactsStore.ts`'s `tickerDataGapReport()`,
+`api/src/routes/dashboard.ts`'s `GET /ticker-data-gap-report`,
+`web/src/data/{DataProvider,ApiProvider,StaticJsonProvider}.ts`'s
+`getTickerDataGapReport()`, and `web/src/types.ts`'s
+`TickerDataGapReport`/`DataLayerGap` interfaces (hand-mirrored from
+`meta.readiness`'s pydantic models — no `contracts/` schema exists for
+this artifact, matching `financial_statements.json`'s own precedent).
+
+UI: rather than a new page, Opportunity Center's existing "Decision
+Readiness" table gained `onRowClick`, paired with a new "Data Coverage"
+detail `Card` — the same click-to-select-plus-detail-panel pattern the
+Opportunities table above it already uses for its "Evidence" panel. The
+detail card renders the 5 named layers (Financials/Disclosures/News/
+Macro/Knowledge) as meter cards, plus overall completeness,
+Swing/Investment readiness flags, blockers, and next actions.
+
+**Verified live in a real headless browser** (not just `tsc`/build/test
+green): a real mock-mode `agx run` output was served through a
+production Vite build, and clicking a Decision Readiness row (`ABUK`)
+correctly populated the Data Coverage panel with its real 5-layer
+breakdown (each showing 0% / "Below the readiness threshold for this
+layer" — the honest current state of this sandbox's own data, not a
+placeholder). `npm run lint`/`build`/`test` clean for both `api` and
+`web` workspaces (added `getTickerDataGapReport` to the test suite's
+`fakeProvider` fixture, the one other place implementing the full
+`DashboardDataProvider` contract).
+
 ## Monte Carlo stress simulator (System 10, Experiment Factory)
 
 Closes the one Experiment Factory gap `docs/PHASE_STATUS.md`/

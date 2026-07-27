@@ -1,6 +1,32 @@
 # Next Missions
 
-## Closed this phase: Monte Carlo stress simulator
+## Closed this phase: TD-34 web/API wiring
+
+Item 1 from the "Genuinely next now" list below is now closed — see
+`CURRENT_MISSION.md`'s "TD-34" entry and `docs/PHASE_STATUS.md`'s
+matching section. This was the last purely-engineering item on the
+punch list the project owner's "continue all remaining legal/free
+directions" instruction opened; everything genuinely next now waits on
+either real accumulated evidence or an external verified source:
+
+1. **Calibrate `agents.news_sentiment.classify_headline_sentiment()`'s
+   phrase lists** (TD-35) once a meaningful batch of real live headlines
+   accumulates.
+2. **Source a verified Arabic-language EGX constituent list** to close
+   TD-36 (no fabricated transliteration is an option).
+3. **Consult a real publication-schedule source** to replace
+   `data.point_in_time`'s declared lag floors with cited, source-specific
+   figures (TD-37).
+4. **Watch the next scheduled/manual `discovery.yml` run** and the next
+   real trading day the production pipeline runs against (both named in
+   earlier phases, neither closeable from inside this session).
+
+None of these are engineering tasks this session can advance further
+right now without either real accumulated evidence or the project owner
+supplying an external input — see each item's own TD entry for its exact
+repayment trigger.
+
+## Closed prior phase: Monte Carlo stress simulator
 
 Item 2 from the "Genuinely next now" list below is now closed — see
 `CURRENT_MISSION.md`'s "Monte Carlo stress simulator" entry and

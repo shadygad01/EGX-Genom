@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.28.0 — `ticker_data_gap_report.json` web/API wiring (TD-34)
+
+Closes the last purely-engineering item on the post-freeze punch list.
+The backend artifact (`meta.readiness.build_ticker_data_gap_report`) was
+correct and tested but had no route, provider method, TS type, or UI
+surface. Wired following `financial_statements.json`'s exact existing
+pattern: `api/src/artifactsStore.ts`/`routes/dashboard.ts`
+(`GET /ticker-data-gap-report`), `web/src/data/{DataProvider,ApiProvider,
+StaticJsonProvider}.ts`, `web/src/types.ts` (`TickerDataGapReport`/
+`DataLayerGap`).
+
+UI: Opportunity Center's "Decision Readiness" table gained `onRowClick`
+paired with a new "Data Coverage" detail card — the same click-to-select
+pattern the Opportunities table above it already uses — showing the
+5-layer completeness breakdown, blockers, and next actions per ticker.
+
+Verified in a real headless browser against a real mock-mode `agx run`
+output served through a production Vite build: clicking a Decision
+Readiness row correctly populates the detail panel. `npm run lint`/
+`build`/`test` clean for both workspaces.
+
 ## 0.27.0 — Monte Carlo stress simulator (block bootstrap)
 
 Closes the one Experiment Factory gap docs had explicitly named as a

@@ -116,6 +116,10 @@ export class ArtifactsReader {
     return readJsonOrDefault<T[]>(this.path("decision_readiness.json"), []);
   }
 
+  tickerDataGapReport<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("ticker_data_gap_report.json"), []);
+  }
+
   // Written by the weekly Discovery workflow (.github/workflows/discovery.yml),
   // not by agx run/export-dashboard -- absent until the first scheduled run's
   // PR merges. See docs/DATA_ACQUISITION.md's "Discovery workflow" section.

@@ -1,6 +1,30 @@
 # Current Mission
 
-## Current mission: Monte Carlo stress simulator
+## Current mission: TD-34 — `ticker_data_gap_report.json` web/API wiring
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: the last purely-engineering item on
+`NEXT_MISSIONS.md`'s punch list.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s "TD-34" section: wired
+following `financial_statements.json`'s exact existing pattern (API
+route/provider method, both web providers, TS types); UI reuses
+Opportunity Center's existing click-to-select pattern for a new "Data
+Coverage" detail card on the Decision Readiness table, rather than a new
+page. Verified in a real headless browser against real mock-mode `agx
+run` output served through a production build — clicking a row correctly
+populates the 5-layer breakdown. `npm run lint`/`build`/`test` clean for
+both `api` and `web`.
+
+**All five items from the project owner's "continue all remaining
+legal/free directions" instruction are now closed**: NewsIntelligenceAgent,
+entity resolution for news-to-ticker matching, macro frequency alignment
++ no-look-ahead discipline, the Monte Carlo stress simulator, and this
+TD-34 wiring. See `NEXT_MISSIONS.md` for what's genuinely next.
+
+---
+
+## Prior mission: Monte Carlo stress simulator
 
 Immediate follow-up, per the project owner's "continue all remaining
 legal/free directions" instruction: `NEXT_MISSIONS.md`'s Monte Carlo

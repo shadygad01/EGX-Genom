@@ -1,94 +1,135 @@
 from agx_research.discovery.wikidata_lookup import (
     WikidataOfficialWebsiteClient,
-    build_wikidata_query_url,
-    match_wikidata_websites_to_companies,
-    parse_wikidata_company_websites,
+    build_wikidata_claims_url,
+    build_wikidata_search_url,
+    parse_wikidata_official_website,
+    parse_wikidata_search_results,
 )
 
-_SPARQL_RESPONSE = {
-    "results": {
-        "bindings": [
+_SEARCH_RESPONSE_COMI = {
+    "search": [
+        {"id": "Q1163037", "label": "Commercial International Bank", "description": "bank in Egypt"},
+        {"id": "Q999999", "label": "Some Other Bank", "description": "unrelated"},
+    ]
+}
+
+_CLAIMS_RESPONSE_WITH_WEBSITE = {
+    "claims": {
+        "P856": [
             {
-                "companyLabel": {"type": "literal", "value": "Commercial International Bank"},
-                "website": {"type": "uri", "value": "https://www.cibeg.com/en"},
-            },
-            {
-                "companyLabel": {"type": "literal", "value": "Telecom Egypt Co."},
-                "website": {"type": "uri", "value": "https://www.telecomegypt.com.eg/"},
-            },
-            # No `website` binding at all -- P856 wasn't set for this hit;
-            # must be skipped, not defaulted to something invented.
-            {"companyLabel": {"type": "literal", "value": "Some Other Company"}},
+                "mainsnak": {
+                    "property": "P856",
+                    "datavalue": {"value": "https://www.cibeg.com/en", "type": "string"},
+                    "datatype": "url",
+                },
+                "type": "statement",
+                "rank": "normal",
+            }
         ]
     }
 }
 
-_COMPANIES = {
-    "COMI": "Commercial International Bank",
-    "ETEL": "Telecom Egypt",
-    "HRHO": "EFG Hermes Holding",  # not in the response -- must not match anything
-}
+
+def test_parse_wikidata_search_results_reads_real_entries():
+    results = parse_wikidata_search_results(_SEARCH_RESPONSE_COMI)
+    assert results == [
+        ("Q1163037", "Commercial International Bank"),
+        ("Q999999", "Some Other Bank"),
+    ]
 
 
-def test_parse_wikidata_company_websites_reads_real_bindings():
-    result = parse_wikidata_company_websites(_SPARQL_RESPONSE)
-    assert result == {
-        "Commercial International Bank": "https://www.cibeg.com/en",
-        "Telecom Egypt Co.": "https://www.telecomegypt.com.eg/",
-    }
+def test_parse_wikidata_search_results_empty_response():
+    assert parse_wikidata_search_results({"search": []}) == []
+    assert parse_wikidata_search_results({}) == []
 
 
-def test_parse_wikidata_company_websites_empty_response():
-    assert parse_wikidata_company_websites({"results": {"bindings": []}}) == {}
-    assert parse_wikidata_company_websites({}) == {}
+def test_parse_wikidata_search_results_skips_entry_missing_label():
+    payload = {"search": [{"id": "Q1"}, {"id": "Q2", "label": "Real Label"}]}
+    assert parse_wikidata_search_results(payload) == [("Q2", "Real Label")]
 
 
-def test_match_wikidata_websites_to_companies_matches_by_name_token_overlap():
-    labels_to_websites = parse_wikidata_company_websites(_SPARQL_RESPONSE)
-    found = match_wikidata_websites_to_companies(labels_to_websites, _COMPANIES)
-    assert found["COMI"] == "www.cibeg.com"
-    assert found["ETEL"] == "www.telecomegypt.com.eg"
+def test_parse_wikidata_official_website_reads_real_claim():
+    assert parse_wikidata_official_website(_CLAIMS_RESPONSE_WITH_WEBSITE) == "https://www.cibeg.com/en"
 
 
-def test_match_wikidata_websites_to_companies_never_matches_a_company_not_in_the_response():
-    labels_to_websites = parse_wikidata_company_websites(_SPARQL_RESPONSE)
-    found = match_wikidata_websites_to_companies(labels_to_websites, _COMPANIES)
-    assert "HRHO" not in found
+def test_parse_wikidata_official_website_no_claim():
+    assert parse_wikidata_official_website({"claims": {}}) is None
+    assert parse_wikidata_official_website({}) is None
 
 
-def test_match_wikidata_websites_to_companies_ignores_a_website_with_no_hostname():
-    found = match_wikidata_websites_to_companies(
-        {"Commercial International Bank": "not-a-url"}, _COMPANIES
-    )
-    assert found == {}
+def test_parse_wikidata_official_website_ignores_novalue_snak():
+    payload = {"claims": {"P856": [{"mainsnak": {"snaktype": "novalue"}}]}}
+    assert parse_wikidata_official_website(payload) is None
 
 
-def test_build_wikidata_query_url_targets_the_real_sparql_endpoint_with_json_format():
-    url = build_wikidata_query_url()
-    assert url.startswith("https://query.wikidata.org/sparql?query=")
-    assert url.endswith("&format=json")
+def test_build_wikidata_search_url_encodes_the_company_name():
+    url = build_wikidata_search_url("Commercial International Bank")
+    assert url.startswith("https://www.wikidata.org/w/api.php?action=wbsearchentities")
+    assert "search=Commercial%20International%20Bank" in url
+    assert "format=json" in url
 
 
-def test_client_lookup_returns_ticker_to_hostname():
+def test_build_wikidata_claims_url_targets_the_entity_and_p856():
+    url = build_wikidata_claims_url("Q1163037")
+    assert url.startswith("https://www.wikidata.org/w/api.php?action=wbgetclaims")
+    assert "entity=Q1163037" in url
+    assert "property=P856" in url
+
+
+def test_client_lookup_matches_search_result_and_reads_its_claim():
     calls = []
 
     def fetch_json(url):
         calls.append(url)
-        return _SPARQL_RESPONSE
+        if "wbsearchentities" in url:
+            return _SEARCH_RESPONSE_COMI
+        return _CLAIMS_RESPONSE_WITH_WEBSITE
 
     client = WikidataOfficialWebsiteClient(fetch_json)
-    result = client.lookup(_COMPANIES)
+    result = client.lookup({"COMI": "Commercial International Bank"})
 
-    assert result == {"COMI": "www.cibeg.com", "ETEL": "www.telecomegypt.com.eg"}
-    assert len(calls) == 1
-    assert "query.wikidata.org/sparql" in calls[0]
-
-
-def test_client_lookup_degrades_to_empty_on_unreachable_endpoint():
-    client = WikidataOfficialWebsiteClient(lambda url: {})
-    assert client.lookup(_COMPANIES) == {}
+    assert result == {"COMI": "www.cibeg.com"}
+    assert len(calls) == 2
+    assert "wbsearchentities" in calls[0]
+    assert "wbgetclaims" in calls[1] and "Q1163037" in calls[1]
 
 
-def test_client_lookup_degrades_to_empty_on_malformed_non_dict_response():
-    client = WikidataOfficialWebsiteClient(lambda url: None)
-    assert client.lookup(_COMPANIES) == {}
+def test_client_lookup_skips_a_company_with_no_matching_search_result():
+    def fetch_json(url):
+        return {"search": [{"id": "Q1", "label": "Completely Unrelated Company"}]}
+
+    client = WikidataOfficialWebsiteClient(fetch_json)
+    assert client.lookup({"HRHO": "EFG Hermes Holding"}) == {}
+
+
+def test_client_lookup_skips_a_company_whose_matched_entity_has_no_website_claim():
+    def fetch_json(url):
+        if "wbsearchentities" in url:
+            return _SEARCH_RESPONSE_COMI
+        return {"claims": {}}
+
+    client = WikidataOfficialWebsiteClient(fetch_json)
+    assert client.lookup({"COMI": "Commercial International Bank"}) == {}
+
+
+def test_client_lookup_one_company_failing_does_not_block_the_rest():
+    def fetch_json(url):
+        if "search=Bad" in url:
+            return None  # simulates an unreachable/malformed response
+        if "wbsearchentities" in url:
+            return _SEARCH_RESPONSE_COMI
+        return _CLAIMS_RESPONSE_WITH_WEBSITE
+
+    client = WikidataOfficialWebsiteClient(fetch_json)
+    result = client.lookup({
+        "BAD": "Bad Company",
+        "COMI": "Commercial International Bank",
+    })
+    assert result == {"COMI": "www.cibeg.com"}
+
+
+def test_client_lookup_empty_companies():
+    calls = []
+    client = WikidataOfficialWebsiteClient(lambda url: calls.append(url))
+    assert client.lookup({}) == {}
+    assert calls == []

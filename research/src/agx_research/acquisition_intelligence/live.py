@@ -96,57 +96,44 @@ def build_live_wayback_client(*, timeout_seconds: float = 15.0) -> WaybackAvaila
     return WaybackAvailabilityClient(fetch_json)
 
 
-def build_live_wikidata_client(*, timeout_seconds: float = 55.0) -> WikidataOfficialWebsiteClient:
-    """Wikidata's own SPARQL endpoint requires `Accept:
-    application/sparql-results+json` (unlike Wayback's APIs, which are
-    JSON by default) -- otherwise it may reply with an HTML results page
-    instead. A longer default timeout than Wayback's, just under
-    Wikidata's own ~60s public-endpoint server-side execution limit: a
-    P17+P856 scan is still a heavier query than a single-URL lookup, and a
-    client-side timeout shorter than the server's own limit would abort a
-    query that was about to legitimately succeed.
+def build_live_wikidata_client(
+    *, timeout_seconds: float = 30.0, min_seconds_between_requests: float = 0.3,
+) -> WikidataOfficialWebsiteClient:
+    """`WikidataOfficialWebsiteClient.lookup` calls this up to twice per
+    company (a name search, then a claims read for whatever entity
+    matched) -- `min_seconds_between_requests` paces that loop so a
+    ~100-company sprint run stays a reasonable, well-behaved client rather
+    than a request burst, matching the spirit (not the exact mechanism) of
+    `collectors.fetcher.HttpFetcher`'s per-source rate limiting.
     """
+    last_request_at = 0.0
+
     def fetch_json(url: str):
-        request = urllib.request.Request(
-            url, headers={"User-Agent": _USER_AGENT, "Accept": "application/sparql-results+json"}
-        )
+        nonlocal last_request_at
+        elapsed = time.monotonic() - last_request_at
+        if elapsed < min_seconds_between_requests:
+            time.sleep(min_seconds_between_requests - elapsed)
+        last_request_at = time.monotonic()
+
+        request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
         try:
             with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-                payload = json.loads(response.read().decode("utf-8", errors="replace"))
+                return json.loads(response.read().decode("utf-8", errors="replace"))
         except urllib.error.HTTPError as exc:
             # Diagnostic only: `WikidataOfficialWebsiteClient.lookup` still
-            # degrades to `{}` on any non-dict/malformed return either way
-            # (never raises to the caller) -- this is purely so a live run's
-            # logs can distinguish "the endpoint rejected/rate-limited the
-            # request" from "the query legitimately returned zero matches",
-            # which looked identical in a first live run (see AD-33's
-            # follow-up: two real, well-documented EGX30 constituents both
-            # came back with no hint, and this was the only way to tell why).
-            body = exc.read().decode("utf-8", errors="replace")[:500]
+            # degrades to "no hint" on any failure either way (never raises
+            # to the caller) -- this is purely so a live run's logs can
+            # distinguish "the endpoint rejected/rate-limited the request"
+            # from "no matching entity/claim exists", which looked
+            # identical with no logging at all (see AD-33's follow-up).
+            body = exc.read().decode("utf-8", errors="replace")[:300]
             print(
-                f"Wikidata SPARQL request failed: HTTP {exc.code} {exc.reason}: {body}",
+                f"Wikidata API request failed: HTTP {exc.code} {exc.reason}: {body}",
                 file=sys.stderr,
             )
             return {}
         except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError) as exc:
-            print(f"Wikidata SPARQL request failed: {exc!r}", file=sys.stderr)
+            print(f"Wikidata API request failed: {exc!r}", file=sys.stderr)
             return {}
-
-        bindings = (payload.get("results") or {}).get("bindings", []) if isinstance(payload, dict) else []
-        print(f"Wikidata SPARQL request succeeded: {len(bindings)} binding(s) returned.", file=sys.stderr)
-        # Temporary extra diagnostic (AD-33 follow-up): the query itself
-        # demonstrably works (2404 real bindings on a live run) yet
-        # match_wikidata_websites_to_companies still found zero matches for
-        # Telecom Egypt -- so the remaining question is what the raw labels
-        # actually look like, not whether data exists. Printing every label
-        # containing a fixed substring is a cheap way to see the real label
-        # text/shape without dumping all ~2400 rows.
-        sample = [
-            (b.get("companyLabel", {}).get("value"), b.get("website", {}).get("value"))
-            for b in bindings
-            if "telecom" in (b.get("companyLabel", {}).get("value") or "").lower()
-        ]
-        print(f"Wikidata labels containing 'telecom': {sample}", file=sys.stderr)
-        return payload
 
     return WikidataOfficialWebsiteClient(fetch_json)

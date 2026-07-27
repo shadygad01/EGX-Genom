@@ -221,13 +221,18 @@ before the engine ever runs a per-company target:
    already-resolved catalog target's own homepage (e.g. `egx_official`,
    once reachable) for anchor text matching a company's known display
    name.
-2. `discovery.wikidata_lookup.WikidataOfficialWebsiteClient` — queries
-   Wikidata's free, no-key, documented public SPARQL endpoint for
-   entities with a declared `P856` ("official website") property, matched
-   by the same name-token-overlap discipline. Independent of
-   `egx_official`'s reachability entirely, so it still supplies hints for
-   as many constituents as Wikidata covers even while the exchange's own
-   site stays unreachable.
+2. `discovery.wikidata_lookup.WikidataOfficialWebsiteClient` — searches
+   Wikidata's free, no-key, documented action API (`wbsearchentities`) by
+   each company's own display name, then reads the matched entity's
+   declared `P856` ("official website") claim (`wbgetclaims`), matched by
+   the same name-token-overlap discipline. Deliberately per-company search
+   rather than one bulk country-filtered query: an earlier `P17`-filtered
+   SPARQL design worked (a live run returned 2404 real results) but missed
+   real, well-documented companies outright, since `P17` ("country") is
+   not reliably set on individual company items — searching by name
+   sidesteps that gap. Independent of `egx_official`'s reachability
+   entirely, so it still supplies hints for as many constituents as
+   Wikidata covers even while the exchange's own site stays unreachable.
 
 Either way, a hint is never trusted directly: it is always re-probed
 independently by `HeuristicDomainResolver` before anything becomes a real

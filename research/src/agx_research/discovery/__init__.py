@@ -12,9 +12,10 @@ from agx_research.discovery.engine import (
 )
 from agx_research.discovery.wikidata_lookup import (
     WikidataOfficialWebsiteClient,
-    build_wikidata_query_url,
-    match_wikidata_websites_to_companies,
-    parse_wikidata_company_websites,
+    build_wikidata_claims_url,
+    build_wikidata_search_url,
+    parse_wikidata_official_website,
+    parse_wikidata_search_results,
 )
 
 __all__ = [
@@ -30,7 +31,8 @@ __all__ = [
     "discover_company_directory_links",
     "significant_tokens",
     "WikidataOfficialWebsiteClient",
-    "build_wikidata_query_url",
-    "parse_wikidata_company_websites",
-    "match_wikidata_websites_to_companies",
+    "build_wikidata_search_url",
+    "build_wikidata_claims_url",
+    "parse_wikidata_search_results",
+    "parse_wikidata_official_website",
 ]

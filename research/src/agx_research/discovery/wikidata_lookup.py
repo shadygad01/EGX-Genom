@@ -7,16 +7,27 @@ names two honest paths to a real per-company domain hint: the company's
 own public disclosure, or `discover_company_directory_links` reading an
 already-resolved directory homepage (e.g. EGX's own listed-companies page).
 This module is a third, independent path: Wikidata's own declared `P856`
-("official website") property for an entity, queried through its public,
-documented, no-key SPARQL endpoint -- the same confidence tier as the
-Wayback Machine APIs `acquisition_intelligence.historical` already uses for
+("official website") property for an entity, read through its public,
+documented, no-key action API -- the same confidence tier as the Wayback
+Machine APIs `acquisition_intelligence.historical` already uses for
 verification, and reusable even while `egx_official` itself stays
 unreachable, since it never depends on the exchange's own site at all.
+
+Per-company search (`wbsearchentities` + `wbgetclaims`), not one bulk
+query: an earlier design queried everything Wikidata tags `P17` (country)
+= Egypt in one SPARQL call. That query demonstrably worked (a live run
+returned 2404 real results) but missed real, well-documented companies --
+Telecom Egypt among them -- outright, because `P17` is not reliably set on
+individual company items; organizations more often carry a headquarters
+location than a direct country statement. Searching by the company's own
+display name sidesteps that gap entirely: it asks Wikidata "what entity is
+this name", not "what entities are tagged Egypt", so it works whether or
+not `P17` happens to be set on that particular item.
 
 Matching reuses `discovery.engine.significant_tokens`'s exact name-token-
 overlap discipline (no duplicated matching logic, same rule everywhere): a
 match still requires every significant token of a company's known display
-name to appear in a label Wikidata itself returned for a real P856 hit.
+name to appear in a label Wikidata itself returned for a real search hit.
 A result here still only becomes a `domain_hints` entry -- it is always
 re-probed independently by
 `acquisition_intelligence.domain_resolution.HeuristicDomainResolver` before
@@ -34,79 +45,61 @@ from agx_research.discovery.engine import significant_tokens
 
 FetchJson = Callable[[str], object]
 
-WIKIDATA_SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
+WIKIDATA_API_ENDPOINT = "https://www.wikidata.org/w/api.php"
 
-# Q79 = Egypt (P17 = country of the entity) -- a stable, widely-documented
-# Wikidata ID, not a guess. SERVICE wikibase:label pulls each hit's best
-# English label so it can be matched against `companies`' display names.
-#
-# Deliberately NOT filtered by entity type (no `P31/wdt:P279* wd:Q4830453`
-# "instance of a subclass of business" traversal): a live run against two
-# real EGX30 constituents (Telecom Egypt, Commercial International Bank --
-# both with real, well-documented Wikidata/Wikipedia entries) returned zero
-# matches with that filter in place. A `P31/P279*` property-path traversal
-# is exactly the query shape Wikidata's public endpoint's own documentation
-# warns is prone to server-side timeout, and both companies failing
-# identically despite genuinely existing points at the query itself never
-# completing, not at missing data. Matching every Egypt-linked entity with
-# a declared P856 instead is a cheaper, single-hop query; the existing
-# name-token-overlap matching in `match_wikidata_websites_to_companies`
-# already filters the larger result set down to real company-name hits, so
-# broadening this query adds noise-filtered-out-later, not false trust.
-EGYPT_COMPANIES_WEBSITES_QUERY = """
-SELECT ?companyLabel ?website WHERE {
-  ?company wdt:P17 wd:Q79.
-  ?company wdt:P856 ?website.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-}
-LIMIT 20000
-""".strip()
+_OFFICIAL_WEBSITE_PROPERTY = "P856"
+_SEARCH_RESULT_LIMIT = 5
 
 
-def build_wikidata_query_url(query: str = EGYPT_COMPANIES_WEBSITES_QUERY) -> str:
-    return f"{WIKIDATA_SPARQL_ENDPOINT}?query={quote(query)}&format=json"
+def build_wikidata_search_url(name: str) -> str:
+    return (
+        f"{WIKIDATA_API_ENDPOINT}?action=wbsearchentities&search={quote(name)}"
+        f"&language=en&type=item&format=json&limit={_SEARCH_RESULT_LIMIT}"
+    )
 
 
-def parse_wikidata_company_websites(payload: dict) -> dict[str, str]:
-    """`payload` is the SPARQL endpoint's own JSON response shape
-    (`results.bindings`, each a `{"companyLabel": {"value": ...}, "website":
-    {"value": ...}}` dict per the SPARQL 1.1 Query Results JSON Format).
-    A binding missing either field is skipped, not guessed at -- only a
-    real response's actual shape is trusted.
+def parse_wikidata_search_results(payload: dict) -> list[tuple[str, str]]:
+    """`payload` is a real `wbsearchentities` response (`search` -> list of
+    `{"id": ..., "label": ..., ...}` dicts). An entry missing either field
+    is skipped -- nothing to match against, not a guess.
     """
-    websites: dict[str, str] = {}
-    for binding in (payload.get("results") or {}).get("bindings", []):
-        label = (binding.get("companyLabel") or {}).get("value")
-        website = (binding.get("website") or {}).get("value")
-        if label and website:
-            websites[label] = website
-    return websites
+    results: list[tuple[str, str]] = []
+    for entry in payload.get("search") or []:
+        entity_id = entry.get("id")
+        label = entry.get("label")
+        if entity_id and label:
+            results.append((entity_id, label))
+    return results
 
 
-def match_wikidata_websites_to_companies(
-    labels_to_websites: dict[str, str], companies: dict[str, str]
-) -> dict[str, str]:
-    """Ticker -> hostname (homepage-level, matching every other
-    `domain_hints` value in `acquisition_intelligence`) for the first
-    Wikidata label matching each company's known display name by
-    significant-token overlap -- identical discipline to
-    `discover_company_directory_links`, applied to SPARQL result labels
-    instead of anchor text.
+def build_wikidata_claims_url(entity_id: str) -> str:
+    return (
+        f"{WIKIDATA_API_ENDPOINT}?action=wbgetclaims&entity={quote(entity_id)}"
+        f"&property={_OFFICIAL_WEBSITE_PROPERTY}&format=json"
+    )
+
+
+def parse_wikidata_official_website(payload: dict) -> str | None:
+    """`payload` is a real `wbgetclaims` response restricted to `P856`.
+    Returns the first claim's string value if present, else `None` -- a
+    claim with no `datavalue` (a "no value"/"unknown value" snak) or a
+    non-string value is treated as absent, never guessed at.
     """
-    significant = {ticker: significant_tokens(name) for ticker, name in companies.items()}
-    found: dict[str, str] = {}
-    for label, website in labels_to_websites.items():
-        label_tokens = significant_tokens(label)
-        if not label_tokens:
-            continue
-        for ticker, tokens in significant.items():
-            if ticker in found or not tokens:
-                continue
-            if tokens.issubset(label_tokens):
-                hostname = urlsplit(website).netloc
-                if hostname:
-                    found[ticker] = hostname
-    return found
+    for claim in (payload.get("claims") or {}).get(_OFFICIAL_WEBSITE_PROPERTY, []):
+        value = ((claim.get("mainsnak") or {}).get("datavalue") or {}).get("value")
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def _find_matching_entity(candidates: list[tuple[str, str]], name: str) -> str | None:
+    tokens = significant_tokens(name)
+    if not tokens:
+        return None
+    for entity_id, label in candidates:
+        if tokens.issubset(significant_tokens(label)):
+            return entity_id
+    return None
 
 
 class WikidataOfficialWebsiteClient:
@@ -114,16 +107,32 @@ class WikidataOfficialWebsiteClient:
         self.fetch_json = fetch_json
 
     def lookup(self, companies: dict[str, str]) -> dict[str, str]:
-        """Ticker -> hostname for every company in `companies` that a real
-        Wikidata SPARQL response both reports a `P856` official website for
-        and whose label matches. Returns `{}` (never raises) if the
-        endpoint is unreachable or the response is empty/malformed -- the
-        same honest degrade-to-no-hint every other network-dependent step
-        in this package uses; callers fall back to whatever other hint
-        source (or none) they already had.
+        """Ticker -> hostname for every company in `companies` (ticker ->
+        display name) that a real Wikidata name search finds a matching
+        entity for, and whose entity has a real `P856` claim. One
+        company's lookup failing (unreachable endpoint, no match, no
+        claim) never blocks the rest -- each is independently degraded to
+        "no hint", the same honest fallback every other network-dependent
+        step in this package uses.
         """
-        payload = self.fetch_json(build_wikidata_query_url())
-        if not isinstance(payload, dict):
-            return {}
-        labels_to_websites = parse_wikidata_company_websites(payload)
-        return match_wikidata_websites_to_companies(labels_to_websites, companies)
+        found: dict[str, str] = {}
+        for ticker, name in companies.items():
+            website = self._lookup_one(name)
+            if website is None:
+                continue
+            hostname = urlsplit(website).netloc
+            if hostname:
+                found[ticker] = hostname
+        return found
+
+    def _lookup_one(self, name: str) -> str | None:
+        search_payload = self.fetch_json(build_wikidata_search_url(name))
+        if not isinstance(search_payload, dict):
+            return None
+        entity_id = _find_matching_entity(parse_wikidata_search_results(search_payload), name)
+        if entity_id is None:
+            return None
+        claims_payload = self.fetch_json(build_wikidata_claims_url(entity_id))
+        if not isinstance(claims_payload, dict):
+            return None
+        return parse_wikidata_official_website(claims_payload)

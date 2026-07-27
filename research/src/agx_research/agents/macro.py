@@ -1,16 +1,33 @@
 """Macro agent: relates macroeconomic series moves to stock returns.
 
 Real, mechanical implementation: Pearson correlation between a macro
-series' day-over-day percentage changes and each ticker's adjusted daily
-returns over the snapshot window. Proposes a finding when |correlation|
-clears the threshold. The proposed rationale is a stated mechanism
-hypothesis (judged downstream by the causal gate/economist reviewer),
-never asserted as established truth.
+series' period-over-period percentage changes and each ticker's adjusted
+daily returns over the snapshot window. Proposes a finding when
+|correlation| clears the threshold. The proposed rationale is a stated
+mechanism hypothesis (judged downstream by the causal gate/economist
+reviewer), never asserted as established truth.
+
+Macro series publish at their own frequency (daily FRED series, monthly
+CAPMAS, annual World Bank/UN SDG) which almost never lands exactly on a
+trading day -- aligning by raw date equality silently starved every
+lower-frequency series of any correlation at all. `_forward_fill_onto`
+carries each macro observation's latest known percentage change forward
+onto every trading day up to (not including) the next observation --
+standard last-observation-carried-forward step alignment, the same
+"assume nothing changed until told otherwise" discipline real point-in-
+time backtesting uses. This never looks ahead: a trading day is only ever
+assigned a change from an observation dated on or before it.
+`data.snapshot.build_snapshot`'s `macro_series_sources`-driven filtering
+(`data.point_in_time`) is what keeps an observation out of the snapshot
+entirely until it was actually knowable in the first place; this
+alignment only decides which already-admitted observation applies to
+which trading day.
 """
 
 from __future__ import annotations
 
-from datetime import datetime
+from bisect import bisect_right
+from datetime import date, datetime
 
 from agx_research.agents.base import ResearchAgent, ResearchFinding
 from agx_research.config import Horizon
@@ -18,6 +35,21 @@ from agx_research.data.adjustments import adjusted_returns_for_ticker
 from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.features.correlation import pearson_correlation
+
+
+def _forward_fill_onto(
+    changes_by_date: dict[date, float], trading_dates: list[date]
+) -> dict[date, float]:
+    """Carry each macro observation's change forward onto every trading
+    date on or after it, up to the next observation -- never onto a
+    trading date before the observation's own date (no look-ahead)."""
+    observed_dates = sorted(changes_by_date)
+    aligned: dict[date, float] = {}
+    for trading_date in trading_dates:
+        idx = bisect_right(observed_dates, trading_date) - 1
+        if idx >= 0:
+            aligned[trading_date] = changes_by_date[observed_dates[idx]]
+    return aligned
 
 _SERIES_MECHANISMS: dict[str, str] = {
     "BRENT_USD": "oil-price exposure of input costs and export revenues",
@@ -46,10 +78,12 @@ class MacroAgent(ResearchAgent):
                 bars = snapshot.price_history.get(ticker, [])
                 returns = adjusted_returns_for_ticker(snapshot, ticker)
                 returns_by_date = {bar.trade_date: value for bar, value in zip(bars[1:], returns)}
-                common_dates = sorted(set(macro_changes_by_date) & set(returns_by_date))
+                trading_dates = sorted(returns_by_date)
+                forward_filled_macro = _forward_fill_onto(macro_changes_by_date, trading_dates)
+                common_dates = sorted(forward_filled_macro)
                 if len(common_dates) < 4:
                     continue
-                aligned_macro = [macro_changes_by_date[d] for d in common_dates]
+                aligned_macro = [forward_filled_macro[d] for d in common_dates]
                 aligned_returns = [returns_by_date[d] for d in common_dates]
                 correlation = pearson_correlation(aligned_macro, aligned_returns)
                 if correlation is None or abs(correlation) < self.correlation_threshold:

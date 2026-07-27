@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.26.0 — Macro frequency alignment + no-look-ahead discipline
+
+`MacroAgent` aligned macro observations to trading days by exact date
+equality, silently starving every lower-frequency series (monthly/
+quarterly/annual) of correlation evidence since their dates almost never
+land on a trading day. Fixed with `agents/macro.py`'s
+`_forward_fill_onto()` — standard last-observation-carried-forward step
+alignment, never assigning a change to a trading day before the
+observation that produced it.
+
+Separately, nothing distinguished a macro value's `observation_date`
+(the period it describes) from when it actually became known —
+real look-ahead bias. New `data/point_in_time.py` (`is_knowable`) applies
+a declared, deliberately conservative per-source publication-lag floor
+(new debt TD-37); `data.snapshot.build_snapshot()`'s new
+`macro_series_sources` param drops any not-yet-knowable observation
+before it reaches an agent, wired in `ProductionPipeline` for LIVE mode
+only (mock/replay default to no filtering change).
+
+An initial 365-day World Bank/UN SDG lag assumption was caught
+contradicting this codebase's own live-verified evidence (a real
+collected observation only ~165 days old) before merging — scaled back
+to a 30-day floor.
+
+8 new tests (608 total, up from 600); `ruff check` clean.
+
 ## 0.25.0 — Real entity resolution for news-to-ticker matching
 
 `RssNewsCollector`/`GdeltDocCollector` attributed news to a ticker via a

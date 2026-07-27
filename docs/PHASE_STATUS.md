@@ -889,6 +889,54 @@ workflow already writes them in final shape). `npm run build`/`test`
 clean for both `api` and `web` workspaces (required a fresh `npm install`
 in this session first — `node_modules` had never been installed).
 
+## Macro frequency alignment + no-look-ahead discipline (System 08/14)
+
+Closes `NEXT_MISSIONS.md` item 2 (the project owner's own completion
+plan item 5): `MacroAgent` aligned macro observations to trading days by
+*exact date equality* — since daily/monthly/quarterly/annual series
+almost never land on the same date as a trading day, every
+lower-frequency macro series was silently starved of correlation
+evidence entirely (a distinct gap from the earlier "Item 5" fix, which
+only widened the *lookback window* size, not the *alignment* method).
+Separately, nothing distinguished a macro value's `observation_date`
+(the period it describes) from when it actually became publicly known —
+treating a value as usable starting on its own period-end date is real
+look-ahead bias.
+
+Closed, as two independent pieces:
+
+- **Frequency alignment**: `agents/macro.py`'s `_forward_fill_onto()`
+  carries each macro observation's percentage change forward onto every
+  trading day up to (never before) the next observation — standard
+  last-observation-carried-forward step alignment, replacing the exact
+  date-equality intersection. Never looks ahead: a trading day is only
+  ever assigned a change from an observation dated on or before it.
+- **No-look-ahead discipline**: new `data/point_in_time.py`
+  (`is_knowable`/`known_as_of`) applies a declared, deliberately
+  conservative per-source-class publication-lag floor (new debt, TD-37 —
+  not a cited real average, picked low enough to never contradict this
+  codebase's own live-verified evidence of a ~165-day-old real World Bank
+  observation being collectible) and `data.snapshot.build_snapshot()`
+  gained an optional `macro_series_sources` param that drops any
+  observation not yet knowable as of the snapshot's own `as_of` before it
+  ever reaches an agent. `production.pipeline.ProductionPipeline` wires
+  the real mapping (`production.collector_plan.LIVE_MACRO_SERIES_SOURCES`,
+  built from the same series-id groupings `LIVE_MACRO_SERIES_IDS` already
+  uses) only in LIVE mode; mock/replay default to no filtering change
+  (0 assumed lag), so no existing test's behavior shifted unless it
+  explicitly opts in.
+
+**One real regression caught and fixed before merging**: an initial,
+more aggressive 365-day World Bank/UN SDG lag assumption directly
+contradicted this codebase's own already-live-verified evidence (a real
+collected World Bank observation only ~165 days old) — it would have
+silently discarded genuinely-available real data, the opposite of the
+goal. Scaled back to a 30-day floor, verified against the exact
+regression test that first caught it
+(`test_live_mode_collects_real_endpoints_and_reports_unavailable_sources`).
+
+8 new tests (608 total, up from 600); `ruff check` clean.
+
 ## Entity resolution for news-to-ticker matching (System 02/08)
 
 Immediate follow-up to NewsIntelligenceAgent, closing `NEXT_MISSIONS.md`

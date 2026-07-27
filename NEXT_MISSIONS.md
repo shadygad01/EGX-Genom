@@ -1,6 +1,23 @@
 # Next Missions
 
-## Closed this phase: entity resolution for news-to-ticker matching
+## Closed this phase: macro frequency alignment + no-look-ahead discipline
+
+Item 2 from the "Genuinely next now" list below is now closed — see
+`CURRENT_MISSION.md`'s "macro frequency alignment + no-look-ahead
+discipline" entry and `docs/PHASE_STATUS.md`'s matching section.
+
+**Genuinely next now** (in priority order):
+
+1. **`ticker_data_gap_report.json` web/API wiring** (TD-34).
+2. **Monte Carlo stress simulator** (System 10).
+3. **Calibrate `agents.news_sentiment.classify_headline_sentiment()`'s
+   phrase lists** (TD-35), source a verified Arabic-language EGX
+   constituent list (TD-36), and consult a real publication-schedule
+   source to replace `data.point_in_time`'s declared lag floors with
+   cited figures (TD-37) — all three wait on real accumulated evidence
+   or an external source, not more engineering right now.
+
+## Closed prior phase: entity resolution for news-to-ticker matching
 
 Item 1 from the "Genuinely next" list below is now closed — see
 `CURRENT_MISSION.md`'s "entity resolution for news-to-ticker matching"

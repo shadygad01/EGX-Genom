@@ -114,6 +114,24 @@ LIVE_MACRO_SERIES_IDS += [
     local_id for mappings in LIVE_CAPMAS_INDICATORS.values() for local_id in mappings.values()
 ]
 
+# series_id -> source, for `data.point_in_time`'s per-source publication-lag
+# assumption (`data.snapshot.build_snapshot`'s `macro_series_sources` param)
+# -- built from the exact same groupings above, never a second declaration.
+LIVE_MACRO_SERIES_SOURCES: dict[str, str] = {
+    **{sid: "fred" for sid in LIVE_FRED_SERIES_IDS},
+    **{sid: "worldbank" for sid in LIVE_WORLDBANK_INDICATORS.values()},
+    **{
+        local_id: "undata"
+        for mappings in LIVE_UN_SDG_SERIES.values()
+        for local_id in mappings.values()
+    },
+    **{
+        local_id: "capmas"
+        for mappings in LIVE_CAPMAS_INDICATORS.values()
+        for local_id in mappings.values()
+    },
+}
+
 # World Bank/UN SDG report annually (often with a 1-2 year publication lag)
 # and CAPMAS monthly -- the 30-day window used for prices/news/events would
 # starve all of them of any observation almost always (a live-confirmed gap:

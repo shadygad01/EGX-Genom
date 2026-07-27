@@ -1,6 +1,27 @@
 # Current Mission
 
-## Current mission: entity resolution for news-to-ticker matching
+## Current mission: macro frequency alignment + no-look-ahead discipline
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: `NEXT_MISSIONS.md` item 2.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s matching section for full
+detail: `agents/macro.py` now forward-fills a macro series' step changes
+onto every trading day instead of requiring exact date equality (closing
+the frequency-mismatch half); `data/point_in_time.py` + `data.snapshot.
+build_snapshot()`'s new `macro_series_sources` param drop any
+observation not yet knowable given a declared, conservative per-source
+publication-lag floor (new debt TD-37), wired into `ProductionPipeline`
+for LIVE mode. Caught and fixed a real near-miss before merging: an
+initial 365-day World Bank/UN SDG lag assumption contradicted this
+codebase's own live-verified evidence (a real ~165-day-old collected
+observation) — scaled back to a 30-day floor, verified against the
+regression test that caught it. 608 backend tests pass (8 new); `ruff
+check` clean.
+
+---
+
+## Prior mission: entity resolution for news-to-ticker matching
 
 Immediate follow-up, per the project owner's "continue all remaining
 legal/free directions" instruction: `NEXT_MISSIONS.md` item 1,

@@ -14,6 +14,7 @@ runtime is deployed with egress.
 from __future__ import annotations
 
 import json
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -111,8 +112,28 @@ def build_live_wikidata_client(*, timeout_seconds: float = 55.0) -> WikidataOffi
         )
         try:
             with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-                return json.loads(response.read().decode("utf-8", errors="replace"))
-        except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError):
+                payload = json.loads(response.read().decode("utf-8", errors="replace"))
+        except urllib.error.HTTPError as exc:
+            # Diagnostic only: `WikidataOfficialWebsiteClient.lookup` still
+            # degrades to `{}` on any non-dict/malformed return either way
+            # (never raises to the caller) -- this is purely so a live run's
+            # logs can distinguish "the endpoint rejected/rate-limited the
+            # request" from "the query legitimately returned zero matches",
+            # which looked identical in a first live run (see AD-33's
+            # follow-up: two real, well-documented EGX30 constituents both
+            # came back with no hint, and this was the only way to tell why).
+            body = exc.read().decode("utf-8", errors="replace")[:500]
+            print(
+                f"Wikidata SPARQL request failed: HTTP {exc.code} {exc.reason}: {body}",
+                file=sys.stderr,
+            )
             return {}
+        except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError) as exc:
+            print(f"Wikidata SPARQL request failed: {exc!r}", file=sys.stderr)
+            return {}
+
+        bindings = (payload.get("results") or {}).get("bindings", []) if isinstance(payload, dict) else []
+        print(f"Wikidata SPARQL request succeeded: {len(bindings)} binding(s) returned.", file=sys.stderr)
+        return payload
 
     return WikidataOfficialWebsiteClient(fetch_json)

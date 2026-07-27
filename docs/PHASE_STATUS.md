@@ -871,3 +871,35 @@ present (a plain file copy, not a Python re-export, since the Discovery
 workflow already writes them in final shape). `npm run build`/`test`
 clean for both `api` and `web` workspaces (required a fresh `npm install`
 in this session first — `node_modules` had never been installed).
+
+## TargetOrganization coverage: 14 of 20 untargeted PLANNED sources (System 02)
+
+The first real, live `agx discover-planned-report` run (2026-07-27, manual
+`workflow_dispatch`, see the "Weekly Discovery Workflow" section above)
+produced real evidence: of 34 in-scope sources, 1 verified reachable
+(`skynews_arabia_economy`, a real RSS feed with 500 Wayback snapshots), 5
+legality-blocked (a real candidate existed but robots.txt/ToS disallowed
+it — a hard, non-negotiable stop, not something this codebase or this
+assistant will bypass regardless of a "make it 100%" ask), 7 with no
+reachable domain, 1 with no discoverable candidates, and 20 `not_targeted`
+— no `TargetOrganization` entry existed for the engine to even attempt.
+
+Closed: added `TargetOrganization` entries for 14 of those 20 — every one
+with a single, unambiguous, publicly-known organization domain (IMF,
+OECD, Egypt's Ministry of Finance, Egypt's Open Data portal, the Suez
+Canal Authority, Investing.com, TradingView, Google Trends, the Wikimedia
+Foundation, arXiv, SSRN, NBER, Google Scholar, ResearchGate) — same
+public-knowledge category as every existing target, independently
+re-verified for reachability before anything is trusted. Verified
+locally (no egress in this sandbox, so all 28 now-targeted sources
+honestly report `no_reachable_domain` — the point is they're attempted at
+all now). 568 backend tests pass; `ruff check` clean.
+
+Left `not_targeted` on purpose: `github_releases`, `company_social_official`,
+`public_telegram`, `patents`, `hiring_signals` (each names more than one
+candidate organization or is inherently per-company/per-channel — picking
+one would be a fabricated guess), plus `company_ir`'s own per-constituent
+marker (already correctly handled by `generate_company_ir_targets`).
+
+See `CURRENT_MISSION.md`'s "target the closeable half of not_targeted"
+entry and `NEXT_MISSIONS.md` for what's genuinely next.

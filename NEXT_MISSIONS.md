@@ -1,5 +1,31 @@
 # Next Missions
 
+## Closed this phase: TargetOrganization entries for 14 of 20 untargeted sources
+
+Item 1 below (partially) and item 3 (fully) from the phase below are now
+closed — see `CURRENT_MISSION.md`'s "target the closeable half of
+not_targeted" entry for the full evidence and reasoning (grounded in the
+first real live discovery run's own `discovery_metrics.json`).
+
+**Genuinely next:**
+
+1. **The remaining 6 untargeted sources** (`github_releases`,
+   `company_social_official`, `public_telegram`, `patents`,
+   `hiring_signals`, `company_ir`'s per-constituent marker) stay
+   untargeted on purpose — each names more than one candidate
+   organization or is inherently per-company/per-channel. Needs the
+   project owner to name a specific organization/channel/office, or a
+   `generate_company_ir_targets`-style per-entity expansion.
+2. **Wire `AcquisitionContinuityMonitor.check_and_recover()`** into the
+   weekly schedule (TD-23's remaining half).
+3. **Watch the next scheduled/manual `discovery.yml` run** with the 14
+   new targets wired in — the real test of whether any of them resolve
+   to a reachable domain and clear the legality gate.
+4. **Enable "Allow GitHub Actions to create and approve pull requests"**
+   (Settings → Actions → General) so `discovery.yml`'s own `gh pr create`
+   step succeeds unattended — the first live run had to have its PR
+   opened manually because this repo setting was off.
+
 ## Closed this phase: weekly Discovery workflow
 
 The "dozens of sources stay PLANNED, waiting on network egress" item from

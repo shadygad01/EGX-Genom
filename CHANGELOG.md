@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.22.0 — TargetOrganization entries for 14 previously-untargeted sources
+
+The first real, live `agx discover-planned-report` run (2026-07-27, manual
+`workflow_dispatch`) reported 20 catalogued `PLANNED` sources as
+`not_targeted`. Of those, 14 have a single, unambiguous, publicly-known
+organization domain (the same category of public knowledge already used
+for every existing target — Reuters is reuters.com, CBE is cbe.org.eg —
+independently re-verified for reachability before anything is trusted,
+never asserted): IMF, OECD, Egypt's Ministry of Finance, Egypt's Open
+Data portal, the Suez Canal Authority, Investing.com, TradingView,
+Google Trends, the Wikimedia Foundation, arXiv, SSRN, NBER, Google
+Scholar, ResearchGate.
+
+The remaining 6 (`github_releases`, `company_social_official`,
+`public_telegram`, `patents`, `hiring_signals`, plus `company_ir`'s own
+per-constituent marker) stay untargeted on purpose: each names more than
+one candidate organization or is inherently per-company/per-channel
+(which of EPO vs. WIPO, which Telegram channel, which company's own
+career page) — picking one for the catalog would be exactly the kind of
+guess this program's own rules forbid.
+
+Reduces the report's `not_targeted` count from 20 to 5 (`company_ir`'s
+marker is separately, correctly excluded). 568 backend tests pass; `ruff
+check` clean.
+
 ## 0.21.0 — Surface already-computed data the dashboard was hiding
 
 The project owner reviewed the live Mission Control and Source

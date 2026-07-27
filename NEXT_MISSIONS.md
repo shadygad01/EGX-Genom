@@ -1,6 +1,22 @@
 # Next Missions
 
-## Closed this phase: NewsIntelligenceAgent
+## Closed this phase: entity resolution for news-to-ticker matching
+
+Item 1 from the "Genuinely next" list below is now closed — see
+`CURRENT_MISSION.md`'s "entity resolution for news-to-ticker matching"
+entry and `docs/PHASE_STATUS.md`'s matching section.
+
+**Genuinely next now** (in priority order):
+
+1. **Monte Carlo stress simulator** (System 10).
+2. **Macro frequency alignment + no-look-ahead discipline**.
+3. **`ticker_data_gap_report.json` web/API wiring** (TD-34).
+4. **Calibrate `agents.news_sentiment.classify_headline_sentiment()`'s
+   phrase lists** (TD-35) and, separately, source a verified
+   Arabic-language EGX constituent list to close TD-36 — both wait on
+   real accumulated evidence, not more engineering right now.
+
+## Closed prior phase: NewsIntelligenceAgent
 
 Item 2 from the "Beyond this" list below is now closed — see
 `CURRENT_MISSION.md`'s "NewsIntelligenceAgent" entry and

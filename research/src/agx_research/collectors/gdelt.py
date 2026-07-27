@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.raw import RawDocument, build_raw_document
 from agx_research.data.schemas import NewsItem
+from agx_research.universe.entity_resolution import resolve_ticker_mentions
 
 
 class GdeltDocCollector(Collector):
@@ -20,14 +21,19 @@ class GdeltDocCollector(Collector):
         spec,
         *,
         query: str,
-        ticker_hints: list[str] | None = None,
+        ticker_hints: dict[str, str] | list[str] | None = None,
         max_records: int = 250,
         timespan: str = "7d",
         fetcher=None,
     ):
         super().__init__(spec, fetcher)
         self.query = query
-        self.ticker_hints = ticker_hints or []
+        # See `RssNewsCollector` for the same {ticker: company_name} vs.
+        # plain list[str] posture -- both get the upgraded exact-token
+        # ticker match via `resolve_ticker_mentions`.
+        self.companies: dict[str, str] = (
+            dict(ticker_hints) if isinstance(ticker_hints, dict) else {t: "" for t in (ticker_hints or [])}
+        )
         self.max_records = min(max(max_records, 1), 250)
         self.timespan = timespan
 
@@ -83,8 +89,7 @@ class GdeltDocCollector(Collector):
             except ValueError:
                 batch.parse_warnings.append(f"article {index}: invalid seendate; skipped")
                 continue
-            lowered = title.lower()
-            matched = [ticker for ticker in self.ticker_hints if ticker.lower() in lowered]
+            matched = resolve_ticker_mentions(title, self.companies)
             batch.news_items.append(
                 NewsItem(
                     published_at=published,

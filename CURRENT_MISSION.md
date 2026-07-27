@@ -1,6 +1,26 @@
 # Current Mission
 
-## Current mission: NewsIntelligenceAgent — turn already-connected real news into a real signal
+## Current mission: entity resolution for news-to-ticker matching
+
+Immediate follow-up, per the project owner's "continue all remaining
+legal/free directions" instruction: `NEXT_MISSIONS.md` item 1,
+strengthening `NewsIntelligenceAgent`'s (and every RSS/GDELT-sourced
+event's) own ticker attribution.
+
+**Closed** — see `docs/PHASE_STATUS.md`'s "Entity resolution for
+news-to-ticker matching" section for full detail: replaced
+`RssNewsCollector`/`GdeltDocCollector`'s substring ticker match with real
+word/token + company-name matching (`universe/entity_resolution.py`,
+reusing `discovery.engine.significant_tokens()`), and threaded real
+company names already present in this codebase
+(`research/data/universe/EGX30.csv`/`EGX70.csv`) through the production
+pipeline into both collectors. Deliberately no Arabic aliases (TD-36) —
+no verified source exists, and this codebase does not fabricate one. 600
+backend tests pass (8 new); `ruff check` clean.
+
+---
+
+## Prior mission: NewsIntelligenceAgent — turn already-connected real news into a real signal
 
 The project owner asked why Opportunity Center recommendations still
 aren't "real research," and, once the honest answer (99 of 101 tickers

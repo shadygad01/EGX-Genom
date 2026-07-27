@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.25.0 — Real entity resolution for news-to-ticker matching
+
+`RssNewsCollector`/`GdeltDocCollector` attributed news to a ticker via a
+bare case-insensitive substring check (`ticker.lower() in
+title.lower()`) — the exact "VLMR matches inside VLMRA" false-positive
+risk named in the project owner's own completion plan. New module
+`universe/entity_resolution.py` (`resolve_ticker_mentions`) fixes this:
+ticker matching is now a real word/token match, and when a real company
+display name is available, the full name is matched too via the same
+conservative "every significant token present" discipline
+`discover_company_directory_links()` already uses (shared
+`significant_tokens()` helper, not a parallel implementation).
+
+`production.pipeline.ProductionPipeline._ticker_companies()` threads real
+company names from `research/data/universe/EGX30.csv`/`EGX70.csv` (the
+already-reviewed, EGX-sourced 101-ticker seed with real English names and
+ISINs) through `collector_plan.build_collector_plan`/`build_live_collector`
+into both news collectors, so live/mock runs get genuine entity
+resolution, not a ticker-only guess. Both collectors stay backward
+compatible with a plain `ticker_hints: list[str]` for callers with no
+company-name data (still upgraded from substring to exact-token
+matching). No Arabic alias list yet — no verified Arabic-language EGX
+source exists in this codebase (new debt, TD-36); inventing
+transliterations would risk a wrong match, worse than a missed one.
+
+8 new tests (600 total, up from 592); `ruff check` clean.
+
 ## 0.24.0 — NewsIntelligenceAgent: real news sentiment now produces findings
 
 `agents.news_intelligence.NewsIntelligenceAgent` was an honest

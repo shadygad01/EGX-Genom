@@ -1,6 +1,7 @@
 from agx_research.universe.bootstrap import materialize_universe_seed
 from agx_research.universe.collected import CollectedUniverseProvider
 from agx_research.universe.constituent import IndexConstituent
+from agx_research.universe.entity_resolution import resolve_ticker_mentions
 from agx_research.universe.provider import (
     MappingUniverseProvider,
     UniverseArtifact,
@@ -22,4 +23,5 @@ __all__ = [
     "UniverseArtifact",
     "UniverseProvider",
     "materialize_universe_seed",
+    "resolve_ticker_mentions",
 ]

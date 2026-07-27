@@ -188,6 +188,13 @@ class ProductionPipeline:
         """Resolve membership at use time; the provider is the only source of truth."""
         return sorted(self.universe_provider.constituents(as_of))
 
+    def _ticker_companies(self, as_of: date) -> dict[str, str]:
+        """{ticker: company_name} for real entity resolution in news
+        collectors (`universe.entity_resolution.resolve_ticker_mentions`),
+        from the same provider `_tickers` already reads -- never a second,
+        possibly-drifting source of company names."""
+        return dict(self.universe_provider.constituents(as_of))
+
     # ---- the public entrypoint ----------------------------------------
 
     def run(
@@ -435,6 +442,7 @@ class ProductionPipeline:
             mode=mode,
             raw_documents=self.raw_documents,
             tickers=self._tickers(as_of or self._run_as_of),
+            companies=self._ticker_companies(as_of or self._run_as_of),
         )
         self._unavailable = unavailable_sources(self.registry, {p.source_id for p in self._planned})
         if not self._planned:
@@ -537,6 +545,7 @@ class ProductionPipeline:
                 spec,
                 fetcher=fetcher,
                 tickers=self._tickers(self._run_as_of),
+                companies=self._ticker_companies(self._run_as_of),
             )
 
         engine = CapabilityDecisionEngine(self.registry, factory, metrics=self.metrics)

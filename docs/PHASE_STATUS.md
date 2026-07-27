@@ -889,6 +889,46 @@ workflow already writes them in final shape). `npm run build`/`test`
 clean for both `api` and `web` workspaces (required a fresh `npm install`
 in this session first — `node_modules` had never been installed).
 
+## Entity resolution for news-to-ticker matching (System 02/08)
+
+Immediate follow-up to NewsIntelligenceAgent, closing `NEXT_MISSIONS.md`
+item 1: `RssNewsCollector`/`GdeltDocCollector`'s ticker attribution was a
+bare case-insensitive **substring** check (`ticker.lower() in
+title.lower()`), the exact "VLMR matches inside VLMRA" false-positive risk
+the project owner's own completion plan named.
+
+Closed: `universe.entity_resolution.resolve_ticker_mentions()` (new
+module) matches a ticker only as its own word/token (never a substring of
+a longer one) and, when a real company display name is available, also
+matches the company's full name via the same conservative
+"every-significant-token-present" discipline `discover_company_directory_links()`
+already uses (reusing its exact `significant_tokens()` helper — one
+definition, not a parallel one). `RssNewsCollector`/`GdeltDocCollector`
+now accept `ticker_hints` as either a `{ticker: company_name}` mapping
+(full entity resolution) or a plain `list[str]` (ticker-only, still
+upgraded from substring to exact-token matching) — fully backward
+compatible. `production.pipeline.ProductionPipeline` gained
+`_ticker_companies()` (reads the same `UniverseProvider` `_tickers()`
+already uses) and threads real company names from
+`research/data/universe/EGX30.csv`/`EGX70.csv` (the reviewed, EGX-sourced
+101-ticker seed — real English display names + ISINs, already present in
+this codebase) all the way through `production.collector_plan.
+build_collector_plan`/`build_live_collector` into both news collectors.
+
+Deliberately no Arabic alias list (new debt, TD-36) — no verified
+Arabic-language source for EGX30/EGX70 names exists in this codebase, and
+guessing transliterations would risk a wrong match, worse than a missed
+one.
+
+**Verified live** (mock mode, real seed data): a real `agx run` against
+the actual `research/data/universe/EGX30.csv` seed correctly resolves
+"COMI reports strong Q2 net income growth" → `COMI` via the seeded
+constituent list's real English name path, honestly reports `[]` for the
+same news item when queried at a date before the seed's own `as_of_date`
+(no look-ahead — `CollectedUniverseProvider`'s existing point-in-time
+guarantee, not a regression). 600 backend tests pass (8 new, up from
+592); `ruff check` clean.
+
 ## NewsIntelligenceAgent: real news sentiment now produces findings (System 08)
 
 `NEXT_MISSIONS.md` named `agents.news_intelligence.NewsIntelligenceAgent`

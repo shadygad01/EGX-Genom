@@ -88,11 +88,18 @@ export function OpportunityCenter() {
                   header: "Horizons",
                   render: (r) => (
                     <div className={styles.horizonBadges}>
-                      {HORIZON_ORDER.filter((h) => r.horizon_predictions[h]).map((h) => (
-                        <Badge key={h} variant="neutral">
-                          {titleCase(h)}
-                        </Badge>
-                      ))}
+                      {HORIZON_ORDER.filter((h) => r.horizon_predictions[h]).map((h) => {
+                        const prediction = r.horizon_predictions[h]!;
+                        return (
+                          <Badge
+                            key={h}
+                            variant={prediction.expected_return >= 0 ? "positive" : "negative"}
+                            title={`${titleCase(h)}: ${formatSignedPercent(prediction.expected_return)} exp. return, ${formatPercent(prediction.confidence)} confidence`}
+                          >
+                            {titleCase(h)} {formatSignedPercent(prediction.expected_return)}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   ),
                 },
@@ -165,6 +172,47 @@ function OpportunityDetail({
           deltaSign={recommendation.combined_expected_return >= 0 ? 1 : -1}
         />
         <StatTile label="Exp. Risk" value={formatPercent(recommendation.combined_expected_risk)} />
+      </div>
+
+      <div className={styles.block}>
+        <div className={styles.blockTitle}>Horizon Breakdown</div>
+        <div className={styles.horizonGrid}>
+          {HORIZON_ORDER.map((h) => {
+            const prediction = recommendation.horizon_predictions[h];
+            return (
+              <div key={h} className={styles.horizonCard}>
+                <div className={styles.horizonCardHeader}>
+                  <span className={styles.horizonCardTitle}>{titleCase(h)}</span>
+                  {prediction ? (
+                    <Meter value={prediction.confidence} label={formatPercent(prediction.confidence)} />
+                  ) : (
+                    <Badge variant="neutral">No signal</Badge>
+                  )}
+                </div>
+                {prediction ? (
+                  <>
+                    <div className={styles.horizonCardStats}>
+                      <span
+                        className="num"
+                        style={{ color: prediction.expected_return >= 0 ? "var(--positive)" : "var(--negative)" }}
+                      >
+                        {formatSignedPercent(prediction.expected_return)}
+                      </span>
+                      <span className={styles.horizonCardStatLabel}>exp. return</span>
+                      <span className="num">{formatPercent(prediction.expected_risk)}</span>
+                      <span className={styles.horizonCardStatLabel}>exp. risk</span>
+                    </div>
+                    <p className={styles.horizonCardWhy}>
+                      {prediction.explanation.why_this_stock} {prediction.explanation.why_now}
+                    </p>
+                  </>
+                ) : (
+                  <p className={styles.horizonCardWhy}>No model prediction for this horizon yet.</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className={styles.block}>

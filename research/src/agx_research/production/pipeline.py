@@ -86,6 +86,7 @@ from agx_research.production import artifacts as production_artifacts
 from agx_research.production.collector_plan import (
     EXPECTED_RECORDS,
     EXPECTED_RECORDS_LIVE,
+    LIVE_MACRO_LOOKBACK_DAYS,
     LIVE_MACRO_SERIES_IDS,
     ExecutionMode,
     build_collector_plan,
@@ -136,6 +137,7 @@ class ProductionPipeline:
         data_dir: Path | str,
         universe_provider: UniverseProvider | None = None,
         macro_series_ids: list[str] | None = None,
+        macro_lookback_days: int | None = None,
     ):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
@@ -145,6 +147,11 @@ class ProductionPipeline:
         # fixtures' placeholder ids -- an explicit override here always wins.
         self._macro_series_ids_override = macro_series_ids
         self.macro_series_ids = macro_series_ids or list(_DEFAULT_MACRO_SERIES)
+        # Same deferral as macro_series_ids: LIVE's annual/quarterly official
+        # statistics need a much longer window than the mock fixtures'
+        # matched-to-lookback_days dates do.
+        self._macro_lookback_days_override = macro_lookback_days
+        self.macro_lookback_days = macro_lookback_days or 30
 
         # Populated by stages as they run; downstream stages check these
         # rather than assume a prior stage succeeded.
@@ -202,6 +209,12 @@ class ProductionPipeline:
             self.macro_series_ids = list(LIVE_MACRO_SERIES_IDS)
         else:
             self.macro_series_ids = list(_DEFAULT_MACRO_SERIES)
+        if self._macro_lookback_days_override is not None:
+            self.macro_lookback_days = self._macro_lookback_days_override
+        elif mode == ExecutionMode.LIVE:
+            self.macro_lookback_days = LIVE_MACRO_LOOKBACK_DAYS
+        else:
+            self.macro_lookback_days = 30
 
         started_at = datetime.now()
         stages: list[StageResult] = []
@@ -688,6 +701,7 @@ class ProductionPipeline:
             StaticSectorProvider(),
             macro_series_ids=self.macro_series_ids,
             lookback_days=30,
+            macro_lookback_days=self.macro_lookback_days,
             event_platform=self.event_platform,
         )
         state = self.market_memory.reconstruct(as_of)

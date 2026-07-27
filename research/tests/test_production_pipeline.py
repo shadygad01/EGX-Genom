@@ -18,6 +18,7 @@ import pytest
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.production.collector_plan import (
     LIVE_FRED_SERIES_IDS,
+    LIVE_MACRO_LOOKBACK_DAYS,
     LIVE_STOOQ_TICKER_SUFFIX,
     LIVE_WORLDBANK_INDICATORS,
     ExecutionMode,
@@ -457,6 +458,16 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
     decisions = {decision.capability: decision for decision in pipeline.capability_decisions}
     assert decisions["index_constituents"].succeeded is True
     assert decisions["index_constituents"].selected_source_ids == ["egx_universe_seed"]
+
+    # LIVE's World Bank fixture reports its one observation on 2025-12-31,
+    # ~165 days before RUN_DATE -- outside the 30-day window prices/news use
+    # but inside the wider macro-only window. A shared window would starve
+    # every annual/quarterly macro series (a real, live-confirmed gap).
+    assert pipeline.macro_lookback_days == LIVE_MACRO_LOOKBACK_DAYS
+    snapshot = pipeline.market_memory.reconstruct(RUN_DATE).dataset_snapshot
+    assert snapshot.macro_lookback_days == LIVE_MACRO_LOOKBACK_DAYS
+    for indicator_local_id in LIVE_WORLDBANK_INDICATORS.values():
+        assert len(snapshot.macro_series[indicator_local_id]) == 1
 
 
 def test_live_mode_fails_loudly_when_every_collector_fails(tmp_path, monkeypatch):

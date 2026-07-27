@@ -34,6 +34,7 @@ class DatasetSnapshot(BaseModel):
     version: int = 1
     as_of: date
     lookback_days: int
+    macro_lookback_days: int
     tickers: list[str]
     macro_series_ids: list[str]
     price_history: dict[str, list[PriceBar]] = Field(default_factory=dict)
@@ -49,19 +50,31 @@ def build_snapshot(
     macro_series_ids: list[str],
     as_of: date,
     lookback_days: int,
+    macro_lookback_days: int | None = None,
 ) -> DatasetSnapshot:
-    """Materialize a content-hashed snapshot of everything available as of `as_of`."""
+    """Materialize a content-hashed snapshot of everything available as of `as_of`.
+
+    `macro_lookback_days` (default: `lookback_days`) windows only
+    `macro_series` — annual/quarterly official statistics (World Bank, UN
+    SDG, CAPMAS) need a much longer window than the daily price/news/event
+    window to ever contain an observation at all; using one shared window
+    for both silently starved every macro series (a real, live-confirmed
+    gap, not a hypothetical one).
+    """
     start = as_of - timedelta(days=lookback_days)
+    macro_lookback_days = lookback_days if macro_lookback_days is None else macro_lookback_days
+    macro_start = as_of - timedelta(days=macro_lookback_days)
 
     price_history = {t: provider.get_price_history(t, start, as_of) for t in tickers}
     corporate_events = {t: provider.get_corporate_events(t, start, as_of) for t in tickers}
-    macro_series = {s: provider.get_macro_series(s, start, as_of) for s in macro_series_ids}
+    macro_series = {s: provider.get_macro_series(s, macro_start, as_of) for s in macro_series_ids}
     news = provider.get_news(None, start, as_of)
 
     canonical = json.dumps(
         {
             "as_of": as_of.isoformat(),
             "lookback_days": lookback_days,
+            "macro_lookback_days": macro_lookback_days,
             "tickers": sorted(tickers),
             "macro_series_ids": sorted(macro_series_ids),
             "price_history": {
@@ -84,6 +97,7 @@ def build_snapshot(
         id=snapshot_id,
         as_of=as_of,
         lookback_days=lookback_days,
+        macro_lookback_days=macro_lookback_days,
         tickers=tickers,
         macro_series_ids=macro_series_ids,
         price_history=price_history,

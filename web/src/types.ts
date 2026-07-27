@@ -216,6 +216,7 @@ export interface DatasetSnapshot {
   version: number;
   as_of: string;
   lookback_days: number;
+  macro_lookback_days: number;
   tickers: string[];
   macro_series_ids: string[];
   price_history: Record<string, PriceBar[]>;

@@ -172,10 +172,12 @@ def export_collector_status(
                 "parse_success": provider_yield > 0,
                 "yield": provider_yield,
                 "documents_fetched": documents,
-                "health_status": (
-                    registry.latest(source_id).health_status.value
-                    if registry.latest(source_id) else None
-                ),
+                # `health_status`/`reputation_score`/`data_quality_score` already
+                # come from `_collector_status_row`'s own `registry.latest(provider_id)`
+                # lookup above -- `CollectionService` now records metrics/health
+                # against the provider's own id directly (see
+                # `CollectionService._record_provider_outcome`), so this row no
+                # longer needs to borrow the parent composite's health as a stand-in.
             })
             rows.append(row)
     emitted_ids = {row["source_id"] for row in rows}

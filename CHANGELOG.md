@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.18.0 — Provider-leg health/reputation measured directly
+
+The project owner flagged, from a review of the live source dashboards,
+that a source integrated as a provider leg inside a composite collector
+(`yahoo_finance`/`stockanalysis`/`mubasher` inside
+`EgxCompositePriceCollector`, via `SourceSpec.integrated_via`) could show
+`health_status: unknown`/`data_quality_score: null` in `source_registry.json`
+even while actively serving real traffic through the composite — because
+`CollectionService` only ever recorded metrics/health against the parent
+collector's own id, never against the provider id a document was actually
+attributed to (`Collector.provider_for_document`). The previous session's
+`export_collector_status` fix addressed this for the dashboard's derived
+per-run status table only (COLLECTED/STANDBY rows), by borrowing the
+parent composite's `health_status` as a stand-in — the registry's own
+`SourceSpec.health_status`/`reputation_score`/`data_quality_score` for
+each provider leg were untouched and any consumer reading the registry
+directly still saw permanently `unknown`/`null` fields.
+
+- `CollectionService._record_provider_outcome` (new): records
+  `SourceMetrics`/`HealthStatus` against a provider leg's own registry id,
+  using the same per-document quality assessment already computed for
+  that document (each raw document is already attributable to exactly one
+  provider) — called alongside the existing collector-level
+  `_record_run_outcome` for every document a `provider_for_document`-aware
+  collector produces, on both the success and parser-failure paths.
+- `production.artifacts.export_collector_status` no longer overwrites a
+  provider-leg row's `health_status` with the parent composite's value —
+  `_collector_status_row`'s own `registry.latest(provider_id)` lookup
+  already returns the provider's own, now-measured status.
+- New test: `test_provider_leg_health_and_reputation_are_measured_directly`
+  (`test_collection_service.py`) — a good and a bad provider leg wired
+  behind one stub composite collector each get their own, independently
+  correct metrics/health, not a shared or borrowed value.
+- 567 backend tests pass (1 new); `ruff check` clean. No new source,
+  collector, or acquisition-architecture change — this is strictly a
+  measurement-accuracy fix for sources already integrated, so it does not
+  reopen the acquisition-architecture freeze (see `NEXT_MISSIONS.md`).
+
 ## 0.17.0 — Ticker Data Gap Report
 
 - `meta.readiness.build_ticker_data_gap_report` decomposes

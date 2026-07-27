@@ -750,3 +750,55 @@ exists, since several items turned out already engineering-complete:
    evidenced defensive measures documented in phase 2/3 above — see
    `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section
    and `CURRENT_MISSION.md` for full detail.
+
+## Provider-Leg Health Measurement Accuracy (System 02 accuracy review)
+
+The project owner reviewed the live source dashboards produced by prior
+sessions and flagged, correctly, that the picture was honest but
+incomplete: dozens of catalogued sources are still `PLANNED` pending a
+verified endpoint (real, business/engineering-blocked, see "What's still
+blocked" in `docs/DATA_ACQUISITION.md`), `NEEDS_KEY` sources have no
+credential yet (a business action, not code — see `docs/DATA_ACQUISITION.md`'s
+source catalog policy), no scheduled recurring discovery/collection runs
+yet (System-18 scheduling, TD-23's own named repayment trigger), and —
+the one genuinely closeable engineering gap this phase found — a source
+integrated as a provider leg inside a composite collector
+(`yahoo_finance`/`stockanalysis`/`mubasher` inside
+`EgxCompositePriceCollector`, via `SourceSpec.integrated_via`) could show
+`health_status: unknown` / `data_quality_score: null` in
+`source_registry.json` even while actively serving real traffic through
+the composite, because `CollectionService` only ever recorded metrics/
+health against the parent collector's id, never against the specific
+provider id a document was actually attributable to. A prior session's
+`export_collector_status` fix addressed this for the dashboard's derived
+per-run status table only (by borrowing the parent's `health_status` as
+a stand-in for display) — the registry's own per-provider fields were
+never actually measured, so any consumer reading `source_registry.json`
+directly (not just the dashboard's derived view) still saw a permanently
+unmeasured leg.
+
+Closed: `collectors.service.CollectionService._record_provider_outcome`
+now records `SourceMetrics`/`HealthStatus` against a provider leg's own
+registry id from the same per-document quality assessment already
+computed for that document (each raw document a `provider_for_document`-
+aware collector produces is already attributable to exactly one
+provider) — on both the success and parser-failure paths, mirroring the
+existing collector-level `_record_run_outcome` exactly. `export_collector_status`
+no longer overwrites a provider row's `health_status` with the parent's
+value; it now reads the provider's own, correctly-measured status like
+every other source. New test:
+`test_provider_leg_health_and_reputation_are_measured_directly`
+(`test_collection_service.py`). 567 backend tests pass (1 new); `ruff
+check` clean.
+
+Everything else the owner named stays correctly deferred, not chased:
+converting a `PLANNED` source to `IMPLEMENTED` needs a verified real
+endpoint (this dev sandbox has no arbitrary outbound egress, though the
+GitHub Actions production deployment does — see `CURRENT_MISSION.md`);
+`NEEDS_KEY` sources need the user's own API key, a credential/business
+action this codebase never fabricates or bypasses; and a real periodic
+discovery/collection scheduler needs System 18's managed-scheduling
+decision (cloud target + secrets + scheduler), which remains
+business-blocked exactly as `docs/ROADMAP.md`/TD-23 already name. None of
+these are re-opened by this phase — this phase closed only the
+measurement-accuracy defect in sources already integrated.

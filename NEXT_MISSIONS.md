@@ -1,5 +1,34 @@
 # Next Missions
 
+## Closed this phase: provider-leg health measurement accuracy
+
+The project owner's source-dashboard review named one genuinely
+closeable engineering gap (provider legs inside a composite collector
+never had their own health/reputation measured — see `CURRENT_MISSION.md`
+and `docs/PHASE_STATUS.md`'s "Provider-Leg Health Measurement Accuracy"
+section) — closed this phase. The review's other three points remain
+correctly business/infrastructure-blocked, not code gaps, and are named
+here explicitly so the project owner can act on them directly rather than
+have this codebase guess or fabricate around them:
+
+- **Dozens of sources stay `PLANNED`** until a verified real endpoint
+  exists for each (this dev sandbox has no arbitrary outbound egress;
+  the GitHub Actions production deployment does — see
+  `CURRENT_MISSION.md`'s "Superseded six times" note). Converting one to
+  `IMPLEMENTED` is real, source-by-source acquisition work the standing
+  freeze (below) explicitly defers pending a new named business input.
+- **Paid/`NEEDS_KEY` sources** (FMP, AlphaVantage, Polygon, Tiingo) are
+  code-complete and only need the project owner to supply their own
+  free-tier API key, then flip the catalog entry's `status` — a
+  credential/business action, never something to fabricate or bypass.
+- **No scheduled recurring discovery/collection run** exists yet because
+  it needs System 18's managed-scheduling decision (cloud target +
+  secrets + scheduler) — named in `docs/ROADMAP.md` and TD-23's own
+  repayment trigger ("System-18 scheduling exists → wire a periodic
+  full-catalog `agx discover-sources` pass"). `AcquisitionContinuityMonitor`
+  already re-runs discovery reactively on a `DOWN` health signal; only the
+  *proactive periodic* pass awaits real deployment scheduling.
+
 ## Immediately next: from the project owner's data-sources completion plan
 
 The project owner's latest plan (see `CURRENT_MISSION.md`'s "Ticker Data

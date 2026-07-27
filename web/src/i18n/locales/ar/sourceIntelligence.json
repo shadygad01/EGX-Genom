@@ -1,0 +1,57 @@
+{
+  "title": "استخبارات المصادر",
+  "description": "الصحة والتوفر والتغطية والحداثة وزمن الاستجابة والتأهيل ودرجة التحقق لكل مصدر يتتبعه AGX.",
+  "emptyTitle": "لا توجد مصادر مسجلة بعد",
+  "columns": {
+    "source": "المصدر",
+    "category": "الفئة",
+    "status": "الحالة",
+    "integratedCollected": "مُدمج / تم الجمع",
+    "integratedStandby": "مُدمج / قيد الاستعداد",
+    "integration": "التكامل",
+    "integratedVia": "عبر {{name}}",
+    "lifecycle": "دورة الحياة",
+    "health": "الصحة",
+    "notMeasured": "لم يتم القياس",
+    "validationScore": "درجة التحقق"
+  },
+  "detail": {
+    "title": "تفاصيل المصدر",
+    "emptyTitle": "لم يتم اختيار مصدر",
+    "emptyDetail": "اختر صفًا لعرض تفاصيل الصحة والسمعة كاملة.",
+    "priorityMeta": "{{category}} · {{country}} · أولوية {{priority}}",
+    "discoveredFirstRun": "الاكتشاف / أول تشغيل",
+    "lastRun": "آخر تشغيل",
+    "totalRuns": "إجمالي مرات التشغيل",
+    "documentsLastRun": "المستندات (آخر تشغيل)",
+    "integratedVia": "مُدمج عبر",
+    "decisionCapabilities": "قدرات القرار",
+    "expectedLatency": "زمن الاستجابة المتوقع",
+    "validationScore": "درجة التحقق",
+    "compositeReputation": "السمعة المركّبة"
+  },
+  "reputation": {
+    "title": "أبعاد السمعة",
+    "emptyTitle": "لا توجد بيانات سمعة بعد",
+    "emptyDetail": "تُعبأ أبعاد السمعة بمجرد أن يعمل هذا المصدر مرة واحدة على الأقل.",
+    "availability": "التوفر",
+    "coverage": "التغطية",
+    "freshness": "الحداثة",
+    "latency": "زمن الاستجابة",
+    "accuracy": "الدقة",
+    "schemaStability": "ثبات المخطط",
+    "correctionRate": "معدل التصحيح",
+    "duplicateRate": "معدل التكرار",
+    "historicalUsefulness": "الفائدة التاريخية"
+  },
+  "discoveryEvidence": {
+    "title": "أدلة الاكتشاف",
+    "cachedResult": " (نتيجة مخزّنة مؤقتًا)",
+    "endpointVerified": "تم التحقق من نقطة النهاية.",
+    "discovered": "تم الاكتشاف: {{endpoints}}",
+    "evidence": "الأدلة: {{items}}"
+  },
+  "notes": {
+    "title": "ملاحظات"
+  }
+}

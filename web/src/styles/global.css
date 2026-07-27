@@ -76,7 +76,7 @@ table {
 
 .skip-link {
   position: absolute;
-  left: -9999px;
+  inset-inline-start: -9999px;
   top: 0;
   z-index: 1000;
   background: var(--accent);
@@ -88,13 +88,31 @@ table {
 }
 
 .skip-link:focus {
-  left: var(--space-4);
+  inset-inline-start: var(--space-4);
   top: var(--space-4);
 }
 
+/* Numbers, ticker codes, and other Latin-script/numeric data always read
+   left-to-right, independent of the page's overall direction (a standard
+   financial-dashboard convention) -- unicode-bidi: isolate keeps this
+   span's internal ordering from being affected by surrounding RTL text,
+   and vice versa. */
 .num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* A "proceed forward" affordance (a link/chevron implying "next") --
+   mirrors under RTL so it still points toward reading-forward instead of
+   pointing backward at the text it follows. */
+.icon-forward {
+  display: inline-block;
+}
+
+[dir="rtl"] .icon-forward {
+  transform: scaleX(-1);
 }
 
 .visually-hidden {

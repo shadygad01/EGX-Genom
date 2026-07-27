@@ -1,0 +1,234 @@
+{
+  "app": {
+    "brand": "أبحاث AGX",
+    "footer": "EGX30 + EGX70 · بحث فقط",
+    "fallbackTitle": "أبحاث AGX"
+  },
+  "nav": {
+    "aiBriefing": "موجز الذكاء الاصطناعي",
+    "opportunityCenter": "مركز الفرص",
+    "marketIntelligence": "استخبارات السوق",
+    "researchCenter": "مركز الأبحاث",
+    "knowledgeGraph": "مخطط المعرفة",
+    "missionControl": "مركز التحكم",
+    "sourceIntelligence": "استخبارات المصادر",
+    "systemAdministration": "إدارة النظام",
+    "companyWorkspace": "مساحة أبحاث الشركة"
+  },
+  "topbar": {
+    "nominal": "طبيعي",
+    "degraded": "متدهور",
+    "lastCycle": "آخر دورة {{time}}"
+  },
+  "language": {
+    "toggleLabel": "اللغة",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "states": {
+    "loading": "جارٍ التحميل",
+    "somethingWrong": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "noneRecorded": "لا يوجد سجل.",
+    "underConstruction": "قيد الإنشاء"
+  },
+  "horizon": {
+    "micro": "قصير",
+    "swing": "متوسط",
+    "investment": "طويل"
+  },
+  "table": {
+    "ticker": "الرمز",
+    "status": "الحالة",
+    "decision": "القرار",
+    "confidence": "الثقة",
+    "expReturn": "العائد المتوقع",
+    "expRisk": "المخاطرة المتوقعة",
+    "blockers": "المعوقات",
+    "nextActions": "الإجراءات التالية",
+    "noSignal": "لا توجد إشارة"
+  },
+  "a11y": {
+    "mainNavigation": "التنقل الرئيسي"
+  },
+  "readiness": {
+    "ready": "جاهز",
+    "degraded": "متدهور",
+    "blocked": "محظور",
+    "researchable": "قابل للبحث",
+    "abstain": "امتناع"
+  },
+  "enums": {
+    "horizon": { "micro": "قصير المدى", "swing": "متوسط المدى", "investment": "طويل المدى" },
+    "readinessStatus": { "ready": "جاهز", "degraded": "متدهور", "blocked": "محظور" },
+    "decision": { "researchable": "قابل للبحث", "abstain": "امتناع" },
+    "knowledgeStatus": { "promoted": "معتمد", "monitoring": "قيد المراقبة", "retired": "متقاعد" },
+    "geneStatus": { "promoted": "معتمد", "monitoring": "قيد المراقبة", "replaced": "مستبدل", "retired": "متقاعد" },
+    "eventType": {
+      "corporate": "مؤسسي",
+      "macroeconomic": "اقتصاد كلي",
+      "political": "سياسي",
+      "market": "سوق",
+      "technical": "فني",
+      "news": "إخباري"
+    },
+    "eventSeverity": { "low": "منخفض", "medium": "متوسط", "high": "مرتفع", "critical": "حرج" },
+    "eventStatus": {
+      "pending": "معلّق",
+      "confirmed": "مؤكد",
+      "corroborated": "مدعوم",
+      "disputed": "متنازع عليه",
+      "retracted": "مسحوب",
+      "superseded": "مُستبدل",
+      "archived": "مؤرشف"
+    },
+    "runStatus": {
+      "succeeded": "نجح",
+      "failed": "فشل",
+      "skipped_non_trading": "تم التخطي — يوم غير تداولي"
+    },
+    "sourceStatus": {
+      "implemented": "مُفعّل",
+      "planned": "مخطط له",
+      "needs_key": "يتطلب مفتاح API",
+      "tos_review": "قيد مراجعة الشروط",
+      "disabled": "معطّل"
+    },
+    "lifecycleState": {
+      "candidate": "مرشح",
+      "quarantine": "معزول",
+      "evaluation": "قيد التقييم",
+      "trusted": "موثوق",
+      "core": "أساسي"
+    },
+    "healthStatus": { "unknown": "غير معروف", "healthy": "سليم", "degraded": "متدهور", "down": "متعطل" },
+    "activationStatus": { "active": "نشط", "paused": "متوقف مؤقتًا", "retired": "متقاعد" },
+    "capabilityStrategyOutcome": {
+      "succeeded": "نجح",
+      "zero_yield": "بدون نتائج",
+      "failed": "فشل",
+      "skipped": "تم التخطي"
+    },
+    "stageStatus": { "succeeded": "نجح", "partial": "جزئي", "failed": "فشل", "skipped": "تم التخطي" },
+    "stageName": {
+      "entrypoint": "نقطة الدخول",
+      "source_registry": "سجل المصادر",
+      "discovery_engine": "محرك الاكتشاف",
+      "collector_selection": "اختيار جامعات البيانات",
+      "collector_execution": "تنفيذ جمع البيانات",
+      "raw_archive": "الأرشيف الخام",
+      "canonical_transformation": "التحويل القياسي",
+      "validation": "التحقق",
+      "event_platform": "منصة الأحداث",
+      "market_memory": "ذاكرة السوق",
+      "knowledge_base": "قاعدة المعرفة",
+      "research_pipeline": "خط سير الأبحاث",
+      "genome": "الجينوم",
+      "investment_case_generator": "مولّد الحالات الاستثمارية",
+      "dashboard_artifact_generator": "مولّد ملفات لوحة التحكم",
+      "mission_control_update": "تحديث مركز التحكم",
+      "execution_report": "تقرير التنفيذ"
+    },
+    "nodeType": {
+      "company": "شركة",
+      "sector": "قطاع",
+      "market": "سوق",
+      "event": "حدث",
+      "hypothesis": "فرضية",
+      "experiment": "تجربة",
+      "feature": "ميزة",
+      "gene": "جين",
+      "research_paper": "ورقة بحثية",
+      "prediction": "تنبؤ",
+      "recommendation": "توصية",
+      "knowledge": "معرفة",
+      "dataset_snapshot": "لقطة بيانات",
+      "research_finding": "نتيجة بحثية",
+      "macro_series": "سلسلة اقتصادية كلية"
+    },
+    "sourceCategory": {
+      "official": "رسمي",
+      "company": "شركات",
+      "market_data": "بيانات السوق",
+      "news": "أخبار",
+      "arabic_news": "أخبار عربية",
+      "macroeconomic": "اقتصاد كلي",
+      "global_markets": "أسواق عالمية",
+      "alternative": "بديلة",
+      "research": "أبحاث"
+    },
+    "accessMethod": {
+      "csv_download": "تحميل CSV",
+      "json_api": "واجهة JSON",
+      "rss_feed": "خلاصة RSS",
+      "xbrl": "XBRL",
+      "pdf_download": "تحميل PDF",
+      "html_scrape": "استخلاص HTML",
+      "manual": "يدوي"
+    },
+    "entityKind": {
+      "company": "شركة",
+      "sector": "قطاع",
+      "macro_series": "سلسلة اقتصادية كلية",
+      "market": "سوق",
+      "unknown": "غير معروف"
+    },
+    "eventRelationshipType": {
+      "corroborates": "يدعم",
+      "supersedes": "يحل محل",
+      "contradicts": "يتعارض مع",
+      "causally_precedes": "يسبق سببيًا",
+      "part_of": "جزء من"
+    },
+    "periodType": { "annual": "سنوي", "quarterly": "ربع سنوي" },
+    "executionMode": { "mock": "محاكاة", "live": "مباشر", "replay": "إعادة تشغيل" },
+    "collectorStatus": {
+      "collected": "تم الجمع",
+      "degraded": "متدهور",
+      "standby": "قيد الاستعداد",
+      "failed": "فشل",
+      "unavailable": "غير متاح"
+    },
+    "discoveryResult": {
+      "verified_reachable": "تم التحقق من إمكانية الوصول",
+      "not_targeted": "غير مستهدف",
+      "no_reachable_domain": "لا يوجد نطاق يمكن الوصول إليه",
+      "homepage_unreachable": "الصفحة الرئيسية غير قابلة للوصول",
+      "no_candidates_discovered": "لم يتم اكتشاف مرشحين",
+      "legality_blocked": "محظور قانونيًا",
+      "not_verified": "لم يتم التحقق"
+    },
+    "capability": {
+      "price_data": "بيانات الأسعار",
+      "corporate_disclosures": "الإفصاحات المؤسسية",
+      "corporate_actions": "الإجراءات المؤسسية",
+      "financial_statements": "القوائم المالية",
+      "investor_relations": "علاقات المستثمرين",
+      "news": "الأخبار",
+      "macroeconomic": "الاقتصاد الكلي",
+      "market_breadth": "اتساع السوق",
+      "trading_calendar": "تقويم التداول",
+      "index_constituents": "مكونات المؤشر",
+      "sector_membership": "الانتماء القطاعي",
+      "economic_releases": "الإصدارات الاقتصادية",
+      "research_papers": "الأوراق البحثية"
+    },
+    "corporateEventType": {
+      "stock_split": "تجزئة أسهم",
+      "capital_increase": "زيادة رأس المال",
+      "buyback": "إعادة شراء أسهم",
+      "management_change": "تغيير إداري",
+      "delisting": "شطب من التداول",
+      "merger": "اندماج",
+      "acquisition": "استحواذ",
+      "dividend": "توزيعات أرباح",
+      "guidance": "توجيهات الشركة",
+      "earnings": "نتائج الأعمال"
+    },
+    "statementType": {
+      "income_statement": "قائمة الدخل",
+      "balance_sheet": "الميزانية العمومية",
+      "cash_flow": "قائمة التدفقات النقدية"
+    }
+  }
+}

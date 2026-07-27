@@ -1,0 +1,59 @@
+{
+  "runtime": {
+    "title": "Runtime & Versions",
+    "description": "The pipeline version and mode behind the most recent execution.",
+    "emptyTitle": "No execution report yet",
+    "pipelineVersion": "Pipeline Version",
+    "executionMode": "Execution Mode",
+    "overallStatus": "Overall Status",
+    "runDates": "Run Dates",
+    "started": "Started",
+    "completed": "Completed",
+    "duration": "Duration"
+  },
+  "configuration": {
+    "title": "Configuration",
+    "subtitle": "Where this run's artifacts were written, and which stages were skipped",
+    "emptyTitle": "No configuration data yet",
+    "dashboardDirectory": "Dashboard directory:",
+    "skippedStages": "Skipped stages:",
+    "noSkippedStages": "No stages were skipped in the most recent run."
+  },
+  "replay": {
+    "title": "Replay",
+    "currentMode": "Current mode: {{mode}}",
+    "notYetRun": "Not yet run",
+    "detail": "Replay mode re-executes the identical pipeline against already-archived RawDocuments from a prior run, proving the pipeline cannot distinguish live data from replayed data. No dedicated replay-history artifact exists separately from Execution History below."
+  },
+  "artifacts": {
+    "title": "Artifacts",
+    "description": "Every dashboard artifact file written by the most recent run, and how many records it holds.",
+    "totalArtifacts": "Total Artifacts",
+    "emptyTitle": "No artifacts recorded yet",
+    "artifact": "Artifact",
+    "records": "Records"
+  },
+  "performance": {
+    "title": "Performance",
+    "description": "Every stage of the most recent execution, slowest first.",
+    "emptyTitle": "No stage timing recorded yet",
+    "stage": "Stage",
+    "status": "Status",
+    "duration": "Duration"
+  },
+  "executionHistory": {
+    "title": "Execution History",
+    "description": "Every research-cycle run, including error and session detail.",
+    "emptyTitle": "No runs recorded yet",
+    "runDate": "Run Date",
+    "status": "Status",
+    "session": "Session",
+    "error": "Error",
+    "completed": "Completed"
+  },
+  "logs": {
+    "title": "Logs",
+    "notYetAvailable": "Not yet available",
+    "detail": "No artifact carries raw log lines yet -- this section will populate once one exists, rather than fabricating a log stream."
+  }
+}

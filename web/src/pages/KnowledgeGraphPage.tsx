@@ -1,9 +1,11 @@
 import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Card } from "../components/primitives/Card";
 import { Section } from "../components/primitives/Section";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
+import { useEnumLabel } from "../hooks/useEnumLabel";
 import { computeForceLayout } from "../lib/forceLayout";
 import { titleCase } from "../lib/format";
 import type { GraphEdge, NodeType } from "../types";
@@ -36,6 +38,8 @@ const HEIGHT = 640;
  * (lib/forceLayout.ts) rather than adding a graph-rendering library for
  * one page. */
 export function KnowledgeGraphPage() {
+  const { t } = useTranslation("knowledgeGraph");
+  const label = useEnumLabel();
   const graph = useArtifact((p) => p.getKnowledgeGraph());
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -93,14 +97,11 @@ export function KnowledgeGraphPage() {
   }
 
   return (
-    <Section
-      title="Knowledge Graph"
-      description="Every relationship AGX has recorded between companies, events, knowledge, genes, and research -- mechanically derived from provenance, not hand-built."
-    >
+    <Section title={t("title")} description={t("description")}>
       {graph.loading && <LoadingState rows={6} />}
       {graph.error && <ErrorState detail={graph.error.message} onRetry={graph.reload} />}
       {!graph.loading && !graph.error && nodes.length === 0 && (
-        <EmptyState title="No graph data yet" detail="The knowledge graph populates as entities are created and their provenance links are projected." />
+        <EmptyState title={t("emptyTitle")} detail={t("emptyDetail")} />
       )}
 
       {!graph.loading && !graph.error && nodes.length > 0 && (
@@ -110,11 +111,11 @@ export function KnowledgeGraphPage() {
               <input
                 className={styles.searchInput}
                 type="text"
-                placeholder="Search nodes by label…"
+                placeholder={t("searchPlaceholder")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
-              <span className={styles.hint}>Scroll to zoom · drag to pan · click a node for detail</span>
+              <span className={styles.hint}>{t("hint")}</span>
             </div>
             <div className={styles.canvasWrap}>
               <svg
@@ -166,35 +167,35 @@ export function KnowledgeGraphPage() {
                 </g>
               </svg>
               <div className={styles.legend}>
-                {legendTypes.map((t) => (
-                  <span key={t} className={styles.legendItem}>
-                    <span className={styles.legendDot} style={{ background: NODE_COLOR[t] }} />
-                    {titleCase(t)}
+                {legendTypes.map((nodeType) => (
+                  <span key={nodeType} className={styles.legendItem}>
+                    <span className={styles.legendDot} style={{ background: NODE_COLOR[nodeType] }} />
+                    {label("nodeType", nodeType)}
                   </span>
                 ))}
               </div>
             </div>
           </div>
 
-          <Card title="Node Detail" dense>
-            {!selected && <EmptyState title="No node selected" detail="Click a node to see its metadata and relationships." />}
+          <Card title={t("nodeDetail.title")} dense>
+            {!selected && <EmptyState title={t("nodeDetail.emptyTitle")} detail={t("nodeDetail.emptyDetail")} />}
             {selected && (
               <div>
                 <div className={styles.detailTitle}>{selected.label}</div>
                 <div className={styles.detailMeta}>
-                  {titleCase(selected.node_type)} · {selected.id}
+                  {label("nodeType", selected.node_type)} · <span className="num">{selected.id}</span>
                 </div>
 
                 {selected.node_type === "company" && (
                   <Link to={`/company/${selected.id}`} style={{ color: "var(--accent-strong)", fontWeight: 600, fontSize: "var(--text-xs)" }}>
-                    Open research workspace →
+                    {t("nodeDetail.openWorkspace")} <span className="icon-forward" aria-hidden="true">→</span>
                   </Link>
                 )}
 
                 {Object.keys(selected.metadata).length > 0 && (
                   <>
                     <div className={styles.blockTitle} style={{ marginTop: "var(--space-4)" }}>
-                      Metadata
+                      {t("nodeDetail.metadata")}
                     </div>
                     <div className={styles.metaTable}>
                       {Object.entries(selected.metadata).map(([k, v]) => (
@@ -207,9 +208,9 @@ export function KnowledgeGraphPage() {
                   </>
                 )}
 
-                <div className={styles.blockTitle}>Relationships ({selectedEdges.length})</div>
+                <div className={styles.blockTitle}>{t("nodeDetail.relationships", { count: selectedEdges.length })}</div>
                 {selectedEdges.length === 0 ? (
-                  <EmptyState title="No connected edges" />
+                  <EmptyState title={t("nodeDetail.noConnectedEdges")} />
                 ) : (
                   <div className={styles.edgeList}>
                     {selectedEdges.map((e) => {
@@ -218,7 +219,10 @@ export function KnowledgeGraphPage() {
                       const otherLabel = nodeById.get(otherId)?.label ?? otherId;
                       return (
                         <div key={e.id} className={styles.edgeRow}>
-                          {outgoing ? "→" : "←"} {titleCase(e.relationship)} {outgoing ? "to" : "from"} <strong>{otherLabel}</strong>
+                          {/* Data-semantic direction (an actual graph-edge property, not a
+                              "proceed forward" UI cue) -- never mirrored under RTL. */}
+                          <span className="num" aria-hidden="true">{outgoing ? "→" : "←"}</span>{" "}
+                          {label("eventRelationshipType", e.relationship)} {outgoing ? t("nodeDetail.edgeTo") : t("nodeDetail.edgeFrom")} <strong>{otherLabel}</strong>
                         </div>
                       );
                     })}

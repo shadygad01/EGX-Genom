@@ -25,38 +25,51 @@ export function formatCompactNumber(value: number | null | undefined): string {
   return Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
 }
 
-export function formatDate(value: string | null | undefined): string {
+// Calendar dates translate (month names, etc.) with the active UI language;
+// digit glyphs and separators stay Western ("latn" numbering system) even in
+// Arabic, matching this dashboard's financial-data convention -- see
+// styles/global.css's `.num` for the same rule applied to numeric figures.
+const DEFAULT_LOCALE = "en-US";
+
+export function formatDate(value: string | null | undefined, locale: string = DEFAULT_LOCALE): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return date.toLocaleDateString(locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    numberingSystem: "latn",
+  });
 }
 
-export function formatDateTime(value: string | null | undefined): string {
+export function formatDateTime(value: string | null | undefined, locale: string = DEFAULT_LOCALE): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    numberingSystem: "latn",
   });
 }
 
-export function formatRelativeToNow(value: string | null | undefined): string {
+export function formatRelativeToNow(value: string | null | undefined, locale: string = DEFAULT_LOCALE): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto", numberingSystem: "latn" } as Intl.RelativeTimeFormatOptions);
   const diffMs = Date.now() - date.getTime();
   const diffMinutes = Math.round(diffMs / 60000);
-  if (Math.abs(diffMinutes) < 1) return "just now";
+  if (Math.abs(diffMinutes) < 1) return rtf.format(0, "second");
   const diffHours = Math.round(diffMinutes / 60);
-  if (Math.abs(diffHours) < 1) return `${Math.abs(diffMinutes)}m ${diffMinutes >= 0 ? "ago" : "from now"}`;
+  if (Math.abs(diffHours) < 1) return rtf.format(-diffMinutes, "minute");
   const diffDays = Math.round(diffHours / 24);
-  if (Math.abs(diffDays) < 1) return `${Math.abs(diffHours)}h ${diffHours >= 0 ? "ago" : "from now"}`;
-  return `${Math.abs(diffDays)}d ${diffDays >= 0 ? "ago" : "from now"}`;
+  if (Math.abs(diffDays) < 1) return rtf.format(-diffHours, "hour");
+  return rtf.format(-diffDays, "day");
 }
 
 export function titleCase(value: string): string {

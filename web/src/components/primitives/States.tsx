@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import styles from "./States.module.css";
 
 export interface EmptyStateProps {
@@ -23,15 +24,16 @@ export interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-export function ErrorState({ title = "Something went wrong", detail, onRetry }: ErrorStateProps) {
+export function ErrorState({ title, detail, onRetry }: ErrorStateProps) {
+  const { t } = useTranslation("common");
   return (
     <div className={styles.state} role="alert">
       <span className={styles.icon} aria-hidden="true">⚠</span>
-      <span className={styles.errorTitle}>{title}</span>
+      <span className={styles.errorTitle}>{title ?? t("states.somethingWrong")}</span>
       {detail && <span className={styles.detail}>{detail}</span>}
       {onRetry && (
         <button type="button" onClick={onRetry} className={styles.retryButton}>
-          Retry
+          {t("states.retry")}
         </button>
       )}
     </div>
@@ -44,9 +46,10 @@ export interface LoadingStateProps {
 }
 
 /** Skeleton block(s), not a spinner -- preserves layout while data loads. */
-export function LoadingState({ label = "Loading", rows = 3 }: LoadingStateProps) {
+export function LoadingState({ label, rows = 3 }: LoadingStateProps) {
+  const { t } = useTranslation("common");
   return (
-    <div className={styles.skeletonWrap} role="status" aria-label={label}>
+    <div className={styles.skeletonWrap} role="status" aria-label={label ?? t("states.loading")}>
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className={styles.skeletonBlock} style={{ height: "1.5rem" }} />
       ))}

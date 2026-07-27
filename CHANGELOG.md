@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.29.0 — Bilingual EN/AR dashboard with full RTL layout
+
+The web dashboard is now bilingual: an EN/AR toggle in the top bar
+(`LanguageToggle`) switches the whole UI, persisted to `localStorage` and
+seeded from `navigator.language` on first visit. Backed by `i18next`/
+`react-i18next` with one JSON namespace per page under
+`web/src/i18n/locales/{en,ar}/`.
+
+Arabic renders full RTL (`dir="rtl"` on `<html>`, driven by
+`i18n/index.ts`'s `applyDocumentDirection`), achieved almost entirely
+through CSS logical properties (`inset-inline-start/end`,
+`padding-inline-start/end`, `border-inline-end`, `text-align: start/end`)
+rather than per-component RTL overrides — only 7 stylesheets needed
+physical-to-logical conversions across the whole `web/src` tree. Numeric
+and ticker data (prices, percentages, IDs, dates) always render LTR via a
+new `.num` utility class (`direction: ltr; unicode-bidi: isolate;`),
+matching real Arabic financial-dashboard convention; a `useFormatters()`
+hook forces `numberingSystem: "latn"` so locale-aware date formatting
+never switches to Eastern Arabic numerals.
+
+Translation scope is deliberately bounded, following this project's own
+"never fabricate" principle: UI chrome and closed backend vocabularies
+(the `Horizon`/`Decision`/`SourceStatus`/... unions in `web/src/types.ts`,
+translated via a new `useEnumLabel()` hook with a safe title-case
+fallback for any value the dictionary doesn't cover) are translated.
+Free-form backend-generated content — explanations, evidence, news
+headlines, notes, company names, macro series ids, financial-statement
+line items — stays English, since translating those would require either
+fabricating financial/legal Arabic terminology or a backend
+LLM-translation feature that doesn't exist.
+
 ## 0.28.0 — `ticker_data_gap_report.json` web/API wiring (TD-34)
 
 Closes the last purely-engineering item on the post-freeze punch list.

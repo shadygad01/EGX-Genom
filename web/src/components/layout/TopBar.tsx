@@ -1,48 +1,53 @@
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Badge } from "../primitives/Badge";
 import { useArtifact } from "../../hooks/useArtifact";
-import { formatRelativeToNow } from "../../lib/format";
+import { useFormatters } from "../../hooks/useFormatters";
+import { LanguageToggle } from "./LanguageToggle";
 import styles from "./TopBar.module.css";
 
-const PAGE_TITLES: Record<string, string> = {
-  "/": "AI Briefing",
-  "/opportunities": "Opportunity Center",
-  "/market": "Market Intelligence",
-  "/research": "Research Center",
-  "/knowledge-graph": "Knowledge Graph",
-  "/mission-control": "Mission Control",
-  "/sources": "Source Intelligence",
-  "/admin": "System Administration",
+const PAGE_TITLE_KEYS: Record<string, string> = {
+  "/": "nav.aiBriefing",
+  "/opportunities": "nav.opportunityCenter",
+  "/market": "nav.marketIntelligence",
+  "/research": "nav.researchCenter",
+  "/knowledge-graph": "nav.knowledgeGraph",
+  "/mission-control": "nav.missionControl",
+  "/sources": "nav.sourceIntelligence",
+  "/admin": "nav.systemAdministration",
 };
-
-function titleForPath(pathname: string): string {
-  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
-  if (pathname.startsWith("/company/")) return "Company Research Workspace";
-  return "AGX Research";
-}
 
 /** Global status strip -- pipeline health, always visible, so a portfolio
  * manager never wonders whether what they're reading is stale. */
 export function TopBar() {
+  const { t } = useTranslation("common");
+  const { formatRelativeToNow } = useFormatters();
   const location = useLocation();
   const { data: status } = useArtifact((p) => p.getSystemStatus());
 
   const hasFailures = (status?.failed ?? 0) > 0;
+  const titleKey = PAGE_TITLE_KEYS[location.pathname];
+  const title = titleKey
+    ? t(titleKey)
+    : location.pathname.startsWith("/company/")
+      ? t("nav.companyWorkspace")
+      : t("app.fallbackTitle");
 
   return (
     <header className={styles.topbar}>
-      <span className={styles.title}>{titleForPath(location.pathname)}</span>
+      <span className={styles.title}>{title}</span>
       <div className={styles.status}>
         {status && (
           <>
             <Badge variant={hasFailures ? "warning" : "positive"} dot>
-              {hasFailures ? "Degraded" : "Nominal"}
+              {hasFailures ? t("topbar.degraded") : t("topbar.nominal")}
             </Badge>
             <span className={styles.timestamp}>
-              Last cycle {formatRelativeToNow(status.pipeline_run_date)}
+              {t("topbar.lastCycle", { time: formatRelativeToNow(status.pipeline_run_date) })}
             </span>
           </>
         )}
+        <LanguageToggle />
       </div>
     </header>
   );

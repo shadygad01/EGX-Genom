@@ -395,6 +395,50 @@ export interface AcquisitionDecision {
   succeeded: boolean;
 }
 
+// --- discovery_report.json / discovery_metrics.json / endpoint_candidates.json
+// (research/data/discovery/, written by the weekly Discovery workflow --
+// see docs/DATA_ACQUISITION.md's "Discovery workflow" section. Absent
+// until the first scheduled/workflow_dispatch run's PR merges -- an
+// honest empty state, not a missing feature, until then.) ---
+
+export interface DiscoveryOutcome {
+  source_id: string;
+  previous_status: string;
+  current_status: string;
+  discovered_endpoints: string[];
+  verification_result: string;
+  reason_for_failure: string | null;
+  evidence: string[];
+  recommendation: string;
+  confidence: number;
+  from_cache: boolean;
+  verified_at: string;
+}
+
+export interface EndpointCandidate {
+  source_id: string;
+  discovered_url: string;
+  access_method_guess: string;
+  legality_verdict: string;
+  robots_allows: boolean | null;
+  stability_score: number;
+  historical_score: number;
+  composite_score: number;
+  selected: boolean;
+}
+
+export interface DiscoveryMetrics {
+  started_at: string;
+  finished_at: string;
+  duration_seconds: number;
+  sources_in_report: number;
+  sources_checked_fresh_this_run: number;
+  sources_served_from_cache: number;
+  sources_verified_reachable: number;
+  by_verification_result: Record<string, number>;
+  average_confidence_verified: number | null;
+}
+
 // --- runtime_status.json (same shape as one RunRecord) ---
 export type RuntimeStatus = RunRecord;
 

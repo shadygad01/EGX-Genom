@@ -11,6 +11,9 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  DiscoveryMetrics,
+  DiscoveryOutcome,
+  EndpointCandidate,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -130,5 +133,17 @@ export class ApiProvider implements DashboardDataProvider {
 
   getDecisionReadiness(): Promise<DecisionReadiness[]> {
     return fetchJson<DecisionReadiness[]>("/decision-readiness");
+  }
+
+  getDiscoveryReport(): Promise<DiscoveryOutcome[]> {
+    return fetchJson<DiscoveryOutcome[]>("/discovery-report");
+  }
+
+  getDiscoveryMetrics(): Promise<DiscoveryMetrics | null> {
+    return fetchJson<DiscoveryMetrics | null>("/discovery-metrics");
+  }
+
+  getEndpointCandidates(): Promise<EndpointCandidate[]> {
+    return fetchJson<EndpointCandidate[]>("/endpoint-candidates");
   }
 }

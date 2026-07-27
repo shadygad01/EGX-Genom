@@ -13,6 +13,9 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  DiscoveryMetrics,
+  DiscoveryOutcome,
+  EndpointCandidate,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -64,4 +67,7 @@ export interface DashboardDataProvider {
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;
+  getDiscoveryReport(): Promise<DiscoveryOutcome[]>;
+  getDiscoveryMetrics(): Promise<DiscoveryMetrics | null>;
+  getEndpointCandidates(): Promise<EndpointCandidate[]>;
 }

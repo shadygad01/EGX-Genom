@@ -6,8 +6,18 @@ import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
 import { formatDate, formatDateTime, formatNumber, formatPercent, titleCase } from "../lib/format";
-import type { CollectorStatusRow, GeneStatus, HealthStatus, RunStatus, StageStatus } from "../types";
+import type { CollectorStatusRow, DiscoveryOutcome, GeneStatus, HealthStatus, RunStatus, StageStatus } from "../types";
 import styles from "./MissionControlPage.module.css";
+
+const DISCOVERY_RESULT_VARIANT: Record<string, BadgeVariant> = {
+  verified_reachable: "positive",
+  not_targeted: "neutral",
+  no_reachable_domain: "negative",
+  homepage_unreachable: "negative",
+  no_candidates_discovered: "warning",
+  legality_blocked: "warning",
+  not_verified: "neutral",
+};
 
 const STAGE_VARIANT: Record<StageStatus, BadgeVariant> = {
   succeeded: "positive",
@@ -44,12 +54,29 @@ const GENE_VARIANT: Record<GeneStatus, BadgeVariant> = {
   retired: "neutral",
 };
 
+/** `collector_status.json` carries per-record-type counts (price bars,
+ * macro observations, news, corporate events, index constituents,
+ * financial statement line items) that a single summed "Yield" number
+ * otherwise hides -- e.g. a source producing prices but zero news, or
+ * vice versa. Only non-zero categories are shown, so a single-purpose
+ * source's row stays short. */
+function describeYieldBreakdown(row: CollectorStatusRow): string {
+  const parts: string[] = [
+    row.price_bars_written && `${formatNumber(row.price_bars_written)} price`,
+    row.macro_observations_written && `${formatNumber(row.macro_observations_written)} macro`,
+    row.news_items_written && `${formatNumber(row.news_items_written)} news`,
+    row.corporate_events_written && `${formatNumber(row.corporate_events_written)} corp. actions`,
+    row.index_constituents_written && `${formatNumber(row.index_constituents_written)} index`,
+    row.financial_statement_line_items_written && `${formatNumber(row.financial_statement_line_items_written)} financials`,
+  ].filter((part): part is string => Boolean(part));
+  return parts.length ? parts.join(" · ") : "—";
+}
+
 /** Everything an operator needs to know about the platform itself:
  * current mission status, pipeline health stage-by-stage, collector
- * output, knowledge/genome status, source health, execution history, and
- * current blockers -- all composed from existing artifacts. Discovery
- * Engine detail is an honest gap: acquisition_intelligence has no
- * dashboard export yet. */
+ * output, knowledge/genome status, source health, execution history,
+ * current blockers, and the weekly Discovery workflow's own verification
+ * report -- all composed from existing artifacts. */
 export function MissionControlPage() {
   const missionStatus = useArtifact((p) => p.getMissionStatus());
   const executionReport = useArtifact((p) => p.getExecutionReport());
@@ -59,6 +86,8 @@ export function MissionControlPage() {
   const sourceRegistry = useArtifact((p) => p.getSourceRegistry());
   const runtimeMetrics = useArtifact((p) => p.getRuntimeMetrics());
   const acquisitionDecisions = useArtifact((p) => p.getAcquisitionDecisions());
+  const discoveryReport = useArtifact((p) => p.getDiscoveryReport());
+  const discoveryMetrics = useArtifact((p) => p.getDiscoveryMetrics());
 
   const geneCounts = {
     promoted: (genes.data ?? []).filter((g) => g.status === "promoted").length,
@@ -195,8 +224,16 @@ export function MissionControlPage() {
                   : <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? "Yes" : "No"}</Badge>,
               },
               { key: "yield", header: "Yield", align: "right", render: (c) => formatNumber(c.yield) },
+              { key: "breakdown", header: "Breakdown", render: (c) => describeYieldBreakdown(c) },
               { key: "events", header: "Events", align: "right", render: (c) => formatNumber(c.events_produced) },
               { key: "docs", header: "Documents", align: "right", render: (c) => formatNumber(c.documents_fetched) },
+              {
+                key: "withheld",
+                header: "Withheld",
+                align: "right",
+                render: (c) => (c.batches_withheld > 0 ? <Badge variant="warning">{formatNumber(c.batches_withheld)}</Badge> : "0"),
+              },
+              { key: "reputation", header: "Reputation", align: "right", render: (c) => (c.reputation_score != null ? formatPercent(c.reputation_score) : "—") },
               { key: "quality", header: "Quality", align: "right", render: (c) => (c.data_quality_score != null ? formatPercent(c.data_quality_score) : "—") },
               { key: "reason", header: "Reason", render: (c) => c.reason ?? "—" },
             ]}
@@ -294,6 +331,51 @@ export function MissionControlPage() {
                 render: (d) =>
                   d.attempts[0] ? `${d.attempts[0].source_id} (${titleCase(d.attempts[0].outcome)})` : "—",
               },
+            ]}
+          />
+        )}
+      </Section>
+
+      <Section
+        title="Weekly Discovery"
+        description="The Acquisition Intelligence Engine's own scheduled, evidenced attempt to verify a real endpoint for every catalogued PLANNED/CANDIDATE source (see .github/workflows/discovery.yml) -- never an automatic promotion, always a human-reviewed pull request."
+      >
+        {discoveryMetrics.data && (
+          <div className={styles.grid}>
+            <StatTile label="Sources In Report" value={discoveryMetrics.data.sources_in_report} />
+            <StatTile label="Verified Reachable" value={discoveryMetrics.data.sources_verified_reachable} />
+            <StatTile label="Checked Fresh" value={discoveryMetrics.data.sources_checked_fresh_this_run} />
+            <StatTile label="Served From Cache" value={discoveryMetrics.data.sources_served_from_cache} />
+            <StatTile label="Last Run" value={formatDateTime(discoveryMetrics.data.finished_at)} />
+          </div>
+        )}
+        {discoveryReport.loading && <LoadingState rows={3} />}
+        {discoveryReport.error && <ErrorState detail={discoveryReport.error.message} onRetry={discoveryReport.reload} />}
+        {!discoveryReport.loading && !discoveryReport.error && (
+          <DataTable
+            rows={discoveryReport.data ?? []}
+            getRowKey={(r) => r.source_id}
+            emptyTitle="No discovery report yet"
+            emptyDetail="Published once the weekly workflow's pull request merges -- see docs/DATA_ACQUISITION.md's Discovery workflow section."
+            columns={[
+              { key: "source", header: "Source", render: (r: DiscoveryOutcome) => r.source_id },
+              {
+                key: "result",
+                header: "Result",
+                render: (r) => (
+                  <Badge variant={DISCOVERY_RESULT_VARIANT[r.verification_result] ?? "neutral"}>
+                    {titleCase(r.verification_result)}
+                  </Badge>
+                ),
+              },
+              { key: "endpoint", header: "Endpoint", render: (r) => r.discovered_endpoints[0] ?? "—" },
+              { key: "confidence", header: "Confidence", align: "right", render: (r) => formatPercent(r.confidence) },
+              {
+                key: "cache",
+                header: "Cache",
+                render: (r) => (r.from_cache ? <Badge variant="accent">Cached</Badge> : <Badge variant="neutral">Fresh</Badge>),
+              },
+              { key: "recommendation", header: "Recommendation", render: (r) => r.recommendation },
             ]}
           />
         )}

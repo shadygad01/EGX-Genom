@@ -28,6 +28,9 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getSourceMetrics: async () => [],
     getAcquisitionDecisions: async () => [],
     getDecisionReadiness: async () => [],
+    getDiscoveryReport: async () => [],
+    getDiscoveryMetrics: async () => null,
+    getEndpointCandidates: async () => [],
     ...overrides,
   };
 }

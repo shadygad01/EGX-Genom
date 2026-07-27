@@ -16,9 +16,17 @@ on:
         description: "The deploy-pages.yml run id whose github-pages artifact to inspect"
         required: true
       files:
-        description: "Space-separated data/*.json filenames (no path) to print"
+        description: "Space-separated data/*.json filenames (no path) to print in full"
         required: false
-        default: "investment_cases.json decision_readiness.json"
+        default: ""
+      jq_filter:
+        description: >-
+          Optional jq filter applied to each file in `files` instead of
+          printing it in full -- e.g. '.dataset_snapshot.macro_series_ids,
+          (.dataset_snapshot.macro_series | keys)' to inspect one field of
+          a huge file without dumping the whole thing to the log.
+        required: false
+        default: ""
 
 permissions:
   actions: read
@@ -42,6 +50,19 @@ jobs:
             echo "===== data/$f ====="
             if [ -f "extracted/data/$f" ]; then
               cat "extracted/data/$f"
+            else
+              echo "(not found)"
+            fi
+            echo
+          done
+
+      - name: Apply jq filter to requested files
+        if: ${{ github.event.inputs.jq_filter != '' }}
+        run: |
+          for f in ${{ github.event.inputs.files }}; do
+            echo "===== jq '${{ github.event.inputs.jq_filter }}' data/$f ====="
+            if [ -f "extracted/data/$f" ]; then
+              jq '${{ github.event.inputs.jq_filter }}' "extracted/data/$f"
             else
               echo "(not found)"
             fi

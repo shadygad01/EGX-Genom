@@ -1,5 +1,74 @@
 # Current Mission
 
+## Current mission: weekly Discovery workflow — verify PLANNED sources continuously
+
+The project owner pushed back on "37 sources stay PLANNED pending network
+egress" as an unfinished-sounding answer: this dev sandbox has no egress,
+but the GitHub Actions production deployment does, and nothing was
+actually scheduled to use it for discovery. Asked, in effect, "what are
+you waiting for — finish it."
+
+Presented the concrete design choice (a new, separate scheduled workflow
+vs. adding the step back into the fast production deploy vs. just
+documenting the plan) via `AskUserQuestion`; the project owner chose a
+dedicated, weekly, separate workflow with durable (git-committed)
+evidence, gave a full detailed specification (scope: only `PLANNED`/
+`CANDIDATE` sources; real verification with evidence per conclusion;
+three named JSON artifacts; incremental — don't re-test what's still
+fresh; promote through the existing qualification pipeline; PR only,
+never a direct commit to `main`).
+
+**Closed**:
+- `acquisition_intelligence/discovery_report.py` (new): `plan_discovery_targets`
+  scopes the catalog to in-scope sources honestly (excludes per-constituent
+  markers and provider legs already wired via `integrated_via`, and reports
+  a `PLANNED` source with no `TargetOrganization` as `not_targeted` rather
+  than fabricating one); `run_discovery_report` runs the *existing*,
+  unmodified `AcquisitionIntelligenceEngine.run_for_target` (which already
+  calls the qualification pipeline internally — no new promotion mechanism
+  needed) with a TTL + input-fingerprint incremental cache
+  (`DiscoveryHistoryRepository`); `build_discovery_metrics` aggregates
+  counts. 9 new tests (`test_discovery_report.py`), all fake-backed (no
+  network), including cache-hit, TTL-expiry, and fingerprint-drift cases.
+- New CLI subcommand `discover-planned-report` (`--out`, `--history`,
+  `--ttl-days`, `--force`) wiring the above into three JSON artifacts.
+- New `.github/workflows/discovery.yml`: its own trigger (weekly cron +
+  `workflow_dispatch`), never touches or blocks `deploy-pages.yml`. Commits
+  evidence only to a dedicated `discovery/latest` branch and opens/updates
+  one standing PR against `main` — never a direct commit, never an
+  automatic `SourceSpec.status` flip (that stays a reviewed, manual step
+  per `AD-16`/`AD-24`, same as every prior source promotion in this
+  codebase). Restores the prior run's history from `discovery/latest`
+  before running, so re-verification genuinely only happens on TTL expiry,
+  input drift, or an explicit `--force`.
+- `research/data/discovery/README.md` documents the three artifacts;
+  `research/scripts/build_discovery_pr_summary.py` renders the PR body
+  from the committed JSON (never a second source of truth).
+- Smoke-tested the CLI subcommand directly in this sandbox: an honest
+  first run reports `no_reachable_domain` for all 14 in-scope, targeted
+  sources (no egress here, exactly as documented) and `not_targeted` for
+  the 20 catalogued sources without a `TargetOrganization` yet (~82s); a
+  second run within the TTL served every result from cache with zero new
+  probes (~0.002s) — the incremental behavior verified working, not just
+  unit-tested.
+- Updated `docs/DATA_ACQUISITION.md` (new "Discovery workflow" section),
+  `docs/ROADMAP.md` (closed the "run discover-sources" item), and
+  `docs/TECHNICAL_DEBT.md` (TD-23 partially closed — the scheduling half
+  is done; wiring `AcquisitionContinuityMonitor`'s DOWN-recovery into the
+  same schedule is still open, out of this mission's explicit PLANNED-only
+  scope).
+- 568 backend tests pass; `ruff check` clean.
+
+**Named, not done** (deliberately out of this mission's scope): adding
+`TargetOrganization` entries for the 20 untargeted `PLANNED` sources (a
+real per-organization research decision, not this mission's ask); wiring
+`AcquisitionContinuityMonitor` into the same schedule (TD-23's remaining
+half); this session cannot verify the live GitHub Actions run itself (no
+egress here) — the first real scheduled run, or a manual
+`workflow_dispatch`, is the first live proof.
+
+---
+
 ## Current mission: no-API-key-sources decision — remove `NEEDS_KEY` entirely
 
 Immediate follow-up to the mission below: the project owner made an

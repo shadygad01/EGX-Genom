@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.20.0 — Weekly Discovery workflow
+
+Closes "dozens of sources stay PLANNED, waiting on network egress" for
+real: this dev sandbox has none, but the GitHub Actions production
+deployment does, and nothing was scheduled to use it for discovery until
+now.
+
+- New `acquisition_intelligence/discovery_report.py`: `plan_discovery_targets`
+  scopes the catalog to `PLANNED`/`CANDIDATE` sources with a real
+  `TargetOrganization`, excluding per-constituent markers and provider
+  legs already wired via `integrated_via`; `run_discovery_report` runs the
+  existing `AcquisitionIntelligenceEngine.run_for_target` (unmodified —
+  its own qualification-pipeline promotion already applies) with a
+  TTL + input-fingerprint incremental cache; `build_discovery_metrics`
+  aggregates counts. 9 new tests, all fake-backed.
+- New CLI subcommand `discover-planned-report` writing
+  `discovery_report.json`/`discovery_metrics.json`/`endpoint_candidates.json`.
+- New `.github/workflows/discovery.yml`: weekly cron + `workflow_dispatch`,
+  entirely separate from `deploy-pages.yml` (never blocks or slows the
+  production deploy). Commits evidence only to a dedicated `discovery/latest`
+  branch and opens/updates one PR against `main` — never a direct commit,
+  never an automatic `SourceSpec.status` flip.
+- New `research/data/discovery/README.md`; new
+  `research/scripts/build_discovery_pr_summary.py` (PR body from the
+  committed JSON, no second source of truth).
+- Smoke-tested directly: a cold run against the real (egress-less) sandbox
+  honestly reports `no_reachable_domain`/`not_targeted` for all 34
+  in-scope sources (~82s); a second run within the TTL served every
+  result from cache with zero new probes (~0.002s).
+- Updated `docs/DATA_ACQUISITION.md` ("Discovery workflow" section),
+  `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md` (TD-23 partially closed).
+- 568 backend tests pass; `ruff check` clean.
+
 ## 0.19.0 — No-API-key-sources policy: remove NEEDS_KEY entirely
 
 The project owner made an explicit, permanent policy call: the platform

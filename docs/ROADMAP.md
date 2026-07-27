@@ -58,17 +58,18 @@ they're config/verification work against the now-complete platform
 (registry, discovery, qualification, reputation, health, archive,
 provenance, replay, acquisition intelligence — see `docs/DATA_ACQUISITION.md`):
 
-- **Run `agx discover-sources` wherever this deploys with outbound network
-  egress.** The Acquisition Intelligence Engine is complete and tested
-  (`acquisition_intelligence/`); in this development sandbox it correctly
-  reports "no reachable domain" for all 12 named PLANNED official/company/
-  regional-news targets because the sandbox itself has no egress to
-  arbitrary hosts (confirmed directly, not assumed). This single step —
-  not manual endpoint research — is what completes the remaining item from
-  the program's named 16-collector build order that isn't already either
-  done (World Bank) or blocked on a business decision (Yahoo/TradingView
-  ToS review); see `docs/DATA_ACQUISITION.md`'s "What's still blocked"
-  section for the full breakdown.
+- ~~Run `agx discover-sources` wherever this deploys with outbound network
+  egress~~ **Closed**: `.github/workflows/discovery.yml` now runs
+  `agx discover-planned-report` weekly (plus manual `workflow_dispatch`)
+  against every `PLANNED`/`CANDIDATE` source with a `TargetOrganization`,
+  entirely on its own schedule and branch — it never blocks or slows
+  `deploy-pages.yml`'s production deploy. Results (evidence, per-source
+  recommendation, an incremental cache so an unchanged source isn't
+  re-probed weekly) land only via a reviewed pull request against `main`
+  from a dedicated `discovery/latest` branch — never a direct commit. See
+  `docs/DATA_ACQUISITION.md`'s "Discovery workflow" section for the full
+  design, and `docs/DATA_ACQUISITION.md`'s "What's still blocked" section
+  for the per-source build-order breakdown this feeds.
 - Every `SourceSpec` the engine auto-generates still needs an engineer to
   write and test the concrete collector before flipping `PLANNED` to
   `IMPLEMENTED` (by design — see `AD-16`/`AD-24`); the generic

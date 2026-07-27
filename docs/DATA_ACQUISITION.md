@@ -31,6 +31,8 @@ acquisition_intelligence/
                            whose candidates are already catalogued, with automatic
                            fallback (CapabilityDecisionEngine)
               continuity.py -- AcquisitionContinuityMonitor (re-discover on DOWN)
+              discovery_report.py -- weekly scheduled verification report +
+                           incremental cache (see "Discovery workflow" below)
               live.py -- real HttpFetcher/Wayback-backed adapters (deployment only)
 sources/      SourceSpec (full charter field set) + SourceRegistry + seed catalog
               qualification.py  -- Candidate/Quarantine/Evaluation/Trusted/Core
@@ -432,6 +434,59 @@ AlphaVantage, TradingView News) breaks down as:
   already exist and are tested — turning a discovered method into a
   collectable source is then the "small adapter" the platform promises,
   not new engineering.
+
+## Discovery workflow (continuous, scheduled, evidenced)
+
+The moment this platform runs somewhere with real network egress
+(GitHub Actions), the paragraph above's "not a human's job" claim needed
+to actually run somewhere on a schedule, not stay a manually-invoked CLI
+command. `.github/workflows/discovery.yml` is that schedule — a
+completely separate workflow from `deploy-pages.yml`'s production
+pipeline (own trigger, own branch, never blocks or slows the production
+deploy) that runs weekly (and on manual `workflow_dispatch`):
+
+1. **Scope**: only catalogued `PLANNED`/`CANDIDATE` sources that have a
+   matching `TargetOrganization` and are not a per-constituent marker or a
+   provider leg already wired inside a composite collector (`integrated_via`
+   — its real endpoint already exists in code; discovery would be
+   redundant). `acquisition_intelligence.discovery_report.plan_discovery_targets`
+   makes this split explicit and honest: a `PLANNED` source with no
+   `TargetOrganization` yet is reported (`not_targeted`), never given a
+   fabricated domain to try.
+2. **Verification**: reuses the exact same `AcquisitionIntelligenceEngine.
+   run_for_target` this document already describes above — real domain
+   resolution, real robots.txt/legality checks, real stability/historical
+   scoring, real qualification-pipeline promotion on a successful run
+   (`CANDIDATE` → `QUARANTINE`). Nothing new is invented here; the workflow
+   just runs the existing engine on a schedule instead of by hand.
+3. **Incremental, not repetitive**: `agx discover-planned-report` (the
+   `discover-planned-report` CLI subcommand,
+   `acquisition_intelligence.discovery_report.run_discovery_report`) caches
+   each source's last real result (`discovery_history.json`) with a 30-day
+   TTL. A source is only re-probed when the cache expired, its target's own
+   inputs changed (a new domain hint, for instance — fingerprinted), or a
+   run explicitly forces it (`--force id1,id2`, wired to `workflow_dispatch`'s
+   `force` input). A cached row still appears in the report every run
+   (`from_cache: true`), so the report is always a complete picture.
+4. **Evidenced, structured output**: three JSON artifacts per run —
+   `discovery_report.json` (one row per in-scope source: previous/current
+   status, discovered endpoints, verification result, failure reason,
+   evidence, a recommendation, and a confidence score), `discovery_metrics.json`
+   (aggregate counts), and `endpoint_candidates.json` (every ranked
+   candidate considered, not just the winner) — all under
+   `research/data/discovery/` (see its own `README.md`).
+5. **Never a direct commit to `main`, never an automatic promotion**: the
+   workflow commits its output only to a dedicated `discovery/latest`
+   branch and opens/updates one standing pull request against `main` — a
+   human always reviews before this evidence lands on `main`. Flipping a
+   `SourceSpec.status` to `IMPLEMENTED` is never done by this workflow: per
+   `AD-16`/`AD-24`, that still requires an engineer to write and test a
+   concrete collector against the verified endpoint's real response shape
+   (except for `RSS_FEED`, where `RssNewsCollector` is already a generic,
+   tested collector — the PR's summary flags exactly this case as "ready
+   for a maintainer to review", the same precedent already used for
+   Enterprise/Al Borsa/Masrawy/FRA/Sky News Arabia, but the flip itself is
+   still a reviewed, separate commit).
 
 ## Legal compliance (enforced, not aspirational)
 

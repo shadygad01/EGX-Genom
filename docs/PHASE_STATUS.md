@@ -12,10 +12,11 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 (cost/coverage/contract) explicitly reserved for the user. See
 `docs/ROADMAP.md`.
 
-Current acquisition registry after the live UN Statistics and CAPMAS API
-connections: **52 sources (12 IMPLEMENTED / 28 PLANNED / 4 NEEDS_KEY /
-8 TOS_REVIEW)**. This current count supersedes older counts embedded in the
-long-form phase evidence below.
+Current acquisition registry, after removing every `NEEDS_KEY` source per
+the project owner's no-API-key-sources decision: **51 sources
+(14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY / 0 TOS_REVIEW)**. This current
+count supersedes older counts embedded in the long-form phase evidence
+below.
 
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
@@ -802,3 +803,46 @@ decision (cloud target + secrets + scheduler), which remains
 business-blocked exactly as `docs/ROADMAP.md`/TD-23 already name. None of
 these are re-opened by this phase — this phase closed only the
 measurement-accuracy defect in sources already integrated.
+
+## Weekly Discovery Workflow (System 02 continuous verification)
+
+The project owner pushed back on the previous phase's "still needs
+network egress" framing as an unfinished-sounding non-answer: this dev
+sandbox has none, but the GitHub Actions production deployment does, and
+nothing was scheduled to actually use it. Presented the concrete design
+choice via `AskUserQuestion` (separate scheduled workflow vs. adding the
+step into the fast production deploy vs. just documenting the plan); the
+project owner chose a dedicated weekly workflow with durable, PR-reviewed
+evidence and gave a full specification (scope limited to `PLANNED`/
+`CANDIDATE` sources; real evidenced verification; three named JSON
+artifacts; incremental caching; promotion through the existing
+qualification pipeline; PR only, never a direct commit to `main`).
+
+Closed: `.github/workflows/discovery.yml` runs the new
+`discover-planned-report` CLI subcommand
+(`acquisition_intelligence.discovery_report`) weekly (plus manual
+`workflow_dispatch`), reusing the unmodified `AcquisitionIntelligenceEngine.
+run_for_target` (its own qualification-pipeline promotion already
+applies — no new promotion mechanism was needed). A TTL + input-
+fingerprint incremental cache (`DiscoveryHistoryRepository`) means an
+unchanged source is not re-probed weekly; evidence lands on a dedicated
+`discovery/latest` branch and one standing PR against `main`, never a
+direct commit, and the workflow never flips a `SourceSpec.status` itself
+— that stays a reviewed, manual engineering step per `AD-16`/`AD-24`,
+exactly the same gate every prior source promotion in this codebase went
+through. 9 new tests (`test_discovery_report.py`), all fake-backed; 568
+backend tests pass; `ruff check` clean. Smoke-tested directly against
+this sandbox's real (egress-less) network: an honest first run reports
+`no_reachable_domain` for the 14 in-scope, targeted sources and
+`not_targeted` for the 20 catalogued sources with no `TargetOrganization`
+yet (~82s); a second run within the TTL served every result from cache
+with zero new probes (~0.002s) — the caching behavior verified working,
+not just asserted by a unit test.
+
+See `docs/DATA_ACQUISITION.md`'s "Discovery workflow" section for the
+full design, `CURRENT_MISSION.md` for the mission narrative, and
+`NEXT_MISSIONS.md` for what's genuinely next (per-organization
+`TargetOrganization` research for the 20 still-untargeted sources; wiring
+`AcquisitionContinuityMonitor`'s DOWN-recovery into the same schedule;
+reviewing the first real scheduled run's PR once GitHub Actions produces
+one, which this session cannot verify directly).

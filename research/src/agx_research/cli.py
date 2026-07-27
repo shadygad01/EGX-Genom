@@ -11,10 +11,15 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 from agx_research.acquisition_intelligence.continuity import AcquisitionContinuityMonitor
+from agx_research.acquisition_intelligence.discovery_report import (
+    DiscoveryHistoryRepository,
+    build_discovery_metrics,
+    run_discovery_report,
+)
 from agx_research.acquisition_intelligence.engine import AcquisitionIntelligenceEngine
 from agx_research.acquisition_intelligence.live import (
     build_live_fetch_text,
@@ -159,6 +164,34 @@ def main(argv: list[str] | None = None) -> int:
         "--recover-only",
         action="store_true",
         help="Skip fresh targets; only re-run continuity recovery for sources currently DOWN",
+    )
+
+    discover_report_parser = sub.add_parser(
+        "discover-planned-report",
+        help="Weekly Discovery workflow: run the Acquisition Intelligence Engine against every "
+        "PLANNED/CANDIDATE source with a catalogued TargetOrganization, write an evidenced "
+        "discovery_report.json/discovery_metrics.json/endpoint_candidates.json, and cache results "
+        "so an unchanged source is not re-probed every run. Never flips a source to IMPLEMENTED "
+        "itself -- see docs/DATA_ACQUISITION.md's Discovery workflow section.",
+    )
+    discover_report_parser.add_argument(
+        "--out", type=Path, required=True, help="Directory to write the three report JSON files"
+    )
+    discover_report_parser.add_argument(
+        "--history",
+        type=Path,
+        required=True,
+        help="Path to the persisted, git-tracked discovery-history JSON file (incremental cache)",
+    )
+    discover_report_parser.add_argument(
+        "--ttl-days",
+        type=float,
+        default=30.0,
+        help="How long a verified/failed result stays cached before being re-probed (default 30)",
+    )
+    discover_report_parser.add_argument(
+        "--force",
+        help="Comma-separated source ids to re-probe even if their cache entry is still fresh",
     )
 
     export_dashboard_parser = sub.add_parser(
@@ -331,6 +364,40 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{result.target_id}: {outcome} -- {result.reason}")
         if not results:
             print("No targets selected (check --target and --recover-only).")
+        return 0
+
+    if args.command == "discover-planned-report":
+        args.data_dir.mkdir(parents=True, exist_ok=True)
+        args.out.mkdir(parents=True, exist_ok=True)
+        registry = seed_registry(SourceRegistry(args.data_dir / "source_registry.json"))
+        fetcher = HttpFetcher()
+        engine = AcquisitionIntelligenceEngine(
+            prober=build_live_prober(fetcher),
+            fetch_text=build_live_fetch_text(fetcher),
+            robots_checker=build_live_robots_checker(fetcher),
+            registry=registry,
+            wayback=build_live_wayback_client(),
+        )
+        history = DiscoveryHistoryRepository(args.history)
+        force_ids = {s.strip() for s in args.force.split(",") if s.strip()} if args.force else set()
+        started_at = datetime.now()
+        outcomes, candidates = run_discovery_report(
+            engine, registry, seed_target_organizations(), history,
+            force_ids=force_ids, ttl_days=args.ttl_days, now=started_at,
+        )
+        finished_at = datetime.now()
+        metrics = build_discovery_metrics(outcomes, started_at=started_at, finished_at=finished_at)
+
+        (args.out / "discovery_report.json").write_text(
+            json.dumps([o.model_dump(mode="json") for o in outcomes], indent=2, sort_keys=True) + "\n"
+        )
+        (args.out / "discovery_metrics.json").write_text(
+            json.dumps(metrics, indent=2, sort_keys=True) + "\n"
+        )
+        (args.out / "endpoint_candidates.json").write_text(
+            json.dumps([c.model_dump(mode="json") for c in candidates], indent=2, sort_keys=True) + "\n"
+        )
+        print(json.dumps(metrics, indent=2))
         return 0
 
     if args.command == "export-dashboard":

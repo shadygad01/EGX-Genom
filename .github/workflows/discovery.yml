@@ -1,0 +1,105 @@
+name: Weekly source discovery
+
+# Deliberately its own workflow, on its own trigger, touching its own
+# branch -- it must never slow down or block deploy-pages.yml (which keeps
+# running the production pipeline against already-IMPLEMENTED sources on
+# every push to main, unaffected by anything here). See
+# docs/DATA_ACQUISITION.md's "Discovery workflow" section for the full
+# design and docs/ROADMAP.md's "no-API-key-sources" note for what this
+# does and does not do (it verifies real endpoints; it never flips a
+# source's status or edits sources/catalog.py by itself).
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # every Monday 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Comma-separated source ids to re-verify even if their cache entry is still fresh"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Install research package
+        working-directory: research
+        run: uv sync
+
+      # Discovery is only cheap on repeat runs if it can see what it
+      # already verified last time. History/report state lives on a
+      # dedicated bot branch, never on main -- so this restores from
+      # discovery/latest if that branch already exists, and starts cold
+      # (an honest first run) if it doesn't.
+      - name: Restore prior discovery history from discovery/latest
+        run: |
+          mkdir -p research/data/discovery
+          if git ls-remote --exit-code --heads origin discovery/latest > /dev/null 2>&1; then
+            git fetch origin discovery/latest
+            git show origin/discovery/latest:research/data/discovery/discovery_history.json \
+              > research/data/discovery/discovery_history.json 2> /dev/null || true
+          fi
+
+      - name: Run weekly source discovery
+        working-directory: research
+        run: |
+          FORCE_ARGS=()
+          if [ -n "${{ github.event.inputs.force }}" ]; then
+            FORCE_ARGS=(--force "${{ github.event.inputs.force }}")
+          fi
+          uv run python -m agx_research.cli \
+            --data-dir /tmp/agx_discovery_data \
+            discover-planned-report \
+            --out /tmp/discovery-out \
+            --history data/discovery/discovery_history.json \
+            --ttl-days 30 \
+            "${FORCE_ARGS[@]}"
+
+      - name: Copy report artifacts into the tracked discovery data directory
+        run: |
+          cp /tmp/discovery-out/discovery_report.json research/data/discovery/discovery_report.json
+          cp /tmp/discovery-out/discovery_metrics.json research/data/discovery/discovery_metrics.json
+          cp /tmp/discovery-out/endpoint_candidates.json research/data/discovery/endpoint_candidates.json
+
+      - name: Build the PR summary
+        run: |
+          uv run --project research python research/scripts/build_discovery_pr_summary.py \
+            research/data/discovery /tmp/discovery-out/pr_body.md
+
+      - name: Commit evidence to discovery/latest (never main)
+        id: commit
+        run: |
+          git config user.name "agx-discovery-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -B discovery/latest
+          git add research/data/discovery/
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Weekly source discovery: $(date -u +%F)"
+            git push --force origin discovery/latest
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update the weekly discovery report PR
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create --base main --head discovery/latest \
+            --title "Weekly source discovery report" \
+            --body-file /tmp/discovery-out/pr_body.md \
+            || gh pr edit discovery/latest --body-file /tmp/discovery-out/pr_body.md

@@ -100,8 +100,9 @@ research/        Python package `agx_research` — the research engine
                   CollectionBatch as a pure function), HttpFetcher
                   (robots.txt + rate limit + retry; fetch_text/fetch_bytes),
                   per-source collectors (Stooq, FRED, World Bank, generic
-                  RSS/Atom; AlphaVantage/FMP code-complete but NEEDS_KEY) +
-                  generic collector-type frameworks (PdfDocumentCollector,
+                  RSS/Atom; no NEEDS_KEY sources by policy, see
+                  `docs/DATA_ACQUISITION.md`) + generic collector-type
+                  frameworks (PdfDocumentCollector,
                   ExcelSeriesCollector, FilesystemCollector,
                   BrowserAutomationCollector honest stub,
                   ArchiveReplayCollector), QualityAssessment scoring,

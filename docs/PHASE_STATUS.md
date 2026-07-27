@@ -12,15 +12,16 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 (cost/coverage/contract) explicitly reserved for the user. See
 `docs/ROADMAP.md`.
 
-Current acquisition registry after the live UN Statistics and CAPMAS API
-connections: **52 sources (12 IMPLEMENTED / 28 PLANNED / 4 NEEDS_KEY /
-8 TOS_REVIEW)**. This current count supersedes older counts embedded in the
-long-form phase evidence below.
+Current acquisition registry, after removing every `NEEDS_KEY` source per
+the project owner's no-API-key-sources decision: **51 sources
+(14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY / 0 TOS_REVIEW)**. This current
+count supersedes older counts embedded in the long-form phase evidence
+below.
 
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
 | 01 | Foundation | **DONE** | `domain/`, `storage/`, `config.py`; reused unmodified by every later store; CI green. |
-| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`+`acquisition_intelligence/`, see `docs/DATA_ACQUISITION.md`): a 52-source registry (11 IMPLEMENTED / 29 PLANNED / 4 NEEDS_KEY / 8 TOS_REVIEW) across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap/API-doc scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank, UN Statistics SDG (macro), GDELT, and generic RSS/Atom (news), including live-verified Enterprise, FRA, Al Borsa and Masrawy Economy configurations, plus AlphaVantage/FMP code-complete pending a user API key; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version; a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes. **New this phase: the Acquisition Intelligence Engine** (`acquisition_intelligence/`) — given only an organization's identity (never a manually supplied URL), it resolves a verified-reachable domain, discovers candidate acquisition methods, verifies legality (robots.txt + ToS heuristics, scraping never auto-clears)/stability (URL-shape + probe consistency)/historical availability (Wayback Machine APIs), ranks and selects the best, auto-generates a still-`PLANNED` `SourceSpec`, registers it, and begins qualification; `AcquisitionContinuityMonitor` re-runs discovery automatically for any source whose health goes `DOWN`. Fully tested with fakes (20 tests covering the complete pipeline); wired into `cli.py`'s `discover-sources` subcommand. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; the engine itself performs live, verified discovery wherever the target permits access. **New this phase: priority-ordered catalog processing** (`AcquisitionIntelligenceEngine.run_catalog`, `TargetOrganization.priority`) matching the project owner's explicit business-value order (EGX official → EGX30/EGX70 company Investor Relations → CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → everything else discovered), plus `generate_company_ir_targets()` (one real target per EGX30 constituent, expanding the previously-inert `company_ir` marker entry) and `discover_company_directory_links()` (extracts a company's own homepage link from an already-fetched directory page by real anchor-text matching, letting a resolved exchange/regulator homepage supply real per-company hints instead of guessing ~100 corporate domains). See "Production Execution Phase" below. |
+| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`+`acquisition_intelligence/`, see `docs/DATA_ACQUISITION.md`): a 51-source registry (14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY / 0 TOS_REVIEW — per the project owner's explicit decision, no `NEEDS_KEY` source is catalogued at all; see `docs/DATA_ACQUISITION.md`'s "No API-key sources") across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap/API-doc scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank, UN Statistics SDG (macro), GDELT, and generic RSS/Atom (news), including live-verified Enterprise, FRA, Al Borsa and Masrawy Economy configurations; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version; a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes. **New this phase: the Acquisition Intelligence Engine** (`acquisition_intelligence/`) — given only an organization's identity (never a manually supplied URL), it resolves a verified-reachable domain, discovers candidate acquisition methods, verifies legality (robots.txt + ToS heuristics, scraping never auto-clears)/stability (URL-shape + probe consistency)/historical availability (Wayback Machine APIs), ranks and selects the best, auto-generates a still-`PLANNED` `SourceSpec`, registers it, and begins qualification; `AcquisitionContinuityMonitor` re-runs discovery automatically for any source whose health goes `DOWN`. Fully tested with fakes (20 tests covering the complete pipeline); wired into `cli.py`'s `discover-sources` subcommand. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; the engine itself performs live, verified discovery wherever the target permits access. **New this phase: priority-ordered catalog processing** (`AcquisitionIntelligenceEngine.run_catalog`, `TargetOrganization.priority`) matching the project owner's explicit business-value order (EGX official → EGX30/EGX70 company Investor Relations → CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → everything else discovered), plus `generate_company_ir_targets()` (one real target per EGX30 constituent, expanding the previously-inert `company_ir` marker entry) and `discover_company_directory_links()` (extracts a company's own homepage link from an already-fetched directory page by real anchor-text matching, letting a resolved exchange/regulator homepage supply real per-company hints instead of guessing ~100 corporate domains). See "Production Execution Phase" below. |
 | 03 | Event Platform | **DONE** | Fingerprint identity, taxonomy/ontology, entity resolution, dedup/conflict/lifecycle, `EventPlatform` sole write path, graph projection. Blocked-external: political/technical feeds, NLP entity linking. |
 | 04 | Market Memory | **DONE** | `MarketState` (snapshot+universe+sectors+events+session), `TradingCalendar` (fixed holidays as rules; movable as explicit placeholder table). Blocked-external: authoritative movable-holiday dates. |
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
@@ -750,3 +751,98 @@ exists, since several items turned out already engineering-complete:
    evidenced defensive measures documented in phase 2/3 above — see
    `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section
    and `CURRENT_MISSION.md` for full detail.
+
+## Provider-Leg Health Measurement Accuracy (System 02 accuracy review)
+
+The project owner reviewed the live source dashboards produced by prior
+sessions and flagged, correctly, that the picture was honest but
+incomplete: dozens of catalogued sources are still `PLANNED` pending a
+verified endpoint (real, business/engineering-blocked, see "What's still
+blocked" in `docs/DATA_ACQUISITION.md`), `NEEDS_KEY` sources have no
+credential yet (a business action, not code — see `docs/DATA_ACQUISITION.md`'s
+source catalog policy), no scheduled recurring discovery/collection runs
+yet (System-18 scheduling, TD-23's own named repayment trigger), and —
+the one genuinely closeable engineering gap this phase found — a source
+integrated as a provider leg inside a composite collector
+(`yahoo_finance`/`stockanalysis`/`mubasher` inside
+`EgxCompositePriceCollector`, via `SourceSpec.integrated_via`) could show
+`health_status: unknown` / `data_quality_score: null` in
+`source_registry.json` even while actively serving real traffic through
+the composite, because `CollectionService` only ever recorded metrics/
+health against the parent collector's id, never against the specific
+provider id a document was actually attributable to. A prior session's
+`export_collector_status` fix addressed this for the dashboard's derived
+per-run status table only (by borrowing the parent's `health_status` as
+a stand-in for display) — the registry's own per-provider fields were
+never actually measured, so any consumer reading `source_registry.json`
+directly (not just the dashboard's derived view) still saw a permanently
+unmeasured leg.
+
+Closed: `collectors.service.CollectionService._record_provider_outcome`
+now records `SourceMetrics`/`HealthStatus` against a provider leg's own
+registry id from the same per-document quality assessment already
+computed for that document (each raw document a `provider_for_document`-
+aware collector produces is already attributable to exactly one
+provider) — on both the success and parser-failure paths, mirroring the
+existing collector-level `_record_run_outcome` exactly. `export_collector_status`
+no longer overwrites a provider row's `health_status` with the parent's
+value; it now reads the provider's own, correctly-measured status like
+every other source. New test:
+`test_provider_leg_health_and_reputation_are_measured_directly`
+(`test_collection_service.py`). 567 backend tests pass (1 new); `ruff
+check` clean.
+
+Everything else the owner named stays correctly deferred, not chased:
+converting a `PLANNED` source to `IMPLEMENTED` needs a verified real
+endpoint (this dev sandbox has no arbitrary outbound egress, though the
+GitHub Actions production deployment does — see `CURRENT_MISSION.md`);
+`NEEDS_KEY` sources need the user's own API key, a credential/business
+action this codebase never fabricates or bypasses; and a real periodic
+discovery/collection scheduler needs System 18's managed-scheduling
+decision (cloud target + secrets + scheduler), which remains
+business-blocked exactly as `docs/ROADMAP.md`/TD-23 already name. None of
+these are re-opened by this phase — this phase closed only the
+measurement-accuracy defect in sources already integrated.
+
+## Weekly Discovery Workflow (System 02 continuous verification)
+
+The project owner pushed back on the previous phase's "still needs
+network egress" framing as an unfinished-sounding non-answer: this dev
+sandbox has none, but the GitHub Actions production deployment does, and
+nothing was scheduled to actually use it. Presented the concrete design
+choice via `AskUserQuestion` (separate scheduled workflow vs. adding the
+step into the fast production deploy vs. just documenting the plan); the
+project owner chose a dedicated weekly workflow with durable, PR-reviewed
+evidence and gave a full specification (scope limited to `PLANNED`/
+`CANDIDATE` sources; real evidenced verification; three named JSON
+artifacts; incremental caching; promotion through the existing
+qualification pipeline; PR only, never a direct commit to `main`).
+
+Closed: `.github/workflows/discovery.yml` runs the new
+`discover-planned-report` CLI subcommand
+(`acquisition_intelligence.discovery_report`) weekly (plus manual
+`workflow_dispatch`), reusing the unmodified `AcquisitionIntelligenceEngine.
+run_for_target` (its own qualification-pipeline promotion already
+applies — no new promotion mechanism was needed). A TTL + input-
+fingerprint incremental cache (`DiscoveryHistoryRepository`) means an
+unchanged source is not re-probed weekly; evidence lands on a dedicated
+`discovery/latest` branch and one standing PR against `main`, never a
+direct commit, and the workflow never flips a `SourceSpec.status` itself
+— that stays a reviewed, manual engineering step per `AD-16`/`AD-24`,
+exactly the same gate every prior source promotion in this codebase went
+through. 9 new tests (`test_discovery_report.py`), all fake-backed; 568
+backend tests pass; `ruff check` clean. Smoke-tested directly against
+this sandbox's real (egress-less) network: an honest first run reports
+`no_reachable_domain` for the 14 in-scope, targeted sources and
+`not_targeted` for the 20 catalogued sources with no `TargetOrganization`
+yet (~82s); a second run within the TTL served every result from cache
+with zero new probes (~0.002s) — the caching behavior verified working,
+not just asserted by a unit test.
+
+See `docs/DATA_ACQUISITION.md`'s "Discovery workflow" section for the
+full design, `CURRENT_MISSION.md` for the mission narrative, and
+`NEXT_MISSIONS.md` for what's genuinely next (per-organization
+`TargetOrganization` research for the 20 still-untargeted sources; wiring
+`AcquisitionContinuityMonitor`'s DOWN-recovery into the same schedule;
+reviewing the first real scheduled run's PR once GitHub Actions produces
+one, which this session cannot verify directly).

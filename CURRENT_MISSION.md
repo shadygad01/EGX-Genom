@@ -1,5 +1,148 @@
 # Current Mission
 
+## Current mission: weekly Discovery workflow — verify PLANNED sources continuously
+
+The project owner pushed back on "37 sources stay PLANNED pending network
+egress" as an unfinished-sounding answer: this dev sandbox has no egress,
+but the GitHub Actions production deployment does, and nothing was
+actually scheduled to use it for discovery. Asked, in effect, "what are
+you waiting for — finish it."
+
+Presented the concrete design choice (a new, separate scheduled workflow
+vs. adding the step back into the fast production deploy vs. just
+documenting the plan) via `AskUserQuestion`; the project owner chose a
+dedicated, weekly, separate workflow with durable (git-committed)
+evidence, gave a full detailed specification (scope: only `PLANNED`/
+`CANDIDATE` sources; real verification with evidence per conclusion;
+three named JSON artifacts; incremental — don't re-test what's still
+fresh; promote through the existing qualification pipeline; PR only,
+never a direct commit to `main`).
+
+**Closed**:
+- `acquisition_intelligence/discovery_report.py` (new): `plan_discovery_targets`
+  scopes the catalog to in-scope sources honestly (excludes per-constituent
+  markers and provider legs already wired via `integrated_via`, and reports
+  a `PLANNED` source with no `TargetOrganization` as `not_targeted` rather
+  than fabricating one); `run_discovery_report` runs the *existing*,
+  unmodified `AcquisitionIntelligenceEngine.run_for_target` (which already
+  calls the qualification pipeline internally — no new promotion mechanism
+  needed) with a TTL + input-fingerprint incremental cache
+  (`DiscoveryHistoryRepository`); `build_discovery_metrics` aggregates
+  counts. 9 new tests (`test_discovery_report.py`), all fake-backed (no
+  network), including cache-hit, TTL-expiry, and fingerprint-drift cases.
+- New CLI subcommand `discover-planned-report` (`--out`, `--history`,
+  `--ttl-days`, `--force`) wiring the above into three JSON artifacts.
+- New `.github/workflows/discovery.yml`: its own trigger (weekly cron +
+  `workflow_dispatch`), never touches or blocks `deploy-pages.yml`. Commits
+  evidence only to a dedicated `discovery/latest` branch and opens/updates
+  one standing PR against `main` — never a direct commit, never an
+  automatic `SourceSpec.status` flip (that stays a reviewed, manual step
+  per `AD-16`/`AD-24`, same as every prior source promotion in this
+  codebase). Restores the prior run's history from `discovery/latest`
+  before running, so re-verification genuinely only happens on TTL expiry,
+  input drift, or an explicit `--force`.
+- `research/data/discovery/README.md` documents the three artifacts;
+  `research/scripts/build_discovery_pr_summary.py` renders the PR body
+  from the committed JSON (never a second source of truth).
+- Smoke-tested the CLI subcommand directly in this sandbox: an honest
+  first run reports `no_reachable_domain` for all 14 in-scope, targeted
+  sources (no egress here, exactly as documented) and `not_targeted` for
+  the 20 catalogued sources without a `TargetOrganization` yet (~82s); a
+  second run within the TTL served every result from cache with zero new
+  probes (~0.002s) — the incremental behavior verified working, not just
+  unit-tested.
+- Updated `docs/DATA_ACQUISITION.md` (new "Discovery workflow" section),
+  `docs/ROADMAP.md` (closed the "run discover-sources" item), and
+  `docs/TECHNICAL_DEBT.md` (TD-23 partially closed — the scheduling half
+  is done; wiring `AcquisitionContinuityMonitor`'s DOWN-recovery into the
+  same schedule is still open, out of this mission's explicit PLANNED-only
+  scope).
+- 568 backend tests pass; `ruff check` clean.
+
+**Named, not done** (deliberately out of this mission's scope): adding
+`TargetOrganization` entries for the 20 untargeted `PLANNED` sources (a
+real per-organization research decision, not this mission's ask); wiring
+`AcquisitionContinuityMonitor` into the same schedule (TD-23's remaining
+half); this session cannot verify the live GitHub Actions run itself (no
+egress here) — the first real scheduled run, or a manual
+`workflow_dispatch`, is the first live proof.
+
+---
+
+## Current mission: no-API-key-sources decision — remove `NEEDS_KEY` entirely
+
+Immediate follow-up to the mission below: the project owner made an
+explicit, permanent policy call — the platform is scoped exclusively to
+genuinely free sources, so any source whose only route needs a
+user-registered API key serves no goal ("لا انتظار" — no waiting on a
+key that will never come, and if the only solution for a capability is a
+keyed API, delete it rather than leave it catalogued and idle).
+
+**Closed**: removed all four `NEEDS_KEY` seed catalog entries (`fmp`,
+`alphavantage`, `polygon`, `tiingo`) from `sources/catalog.py`, deleted
+`AlphaVantageCollector`/`FmpCollector` (`collectors/alphavantage.py`,
+`collectors/fmp.py`) and their tests, and dropped their ids from
+`acquisition_intelligence/capability.py`'s `CAPABILITY_STRATEGIES` pools
+for `Capability.PRICE_DATA`/`Capability.FINANCIAL_STATEMENTS`. Updated
+`test_capability_engine.py`'s synthetic fallback tests to use a still-
+catalogued candidate id instead of the removed `fmp` placeholder (the
+tests exercise the ranking/fallback engine generically, not FMP itself).
+Registry is now 51 sources (14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY /
+0 TOS_REVIEW). Updated `docs/DATA_ACQUISITION.md` ("No API-key sources"
+section, replacing the old NEEDS_KEY policy description),
+`docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md`
+(TD-21's repayment trigger no longer suggests a keyed resolver), and
+`docs/ACQUISITION_STRATEGY.md` (an inline "Update" note over the
+now-historical FMP/AlphaVantage analysis, preserving the original
+analysis for accuracy rather than rewriting it). `SourceStatus.NEEDS_KEY`
+stays in the enum as a structural classification — nothing currently
+uses it, and any future source proposal needing a credential should be
+rejected the same way, not silently re-added.
+
+`NEXT_MISSIONS.md`'s "Paid/`NEEDS_KEY` sources" item is now closed
+outright rather than deferred (see its updated entry).
+
+---
+
+## Current mission: provider-leg health measurement accuracy (System 02 accuracy review)
+
+The project owner reviewed the platform's own source dashboards (as
+generated by a prior Codex/Claude session) and reported the picture back
+in detail: it's correct given current data, but reveals that dozens of
+catalogued sources are still `PLANNED` without a verified endpoint, paid
+sources have no key yet, no scheduled recurring discovery/collection
+exists, and — specifically — `Unknown` health on some sources integrated
+via composite integration is misleading because the measurement never
+reaches the sub-source. Asked for the gaps to be closed.
+
+**Outcome**: the first three are already-documented, correctly-named
+business/infrastructure blockers, not code gaps — a `PLANNED` source
+needs a verified real endpoint (this dev sandbox has no arbitrary
+outbound egress, though the GitHub Actions production deployment does),
+`NEEDS_KEY` needs the user's own credential, and periodic scheduling
+needs System 18's managed-scheduling decision (TD-23's own named
+repayment trigger) — re-attempting any of them here would mean guessing
+a URL or fabricating a key, which this codebase's own rules forbid. The
+fourth complaint was real and closeable: `CollectionService` only ever
+recorded `SourceMetrics`/`HealthStatus` against a composite collector's
+own id, never against the specific provider leg (`yahoo_finance`/
+`stockanalysis`/`mubasher` inside `EgxCompositePriceCollector`) a
+document was actually attributable to, so those legs' own
+`health_status`/`data_quality_score` in `source_registry.json` stayed
+`unknown`/`null` forever regardless of how much real traffic they
+served. Closed with `CollectionService._record_provider_outcome`,
+recording each provider leg's own metrics/health from the same
+per-document quality assessment already computed for it; also removed a
+prior session's display-layer workaround (`export_collector_status`
+borrowing the parent composite's `health_status` for a provider row)
+now that the provider's own measured value is correct. See
+`docs/PHASE_STATUS.md`'s "Provider-Leg Health Measurement Accuracy"
+section for full detail. 567 backend tests pass (1 new); `ruff check`
+clean. Not a re-opening of the acquisition-architecture freeze below —
+no new `TargetOrganization`, collector, or source added.
+
+---
+
 ## Current mission: Ticker Data Gap Report (supersedes the acquisition freeze below for this one item)
 
 The project owner supplied a new, detailed completion plan (in Arabic)

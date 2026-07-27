@@ -247,6 +247,70 @@ def test_run_records_source_metrics_and_updates_registry_health_and_reputation(t
     assert updated_spec.data_quality_score is not None
 
 
+class _ProviderTaggedCollector(StubCollector):
+    """A composite collector where every document is attributable to one
+    provider leg, mirroring `EgxCompositePriceCollector.provider_for_document`.
+    """
+
+    def __init__(self, spec, batches, provider_by_url):
+        super().__init__(spec, batches)
+        self._provider_by_url = provider_by_url
+
+    def provider_for_document(self, document: RawDocument) -> str | None:
+        return self._provider_by_url.get(document.original_url)
+
+
+def test_provider_leg_health_and_reputation_are_measured_directly(tmp_path):
+    """Provider legs wired inside a composite collector (`SourceSpec.
+    integrated_via`, e.g. yahoo_finance/stockanalysis/mubasher inside
+    `EgxCompositePriceCollector`) must have their own health/reputation
+    measured from the documents actually attributed to them -- not stay
+    `HealthStatus.UNKNOWN`/`data_quality_score=None` forever regardless of
+    how much real traffic they served, which is misleading in the Source
+    Intelligence dashboard.
+    """
+    from agx_research.sources.registry import SourceRegistry
+    from agx_research.sources.reputation import SourceMetricsRepository
+    from agx_research.sources.spec import HealthStatus
+
+    registry = SourceRegistry()
+    registry.add(make_spec())
+    registry.add(make_spec(id="good_provider", integrated_via="stub_source"))
+    registry.add(make_spec(id="bad_provider", integrated_via="stub_source"))
+    metrics_repo = SourceMetricsRepository()
+    service = CollectionService(
+        tmp_path, registry=registry, metrics=metrics_repo, min_confidence=0.5
+    )
+    collector = _ProviderTaggedCollector(
+        make_spec(),
+        {
+            "https://x/good": good_batch(),
+            "https://x/bad": good_batch(price_bars=[], parse_warnings=["nothing usable"]),
+        },
+        provider_by_url={"https://x/good": "good_provider", "https://x/bad": "bad_provider"},
+    )
+
+    service.run(collector, expected_records=1)
+
+    good_metrics = metrics_repo.latest("good_provider")
+    assert good_metrics is not None
+    assert good_metrics.runs_total == 1
+    good_spec = registry.latest("good_provider")
+    assert good_spec.health_status == HealthStatus.HEALTHY
+    assert good_spec.data_quality_score is not None
+
+    bad_metrics = metrics_repo.latest("bad_provider")
+    assert bad_metrics is not None
+    assert bad_metrics.materialized_total == 0  # zero yield, never materialized
+    bad_spec = registry.latest("bad_provider")
+    assert bad_spec.health_status != HealthStatus.UNKNOWN  # measured, not left unknown
+
+    # The parent composite's own metrics are unaffected in count by the
+    # per-provider bookkeeping -- one run per document, same as before.
+    parent_metrics = metrics_repo.latest("stub_source")
+    assert parent_metrics.runs_total == 2
+
+
 class _FetchRaisingCollector(StubCollector):
     """`fetch()` always raises -- simulates a real connection/timeout
     failure (e.g. FRED's `fredgraph.csv` timing out), never reaching

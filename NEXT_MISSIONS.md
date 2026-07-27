@@ -1,5 +1,67 @@
 # Next Missions
 
+## Closed this phase: weekly Discovery workflow
+
+The "dozens of sources stay PLANNED, waiting on network egress" item from
+the phase below is now closed, not deferred: `.github/workflows/discovery.yml`
+runs `agx discover-planned-report` weekly against every in-scope
+`PLANNED`/`CANDIDATE` source, entirely separate from the production
+deploy, landing evidence via a reviewed PR (never a direct commit, never
+an automatic status flip). See `CURRENT_MISSION.md`'s "weekly Discovery
+workflow" entry and `docs/DATA_ACQUISITION.md`'s "Discovery workflow"
+section.
+
+**Genuinely next, once real scheduled runs accumulate evidence:**
+
+1. **Add `TargetOrganization` entries for the 20 catalogued `PLANNED`
+   sources with none yet** (`mof_egypt`, `egypt_open_data`, `investing_com`,
+   `tradingview`, `imf`, `oecd`, `suez_canal_stats`, `wikipedia_pageviews`,
+   `google_trends`, `github_releases`, `company_social_official`,
+   `public_telegram`, `patents`, `hiring_signals`, `arxiv`, `ssrn`, `nber`,
+   `google_scholar`, `researchgate`, plus `yahoo_finance`/`stockanalysis`
+   which are intentionally excluded as provider legs, not gaps). Each
+   needs a real, publicly-known domain hint researched per organization —
+   a genuine per-source decision, not something to batch-guess.
+2. **Wire `AcquisitionContinuityMonitor.check_and_recover()` into the same
+   weekly schedule** (TD-23's remaining half) so a source that went `DOWN`
+   also gets proactive alternative-method discovery, not just the
+   PLANNED-source verification the current workflow covers.
+3. **Watch the first real scheduled/`workflow_dispatch` run** on GitHub
+   Actions (this session cannot verify it directly — no egress here) and
+   review whatever PR it opens against `main`.
+
+## Closed this phase: provider-leg health measurement accuracy
+
+The project owner's source-dashboard review named one genuinely
+closeable engineering gap (provider legs inside a composite collector
+never had their own health/reputation measured — see `CURRENT_MISSION.md`
+and `docs/PHASE_STATUS.md`'s "Provider-Leg Health Measurement Accuracy"
+section) — closed this phase. The review's other three points remain
+correctly business/infrastructure-blocked, not code gaps, and are named
+here explicitly so the project owner can act on them directly rather than
+have this codebase guess or fabricate around them:
+
+- **Dozens of sources stay `PLANNED`** until a verified real endpoint
+  exists for each (this dev sandbox has no arbitrary outbound egress;
+  the GitHub Actions production deployment does — see
+  `CURRENT_MISSION.md`'s "Superseded six times" note). Converting one to
+  `IMPLEMENTED` is real, source-by-source acquisition work the standing
+  freeze (below) explicitly defers pending a new named business input.
+- **`NEEDS_KEY` sources (FMP, AlphaVantage, Polygon, Tiingo)** — the
+  project owner reviewed this and decided against it explicitly: the
+  platform is scoped to genuinely free, no-registration sources only, so
+  waiting on a key serves no goal. All four catalog entries and the two
+  collector classes (`AlphaVantageCollector`, `FmpCollector`) plus their
+  tests were removed this phase — see `docs/DATA_ACQUISITION.md`'s "No
+  API-key sources" section. This is now closed, not deferred.
+- **No scheduled recurring discovery/collection run** exists yet because
+  it needs System 18's managed-scheduling decision (cloud target +
+  secrets + scheduler) — named in `docs/ROADMAP.md` and TD-23's own
+  repayment trigger ("System-18 scheduling exists → wire a periodic
+  full-catalog `agx discover-sources` pass"). `AcquisitionContinuityMonitor`
+  already re-runs discovery reactively on a `DOWN` health signal; only the
+  *proactive periodic* pass awaits real deployment scheduling.
+
 ## Immediately next: from the project owner's data-sources completion plan
 
 The project owner's latest plan (see `CURRENT_MISSION.md`'s "Ticker Data

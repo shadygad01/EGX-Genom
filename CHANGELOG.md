@@ -1,5 +1,102 @@
 # Changelog
 
+## 0.20.0 — Weekly Discovery workflow
+
+Closes "dozens of sources stay PLANNED, waiting on network egress" for
+real: this dev sandbox has none, but the GitHub Actions production
+deployment does, and nothing was scheduled to use it for discovery until
+now.
+
+- New `acquisition_intelligence/discovery_report.py`: `plan_discovery_targets`
+  scopes the catalog to `PLANNED`/`CANDIDATE` sources with a real
+  `TargetOrganization`, excluding per-constituent markers and provider
+  legs already wired via `integrated_via`; `run_discovery_report` runs the
+  existing `AcquisitionIntelligenceEngine.run_for_target` (unmodified —
+  its own qualification-pipeline promotion already applies) with a
+  TTL + input-fingerprint incremental cache; `build_discovery_metrics`
+  aggregates counts. 9 new tests, all fake-backed.
+- New CLI subcommand `discover-planned-report` writing
+  `discovery_report.json`/`discovery_metrics.json`/`endpoint_candidates.json`.
+- New `.github/workflows/discovery.yml`: weekly cron + `workflow_dispatch`,
+  entirely separate from `deploy-pages.yml` (never blocks or slows the
+  production deploy). Commits evidence only to a dedicated `discovery/latest`
+  branch and opens/updates one PR against `main` — never a direct commit,
+  never an automatic `SourceSpec.status` flip.
+- New `research/data/discovery/README.md`; new
+  `research/scripts/build_discovery_pr_summary.py` (PR body from the
+  committed JSON, no second source of truth).
+- Smoke-tested directly: a cold run against the real (egress-less) sandbox
+  honestly reports `no_reachable_domain`/`not_targeted` for all 34
+  in-scope sources (~82s); a second run within the TTL served every
+  result from cache with zero new probes (~0.002s).
+- Updated `docs/DATA_ACQUISITION.md` ("Discovery workflow" section),
+  `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md` (TD-23 partially closed).
+- 568 backend tests pass; `ruff check` clean.
+
+## 0.19.0 — No-API-key-sources policy: remove NEEDS_KEY entirely
+
+The project owner made an explicit, permanent policy call: the platform
+relies exclusively on genuinely free, no-registration sources, so waiting
+on a `NEEDS_KEY` credential serves no goal — if a capability's only real
+solution is a keyed API, drop it rather than leave it catalogued and idle.
+
+- Removed the four `NEEDS_KEY` seed catalog entries (`fmp`,
+  `alphavantage`, `polygon`, `tiingo`) from `sources/catalog.py`.
+- Deleted `AlphaVantageCollector`/`FmpCollector` and their tests — dead
+  code once their only catalog entries were removed.
+- Dropped their ids from `acquisition_intelligence/capability.py`'s
+  `CAPABILITY_STRATEGIES` pools (`PRICE_DATA`, `FINANCIAL_STATEMENTS`).
+- Updated `test_capability_engine.py`'s synthetic fallback tests to use a
+  still-catalogued id instead of the removed `fmp` placeholder (those
+  tests exercise the generic ranking/fallback engine, not FMP itself).
+- Registry is now 51 sources (14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY /
+  0 TOS_REVIEW). `SourceStatus.NEEDS_KEY` stays in the enum as a
+  structural classification — no seed source uses it, and any future
+  source proposal needing a credential should be rejected the same way.
+- Updated `docs/DATA_ACQUISITION.md`, `docs/ARCHITECTURE.md`,
+  `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md` (TD-21), and
+  `docs/ACQUISITION_STRATEGY.md` (an inline note over the now-historical
+  FMP/AlphaVantage analysis, preserving the original text).
+- 559 backend tests pass; `ruff check` clean.
+
+## 0.18.0 — Provider-leg health/reputation measured directly
+
+The project owner flagged, from a review of the live source dashboards,
+that a source integrated as a provider leg inside a composite collector
+(`yahoo_finance`/`stockanalysis`/`mubasher` inside
+`EgxCompositePriceCollector`, via `SourceSpec.integrated_via`) could show
+`health_status: unknown`/`data_quality_score: null` in `source_registry.json`
+even while actively serving real traffic through the composite — because
+`CollectionService` only ever recorded metrics/health against the parent
+collector's own id, never against the provider id a document was actually
+attributed to (`Collector.provider_for_document`). The previous session's
+`export_collector_status` fix addressed this for the dashboard's derived
+per-run status table only (COLLECTED/STANDBY rows), by borrowing the
+parent composite's `health_status` as a stand-in — the registry's own
+`SourceSpec.health_status`/`reputation_score`/`data_quality_score` for
+each provider leg were untouched and any consumer reading the registry
+directly still saw permanently `unknown`/`null` fields.
+
+- `CollectionService._record_provider_outcome` (new): records
+  `SourceMetrics`/`HealthStatus` against a provider leg's own registry id,
+  using the same per-document quality assessment already computed for
+  that document (each raw document is already attributable to exactly one
+  provider) — called alongside the existing collector-level
+  `_record_run_outcome` for every document a `provider_for_document`-aware
+  collector produces, on both the success and parser-failure paths.
+- `production.artifacts.export_collector_status` no longer overwrites a
+  provider-leg row's `health_status` with the parent composite's value —
+  `_collector_status_row`'s own `registry.latest(provider_id)` lookup
+  already returns the provider's own, now-measured status.
+- New test: `test_provider_leg_health_and_reputation_are_measured_directly`
+  (`test_collection_service.py`) — a good and a bad provider leg wired
+  behind one stub composite collector each get their own, independently
+  correct metrics/health, not a shared or borrowed value.
+- 567 backend tests pass (1 new); `ruff check` clean. No new source,
+  collector, or acquisition-architecture change — this is strictly a
+  measurement-accuracy fix for sources already integrated, so it does not
+  reopen the acquisition-architecture freeze (see `NEXT_MISSIONS.md`).
+
 ## 0.17.0 — Ticker Data Gap Report
 
 - `meta.readiness.build_ticker_data_gap_report` decomposes

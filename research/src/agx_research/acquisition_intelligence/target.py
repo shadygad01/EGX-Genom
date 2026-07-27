@@ -270,6 +270,149 @@ def seed_target_organizations() -> list[TargetOrganization]:
             existing_source_id="asharq_economy",
             priority=PRIORITY_ADDITIONAL_DISCOVERED,
         ),
+        # ---- Coverage-expansion mission: the first real, live `agx
+        # discover-planned-report` run (2026-07-27, see
+        # docs/DATA_ACQUISITION.md's "Discovery workflow" section) reported
+        # 20 catalogued `PLANNED` sources as `not_targeted` -- correctly, since
+        # the engine had nothing to resolve/probe for them. Of those, these 14
+        # have a single, unambiguous, publicly-known organization domain (the
+        # same category of public knowledge already used for every target
+        # above -- Reuters is reuters.com, CBE is cbe.org.eg -- independently
+        # re-verified for reachability by HeuristicDomainResolver before
+        # anything is trusted, never asserted here). The remaining 6
+        # (`github_releases`, `company_social_official`, `public_telegram`,
+        # `patents`, `hiring_signals`, plus `company_ir`'s own per-constituent
+        # marker) stay untargeted on purpose: each names more than one
+        # candidate organization or is inherently per-company/per-channel
+        # (which specific EPO vs. WIPO, which Telegram channel, which
+        # company's own career page), and picking one for the catalog would be
+        # exactly the kind of guess this program's own rules forbid.
+        TargetOrganization(
+            id="imf",
+            name="International Monetary Fund",
+            category=SourceCategory.MACROECONOMIC,
+            country="US",
+            domain_hints=["imf.org", "www.imf.org"],
+            existing_source_id="imf",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="oecd",
+            name="OECD",
+            category=SourceCategory.MACROECONOMIC,
+            country="FR",
+            domain_hints=["oecd.org", "www.oecd.org"],
+            existing_source_id="oecd",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="mof_egypt",
+            name="Ministry of Finance (Egypt)",
+            category=SourceCategory.OFFICIAL,
+            country="EG",
+            domain_hints=["mof.gov.eg", "www.mof.gov.eg"],
+            existing_source_id="mof_egypt",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="egypt_open_data",
+            name="Government Open Data (Egypt)",
+            category=SourceCategory.OFFICIAL,
+            country="EG",
+            domain_hints=["data.gov.eg", "www.data.gov.eg"],
+            existing_source_id="egypt_open_data",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="suez_canal_stats",
+            name="Suez Canal Authority",
+            category=SourceCategory.GLOBAL_MARKETS,
+            country="EG",
+            domain_hints=["suezcanal.gov.eg", "www.suezcanal.gov.eg"],
+            existing_source_id="suez_canal_stats",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="investing_com",
+            name="Investing.com",
+            category=SourceCategory.MARKET_DATA,
+            country="US",
+            domain_hints=["investing.com", "www.investing.com"],
+            existing_source_id="investing_com",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="tradingview",
+            name="TradingView",
+            category=SourceCategory.MARKET_DATA,
+            country="US",
+            domain_hints=["tradingview.com", "www.tradingview.com"],
+            existing_source_id="tradingview",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="google_trends",
+            name="Google Trends",
+            category=SourceCategory.ALTERNATIVE,
+            country="US",
+            domain_hints=["trends.google.com"],
+            existing_source_id="google_trends",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="wikipedia_pageviews",
+            name="Wikimedia Foundation",
+            category=SourceCategory.ALTERNATIVE,
+            country="US",
+            domain_hints=["wikimedia.org", "www.wikimedia.org"],
+            existing_source_id="wikipedia_pageviews",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="arxiv",
+            name="arXiv",
+            category=SourceCategory.RESEARCH,
+            country="US",
+            domain_hints=["arxiv.org", "www.arxiv.org"],
+            existing_source_id="arxiv",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="ssrn",
+            name="SSRN",
+            category=SourceCategory.RESEARCH,
+            country="US",
+            domain_hints=["ssrn.com", "www.ssrn.com"],
+            existing_source_id="ssrn",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="nber",
+            name="National Bureau of Economic Research",
+            category=SourceCategory.RESEARCH,
+            country="US",
+            domain_hints=["nber.org", "www.nber.org"],
+            existing_source_id="nber",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="google_scholar",
+            name="Google Scholar",
+            category=SourceCategory.RESEARCH,
+            country="US",
+            domain_hints=["scholar.google.com"],
+            existing_source_id="google_scholar",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="researchgate",
+            name="ResearchGate",
+            category=SourceCategory.RESEARCH,
+            country="DE",
+            domain_hints=["researchgate.net", "www.researchgate.net"],
+            existing_source_id="researchgate",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
     ]
 
 

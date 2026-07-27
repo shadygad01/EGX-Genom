@@ -1,5 +1,54 @@
 # Current Mission
 
+## Current mission: target the closeable half of "not_targeted", explain the rest honestly
+
+The project owner looked at the live `/sources` page after the first real
+Discovery run and asked, pointedly, why `PLANNED` sources still aren't
+"working", with an explicit "100%" goal.
+
+**The honest answer, grounded in the real run's own evidence** (34 sources
+probed with real network egress, `discovery_metrics.json`): of 34 in-scope
+sources, 1 verified reachable, 5 were legality-blocked (a real candidate
+existed but robots.txt/ToS disallowed it), 7 had no reachable domain, 1 had
+no discoverable candidates, and 20 were `not_targeted` (no
+`TargetOrganization` entry existed at all — the engine had nothing to
+resolve). "100%" is not an available outcome for the legality-blocked
+five — bypassing robots.txt/ToS is a hard rule this codebase (and this
+assistant) will not cross, full stop, regardless of the goal stated. But
+20 of the 34 were a genuinely closeable gap, not a hard blocker.
+
+**Closed**: added `TargetOrganization` entries (`acquisition_intelligence/
+target.py`) for 14 of those 20 — every one with a single, unambiguous,
+publicly-known organization domain (IMF, OECD, Egypt's Ministry of
+Finance, Egypt's Open Data portal, the Suez Canal Authority,
+Investing.com, TradingView, Google Trends, the Wikimedia Foundation,
+arXiv, SSRN, NBER, Google Scholar, ResearchGate) — the same category of
+public knowledge already used for every existing target (Reuters is
+reuters.com), independently re-verified for reachability before anything
+is trusted, never asserted. Verified locally (this sandbox has no egress,
+so all 28 now-targeted sources honestly report `no_reachable_domain` —
+the point is that they're attempted at all now, not skipped as
+`not_targeted`). 568 backend tests pass; `ruff check` clean.
+
+**Left alone, on purpose, not silently**: the remaining 6
+(`github_releases`, `company_social_official`, `public_telegram`,
+`patents`, `hiring_signals`, `company_ir`'s own per-constituent marker)
+each name more than one candidate organization or are inherently
+per-company/per-channel — picking one would be exactly the fabrication
+this program's own rules forbid. These stay `not_targeted` until the
+project owner names which specific organization/channel/office to target,
+or until per-company generation (like `company_ir`'s own
+`generate_company_ir_targets`) is extended to cover them.
+
+**What "100%" will still never mean**: even a source that gets
+`verified_reachable` next run still isn't `IMPLEMENTED` automatically —
+per `AD-16`/`AD-24`, a maintainer must still confirm the real content
+parses correctly before that flip, exactly the gate every prior promotion
+(Enterprise, Al Borsa, Masrawy, FRA, Sky News Arabia) went through. This
+is a deliberate safety rule, not a remaining task to automate away.
+
+---
+
 ## Current mission: surface already-computed data the dashboard was hiding
 
 The project owner looked at the live Mission Control (`/mission-control`)

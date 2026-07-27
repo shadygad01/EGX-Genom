@@ -36,6 +36,13 @@ from agx_research.sources.spec import SourceCategory
 # list. "Additional free public source discovered by the engine" (anything
 # not named) defaults to the catch-all tier below the named sources.
 PRIORITY_EGX_OFFICIAL = 1
+# Co-equal with PRIORITY_EGX_OFFICIAL on purpose (not a new numeric tier):
+# any third-party company-directory candidate needs to run in `run_catalog`
+# before the per-company `company_ir_*` targets it might supply hints for
+# (PRIORITY_EGX30_IR below), same as egx_official itself -- Python's stable
+# sort keeps declaration order among equal priorities, so listing these
+# right after egx_official in `seed_target_organizations` is sufficient.
+PRIORITY_COMPANY_DIRECTORY = PRIORITY_EGX_OFFICIAL
 PRIORITY_EGX30_IR = 2
 PRIORITY_EGX70_IR = 3
 PRIORITY_CBE = 4
@@ -89,6 +96,23 @@ def seed_target_organizations() -> list[TargetOrganization]:
             "constituent, domain hints come from each company's own public disclosure or a "
             "company-directory hint discovered from an already-resolved exchange homepage, "
             "never guessed centrally.",
+        ),
+        # Coverage-expansion mission: a free, independent third-party EGX
+        # listed-companies directory (its own real URL found via public web
+        # search, not asserted or guessed), added specifically as a second
+        # candidate source of real company-directory links for the
+        # `company_ir` chain -- alongside egx_official and
+        # `discovery.wikidata_lookup`, never replacing either (AD-33).
+        TargetOrganization(
+            id="african_markets_egx",
+            name="African Markets -- EGX Listed Companies",
+            category=SourceCategory.MARKET_DATA,
+            country="ZA",
+            domain_hints=["african-markets.com", "www.african-markets.com"],
+            existing_source_id="african_markets_egx",
+            priority=PRIORITY_COMPANY_DIRECTORY,
+            notes="Third-party directory of EGX-listed companies; candidate company-directory "
+            "hint source for company_ir, independent of egx_official's own reachability.",
         ),
         TargetOrganization(
             id="cbe",

@@ -208,6 +208,32 @@ catalogued `SourceSpec` is the separate, explicit
 at `LifecycleState.CANDIDATE` / `SourceStatus.PLANNED` with conservative
 priors, regardless of what the discovery heuristic found.
 
+### Company directory hints (`discovery/wikidata_lookup.py`)
+
+Per-company Investor Relations targets (`acquisition_intelligence.target.generate_company_ir_targets`,
+one per EGX30/EGX70 constituent) are generated with no `domain_hints` at
+all — guessing ~30-100 corporate domains from training-data recall is
+exactly the fabrication this platform's rules forbid. Two honest paths
+supply a real hint instead, both feeding `cli.py`'s `discover-sources`
+before the engine ever runs a per-company target:
+
+1. `discovery.discover_company_directory_links` — reads an
+   already-resolved catalog target's own homepage (e.g. `egx_official`,
+   once reachable) for anchor text matching a company's known display
+   name.
+2. `discovery.wikidata_lookup.WikidataOfficialWebsiteClient` — queries
+   Wikidata's free, no-key, documented public SPARQL endpoint for
+   entities with a declared `P856` ("official website") property, matched
+   by the same name-token-overlap discipline. Independent of
+   `egx_official`'s reachability entirely, so it still supplies hints for
+   as many constituents as Wikidata covers even while the exchange's own
+   site stays unreachable.
+
+Either way, a hint is never trusted directly: it is always re-probed
+independently by `HeuristicDomainResolver` before anything becomes a real
+`SourceSpec` (AD-24/AD-33 hold unchanged) — both paths only ever narrow
+*where to look*, never *what to trust*.
+
 ### Source Qualification Pipeline (`sources/qualification.py`)
 
 Candidate -> Quarantine -> Evaluation -> Trusted -> Core. Promotion is

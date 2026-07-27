@@ -21,6 +21,7 @@ import urllib.request
 from agx_research.acquisition_intelligence.domain_resolution import ProbeResult
 from agx_research.acquisition_intelligence.historical import WaybackAvailabilityClient
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
+from agx_research.discovery.wikidata_lookup import WikidataOfficialWebsiteClient
 from agx_research.sources.spec import (
     AccessMethod,
     RateLimit,
@@ -92,3 +93,23 @@ def build_live_wayback_client(*, timeout_seconds: float = 15.0) -> WaybackAvaila
             return {}
 
     return WaybackAvailabilityClient(fetch_json)
+
+
+def build_live_wikidata_client(*, timeout_seconds: float = 30.0) -> WikidataOfficialWebsiteClient:
+    """Wikidata's own SPARQL endpoint requires `Accept:
+    application/sparql-results+json` (unlike Wayback's APIs, which are
+    JSON by default) -- otherwise it may reply with an HTML results page
+    instead. A longer default timeout than Wayback's: a P17+P31/P279*+P856
+    query over all Wikidata is a heavier query than a single-URL lookup.
+    """
+    def fetch_json(url: str):
+        request = urllib.request.Request(
+            url, headers={"User-Agent": _USER_AGENT, "Accept": "application/sparql-results+json"}
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+                return json.loads(response.read().decode("utf-8", errors="replace"))
+        except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError):
+            return {}
+
+    return WikidataOfficialWebsiteClient(fetch_json)

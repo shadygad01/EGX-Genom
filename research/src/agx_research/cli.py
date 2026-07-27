@@ -26,6 +26,7 @@ from agx_research.acquisition_intelligence.live import (
     build_live_prober,
     build_live_robots_checker,
     build_live_wayback_client,
+    build_live_wikidata_client,
 )
 from agx_research.acquisition_intelligence.target import (
     generate_company_ir_targets,
@@ -342,7 +343,26 @@ def main(argv: list[str] | None = None) -> int:
         # change needed.
         universe_provider = CollectedUniverseProvider(args.data_dir)
         universe = universe_provider.constituents(date.today())
-        all_targets = [*seed_target_organizations(), *generate_company_ir_targets(universe)]
+        company_ir_targets = generate_company_ir_targets(universe)
+
+        # A second, independent free hint source that does not depend on
+        # `egx_official` being reachable at all: Wikidata's own declared
+        # `P856` (official website) property, matched by company name (see
+        # `discovery.wikidata_lookup`). `run_catalog`'s own
+        # `discover_company_directory_links` pass (via egx_official or any
+        # other resolved catalog target) can still supply a hint later in
+        # the same run for any ticker this lookup missed -- it never
+        # overrides a hint a target already carries, so applying this first
+        # only ever adds coverage, never removes it.
+        wikidata_hints = build_live_wikidata_client().lookup(universe)
+        if wikidata_hints:
+            company_ir_targets = [
+                t.model_copy(update={"domain_hints": [wikidata_hints[t.company_ticker]]})
+                if t.company_ticker in wikidata_hints
+                else t
+                for t in company_ir_targets
+            ]
+        all_targets = [*seed_target_organizations(), *company_ir_targets]
 
         results = []
         if not args.recover_only:

@@ -28,7 +28,7 @@ below.
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
 | 06 | Alpha Genome | **DONE** | Immutable genes, `mutate()` (single-parent), `merge()` (multi-parent synthesis), lineage walk, status machine; never overwrites. |
 | 07 | Research OS | **DONE** | TaskGraph/Artifacts/Sessions plus `DailyResearchPipeline` — the full 8-gate walk wired to real validators, board, causal gate, adversarial scientist, genome, papers, graph. End-to-end tested incl. rejection honesty and determinism. |
-| 08 | Scientist Framework | **DONE** (5 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure real; News/FinancialPerformance/HistoricalPatterns are honest stubs, all data-blocked (NLP, fundamentals feed, long history). Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
+| 08 | Scientist Framework | **DONE** (6 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure, NewsIntelligence real; FinancialPerformance/HistoricalPatterns remain honest stubs, both genuinely data-blocked (fundamentals feed, long history — see "NewsIntelligenceAgent" phase below for why News is no longer in that list). Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
 | 09 | Feature Discovery | **DONE** | Three autonomous generators (pairwise correlation, momentum, volatility) over three registered feature definitions; candidates versioned+evidenced. |
 | 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo an explicit placeholder (needs a simulator — research decision). |
 | 11 | Validation Framework | **DONE** | `SignificanceThresholdValidator`, `NaiveDirectionalBacktester` (costs explicitly out of scope, stated), `HistoricalWorstWindowStressTester` (scenario located in real data, not simulated). Deferred: cost-aware portfolio-level backtesting (with 15's future optimizer). |
@@ -888,6 +888,50 @@ present (a plain file copy, not a Python re-export, since the Discovery
 workflow already writes them in final shape). `npm run build`/`test`
 clean for both `api` and `web` workspaces (required a fresh `npm install`
 in this session first — `node_modules` had never been installed).
+
+## NewsIntelligenceAgent: real news sentiment now produces findings (System 08)
+
+`NEXT_MISSIONS.md` named `agents.news_intelligence.NewsIntelligenceAgent`
+as "the most directly-unblocked stub in the codebase" — it had been an
+honest `NotImplementedError` stub only because no real Egyptian news flow
+existed to research, and that stopped being true once `enterprise_press`/
+`fra_egypt` started producing real, dated `NewsItem`/`CorporateEvent`
+records every live run (see "First real Egyptian market data flowing
+live" above).
+
+Closed: implemented as a real, mechanical event-study-lite, mirroring
+`CorporateEventsAgent`'s exact structure — for each ticker's news item,
+`agents.news_sentiment.classify_headline_sentiment()` (a declared,
+headline-only positive/negative keyword heuristic, same honesty tier as
+`collectors.corporate_event_classifier`, new debt TD-35) classifies
+sentiment; unclassifiable headlines are silently skipped, never guessed.
+For sentiment-classified items with enough return history on both sides,
+the agent compares mean adjusted return after the item to before it and
+proposes a MICRO-horizon post-news-drift hypothesis when the shift clears
+a threshold. Wired into `production.pipeline.ProductionPipeline`'s
+Research Pipeline stage alongside the other five real agents (System 08 is
+now 6 of 8 agents real).
+
+**One real, previously-latent bug found and fixed while building this**:
+`collectors.service._append_news` was the only per-record materialization
+writer that blindly appended instead of merging idempotently by natural
+key, unlike every sibling writer (`_write_price_bars`/
+`_write_macro_observations`/`_write_corporate_events`/index constituents)
+— collecting the same feed twice (a mock run followed by a replay run
+reading the same archive, the exact scenario `test_production_pipeline.py`'s
+mock/replay-determinism test exercises) silently duplicated every news
+row. Harmless as long as nothing consumed `news.csv` for hypothesis
+generation; caught immediately once `NewsIntelligenceAgent` did (the
+existing determinism test failed 5 vs. 7 hypotheses on identical input
+the moment the agent was wired in). Fixed by merging on
+`(date, source, headline)`, matching every sibling writer exactly.
+
+**Verified live** (mock mode): a real MFPC finding ("MFPC exhibits
+downward price drift following positive news") flowed all the way through
+`DailyResearchPipeline` into `hypotheses.json`, sourced from the existing
+mock RSS headline "MFPC board declares dividend" — a genuine, if
+uncalibrated, new research signal, not a fabricated one. 24 new tests (592
+total, up from 568); `ruff check` clean.
 
 ## TargetOrganization coverage: 14 of 20 untargeted PLANNED sources (System 02)
 

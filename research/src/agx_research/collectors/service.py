@@ -223,23 +223,33 @@ def _write_index_constituents(
 
 
 def _append_news(data_dir: Path, items) -> int:
+    # Merged idempotently by (date, source, headline), matching every
+    # sibling writer above (_write_price_bars/_write_macro_observations/
+    # _write_corporate_events) -- collecting the same feed twice (e.g. a
+    # mock run followed by a replay run reading the same archive) must not
+    # duplicate rows, since a downstream agent may treat each row as one
+    # independent observation.
     path = data_dir / "news.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
-    is_new = not path.exists()
-    with path.open("a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if is_new:
-            writer.writerow(["date", "source", "headline", "tickers", "body"])
-        for item in items:
-            writer.writerow(
-                [
-                    item.published_at.isoformat(),
-                    item.source,
-                    item.headline,
-                    "|".join(item.tickers),
-                    item.body or "",
-                ]
-            )
+    existing: dict[tuple[str, str, str], dict] = {}
+    if path.exists():
+        with path.open(newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                existing[(row["date"], row["source"], row["headline"])] = row
+    for item in items:
+        key = (item.published_at.isoformat(), item.source, item.headline)
+        existing[key] = {
+            "date": item.published_at.isoformat(),
+            "source": item.source,
+            "headline": item.headline,
+            "tickers": "|".join(item.tickers),
+            "body": item.body or "",
+        }
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["date", "source", "headline", "tickers", "body"])
+        writer.writeheader()
+        for key in sorted(existing):
+            writer.writerow(existing[key])
     return len(items)
 
 

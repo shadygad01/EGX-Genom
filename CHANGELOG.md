@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.24.0 — NewsIntelligenceAgent: real news sentiment now produces findings
+
+`agents.news_intelligence.NewsIntelligenceAgent` was an honest
+`NotImplementedError` stub since System 08 was built, correctly deferred
+because no real Egyptian news flow existed to research. That stopped being
+true once `enterprise_press`/`fra_egypt` started producing real, dated
+`NewsItem` records every live run (see `docs/PHASE_STATUS.md`'s "Egyptian
+Live Data Sprint" phase) — this was the most directly-unblocked stub in
+the codebase, named explicitly in `NEXT_MISSIONS.md`.
+
+Implemented as a real, mechanical event-study-lite, mirroring
+`CorporateEventsAgent` exactly: `agents.news_sentiment.classify_headline_sentiment()`
+is a declared, headline-only keyword heuristic (positive/negative phrase
+lists, negative checked first) — the same honesty tier as
+`collectors.corporate_event_classifier`, never a fabricated NLP/sentiment
+score (new debt, TD-35). For each ticker's sentiment-classified news item
+with enough return history on both sides, the agent compares mean adjusted
+return after the item to before it and proposes a MICRO-horizon
+post-news-drift hypothesis when the shift clears a threshold. Wired into
+`production.pipeline.ProductionPipeline`'s Research Pipeline stage
+alongside the other five real agents.
+
+Building this surfaced and fixed a real, previously-latent bug:
+`collectors.service._append_news` was the only per-record materialization
+writer that blindly appended instead of merging idempotently by natural
+key (unlike prices/macro/corporate-events/index-constituents) — collecting
+the same feed twice (e.g. a mock run followed by a replay run reading the
+same archive) silently duplicated every news row. Harmless while nothing
+consumed `news.csv` for hypothesis generation; caught immediately once
+`NewsIntelligenceAgent` did, via `test_production_pipeline.py`'s existing
+mock/replay-determinism test (5 vs. 7 hypotheses on the same input). Fixed
+by merging on `(date, source, headline)`, matching every sibling writer.
+
+24 new tests (592 total, up from 568); `ruff check` clean.
+
 ## 0.23.0 — Macro data now reaches the decision engine in live runs
 
 A live production run's `investment_cases.json` showed all 62 published

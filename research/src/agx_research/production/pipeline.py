@@ -63,6 +63,7 @@ from agx_research.agents.corporate_events import CorporateEventsAgent
 from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
 from agx_research.agents.market_structure import MarketStructureAgent
+from agx_research.agents.news_intelligence import NewsIntelligenceAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository
@@ -736,6 +737,7 @@ class ProductionPipeline:
             CorporateEventsAgent(),
             LiquidityAgent(),
             TechnicalStructureAgent(),
+            NewsIntelligenceAgent(),
         ]
         daily_pipeline = DailyResearchPipeline(
             self.market_memory,

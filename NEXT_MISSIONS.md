@@ -1,6 +1,36 @@
 # Next Missions
 
-## Closed this phase: TargetOrganization entries for 14 of 20 untargeted sources
+## Closed this phase: NewsIntelligenceAgent
+
+Item 2 from the "Beyond this" list below is now closed — see
+`CURRENT_MISSION.md`'s "NewsIntelligenceAgent" entry and
+`docs/PHASE_STATUS.md`'s matching section for full evidence. System 08 is
+now 6 of 8 agents real.
+
+**Genuinely next, all legal/free and not acquisition-architecture work**
+(in the order they'd most directly improve real recommendation quality):
+
+1. **Entity resolution for news** (Arabic + English alias lists per
+   EGX30/EGX70 company — legal name, trading name, ticker, ISIN) so a
+   headline is matched to the right ticker, not a similarly-named one.
+   Directly strengthens `NewsIntelligenceAgent`'s own ticker attribution
+   (today: whatever `ticker_hints` a collector happens to be configured
+   with) as well as `corporate_event_classifier`'s.
+2. **Monte Carlo stress simulator** (System 10) — the one Experiment
+   Factory gap that's a design decision, not a data blocker; strengthens
+   every hypothesis reaching Stress Testing, including the new News
+   findings.
+3. **Macro frequency alignment + no-look-ahead discipline** — normalize
+   daily/monthly/quarterly/annual series onto a common comparison
+   calendar and distinguish `period_end_date` from real publication date,
+   closing a real look-ahead-bias risk before more macro series connect.
+4. **`ticker_data_gap_report.json` web/API wiring** (TD-34) — route +
+   provider + types, following `financial_statements.json`'s pattern.
+5. **Calibrate `agents.news_sentiment.classify_headline_sentiment()`'s
+   phrase lists** (TD-35) once a meaningful batch of real live headlines
+   accumulates.
+
+## Closed prior phase: TargetOrganization entries for 14 of 20 untargeted sources
 
 Item 1 below (partially) and item 3 (fully) from the phase below are now
 closed — see `CURRENT_MISSION.md`'s "target the closeable half of
@@ -148,19 +178,10 @@ block bootstrap, parametric, historical-resampling — matches the
 existing `HistoricalWorstWindowStressTester`'s "locate a real scenario in
 real data, never a simulated one" philosophy) before writing code.
 
-## 2. NewsIntelligenceAgent (System 08, Scientist Framework)
+## 2. ~~NewsIntelligenceAgent (System 08, Scientist Framework)~~ — Closed
 
-`agents/news_intelligence.py` is an honest `NotImplementedError` stub —
-previously correctly deferred because there was no real Egyptian news
-flow to research. That's no longer true: `enterprise_press` and
-`fra_egypt` are now producing real, dated `NewsItem`/`CorporateEvent`
-records every live run. This is the most directly-unblocked stub in the
-codebase — a genuine research/engineering task now, not a data-blocked
-one. Design a real signal methodology (headline-keyword sentiment is the
-honest starting tier, matching `corporate_event_classifier`'s own
-precedent — never a fabricated NLP score) before implementing; the
-`ResearchAgent` interface and `DatasetSnapshot` plumbing are already
-built and tested.
+See the "Closed this phase" section at the top of this document and
+`docs/PHASE_STATUS.md`'s "NewsIntelligenceAgent" section.
 
 ## 3. Verify the pipeline against the next real trading day
 

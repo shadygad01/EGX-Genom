@@ -1,0 +1,17 @@
+{
+  "average_confidence_verified": 0.5,
+  "by_verification_result": {
+    "legality_blocked": 5,
+    "no_candidates_discovered": 1,
+    "no_reachable_domain": 7,
+    "not_targeted": 20,
+    "verified_reachable": 1
+  },
+  "duration_seconds": 2096.423185,
+  "finished_at": "2026-07-27T08:43:47.877107",
+  "sources_checked_fresh_this_run": 34,
+  "sources_in_report": 34,
+  "sources_served_from_cache": 0,
+  "sources_verified_reachable": 1,
+  "started_at": "2026-07-27T08:08:51.453922"
+}

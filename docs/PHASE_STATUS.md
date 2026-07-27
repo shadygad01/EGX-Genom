@@ -6,11 +6,12 @@ being external/business-blocked and named) / **PARTIAL** / **NOT STARTED**.
 
 Cross-cutting note on what DONE means here: the *architecture and
 engineering* are production-shaped and fully tested; the platform still
-runs on placeholder market data. Every conclusion the system produces is
-only as real as its data feed, and the single largest open item for a true
-Production 1.0 is the licensed EGX data vendor — a business decision
-(cost/coverage/contract) explicitly reserved for the user. See
-`docs/ROADMAP.md`.
+runs on placeholder market data for the gaps the free-source Acquisition
+Program hasn't closed yet. The licensed-vendor question is no longer open:
+per the project owner's 2026-07-27 decision (`docs/ARCHITECTURE_DECISIONS.md`'s
+AD-32), no paid/licensed data vendor will ever be used — every remaining
+data gap, including per-company fundamentals, must be closed exclusively
+through free, publicly-reachable sources. See `docs/ROADMAP.md`.
 
 Current acquisition registry, after removing every `NEEDS_KEY` source per
 the project owner's no-API-key-sources decision: **51 sources
@@ -39,13 +40,18 @@ below.
 | 17 | Continuous Learning | **DONE** (v1) | `ContinuousLearningMonitor`: realized performance recorded on knowledge+genes from real later-window data; mechanical sign-disagreement retirement policy with audited reasons. |
 | 18 | Production Infrastructure | **PARTIAL** | Engineering-closeable parts done: integrity-checked backup/verify/restore, CLI (`run`/`status`/`backup`/`restore`/`discover-sources`/`collect`), the first production execution pipeline (`agx run` — see "Production Execution Pipeline" below), Dockerfile, CI. Business-blocked: cloud provider + payment, secrets management service, managed scheduling, API authentication context, monitoring/alerting stack. Named in `docs/ROADMAP.md`. |
 
-## What Production 1.0 still needs (all business-blocked)
+## What Production 1.0 still needs (all business-blocked, except #1 which is decided)
 
-1. **Licensed EGX market data vendor** — the single gating decision.
+1. ~~Licensed EGX market data vendor~~ — **decided against, permanently**
+   (AD-32): no paid vendor of any kind. Closing #4 below (fundamentals,
+   news NLP, long-history) is now engineering-only work against free
+   sources, principally finishing the `egx_official` → per-company
+   `company_ir` domain-resolution chain in `acquisition_intelligence/`.
 2. Cloud/deployment target + secrets management + scheduler (18).
 3. Authoritative EGX holiday calendar + universe/sector feeds (04/02).
-4. Optional data feeds unlocking the remaining stubs: news NLP source,
-   fundamentals feed, long-history archive (08/12 stragglers).
+4. Free-source-only data feeds still needed to unlock the remaining stubs:
+   a working news NLP source, real per-company financial-statement
+   collection, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
 (477 Python tests + 33 TypeScript tests green).

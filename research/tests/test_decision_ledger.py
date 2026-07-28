@@ -43,6 +43,7 @@ def test_ledger_records_once_and_evaluates_expired_decision(tmp_path):
 
     snapshot = DatasetSnapshot(
         id="snapshot", as_of=date(2026, 7, 4), lookback_days=10,
+        macro_lookback_days=10,
         tickers=["COMI"], macro_series_ids=[], price_history={
             "COMI": [bar(date(2026, 7, 1), 100), bar(date(2026, 7, 4), 103)],
             "EGX30": [
@@ -83,6 +84,7 @@ def test_performance_cannot_be_sufficient_without_benchmark(tmp_path):
     ledger.record_recommendations([recommendation])
     snapshot = DatasetSnapshot(
         id="snapshot", as_of=date(2026, 7, 4), lookback_days=10,
+        macro_lookback_days=10,
         tickers=["COMI"], macro_series_ids=[], price_history={"COMI": [
             bar(date(2026, 7, 1), 100), bar(date(2026, 7, 4), 103),
         ]},
@@ -110,6 +112,7 @@ def test_watch_and_avoid_are_not_counted_as_executed_trades(tmp_path):
         ledger.record_recommendations([recommendation])
         snapshot = DatasetSnapshot(
             id="snapshot", as_of=date(2026, 7, 4), lookback_days=10,
+            macro_lookback_days=10,
             tickers=["COMI"], macro_series_ids=[], price_history={
                 "COMI": [bar(date(2026, 7, 1), 100), bar(date(2026, 7, 4), 90)],
                 "EGX30": [

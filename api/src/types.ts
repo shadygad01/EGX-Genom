@@ -196,10 +196,14 @@ export interface DatasetSnapshot {
   version: number;
   as_of: string;
   lookback_days: number;
+  macro_lookback_days: number;
+  pattern_lookback_days: number;
   tickers: string[];
   macro_series_ids: string[];
   price_history: Record<string, PriceBar[]>;
+  long_price_history: Record<string, PriceBar[]>;
   corporate_events: Record<string, CorporateEvent[]>;
+  long_corporate_events: Record<string, CorporateEvent[]>;
   macro_series: Record<string, MacroObservation[]>;
   news: NewsItem[];
 }

@@ -223,23 +223,33 @@ def _write_index_constituents(
 
 
 def _append_news(data_dir: Path, items) -> int:
+    # Merged idempotently by (date, source, headline), matching every
+    # sibling writer above (_write_price_bars/_write_macro_observations/
+    # _write_corporate_events) -- collecting the same feed twice (e.g. a
+    # mock run followed by a replay run reading the same archive) must not
+    # duplicate rows, since a downstream agent may treat each row as one
+    # independent observation.
     path = data_dir / "news.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
-    is_new = not path.exists()
-    with path.open("a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if is_new:
-            writer.writerow(["date", "source", "headline", "tickers", "body"])
-        for item in items:
-            writer.writerow(
-                [
-                    item.published_at.isoformat(),
-                    item.source,
-                    item.headline,
-                    "|".join(item.tickers),
-                    item.body or "",
-                ]
-            )
+    existing: dict[tuple[str, str, str], dict] = {}
+    if path.exists():
+        with path.open(newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                existing[(row["date"], row["source"], row["headline"])] = row
+    for item in items:
+        key = (item.published_at.isoformat(), item.source, item.headline)
+        existing[key] = {
+            "date": item.published_at.isoformat(),
+            "source": item.source,
+            "headline": item.headline,
+            "tickers": "|".join(item.tickers),
+            "body": item.body or "",
+        }
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["date", "source", "headline", "tickers", "body"])
+        writer.writeheader()
+        for key in sorted(existing):
+            writer.writerow(existing[key])
     return len(items)
 
 
@@ -354,6 +364,15 @@ class CollectionService:
                     collector, document, succeeded=False, expected_records=expected_records,
                     records_produced=0, parser_raised=True, latency_seconds=latency_seconds,
                 )
+                if callable(provider_for_document):
+                    provider = provider_for_document(document)
+                    if provider:
+                        self._record_provider_outcome(
+                            provider, succeeded=False, expected_records=expected_records,
+                            records_produced=0, parser_raised=True,
+                            schema_version=document.schema_version,
+                            latency_seconds=latency_seconds,
+                        )
                 result.batches_withheld += 1
                 continue
 
@@ -381,17 +400,16 @@ class CollectionService:
                 + len(batch.financial_statement_line_items)
             )
             materialized = assessment.confidence_score >= self.min_confidence
+            provider = provider_for_document(document) if callable(provider_for_document) else None
 
             corroborated = 0
             new_candidates = 0
             if materialized:
                 result.batches_materialized += 1
-                if callable(provider_for_document):
-                    provider = provider_for_document(document)
-                    if provider:
-                        result.provider_yields[provider] = (
-                            result.provider_yields.get(provider, 0) + produced
-                        )
+                if provider:
+                    result.provider_yields[provider] = (
+                        result.provider_yields.get(provider, 0) + produced
+                    )
                 by_ticker: dict[str, list] = {}
                 for bar in batch.price_bars:
                     by_ticker.setdefault(bar.ticker, []).append(bar)
@@ -479,6 +497,13 @@ class CollectionService:
                 corroborated_candidates=corroborated, new_candidates=new_candidates,
                 latency_seconds=latency_seconds,
             )
+            if provider:
+                self._record_provider_outcome(
+                    provider, succeeded=True, expected_records=expected_records,
+                    records_produced=produced, assessment=assessment,
+                    schema_version=document.schema_version,
+                    latency_seconds=latency_seconds,
+                )
 
         # One persisted snapshot per source run, not once per document. A
         # full-Universe price source can return hundreds of large raw pages;
@@ -565,3 +590,56 @@ class CollectionService:
             reputation = compute_reputation(metrics)
             if reputation.composite is not None:
                 self.registry.record_measured_quality(collector.spec.id, reputation.composite)
+
+    def _record_provider_outcome(
+        self,
+        provider_id: str,
+        *,
+        succeeded: bool,
+        expected_records: int,
+        records_produced: int,
+        schema_version: str | None,
+        parser_raised: bool = False,
+        assessment: QualityAssessment | None = None,
+        latency_seconds: float | None = None,
+    ) -> None:
+        """A provider leg wired inside a composite collector (`SourceSpec.
+        integrated_via`, e.g. yahoo_finance/stockanalysis/mubasher inside
+        `EgxCompositePriceCollector`) is an operationally distinct source
+        with its own registry entry. Each raw document is already
+        attributable to exactly one provider (`Collector.provider_for_document`),
+        so its measured outcome can be recorded against that provider's own
+        id instead of leaving its `health_status`/`reputation_score` at
+        `UNKNOWN`/`None` forever regardless of how much real traffic it
+        actually served -- the exact "measurement never reaches the
+        sub-source" gap this closes.
+        """
+        if self.registry is None or self.registry.latest(provider_id) is None:
+            return
+        prior = self.metrics.latest(provider_id)
+        had_produced_before = bool(prior and prior.records_produced_total > 0)
+        metrics = self.metrics.record_run(
+            provider_id,
+            succeeded=succeeded,
+            records_expected=expected_records,
+            records_produced=records_produced,
+            confidence_score=assessment.confidence_score if assessment else None,
+            freshness_score=assessment.freshness_score if assessment else None,
+            coverage_score=assessment.coverage_score if assessment else None,
+            latency_seconds=latency_seconds,
+            materialized=succeeded and not parser_raised and records_produced > 0,
+            schema_version=schema_version,
+        )
+        health, _alerts = self.health_monitor.evaluate_run(
+            provider_id,
+            metrics,
+            fetch_succeeded=succeeded,
+            parser_raised=parser_raised,
+            records_produced=records_produced,
+            had_produced_before=had_produced_before,
+            freshness_score=assessment.freshness_score if assessment else None,
+        )
+        self.registry.update_health(provider_id, health)
+        reputation = compute_reputation(metrics)
+        if reputation.composite is not None:
+            self.registry.record_measured_quality(provider_id, reputation.composite)

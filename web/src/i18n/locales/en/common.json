@@ -1,0 +1,64 @@
+{
+  "app": {
+    "brand": "AGX Research",
+    "footer": "EGX30 + EGX70 · Research Only",
+    "fallbackTitle": "AGX Research"
+  },
+  "disclaimer": {
+    "text": "AGX is an autonomous research scaffold, not a licensed investment advisor. Nothing here is investment advice or a recommendation to buy or sell any security -- verify independently and consult a licensed professional before acting."
+  },
+  "nav": {
+    "aiBriefing": "AI Briefing",
+    "opportunityCenter": "Opportunity Center",
+    "marketIntelligence": "Market Intelligence",
+    "researchCenter": "Research Center",
+    "knowledgeGraph": "Knowledge Graph",
+    "missionControl": "Mission Control",
+    "sourceIntelligence": "Source Intelligence",
+    "systemAdministration": "System Administration",
+    "companyWorkspace": "Company Research Workspace"
+  },
+  "topbar": {
+    "nominal": "Nominal",
+    "degraded": "Degraded",
+    "lastCycle": "Last cycle {{time}}"
+  },
+  "language": {
+    "toggleLabel": "Language",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "states": {
+    "loading": "Loading",
+    "somethingWrong": "Something went wrong",
+    "retry": "Retry",
+    "noneRecorded": "None recorded.",
+    "underConstruction": "Under construction"
+  },
+  "horizon": {
+    "micro": "Micro",
+    "swing": "Swing",
+    "investment": "Investment"
+  },
+  "table": {
+    "ticker": "Ticker",
+    "status": "Status",
+    "decision": "Decision",
+    "confidence": "Confidence",
+    "expReturn": "Exp. Return",
+    "expRisk": "Exp. Risk",
+    "blockers": "Blockers",
+    "nextActions": "Next Actions",
+    "noSignal": "No signal"
+  },
+  "a11y": {
+    "mainNavigation": "Main navigation"
+  },
+  "readiness": {
+    "ready": "Ready",
+    "degraded": "Degraded",
+    "blocked": "Blocked",
+    "researchable": "Researchable",
+    "abstain": "Abstain"
+  }
+}

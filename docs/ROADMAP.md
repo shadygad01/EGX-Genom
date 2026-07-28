@@ -26,12 +26,20 @@ component needs to know which is active.
 
 Required user/business inputs, in priority order:
 
-1. **EGX market data vendor selection** (the gating decision). Candidates
-   to evaluate on cost/coverage/latency/licensing: EGX official feeds,
-   Mubasher, Refinitiv/LSEG, Bloomberg. Engineering integration after the
-   decision: one `DataProvider` implementation + `FallbackDataProvider`
-   configuration + re-run of `data.quality` calibration. Estimated
-   engineering: small — the seam exists.
+1. ~~EGX market data vendor selection~~ — **decided (2026-07-27, see
+   `docs/ARCHITECTURE_DECISIONS.md`'s AD-32): no paid/licensed vendor of
+   any kind, permanently.** The `DataProvider` real-vendor seam stays
+   unused; real EGX data (prices, macro, news, and per-company
+   fundamentals alike) must come exclusively from the free-source
+   Acquisition Program (`sources/`+`collectors/`+`acquisition_intelligence/`,
+   see `docs/DATA_ACQUISITION.md`). Remaining engineering work under this
+   constraint is tracked below under "Data Acquisition Platform" —
+   principally widening `IMPLEMENTED` coverage and closing the per-company
+   `company_ir` domain-resolution gap that gates real financial-statement
+   data, now via two independent hint sources (`egx_official`'s own
+   directory once reachable, and `discovery.wikidata_lookup` regardless of
+   whether it is — AD-33) rather than depending solely on the exchange's
+   own site.
 2. **Deployment target** (cloud provider + payment), which unlocks:
    secrets management, managed scheduling of `RuntimeEngine`, monitoring/
    alerting, API authentication context, backup storage/retention.
@@ -48,9 +56,7 @@ a real runtime engine (`acquisition_intelligence.capability`/
 `capability_engine`, wired into `production/pipeline.py`'s LIVE mode --
 see the doc's "Runtime Implementation" section). Its concrete next steps,
 not yet done: verify IMF's and OECD's documented SDMX/JSON API contracts
-and catalogue them directly (like World Bank), rather than as
-homepage-discovery targets; explore FMP's financial-statement endpoints
-for EGX coverage once a key exists; once a second `IMPLEMENTED` candidate
+and catalogue them directly (like World Bank); once a second `IMPLEMENTED` candidate
 exists for a capability beyond Macroeconomic, review whether
 `rank_capability_strategies()`'s declared composite weighting (TD-33)
 actually orders them the way measured outcomes would.
@@ -60,24 +66,29 @@ they're config/verification work against the now-complete platform
 (registry, discovery, qualification, reputation, health, archive,
 provenance, replay, acquisition intelligence — see `docs/DATA_ACQUISITION.md`):
 
-- **Run `agx discover-sources` wherever this deploys with outbound network
-  egress.** The Acquisition Intelligence Engine is complete and tested
-  (`acquisition_intelligence/`); in this development sandbox it correctly
-  reports "no reachable domain" for all 12 named PLANNED official/company/
-  regional-news targets because the sandbox itself has no egress to
-  arbitrary hosts (confirmed directly, not assumed). This single step —
-  not manual endpoint research — is what completes the remaining item from
-  the program's named 16-collector build order that isn't already either
-  done (World Bank, AlphaVantage/FMP) or blocked on a business decision
-  (Yahoo/TradingView ToS review); see `docs/DATA_ACQUISITION.md`'s "What's
-  still blocked" section for the full breakdown.
+- ~~Run `agx discover-sources` wherever this deploys with outbound network
+  egress~~ **Closed**: `.github/workflows/discovery.yml` now runs
+  `agx discover-planned-report` weekly (plus manual `workflow_dispatch`)
+  against every `PLANNED`/`CANDIDATE` source with a `TargetOrganization`,
+  entirely on its own schedule and branch — it never blocks or slows
+  `deploy-pages.yml`'s production deploy. Results (evidence, per-source
+  recommendation, an incremental cache so an unchanged source isn't
+  re-probed weekly) land only via a reviewed pull request against `main`
+  from a dedicated `discovery/latest` branch — never a direct commit. See
+  `docs/DATA_ACQUISITION.md`'s "Discovery workflow" section for the full
+  design, and `docs/DATA_ACQUISITION.md`'s "What's still blocked" section
+  for the per-source build-order breakdown this feeds.
 - Every `SourceSpec` the engine auto-generates still needs an engineer to
   write and test the concrete collector before flipping `PLANNED` to
   `IMPLEMENTED` (by design — see `AD-16`/`AD-24`); the generic
   `RssNewsCollector`/`ExcelSeriesCollector`/`PdfDocumentCollector` already
   exist and cover most of what discovery is expected to find.
-- Once a user supplies an AlphaVantage or FMP API key, flip that entry to
-  `IMPLEMENTED` — the collector code and tests already exist.
+- Per the project owner's explicit decision, no `NEEDS_KEY` source will be
+  catalogued going forward — FMP/AlphaVantage/Polygon/Tiingo were removed
+  from the seed catalog and their collector code deleted for this reason
+  (see `docs/DATA_ACQUISITION.md`'s "No API-key sources" note). Any future
+  capability gap must be closed with a genuinely free, no-registration
+  source, or left honestly uncovered.
 - Cross-source corroboration measurement: once two IMPLEMENTED sources
   cover overlapping data (e.g. a second price source alongside Stooq),
   wire `consistency_score` in `collectors.quality.assess_quality()` instead
@@ -173,11 +184,15 @@ production entrypoint. What's next, in priority order:
   Engine section above.
 - Expand `collector_plan.py`'s mock/replay fixture coverage beyond
   COMI/MFPC once more tickers matter for research breadth.
-- Schedule `agx run` itself (System 18, business-blocked in general, but
-  the command is deployment-ready today) once any deployment target
-  exists — this is the "runs unchanged under GitHub Actions and
-  Cloudflare" the mission specified; `.github/workflows/deploy-pages.yml`
-  already proves the GitHub Actions half.
+- ~~Schedule `agx run` itself~~ **Closed for the GitHub Pages target**:
+  `.github/workflows/deploy-pages.yml` now also fires on a daily
+  `schedule:` cron (15:30 UTC, Sun-Thu, matching EGX's post-close window),
+  not just on push — free on a public repo, no deployment target or paid
+  scheduler needed. The dashboard now refreshes with real live data once a
+  day even with zero commits. What's still open: a hosted `api/`'s own
+  `DASHBOARD_ARTIFACTS_DIR` refresh (TD-14) needs a real deployment target
+  to have anything to schedule against — this closes only the
+  GitHub-Pages/`StaticJsonProvider` half.
 
 ## Dashboard architecture: next engineering-closeable steps
 
@@ -186,10 +201,12 @@ production entrypoint. What's next, in priority order:
   business-blocked in general, but this specific refresh needs only a cron
   job/timer once *any* deployment target exists — smaller than the
   System 18 blockers above).
-- `patterns.json` stays `[]` — and `validate_dashboard_artifacts()` enforces
-  that — until `agents.historical_patterns.HistoricalPatternsAgent` is
-  implemented (still a data/methodology gap, see `docs/PHASE_STATUS.md`
-  System 08).
+- `patterns.json` stays `[]` — and `validate_dashboard_artifacts()`
+  enforces that — until a dedicated `Pattern` pydantic model/contract
+  exists for its dashboard-specific shape (TD-15). `HistoricalPatternsAgent`
+  itself is implemented and its findings already flow through the normal
+  pipeline like any other agent's (see `docs/PHASE_STATUS.md` System 08);
+  this is only about a separate raw-pattern display artifact.
 - Once a second `IMPLEMENTED` source overlaps an existing one, wire
   `consistency_score` (see the Data Acquisition Program item above) — this
   also improves `system_status.json`'s honesty once real corroboration
@@ -202,11 +219,11 @@ production entrypoint. What's next, in priority order:
   `HorizonModel` contract and model versioning are ready.
 - Covariance-based portfolio optimization replacing capped proportional
   scoring; cost-aware portfolio-level backtesting harness.
-- Remaining scientist agents as their feeds arrive: NewsIntelligence
-  (NLP), FinancialPerformance (fundamentals), HistoricalPatterns
-  (long-history analogs) — plus the HistoricalReviewer and the three
-  remaining adversarial attacks (overfitting harness, regime labels,
-  live-degradation comparison).
+- Remaining scientist agent: FinancialPerformance (fundamentals) — still
+  genuinely data-blocked on real per-company financial statements, unlike
+  NewsIntelligence and HistoricalPatterns which are both now real — plus
+  the HistoricalReviewer and the three remaining adversarial attacks
+  (overfitting harness, regime labels, live-degradation comparison).
 - Monte Carlo experiment once a market simulator design is chosen.
 - Database-backed `Repository[T]` implementation when JSON stores hit
   scale limits; dedicated graph store behind the same interface.

@@ -32,8 +32,12 @@ export async function dashboardRoutes(
   app.get("/acquisition-decisions", async () => artifacts.acquisitionDecisions());
   app.get("/decision-readiness", async () => artifacts.decisionReadiness());
   app.get("/ticker-data-gaps", async () => artifacts.tickerDataGapReport());
+  app.get("/ticker-data-gap-report", async () => artifacts.tickerDataGapReport());
   app.get("/source-truth", async () => artifacts.sourceTruth());
   app.get("/decision-history", async () => artifacts.decisionHistory());
   app.get("/decision-performance", async () => artifacts.decisionPerformance());
   app.get("/publication-gate", async () => artifacts.publicationGate());
+  app.get("/discovery-report", async () => artifacts.discoveryReport());
+  app.get("/discovery-metrics", async () => artifacts.discoveryMetrics());
+  app.get("/endpoint-candidates", async () => artifacts.endpointCandidates());
 }

@@ -57,8 +57,32 @@
           "title": "Id",
           "type": "string"
         },
+        "long_corporate_events": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/CorporateEvent"
+            },
+            "type": "array"
+          },
+          "title": "Long Corporate Events",
+          "type": "object"
+        },
+        "long_price_history": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/PriceBar"
+            },
+            "type": "array"
+          },
+          "title": "Long Price History",
+          "type": "object"
+        },
         "lookback_days": {
           "title": "Lookback Days",
+          "type": "integer"
+        },
+        "macro_lookback_days": {
+          "title": "Macro Lookback Days",
           "type": "integer"
         },
         "macro_series": {
@@ -84,6 +108,11 @@
           },
           "title": "News",
           "type": "array"
+        },
+        "pattern_lookback_days": {
+          "default": 0,
+          "title": "Pattern Lookback Days",
+          "type": "integer"
         },
         "price_history": {
           "additionalProperties": {
@@ -112,6 +141,7 @@
         "id",
         "as_of",
         "lookback_days",
+        "macro_lookback_days",
         "tickers",
         "macro_series_ids"
       ],

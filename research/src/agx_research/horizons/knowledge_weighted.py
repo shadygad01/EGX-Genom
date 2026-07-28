@@ -20,7 +20,7 @@ from datetime import date, datetime
 
 from agx_research.config import Horizon
 from agx_research.domain.provenance import Provenance, ProvenanceRef
-from agx_research.events.event import EventSeverity
+from agx_research.events.event import Event, EventSeverity
 from agx_research.events.lifecycle import EventStatus
 from agx_research.events.service import EventPlatform
 from agx_research.explainability import Explanation
@@ -30,6 +30,19 @@ from agx_research.knowledge import KnowledgeObject
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 
 _EGX_MARKET_ENTITY_ID = "EGX"
+
+
+def _event_headline(event: Event) -> str:
+    """A quoted headline prefix for a supporting-evidence line, or "" if the
+    event carries none. Without this, an event's line in `supporting_evidence`
+    was only its opaque id + category/severity/confidence -- real, but
+    unreadable to a human deciding whether the evidence is actually relevant.
+    The headline itself already exists on news-derived events
+    (`events.adapters` sets `metadata["headline"]`); this only surfaces it,
+    it never invents one for an event that doesn't carry it.
+    """
+    headline = event.metadata.get("headline")
+    return f'"{headline}" ' if headline else ""
 
 
 class KnowledgeWeightedHorizonModel(HorizonModel):
@@ -116,8 +129,9 @@ class KnowledgeWeightedHorizonModel(HorizonModel):
                 for k in relevant
             ]
             + [
-                f"event {event.id}: {event.subtype}, severity={event.severity.value}, "
-                f"confidence={event.confidence:.2f}, sources={','.join(event.sources)}"
+                f"event {event.id}: {_event_headline(event)}{event.subtype}, "
+                f"severity={event.severity.value}, confidence={event.confidence:.2f}, "
+                f"sources={','.join(event.sources)}"
                 for event in active_events
             ],
             evidence_refs=[

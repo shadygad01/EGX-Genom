@@ -13,6 +13,13 @@ ticker hint matches, populating `batch.corporate_events` alongside the
 always-produced `NewsItem` -- the same disclosure viewed two ways, not two
 collectors. Off by default: most RSS sources are pure news outlets, not
 IR disclosure feeds, where this classification wouldn't be meaningful.
+
+Ticker attribution uses `universe.entity_resolution.resolve_ticker_mentions`
+(a real word/token match, not a substring check) whenever `ticker_hints`
+is given as a `{ticker: company_name}` mapping; a plain `list[str]` is
+still accepted for callers with no company-name data and still gets the
+upgraded exact-token ticker match (see that module's docstring for why
+`RssNewsCollector`'s prior substring check was a real false-positive risk).
 """
 
 from __future__ import annotations
@@ -25,6 +32,7 @@ from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.corporate_event_classifier import classify_corporate_event_type
 from agx_research.collectors.raw import RawDocument, fetch_single_text_document
 from agx_research.data.schemas import CorporateEvent, NewsItem
+from agx_research.universe.entity_resolution import resolve_ticker_mentions
 
 
 def _local_name(tag: str) -> str:
@@ -79,13 +87,18 @@ class RssNewsCollector(Collector):
         spec,
         feed_url: str,
         *,
-        ticker_hints: list[str] | None = None,
+        ticker_hints: dict[str, str] | list[str] | None = None,
         classify_corporate_events: bool = False,
         fetcher=None,
     ):
         super().__init__(spec, fetcher)
         self.feed_url = feed_url
-        self.ticker_hints = ticker_hints or []
+        # A plain list (no company-name data) still gets the upgraded
+        # exact-token ticker match; an empty display name never matches by
+        # name alone (see `resolve_ticker_mentions`'s own guard).
+        self.companies: dict[str, str] = (
+            dict(ticker_hints) if isinstance(ticker_hints, dict) else {t: "" for t in (ticker_hints or [])}
+        )
         # Opt-in: most RSS sources are pure news outlets, not IR disclosure
         # feeds -- classification only makes sense where headlines plausibly
         # announce corporate actions (see `corporate_event_classifier`).
@@ -117,8 +130,7 @@ class RssNewsCollector(Collector):
                 batch.parse_warnings.append(f"entry {index}: missing title or date; skipped")
                 continue
             link = _entry_link(entry)
-            title_lower = title.lower()
-            matched = [t for t in self.ticker_hints if t.lower() in title_lower]
+            matched = resolve_ticker_mentions(title, self.companies)
             batch.news_items.append(
                 NewsItem(
                     published_at=published,

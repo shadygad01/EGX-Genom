@@ -31,6 +31,8 @@ acquisition_intelligence/
                            whose candidates are already catalogued, with automatic
                            fallback (CapabilityDecisionEngine)
               continuity.py -- AcquisitionContinuityMonitor (re-discover on DOWN)
+              discovery_report.py -- weekly scheduled verification report +
+                           incremental cache (see "Discovery workflow" below)
               live.py -- real HttpFetcher/Wayback-backed adapters (deployment only)
 sources/      SourceSpec (full charter field set) + SourceRegistry + seed catalog
               qualification.py  -- Candidate/Quarantine/Evaluation/Trusted/Core
@@ -181,7 +183,7 @@ Collector *types* covered, per the charter's list:
 | Type | How it's served |
 |---|---|
 | RSS/Atom | `RssNewsCollector` — one generic collector serving every feed-publishing outlet via `SourceSpec` configuration |
-| REST/JSON API | `WorldBankCollector`, `AlphaVantageCollector`, `FmpCollector` — one class per API shape (shapes differ enough that a single generic JSON collector would either be too rigid or reinvent per-source mapping) |
+| REST/JSON API | `WorldBankCollector` — one class per API shape (shapes differ enough that a single generic JSON collector would either be too rigid or reinvent per-source mapping) |
 | CSV download | `StooqPriceCollector`, `FredCsvCollector` |
 | Excel (XLSX) | `ExcelSeriesCollector` — generic, column-mapped (openpyxl-backed) |
 | PDF | `PdfDocumentCollector` — generic fetch/archive/text-extraction base (pypdf-backed); `parse()` stays source-specific by necessity |
@@ -205,6 +207,37 @@ catalogued `SourceSpec` is the separate, explicit
 `qualification.register_candidate` step, which always mints the new source
 at `LifecycleState.CANDIDATE` / `SourceStatus.PLANNED` with conservative
 priors, regardless of what the discovery heuristic found.
+
+### Company directory hints (`discovery/wikidata_lookup.py`)
+
+Per-company Investor Relations targets (`acquisition_intelligence.target.generate_company_ir_targets`,
+one per EGX30/EGX70 constituent) are generated with no `domain_hints` at
+all — guessing ~30-100 corporate domains from training-data recall is
+exactly the fabrication this platform's rules forbid. Two honest paths
+supply a real hint instead, both feeding `cli.py`'s `discover-sources`
+before the engine ever runs a per-company target:
+
+1. `discovery.discover_company_directory_links` — reads an
+   already-resolved catalog target's own homepage (e.g. `egx_official`,
+   once reachable) for anchor text matching a company's known display
+   name.
+2. `discovery.wikidata_lookup.WikidataOfficialWebsiteClient` — searches
+   Wikidata's free, no-key, documented action API (`wbsearchentities`) by
+   each company's own display name, then reads the matched entity's
+   declared `P856` ("official website") claim (`wbgetclaims`), matched by
+   the same name-token-overlap discipline. Deliberately per-company search
+   rather than one bulk country-filtered query: an earlier `P17`-filtered
+   SPARQL design worked (a live run returned 2404 real results) but missed
+   real, well-documented companies outright, since `P17` ("country") is
+   not reliably set on individual company items — searching by name
+   sidesteps that gap. Independent of `egx_official`'s reachability
+   entirely, so it still supplies hints for as many constituents as
+   Wikidata covers even while the exchange's own site stays unreachable.
+
+Either way, a hint is never trusted directly: it is always re-probed
+independently by `HeuristicDomainResolver` before anything becomes a real
+`SourceSpec` (AD-24/AD-33 hold unchanged) — both paths only ever narrow
+*where to look*, never *what to trust*.
 
 ### Source Qualification Pipeline (`sources/qualification.py`)
 
@@ -333,12 +366,20 @@ an explicit status:
 - **PLANNED** — catalogued with known access details; collector not yet
   written (most are one configuration of an existing generic collector,
   e.g. an RSS feed URL). Seeded at `LifecycleState.CANDIDATE`, `ACTIVE`.
-- **NEEDS_KEY** — free tier requires a user-registered API key
-  (AlphaVantage, FMP, Polygon, Tiingo). Keys are credentials: a business/
-  user action, never fabricated or bypassed. Collector *code* can exist and
-  be fully tested against the API's public documented shape (see
-  AlphaVantage/FMP below) without the source becoming collectable — seeded
-  at `CANDIDATE`/`PAUSED`.
+- **NEEDS_KEY** — reserved for a source whose only access route requires a
+  user-registered credential. **No seed source currently uses this
+  status.** The project owner's explicit decision: this platform is
+  scoped to sources collectable with no registration/credential of any
+  kind, so a capability whose only real strategy needs a key is left
+  honestly uncovered rather than catalogued and left waiting indefinitely.
+  `AlphaVantageCollector`/`FmpCollector` and the `alphavantage`/`fmp`/
+  `polygon`/`tiingo` catalog entries existed under this status and were
+  removed for exactly this reason (see "No API-key sources" below) — not
+  because their collector code was wrong. The status value itself stays
+  in `SourceStatus` as a structural classification (a source that turns
+  out to be genuinely free but happens to require a no-cost registration
+  step is a decision to revisit explicitly, not a status this codebase
+  auto-assigns).
 - **TOS_REVIEW** — access exists but redistribution/automation terms are
   ambiguous (Yahoo Finance unofficial API, Investing.com, TradingView,
   Google Trends automation, LinkedIn). Not collected until the review
@@ -367,16 +408,23 @@ check for HTML-ish fetches; it is exercised in deployment, not in unit
 tests (this sandbox has no outbound egress for live collection, only for
 package installs).
 
-### Code-complete but not yet collectable
+### No API-key sources
 
-`AlphaVantageCollector` and `FmpCollector` are fully implemented and
-unit-tested against each API's documented public JSON response shape
-(`Meta Data`/`Time Series (Daily)` for AlphaVantage; `symbol`/`historical`
-for FMP) — but their seed catalog entries stay `NEEDS_KEY` because no API
-key exists to actually collect with. This is the platform's "small
-adapter" promise made concrete: once a user supplies their own free-tier
-key, activating the source is a `SourceSpec.status` flip plus passing the
-key into the constructor — no new parsing code.
+Earlier phases carried `AlphaVantageCollector`/`FmpCollector` — fully
+implemented and unit-tested against each API's documented public JSON
+response shape — with their seed catalog entries (`alphavantage`, `fmp`)
+staying `NEEDS_KEY` pending a user-supplied key, plus two further
+placeholder entries (`polygon`, `tiingo`) with no collector code at all.
+The project owner's explicit decision: the platform relies exclusively on
+genuinely free, no-registration sources, so waiting on a key indefinitely
+serves no goal, and a capability whose only real strategy requires one
+should be dropped rather than left permanently blocked. All four catalog
+entries and the two collector classes (plus their tests) were removed.
+`Capability.PRICE_DATA`/`Capability.FINANCIAL_STATEMENTS`'s declared
+candidate pools (`acquisition_intelligence/capability.py`) no longer name
+them either. Any future capability gap must be closed with a genuinely
+free source (no registration step of any kind), or left honestly
+uncovered — never with a `NEEDS_KEY` catalog entry.
 
 ## What's still blocked
 
@@ -385,7 +433,8 @@ The 16-collector build order in the program's implementation policy
 CNBC Arabia, Trading Economics, CBE, FRA, CAPMAS, Yahoo Finance, FMP,
 AlphaVantage, TradingView News) breaks down as:
 
-- **FMP, AlphaVantage** — code-complete, `NEEDS_KEY` (above).
+- **FMP, AlphaVantage** — removed from the catalog per the no-API-key
+  policy above; no longer part of this program at all.
 - **Yahoo Finance, TradingView News** — `TOS_REVIEW`; automation terms are
   ambiguous, so collection stays blocked until a human legal/ToS review
   clears them. Not a coding gap.
@@ -417,11 +466,65 @@ AlphaVantage, TradingView News) breaks down as:
   collectable source is then the "small adapter" the platform promises,
   not new engineering.
 
+## Discovery workflow (continuous, scheduled, evidenced)
+
+The moment this platform runs somewhere with real network egress
+(GitHub Actions), the paragraph above's "not a human's job" claim needed
+to actually run somewhere on a schedule, not stay a manually-invoked CLI
+command. `.github/workflows/discovery.yml` is that schedule — a
+completely separate workflow from `deploy-pages.yml`'s production
+pipeline (own trigger, own branch, never blocks or slows the production
+deploy) that runs weekly (and on manual `workflow_dispatch`):
+
+1. **Scope**: only catalogued `PLANNED`/`CANDIDATE` sources that have a
+   matching `TargetOrganization` and are not a per-constituent marker or a
+   provider leg already wired inside a composite collector (`integrated_via`
+   — its real endpoint already exists in code; discovery would be
+   redundant). `acquisition_intelligence.discovery_report.plan_discovery_targets`
+   makes this split explicit and honest: a `PLANNED` source with no
+   `TargetOrganization` yet is reported (`not_targeted`), never given a
+   fabricated domain to try.
+2. **Verification**: reuses the exact same `AcquisitionIntelligenceEngine.
+   run_for_target` this document already describes above — real domain
+   resolution, real robots.txt/legality checks, real stability/historical
+   scoring, real qualification-pipeline promotion on a successful run
+   (`CANDIDATE` → `QUARANTINE`). Nothing new is invented here; the workflow
+   just runs the existing engine on a schedule instead of by hand.
+3. **Incremental, not repetitive**: `agx discover-planned-report` (the
+   `discover-planned-report` CLI subcommand,
+   `acquisition_intelligence.discovery_report.run_discovery_report`) caches
+   each source's last real result (`discovery_history.json`) with a 30-day
+   TTL. A source is only re-probed when the cache expired, its target's own
+   inputs changed (a new domain hint, for instance — fingerprinted), or a
+   run explicitly forces it (`--force id1,id2`, wired to `workflow_dispatch`'s
+   `force` input). A cached row still appears in the report every run
+   (`from_cache: true`), so the report is always a complete picture.
+4. **Evidenced, structured output**: three JSON artifacts per run —
+   `discovery_report.json` (one row per in-scope source: previous/current
+   status, discovered endpoints, verification result, failure reason,
+   evidence, a recommendation, and a confidence score), `discovery_metrics.json`
+   (aggregate counts), and `endpoint_candidates.json` (every ranked
+   candidate considered, not just the winner) — all under
+   `research/data/discovery/` (see its own `README.md`).
+5. **Never a direct commit to `main`, never an automatic promotion**: the
+   workflow commits its output only to a dedicated `discovery/latest`
+   branch and opens/updates one standing pull request against `main` — a
+   human always reviews before this evidence lands on `main`. Flipping a
+   `SourceSpec.status` to `IMPLEMENTED` is never done by this workflow: per
+   `AD-16`/`AD-24`, that still requires an engineer to write and test a
+   concrete collector against the verified endpoint's real response shape
+   (except for `RSS_FEED`, where `RssNewsCollector` is already a generic,
+   tested collector — the PR's summary flags exactly this case as "ready
+   for a maintainer to review", the same precedent already used for
+   Enterprise/Al Borsa/Masrawy/FRA/Sky News Arabia, but the flip itself is
+   still a reviewed, separate commit).
+
 ## Legal compliance (enforced, not aspirational)
 
 - `FetchPolicy.respect_robots` blocks fetches disallowed by robots.txt.
 - No collector authenticates, bypasses paywalls, or touches restricted
-  data; NEEDS_KEY sources idle until the user supplies their own key.
+  data; per the project owner's decision, no source is catalogued at all
+  if its only route requires a credential (see "No API-key sources").
 - Every `SourceSpec` records `license` and `terms_of_use_url`; TOS_REVIEW
   status blocks collection outright.
 - Rate limits are per-source configuration honored by the fetcher.

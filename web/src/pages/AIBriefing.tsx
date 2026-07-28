@@ -1,20 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
+import { Disclaimer } from "../components/primitives/Disclaimer";
 import { Meter } from "../components/primitives/Meter";
 import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
-import {
-  formatDate,
-  formatDateTime,
-  formatSignedPercent,
-  formatPercent,
-  titleCase,
-} from "../lib/format";
-import type { CorporateEvent, Event, EventSeverity, HorizonDecision, KnowledgeStatus, NewsItem, Recommendation } from "../types";
+import { useEnumLabel } from "../hooks/useEnumLabel";
+import { useFormatters } from "../hooks/useFormatters";
+import { formatSignedPercent, formatPercent, titleCase } from "../lib/format";
+import type { CorporateEvent, Event, EventSeverity, KnowledgeStatus, NewsItem } from "../types";
 import styles from "./AIBriefing.module.css";
 
 const SEVERITY_VARIANT: Record<EventSeverity, BadgeVariant> = {
@@ -34,6 +32,10 @@ const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
  * manager needs to know before the market opens, generated entirely from
  * already-produced AGX artifacts -- no calculation happens on this page. */
 export function AIBriefing() {
+  const { t } = useTranslation("aiBriefing");
+  const { t: tCommon } = useTranslation("common");
+  const label = useEnumLabel();
+  const { formatDate, formatDateTime } = useFormatters();
   const navigate = useNavigate();
   const systemStatus = useArtifact((p) => p.getSystemStatus());
   const marketState = useArtifact((p) => p.getMarketState());
@@ -43,16 +45,10 @@ export function AIBriefing() {
   const papers = useArtifact((p) => p.getPapers());
   const investmentCases = useArtifact((p) => p.getInvestmentCases());
   const executionReport = useArtifact((p) => p.getExecutionReport());
-  const decisionPerformance = useArtifact((p) => p.getDecisionPerformance());
-  const publicationGate = useArtifact((p) => p.getPublicationGate());
 
-  const topOpportunities = publicationGate.data?.publication_ready ? [...(recommendations.data ?? [])]
-    .filter((recommendation) => Object.values(recommendation.horizon_decisions).some(
-      (decision) => decision?.publication_status === "publication_ready"
-        && decision.action !== "abstain",
-    ))
-    .sort((a, b) => bestDecisionScore(b) - bestDecisionScore(a))
-    .slice(0, 5) : [];
+  const topOpportunities = [...(recommendations.data ?? [])]
+    .sort((a, b) => b.combined_expected_return - a.combined_expected_return)
+    .slice(0, 5);
 
   const elevatedEvents = [...(events.data ?? [])]
     .filter((e) => e.severity === "high" || e.severity === "critical")
@@ -82,155 +78,30 @@ export function AIBriefing() {
 
   return (
     <>
-      <Section
-        title="ملخص القرار"
-        description="ما الذي يمكن فعله الآن، لكل أفق، مع إثبات الأداء أو التصريح بعدم كفاية العينة."
-      >
-        <div role="alert" style={{ border: "1px solid var(--warning)", padding: "12px", marginBottom: "16px" }}>
-          <strong>بحث فقط — بيانات تجريبية.</strong> لا توجد توصية صالحة للنشر قبل اجتياز بوابات البيانات الحية والمراجعة القانونية.
-        </div>
-        {publicationGate.data && (
-          <Card
-            title={publicationGate.data.publication_ready ? "بوابة النشر: مجتازة" : "بوابة النشر: محظورة"}
-            subtitle={`آخر تقييم: ${formatDate(publicationGate.data.as_of)}`}
-            dense
-          >
-            <ul>
-              {publicationGate.data.checks.map((check) => (
-                <li key={check.id}>
-                  {check.passed ? "✓" : "✕"} {check.label}
-                  {!check.passed && check.blocker ? ` — ${check.blocker}` : ""}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
-        {topOpportunities.length === 0 ? (
-          <EmptyState title="امتناع" detail="لا توجد قرارات اجتازت بوابات الأدلة الحالية." />
-        ) : (
-          <DataTable
-            rows={topOpportunities}
-            getRowKey={(row) => row.ticker}
-            columns={[
-              { key: "ticker", header: "السهم", render: (row) => row.ticker },
-              { key: "action", header: "القرار", render: (row) => bestDecision(row)?.action ?? "abstain" },
-              { key: "horizon", header: "الأفق", render: (row) => bestDecision(row)?.horizon_window ?? "—" },
-              { key: "valid", header: "صالح حتى", render: (row) => formatDate(bestDecision(row)?.valid_until ?? null) },
-              { key: "score", header: "درجة المخاطر", align: "right", render: (row) => bestDecision(row)?.risk_adjusted_score.toFixed(2) ?? "—" },
-            ]}
-          />
-        )}
-        <Card title="إثبات الأداء" subtitle="لا تُعرض نسبة نجاح كدليل حتى تتوفر 30 نتيجة مقيمة على الأقل لكل أفق" dense>
-          {decisionPerformance.loading && <LoadingState />}
-          {!decisionPerformance.loading && (decisionPerformance.data ?? []).length === 0 && (
-            <EmptyState title="لا يوجد سجل أداء بعد" detail="سيظهر الأداء بعد انتهاء صلاحية القرارات وتقييم نتائجها تلقائيًا." />
-          )}
-          {(decisionPerformance.data ?? []).length > 0 && (
-            <DataTable
-              rows={decisionPerformance.data ?? []}
-              getRowKey={(row) => row.horizon}
-              columns={[
-                { key: "horizon", header: "الأفق", render: (row) => titleCase(row.horizon) },
-                { key: "evaluated", header: "مقيّمة", align: "right", render: (row) => row.evaluated },
-                { key: "hit", header: "نسبة التفوق", render: (row) => row.sample_status === "sufficient" && row.hit_rate != null ? formatPercent(row.hit_rate) : row.sample_status === "insufficient_benchmark" ? "المؤشر غير مكتمل" : "عينة غير كافية" },
-                { key: "realized", header: "العائد المحقق", render: (row) => row.mean_realized_return != null ? formatSignedPercent(row.mean_realized_return) : "—" },
-                { key: "excess", header: "فوق EGX30", render: (row) => row.sample_status === "sufficient" && row.mean_excess_return != null ? formatSignedPercent(row.mean_excess_return) : "—" },
-              ]}
-            />
-          )}
-        </Card>
-      </Section>
+      <Disclaimer />
 
-      <Section
-        title="صحة النظام"
-        description="حالة تنفيذ خط الإنتاج في أحدث دورة بحث."
-      >
-        {systemStatus.loading && <LoadingState rows={1} />}
-        {systemStatus.error && <ErrorState detail={systemStatus.error.message} onRetry={systemStatus.reload} />}
-        {systemStatus.data && (
-          <div className={styles.statGrid}>
-            <StatTile label="آخر دورة" value={formatDate(systemStatus.data.pipeline_run_date)} />
-            <StatTile label="مرات التشغيل" value={systemStatus.data.runs} />
-            <StatTile
-              label="الناجحة"
-              value={systemStatus.data.succeeded}
-              deltaSign={systemStatus.data.failed > 0 ? -1 : 1}
-              delta={systemStatus.data.failed > 0 ? `${systemStatus.data.failed} فاشلة` : "كلها سليمة"}
-            />
-            <StatTile label="كائنات المعرفة" value={systemStatus.data.knowledge_objects} />
-            {Object.entries(systemStatus.data.by_status).map(([status, count]) => (
-              <StatTile key={status} label={titleCase(status)} value={count} />
-            ))}
-          </div>
-        )}
-      </Section>
-
-      {executionReport.data && (
-        <Section
-          title="التغييرات منذ الدورة السابقة"
-          description="صافي التغير في المعرفة والاكتشافات الناتج عن آخر تشغيل كامل."
-        >
-          <div className={styles.statGrid}>
-            <StatTile
-              label="كائنات المعرفة"
-              value={executionReport.data.knowledge_after}
-              deltaSign={Math.sign(executionReport.data.knowledge_after - executionReport.data.knowledge_before)}
-              delta={`${executionReport.data.knowledge_after - executionReport.data.knowledge_before >= 0 ? "+" : ""}${
-                executionReport.data.knowledge_after - executionReport.data.knowledge_before
-              } منذ آخر تشغيل`}
-            />
-            <StatTile
-              label="الجينات البحثية"
-              value={executionReport.data.genome_after}
-              deltaSign={Math.sign(executionReport.data.genome_after - executionReport.data.genome_before)}
-              delta={`${executionReport.data.genome_after - executionReport.data.genome_before >= 0 ? "+" : ""}${
-                executionReport.data.genome_after - executionReport.data.genome_before
-              } منذ آخر تشغيل`}
-            />
-            <StatTile
-              label="الأحداث"
-              value={executionReport.data.events_after}
-              deltaSign={Math.sign(executionReport.data.events_after - executionReport.data.events_before)}
-              delta={`${executionReport.data.events_after - executionReport.data.events_before >= 0 ? "+" : ""}${
-                executionReport.data.events_after - executionReport.data.events_before
-              } منذ آخر تشغيل`}
-            />
-            <StatTile label="حالة خط الإنتاج" value={titleCase(executionReport.data.overall_status)} />
-          </div>
-          {executionReport.data.errors.length > 0 && (
-            <div className={styles.list} style={{ marginTop: "var(--space-4)" }}>
-              {executionReport.data.errors.map((e, i) => (
-                <div key={i} className={styles.listItemDetail}>
-                  <Badge variant="negative">خطأ</Badge> {e}
-                </div>
-              ))}
-            </div>
-          )}
-        </Section>
-      )}
-
-      <Section title="ملخص السوق" description="جلسة التداول ونطاق الأسهم في آخر دورة.">
+      <Section title={t("marketSummary.title")} description={t("marketSummary.description")}>
         {marketState.loading && <LoadingState rows={1} />}
         {marketState.error && <ErrorState detail={marketState.error.message} onRetry={marketState.reload} />}
         {marketState.data === null && !marketState.loading && !marketState.error && (
-          <EmptyState title="لا توجد حالة سوق بعد" detail="تظهر بعد تشغيل أول دورة بحث." />
+          <EmptyState title={t("marketSummary.emptyTitle")} detail={t("marketSummary.emptyDetail")} />
         )}
         {marketState.data && (
           <div className={styles.statGrid}>
-            <StatTile label="حتى تاريخ" value={formatDate(marketState.data.as_of)} />
+            <StatTile label={t("marketSummary.asOf")} value={formatDate(marketState.data.as_of)} />
             <StatTile
-              label="جلسة التداول"
-              value={marketState.data.trading_session.is_trading_day ? "مفتوحة" : "مغلقة"}
+              label={t("marketSummary.tradingSession")}
+              value={marketState.data.trading_session.is_trading_day ? t("marketSummary.open") : t("marketSummary.closed")}
               caption={marketState.data.trading_session.holiday_name ?? undefined}
             />
-            <StatTile label="الأسهم" value={Object.keys(marketState.data.constituents).length} />
-            <StatTile label="القطاعات" value={new Set(Object.values(marketState.data.sectors)).size} />
+            <StatTile label={t("marketSummary.constituents")} value={Object.keys(marketState.data.constituents).length} />
+            <StatTile label={t("marketSummary.sectors")} value={new Set(Object.values(marketState.data.sectors)).size} />
           </div>
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="أبرز الفرص" subtitle="مرتبة حسب ثقة AGX">
+        <Card title={t("topOpportunities.title")} subtitle={t("topOpportunities.subtitle")}>
           {recommendations.loading && <LoadingState />}
           {recommendations.error && <ErrorState detail={recommendations.error.message} onRetry={recommendations.reload} />}
           {!recommendations.loading && !recommendations.error && (
@@ -238,18 +109,29 @@ export function AIBriefing() {
               rows={topOpportunities}
               getRowKey={(r) => r.ticker}
               onRowClick={(r) => navigate(`/company/${r.ticker}`)}
-              emptyTitle="لا توجد فرص بعد"
-              emptyDetail="تظهر القرارات بعد أن يجمع محرك القرار تنبؤات الآفاق."
+              emptyTitle={t("topOpportunities.emptyTitle")}
+              emptyDetail={
+                systemStatus.data && systemStatus.data.knowledge_objects > 0
+                  ? t("topOpportunities.emptyDetailMonitoring", { count: systemStatus.data.knowledge_objects })
+                  : t("topOpportunities.emptyDetail")
+              }
               columns={[
                 {
                   key: "ticker",
-                  header: "السهم",
-                  render: (r) => <span style={{ color: "var(--accent-strong)", fontWeight: 600 }}>{r.ticker}</span>,
+                  header: tCommon("table.ticker"),
+                  render: (r) => (
+                    <div className={styles.tickerCell}>
+                      <span className={`${styles.tickerCode} num`}>{r.ticker}</span>
+                      {r.explanation.why_this_stock && (
+                        <span className={styles.tickerRationale}>{r.explanation.why_this_stock}</span>
+                      )}
+                    </div>
+                  ),
                 },
-                { key: "confidence", header: "الثقة", render: (r) => <Meter value={r.confidence} label={formatPercent(r.confidence)} /> },
+                { key: "confidence", header: tCommon("table.confidence"), render: (r) => <Meter value={r.confidence} label={formatPercent(r.confidence)} /> },
                 {
                   key: "return",
-                  header: "العائد المتوقع",
+                  header: tCommon("table.expReturn"),
                   align: "right",
                   render: (r) => (
                     <span className="num" style={{ color: r.combined_expected_return >= 0 ? "var(--positive)" : "var(--negative)" }}>
@@ -257,17 +139,17 @@ export function AIBriefing() {
                     </span>
                   ),
                 },
-                { key: "risk", header: "المخاطر المتوقعة", align: "right", render: (r) => <span className="num">{formatPercent(r.combined_expected_risk)}</span> },
+                { key: "risk", header: tCommon("table.expRisk"), align: "right", render: (r) => <span className="num">{formatPercent(r.combined_expected_risk)}</span> },
               ]}
             />
           )}
         </Card>
 
-        <Card title="أكبر المخاطر" subtitle="الأحداث عالية وحرجة الشدة قيد المتابعة">
+        <Card title={t("biggestRisks.title")} subtitle={t("biggestRisks.subtitle")}>
           {events.loading && <LoadingState />}
           {events.error && <ErrorState detail={events.error.message} onRetry={events.reload} />}
           {!events.loading && !events.error && elevatedEvents.length === 0 && (
-            <EmptyState title="لا توجد أحداث مرتفعة الشدة" detail="لا يوجد حاليًا حدث مصنف عاليًا أو حرجًا." />
+            <EmptyState title={t("biggestRisks.emptyTitle")} detail={t("biggestRisks.emptyDetail")} />
           )}
           {elevatedEvents.length > 0 && (
             <div className={styles.list}>
@@ -280,20 +162,20 @@ export function AIBriefing() {
                     <span className={styles.listItemMeta}>{formatDate(e.event_date)}</span>
                   </div>
                   <div className={styles.badgeRow}>
-                    <Badge variant={SEVERITY_VARIANT[e.severity]}>{titleCase(e.severity)}</Badge>
-                    <Badge variant="neutral">{titleCase(e.event_type)}</Badge>
+                    <Badge variant={SEVERITY_VARIANT[e.severity]}>{label("eventSeverity", e.severity)}</Badge>
+                    <Badge variant="neutral">{label("eventType", e.event_type)}</Badge>
                   </div>
-                  <span className={styles.listItemDetail}>{titleCase(e.subtype)} · {titleCase(e.status)}</span>
+                  <span className={styles.listItemDetail}>{titleCase(e.subtype)} · {label("eventStatus", e.status)}</span>
                 </div>
               ))}
             </div>
           )}
         </Card>
 
-        <Card title="أهم الأخبار" subtitle="أحدث العناوين من المصادر التي يراقبها AGX">
+        <Card title={t("mostImportantNews.title")} subtitle={t("mostImportantNews.subtitle")}>
           {marketState.loading && <LoadingState />}
           {!marketState.loading && news.length === 0 && (
-            <EmptyState title="لا توجد أخبار بعد" detail="تظهر الأخبار بعد استيعابها في دورة جمع البيانات." />
+            <EmptyState title={t("mostImportantNews.emptyTitle")} detail={t("mostImportantNews.emptyDetail")} />
           )}
           {news.length > 0 && (
             <div className={styles.list}>
@@ -313,17 +195,19 @@ export function AIBriefing() {
           )}
         </Card>
 
-        <Card title="المحفزات القادمة" subtitle="الأحداث المؤسسية المجدولة من تاريخ آخر دورة فصاعدًا">
+        <Card title={t("upcomingCatalysts.title")} subtitle={t("upcomingCatalysts.subtitle")}>
           {marketState.loading && <LoadingState />}
           {!marketState.loading && upcomingCatalysts.length === 0 && (
-            <EmptyState title="لا توجد محفزات مجدولة" detail="لا توجد أحداث مؤسسية قادمة معروفة لنطاق الأسهم المغطى." />
+            <EmptyState title={t("upcomingCatalysts.emptyTitle")} detail={t("upcomingCatalysts.emptyDetail")} />
           )}
           {upcomingCatalysts.length > 0 && (
             <div className={styles.list}>
               {upcomingCatalysts.map((ce, i) => (
                 <div key={i} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{ce.ticker} — {titleCase(ce.event_type)}</span>
+                    <span className={styles.listItemTitle}>
+                      <span className="num">{ce.ticker}</span> — {label("corporateEventType", ce.event_type)}
+                    </span>
                     <span className={styles.listItemMeta}>{formatDate(ce.event_date)}</span>
                   </div>
                   <span className={styles.listItemDetail}>{ce.description}</span>
@@ -333,23 +217,23 @@ export function AIBriefing() {
           )}
         </Card>
 
-        <Card title="تغييرات المعرفة" subtitle="أحدث كائنات المعرفة اكتشافًا أو تحديثًا">
+        <Card title={t("knowledgeChanges.title")} subtitle={t("knowledgeChanges.subtitle")}>
           {knowledge.loading && <LoadingState />}
           {knowledge.error && <ErrorState detail={knowledge.error.message} onRetry={knowledge.reload} />}
           {!knowledge.loading && !knowledge.error && recentKnowledge.length === 0 && (
-            <EmptyState title="لا توجد كائنات معرفة بعد" detail="تظهر المعرفة المرقّاة أو المراقبة هنا بعد اكتشافها." />
+            <EmptyState title={t("knowledgeChanges.emptyTitle")} detail={t("knowledgeChanges.emptyDetail")} />
           )}
           {recentKnowledge.length > 0 && (
             <div className={styles.list}>
               {recentKnowledge.map((k) => (
                 <div key={k.id} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{k.affected_assets.join(", ")}</span>
+                    <span className={`${styles.listItemTitle} num`}>{k.affected_assets.join(", ")}</span>
                     <span className={styles.listItemMeta}>{formatDate(k.discovery_date)}</span>
                   </div>
                   <div className={styles.badgeRow}>
-                    <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{titleCase(k.status)}</Badge>
-                    <Badge variant="neutral">{titleCase(k.horizon)}</Badge>
+                    <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{label("knowledgeStatus", k.status)}</Badge>
+                    <Badge variant="neutral">{label("horizon", k.horizon)}</Badge>
                   </div>
                   <span className={styles.listItemDetail}>{k.economic_explanation}</span>
                 </div>
@@ -358,11 +242,11 @@ export function AIBriefing() {
           )}
         </Card>
 
-        <Card title="الاكتشافات العلمية" subtitle="أحدث الأوراق البحثية المنشورة">
+        <Card title={t("scientificDiscoveries.title")} subtitle={t("scientificDiscoveries.subtitle")}>
           {papers.loading && <LoadingState />}
           {papers.error && <ErrorState detail={papers.error.message} onRetry={papers.reload} />}
           {!papers.loading && !papers.error && recentPapers.length === 0 && (
-            <EmptyState title="لا توجد أوراق بعد" detail="تُنتج الأوراق بعد ترقية فرضية إلى معرفة." />
+            <EmptyState title={t("scientificDiscoveries.emptyTitle")} detail={t("scientificDiscoveries.emptyDetail")} />
           )}
           {recentPapers.length > 0 && (
             <div className={styles.list}>
@@ -380,11 +264,24 @@ export function AIBriefing() {
         </Card>
       </div>
 
-      <Section title="المحفظة" description="التخصيص الحالي على مستوى المحفظة إن كان محرك القرار قد أنتجه.">
+      <Section title={t("portfolio.title")} description={t("portfolio.description")}>
         {investmentCases.loading && <LoadingState />}
         {investmentCases.error && <ErrorState detail={investmentCases.error.message} onRetry={investmentCases.reload} />}
         {!investmentCases.loading && !investmentCases.error && investmentCases.data?.portfolio == null && (
-          <EmptyState title="لا يوجد تخصيص محفظة بعد" detail="يظهر التخصيص بعد تشغيل كامل لخط الإنتاج واجتياز بوابة النشر." />
+          <EmptyState
+            title={t("portfolio.emptyTitle")}
+            detail={
+              systemStatus.data && systemStatus.data.knowledge_objects > 0
+                ? t("portfolio.emptyDetailMonitoring", { count: systemStatus.data.knowledge_objects })
+                : t("portfolio.emptyDetail")
+            }
+          />
+        )}
+        {investmentCases.data?.portfolio?.explanation.why_this_stock && (
+          <p className={styles.portfolioRationale}>
+            <span className={styles.portfolioRationaleLabel}>{t("portfolio.rationale")}</span>
+            {investmentCases.data.portfolio.explanation.why_this_stock}
+          </p>
         )}
         {investmentCases.data?.portfolio && (
           <DataTable
@@ -393,18 +290,18 @@ export function AIBriefing() {
             columns={[
               {
                 key: "ticker",
-                header: "السهم",
+                header: tCommon("table.ticker"),
                 render: (p) => (
-                  <Link to={`/company/${p.ticker}`} style={{ color: "var(--accent-strong)", fontWeight: 600 }}>
+                  <Link to={`/company/${p.ticker}`} className="num" style={{ color: "var(--accent-strong)", fontWeight: 600 }}>
                     {p.ticker}
                   </Link>
                 ),
               },
-              { key: "weight", header: "الوزن", align: "right", render: (p) => <span className="num">{formatPercent(p.weight)}</span> },
-              { key: "confidence", header: "الثقة", render: (p) => <Meter value={p.confidence} label={formatPercent(p.confidence)} /> },
+              { key: "weight", header: t("portfolio.weight"), align: "right", render: (p) => <span className="num">{formatPercent(p.weight)}</span> },
+              { key: "confidence", header: tCommon("table.confidence"), render: (p) => <Meter value={p.confidence} label={formatPercent(p.confidence)} /> },
               {
                 key: "return",
-                header: "العائد المتوقع",
+                header: tCommon("table.expReturn"),
                 align: "right",
                 render: (p) => (
                   <span className="num" style={{ color: p.expected_return >= 0 ? "var(--positive)" : "var(--negative)" }}>
@@ -417,27 +314,86 @@ export function AIBriefing() {
         )}
         {investmentCases.data?.portfolio && (
           <div className={styles.statGrid} style={{ marginTop: "var(--space-4)" }}>
-            <StatTile label="وزن النقد" value={formatPercent(investmentCases.data.portfolio.cash_weight)} />
-            <StatTile label="Positions" value={investmentCases.data.portfolio.positions.length} />
+            <StatTile label={t("portfolio.cashWeight")} value={formatPercent(investmentCases.data.portfolio.cash_weight)} />
+            <StatTile label={t("portfolio.positions")} value={investmentCases.data.portfolio.positions.length} />
           </div>
         )}
       </Section>
+
+      <Section title={t("systemHealth.title")} description={t("systemHealth.description")}>
+        {systemStatus.loading && <LoadingState rows={1} />}
+        {systemStatus.error && <ErrorState detail={systemStatus.error.message} onRetry={systemStatus.reload} />}
+        {systemStatus.data && (
+          <div className={styles.statGrid}>
+            <StatTile label={t("systemHealth.lastCycle")} value={formatDate(systemStatus.data.pipeline_run_date)} />
+            <StatTile label={t("systemHealth.runs")} value={systemStatus.data.runs} />
+            <StatTile
+              label={t("systemHealth.succeeded")}
+              value={systemStatus.data.succeeded}
+              deltaSign={systemStatus.data.failed > 0 ? -1 : 1}
+              delta={
+                systemStatus.data.failed > 0
+                  ? t("systemHealth.failedCount", { count: systemStatus.data.failed })
+                  : t("systemHealth.allClear")
+              }
+            />
+            <StatTile label={t("systemHealth.knowledgeObjects")} value={systemStatus.data.knowledge_objects} />
+            {Object.entries(systemStatus.data.by_status).map(([status, count]) => (
+              <StatTile key={status} label={label("knowledgeStatus", status)} value={count} />
+            ))}
+          </div>
+        )}
+      </Section>
+
+      {executionReport.data && (
+        <Section title={t("changesSinceYesterday.title")} description={t("changesSinceYesterday.description")}>
+          <div className={styles.statGrid}>
+            <StatTile
+              label={t("changesSinceYesterday.knowledgeObjects")}
+              value={executionReport.data.knowledge_after}
+              deltaSign={Math.sign(executionReport.data.knowledge_after - executionReport.data.knowledge_before)}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.knowledge_after - executionReport.data.knowledge_before >= 0 ? "+" : ""}${
+                  executionReport.data.knowledge_after - executionReport.data.knowledge_before
+                }`,
+              })}
+            />
+            <StatTile
+              label={t("changesSinceYesterday.genes")}
+              value={executionReport.data.genome_after}
+              deltaSign={Math.sign(executionReport.data.genome_after - executionReport.data.genome_before)}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.genome_after - executionReport.data.genome_before >= 0 ? "+" : ""}${
+                  executionReport.data.genome_after - executionReport.data.genome_before
+                }`,
+              })}
+            />
+            <StatTile
+              label={t("changesSinceYesterday.events")}
+              value={executionReport.data.events_after}
+              deltaSign={Math.sign(executionReport.data.events_after - executionReport.data.events_before)}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.events_after - executionReport.data.events_before >= 0 ? "+" : ""}${
+                  executionReport.data.events_after - executionReport.data.events_before
+                }`,
+              })}
+            />
+            <StatTile
+              label={t("changesSinceYesterday.pipelineStatus")}
+              value={label("stageStatus", executionReport.data.overall_status)}
+            />
+          </div>
+          {executionReport.data.errors.length > 0 && (
+            <div className={styles.list} style={{ marginTop: "var(--space-4)" }}>
+              {executionReport.data.errors.map((e, i) => (
+                <div key={i} className={styles.listItemDetail}>
+                  <Badge variant="negative">{t("changesSinceYesterday.error")}</Badge> {e}
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
     </>
   );
-}
-
-function bestDecision(recommendation: Recommendation): HorizonDecision | null {
-  const decisions = Object.values(recommendation.horizon_decisions).filter(
-    (decision): decision is HorizonDecision => Boolean(decision)
-      && decision.publication_status === "publication_ready"
-      && decision.action !== "abstain",
-  );
-  return decisions.reduce<HorizonDecision | null>(
-    (best, decision) => !best || decision.risk_adjusted_score > best.risk_adjusted_score ? decision : best,
-    null,
-  );
-}
-
-function bestDecisionScore(recommendation: Recommendation): number {
-  return bestDecision(recommendation)?.risk_adjusted_score ?? Number.NEGATIVE_INFINITY;
 }

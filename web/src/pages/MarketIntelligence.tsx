@@ -1,9 +1,12 @@
+import { useTranslation } from "react-i18next";
 import { Card } from "../components/primitives/Card";
 import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
-import { formatDate, formatNumber, titleCase } from "../lib/format";
+import { useEnumLabel } from "../hooks/useEnumLabel";
+import { useFormatters } from "../hooks/useFormatters";
+import { formatNumber, titleCase } from "../lib/format";
 import type { CorporateEvent, MacroObservation } from "../types";
 import styles from "./MarketIntelligence.module.css";
 
@@ -14,6 +17,9 @@ import styles from "./MarketIntelligence.module.css";
  * rather than a frontend-side calculation from raw price bars, which
  * CLAUDE.md's own return-adjustment rule forbids doing outside `data/`. */
 export function MarketIntelligence() {
+  const { t } = useTranslation("marketIntelligence");
+  const label = useEnumLabel();
+  const { formatDate } = useFormatters();
   const marketState = useArtifact((p) => p.getMarketState());
 
   const sectors = marketState.data?.sectors ?? {};
@@ -49,42 +55,42 @@ export function MarketIntelligence() {
 
   return (
     <>
-      <Section title="ملخص السوق" description="نطاق الأسهم وجلسة التداول في آخر دورة بحث.">
+      <Section title={t("marketSummary.title")} description={t("marketSummary.description")}>
         {!marketState.data ? (
-          <EmptyState title="لا توجد حالة سوق بعد" detail="تظهر بعد تشغيل أول دورة بحث." />
+          <EmptyState title={t("marketSummary.emptyTitle")} detail={t("marketSummary.emptyDetail")} />
         ) : (
           <div className={styles.grid}>
-            <StatTile label="حتى تاريخ" value={formatDate(marketState.data.as_of)} />
+            <StatTile label={t("marketSummary.asOf")} value={formatDate(marketState.data.as_of)} />
             <StatTile
-              label="جلسة التداول"
-              value={marketState.data.trading_session.is_trading_day ? "مفتوحة" : "مغلقة"}
+              label={t("marketSummary.tradingSession")}
+              value={marketState.data.trading_session.is_trading_day ? t("marketSummary.open") : t("marketSummary.closed")}
               caption={marketState.data.trading_session.holiday_name ?? undefined}
             />
-            <StatTile label="الأسهم" value={Object.keys(constituents).length} />
-            <StatTile label="القطاعات" value={bySector.size} />
+            <StatTile label={t("marketSummary.constituents")} value={Object.keys(constituents).length} />
+            <StatTile label={t("marketSummary.sectors")} value={bySector.size} />
           </div>
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="توزيع القطاعات" subtitle="الأسهم المغطاة ذات القطاعات المعروفة">
+        <Card title={t("sectorComposition.title")} subtitle={t("sectorComposition.subtitle")}>
           {bySector.size === 0 ? (
-            <EmptyState title="لا توجد بيانات قطاعات بعد" />
+            <EmptyState title={t("sectorComposition.emptyTitle")} />
           ) : (
             <div>
               {[...bySector.entries()].map(([sector, tickers]) => (
                 <div key={sector} className={styles.sectorRow}>
                   <span className={styles.sectorName}>{sector}</span>
-                  <span className={styles.sectorTickers}>{tickers.join(", ")}</span>
+                  <span className={`${styles.sectorTickers} num`}>{tickers.join(", ")}</span>
                 </div>
               ))}
             </div>
           )}
         </Card>
 
-        <Card title="لوحة الاقتصاد الكلي" subtitle="أحدث مشاهدة لكل سلسلة متابعة">
+        <Card title={t("macroDashboard.title")} subtitle={t("macroDashboard.subtitle")}>
           {latestMacro.length === 0 ? (
-            <EmptyState title="لا توجد بيانات اقتصاد كلي بعد" />
+            <EmptyState title={t("macroDashboard.emptyTitle")} />
           ) : (
             <div className={styles.grid}>
               {latestMacro.map(({ seriesId, observation }) => (
@@ -92,7 +98,7 @@ export function MarketIntelligence() {
                   key={seriesId}
                   label={titleCase(seriesId)}
                   value={observation ? formatNumber(observation.value, 2) : "—"}
-                  caption={observation ? formatDate(observation.observation_date) : "لا توجد مشاهدات"}
+                  caption={observation ? formatDate(observation.observation_date) : t("macroDashboard.noObservations")}
                 />
               ))}
             </div>
@@ -101,15 +107,15 @@ export function MarketIntelligence() {
       </div>
 
       <div className={styles.twoCol}>
-        <Card title="الأرباح والإجراءات والإفصاحات القادمة" subtitle="الأحداث المجدولة عبر نطاق الأسهم المغطى">
+        <Card title={t("upcomingEvents.title")} subtitle={t("upcomingEvents.subtitle")}>
           {upcoming.length === 0 ? (
-            <EmptyState title="لا توجد أحداث مجدولة" detail="لا توجد أحداث مؤسسية قادمة معروفة لنطاق الأسهم المغطى." />
+            <EmptyState title={t("upcomingEvents.emptyTitle")} detail={t("upcomingEvents.emptyDetail")} />
           ) : (
             <div className={styles.list}>
               {upcoming.map((e, i) => (
                 <div key={i} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{e.ticker} — {titleCase(e.event_type)}</span>
+                    <span className={styles.listItemTitle}><span className="num">{e.ticker}</span> — {label("corporateEventType", e.event_type)}</span>
                     <span className={styles.listItemMeta}>{formatDate(e.event_date)}</span>
                   </div>
                   <span className={styles.listItemDetail}>{e.description}</span>
@@ -119,15 +125,15 @@ export function MarketIntelligence() {
           )}
         </Card>
 
-        <Card title="الإجراءات المؤسسية الأخيرة" subtitle="الأحداث المؤسسية السابقة عبر نطاق الأسهم المغطى">
+        <Card title={t("recentActions.title")} subtitle={t("recentActions.subtitle")}>
           {past.length === 0 ? (
-            <EmptyState title="لا توجد إجراءات مؤسسية مسجلة" />
+            <EmptyState title={t("recentActions.emptyTitle")} />
           ) : (
             <div className={styles.list}>
               {past.map((e, i) => (
                 <div key={i} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{e.ticker} — {titleCase(e.event_type)}</span>
+                    <span className={styles.listItemTitle}><span className="num">{e.ticker}</span> — {label("corporateEventType", e.event_type)}</span>
                     <span className={styles.listItemMeta}>{formatDate(e.event_date)}</span>
                   </div>
                   <span className={styles.listItemDetail}>{e.description}</span>
@@ -139,18 +145,12 @@ export function MarketIntelligence() {
       </div>
 
       <div className={styles.twoCol}>
-        <Card title="اتساع السوق والسيولة">
-          <EmptyState
-            title="غير متاح بعد"
-            detail="يتطلب اتساع السوق والسيولة ملفًا محسوبًا خلفيًا للأسهم الصاعدة والهابطة والحجم المعدل؛ لا تحسب الواجهة هذه القيم من الأسعار الخام."
-          />
+        <Card title={t("breadthLiquidity.title")}>
+          <EmptyState title={t("breadthLiquidity.emptyTitle")} detail={t("breadthLiquidity.emptyDetail")} />
         </Card>
 
-        <Card title="نظام السوق والمقارنة التاريخية">
-          <EmptyState
-            title="غير متاح بعد"
-            detail="لا يوجد حتى الآن تصنيف لنظام السوق أو ملف مقارنة تاريخية من محرك البحث؛ سيظهر القسم عند إنتاجه."
-          />
+        <Card title={t("marketRegime.title")}>
+          <EmptyState title={t("marketRegime.emptyTitle")} detail={t("marketRegime.emptyDetail")} />
         </Card>
       </div>
     </>

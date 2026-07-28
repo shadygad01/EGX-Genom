@@ -68,14 +68,14 @@
   font-size: var(--text-sm);
   color: var(--text-primary);
   line-height: var(--leading-normal);
-  padding-left: var(--space-4);
+  padding-inline-start: var(--space-4);
   position: relative;
 }
 
 .bulletList li::before {
   content: "";
   position: absolute;
-  left: 2px;
+  inset-inline-start: 2px;
   top: 0.55em;
   width: 4px;
   height: 4px;
@@ -116,4 +116,58 @@
   display: flex;
   gap: var(--space-1);
   flex-wrap: wrap;
+}
+
+.horizonGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+@media (max-width: 720px) {
+  .horizonGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.horizonCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.horizonCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.horizonCardTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.horizonCardStats {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: var(--space-2);
+  row-gap: 0;
+  align-items: baseline;
+}
+
+.horizonCardStatLabel {
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+}
+
+.horizonCardWhy {
+  font-size: var(--text-2xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+  margin: 0;
 }

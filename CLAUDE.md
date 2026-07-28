@@ -221,6 +221,10 @@ Layout:
   ex-date — use the last *cum*-dividend close, strictly before it (a real
   bug caught by this codebase's own tests; see `data/adjustments.py`).
 - Do not populate `patterns.json` with invented entries. It stays `[]`
-  until `agents.historical_patterns.HistoricalPatternsAgent` is
-  implemented; `validate_dashboard_artifacts()` enforces this and fails
-  the build if it's ever non-empty.
+  until a dedicated `Pattern` pydantic model/contract exists for its
+  dashboard-specific shape (TD-15); `validate_dashboard_artifacts()`
+  enforces this and fails the build if it's ever non-empty.
+  `agents.historical_patterns.HistoricalPatternsAgent` itself is
+  implemented and its findings already flow through the normal
+  finding/hypothesis/knowledge pipeline like any other agent's — this
+  restriction is only about the separate raw-pattern display artifact.

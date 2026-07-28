@@ -57,10 +57,6 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     Capability.PRICE_DATA: [
         "egx_price_composite",
         "stooq",
-        "fmp",
-        "alphavantage",
-        "polygon",
-        "tiingo",
         "egx_official",
         "company_ir",
     ],
@@ -80,7 +76,7 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "mubasher",
         "zawya",
     ],
-    Capability.FINANCIAL_STATEMENTS: ["company_ir", "fmp"],
+    Capability.FINANCIAL_STATEMENTS: ["company_ir"],
     Capability.INVESTOR_RELATIONS: ["company_ir"],
     Capability.NEWS: [
         "reuters",

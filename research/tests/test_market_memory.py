@@ -71,3 +71,23 @@ def test_reconstruct_populates_canonical_events():
     assert state.events, "expected registered events for the mock window"
     # Events come through the platform: fingerprint ids, resolved entities.
     assert all(e.id.startswith("event_") for e in state.events)
+
+
+def test_macro_lookback_days_is_passed_through_to_the_snapshot():
+    memory = MarketMemory(
+        MockDataProvider(MOCK_ROOT),
+        MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
+        StaticSectorProvider(),
+        macro_series_ids=["BRENT_USD"],
+        lookback_days=5,
+        macro_lookback_days=30,
+    )
+    state = memory.reconstruct(date(2026, 6, 14))
+    assert state.dataset_snapshot.macro_lookback_days == 30
+    assert all(
+        bar.trade_date >= date(2026, 6, 9) for bar in state.dataset_snapshot.price_history["COMI"]
+    )
+    assert any(
+        obs.observation_date < date(2026, 6, 9)
+        for obs in state.dataset_snapshot.macro_series["BRENT_USD"]
+    )

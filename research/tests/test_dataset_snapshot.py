@@ -51,3 +51,90 @@ def test_bundles_corporate_events_and_macro_and_news():
     assert len(snapshot.corporate_events["MFPC"]) == 1
     assert len(snapshot.macro_series["BRENT_USD"]) > 0
     assert len(snapshot.news) > 0
+
+
+def test_macro_lookback_days_defaults_to_lookback_days():
+    snapshot = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    assert snapshot.macro_lookback_days == 30
+
+
+def test_macro_lookback_days_windows_macro_series_independently_of_price_history():
+    # Mock BRENT_USD/COMI both start 2026-06-01 -- a 5-day price window (start
+    # 2026-06-09) drops the early bars, but a 30-day macro window still
+    # covers the whole mock fixture. This is the exact independence that a
+    # single shared window doesn't give annual/quarterly macro sources.
+    snapshot = build_snapshot(
+        provider(),
+        tickers=["COMI"],
+        macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14),
+        lookback_days=5,
+        macro_lookback_days=30,
+    )
+    assert all(bar.trade_date >= date(2026, 6, 9) for bar in snapshot.price_history["COMI"])
+    assert any(
+        obs.observation_date < date(2026, 6, 9) for obs in snapshot.macro_series["BRENT_USD"]
+    )
+
+
+def test_macro_series_sources_drops_not_yet_knowable_observations():
+    # Mock BRENT_USD has observations through 2026-06-14; a declared
+    # 30-day "worldbank" publication lag means only observations dated on
+    # or before as_of - 30 days are knowable yet.
+    without_lag = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    with_lag = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+        macro_series_sources={"BRENT_USD": "worldbank"},
+    )
+    assert len(with_lag.macro_series["BRENT_USD"]) < len(without_lag.macro_series["BRENT_USD"])
+    assert all(
+        obs.observation_date <= date(2026, 5, 15) for obs in with_lag.macro_series["BRENT_USD"]
+    )
+
+
+def test_pattern_lookback_days_defaults_to_empty_long_price_history():
+    snapshot = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=[],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    assert snapshot.pattern_lookback_days == 0
+    assert snapshot.long_price_history == {}
+    assert snapshot.long_corporate_events == {}
+
+
+def test_pattern_lookback_days_windows_price_history_independently():
+    # Mock COMI data starts 2026-06-01. A 5-day price window (start
+    # 2026-06-09) drops the early bars from price_history, but a 30-day
+    # pattern window still reaches back to the fixture's start -- the same
+    # independence macro_lookback_days already gives macro series.
+    snapshot = build_snapshot(
+        provider(),
+        tickers=["COMI"],
+        macro_series_ids=[],
+        as_of=date(2026, 6, 14),
+        lookback_days=5,
+        pattern_lookback_days=30,
+    )
+    assert all(bar.trade_date >= date(2026, 6, 9) for bar in snapshot.price_history["COMI"])
+    assert any(bar.trade_date < date(2026, 6, 9) for bar in snapshot.long_price_history["COMI"])
+    assert len(snapshot.long_price_history["COMI"]) > len(snapshot.price_history["COMI"])
+
+
+def test_macro_series_sources_unmapped_series_id_unaffected():
+    with_map = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+        macro_series_sources={"SOME_OTHER_SERIES": "worldbank"},
+    )
+    without_map = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    assert with_map.macro_series["BRENT_USD"] == without_map.macro_series["BRENT_USD"]

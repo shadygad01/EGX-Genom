@@ -1,76 +1,478 @@
 # Changelog
 
-## 0.18.1 — Benchmark-matched decision outcomes
+## 0.32.1 — Supporting Evidence cleanup, part 2: id prefixes and duplicate lines
 
-- Decision outcomes now deduct an explicit transaction-cost assumption and
-  retain the gross asset return separately.
-- Every expired decision is matched to point-in-time EGX30 entry/exit prices;
-  hit rate and excess return remain unavailable when that benchmark is absent.
-- The UI distinguishes an insufficient decision sample from incomplete
-  benchmark coverage and displays mean excess return only after the full gate.
-- A fail-closed publication gate now requires referenced external evidence,
-  positive benchmark-matched performance for all horizons, and an unexpired
-  human legal approval before any decision can become `publication_ready`.
-- Five-reviewer Council audit closed six P0 scientific defects: discovery/test
-  leakage, pair-date misalignment, horizon-unit mismatch, readiness bypass,
-  knowledge time travel, and phantom execution of WATCH/AVOID/ABSTAIN.
-- Source legal clearance is independent of collector implementation and the
-  live price adapter no longer disables the shared robots policy.
-- The landing page excludes research-only candidates from the executable
-  decision; company research uses separate horizon cards and zero size while
-  publication is blocked.
-- Publication evidence now must match an archived RawDocument by id, source,
-  SHA-256 and timestamp; stale, partial, legally uncleared, same-group or
-  tampered references fail closed.
-- Bootstrap inference now resamples moving time blocks, overlapping
-  walk-forward windows use Newey-West HAC, and Bonferroni family size includes
-  all previously persisted hypothesis attempts.
-- Buy decisions now carry a fresh reference price, numeric entry/invalidation
-  levels and a review trigger; otherwise the engine abstains.
-- Portfolio construction now occurs after publication gating and allocates only
-  publication-ready numeric buy decisions, eliminating implicit research trades.
-- The per-ticker data-gap report is now available through API and static modes
-  and visible in the Arabic decision center with missing layers and next action.
-- Core opportunity and company decision sections are Arabic, and explicitly
-  expose evidence reference kind, immutable id and version instead of hiding
-  traceability behind narrative evidence text.
-- Decision-engine narratives and readiness blockers/actions are now generated
-  in Arabic at the domain layer, keeping API and static consumers consistent.
-- The primary AI Briefing is Arabic across health, changes, market, opportunity,
-  risk, news, catalyst, knowledge, discovery and portfolio sections.
-- Primary navigation plus market, company and source-transparency surfaces are
-  Arabic, including fail-honest empty states and source health/legal labels.
-- Research Center and Knowledge Graph are Arabic across hypothesis gates,
-  knowledge lifecycle, scientific papers, graph controls and node details.
-- Mission Control and System Administration are Arabic across pipeline stages,
-  collectors, blockers, acquisition choices, artifacts, replay and logs.
-- Added the fail-closed `publication-status` CLI: it validates production
-  evidence, immutable raw-document references, benchmark performance and human
-  legal approval, returns exit code 2 while blocked, and reports missing or
-  malformed control files explicitly.
-- Dashboard validation now rejects any post-export mismatch between the
-  publication gate, decision statuses and portfolio allocation. Pages uploads
-  also require the publication, performance, history, source-truth and
-  per-ticker gap artifacts to exist.
+The 0.31.2 `humanizeEvidence()` fix only handled inline `key=value` pairs;
+real production output showed it was still incomplete for real
+opportunities -- raw internal id prefixes, bare tokens, and duplicated
+lines were all still visible on the live site. This closes every remaining
+gap, purely at render time (no backend evidence string changed):
 
-## 0.18.0 — Horizon Decision Safety
+- **`hyp_<id> v<N>:` and `event event_<id>:` prefixes** (every
+  `KnowledgeWeightedHorizonModel` evidence line opens with the raw
+  `KnowledgeObject`/`Event` id -- real provenance, unreadable to a person)
+  are now relabeled to `Knowledge: ` / `Event: `.
+- **Bare `micro:`/`swing:`/`investment:` horizon prefixes** (from
+  `MetaDecisionEngine`'s per-horizon evidence lines) are now title-cased.
+- **Bare snake_case tokens with no `=`** -- an event's `.subtype`
+  (`large_price_move`, `macro_news`) appended straight after its
+  headline -- are now humanized the same way `key=value` pairs are.
+- **Exact-duplicate evidence lines** are gone from both Opportunity Center
+  and Company Workspace. `MetaDecisionEngine` concatenates each horizon
+  prediction's full evidence list when combining them into a
+  `Recommendation`, so a knowledge object or event supporting more than
+  one horizon had its lines repeated verbatim; the list is now
+  deduplicated at render time (`dedupeEvidence()`), order-preserving,
+  before display.
+- Verified against a real mock-mode dashboard export with production-shaped
+  evidence strings, in a real browser, in both English and Arabic (RTL).
 
-- Added one `HorizonDecision` per ticker and horizon with an explicit research
-  action, validity window, risk definition, risk-adjusted score, position cap,
-  invalidation conditions, evidence references, and `research_only` status.
-- Decision readiness is evaluated per horizon and requires matching knowledge;
-  production defaults require 60 observations instead of five-observation fixtures.
-- Clean adversarial checks are confidence-neutral instead of adding `+0.02`.
-- Opportunity Center is Arabic/RTL, decision-first, risk-adjusted in ordering,
-  and carries an unconditional demo/non-advice warning.
-- Added `source_truth.json`, which separates catalogued/usable/fetched/fresh/
-  productive/corroborated sources from sources that actually reached the
-  decision path.
-- Added an append-only decision ledger, automatic post-expiry outcome
-  evaluation, and `decision_performance.json`; the UI labels fewer than 30
-  evaluated decisions per horizon as an insufficient sample.
-- Backtests now reserve an out-of-sample tail and deduct transaction costs;
-  statistical validation applies a family-wise Bonferroni correction.
+## 0.32.0 — Council review follow-through: disclaimer, surfaced rationale, priority ordering
+
+Five independent review passes (data sources, decision clarity, value,
+content structure, audience/risk) against the live dashboard's actual
+source code surfaced one critical and several high-value, zero-backend
+fixes, all implemented here:
+
+- **New `Disclaimer` primitive**, shown on every page that displays a
+  concrete decision (AI Briefing, Opportunity Center, Company Workspace):
+  "AGX is an autonomous research scaffold, not a licensed investment
+  advisor..." -- previously there was no investor-facing disclaimer
+  anywhere in the product, the single largest trust/legal gap the audit
+  found.
+- **Backend-computed rationale now actually reaches the screen.** AI
+  Briefing's "Top Opportunities" table shows each recommendation's
+  `explanation.why_this_stock` under its ticker; the Portfolio section
+  shows the portfolio-level `explanation.why_this_stock` as a "Why this
+  allocation" summary. Both fields already existed in every artifact --
+  the UI was discarding them.
+- **Honest-abstention empty states, not blank ones.** When there are
+  zero opportunities/portfolio positions but knowledge objects exist and
+  are being monitored, the empty state now says so explicitly ("Monitoring
+  N knowledge object(s) -- none has cleared the promotion bar yet")
+  instead of implying the pipeline hasn't run.
+- **AI Briefing reordered**: System Health and Changes Since Yesterday
+  (operational/meta content) move from the top of the page to the bottom,
+  so Market Summary, Top Opportunities, and Portfolio -- the sections an
+  investor actually opens the page for -- lead.
+- **Decision Readiness table now ranks by proximity to a decision**
+  (ready → degraded → blocked, ticker as tiebreak) instead of raw backend
+  insertion order.
+
+## 0.31.2 — Human-readable Supporting Evidence
+
+Agent/pipeline evidence strings (`ResearchFinding.evidence`, threaded
+unchanged into `KnowledgeObject`/`Explanation.supporting_evidence`) are
+internal `snake_case_key=value` notation by design -- the right shape for
+every agent/gate to parse, but it read as symbol noise ("macro_correlation=
+0.532", "directional_agreement=100.00%") in the dashboard's Supporting
+Evidence lists. New `lib/format.ts#humanizeEvidence()` reformats each
+inline `key=value` it finds into "Key: value", leaving any surrounding
+free text (a headline, a stress-test note) untouched. Applied everywhere
+`supporting_evidence` renders: Opportunity Center's evidence panel and
+Company Research Workspace's investment thesis. New `test/format.test.ts`
+covers single/multi-pair/embedded/free-text shapes.
+
+## 0.31.1 — Rank opportunities by expected return, not confidence
+
+Both places the dashboard lists discovered opportunities -- the AI
+Briefing's "Top Opportunities" widget and the Opportunity Center's main
+table -- now sort by `combined_expected_return` descending (highest
+expected return first) instead of by confidence. Matches how an investor
+actually wants candidates ordered: confidence is still shown per row (and
+still gates whether a recommendation exists at all), it just no longer
+decides row order. Updated the matching EN/AR copy ("Ranked by expected
+return, highest to lowest").
+
+## 0.31.0 — HistoricalPatternsAgent: real analog-matching over live long-history
+
+Closes the last data-blocked half of System 08's `HistoricalPatternsAgent`
+stub. It turned out to be a methodology gap, not a data gap: LIVE mode's
+`egx_price_composite` collector already returns full history (Yahoo
+`range=max`) on every run, but every agent shared one 30-day
+`DatasetSnapshot` window. `data/snapshot.py` gains `pattern_lookback_days`
+(default 0, opt-in) populating a new `long_price_history`/
+`long_corporate_events` pair — the same "one field needs its own window"
+precedent `macro_lookback_days` already set for macro series, not a
+redesign of the shared snapshot. `MarketMemory`/`ProductionPipeline` thread
+it through; LIVE mode requests `LIVE_PATTERN_LOOKBACK_DAYS` (~4 years),
+mock/replay stay at 0 (their fixtures are far too short regardless).
+
+`HistoricalPatternsAgent` itself: for each ticker, mean-centered Euclidean
+distance between the most recent `window`-day adjusted-return path and
+every non-overlapping earlier window in its own history selects the
+`top_k` closest historical analogs; each analog's actual subsequent
+`forward_horizon`-day return is the "what happened next" evidence. A
+finding is proposed only when at least `min_analogs` exist *and* they
+agree in direction beyond `agreement_threshold` — anything weaker is an
+honest skip, never a forced signal. `contracts/market_state.schema.json`
+regenerated; `api/src/types.ts`/`web/src/types.ts` updated to match.
+
+Verified: a hand-built synthetic fixture with a bit-for-bit repeating
+20-day pattern produces the exact expected 5/5 analog match and 100%
+directional agreement; a variant with alternating pattern outcomes
+correctly abstains (3/5 agreement, below threshold). Full mock-mode `agx
+run` re-verified against the pre-change baseline: identical output.
+622 Python tests green (was 616), `npm run lint`/`build`/`test` clean for
+both `api` and `web`.
+
+## 0.30.0 — Free daily automatic refresh (GitHub Actions cron)
+
+`.github/workflows/deploy-pages.yml` gains a `schedule:` trigger (`30 15
+* * 0-4` UTC — after EGX's Sun-Thu close) alongside its existing
+push/`workflow_dispatch` triggers. The dashboard now re-runs the full live
+production pipeline and redeploys once a day automatically, at zero cost
+(GitHub Actions cron is free for a public repository) and with no
+deployment target or paid scheduler required. Closes the GitHub-Pages half
+of ROADMAP.md's "Schedule `agx run` itself" item; a hosted `api/`'s own
+periodic refresh (TD-14) still needs a real deployment target, unchanged.
+
+## 0.29.0 — Bilingual EN/AR dashboard with full RTL layout
+
+The web dashboard is now bilingual: an EN/AR toggle in the top bar
+(`LanguageToggle`) switches the whole UI, persisted to `localStorage` and
+seeded from `navigator.language` on first visit. Backed by `i18next`/
+`react-i18next` with one JSON namespace per page under
+`web/src/i18n/locales/{en,ar}/`.
+
+Arabic renders full RTL (`dir="rtl"` on `<html>`, driven by
+`i18n/index.ts`'s `applyDocumentDirection`), achieved almost entirely
+through CSS logical properties (`inset-inline-start/end`,
+`padding-inline-start/end`, `border-inline-end`, `text-align: start/end`)
+rather than per-component RTL overrides — only 7 stylesheets needed
+physical-to-logical conversions across the whole `web/src` tree. Numeric
+and ticker data (prices, percentages, IDs, dates) always render LTR via a
+new `.num` utility class (`direction: ltr; unicode-bidi: isolate;`),
+matching real Arabic financial-dashboard convention; a `useFormatters()`
+hook forces `numberingSystem: "latn"` so locale-aware date formatting
+never switches to Eastern Arabic numerals.
+
+Translation scope is deliberately bounded, following this project's own
+"never fabricate" principle: UI chrome and closed backend vocabularies
+(the `Horizon`/`Decision`/`SourceStatus`/... unions in `web/src/types.ts`,
+translated via a new `useEnumLabel()` hook with a safe title-case
+fallback for any value the dictionary doesn't cover) are translated.
+Free-form backend-generated content — explanations, evidence, news
+headlines, notes, company names, macro series ids, financial-statement
+line items — stays English, since translating those would require either
+fabricating financial/legal Arabic terminology or a backend
+LLM-translation feature that doesn't exist.
+
+## 0.28.0 — `ticker_data_gap_report.json` web/API wiring (TD-34)
+
+Closes the last purely-engineering item on the post-freeze punch list.
+The backend artifact (`meta.readiness.build_ticker_data_gap_report`) was
+correct and tested but had no route, provider method, TS type, or UI
+surface. Wired following `financial_statements.json`'s exact existing
+pattern: `api/src/artifactsStore.ts`/`routes/dashboard.ts`
+(`GET /ticker-data-gap-report`), `web/src/data/{DataProvider,ApiProvider,
+StaticJsonProvider}.ts`, `web/src/types.ts` (`TickerDataGapReport`/
+`DataLayerGap`).
+
+UI: Opportunity Center's "Decision Readiness" table gained `onRowClick`
+paired with a new "Data Coverage" detail card — the same click-to-select
+pattern the Opportunities table above it already uses — showing the
+5-layer completeness breakdown, blockers, and next actions per ticker.
+
+Verified in a real headless browser against a real mock-mode `agx run`
+output served through a production Vite build: clicking a Decision
+Readiness row correctly populates the detail panel. `npm run lint`/
+`build`/`test` clean for both workspaces.
+
+## 0.27.0 — Monte Carlo stress simulator (block bootstrap)
+
+Closes the one Experiment Factory gap docs had explicitly named as a
+design decision rather than a data blocker: `MonteCarloExperiment` had
+been a `NotImplementedError` placeholder since System 10 was built. New
+`validation.stress_test.MonteCarloBlockBootstrapStressTester` stays
+faithful to the existing stress tester's "locate/derive from real data,
+never simulate" philosophy — every simulated path resamples contiguous
+blocks of the hypothesis's real observed returns with replacement
+(preserving real autocorrelation, unlike `BootstrapExperiment`'s
+single-observation resampling), never a parametric distribution.
+
+`MonteCarloExperiment` is now a real adapter over this tester (mirroring
+`StressTestExperiment`'s shape); `DailyResearchPipeline`'s STRESS_TEST
+gate now requires both the historical worst-window and the Monte Carlo
+tester to pass. Verified: an identical mock-mode run produces the same 5
+hypotheses as before this change.
+
+8 new tests (616 total, up from 608); `ruff check` clean.
+
+## 0.26.0 — Macro frequency alignment + no-look-ahead discipline
+
+`MacroAgent` aligned macro observations to trading days by exact date
+equality, silently starving every lower-frequency series (monthly/
+quarterly/annual) of correlation evidence since their dates almost never
+land on a trading day. Fixed with `agents/macro.py`'s
+`_forward_fill_onto()` — standard last-observation-carried-forward step
+alignment, never assigning a change to a trading day before the
+observation that produced it.
+
+Separately, nothing distinguished a macro value's `observation_date`
+(the period it describes) from when it actually became known —
+real look-ahead bias. New `data/point_in_time.py` (`is_knowable`) applies
+a declared, deliberately conservative per-source publication-lag floor
+(new debt TD-37); `data.snapshot.build_snapshot()`'s new
+`macro_series_sources` param drops any not-yet-knowable observation
+before it reaches an agent, wired in `ProductionPipeline` for LIVE mode
+only (mock/replay default to no filtering change).
+
+An initial 365-day World Bank/UN SDG lag assumption was caught
+contradicting this codebase's own live-verified evidence (a real
+collected observation only ~165 days old) before merging — scaled back
+to a 30-day floor.
+
+8 new tests (608 total, up from 600); `ruff check` clean.
+
+## 0.25.0 — Real entity resolution for news-to-ticker matching
+
+`RssNewsCollector`/`GdeltDocCollector` attributed news to a ticker via a
+bare case-insensitive substring check (`ticker.lower() in
+title.lower()`) — the exact "VLMR matches inside VLMRA" false-positive
+risk named in the project owner's own completion plan. New module
+`universe/entity_resolution.py` (`resolve_ticker_mentions`) fixes this:
+ticker matching is now a real word/token match, and when a real company
+display name is available, the full name is matched too via the same
+conservative "every significant token present" discipline
+`discover_company_directory_links()` already uses (shared
+`significant_tokens()` helper, not a parallel implementation).
+
+`production.pipeline.ProductionPipeline._ticker_companies()` threads real
+company names from `research/data/universe/EGX30.csv`/`EGX70.csv` (the
+already-reviewed, EGX-sourced 101-ticker seed with real English names and
+ISINs) through `collector_plan.build_collector_plan`/`build_live_collector`
+into both news collectors, so live/mock runs get genuine entity
+resolution, not a ticker-only guess. Both collectors stay backward
+compatible with a plain `ticker_hints: list[str]` for callers with no
+company-name data (still upgraded from substring to exact-token
+matching). No Arabic alias list yet — no verified Arabic-language EGX
+source exists in this codebase (new debt, TD-36); inventing
+transliterations would risk a wrong match, worse than a missed one.
+
+8 new tests (600 total, up from 592); `ruff check` clean.
+
+## 0.24.0 — NewsIntelligenceAgent: real news sentiment now produces findings
+
+`agents.news_intelligence.NewsIntelligenceAgent` was an honest
+`NotImplementedError` stub since System 08 was built, correctly deferred
+because no real Egyptian news flow existed to research. That stopped being
+true once `enterprise_press`/`fra_egypt` started producing real, dated
+`NewsItem` records every live run (see `docs/PHASE_STATUS.md`'s "Egyptian
+Live Data Sprint" phase) — this was the most directly-unblocked stub in
+the codebase, named explicitly in `NEXT_MISSIONS.md`.
+
+Implemented as a real, mechanical event-study-lite, mirroring
+`CorporateEventsAgent` exactly: `agents.news_sentiment.classify_headline_sentiment()`
+is a declared, headline-only keyword heuristic (positive/negative phrase
+lists, negative checked first) — the same honesty tier as
+`collectors.corporate_event_classifier`, never a fabricated NLP/sentiment
+score (new debt, TD-35). For each ticker's sentiment-classified news item
+with enough return history on both sides, the agent compares mean adjusted
+return after the item to before it and proposes a MICRO-horizon
+post-news-drift hypothesis when the shift clears a threshold. Wired into
+`production.pipeline.ProductionPipeline`'s Research Pipeline stage
+alongside the other five real agents.
+
+Building this surfaced and fixed a real, previously-latent bug:
+`collectors.service._append_news` was the only per-record materialization
+writer that blindly appended instead of merging idempotently by natural
+key (unlike prices/macro/corporate-events/index-constituents) — collecting
+the same feed twice (e.g. a mock run followed by a replay run reading the
+same archive) silently duplicated every news row. Harmless while nothing
+consumed `news.csv` for hypothesis generation; caught immediately once
+`NewsIntelligenceAgent` did, via `test_production_pipeline.py`'s existing
+mock/replay-determinism test (5 vs. 7 hypotheses on the same input). Fixed
+by merging on `(date, source, headline)`, matching every sibling writer.
+
+24 new tests (592 total, up from 568); `ruff check` clean.
+
+## 0.23.0 — Macro data now reaches the decision engine in live runs
+
+A live production run's `investment_cases.json` showed all 62 published
+recommendations at MICRO horizon only, and the Macro Dashboard showed all
+23 `LIVE_MACRO_SERIES_IDS` (FRED/World Bank/UN SDG) with zero observations.
+Root cause: `_stage_market_memory` used one `lookback_days=30` window for
+prices, news, corporate events, *and* macro series — but World Bank/UN
+SDG report annually (often with a 1-2 year publication lag) and CAPMAS
+monthly, so an annual observation almost never falls inside the last 30
+days. Since `DailyResearchPipeline` (the agents feeding the Meta Decision
+Engine) reconstructs from this exact same snapshot, `MacroAgent` — the
+only agent that turns macro data into SWING-horizon knowledge — had
+nothing to correlate against in any live run.
+
+`data.snapshot.build_snapshot()` now takes an independent
+`macro_lookback_days` (default: `lookback_days`, so mock-mode callers are
+unaffected); `DatasetSnapshot` gained the field so the window actually used
+is explainable, not just assumed. `MarketMemory` and `ProductionPipeline`
+thread it through; LIVE mode uses a new `LIVE_MACRO_LOOKBACK_DAYS = 900`
+constant. Also closed a separate, independent gap: `LIVE_CAPMAS_INDICATORS`'
+local ids were never added to `LIVE_MACRO_SERIES_IDS` at all, so CAPMAS
+data was structurally excluded regardless of window size.
+
+This does not create SWING/INVESTMENT recommendations by itself — it
+removes the specific reason `MacroAgent` was structurally starved of data.
+INVESTMENT horizon still has no agent implemented at all
+(`FinancialPerformanceAgent` remains an honest `NotImplementedError`,
+blocked on a fundamentals data source).
+
+`contracts/market_state.schema.json` regenerated; `api/src/types.ts` and
+`web/src/types.ts` updated to match. 4 new/extended backend tests; 584
+backend tests pass.
+
+## 0.22.0 — TargetOrganization entries for 14 previously-untargeted sources
+
+The first real, live `agx discover-planned-report` run (2026-07-27, manual
+`workflow_dispatch`) reported 20 catalogued `PLANNED` sources as
+`not_targeted`. Of those, 14 have a single, unambiguous, publicly-known
+organization domain (the same category of public knowledge already used
+for every existing target — Reuters is reuters.com, CBE is cbe.org.eg —
+independently re-verified for reachability before anything is trusted,
+never asserted): IMF, OECD, Egypt's Ministry of Finance, Egypt's Open
+Data portal, the Suez Canal Authority, Investing.com, TradingView,
+Google Trends, the Wikimedia Foundation, arXiv, SSRN, NBER, Google
+Scholar, ResearchGate.
+
+The remaining 6 (`github_releases`, `company_social_official`,
+`public_telegram`, `patents`, `hiring_signals`, plus `company_ir`'s own
+per-constituent marker) stay untargeted on purpose: each names more than
+one candidate organization or is inherently per-company/per-channel
+(which of EPO vs. WIPO, which Telegram channel, which company's own
+career page) — picking one for the catalog would be exactly the kind of
+guess this program's own rules forbid.
+
+Reduces the report's `not_targeted` count from 20 to 5 (`company_ir`'s
+marker is separately, correctly excluded). 568 backend tests pass; `ruff
+check` clean.
+
+## 0.21.0 — Surface already-computed data the dashboard was hiding
+
+The project owner reviewed the live Mission Control and Source
+Intelligence pages and found real, already-computed backend data with no
+frontend path to it at all.
+
+- **Mission Control's Collectors table**: added a "Breakdown" column
+  (`collector_status.json`'s per-record-type counts -- price bars, macro
+  observations, news, corporate events, index constituents, financial
+  statement line items -- previously collapsed into one summed "Yield"
+  number), a "Withheld" column (quality-rejected batches, previously
+  shown nowhere), and a "Reputation" column (the composite score,
+  previously computed but never rendered).
+- **Source Intelligence's Reputation Dimensions**: added the 3 of the
+  charter's 9 dimensions that were computed (`compute_reputation()`) and
+  typed but never rendered (`correction_rate`, `duplicate_rate`,
+  `historical_usefulness`), plus a "Composite Reputation" stat tile for
+  the overall score.
+- **Weekly Discovery workflow wired into both pages** (previously zero
+  frontend path at all): new `discovery_report.json`/`discovery_metrics.json`/
+  `endpoint_candidates.json` types, `DashboardDataProvider` methods,
+  `ArtifactsReader`/API routes, `StaticJsonProvider`/`ApiProvider`
+  implementations. Mission Control gets a new "Weekly Discovery" section
+  (metrics + per-source verification table); Source Intelligence's detail
+  panel gets a "Discovery Evidence" block for the selected source, when
+  available. `deploy-pages.yml` copies the three files from
+  `research/data/discovery/` into the dashboard data directory if present
+  (a plain file copy -- they're already final-shaped JSON committed by
+  the Discovery workflow's PR, not reprocessed); an honest empty state
+  renders until the first such PR merges.
+- `npm run build`/`test` clean for both `api` and `web` workspaces.
+
+## 0.20.0 — Weekly Discovery workflow
+
+Closes "dozens of sources stay PLANNED, waiting on network egress" for
+real: this dev sandbox has none, but the GitHub Actions production
+deployment does, and nothing was scheduled to use it for discovery until
+now.
+
+- New `acquisition_intelligence/discovery_report.py`: `plan_discovery_targets`
+  scopes the catalog to `PLANNED`/`CANDIDATE` sources with a real
+  `TargetOrganization`, excluding per-constituent markers and provider
+  legs already wired via `integrated_via`; `run_discovery_report` runs the
+  existing `AcquisitionIntelligenceEngine.run_for_target` (unmodified —
+  its own qualification-pipeline promotion already applies) with a
+  TTL + input-fingerprint incremental cache; `build_discovery_metrics`
+  aggregates counts. 9 new tests, all fake-backed.
+- New CLI subcommand `discover-planned-report` writing
+  `discovery_report.json`/`discovery_metrics.json`/`endpoint_candidates.json`.
+- New `.github/workflows/discovery.yml`: weekly cron + `workflow_dispatch`,
+  entirely separate from `deploy-pages.yml` (never blocks or slows the
+  production deploy). Commits evidence only to a dedicated `discovery/latest`
+  branch and opens/updates one PR against `main` — never a direct commit,
+  never an automatic `SourceSpec.status` flip.
+- New `research/data/discovery/README.md`; new
+  `research/scripts/build_discovery_pr_summary.py` (PR body from the
+  committed JSON, no second source of truth).
+- Smoke-tested directly: a cold run against the real (egress-less) sandbox
+  honestly reports `no_reachable_domain`/`not_targeted` for all 34
+  in-scope sources (~82s); a second run within the TTL served every
+  result from cache with zero new probes (~0.002s).
+- Updated `docs/DATA_ACQUISITION.md` ("Discovery workflow" section),
+  `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md` (TD-23 partially closed).
+- 568 backend tests pass; `ruff check` clean.
+
+## 0.19.0 — No-API-key-sources policy: remove NEEDS_KEY entirely
+
+The project owner made an explicit, permanent policy call: the platform
+relies exclusively on genuinely free, no-registration sources, so waiting
+on a `NEEDS_KEY` credential serves no goal — if a capability's only real
+solution is a keyed API, drop it rather than leave it catalogued and idle.
+
+- Removed the four `NEEDS_KEY` seed catalog entries (`fmp`,
+  `alphavantage`, `polygon`, `tiingo`) from `sources/catalog.py`.
+- Deleted `AlphaVantageCollector`/`FmpCollector` and their tests — dead
+  code once their only catalog entries were removed.
+- Dropped their ids from `acquisition_intelligence/capability.py`'s
+  `CAPABILITY_STRATEGIES` pools (`PRICE_DATA`, `FINANCIAL_STATEMENTS`).
+- Updated `test_capability_engine.py`'s synthetic fallback tests to use a
+  still-catalogued id instead of the removed `fmp` placeholder (those
+  tests exercise the generic ranking/fallback engine, not FMP itself).
+- Registry is now 51 sources (14 IMPLEMENTED / 37 PLANNED / 0 NEEDS_KEY /
+  0 TOS_REVIEW). `SourceStatus.NEEDS_KEY` stays in the enum as a
+  structural classification — no seed source uses it, and any future
+  source proposal needing a credential should be rejected the same way.
+- Updated `docs/DATA_ACQUISITION.md`, `docs/ARCHITECTURE.md`,
+  `docs/ROADMAP.md`, `docs/TECHNICAL_DEBT.md` (TD-21), and
+  `docs/ACQUISITION_STRATEGY.md` (an inline note over the now-historical
+  FMP/AlphaVantage analysis, preserving the original text).
+- 559 backend tests pass; `ruff check` clean.
+
+## 0.18.0 — Provider-leg health/reputation measured directly
+
+The project owner flagged, from a review of the live source dashboards,
+that a source integrated as a provider leg inside a composite collector
+(`yahoo_finance`/`stockanalysis`/`mubasher` inside
+`EgxCompositePriceCollector`, via `SourceSpec.integrated_via`) could show
+`health_status: unknown`/`data_quality_score: null` in `source_registry.json`
+even while actively serving real traffic through the composite — because
+`CollectionService` only ever recorded metrics/health against the parent
+collector's own id, never against the provider id a document was actually
+attributed to (`Collector.provider_for_document`). The previous session's
+`export_collector_status` fix addressed this for the dashboard's derived
+per-run status table only (COLLECTED/STANDBY rows), by borrowing the
+parent composite's `health_status` as a stand-in — the registry's own
+`SourceSpec.health_status`/`reputation_score`/`data_quality_score` for
+each provider leg were untouched and any consumer reading the registry
+directly still saw permanently `unknown`/`null` fields.
+
+- `CollectionService._record_provider_outcome` (new): records
+  `SourceMetrics`/`HealthStatus` against a provider leg's own registry id,
+  using the same per-document quality assessment already computed for
+  that document (each raw document is already attributable to exactly one
+  provider) — called alongside the existing collector-level
+  `_record_run_outcome` for every document a `provider_for_document`-aware
+  collector produces, on both the success and parser-failure paths.
+- `production.artifacts.export_collector_status` no longer overwrites a
+  provider-leg row's `health_status` with the parent composite's value —
+  `_collector_status_row`'s own `registry.latest(provider_id)` lookup
+  already returns the provider's own, now-measured status.
+- New test: `test_provider_leg_health_and_reputation_are_measured_directly`
+  (`test_collection_service.py`) — a good and a bad provider leg wired
+  behind one stub composite collector each get their own, independently
+  correct metrics/health, not a shared or borrowed value.
+- 567 backend tests pass (1 new); `ruff check` clean. No new source,
+  collector, or acquisition-architecture change — this is strictly a
+  measurement-accuracy fix for sources already integrated, so it does not
+  reopen the acquisition-architecture freeze (see `NEXT_MISSIONS.md`).
 
 ## 0.17.0 — Ticker Data Gap Report
 

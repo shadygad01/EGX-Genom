@@ -6,35 +6,31 @@ being external/business-blocked and named) / **PARTIAL** / **NOT STARTED**.
 
 Cross-cutting note on what DONE means here: the *architecture and
 engineering* are production-shaped and fully tested; the platform still
-runs on placeholder market data. Every conclusion the system produces is
-only as real as its data feed, and the single largest open item for a true
-Production 1.0 is the licensed EGX data vendor — a business decision
-(cost/coverage/contract) explicitly reserved for the user. See
-`docs/ROADMAP.md`.
+runs on placeholder market data for the gaps the free-source Acquisition
+Program hasn't closed yet. The licensed-vendor question is no longer open:
+per the project owner's 2026-07-27 decision (`docs/ARCHITECTURE_DECISIONS.md`'s
+AD-32), no paid/licensed data vendor will ever be used — every remaining
+data gap, including per-company fundamentals, must be closed exclusively
+through free, publicly-reachable sources. See `docs/ROADMAP.md`.
 
-Decision-safety update (2026-07-28): outputs now include a conservative,
-`research_only` decision per horizon and the Arabic Opportunity Center shows
-those decisions before evidence. This does not remove the live-data or legal
-publication blockers; it makes them visible and prevents a blended summary
-from masquerading as an executable recommendation.
-
-Current acquisition registry after the live UN Statistics and CAPMAS API
-connections: **52 sources (12 IMPLEMENTED / 28 PLANNED / 4 NEEDS_KEY /
-8 TOS_REVIEW)**. This current count supersedes older counts embedded in the
-long-form phase evidence below.
+Current acquisition registry, after removing every `NEEDS_KEY` source per
+the project owner's no-API-key-sources decision: **52 sources
+(14 IMPLEMENTED / 38 PLANNED / 0 NEEDS_KEY / 0 TOS_REVIEW)**. This current
+count supersedes older counts embedded in the long-form phase evidence
+below.
 
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
 | 01 | Foundation | **DONE** | `domain/`, `storage/`, `config.py`; reused unmodified by every later store; CI green. |
-| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`+`acquisition_intelligence/`, see `docs/DATA_ACQUISITION.md`): a 52-source registry (11 IMPLEMENTED / 29 PLANNED / 4 NEEDS_KEY / 8 TOS_REVIEW) across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap/API-doc scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank, UN Statistics SDG (macro), GDELT, and generic RSS/Atom (news), including live-verified Enterprise, FRA, Al Borsa and Masrawy Economy configurations, plus AlphaVantage/FMP code-complete pending a user API key; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version; a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes. **New this phase: the Acquisition Intelligence Engine** (`acquisition_intelligence/`) — given only an organization's identity (never a manually supplied URL), it resolves a verified-reachable domain, discovers candidate acquisition methods, verifies legality (robots.txt + ToS heuristics, scraping never auto-clears)/stability (URL-shape + probe consistency)/historical availability (Wayback Machine APIs), ranks and selects the best, auto-generates a still-`PLANNED` `SourceSpec`, registers it, and begins qualification; `AcquisitionContinuityMonitor` re-runs discovery automatically for any source whose health goes `DOWN`. Fully tested with fakes (20 tests covering the complete pipeline); wired into `cli.py`'s `discover-sources` subcommand. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; the engine itself performs live, verified discovery wherever the target permits access. **New this phase: priority-ordered catalog processing** (`AcquisitionIntelligenceEngine.run_catalog`, `TargetOrganization.priority`) matching the project owner's explicit business-value order (EGX official → EGX30/EGX70 company Investor Relations → CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → everything else discovered), plus `generate_company_ir_targets()` (one real target per EGX30 constituent, expanding the previously-inert `company_ir` marker entry) and `discover_company_directory_links()` (extracts a company's own homepage link from an already-fetched directory page by real anchor-text matching, letting a resolved exchange/regulator homepage supply real per-company hints instead of guessing ~100 corporate domains). See "Production Execution Phase" below. |
+| 02 | Data Platform | **DONE** | Provider/fallback interfaces, snapshots(+repo), quality checks, split/dividend adjustment, plus the full Data Acquisition Platform (`sources/`+`discovery/`+`collectors/`+`acquisition_intelligence/`, see `docs/DATA_ACQUISITION.md`): a 52-source registry (14 IMPLEMENTED / 38 PLANNED / 0 NEEDS_KEY / 0 TOS_REVIEW — per the project owner's explicit decision, no `NEEDS_KEY` source is catalogued at all; see `docs/DATA_ACQUISITION.md`'s "No API-key sources") across 9 categories with three independent state axes (status/lifecycle_state/health_status); a discovery engine that proposes candidates from RSS-autodiscovery/PDF-repository/structured-dataset/sitemap/API-doc scans without ever trusting them; an evidence-gated Candidate→Quarantine→Evaluation→Trusted→Core qualification pipeline; a 9-dimension reputation engine and health monitor wired into every collection run; real collectors for Stooq, FRED, World Bank, UN Statistics SDG (macro), GDELT, and generic RSS/Atom (news), including live-verified Enterprise, FRA, Al Borsa and Masrawy Economy configurations; generic collector-type frameworks for PDF, Excel, Filesystem, Browser-automation (honest stub), and Archive Replay. A content-addressed Raw Archive stores binary artifacts forever; a per-value Provenance Index traces every materialized price bar/macro observation back to its source/collector/raw-document/hash/schema-version; a Historical Replay engine rebuilds materialized data from archived documents alone when a parser changes. **New this phase: the Acquisition Intelligence Engine** (`acquisition_intelligence/`) — given only an organization's identity (never a manually supplied URL), it resolves a verified-reachable domain, discovers candidate acquisition methods, verifies legality (robots.txt + ToS heuristics, scraping never auto-clears)/stability (URL-shape + probe consistency)/historical availability (Wayback Machine APIs), ranks and selects the best, auto-generates a still-`PLANNED` `SourceSpec`, registers it, and begins qualification; `AcquisitionContinuityMonitor` re-runs discovery automatically for any source whose health goes `DOWN`. Fully tested with fakes (20 tests covering the complete pipeline); wired into `cli.py`'s `discover-sources` subcommand. Blocked-external: licensed EGX vendor for guaranteed-accurate real-time/official data (business decision) remains the gap this doesn't close; the engine itself performs live, verified discovery wherever the target permits access. **New this phase: priority-ordered catalog processing** (`AcquisitionIntelligenceEngine.run_catalog`, `TargetOrganization.priority`) matching the project owner's explicit business-value order (EGX official → EGX30/EGX70 company Investor Relations → CBE/FRA/CAPMAS/Enterprise/Mubasher/Zawya/Reuters/Trading Economics → everything else discovered), plus `generate_company_ir_targets()` (one real target per EGX30 constituent, expanding the previously-inert `company_ir` marker entry) and `discover_company_directory_links()` (extracts a company's own homepage link from an already-fetched directory page by real anchor-text matching, letting a resolved exchange/regulator homepage supply real per-company hints instead of guessing ~100 corporate domains). See "Production Execution Phase" below. |
 | 03 | Event Platform | **DONE** | Fingerprint identity, taxonomy/ontology, entity resolution, dedup/conflict/lifecycle, `EventPlatform` sole write path, graph projection. Blocked-external: political/technical feeds, NLP entity linking. |
 | 04 | Market Memory | **DONE** | `MarketState` (snapshot+universe+sectors+events+session), `TradingCalendar` (fixed holidays as rules; movable as explicit placeholder table). Blocked-external: authoritative movable-holiday dates. |
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
 | 06 | Alpha Genome | **DONE** | Immutable genes, `mutate()` (single-parent), `merge()` (multi-parent synthesis), lineage walk, status machine; never overwrites. |
 | 07 | Research OS | **DONE** | TaskGraph/Artifacts/Sessions plus `DailyResearchPipeline` — the full 8-gate walk wired to real validators, board, causal gate, adversarial scientist, genome, papers, graph. End-to-end tested incl. rejection honesty and determinism. |
-| 08 | Scientist Framework | **DONE** (5 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure real; News/FinancialPerformance/HistoricalPatterns are honest stubs, all data-blocked (NLP, fundamentals feed, long history). Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
+| 08 | Scientist Framework | **DONE** (7 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure, NewsIntelligence, HistoricalPatterns real; only FinancialPerformance remains an honest stub, genuinely data-blocked (no real per-company fundamentals feed exists yet — see "Universe Engine + Corporate Disclosures" section). HistoricalPatternsAgent closed once `data/snapshot.py` gained a `pattern_lookback_days`-windowed `long_price_history` (the same "one field needs its own window" pattern `macro_lookback_days` already established) — LIVE mode's `egx_price_composite` collector already returns full (Yahoo `range=max`) history on every run, so the data existed; only the agent's own analog-matching methodology (mean-centered Euclidean distance over a sliding return window, non-overlapping top-k historical episodes, honest abstain below a directional-agreement threshold) was missing. Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
 | 09 | Feature Discovery | **DONE** | Three autonomous generators (pairwise correlation, momentum, volatility) over three registered feature definitions; candidates versioned+evidenced. |
-| 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo an explicit placeholder (needs a simulator — research decision). |
+| 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo now a real block-bootstrap simulator (`MonteCarloBlockBootstrapStressTester`), not a placeholder. |
 | 11 | Validation Framework | **DONE** | `SignificanceThresholdValidator`, `NaiveDirectionalBacktester` (costs explicitly out of scope, stated), `HistoricalWorstWindowStressTester` (scenario located in real data, not simulated). Deferred: cost-aware portfolio-level backtesting (with 15's future optimizer). |
 | 12 | Review Board | **DONE** (4 of 5 reviewers real) | Statistician, Risk, Economist (structural coherence, not economic truth — stated), PeerValidator (independent replication). Historical reviewer data-blocked. Board wired into the pipeline before `promote()`. |
 | 13 | Runtime Engine | **DONE** | `RuntimeEngine.run_range`: deterministic, per-day failure isolation, non-trading days recorded not skipped silently, persistent run ledger. Now the core of `production.pipeline.ProductionPipeline`'s Research Pipeline stage — see "Production Execution Pipeline" below. OS-level scheduling = deployment config (18). |
@@ -44,13 +40,18 @@ long-form phase evidence below.
 | 17 | Continuous Learning | **DONE** (v1) | `ContinuousLearningMonitor`: realized performance recorded on knowledge+genes from real later-window data; mechanical sign-disagreement retirement policy with audited reasons. |
 | 18 | Production Infrastructure | **PARTIAL** | Engineering-closeable parts done: integrity-checked backup/verify/restore, CLI (`run`/`status`/`backup`/`restore`/`discover-sources`/`collect`), the first production execution pipeline (`agx run` — see "Production Execution Pipeline" below), Dockerfile, CI. Business-blocked: cloud provider + payment, secrets management service, managed scheduling, API authentication context, monitoring/alerting stack. Named in `docs/ROADMAP.md`. |
 
-## What Production 1.0 still needs (all business-blocked)
+## What Production 1.0 still needs (all business-blocked, except #1 which is decided)
 
-1. **Licensed EGX market data vendor** — the single gating decision.
+1. ~~Licensed EGX market data vendor~~ — **decided against, permanently**
+   (AD-32): no paid vendor of any kind. Closing #4 below (fundamentals,
+   news NLP, long-history) is now engineering-only work against free
+   sources, principally finishing the `egx_official` → per-company
+   `company_ir` domain-resolution chain in `acquisition_intelligence/`.
 2. Cloud/deployment target + secrets management + scheduler (18).
 3. Authoritative EGX holiday calendar + universe/sector feeds (04/02).
-4. Optional data feeds unlocking the remaining stubs: news NLP source,
-   fundamentals feed, long-history archive (08/12 stragglers).
+4. Free-source-only data feeds still needed to unlock the remaining stubs:
+   a working news NLP source, real per-company financial-statement
+   collection, long-history archive (08/12 stragglers).
 
 Everything engineering-closeable without those inputs is closed and tested
 (477 Python tests + 33 TypeScript tests green).
@@ -70,6 +71,21 @@ research engine's real output to reach a static deployment target with no
 backend, which the charter's System 18 (Production Infrastructure) never
 required in the first place.
 
+## Bilingual EN/AR dashboard, full RTL (post-Data-Acquisition-Program)
+
+Also a presentation-layer capability, not a new charter system: the web
+dashboard now ships an EN/AR language toggle (`i18next`/`react-i18next`,
+one JSON namespace per page under `web/src/i18n/locales/`) with full RTL
+layout for Arabic, achieved mostly through CSS logical properties rather
+than per-component overrides. Translation is scoped to UI chrome and
+closed backend enum vocabularies (`web/src/types.ts` unions, via
+`useEnumLabel()`); free-form backend-generated prose (explanations,
+evidence, headlines, notes, company names, macro series ids,
+financial-statement line items) intentionally stays English rather than
+risk fabricating financial/legal Arabic terminology. Numeric/ticker data
+always renders LTR regardless of language. See `CHANGELOG.md`'s 0.29.0
+entry for the full design.
+
 ## Data Acquisition Platform (post-Epoch-II, within System 02's scope)
 
 Per the standing charter, the next objective after all 18 systems reached
@@ -86,7 +102,7 @@ one-off collectors:
   reputation engine, health monitoring, raw archive, provenance layer,
   historical replay, quality scoring, legal-compliance enforcement in
   code, not just policy).
-- 51 sources catalogued across all 9 named categories (Official, Company,
+- 52 sources catalogued across all 9 named categories (Official, Company,
   Market Data, News, Arabic News, Macroeconomic, Global Markets,
   Alternative, Research); honestly split IMPLEMENTED (5) / PLANNED (34) /
   NEEDS_KEY (4) / TOS_REVIEW (8).
@@ -731,11 +747,22 @@ exists, since several items turned out already engineering-complete:
   (`api/src/routes/dashboard.ts`, `ApiProvider`/`StaticJsonProvider`,
   `web/src/types.ts`, a dashboard UI section) — see new TD-34. Also not
   done: the plan's item 4 (Arabic/English company-alias entity resolution
-  for news) and item 5 (macro frequency alignment/point-in-time
-  publication-date discipline) — both real, scoped engineering tasks,
-  neither started this phase; named as the next queued items in
-  `NEXT_MISSIONS.md` rather than attempted speculatively in the same
-  sitting as the gap-report work.
+  for news); item 5 (macro frequency alignment) was later closed — see
+  below.
+- **Item 5 closed, live-verified**: a live production run showed every one
+  of the 23 `LIVE_MACRO_SERIES_IDS` (FRED/World Bank/UN SDG) with zero
+  observations — `_stage_market_memory`'s single `lookback_days=30`
+  windowed World Bank/UN SDG's annual (often 1-2 year publication lag) and
+  CAPMAS's monthly observations the same as daily prices, so an annual
+  point almost never falls inside the last 30 days. `data.snapshot.build_snapshot`
+  now takes an independent `macro_lookback_days` (`DatasetSnapshot` gained
+  the field for explainability); `MarketMemory` and `ProductionPipeline`
+  thread it through, with LIVE mode using a new `LIVE_MACRO_LOOKBACK_DAYS`
+  constant (900 days). Also closed the separate gap where
+  `LIVE_CAPMAS_INDICATORS`' local ids were never added to
+  `LIVE_MACRO_SERIES_IDS` at all. `MacroAgent` (the only agent turning
+  macro data into SWING-horizon knowledge) now has real macro observations
+  to correlate against in a live run.
    `enterprise_press` flipped to `IMPLEMENTED`/`TRUSTED`, collecting real
    news from `https://enterpriseam.com/egypt/feed/` (found via standard
    RSS autodiscovery on its own now-reachable homepage, never guessed).
@@ -756,3 +783,358 @@ exists, since several items turned out already engineering-complete:
    evidenced defensive measures documented in phase 2/3 above — see
    `docs/ACQUISITION_STRATEGY.md`'s "First Live Egyptian Source" section
    and `CURRENT_MISSION.md` for full detail.
+
+## Provider-Leg Health Measurement Accuracy (System 02 accuracy review)
+
+The project owner reviewed the live source dashboards produced by prior
+sessions and flagged, correctly, that the picture was honest but
+incomplete: dozens of catalogued sources are still `PLANNED` pending a
+verified endpoint (real, business/engineering-blocked, see "What's still
+blocked" in `docs/DATA_ACQUISITION.md`), `NEEDS_KEY` sources have no
+credential yet (a business action, not code — see `docs/DATA_ACQUISITION.md`'s
+source catalog policy), no scheduled recurring discovery/collection runs
+yet (System-18 scheduling, TD-23's own named repayment trigger), and —
+the one genuinely closeable engineering gap this phase found — a source
+integrated as a provider leg inside a composite collector
+(`yahoo_finance`/`stockanalysis`/`mubasher` inside
+`EgxCompositePriceCollector`, via `SourceSpec.integrated_via`) could show
+`health_status: unknown` / `data_quality_score: null` in
+`source_registry.json` even while actively serving real traffic through
+the composite, because `CollectionService` only ever recorded metrics/
+health against the parent collector's id, never against the specific
+provider id a document was actually attributable to. A prior session's
+`export_collector_status` fix addressed this for the dashboard's derived
+per-run status table only (by borrowing the parent's `health_status` as
+a stand-in for display) — the registry's own per-provider fields were
+never actually measured, so any consumer reading `source_registry.json`
+directly (not just the dashboard's derived view) still saw a permanently
+unmeasured leg.
+
+Closed: `collectors.service.CollectionService._record_provider_outcome`
+now records `SourceMetrics`/`HealthStatus` against a provider leg's own
+registry id from the same per-document quality assessment already
+computed for that document (each raw document a `provider_for_document`-
+aware collector produces is already attributable to exactly one
+provider) — on both the success and parser-failure paths, mirroring the
+existing collector-level `_record_run_outcome` exactly. `export_collector_status`
+no longer overwrites a provider row's `health_status` with the parent's
+value; it now reads the provider's own, correctly-measured status like
+every other source. New test:
+`test_provider_leg_health_and_reputation_are_measured_directly`
+(`test_collection_service.py`). 567 backend tests pass (1 new); `ruff
+check` clean.
+
+Everything else the owner named stays correctly deferred, not chased:
+converting a `PLANNED` source to `IMPLEMENTED` needs a verified real
+endpoint (this dev sandbox has no arbitrary outbound egress, though the
+GitHub Actions production deployment does — see `CURRENT_MISSION.md`);
+`NEEDS_KEY` sources need the user's own API key, a credential/business
+action this codebase never fabricates or bypasses; and a real periodic
+discovery/collection scheduler needs System 18's managed-scheduling
+decision (cloud target + secrets + scheduler), which remains
+business-blocked exactly as `docs/ROADMAP.md`/TD-23 already name. None of
+these are re-opened by this phase — this phase closed only the
+measurement-accuracy defect in sources already integrated.
+
+## Weekly Discovery Workflow (System 02 continuous verification)
+
+The project owner pushed back on the previous phase's "still needs
+network egress" framing as an unfinished-sounding non-answer: this dev
+sandbox has none, but the GitHub Actions production deployment does, and
+nothing was scheduled to actually use it. Presented the concrete design
+choice via `AskUserQuestion` (separate scheduled workflow vs. adding the
+step into the fast production deploy vs. just documenting the plan); the
+project owner chose a dedicated weekly workflow with durable, PR-reviewed
+evidence and gave a full specification (scope limited to `PLANNED`/
+`CANDIDATE` sources; real evidenced verification; three named JSON
+artifacts; incremental caching; promotion through the existing
+qualification pipeline; PR only, never a direct commit to `main`).
+
+Closed: `.github/workflows/discovery.yml` runs the new
+`discover-planned-report` CLI subcommand
+(`acquisition_intelligence.discovery_report`) weekly (plus manual
+`workflow_dispatch`), reusing the unmodified `AcquisitionIntelligenceEngine.
+run_for_target` (its own qualification-pipeline promotion already
+applies — no new promotion mechanism was needed). A TTL + input-
+fingerprint incremental cache (`DiscoveryHistoryRepository`) means an
+unchanged source is not re-probed weekly; evidence lands on a dedicated
+`discovery/latest` branch and one standing PR against `main`, never a
+direct commit, and the workflow never flips a `SourceSpec.status` itself
+— that stays a reviewed, manual engineering step per `AD-16`/`AD-24`,
+exactly the same gate every prior source promotion in this codebase went
+through. 9 new tests (`test_discovery_report.py`), all fake-backed; 568
+backend tests pass; `ruff check` clean. Smoke-tested directly against
+this sandbox's real (egress-less) network: an honest first run reports
+`no_reachable_domain` for the 14 in-scope, targeted sources and
+`not_targeted` for the 20 catalogued sources with no `TargetOrganization`
+yet (~82s); a second run within the TTL served every result from cache
+with zero new probes (~0.002s) — the caching behavior verified working,
+not just asserted by a unit test.
+
+See `docs/DATA_ACQUISITION.md`'s "Discovery workflow" section for the
+full design, `CURRENT_MISSION.md` for the mission narrative, and
+`NEXT_MISSIONS.md` for what's genuinely next (per-organization
+`TargetOrganization` research for the 20 still-untargeted sources; wiring
+`AcquisitionContinuityMonitor`'s DOWN-recovery into the same schedule;
+reviewing the first real scheduled run's PR once GitHub Actions produces
+one, which this session cannot verify directly).
+
+## Frontend accuracy pass: surfacing already-computed data (Mission Control + Source Intelligence)
+
+The project owner reviewed the live `/mission-control` and `/sources`
+pages and reported real, computed backend data with no frontend path to
+it at all — verified by reading the React components against the exact
+artifacts feeding them, not by guessing.
+
+Closed: Mission Control's Collectors table gained Breakdown (per-record-
+type counts `collector_status.json` already carried, previously summed
+into one "Yield" number)/Withheld/Reputation columns; Source
+Intelligence's Reputation Dimensions block gained the 3 of 9 charter
+dimensions that were computed but never rendered (`correction_rate`,
+`duplicate_rate`, `historical_usefulness`) plus a composite-score stat
+tile; and the weekly Discovery workflow (see the "Weekly Discovery
+Workflow" section above) is now wired end to end — new TS types, new
+`DashboardDataProvider`/`ArtifactsReader`/API-route methods, a new
+"Weekly Discovery" Mission Control section, and a "Discovery Evidence"
+block on Source Intelligence's detail panel — where it previously had
+zero frontend path despite existing on disk. `deploy-pages.yml` copies
+`research/data/discovery/*.json` into the dashboard data directory when
+present (a plain file copy, not a Python re-export, since the Discovery
+workflow already writes them in final shape). `npm run build`/`test`
+clean for both `api` and `web` workspaces (required a fresh `npm install`
+in this session first — `node_modules` had never been installed).
+
+## TD-34: `ticker_data_gap_report.json` web/API wiring (System 13 dashboard layer)
+
+Closes the last purely-engineering item on the post-freeze punch list
+(TD-34): the backend artifact existed and was tested, but had no route,
+no provider method, no TS type, and no UI surface.
+
+Closed, following `financial_statements.json`'s exact existing wiring as
+the template: `api/src/artifactsStore.ts`'s `tickerDataGapReport()`,
+`api/src/routes/dashboard.ts`'s `GET /ticker-data-gap-report`,
+`web/src/data/{DataProvider,ApiProvider,StaticJsonProvider}.ts`'s
+`getTickerDataGapReport()`, and `web/src/types.ts`'s
+`TickerDataGapReport`/`DataLayerGap` interfaces (hand-mirrored from
+`meta.readiness`'s pydantic models — no `contracts/` schema exists for
+this artifact, matching `financial_statements.json`'s own precedent).
+
+UI: rather than a new page, Opportunity Center's existing "Decision
+Readiness" table gained `onRowClick`, paired with a new "Data Coverage"
+detail `Card` — the same click-to-select-plus-detail-panel pattern the
+Opportunities table above it already uses for its "Evidence" panel. The
+detail card renders the 5 named layers (Financials/Disclosures/News/
+Macro/Knowledge) as meter cards, plus overall completeness,
+Swing/Investment readiness flags, blockers, and next actions.
+
+**Verified live in a real headless browser** (not just `tsc`/build/test
+green): a real mock-mode `agx run` output was served through a
+production Vite build, and clicking a Decision Readiness row (`ABUK`)
+correctly populated the Data Coverage panel with its real 5-layer
+breakdown (each showing 0% / "Below the readiness threshold for this
+layer" — the honest current state of this sandbox's own data, not a
+placeholder). `npm run lint`/`build`/`test` clean for both `api` and
+`web` workspaces (added `getTickerDataGapReport` to the test suite's
+`fakeProvider` fixture, the one other place implementing the full
+`DashboardDataProvider` contract).
+
+## Monte Carlo stress simulator (System 10, Experiment Factory)
+
+Closes the one Experiment Factory gap `docs/PHASE_STATUS.md`/
+`NEXT_MISSIONS.md` had explicitly named as a design decision, not a data
+blocker: `MonteCarloExperiment` had been an honest `NotImplementedError`
+placeholder since Experiment Factory was built.
+
+Closed: `validation.stress_test.MonteCarloBlockBootstrapStressTester` —
+a real block bootstrap, staying faithful to
+`HistoricalWorstWindowStressTester`'s own stated philosophy ("the
+adverse scenario is not simulated... but located"). Every simulated path
+is built by resampling contiguous *blocks* (not single observations, the
+distinction from the existing `BootstrapExperiment`) of the hypothesis's
+real observed returns with replacement, preserving real short-run
+autocorrelation the way actual bad runs cluster — never a parametric or
+fabricated distribution. Recomputes the hypothesis's statistic over many
+simulated paths and checks whether the adverse-tail percentile keeps the
+full-sample statistic's sign. `block_size` auto-shrinks to fit short
+series (mirroring the historical tester's own `window = min(self.window,
+n)`), so it never raises for any series length the DATA_COLLECTION gate
+already admitted; `seed` makes every run deterministic, the same
+convention `BootstrapExperiment` already uses.
+
+Wired in two places: `MonteCarloExperiment` (`hypotheses/
+experiment_factory.py`) is now a real adapter over this tester (mirroring
+`StressTestExperiment`'s exact adapter shape) instead of raising, so it
+now counts toward the EXPERIMENT stage's real-results total and is stored
+as a versioned artifact like every other experiment; `orchestration.
+pipeline.DailyResearchPipeline`'s STRESS_TEST gate now requires *both* the
+historical worst-window and the Monte Carlo block-bootstrap tester to pass
+— surviving one adverse method isn't evidence the other wouldn't flip it.
+
+**Verified**: a real mock-mode `agx run` against the same 4-ticker
+scenario earlier phases used produces the identical 5 hypotheses as
+before this change — the combined gate doesn't regress what already
+passed. 8 new tests (616 total, up from 608); `ruff check` clean.
+
+## Macro frequency alignment + no-look-ahead discipline (System 08/14)
+
+Closes `NEXT_MISSIONS.md` item 2 (the project owner's own completion
+plan item 5): `MacroAgent` aligned macro observations to trading days by
+*exact date equality* — since daily/monthly/quarterly/annual series
+almost never land on the same date as a trading day, every
+lower-frequency macro series was silently starved of correlation
+evidence entirely (a distinct gap from the earlier "Item 5" fix, which
+only widened the *lookback window* size, not the *alignment* method).
+Separately, nothing distinguished a macro value's `observation_date`
+(the period it describes) from when it actually became publicly known —
+treating a value as usable starting on its own period-end date is real
+look-ahead bias.
+
+Closed, as two independent pieces:
+
+- **Frequency alignment**: `agents/macro.py`'s `_forward_fill_onto()`
+  carries each macro observation's percentage change forward onto every
+  trading day up to (never before) the next observation — standard
+  last-observation-carried-forward step alignment, replacing the exact
+  date-equality intersection. Never looks ahead: a trading day is only
+  ever assigned a change from an observation dated on or before it.
+- **No-look-ahead discipline**: new `data/point_in_time.py`
+  (`is_knowable`/`known_as_of`) applies a declared, deliberately
+  conservative per-source-class publication-lag floor (new debt, TD-37 —
+  not a cited real average, picked low enough to never contradict this
+  codebase's own live-verified evidence of a ~165-day-old real World Bank
+  observation being collectible) and `data.snapshot.build_snapshot()`
+  gained an optional `macro_series_sources` param that drops any
+  observation not yet knowable as of the snapshot's own `as_of` before it
+  ever reaches an agent. `production.pipeline.ProductionPipeline` wires
+  the real mapping (`production.collector_plan.LIVE_MACRO_SERIES_SOURCES`,
+  built from the same series-id groupings `LIVE_MACRO_SERIES_IDS` already
+  uses) only in LIVE mode; mock/replay default to no filtering change
+  (0 assumed lag), so no existing test's behavior shifted unless it
+  explicitly opts in.
+
+**One real regression caught and fixed before merging**: an initial,
+more aggressive 365-day World Bank/UN SDG lag assumption directly
+contradicted this codebase's own already-live-verified evidence (a real
+collected World Bank observation only ~165 days old) — it would have
+silently discarded genuinely-available real data, the opposite of the
+goal. Scaled back to a 30-day floor, verified against the exact
+regression test that first caught it
+(`test_live_mode_collects_real_endpoints_and_reports_unavailable_sources`).
+
+8 new tests (608 total, up from 600); `ruff check` clean.
+
+## Entity resolution for news-to-ticker matching (System 02/08)
+
+Immediate follow-up to NewsIntelligenceAgent, closing `NEXT_MISSIONS.md`
+item 1: `RssNewsCollector`/`GdeltDocCollector`'s ticker attribution was a
+bare case-insensitive **substring** check (`ticker.lower() in
+title.lower()`), the exact "VLMR matches inside VLMRA" false-positive risk
+the project owner's own completion plan named.
+
+Closed: `universe.entity_resolution.resolve_ticker_mentions()` (new
+module) matches a ticker only as its own word/token (never a substring of
+a longer one) and, when a real company display name is available, also
+matches the company's full name via the same conservative
+"every-significant-token-present" discipline `discover_company_directory_links()`
+already uses (reusing its exact `significant_tokens()` helper — one
+definition, not a parallel one). `RssNewsCollector`/`GdeltDocCollector`
+now accept `ticker_hints` as either a `{ticker: company_name}` mapping
+(full entity resolution) or a plain `list[str]` (ticker-only, still
+upgraded from substring to exact-token matching) — fully backward
+compatible. `production.pipeline.ProductionPipeline` gained
+`_ticker_companies()` (reads the same `UniverseProvider` `_tickers()`
+already uses) and threads real company names from
+`research/data/universe/EGX30.csv`/`EGX70.csv` (the reviewed, EGX-sourced
+101-ticker seed — real English display names + ISINs, already present in
+this codebase) all the way through `production.collector_plan.
+build_collector_plan`/`build_live_collector` into both news collectors.
+
+Deliberately no Arabic alias list (new debt, TD-36) — no verified
+Arabic-language source for EGX30/EGX70 names exists in this codebase, and
+guessing transliterations would risk a wrong match, worse than a missed
+one.
+
+**Verified live** (mock mode, real seed data): a real `agx run` against
+the actual `research/data/universe/EGX30.csv` seed correctly resolves
+"COMI reports strong Q2 net income growth" → `COMI` via the seeded
+constituent list's real English name path, honestly reports `[]` for the
+same news item when queried at a date before the seed's own `as_of_date`
+(no look-ahead — `CollectedUniverseProvider`'s existing point-in-time
+guarantee, not a regression). 600 backend tests pass (8 new, up from
+592); `ruff check` clean.
+
+## NewsIntelligenceAgent: real news sentiment now produces findings (System 08)
+
+`NEXT_MISSIONS.md` named `agents.news_intelligence.NewsIntelligenceAgent`
+as "the most directly-unblocked stub in the codebase" — it had been an
+honest `NotImplementedError` stub only because no real Egyptian news flow
+existed to research, and that stopped being true once `enterprise_press`/
+`fra_egypt` started producing real, dated `NewsItem`/`CorporateEvent`
+records every live run (see "First real Egyptian market data flowing
+live" above).
+
+Closed: implemented as a real, mechanical event-study-lite, mirroring
+`CorporateEventsAgent`'s exact structure — for each ticker's news item,
+`agents.news_sentiment.classify_headline_sentiment()` (a declared,
+headline-only positive/negative keyword heuristic, same honesty tier as
+`collectors.corporate_event_classifier`, new debt TD-35) classifies
+sentiment; unclassifiable headlines are silently skipped, never guessed.
+For sentiment-classified items with enough return history on both sides,
+the agent compares mean adjusted return after the item to before it and
+proposes a MICRO-horizon post-news-drift hypothesis when the shift clears
+a threshold. Wired into `production.pipeline.ProductionPipeline`'s
+Research Pipeline stage alongside the other five real agents (System 08 is
+now 6 of 8 agents real).
+
+**One real, previously-latent bug found and fixed while building this**:
+`collectors.service._append_news` was the only per-record materialization
+writer that blindly appended instead of merging idempotently by natural
+key, unlike every sibling writer (`_write_price_bars`/
+`_write_macro_observations`/`_write_corporate_events`/index constituents)
+— collecting the same feed twice (a mock run followed by a replay run
+reading the same archive, the exact scenario `test_production_pipeline.py`'s
+mock/replay-determinism test exercises) silently duplicated every news
+row. Harmless as long as nothing consumed `news.csv` for hypothesis
+generation; caught immediately once `NewsIntelligenceAgent` did (the
+existing determinism test failed 5 vs. 7 hypotheses on identical input
+the moment the agent was wired in). Fixed by merging on
+`(date, source, headline)`, matching every sibling writer exactly.
+
+**Verified live** (mock mode): a real MFPC finding ("MFPC exhibits
+downward price drift following positive news") flowed all the way through
+`DailyResearchPipeline` into `hypotheses.json`, sourced from the existing
+mock RSS headline "MFPC board declares dividend" — a genuine, if
+uncalibrated, new research signal, not a fabricated one. 24 new tests (592
+total, up from 568); `ruff check` clean.
+
+## TargetOrganization coverage: 14 of 20 untargeted PLANNED sources (System 02)
+
+The first real, live `agx discover-planned-report` run (2026-07-27, manual
+`workflow_dispatch`, see the "Weekly Discovery Workflow" section above)
+produced real evidence: of 34 in-scope sources, 1 verified reachable
+(`skynews_arabia_economy`, a real RSS feed with 500 Wayback snapshots), 5
+legality-blocked (a real candidate existed but robots.txt/ToS disallowed
+it — a hard, non-negotiable stop, not something this codebase or this
+assistant will bypass regardless of a "make it 100%" ask), 7 with no
+reachable domain, 1 with no discoverable candidates, and 20 `not_targeted`
+— no `TargetOrganization` entry existed for the engine to even attempt.
+
+Closed: added `TargetOrganization` entries for 14 of those 20 — every one
+with a single, unambiguous, publicly-known organization domain (IMF,
+OECD, Egypt's Ministry of Finance, Egypt's Open Data portal, the Suez
+Canal Authority, Investing.com, TradingView, Google Trends, the Wikimedia
+Foundation, arXiv, SSRN, NBER, Google Scholar, ResearchGate) — same
+public-knowledge category as every existing target, independently
+re-verified for reachability before anything is trusted. Verified
+locally (no egress in this sandbox, so all 28 now-targeted sources
+honestly report `no_reachable_domain` — the point is they're attempted at
+all now). 568 backend tests pass; `ruff check` clean.
+
+Left `not_targeted` on purpose: `github_releases`, `company_social_official`,
+`public_telegram`, `patents`, `hiring_signals` (each names more than one
+candidate organization or is inherently per-company/per-channel — picking
+one would be a fabricated guess), plus `company_ir`'s own per-constituent
+marker (already correctly handled by `generate_company_ir_targets`).
+
+See `CURRENT_MISSION.md`'s "target the closeable half of not_targeted"
+entry and `NEXT_MISSIONS.md` for what's genuinely next.

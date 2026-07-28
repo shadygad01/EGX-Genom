@@ -15,6 +15,9 @@ import type {
   DecisionReadiness,
   DecisionPerformanceSummary,
   DecisionRecord,
+  DiscoveryMetrics,
+  DiscoveryOutcome,
+  EndpointCandidate,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -74,4 +77,7 @@ export interface DashboardDataProvider {
   getDecisionHistory(): Promise<DecisionRecord[]>;
   getDecisionPerformance(): Promise<DecisionPerformanceSummary[]>;
   getPublicationGate(): Promise<PublicationGateReport | null>;
+  getDiscoveryReport(): Promise<DiscoveryOutcome[]>;
+  getDiscoveryMetrics(): Promise<DiscoveryMetrics | null>;
+  getEndpointCandidates(): Promise<EndpointCandidate[]>;
 }

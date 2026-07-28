@@ -80,6 +80,41 @@ def test_parse_month_day_year_timestamp_used_by_arabic_feed():
     assert batch.news_items[0].published_at == date(2026, 7, 26)
 
 
+def test_ticker_hint_no_longer_matches_as_substring_of_a_longer_ticker():
+    # The real near-miss named in the project owner's completion plan:
+    # a "VLMR" hint must not match a headline about "VLMRA".
+    feed = """<?xml version="1.0" encoding="utf-8"?>
+    <rss version="2.0"><channel><item>
+      <title>VLMRA reports quarterly results</title>
+      <link>https://example.test/news/vlmra-q</link>
+      <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    </item></channel></rss>"""
+    collector = RssNewsCollector(
+        rss_spec(), feed_url="https://example.test/feed.xml", ticker_hints=["VLMR"], fetcher=FakeFetcher(feed)
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+    assert batch.news_items[0].tickers == []
+
+
+def test_ticker_hints_as_dict_matches_by_real_company_name_too():
+    feed = """<?xml version="1.0" encoding="utf-8"?>
+    <rss version="2.0"><channel><item>
+      <title>Commercial International Bank CIB posts record earnings</title>
+      <link>https://example.test/news/cib-earnings</link>
+      <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    </item></channel></rss>"""
+    collector = RssNewsCollector(
+        rss_spec(),
+        feed_url="https://example.test/feed.xml",
+        ticker_hints={"COMI": "Commercial International Bank-Egypt (CIB)"},
+        fetcher=FakeFetcher(feed),
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+    assert batch.news_items[0].tickers == ["COMI"]
+
+
 def test_no_ticker_hint_match_leaves_tickers_empty():
     fetcher = FakeFetcher((FIXTURES / "atom_synthetic.xml").read_text())
     collector = RssNewsCollector(

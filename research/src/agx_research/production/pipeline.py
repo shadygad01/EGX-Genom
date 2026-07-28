@@ -60,9 +60,11 @@ from agx_research.acquisition_intelligence.target import (
     seed_target_organizations,
 )
 from agx_research.agents.corporate_events import CorporateEventsAgent
+from agx_research.agents.historical_patterns import HistoricalPatternsAgent
 from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
 from agx_research.agents.market_structure import MarketStructureAgent
+from agx_research.agents.news_intelligence import NewsIntelligenceAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository
@@ -95,7 +97,10 @@ from agx_research.production import artifacts as production_artifacts
 from agx_research.production.collector_plan import (
     EXPECTED_RECORDS,
     EXPECTED_RECORDS_LIVE,
+    LIVE_MACRO_LOOKBACK_DAYS,
     LIVE_MACRO_SERIES_IDS,
+    LIVE_MACRO_SERIES_SOURCES,
+    LIVE_PATTERN_LOOKBACK_DAYS,
     ExecutionMode,
     build_collector_plan,
     build_live_collector,
@@ -145,6 +150,7 @@ class ProductionPipeline:
         data_dir: Path | str,
         universe_provider: UniverseProvider | None = None,
         macro_series_ids: list[str] | None = None,
+        macro_lookback_days: int | None = None,
     ):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
@@ -154,6 +160,21 @@ class ProductionPipeline:
         # fixtures' placeholder ids -- an explicit override here always wins.
         self._macro_series_ids_override = macro_series_ids
         self.macro_series_ids = macro_series_ids or list(_DEFAULT_MACRO_SERIES)
+        # Same deferral as macro_series_ids: LIVE's annual/quarterly official
+        # statistics need a much longer window than the mock fixtures'
+        # matched-to-lookback_days dates do.
+        self._macro_lookback_days_override = macro_lookback_days
+        self.macro_lookback_days = macro_lookback_days or 30
+        # Same deferral again, this time for historical_patterns_agent's
+        # search window (see data/snapshot.py's pattern_lookback_days):
+        # mock/replay fixtures are far too short for meaningful analog
+        # search, so only LIVE requests the wide window.
+        self.pattern_lookback_days = 0
+        # LIVE mode's real series ids map to a known source (see
+        # `data.point_in_time`'s publication-lag assumptions); mock/replay's
+        # placeholder ids don't model real publication delay, so they default
+        # to no filtering change (empty mapping -> 0 assumed lag).
+        self.macro_series_sources: dict[str, str] = {}
 
         # Populated by stages as they run; downstream stages check these
         # rather than assume a prior stage succeeded.
@@ -189,6 +210,13 @@ class ProductionPipeline:
         """Resolve membership at use time; the provider is the only source of truth."""
         return sorted(self.universe_provider.constituents(as_of))
 
+    def _ticker_companies(self, as_of: date) -> dict[str, str]:
+        """{ticker: company_name} for real entity resolution in news
+        collectors (`universe.entity_resolution.resolve_ticker_mentions`),
+        from the same provider `_tickers` already reads -- never a second,
+        possibly-drifting source of company names."""
+        return dict(self.universe_provider.constituents(as_of))
+
     # ---- the public entrypoint ----------------------------------------
 
     def run(
@@ -211,6 +239,14 @@ class ProductionPipeline:
             self.macro_series_ids = list(LIVE_MACRO_SERIES_IDS)
         else:
             self.macro_series_ids = list(_DEFAULT_MACRO_SERIES)
+        if self._macro_lookback_days_override is not None:
+            self.macro_lookback_days = self._macro_lookback_days_override
+        elif mode == ExecutionMode.LIVE:
+            self.macro_lookback_days = LIVE_MACRO_LOOKBACK_DAYS
+        else:
+            self.macro_lookback_days = 30
+        self.macro_series_sources = dict(LIVE_MACRO_SERIES_SOURCES) if mode == ExecutionMode.LIVE else {}
+        self.pattern_lookback_days = LIVE_PATTERN_LOOKBACK_DAYS if mode == ExecutionMode.LIVE else 0
 
         started_at = datetime.now()
         stages: list[StageResult] = []
@@ -430,6 +466,7 @@ class ProductionPipeline:
             mode=mode,
             raw_documents=self.raw_documents,
             tickers=self._tickers(as_of or self._run_as_of),
+            companies=self._ticker_companies(as_of or self._run_as_of),
         )
         self._unavailable = unavailable_sources(self.registry, {p.source_id for p in self._planned})
         if not self._planned:
@@ -532,6 +569,7 @@ class ProductionPipeline:
                 spec,
                 fetcher=fetcher,
                 tickers=self._tickers(self._run_as_of),
+                companies=self._ticker_companies(self._run_as_of),
             )
 
         engine = CapabilityDecisionEngine(self.registry, factory, metrics=self.metrics)
@@ -697,6 +735,9 @@ class ProductionPipeline:
             StaticSectorProvider(),
             macro_series_ids=self.macro_series_ids,
             lookback_days=30,
+            macro_lookback_days=self.macro_lookback_days,
+            macro_series_sources=self.macro_series_sources,
+            pattern_lookback_days=self.pattern_lookback_days,
             event_platform=self.event_platform,
         )
         state = self.market_memory.reconstruct(as_of)
@@ -731,6 +772,8 @@ class ProductionPipeline:
             CorporateEventsAgent(),
             LiquidityAgent(),
             TechnicalStructureAgent(),
+            NewsIntelligenceAgent(),
+            HistoricalPatternsAgent(),
         ]
         daily_pipeline = DailyResearchPipeline(
             self.market_memory,

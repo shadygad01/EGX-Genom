@@ -172,16 +172,21 @@ def discover_api_documentation(html: str, page_url: str) -> list[SourceCandidate
     return candidates
 
 
-_COMPANY_NAME_STOPWORDS = {
+COMPANY_NAME_STOPWORDS = {
     "company", "companies", "group", "holding", "holdings", "egypt", "egyptian",
     "co", "corp", "corporation", "the", "for", "of", "and", "sae", "s.a.e",
     "production", "production.",
 }
 
 
-def _significant_tokens(name: str) -> set[str]:
+def significant_tokens(name: str) -> set[str]:
+    """Public (not `discover_company_directory_links`-private) because
+    `discovery.wikidata_lookup` reuses the exact same name-token-overlap
+    matching discipline against a different page shape (SPARQL result
+    labels instead of anchor text) -- same rule, one definition.
+    """
     normalized = re.sub(r"[^a-z0-9\s]", " ", name.lower())
-    return {tok for tok in normalized.split() if tok and tok not in _COMPANY_NAME_STOPWORDS}
+    return {tok for tok in normalized.split() if tok and tok not in COMPANY_NAME_STOPWORDS}
 
 
 def discover_company_directory_links(
@@ -204,11 +209,11 @@ def discover_company_directory_links(
     most once each -- the first anchor found wins, for determinism).
     """
     parser = _parse_page(html)
-    significant = {ticker: _significant_tokens(name) for ticker, name in companies.items()}
+    significant = {ticker: significant_tokens(name) for ticker, name in companies.items()}
     found: dict[str, str] = {}
 
     for anchor in parser.anchors:
-        text_tokens = _significant_tokens(anchor.get("text", ""))
+        text_tokens = significant_tokens(anchor.get("text", ""))
         if not text_tokens:
             continue
         for ticker, tokens in significant.items():

@@ -10,6 +10,12 @@ on:
       - "package-lock.json"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
+  # Free daily refresh (no deployment target/scheduler required -- GitHub
+  # Actions cron is free for a public repo): 15:30 UTC is after EGX's
+  # Sun-Thu close (Africa/Cairo, UTC+2/+3) so each day's run picks up that
+  # session's close before the next one opens, without waiting on a push.
+  schedule:
+    - cron: "30 15 * * 0-4"
 
 permissions:
   contents: read
@@ -65,6 +71,21 @@ jobs:
         run: |
           uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data \
             run --date "$(date -u +%F)" --mode live --dashboard-out ../web/public/data
+
+      # discovery_report.json/discovery_metrics.json/endpoint_candidates.json
+      # are written by the separate, weekly .github/workflows/discovery.yml
+      # (via a reviewed PR, never a direct commit) -- not by agx run. They're
+      # already final-shaped JSON committed to the repo, so this is a plain
+      # copy, never a Python re-export. Absent on any deploy before the first
+      # Discovery PR merges -- an honest gap, not a missing step; the
+      # dashboard renders an empty state until then.
+      - name: Copy Discovery workflow evidence into the dashboard data dir (if present)
+        run: |
+          for f in discovery_report.json discovery_metrics.json endpoint_candidates.json; do
+            if [ -f "data/discovery/$f" ]; then
+              cp "data/discovery/$f" "../web/public/data/$f"
+            fi
+          done
 
       - name: Validate dashboard JSON artifacts
         run: uv run python -m agx_research.cli validate-dashboard --dir ../web/public/data

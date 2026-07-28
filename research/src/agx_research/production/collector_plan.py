@@ -110,6 +110,45 @@ LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICAT
 LIVE_MACRO_SERIES_IDS += [
     local_id for mappings in LIVE_UN_SDG_SERIES.values() for local_id in mappings.values()
 ]
+LIVE_MACRO_SERIES_IDS += [
+    local_id for mappings in LIVE_CAPMAS_INDICATORS.values() for local_id in mappings.values()
+]
+
+# series_id -> source, for `data.point_in_time`'s per-source publication-lag
+# assumption (`data.snapshot.build_snapshot`'s `macro_series_sources` param)
+# -- built from the exact same groupings above, never a second declaration.
+LIVE_MACRO_SERIES_SOURCES: dict[str, str] = {
+    **{sid: "fred" for sid in LIVE_FRED_SERIES_IDS},
+    **{sid: "worldbank" for sid in LIVE_WORLDBANK_INDICATORS.values()},
+    **{
+        local_id: "undata"
+        for mappings in LIVE_UN_SDG_SERIES.values()
+        for local_id in mappings.values()
+    },
+    **{
+        local_id: "capmas"
+        for mappings in LIVE_CAPMAS_INDICATORS.values()
+        for local_id in mappings.values()
+    },
+}
+
+# World Bank/UN SDG report annually (often with a 1-2 year publication lag)
+# and CAPMAS monthly -- the 30-day window used for prices/news/events would
+# starve all of them of any observation almost always (a live-confirmed gap:
+# every one of `LIVE_MACRO_SERIES_IDS` showed zero observations in a real
+# run). ~2.5 years comfortably covers typical reporting lag for the annual
+# sources while still being a bounded, explainable window rather than "all
+# history".
+LIVE_MACRO_LOOKBACK_DAYS = 900
+
+# historical_patterns_agent needs years of daily bars to search for real
+# analog episodes (see agents/historical_patterns.py); egx_price_composite's
+# Yahoo leg already returns full history (range=max) on every live run, so
+# this window is bounded by what's a defensible, explainable search depth
+# for the agent, not by what the source can supply. ~4 years balances having
+# enough non-overlapping historical windows to find real analogs against an
+# unbounded "all history" search.
+LIVE_PATTERN_LOOKBACK_DAYS = 1460
 
 # Conservative floors, not true full-history sizes (unknown until a real
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
@@ -312,7 +351,12 @@ def _mock_url_map(spec_by_id: dict[str, SourceSpec]) -> dict[str, str]:
 
 
 def build_live_collector(
-    source_id: str, spec: SourceSpec, *, fetcher: HttpFetcher, tickers: list[str]
+    source_id: str,
+    spec: SourceSpec,
+    *,
+    fetcher: HttpFetcher,
+    tickers: list[str],
+    companies: dict[str, str] | None = None,
 ) -> Collector | None:
     """The one place that knows how to construct a real, network-backed
     `Collector` for a given source id in LIVE mode -- reused by both the
@@ -321,6 +365,13 @@ def build_live_collector(
     injected as its `collector_factory`), so there is exactly one live-
     wiring definition per source, not two. Returns `None` for any source id
     this deployment has no live wiring for yet -- never a guess.
+
+    `companies` (ticker -> display name), when given, is threaded into any
+    news collector's `ticker_hints` so its ticker attribution uses real
+    entity resolution (`universe.entity_resolution.resolve_ticker_mentions`)
+    instead of a bare ticker list; `tickers` alone still works (ticker-only
+    matching, no company-name match) for any caller that hasn't looked one
+    up.
     """
     if source_id == "egx_price_composite":
         return EgxCompositePriceCollector(spec, symbols=tickers, fetcher=fetcher)
@@ -341,7 +392,7 @@ def build_live_collector(
         return GdeltDocCollector(
             spec,
             query='(Egypt OR Egyptian OR "Egyptian Exchange" OR EGX)',
-            ticker_hints=tickers,
+            ticker_hints=companies if companies is not None else tickers,
             max_records=50,
             fetcher=fetcher,
         )
@@ -359,7 +410,7 @@ def build_live_collector(
         return RssNewsCollector(
             spec,
             feed_url=spec.base_url,
-            ticker_hints=tickers,
+            ticker_hints=companies if companies is not None else tickers,
             classify_corporate_events=True,
             fetcher=fetcher,
         )
@@ -402,6 +453,7 @@ def build_collector_plan(
     mode: ExecutionMode,
     raw_documents: RawDocumentRepository,
     tickers: list[str] | None = None,
+    companies: dict[str, str] | None = None,
 ) -> list[PlannedCollector]:
     """Collector Selection: pick the collectable sources this pipeline knows
     how to wire (a small, explicit set -- adding a source here is the "small
@@ -432,7 +484,7 @@ def build_collector_plan(
             if source_id not in collectable:
                 continue
             collector = build_live_collector(
-                source_id, collectable[source_id], fetcher=fetcher, tickers=tickers
+                source_id, collectable[source_id], fetcher=fetcher, tickers=tickers, companies=companies
             )
             if collector is not None:
                 plans.append(PlannedCollector(source_id, collector))
@@ -465,7 +517,7 @@ def build_collector_plan(
                     RssNewsCollector(
                         collectable["rss_generic"],
                         feed_url=_MOCK_FEED_URL,
-                        ticker_hints=tickers,
+                        ticker_hints=companies if companies is not None else tickers,
                         classify_corporate_events=True,
                         fetcher=fetcher,
                     ),
@@ -497,7 +549,7 @@ def build_collector_plan(
             real = RssNewsCollector(
                 spec,
                 feed_url=_MOCK_FEED_URL,
-                ticker_hints=tickers,
+                ticker_hints=companies if companies is not None else tickers,
                 classify_corporate_events=True,
             )
         elif source_id == "worldbank":

@@ -1,4 +1,3 @@
-from agx_research.collectors.alphavantage import AlphaVantageCollector
 from agx_research.collectors.archive import RawArchive
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import CollectionBatch, Collector
@@ -8,7 +7,6 @@ from agx_research.collectors.excel import ExcelSeriesCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
 from agx_research.collectors.filesystem import FilesystemCollector
-from agx_research.collectors.fmp import FmpCollector
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.pdf import PdfDocumentCollector
@@ -31,7 +29,6 @@ from agx_research.collectors.un_sdg import UnSdgCollector
 from agx_research.collectors.worldbank import WorldBankCollector
 
 __all__ = [
-    "AlphaVantageCollector",
     "ArchiveReplayCollector",
     "BrowserAutomationCollector",
     "CapmasIndicatorCollector",
@@ -44,7 +41,6 @@ __all__ = [
     "FetchDisallowed",
     "FetchError",
     "FilesystemCollector",
-    "FmpCollector",
     "FredCsvCollector",
     "GdeltDocCollector",
     "HistoricalReplayEngine",

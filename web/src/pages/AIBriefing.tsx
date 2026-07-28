@@ -46,7 +46,7 @@ export function AIBriefing() {
   const executionReport = useArtifact((p) => p.getExecutionReport());
 
   const topOpportunities = [...(recommendations.data ?? [])]
-    .sort((a, b) => b.confidence - a.confidence)
+    .sort((a, b) => b.combined_expected_return - a.combined_expected_return)
     .slice(0, 5);
 
   const elevatedEvents = [...(events.data ?? [])]

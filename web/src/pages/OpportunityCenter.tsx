@@ -23,10 +23,11 @@ import styles from "./OpportunityCenter.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
 
-/** Every opportunity AGX currently sees, ranked by confidence -- the
- * mission's "heart of AGX." Selecting a row shows the full explanation
- * inline; "Open full research workspace" goes to the per-company deep
- * page (Company Research Workspace, a later milestone). */
+/** Every opportunity AGX currently sees, ranked by expected return
+ * (highest to lowest) -- the mission's "heart of AGX." Selecting a row
+ * shows the full explanation inline; "Open full research workspace" goes
+ * to the per-company deep page (Company Research Workspace, a later
+ * milestone). */
 export function OpportunityCenter() {
   const { t } = useTranslation("opportunityCenter");
   const { t: tCommon } = useTranslation("common");
@@ -39,7 +40,9 @@ export function OpportunityCenter() {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [selectedGapTicker, setSelectedGapTicker] = useState<string | null>(null);
 
-  const ranked = [...(recommendations.data ?? [])].sort((a, b) => b.confidence - a.confidence);
+  const ranked = [...(recommendations.data ?? [])].sort(
+    (a, b) => b.combined_expected_return - a.combined_expected_return,
+  );
   const companyNames = marketState.data?.constituents ?? {};
   const selected = ranked.find((r) => r.ticker === selectedTicker) ?? ranked[0] ?? null;
 

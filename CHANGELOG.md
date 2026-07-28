@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.31.1 — Rank opportunities by expected return, not confidence
+
+Both places the dashboard lists discovered opportunities -- the AI
+Briefing's "Top Opportunities" widget and the Opportunity Center's main
+table -- now sort by `combined_expected_return` descending (highest
+expected return first) instead of by confidence. Matches how an investor
+actually wants candidates ordered: confidence is still shown per row (and
+still gates whether a recommendation exists at all), it just no longer
+decides row order. Updated the matching EN/AR copy ("Ranked by expected
+return, highest to lowest").
+
 ## 0.31.0 — HistoricalPatternsAgent: real analog-matching over live long-history
 
 Closes the last data-blocked half of System 08's `HistoricalPatternsAgent`

@@ -1,6 +1,6 @@
 {
   "title": "Opportunity Center",
-  "description": "Every opportunity AGX currently sees, ranked by confidence, with the evidence behind it.",
+  "description": "Every opportunity AGX currently sees, ranked by expected return (highest to lowest), with the evidence behind it.",
   "emptyTitle": "No opportunities yet",
   "emptyDetail": "Recommendations appear once the Meta Decision Engine has combined horizon predictions.",
   "columns": {

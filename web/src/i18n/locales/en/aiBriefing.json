@@ -33,7 +33,7 @@
   },
   "topOpportunities": {
     "title": "Top Opportunities",
-    "subtitle": "Ranked by AGX confidence",
+    "subtitle": "Ranked by expected return, highest to lowest",
     "emptyTitle": "No opportunities yet",
     "emptyDetail": "Recommendations appear once the Meta Decision Engine has combined horizon predictions."
   },

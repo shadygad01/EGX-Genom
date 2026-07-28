@@ -34,6 +34,17 @@
       "title": "HealthStatus",
       "type": "string"
     },
+    "LegalUseStatus": {
+      "description": "Independent legal-review state; implementation is never legal clearance.",
+      "enum": [
+        "cleared",
+        "research_only",
+        "review_required",
+        "blocked"
+      ],
+      "title": "LegalUseStatus",
+      "type": "string"
+    },
     "LifecycleState": {
       "description": "Where a source sits in the qualification pipeline (`sources.qualification`).\n\nDistinct from `SourceStatus`: `status` gates *whether a collector may run\nat all* (auth/ToS/config); `lifecycle_state` gates *how much the rest of\nthe platform trusts it* once it can run. A source can be IMPLEMENTED and\nstill only CANDIDATE/QUARANTINE if it hasn't accumulated evidence yet.\nPromotion only ever moves forward one stage at a time and only on\nevidence (see `qualification.evaluate_promotion`) \u2014 never assigned by\nfiat, never skipped.",
       "enum": [
@@ -230,6 +241,10 @@
       "default": null,
       "description": "Source is an operational provider leg inside this parent collector.",
       "title": "Integrated Via"
+    },
+    "legal_use_status": {
+      "$ref": "#/$defs/LegalUseStatus",
+      "default": "review_required"
     },
     "license": {
       "default": "unknown",

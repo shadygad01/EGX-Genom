@@ -73,11 +73,6 @@
       "title": "Horizon",
       "type": "string"
     },
-    "PriceConditionOperator": {
-      "enum": ["at_or_below", "below", "not_applicable"],
-      "title": "PriceConditionOperator",
-      "type": "string"
-    },
     "HorizonDecision": {
       "description": "One executable-looking but research-only decision for exactly one horizon.\n\nHorizons are never blended here: return, risk, validity and invalidation\nretain the unit and window of their originating prediction.",
       "properties": {
@@ -104,7 +99,15 @@
           "default": "not_applicable"
         },
         "entry_value": {
-          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
           "default": null,
           "title": "Entry Value"
         },
@@ -142,7 +145,15 @@
           "default": "not_applicable"
         },
         "invalidation_value": {
-          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
           "default": null,
           "title": "Invalidation Value"
         },
@@ -156,7 +167,15 @@
           "default": "research_only"
         },
         "reference_price": {
-          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
           "default": null,
           "title": "Reference Price"
         },
@@ -206,11 +225,6 @@
           "title": "Confidence",
           "type": "number"
         },
-        "reference_price": {
-          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
-          "default": null,
-          "title": "Reference Price"
-        },
         "expected_return": {
           "title": "Expected Return",
           "type": "number"
@@ -235,6 +249,19 @@
         },
         "provenance": {
           "$ref": "#/$defs/Provenance"
+        },
+        "reference_price": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Price"
         },
         "supporting_knowledge_ids": {
           "items": {
@@ -262,6 +289,15 @@
       ],
       "title": "Prediction",
       "type": "object"
+    },
+    "PriceConditionOperator": {
+      "enum": [
+        "at_or_below",
+        "below",
+        "not_applicable"
+      ],
+      "title": "PriceConditionOperator",
+      "type": "string"
     },
     "Provenance": {
       "properties": {

@@ -99,6 +99,42 @@ export function signOf(value: number | null | undefined): "positive" | "negative
 // continues as plain text right after its label.
 const EVIDENCE_KEY_VALUE = /\b([a-z][a-z0-9_]*)=([^\s,)]+)/g;
 
+// Every persisted entity's id is `<prefix>_<12 hex chars>` (see
+// domain/identifiers.new_id). KnowledgeWeightedHorizonModel.predict() and
+// decision_engine.py both open an evidence line with one of these ids
+// (e.g. "hyp_3f2a91bc7d4e v2: ..." or "event event_a1b2c3d4e5f6: ...") --
+// real provenance, but meaningless to read. This only strips/relabels the
+// leading id, it never drops the rest of the line.
+const KNOWLEDGE_ID_PREFIX = /^[a-z]+_[0-9a-f]{8,}\s+v\d+:\s*/i;
+const EVENT_ID_PREFIX = /^event\s+[a-z]+_[0-9a-f]{8,}:\s*/i;
+
+// decision_engine.py also opens a per-horizon evidence line with the raw
+// enum value ("micro: expected_return=...").
+const HORIZON_PREFIX = /^(micro|swing|investment):\s*/i;
+
+// Anything still lower_snake_case after the passes above is a bare
+// identifier value with no "key=" attached -- e.g. an event's `.subtype`
+// ("large_price_move", "macro_news") appended straight after its headline.
+// Requires at least one underscore so it never touches an ordinary English
+// word or a value the key=value pass already turned into "Key: value".
+const BARE_SNAKE_TOKEN = /\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g;
+
 export function humanizeEvidence(text: string): string {
-  return text.replace(EVIDENCE_KEY_VALUE, (_match, key: string, value: string) => `${titleCase(key)}: ${value}`);
+  let result = text
+    .replace(KNOWLEDGE_ID_PREFIX, "Knowledge: ")
+    .replace(EVENT_ID_PREFIX, "Event: ")
+    .replace(HORIZON_PREFIX, (_match, horizon: string) => `${titleCase(horizon)}: `);
+  result = result.replace(EVIDENCE_KEY_VALUE, (_match, key: string, value: string) => `${titleCase(key)}: ${value}`);
+  result = result.replace(BARE_SNAKE_TOKEN, (match) => titleCase(match));
+  return result;
+}
+
+/** Removes exact-duplicate lines while preserving first-seen order. The Meta
+ * Decision Engine concatenates each horizon prediction's full evidence list
+ * (meta/decision_engine.py) -- when the same knowledge or event supports
+ * more than one horizon, its evidence lines are repeated verbatim in the
+ * combined Recommendation. This is purely a render-time dedupe: it drops
+ * repeats, it never merges or reworded distinct evidence. */
+export function dedupeEvidence(evidence: readonly string[]): string[] {
+  return Array.from(new Set(evidence));
 }

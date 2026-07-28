@@ -10,7 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from "../components/primitives/S
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
-import { formatNumber, formatPercent, formatSignedPercent, humanizeEvidence, titleCase } from "../lib/format";
+import { dedupeEvidence, formatNumber, formatPercent, formatSignedPercent, humanizeEvidence, titleCase } from "../lib/format";
 import type { GeneStatus, KnowledgeStatus } from "../types";
 import styles from "./CompanyWorkspace.module.css";
 
@@ -130,7 +130,7 @@ export function CompanyWorkspace() {
                   <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
                 ) : (
                   <ul className={styles.bulletList}>
-                    {recommendation.explanation.supporting_evidence.map((e, i) => (
+                    {dedupeEvidence(recommendation.explanation.supporting_evidence).map((e, i) => (
                       <li key={i}>{humanizeEvidence(e)}</li>
                     ))}
                   </ul>

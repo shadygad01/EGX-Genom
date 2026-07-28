@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.32.1 — Supporting Evidence cleanup, part 2: id prefixes and duplicate lines
+
+The 0.31.2 `humanizeEvidence()` fix only handled inline `key=value` pairs;
+real production output showed it was still incomplete for real
+opportunities -- raw internal id prefixes, bare tokens, and duplicated
+lines were all still visible on the live site. This closes every remaining
+gap, purely at render time (no backend evidence string changed):
+
+- **`hyp_<id> v<N>:` and `event event_<id>:` prefixes** (every
+  `KnowledgeWeightedHorizonModel` evidence line opens with the raw
+  `KnowledgeObject`/`Event` id -- real provenance, unreadable to a person)
+  are now relabeled to `Knowledge: ` / `Event: `.
+- **Bare `micro:`/`swing:`/`investment:` horizon prefixes** (from
+  `MetaDecisionEngine`'s per-horizon evidence lines) are now title-cased.
+- **Bare snake_case tokens with no `=`** -- an event's `.subtype`
+  (`large_price_move`, `macro_news`) appended straight after its
+  headline -- are now humanized the same way `key=value` pairs are.
+- **Exact-duplicate evidence lines** are gone from both Opportunity Center
+  and Company Workspace. `MetaDecisionEngine` concatenates each horizon
+  prediction's full evidence list when combining them into a
+  `Recommendation`, so a knowledge object or event supporting more than
+  one horizon had its lines repeated verbatim; the list is now
+  deduplicated at render time (`dedupeEvidence()`), order-preserving,
+  before display.
+- Verified against a real mock-mode dashboard export with production-shaped
+  evidence strings, in a real browser, in both English and Arabic (RTL).
+
 ## 0.32.0 — Council review follow-through: disclaimer, surfaced rationale, priority ordering
 
 Five independent review passes (data sources, decision clarity, value,

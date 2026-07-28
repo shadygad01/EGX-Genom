@@ -12,7 +12,7 @@ import { EmptyState, ErrorState, LoadingState } from "../components/primitives/S
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
-import { formatPercent, formatSignedPercent, humanizeEvidence } from "../lib/format";
+import { dedupeEvidence, formatPercent, formatSignedPercent, humanizeEvidence } from "../lib/format";
 import type {
   CorporateEvent,
   DecisionReadiness,
@@ -345,7 +345,7 @@ function OpportunityDetail({
           <span className={styles.blockText}>{tCommon("states.noneRecorded")}</span>
         ) : (
           <ul className={styles.bulletList}>
-            {explanation.supporting_evidence.map((e, i) => (
+            {dedupeEvidence(explanation.supporting_evidence).map((e, i) => (
               <li key={i}>{humanizeEvidence(e)}</li>
             ))}
           </ul>

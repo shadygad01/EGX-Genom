@@ -60,6 +60,7 @@ from agx_research.acquisition_intelligence.target import (
     seed_target_organizations,
 )
 from agx_research.agents.corporate_events import CorporateEventsAgent
+from agx_research.agents.historical_patterns import HistoricalPatternsAgent
 from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
 from agx_research.agents.market_structure import MarketStructureAgent
@@ -90,6 +91,7 @@ from agx_research.production.collector_plan import (
     LIVE_MACRO_LOOKBACK_DAYS,
     LIVE_MACRO_SERIES_IDS,
     LIVE_MACRO_SERIES_SOURCES,
+    LIVE_PATTERN_LOOKBACK_DAYS,
     ExecutionMode,
     build_collector_plan,
     build_live_collector,
@@ -154,6 +156,11 @@ class ProductionPipeline:
         # matched-to-lookback_days dates do.
         self._macro_lookback_days_override = macro_lookback_days
         self.macro_lookback_days = macro_lookback_days or 30
+        # Same deferral again, this time for historical_patterns_agent's
+        # search window (see data/snapshot.py's pattern_lookback_days):
+        # mock/replay fixtures are far too short for meaningful analog
+        # search, so only LIVE requests the wide window.
+        self.pattern_lookback_days = 0
         # LIVE mode's real series ids map to a known source (see
         # `data.point_in_time`'s publication-lag assumptions); mock/replay's
         # placeholder ids don't model real publication delay, so they default
@@ -230,6 +237,7 @@ class ProductionPipeline:
         else:
             self.macro_lookback_days = 30
         self.macro_series_sources = dict(LIVE_MACRO_SERIES_SOURCES) if mode == ExecutionMode.LIVE else {}
+        self.pattern_lookback_days = LIVE_PATTERN_LOOKBACK_DAYS if mode == ExecutionMode.LIVE else 0
 
         started_at = datetime.now()
         stages: list[StageResult] = []
@@ -720,6 +728,7 @@ class ProductionPipeline:
             lookback_days=30,
             macro_lookback_days=self.macro_lookback_days,
             macro_series_sources=self.macro_series_sources,
+            pattern_lookback_days=self.pattern_lookback_days,
             event_platform=self.event_platform,
         )
         state = self.market_memory.reconstruct(as_of)
@@ -755,6 +764,7 @@ class ProductionPipeline:
             LiquidityAgent(),
             TechnicalStructureAgent(),
             NewsIntelligenceAgent(),
+            HistoricalPatternsAgent(),
         ]
         daily_pipeline = DailyResearchPipeline(
             self.market_memory,

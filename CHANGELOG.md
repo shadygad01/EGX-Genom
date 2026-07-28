@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.31.0 — HistoricalPatternsAgent: real analog-matching over live long-history
+
+Closes the last data-blocked half of System 08's `HistoricalPatternsAgent`
+stub. It turned out to be a methodology gap, not a data gap: LIVE mode's
+`egx_price_composite` collector already returns full history (Yahoo
+`range=max`) on every run, but every agent shared one 30-day
+`DatasetSnapshot` window. `data/snapshot.py` gains `pattern_lookback_days`
+(default 0, opt-in) populating a new `long_price_history`/
+`long_corporate_events` pair — the same "one field needs its own window"
+precedent `macro_lookback_days` already set for macro series, not a
+redesign of the shared snapshot. `MarketMemory`/`ProductionPipeline` thread
+it through; LIVE mode requests `LIVE_PATTERN_LOOKBACK_DAYS` (~4 years),
+mock/replay stay at 0 (their fixtures are far too short regardless).
+
+`HistoricalPatternsAgent` itself: for each ticker, mean-centered Euclidean
+distance between the most recent `window`-day adjusted-return path and
+every non-overlapping earlier window in its own history selects the
+`top_k` closest historical analogs; each analog's actual subsequent
+`forward_horizon`-day return is the "what happened next" evidence. A
+finding is proposed only when at least `min_analogs` exist *and* they
+agree in direction beyond `agreement_threshold` — anything weaker is an
+honest skip, never a forced signal. `contracts/market_state.schema.json`
+regenerated; `api/src/types.ts`/`web/src/types.ts` updated to match.
+
+Verified: a hand-built synthetic fixture with a bit-for-bit repeating
+20-day pattern produces the exact expected 5/5 analog match and 100%
+directional agreement; a variant with alternating pattern outcomes
+correctly abstains (3/5 agreement, below threshold). Full mock-mode `agx
+run` re-verified against the pre-change baseline: identical output.
+622 Python tests green (was 616), `npm run lint`/`build`/`test` clean for
+both `api` and `web`.
+
 ## 0.30.0 — Free daily automatic refresh (GitHub Actions cron)
 
 `.github/workflows/deploy-pages.yml` gains a `schedule:` trigger (`30 15

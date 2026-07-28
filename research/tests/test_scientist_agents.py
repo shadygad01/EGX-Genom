@@ -7,7 +7,6 @@ import pytest
 
 from agx_research.agents.corporate_events import CorporateEventsAgent
 from agx_research.agents.financial_performance import FinancialPerformanceAgent
-from agx_research.agents.historical_patterns import HistoricalPatternsAgent
 from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
 from agx_research.agents.news_intelligence import NewsIntelligenceAgent
@@ -79,7 +78,7 @@ def test_technical_structure_agent_rejects_bad_windows():
 
 
 def test_data_blocked_agents_remain_honest_stubs():
-    for agent in (FinancialPerformanceAgent(), HistoricalPatternsAgent()):
+    for agent in (FinancialPerformanceAgent(),):
         with pytest.raises(NotImplementedError):
             agent.research(snapshot())
 

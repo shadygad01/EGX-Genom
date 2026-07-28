@@ -141,6 +141,15 @@ LIVE_MACRO_SERIES_SOURCES: dict[str, str] = {
 # history".
 LIVE_MACRO_LOOKBACK_DAYS = 900
 
+# historical_patterns_agent needs years of daily bars to search for real
+# analog episodes (see agents/historical_patterns.py); egx_price_composite's
+# Yahoo leg already returns full history (range=max) on every live run, so
+# this window is bounded by what's a defensible, explainable search depth
+# for the agent, not by what the source can supply. ~4 years balances having
+# enough non-overlapping historical windows to find real analogs against an
+# unbounded "all history" search.
+LIVE_PATTERN_LOOKBACK_DAYS = 1460
+
 # Conservative floors, not true full-history sizes (unknown until a real
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
 # lowballing here never unfairly penalizes a real result, it only avoids

@@ -99,6 +99,34 @@ def test_macro_series_sources_drops_not_yet_knowable_observations():
     )
 
 
+def test_pattern_lookback_days_defaults_to_empty_long_price_history():
+    snapshot = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=[],
+        as_of=date(2026, 6, 14), lookback_days=30,
+    )
+    assert snapshot.pattern_lookback_days == 0
+    assert snapshot.long_price_history == {}
+    assert snapshot.long_corporate_events == {}
+
+
+def test_pattern_lookback_days_windows_price_history_independently():
+    # Mock COMI data starts 2026-06-01. A 5-day price window (start
+    # 2026-06-09) drops the early bars from price_history, but a 30-day
+    # pattern window still reaches back to the fixture's start -- the same
+    # independence macro_lookback_days already gives macro series.
+    snapshot = build_snapshot(
+        provider(),
+        tickers=["COMI"],
+        macro_series_ids=[],
+        as_of=date(2026, 6, 14),
+        lookback_days=5,
+        pattern_lookback_days=30,
+    )
+    assert all(bar.trade_date >= date(2026, 6, 9) for bar in snapshot.price_history["COMI"])
+    assert any(bar.trade_date < date(2026, 6, 9) for bar in snapshot.long_price_history["COMI"])
+    assert len(snapshot.long_price_history["COMI"]) > len(snapshot.price_history["COMI"])
+
+
 def test_macro_series_sources_unmapped_series_id_unaffected():
     with_map = build_snapshot(
         provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],

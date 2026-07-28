@@ -10,11 +10,13 @@ are produced by calling `.model_dump(mode="json")` on the exact same
 `KnowledgeObject` list, nothing upstream of that differs.
 
 `patterns.json` is the one deliberate exception: `HistoricalPatternsAgent`
-raises `NotImplementedError` (see `agents/historical_patterns.py`), so
-there is no real pattern-matching output to export yet. Rather than invent
-a schema for a concept that doesn't exist, `export_patterns()` always
-returns an empty list -- honestly empty, not fabricated, until that agent
-is implemented (tracked in docs/TECHNICAL_DEBT.md).
+is implemented (see `agents/historical_patterns.py`) and its findings
+already flow through the normal finding/hypothesis/knowledge pipeline like
+any other agent's, but no dashboard-specific `Pattern` pydantic model/
+contract exists yet for a raw-pattern display artifact distinct from that
+pipeline. Rather than invent one, `export_patterns()` still returns an
+empty list -- honestly empty, not fabricated, until that schema exists
+(tracked as TD-15 in docs/TECHNICAL_DEBT.md).
 """
 
 from __future__ import annotations

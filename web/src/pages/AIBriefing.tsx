@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
+import { Disclaimer } from "../components/primitives/Disclaimer";
 import { Meter } from "../components/primitives/Meter";
 import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
@@ -77,80 +78,7 @@ export function AIBriefing() {
 
   return (
     <>
-      <Section title={t("systemHealth.title")} description={t("systemHealth.description")}>
-        {systemStatus.loading && <LoadingState rows={1} />}
-        {systemStatus.error && <ErrorState detail={systemStatus.error.message} onRetry={systemStatus.reload} />}
-        {systemStatus.data && (
-          <div className={styles.statGrid}>
-            <StatTile label={t("systemHealth.lastCycle")} value={formatDate(systemStatus.data.pipeline_run_date)} />
-            <StatTile label={t("systemHealth.runs")} value={systemStatus.data.runs} />
-            <StatTile
-              label={t("systemHealth.succeeded")}
-              value={systemStatus.data.succeeded}
-              deltaSign={systemStatus.data.failed > 0 ? -1 : 1}
-              delta={
-                systemStatus.data.failed > 0
-                  ? t("systemHealth.failedCount", { count: systemStatus.data.failed })
-                  : t("systemHealth.allClear")
-              }
-            />
-            <StatTile label={t("systemHealth.knowledgeObjects")} value={systemStatus.data.knowledge_objects} />
-            {Object.entries(systemStatus.data.by_status).map(([status, count]) => (
-              <StatTile key={status} label={label("knowledgeStatus", status)} value={count} />
-            ))}
-          </div>
-        )}
-      </Section>
-
-      {executionReport.data && (
-        <Section title={t("changesSinceYesterday.title")} description={t("changesSinceYesterday.description")}>
-          <div className={styles.statGrid}>
-            <StatTile
-              label={t("changesSinceYesterday.knowledgeObjects")}
-              value={executionReport.data.knowledge_after}
-              deltaSign={Math.sign(executionReport.data.knowledge_after - executionReport.data.knowledge_before)}
-              delta={t("changesSinceYesterday.sinceLastRun", {
-                delta: `${executionReport.data.knowledge_after - executionReport.data.knowledge_before >= 0 ? "+" : ""}${
-                  executionReport.data.knowledge_after - executionReport.data.knowledge_before
-                }`,
-              })}
-            />
-            <StatTile
-              label={t("changesSinceYesterday.genes")}
-              value={executionReport.data.genome_after}
-              deltaSign={Math.sign(executionReport.data.genome_after - executionReport.data.genome_before)}
-              delta={t("changesSinceYesterday.sinceLastRun", {
-                delta: `${executionReport.data.genome_after - executionReport.data.genome_before >= 0 ? "+" : ""}${
-                  executionReport.data.genome_after - executionReport.data.genome_before
-                }`,
-              })}
-            />
-            <StatTile
-              label={t("changesSinceYesterday.events")}
-              value={executionReport.data.events_after}
-              deltaSign={Math.sign(executionReport.data.events_after - executionReport.data.events_before)}
-              delta={t("changesSinceYesterday.sinceLastRun", {
-                delta: `${executionReport.data.events_after - executionReport.data.events_before >= 0 ? "+" : ""}${
-                  executionReport.data.events_after - executionReport.data.events_before
-                }`,
-              })}
-            />
-            <StatTile
-              label={t("changesSinceYesterday.pipelineStatus")}
-              value={label("stageStatus", executionReport.data.overall_status)}
-            />
-          </div>
-          {executionReport.data.errors.length > 0 && (
-            <div className={styles.list} style={{ marginTop: "var(--space-4)" }}>
-              {executionReport.data.errors.map((e, i) => (
-                <div key={i} className={styles.listItemDetail}>
-                  <Badge variant="negative">{t("changesSinceYesterday.error")}</Badge> {e}
-                </div>
-              ))}
-            </div>
-          )}
-        </Section>
-      )}
+      <Disclaimer />
 
       <Section title={t("marketSummary.title")} description={t("marketSummary.description")}>
         {marketState.loading && <LoadingState rows={1} />}
@@ -182,12 +110,23 @@ export function AIBriefing() {
               getRowKey={(r) => r.ticker}
               onRowClick={(r) => navigate(`/company/${r.ticker}`)}
               emptyTitle={t("topOpportunities.emptyTitle")}
-              emptyDetail={t("topOpportunities.emptyDetail")}
+              emptyDetail={
+                systemStatus.data && systemStatus.data.knowledge_objects > 0
+                  ? t("topOpportunities.emptyDetailMonitoring", { count: systemStatus.data.knowledge_objects })
+                  : t("topOpportunities.emptyDetail")
+              }
               columns={[
                 {
                   key: "ticker",
                   header: tCommon("table.ticker"),
-                  render: (r) => <span className="num" style={{ color: "var(--accent-strong)", fontWeight: 600 }}>{r.ticker}</span>,
+                  render: (r) => (
+                    <div className={styles.tickerCell}>
+                      <span className={`${styles.tickerCode} num`}>{r.ticker}</span>
+                      {r.explanation.why_this_stock && (
+                        <span className={styles.tickerRationale}>{r.explanation.why_this_stock}</span>
+                      )}
+                    </div>
+                  ),
                 },
                 { key: "confidence", header: tCommon("table.confidence"), render: (r) => <Meter value={r.confidence} label={formatPercent(r.confidence)} /> },
                 {
@@ -329,7 +268,20 @@ export function AIBriefing() {
         {investmentCases.loading && <LoadingState />}
         {investmentCases.error && <ErrorState detail={investmentCases.error.message} onRetry={investmentCases.reload} />}
         {!investmentCases.loading && !investmentCases.error && investmentCases.data?.portfolio == null && (
-          <EmptyState title={t("portfolio.emptyTitle")} detail={t("portfolio.emptyDetail")} />
+          <EmptyState
+            title={t("portfolio.emptyTitle")}
+            detail={
+              systemStatus.data && systemStatus.data.knowledge_objects > 0
+                ? t("portfolio.emptyDetailMonitoring", { count: systemStatus.data.knowledge_objects })
+                : t("portfolio.emptyDetail")
+            }
+          />
+        )}
+        {investmentCases.data?.portfolio?.explanation.why_this_stock && (
+          <p className={styles.portfolioRationale}>
+            <span className={styles.portfolioRationaleLabel}>{t("portfolio.rationale")}</span>
+            {investmentCases.data.portfolio.explanation.why_this_stock}
+          </p>
         )}
         {investmentCases.data?.portfolio && (
           <DataTable
@@ -367,6 +319,81 @@ export function AIBriefing() {
           </div>
         )}
       </Section>
+
+      <Section title={t("systemHealth.title")} description={t("systemHealth.description")}>
+        {systemStatus.loading && <LoadingState rows={1} />}
+        {systemStatus.error && <ErrorState detail={systemStatus.error.message} onRetry={systemStatus.reload} />}
+        {systemStatus.data && (
+          <div className={styles.statGrid}>
+            <StatTile label={t("systemHealth.lastCycle")} value={formatDate(systemStatus.data.pipeline_run_date)} />
+            <StatTile label={t("systemHealth.runs")} value={systemStatus.data.runs} />
+            <StatTile
+              label={t("systemHealth.succeeded")}
+              value={systemStatus.data.succeeded}
+              deltaSign={systemStatus.data.failed > 0 ? -1 : 1}
+              delta={
+                systemStatus.data.failed > 0
+                  ? t("systemHealth.failedCount", { count: systemStatus.data.failed })
+                  : t("systemHealth.allClear")
+              }
+            />
+            <StatTile label={t("systemHealth.knowledgeObjects")} value={systemStatus.data.knowledge_objects} />
+            {Object.entries(systemStatus.data.by_status).map(([status, count]) => (
+              <StatTile key={status} label={label("knowledgeStatus", status)} value={count} />
+            ))}
+          </div>
+        )}
+      </Section>
+
+      {executionReport.data && (
+        <Section title={t("changesSinceYesterday.title")} description={t("changesSinceYesterday.description")}>
+          <div className={styles.statGrid}>
+            <StatTile
+              label={t("changesSinceYesterday.knowledgeObjects")}
+              value={executionReport.data.knowledge_after}
+              deltaSign={Math.sign(executionReport.data.knowledge_after - executionReport.data.knowledge_before)}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.knowledge_after - executionReport.data.knowledge_before >= 0 ? "+" : ""}${
+                  executionReport.data.knowledge_after - executionReport.data.knowledge_before
+                }`,
+              })}
+            />
+            <StatTile
+              label={t("changesSinceYesterday.genes")}
+              value={executionReport.data.genome_after}
+              deltaSign={Math.sign(executionReport.data.genome_after - executionReport.data.genome_before)}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.genome_after - executionReport.data.genome_before >= 0 ? "+" : ""}${
+                  executionReport.data.genome_after - executionReport.data.genome_before
+                }`,
+              })}
+            />
+            <StatTile
+              label={t("changesSinceYesterday.events")}
+              value={executionReport.data.events_after}
+              deltaSign={Math.sign(executionReport.data.events_after - executionReport.data.events_before)}
+              delta={t("changesSinceYesterday.sinceLastRun", {
+                delta: `${executionReport.data.events_after - executionReport.data.events_before >= 0 ? "+" : ""}${
+                  executionReport.data.events_after - executionReport.data.events_before
+                }`,
+              })}
+            />
+            <StatTile
+              label={t("changesSinceYesterday.pipelineStatus")}
+              value={label("stageStatus", executionReport.data.overall_status)}
+            />
+          </div>
+          {executionReport.data.errors.length > 0 && (
+            <div className={styles.list} style={{ marginTop: "var(--space-4)" }}>
+              {executionReport.data.errors.map((e, i) => (
+                <div key={i} className={styles.listItemDetail}>
+                  <Badge variant="negative">{t("changesSinceYesterday.error")}</Badge> {e}
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
     </>
   );
 }

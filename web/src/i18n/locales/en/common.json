@@ -4,6 +4,9 @@
     "footer": "EGX30 + EGX70 · Research Only",
     "fallbackTitle": "AGX Research"
   },
+  "disclaimer": {
+    "text": "AGX is an autonomous research scaffold, not a licensed investment advisor. Nothing here is investment advice or a recommendation to buy or sell any security -- verify independently and consult a licensed professional before acting."
+  },
   "nav": {
     "aiBriefing": "AI Briefing",
     "opportunityCenter": "Opportunity Center",

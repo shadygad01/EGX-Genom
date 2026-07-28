@@ -18,6 +18,7 @@ import type {
   EndpointCandidate,
   Event,
   ExecutionReport,
+  FinancialCoverageReport,
   FinancialStatementLineItem,
   Gene,
   Hypothesis,
@@ -126,6 +127,10 @@ export class ApiProvider implements DashboardDataProvider {
 
   getFinancialStatements(): Promise<FinancialStatementLineItem[]> {
     return fetchJson<FinancialStatementLineItem[]>("/financial-statements");
+  }
+
+  getFinancialCoverage(): Promise<FinancialCoverageReport | null> {
+    return fetchJson<FinancialCoverageReport | null>("/financial-coverage");
   }
 
   getSourceMetrics(): Promise<SourceMetricsRow[]> {

@@ -42,9 +42,13 @@ from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
+from agx_research.collectors.orascom_financials import OrascomFinancialHighlightsCollector
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.stooq import StooqPriceCollector
+from agx_research.collectors.telecom_egypt_financials import (
+    TelecomEgyptFinancialHighlightsCollector,
+)
 from agx_research.collectors.un_sdg import UnSdgCollector
 from agx_research.collectors.worldbank import WorldBankCollector
 from agx_research.sources.registry import SourceRegistry
@@ -162,6 +166,8 @@ EXPECTED_RECORDS_LIVE = {
     "undata": 10,
     "capmas": 10,
     "gdelt": 10,
+    "telecom_egypt_ir": 8,
+    "orascom_ir": 3,
     "enterprise_press": 5,
     "fra_egypt": 5,
     "alborsa": 5,
@@ -396,6 +402,10 @@ def build_live_collector(
             max_records=50,
             fetcher=fetcher,
         )
+    if source_id == "telecom_egypt_ir":
+        return TelecomEgyptFinancialHighlightsCollector(spec, fetcher=fetcher)
+    if source_id == "orascom_ir":
+        return OrascomFinancialHighlightsCollector(spec, fetcher=fetcher)
     if (
         spec.access_method.value == "rss_feed"
         and spec.collector == "RssNewsCollector"
@@ -434,6 +444,8 @@ def live_wired_source_ids(registry: SourceRegistry) -> set[str]:
         "undata",
         "capmas",
         "gdelt",
+        "telecom_egypt_ir",
+        "orascom_ir",
     }
     return {
         spec.id

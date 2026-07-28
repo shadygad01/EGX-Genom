@@ -21,6 +21,7 @@ import type {
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
+  FinancialCoverageReport,
   Gene,
   Hypothesis,
   InvestmentCases,
@@ -69,6 +70,7 @@ export interface DashboardDataProvider {
   getHypotheses(): Promise<Hypothesis[]>;
   getKnowledgeGraph(): Promise<KnowledgeGraphData>;
   getFinancialStatements(): Promise<FinancialStatementLineItem[]>;
+  getFinancialCoverage(): Promise<FinancialCoverageReport | null>;
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;

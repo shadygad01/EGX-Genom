@@ -30,9 +30,10 @@ source id it has no live wiring for yet, never a guessed one.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
@@ -51,7 +52,16 @@ if TYPE_CHECKING:
 # needed to corroborate a headline). These run every ready strategy instead of
 # stopping at the first success; every other capability stops at the first
 # strategy that produces usable output (the mission's fallback-chain model).
-EXHAUSTIVE_CAPABILITIES = {Capability.NEWS, Capability.MACROECONOMIC}
+# News/macro sources corroborate one another. Issuer financial/IR sources are
+# also complementary rather than fallbacks: each one covers a different
+# company, so stopping after the first successful issuer would silently leave
+# the rest of the universe empty.
+EXHAUSTIVE_CAPABILITIES = {
+    Capability.NEWS,
+    Capability.MACROECONOMIC,
+    Capability.FINANCIAL_STATEMENTS,
+    Capability.INVESTOR_RELATIONS,
+}
 
 _NOT_CATALOGUED_REASON = "Not catalogued in the source registry."
 _NOT_READY_REASON_BY_STATUS = {
@@ -254,7 +264,7 @@ class CapabilityDecisionEngine:
                 result = collection_service.run(
                     collector, expected_records=expected_records.get(score.source_id, 1),
                 )
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 -- one source must not abort remaining sources
                 reason = f"{type(exc).__name__}: {exc}"
                 failures[score.source_id] = reason
                 attempts.append(
@@ -288,7 +298,7 @@ class CapabilityDecisionEngine:
                 )
 
         decision = CapabilityDecision(
-            capability=capability.value, decided_at=datetime.now(), attempts=attempts,
+            capability=capability.value, decided_at=datetime.now().astimezone(), attempts=attempts,
             selected_source_ids=selected, succeeded=bool(selected),
         )
         return decision, results, failures

@@ -787,6 +787,24 @@ export interface FinancialStatementLineItem {
   currency: string;
 }
 
+export interface TickerFinancialCoverage {
+  ticker: string;
+  covered: boolean;
+  latest_period_end_date: string | null;
+  present_items: string[];
+  missing_items: string[];
+}
+
+export interface FinancialCoverageReport {
+  as_of: string;
+  universe_count: number;
+  covered_count: number;
+  coverage_percent: number;
+  complete: boolean;
+  required_latest_items: string[];
+  tickers: TickerFinancialCoverage[];
+}
+
 // --- source_metrics.json ---
 
 export interface ReputationScore {

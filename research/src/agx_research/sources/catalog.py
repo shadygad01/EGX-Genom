@@ -67,9 +67,7 @@ def seed_sources() -> list[SourceSpec]:
             update_frequency="daily",
             collector="EgxCompositePriceCollector",
             collector_version="1.0.0",
-            retry_policy=RetryPolicy(
-                max_attempts=2, backoff_seconds=0.5, backoff_multiplier=2.0
-            ),
+            retry_policy=RetryPolicy(max_attempts=2, backoff_seconds=0.5, backoff_multiplier=2.0),
             rate_limit=RateLimit(requests_per_minute=60, min_seconds_between_requests=0.25),
             license=(
                 "Operational collection authorized by the repository owner; upstream terms "
@@ -218,6 +216,36 @@ def seed_sources() -> list[SourceSpec]:
             notes="Official downloads exist (indices, disclosures); exact endpoints to be verified from egx.com.eg before a collector is written -- never guessed.",
         ),
         _spec(
+            id="egid_financial_filings",
+            name="EGID official issuer financial-filings service",
+            category=SourceCategory.OFFICIAL,
+            access_method=AccessMethod.JSON_API,
+            status=SourceStatus.TOS_REVIEW,
+            legal_use_status=LegalUseStatus.BLOCKED,
+            base_url="https://ir.egidegypt.com:8080/api/Feed/getnewsbysearch",
+            reliability_score=0.95,
+            freshness_score=0.9,
+            historical_coverage="up to six years of issuer financial-statement attachments",
+            expected_latency="same day as EGX disclosure",
+            update_frequency="event driven",
+            conflict_priority=98,
+            supported_entities=["EGX issuers by ISIN"],
+            supported_event_types=["corporate"],
+            supported_languages=["ar", "en"],
+            integrated_capabilities=["financial_statements", "investor_relations"],
+            license=(
+                "Official public issuer-IR display service. Cross-issuer automated API use is "
+                "not authorized by published documentation and therefore remains blocked."
+            ),
+            notes=(
+                "Live audit 2026-07-28 verified that public company pages obtain a Feed:Get "
+                "JWT scoped to one company and POST an ISIN to getnewsbysearch. The backend "
+                "accepted other ISINs with that company-scoped token, but relying on that "
+                "behavior could bypass intended tenant authorization. Do not automate until "
+                "EGID confirms a market-wide credential or public bulk-feed terms."
+            ),
+        ),
+        _spec(
             id="egx_universe_seed",
             name="Official EGX30/EGX70 Universe snapshot",
             category=SourceCategory.OFFICIAL,
@@ -321,7 +349,73 @@ def seed_sources() -> list[SourceSpec]:
             supported_event_types=["macroeconomic"],
             supported_languages=["ar", "en"],
         ),
-        # ---- COMPANY (PLANNED; per-company IR config) ----
+        # ---- COMPANY ----
+        _spec(
+            id="telecom_egypt_ir",
+            name="Telecom Egypt Investor Relations",
+            category=SourceCategory.COMPANY,
+            access_method=AccessMethod.HTML_SCRAPE,
+            status=SourceStatus.IMPLEMENTED,
+            legal_use_status=LegalUseStatus.RESEARCH_ONLY,
+            base_url="https://ir.te.eg/",
+            reliability_score=0.95,
+            freshness_score=0.9,
+            historical_coverage="Latest issuer-published quarterly financial highlights",
+            expected_latency="issuer publication",
+            update_frequency="quarterly",
+            collector="TelecomEgyptFinancialHighlightsCollector",
+            collector_version="1.0.0",
+            license=(
+                "Public primary issuer investor-relations release; research use with "
+                "source attribution. Raw release content is not redistributed."
+            ),
+            validation_rules=["FinancialStatementLineItem schema", "explicit EGP-labelled values"],
+            normalization_rules=["EGP bn to EGP units", "quarter label to ISO period end"],
+            conflict_priority=95,
+            priority=95,
+            supported_entities=["ETEL"],
+            supported_event_types=["corporate"],
+            supported_languages=["en"],
+            notes=(
+                "Live-verified official IR homepage and Q1 2026 release. The collector "
+                "fails closed unless a reporting period and explicitly labelled revenue, "
+                "EBITDA, net profit or FCFF amount are present. Scanned statement PDFs are "
+                "archival evidence but are not heuristically OCR-parsed."
+            ),
+        ),
+        _spec(
+            id="orascom_ir",
+            name="Orascom Construction Investor Relations",
+            category=SourceCategory.COMPANY,
+            access_method=AccessMethod.HTML_SCRAPE,
+            status=SourceStatus.IMPLEMENTED,
+            legal_use_status=LegalUseStatus.RESEARCH_ONLY,
+            base_url="https://orascom.com/updates/",
+            reliability_score=0.95,
+            freshness_score=0.9,
+            historical_coverage="Latest issuer-published quarterly or annual result highlights",
+            expected_latency="issuer publication",
+            update_frequency="quarterly",
+            collector="OrascomFinancialHighlightsCollector",
+            collector_version="1.0.0",
+            license=(
+                "Public primary issuer investor-relations release; research use with "
+                "source attribution. Raw article content is not redistributed."
+            ),
+            validation_rules=["FinancialStatementLineItem schema", "explicit USD-labelled values"],
+            normalization_rules=["USD million to USD units", "quarter/FY label to ISO period end"],
+            conflict_priority=95,
+            priority=94,
+            supported_entities=["ORAS"],
+            supported_event_types=["corporate"],
+            supported_languages=["en"],
+            notes=(
+                "Live-verified official updates archive and Q1 2026 result article. "
+                "The collector fails closed unless a period plus one issuer-labelled "
+                "revenue/EBITDA/net-profit highlight sentence is present."
+            ),
+        ),
+        # Generic per-company IR expansion remains planned.
         _spec(
             id="company_ir",
             name="Company Investor Relations (per-constituent config)",
@@ -478,10 +572,7 @@ def seed_sources() -> list[SourceSpec]:
             category=SourceCategory.ARABIC_NEWS,
             access_method=AccessMethod.RSS_FEED,
             status=SourceStatus.IMPLEMENTED,
-            base_url=(
-                "https://www.masrawy.com/rss/feed/206/"
-                "%D8%A5%D9%82%D8%AA%D8%B5%D8%A7%D8%AF"
-            ),
+            base_url=("https://www.masrawy.com/rss/feed/206/%D8%A5%D9%82%D8%AA%D8%B5%D8%A7%D8%AF"),
             reliability_score=0.5,
             freshness_score=0.9,
             collector="RssNewsCollector",
@@ -587,9 +678,7 @@ def seed_sources() -> list[SourceSpec]:
                 status=(
                     SourceStatus.IMPLEMENTED if source_id == "undata" else SourceStatus.PLANNED
                 ),
-                base_url=(
-                    "https://unstats.un.org/SDGAPI/v1/sdg" if source_id == "undata" else ""
-                ),
+                base_url=("https://unstats.un.org/SDGAPI/v1/sdg" if source_id == "undata" else ""),
                 collector="UnSdgCollector" if source_id == "undata" else "",
                 collector_version="1.0.0" if source_id == "undata" else "",
                 license="UN public statistical data" if source_id == "undata" else "",

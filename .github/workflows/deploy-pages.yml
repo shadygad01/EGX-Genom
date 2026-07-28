@@ -88,6 +88,10 @@ jobs:
           done
 
       - name: Validate dashboard JSON artifacts
+        # Publishing partial, explicitly measured coverage is valid. The
+        # validator still rejects malformed, stale, or internally inconsistent
+        # financial artifacts; missing tickers remain visible in the coverage
+        # report instead of blocking the whole dashboard deployment.
         run: uv run python -m agx_research.cli validate-dashboard --dir ../web/public/data
 
       # Acquisition-architecture audit/verification is complete and frozen
@@ -154,7 +158,8 @@ jobs:
                    system_status source_registry investment_cases collector_status \
                    runtime_status dashboard_metrics mission_status execution_report \
                    decision_readiness ticker_data_gap_report source_truth \
-                   decision_performance decision_history publication_gate; do
+                   decision_performance decision_history publication_gate \
+                   financial_statements financial_coverage; do
             test -f "web/dist/data/$f.json"
           done
 

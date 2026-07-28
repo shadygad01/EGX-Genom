@@ -146,9 +146,14 @@ Nothing to change here beyond what TD-29/TD-32 already track.
 |---|---|---|---|---|---|---|---|---|---|
 | Company IR structured export (CSV/XLSX) | Company's own | Low (per-company format) | Full once format known | Quarterly | Per-company | Medium | High | Excel/CSV | `FinancialStatementCollector` **code-complete**, unverified column layout (TD-31) |
 | Company IR PDF filing | Company's own | Low | Partial (extraction risk) | Quarterly | Per-company | Low until layout verified | High | PDF | Deliberately unimplemented (TD-32) — extracting the wrong line item silently is worse than not extracting at all |
-| Financial aggregator API (FMP has a financials endpoint; AlphaVantage does not for most EGX tickers) | Keyed, documented | High | Full | Quarterly, lagged | Coverage unverified for EGX specifically | Medium | Low | JSON API | Not yet explored for financial-statement coverage specifically — flagged as a gap below |
+| Financial aggregator API (FMP has a financials endpoint; AlphaVantage does not for most EGX tickers) | Keyed, documented | High | Full | Quarterly, lagged | Coverage unverified for EGX specifically | Medium | Low | JSON API | Keyed API coverage remains untested |
+| Aggregator display pages (Investing.com, TradingView, MarketScreener) | Provider-controlled | Medium | Not approved | Quarterly/annual | Live-verified for COMI; Investing/TradingView also verified for ABUK | Medium until reconciled | High | Browser/display | Financials coverage exists; automated use is not approved. TradingView explicitly prohibits automated/non-display collection; other providers still require terms/licensing review. See `evidence/financial-statements-source-audit-2026-07-28.md`. |
+| Mubasher financial statements and disclosure documents | Aggregator plus linked EGX documents | Medium | Pending policy/route verification | Quarterly/annual | Live-verified for COMI and ABUK | Potentially high for underlying primary PDFs | Medium-high | Client-rendered table / PDF | Dedicated statement pages and filing PDFs exist. Candidate for primary-document discovery, not yet an approved scraper. See the 2026-07-28 audit. |
 
-**Chosen strategy**: no change to the honest-gap posture (TD-31/TD-32)
+**Chosen strategy**: the source-discovery gap is now partially closed: live
+financial-statement coverage was verified across multiple aggregator surfaces.
+The honest remaining gap is a permitted acquisition route plus source-specific
+parsing and reconciliation (TD-31/TD-32), not absence of financial data.
 until a real export or filing is fetched and its layout inspected. New
 finding to flag: FMP's `/v3/income-statement/{symbol}` family of endpoints
 (same product FMP's already-cataloged NEEDS_KEY price collector uses) is
@@ -765,3 +770,20 @@ intelligence — the hypothesis/validation/genome/explainability/Meta
 Decision Engine side of the pipeline — not toward collecting more data.
 See `CURRENT_MISSION.md` and `NEXT_MISSIONS.md` for what that means
 concretely.
+
+## 2026-07-28 financial-statements correction
+
+The freeze verdict above was too broad: it was valid for the price/news probes
+performed in that sprint, but it had not tested issuer financial-result
+surfaces specifically. A dedicated financials audit found permitted primary
+issuer pages that are stable enough for narrow, fail-closed collection.
+
+`telecom_egypt_ir` and `orascom_ir` are now `IMPLEMENTED` and live-wired. They
+collect only explicitly labelled decision-useful highlights from the issuers'
+own public IR pages, preserve raw URL/hash and value-level provenance, and do
+not redistribute the underlying release. Financial-statements and investor-
+relations capabilities are exhaustive: issuer sources cover different
+companies and therefore accumulate instead of stopping after the first source
+succeeds. Aggregator coverage at Investing, TradingView, Mubasher and
+MarketScreener remains reconciliation/discovery evidence only until an
+automated-use permission or licensed API exists.

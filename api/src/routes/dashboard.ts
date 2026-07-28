@@ -28,6 +28,7 @@ export async function dashboardRoutes(
   app.get("/hypotheses", async () => artifacts.hypotheses());
   app.get("/knowledge-graph", async () => artifacts.knowledgeGraph());
   app.get("/financial-statements", async () => artifacts.financialStatements());
+  app.get("/financial-coverage", async () => artifacts.financialCoverage());
   app.get("/source-metrics", async () => artifacts.sourceMetrics());
   app.get("/acquisition-decisions", async () => artifacts.acquisitionDecisions());
   app.get("/decision-readiness", async () => artifacts.decisionReadiness());

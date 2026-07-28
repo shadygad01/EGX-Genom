@@ -61,6 +61,24 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
         "records": ["macro_observations"],
         "consumers": ["macro_agent", "validation", "meta_decision_engine"],
     },
+    "telecom_egypt_ir": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
+    "orascom_ir": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
     "rss_generic": {
         "records": ["news_items", "events"],
         "consumers": ["event_risk_overlay", "meta_decision_engine"],

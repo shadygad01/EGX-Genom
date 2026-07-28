@@ -76,8 +76,18 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "mubasher",
         "zawya",
     ],
-    Capability.FINANCIAL_STATEMENTS: ["company_ir"],
-    Capability.INVESTOR_RELATIONS: ["company_ir"],
+    Capability.FINANCIAL_STATEMENTS: [
+        "egid_financial_filings",
+        "telecom_egypt_ir",
+        "orascom_ir",
+        "company_ir",
+    ],
+    Capability.INVESTOR_RELATIONS: [
+        "egid_financial_filings",
+        "telecom_egypt_ir",
+        "orascom_ir",
+        "company_ir",
+    ],
     Capability.NEWS: [
         "reuters",
         "enterprise_press",

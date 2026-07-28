@@ -218,6 +218,14 @@ def main(argv: list[str] | None = None) -> int:
         "validate-dashboard", help="Validate a directory of exported dashboard artifacts"
     )
     validate_dashboard_parser.add_argument("--dir", type=Path, required=True)
+    validate_dashboard_parser.add_argument(
+        "--require-complete-financials",
+        action="store_true",
+        help=(
+            "Fail unless every universe ticker has at least one sourced, "
+            "non-estimated financial item"
+        ),
+    )
 
     publication_parser = sub.add_parser(
         "publication-status",
@@ -416,20 +424,27 @@ def main(argv: list[str] | None = None) -> int:
         force_ids = {s.strip() for s in args.force.split(",") if s.strip()} if args.force else set()
         started_at = datetime.now()
         outcomes, candidates = run_discovery_report(
-            engine, registry, seed_target_organizations(), history,
-            force_ids=force_ids, ttl_days=args.ttl_days, now=started_at,
+            engine,
+            registry,
+            seed_target_organizations(),
+            history,
+            force_ids=force_ids,
+            ttl_days=args.ttl_days,
+            now=started_at,
         )
         finished_at = datetime.now()
         metrics = build_discovery_metrics(outcomes, started_at=started_at, finished_at=finished_at)
 
         (args.out / "discovery_report.json").write_text(
-            json.dumps([o.model_dump(mode="json") for o in outcomes], indent=2, sort_keys=True) + "\n"
+            json.dumps([o.model_dump(mode="json") for o in outcomes], indent=2, sort_keys=True)
+            + "\n"
         )
         (args.out / "discovery_metrics.json").write_text(
             json.dumps(metrics, indent=2, sort_keys=True) + "\n"
         )
         (args.out / "endpoint_candidates.json").write_text(
-            json.dumps([c.model_dump(mode="json") for c in candidates], indent=2, sort_keys=True) + "\n"
+            json.dumps([c.model_dump(mode="json") for c in candidates], indent=2, sort_keys=True)
+            + "\n"
         )
         print(json.dumps(metrics, indent=2))
         return 0
@@ -461,7 +476,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "validate-dashboard":
         try:
-            counts = validate_dashboard_artifacts(args.dir)
+            counts = validate_dashboard_artifacts(
+                args.dir,
+                require_complete_financials=args.require_complete_financials,
+            )
         except DashboardArtifactError as exc:
             print(f"Dashboard artifact validation failed: {exc}", file=sys.stderr)
             return 1
@@ -506,11 +524,10 @@ def main(argv: list[str] | None = None) -> int:
             as_of=as_of,
             external=external,
             legal=legal,
-            raw_documents=RawDocumentRepository(
-                args.data_dir / "raw_documents.json"
-            ).all_latest(),
+            raw_documents=RawDocumentRepository(args.data_dir / "raw_documents.json").all_latest(),
             legally_cleared_source_ids={
-                source.id for source in registry.all_latest()
+                source.id
+                for source in registry.all_latest()
                 if source.legal_use_status.value == "cleared"
             },
             input_errors=input_errors,

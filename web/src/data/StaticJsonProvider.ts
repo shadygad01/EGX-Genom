@@ -18,6 +18,7 @@ import type {
   EndpointCandidate,
   Event,
   ExecutionReport,
+  FinancialCoverageReport,
   FinancialStatementLineItem,
   Gene,
   Hypothesis,
@@ -137,6 +138,10 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getFinancialStatements(): Promise<FinancialStatementLineItem[]> {
     return fetchList<FinancialStatementLineItem>("financial_statements.json");
+  }
+
+  getFinancialCoverage(): Promise<FinancialCoverageReport | null> {
+    return fetchObject<FinancialCoverageReport>("financial_coverage.json");
   }
 
   getSourceMetrics(): Promise<SourceMetricsRow[]> {

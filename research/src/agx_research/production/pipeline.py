@@ -76,6 +76,8 @@ from agx_research.domain.identifiers import new_id
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
 from agx_research.financials.collected import CollectedFinancialStatementProvider
+from agx_research.financials.coverage import build_financial_coverage_report
+from agx_research.financials.schema import FinancialStatementLineItem
 from agx_research.genome.service import AlphaGenome
 from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
@@ -245,7 +247,9 @@ class ProductionPipeline:
             self.macro_lookback_days = LIVE_MACRO_LOOKBACK_DAYS
         else:
             self.macro_lookback_days = 30
-        self.macro_series_sources = dict(LIVE_MACRO_SERIES_SOURCES) if mode == ExecutionMode.LIVE else {}
+        self.macro_series_sources = (
+            dict(LIVE_MACRO_SERIES_SOURCES) if mode == ExecutionMode.LIVE else {}
+        )
         self.pattern_lookback_days = LIVE_PATTERN_LOOKBACK_DAYS if mode == ExecutionMode.LIVE else 0
 
         started_at = datetime.now()
@@ -614,14 +618,16 @@ class ProductionPipeline:
             replacement = CapabilityDecision(
                 capability=capability.value,
                 decided_at=datetime.now().astimezone(),
-                attempts=[CapabilityStrategyAttempt(
-                    source_id=source_id,
-                    rank=1,
-                    composite_score=1.0,
-                    outcome="succeeded",
-                    reason=reason,
-                    yield_count=yield_count,
-                )],
+                attempts=[
+                    CapabilityStrategyAttempt(
+                        source_id=source_id,
+                        rank=1,
+                        composite_score=1.0,
+                        outcome="succeeded",
+                        reason=reason,
+                        yield_count=yield_count,
+                    )
+                ],
                 selected_source_ids=[source_id],
                 succeeded=True,
             )
@@ -658,9 +664,7 @@ class ProductionPipeline:
             )
             for source_id in sorted(wired_ids - attempted_ids)
         }
-        self._unavailable = unavailable_sources(
-            self.registry, attempted_ids | set(self._standby)
-        )
+        self._unavailable = unavailable_sources(self.registry, attempted_ids | set(self._standby))
 
         succeeded = len(self.collection_results)
         attempted = succeeded + len(self.collector_failures)
@@ -934,9 +938,7 @@ class ProductionPipeline:
                     legal_path.read_text(encoding="utf-8")
                 )
             except (ValueError, OSError) as exc:
-                publication_input_errors.append(
-                    f"legal_publication_approval.json invalid: {exc}"
-                )
+                publication_input_errors.append(f"legal_publication_approval.json invalid: {exc}")
         else:
             publication_input_errors.append("legal_publication_approval.json missing")
         publication_gate = evaluate_publication_gate(
@@ -944,11 +946,10 @@ class ProductionPipeline:
             as_of=as_of or end,
             external=external_evidence,
             legal=legal_approval,
-            raw_documents=RawDocumentRepository(
-                self.data_dir / "raw_documents.json"
-            ).all_latest(),
+            raw_documents=RawDocumentRepository(self.data_dir / "raw_documents.json").all_latest(),
             legally_cleared_source_ids={
-                source.id for source in self.registry.all_latest()
+                source.id
+                for source in self.registry.all_latest()
                 if source.legal_use_status.value == "cleared"
             },
             input_errors=publication_input_errors,
@@ -965,9 +966,11 @@ class ProductionPipeline:
         investment_cases["recommendations"] = [
             item.model_dump(mode="json") for item in gated_recommendations
         ]
-        investment_cases["portfolio"] = PortfolioConstructor().construct(
-            gated_recommendations, as_of or end
-        ).model_dump(mode="json")
+        investment_cases["portfolio"] = (
+            PortfolioConstructor()
+            .construct(gated_recommendations, as_of or end)
+            .model_dump(mode="json")
+        )
         (dashboard_out / "investment_cases.json").write_text(
             json.dumps(investment_cases, indent=2, sort_keys=True) + "\n"
         )
@@ -1036,6 +1039,16 @@ class ProductionPipeline:
             json.dumps(financial_statements, indent=2, sort_keys=True) + "\n"
         )
         counts["financial_statements.json"] = len(financial_statements)
+
+        financial_coverage = build_financial_coverage_report(
+            tickers=self._tickers(as_of),
+            items=[FinancialStatementLineItem.model_validate(row) for row in financial_statements],
+            as_of=as_of,
+        )
+        (dashboard_out / "financial_coverage.json").write_text(
+            financial_coverage.model_dump_json(indent=2) + "\n"
+        )
+        counts["financial_coverage.json"] = financial_coverage.universe_count
 
         decision_readiness_rows = []
         if as_of is not None:

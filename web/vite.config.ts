@@ -8,6 +8,12 @@ import { defineConfig } from "vite";
 export default defineConfig(({ command }) => ({
   base: command === "build" ? "/EGX-Genom/" : "/",
   plugins: [react()],
+  // This package is an npm workspace symlink. Force every dependency to use
+  // the workspace's single React runtime or hooks can bind to a second copy
+  // and crash the application in the browser.
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
   server: {
     port: 5173,
     proxy: {

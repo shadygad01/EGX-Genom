@@ -23,6 +23,17 @@
     "detail": "Detail",
     "warnings": "Warnings"
   },
+  "financialCoverage": {
+    "title": "Financial Data Coverage",
+    "description": "Coverage requires at least one real reported financial item for every universe ticker; missing depth remains visible.",
+    "emptyTitle": "No financial coverage report yet",
+    "covered": "Covered Tickers",
+    "percent": "Coverage",
+    "status": "Completion Status",
+    "complete": "Complete",
+    "incomplete": "Incomplete",
+    "asOf": "As Of"
+  },
   "knowledgeStatus": {
     "title": "Knowledge Status",
     "subtitle": "Knowledge objects by lifecycle status",

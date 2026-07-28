@@ -59,9 +59,21 @@ export function formatDateTime(value: string | null | undefined, locale: string 
 
 export function formatRelativeToNow(value: string | null | undefined, locale: string = DEFAULT_LOCALE): string {
   if (!value) return "—";
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto", numberingSystem: "latn" } as Intl.RelativeTimeFormatOptions);
+
+  // Date-only values represent calendar days, not instants at UTC midnight.
+  // Parsing them as timestamps made today's cycle read "yesterday" later in
+  // the same day in positive-offset time zones.
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (dateOnly) {
+    const now = new Date();
+    const targetDay = Date.UTC(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]));
+    const currentDay = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    return rtf.format(Math.round((targetDay - currentDay) / 86400000), "day");
+  }
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto", numberingSystem: "latn" } as Intl.RelativeTimeFormatOptions);
   const diffMs = Date.now() - date.getTime();
   const diffMinutes = Math.round(diffMs / 60000);
   if (Math.abs(diffMinutes) < 1) return rtf.format(0, "second");

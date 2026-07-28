@@ -36,14 +36,32 @@
     "generationLabel": "{{id}} · gen {{generation}}"
   },
   "financialStatements": {
-    "title": "Financial Statements",
-    "description": "Line items collected for this ticker.",
+    "title": "Financial Position & Investment Metrics",
+    "description": "Decision-useful profitability, growth, cash-flow and leverage metrics from issuer-reported results.",
     "emptyTitle": "No financial statements collected",
-    "emptyDetail": "Financial statement collection is built but not yet wired to a live, verified filing source (see docs/TECHNICAL_DEBT.md).",
+    "emptyDetail": "No verified decision-useful issuer financial metrics are available for this ticker yet.",
+    "valuationRequired": "Financial strength is not a buy/sell decision without valuation and market risk.",
+    "assessment": {
+      "positive": "Positive fundamental signal",
+      "mixed": "Mixed fundamental signal",
+      "weak": "Weak fundamental signal",
+      "insufficient": "Insufficient metrics for a fundamental signal"
+    },
     "periodEnd": "Period End",
     "type": "Type",
     "statement": "Statement",
     "lineItem": "Line Item",
+    "keyMetrics": "Key Metrics",
+    "items": {
+      "revenue": "Revenue",
+      "ebitda": "EBITDA",
+      "net_income": "Net Income",
+      "free_cash_flow": "Free Cash Flow",
+      "revenue_growth_yoy": "Revenue Growth YoY",
+      "ebitda_growth_yoy": "EBITDA Growth YoY",
+      "net_margin": "Net Margin",
+      "net_debt_to_ebitda": "Net Debt / EBITDA"
+    },
     "value": "Value"
   },
   "corporateActions": {

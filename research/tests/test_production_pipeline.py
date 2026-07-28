@@ -309,6 +309,7 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
         "hypotheses.json",
         "knowledge_graph.json",
         "financial_statements.json",
+        "financial_coverage.json",
         "source_metrics.json",
     }
     for filename in expected:

@@ -44,12 +44,12 @@ class _FakeCollector:
         return []
 
 
-def _empty_result(source_id: str, *, price_bars=0) -> CollectionRunResult:
+def _empty_result(source_id: str, *, price_bars=0, financials=0) -> CollectionRunResult:
     return CollectionRunResult(
         source_id=source_id, documents_fetched=1, batches_materialized=0, batches_withheld=0,
         price_bars_written=price_bars, macro_observations_written=0, news_items_written=0,
         corporate_events_written=0, index_constituents_written=0,
-        financial_statement_line_items_written=0, events_registered=0, assessments=[],
+        financial_statement_line_items_written=financials, events_registered=0, assessments=[],
     )
 
 
@@ -149,7 +149,7 @@ def test_decide_and_execute_falls_through_on_zero_yield():
         "egx_official": _empty_result("egx_official", price_bars=5),
     })
     engine = CapabilityDecisionEngine(registry, factory)
-    decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
+    decision, results, _failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
 
     assert decision.selected_source_ids == ["egx_official"]
     assert "stooq" in results and "egx_official" in results  # both attempts recorded
@@ -188,7 +188,7 @@ def test_decide_and_execute_reports_failure_when_nothing_succeeds():
 
     service = _FakeCollectionService({"stooq": _empty_result("stooq", price_bars=0)})
     engine = CapabilityDecisionEngine(registry, factory)
-    decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
+    decision, _results, _failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
 
     assert decision.succeeded is False
     assert decision.selected_source_ids == []
@@ -225,7 +225,7 @@ def test_macroeconomic_capability_is_exhaustive_not_first_success_only():
         "fred": _empty_result("fred", price_bars=1),
     })
     engine = CapabilityDecisionEngine(registry, factory)
-    decision, results, failures = engine.decide_and_execute(Capability.MACROECONOMIC, service)
+    decision, results, _failures = engine.decide_and_execute(Capability.MACROECONOMIC, service)
 
     # Both complementary macro sources run -- this is not a "pick one"
     # capability (World Bank's Egypt CPI and FRED's global series cover
@@ -254,3 +254,26 @@ def test_news_capability_collects_every_ready_outlet_for_corroboration():
 
     assert set(decision.selected_source_ids) == {"enterprise_press", "alborsa"}
     assert set(results) == {"enterprise_press", "alborsa"}
+
+
+def test_financial_statements_collects_every_ready_issuer():
+    registry = SourceRegistry()
+    registry.add(_spec("telecom_egypt_ir", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("orascom_ir", status=SourceStatus.IMPLEMENTED))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService(
+        {
+            "telecom_egypt_ir": _empty_result("telecom_egypt_ir", financials=8),
+            "orascom_ir": _empty_result("orascom_ir", financials=3),
+        }
+    )
+    decision, results, _ = CapabilityDecisionEngine(registry, factory).decide_and_execute(
+        Capability.FINANCIAL_STATEMENTS, service
+    )
+
+    assert set(decision.selected_source_ids) == {"telecom_egypt_ir", "orascom_ir"}
+    assert set(results) == {"telecom_egypt_ir", "orascom_ir"}
+    assert service.calls == decision.selected_source_ids

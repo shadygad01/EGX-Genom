@@ -246,6 +246,92 @@ def test_validate_missing_file_raises(tmp_path):
         validate_dashboard_artifacts(tmp_path)
 
 
+def test_complete_financial_coverage_requires_every_tickers_latest_position(tmp_path):
+    _write_valid_empty_artifacts(tmp_path)
+    (tmp_path / "universe.json").write_text(
+        '{"as_of":"2026-06-14","count":2,"tickers":["COMI","MFPC"],'
+        '"constituents":{"COMI":"CIB","MFPC":"Misr Fertilizers"}}'
+    )
+    (tmp_path / "financial_statements.json").write_text(
+        """[
+          {"ticker":"COMI","period_end_date":"2026-03-31","period_type":"QUARTERLY",
+           "statement_type":"INCOME_STATEMENT","line_item":"net_income","value":1,"currency":"EGP"},
+          {"ticker":"COMI","period_end_date":"2026-03-31","period_type":"QUARTERLY",
+           "statement_type":"BALANCE_SHEET","line_item":"total_assets","value":4,"currency":"EGP"},
+          {"ticker":"COMI","period_end_date":"2026-03-31","period_type":"QUARTERLY",
+           "statement_type":"BALANCE_SHEET","line_item":"total_liabilities","value":3,"currency":"EGP"},
+          {"ticker":"COMI","period_end_date":"2026-03-31","period_type":"QUARTERLY",
+           "statement_type":"BALANCE_SHEET","line_item":"total_equity","value":1,"currency":"EGP"}
+        ]"""
+    )
+
+    with pytest.raises(DashboardArtifactError, match=r"1/2.*MFPC: no financial statements"):
+        validate_dashboard_artifacts(tmp_path, require_complete_financials=True)
+
+
+def test_complete_financial_coverage_accepts_headline_only_latest_period(tmp_path):
+    _write_valid_empty_artifacts(tmp_path)
+    (tmp_path / "universe.json").write_text(
+        '{"as_of":"2026-06-14","count":1,"tickers":["ETEL"],'
+        '"constituents":{"ETEL":"Telecom Egypt"}}'
+    )
+    (tmp_path / "financial_statements.json").write_text(
+        '[{"ticker":"ETEL","period_end_date":"2026-03-31","period_type":"QUARTERLY",'
+        '"statement_type":"INCOME_STATEMENT","line_item":"net_income",'
+        '"value":1,"currency":"EGP"}]'
+    )
+
+    validate_dashboard_artifacts(tmp_path, require_complete_financials=True)
+
+
+def test_complete_financial_coverage_accepts_core_latest_position(tmp_path):
+    _write_valid_empty_artifacts(tmp_path)
+    (tmp_path / "universe.json").write_text(
+        '{"as_of":"2026-06-14","count":1,"tickers":["COMI"],"constituents":{"COMI":"CIB"}}'
+    )
+    rows = [
+        {
+            "ticker": "COMI",
+            "period_end_date": "2026-03-31",
+            "period_type": "QUARTERLY",
+            "statement_type": "BALANCE_SHEET",
+            "line_item": line_item,
+            "value": 1,
+            "currency": "EGP",
+        }
+        for line_item in ("net_income", "total_assets", "total_liabilities", "total_equity")
+    ]
+    import json
+
+    (tmp_path / "financial_statements.json").write_text(json.dumps(rows))
+
+    validate_dashboard_artifacts(tmp_path, require_complete_financials=True)
+
+
+def test_validate_rejects_stale_financial_coverage_report(tmp_path):
+    _write_valid_empty_artifacts(tmp_path)
+    (tmp_path / "universe.json").write_text(
+        '{"as_of":"2026-06-14","count":1,"tickers":["COMI"],"constituents":{"COMI":"CIB"}}'
+    )
+    (tmp_path / "financial_statements.json").write_text("[]")
+    (tmp_path / "financial_coverage.json").write_text(
+        """{
+          "as_of":"2026-06-14","universe_count":1,"covered_count":1,
+          "coverage_percent":100,"complete":true,
+          "required_latest_items":["net_income","total_assets","total_liabilities","total_equity"],
+          "tickers":[{"ticker":"COMI","covered":true,"latest_period_end_date":"2026-03-31",
+                      "present_items":["net_income","total_assets","total_liabilities","total_equity"],
+                      "missing_items":[]}]
+        }"""
+    )
+
+    with pytest.raises(
+        DashboardArtifactError,
+        match="values differ from financial_statements.json",
+    ):
+        validate_dashboard_artifacts(tmp_path)
+
+
 def _write_valid_empty_artifacts(directory: Path) -> None:
     for filename in ARTIFACT_FILENAMES:
         if filename == "market_state.json":

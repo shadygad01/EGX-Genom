@@ -41,6 +41,12 @@ STANDARD_LINE_ITEMS: tuple[str, ...] = (
     "cash_and_equivalents",
     "total_debt",
     "operating_cash_flow",
+    "free_cash_flow",
+    "ebitda",
+    "revenue_growth_yoy",
+    "ebitda_growth_yoy",
+    "net_margin",
+    "net_debt_to_ebitda",
 )
 
 

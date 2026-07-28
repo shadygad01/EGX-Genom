@@ -10,11 +10,16 @@ the live site.
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
 from agx_research.acquisition_intelligence.capability_engine import CapabilityDecision
 from agx_research.dashboard.schemas import DashboardSystemStatus
 from agx_research.events.event import Event
+from agx_research.financials.coverage import (
+    FinancialCoverageReport,
+    build_financial_coverage_report,
+)
 from agx_research.financials.schema import FinancialStatementLineItem
 from agx_research.genome.gene import Gene
 from agx_research.graph.edges import GraphEdge
@@ -63,7 +68,9 @@ class DashboardArtifactError(Exception):
     pass
 
 
-def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
+def validate_dashboard_artifacts(
+    directory: Path, *, require_complete_financials: bool = False
+) -> dict[str, int]:
     """Returns a filename -> item-count map on success; raises
     DashboardArtifactError (naming the file and reason) on any failure."""
     counts: dict[str, int] = {}
@@ -170,6 +177,9 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
     _validate_optional_model_list(
         directory, "financial_statements.json", FinancialStatementLineItem, counts
     )
+    _validate_optional_financial_coverage(directory, counts, universe_payload)
+    if require_complete_financials:
+        _validate_complete_financial_coverage(directory, universe_payload)
     _validate_optional_knowledge_graph(directory, counts)
     _validate_optional_source_metrics(directory, counts)
     _validate_optional_model_list(
@@ -198,6 +208,92 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
             )
 
     return counts
+
+
+def _validate_complete_financial_coverage(directory: Path, universe_payload) -> None:
+    """Require at least one reported financial item for every constituent.
+
+    Prices and technical indicators do not qualify. A canonical financial item
+    must have a reporting period and retain its raw-document lineage.
+    """
+    if universe_payload is None:
+        raise DashboardArtifactError(
+            "financial_statements.json: complete coverage requires a non-null universe.json"
+        )
+    payload, present = _load_optional_json(directory, "financial_statements.json")
+    if not present:
+        raise DashboardArtifactError(
+            "financial_statements.json: missing (100% financial coverage is required)"
+        )
+    if not isinstance(payload, list):
+        raise DashboardArtifactError("financial_statements.json: expected a JSON array")
+
+    items = [FinancialStatementLineItem.model_validate(item) for item in payload]
+    report = build_financial_coverage_report(
+        tickers=universe_payload["tickers"],
+        items=items,
+        as_of=date.fromisoformat(universe_payload["as_of"]),
+    )
+    failures = [
+        (
+            f"{row.ticker}: no financial statements"
+            if row.latest_period_end_date is None
+            else f"{row.ticker}@{row.latest_period_end_date}: missing {','.join(row.missing_items)}"
+        )
+        for row in report.tickers
+        if not row.covered
+    ]
+
+    if failures:
+        preview = "; ".join(failures[:10])
+        suffix = f"; and {len(failures) - 10} more" if len(failures) > 10 else ""
+        raise DashboardArtifactError(
+            "financial_statements.json: reported financial-data coverage is "
+            f"{report.covered_count}/{report.universe_count}; {preview}{suffix}"
+        )
+
+
+def _validate_optional_financial_coverage(
+    directory: Path, counts: dict[str, int], universe_payload
+) -> None:
+    payload, present = _load_optional_json(directory, "financial_coverage.json")
+    if not present:
+        return
+    try:
+        report = FinancialCoverageReport.model_validate(payload)
+    except Exception as exc:
+        raise DashboardArtifactError(f"financial_coverage.json: {exc}") from exc
+    if universe_payload is not None and sorted(row.ticker for row in report.tickers) != sorted(
+        universe_payload["tickers"]
+    ):
+        raise DashboardArtifactError(
+            "financial_coverage.json: membership differs from universe.json"
+        )
+    statements_payload, statements_present = _load_optional_json(
+        directory, "financial_statements.json"
+    )
+    if universe_payload is not None and statements_present:
+        if not isinstance(statements_payload, list):
+            raise DashboardArtifactError(
+                "financial_statements.json: expected a JSON array"
+            )
+        try:
+            items = [
+                FinancialStatementLineItem.model_validate(item)
+                for item in statements_payload
+            ]
+        except Exception as exc:
+            raise DashboardArtifactError(f"financial_statements.json: {exc}") from exc
+        expected = build_financial_coverage_report(
+            tickers=universe_payload["tickers"],
+            items=items,
+            as_of=date.fromisoformat(universe_payload["as_of"]),
+        )
+        if report != expected:
+            raise DashboardArtifactError(
+                "financial_coverage.json: values differ from financial_statements.json"
+            )
+    counts["financial_coverage.json"] = report.universe_count
 
 
 def _load_optional_json(directory: Path, filename: str):
@@ -267,8 +363,7 @@ def _validate_optional_publication_safety(directory: Path, counts: dict[str, int
     if not cases_present:
         return
     recommendations = [
-        Recommendation.model_validate(item)
-        for item in cases_payload.get("recommendations", [])
+        Recommendation.model_validate(item) for item in cases_payload.get("recommendations", [])
     ]
     ready_decisions = {
         (recommendation.ticker, decision.horizon)
@@ -306,7 +401,8 @@ def _validate_optional_publication_safety(directory: Path, counts: dict[str, int
         )
     }
     ineligible = sorted(
-        position.ticker for position in portfolio.positions
+        position.ticker
+        for position in portfolio.positions
         if position.ticker not in eligible_tickers
     )
     if ineligible:

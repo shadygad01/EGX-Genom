@@ -10,7 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from "../components/primitives/S
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
-import { dedupeEvidence, formatNumber, formatPercent, formatSignedPercent, humanizeEvidence, titleCase } from "../lib/format";
+import { dedupeEvidence, formatCompactNumber, formatNumber, formatPercent, formatSignedPercent, humanizeEvidence, titleCase } from "../lib/format";
 import type { GeneStatus, KnowledgeStatus } from "../types";
 import styles from "./CompanyWorkspace.module.css";
 
@@ -64,6 +64,30 @@ export function CompanyWorkspace() {
   const tickerStatements = (financialStatements.data ?? [])
     .filter((f) => f.ticker === ticker)
     .sort((a, b) => (a.period_end_date > b.period_end_date ? -1 : 1));
+  const latestFinancialPeriod = tickerStatements[0]?.period_end_date;
+  const latestFinancials = tickerStatements.filter((f) => f.period_end_date === latestFinancialPeriod);
+  const financialByItem = new Map(latestFinancials.map((f) => [f.line_item, f]));
+  const revenueGrowth = financialByItem.get("revenue_growth_yoy")?.value;
+  const ebitdaGrowth = financialByItem.get("ebitda_growth_yoy")?.value;
+  const netMargin = financialByItem.get("net_margin")?.value;
+  const leverage = financialByItem.get("net_debt_to_ebitda")?.value;
+  const freeCashFlow = financialByItem.get("free_cash_flow")?.value;
+  const fundamentalChecks: Array<boolean | undefined> = [
+    revenueGrowth === undefined ? undefined : revenueGrowth > 0,
+    ebitdaGrowth === undefined || revenueGrowth === undefined ? undefined : ebitdaGrowth >= revenueGrowth,
+    netMargin === undefined ? undefined : netMargin > 0,
+    leverage === undefined ? undefined : leverage <= 2,
+    freeCashFlow === undefined ? undefined : freeCashFlow > 0,
+  ];
+  const availableChecks = fundamentalChecks.filter((check) => check !== undefined);
+  const passedChecks = availableChecks.filter(Boolean).length;
+  const fundamentalTone = availableChecks.length < 3
+    ? "insufficient"
+    : passedChecks >= 4
+      ? "positive"
+      : passedChecks >= 2
+        ? "mixed"
+        : "weak";
 
   const allCorporateEvents = marketState.data?.dataset_snapshot.corporate_events[ticker] ?? [];
   const pastActions = allCorporateEvents
@@ -253,6 +277,29 @@ export function CompanyWorkspace() {
       </div>
 
       <Section title={t("financialStatements.title")} description={t("financialStatements.description")}>
+        {latestFinancials.length > 0 && (
+          <>
+            <div className={styles.badgeRow}>
+              <Badge variant={fundamentalTone === "positive" ? "positive" : fundamentalTone === "mixed" ? "warning" : fundamentalTone === "weak" ? "negative" : "neutral"}>
+                {t(`financialStatements.assessment.${fundamentalTone}`)}
+              </Badge>
+              <span className={styles.listItemMeta}>{t("financialStatements.valuationRequired")}</span>
+            </div>
+            <div className={styles.grid}>
+              {latestFinancials
+                .filter((f) => ["revenue", "ebitda", "net_income", "free_cash_flow", "revenue_growth_yoy", "ebitda_growth_yoy", "net_margin", "net_debt_to_ebitda"].includes(f.line_item))
+                .map((f) => (
+                  <StatTile
+                    key={f.line_item}
+                    label={t(`financialStatements.items.${f.line_item}`, { defaultValue: titleCase(f.line_item) })}
+                    value={["EGP", "USD"].includes(f.currency)
+                      ? `${formatCompactNumber(f.value)} ${f.currency}`
+                      : `${formatNumber(f.value, 1)}${f.currency}`}
+                  />
+                ))}
+            </div>
+          </>
+        )}
         <DataTable
           rows={tickerStatements}
           getRowKey={(f, i) => `${f.period_end_date}-${f.statement_type}-${f.line_item}-${i}`}
@@ -261,15 +308,25 @@ export function CompanyWorkspace() {
           columns={[
             { key: "period", header: t("financialStatements.periodEnd"), render: (f) => formatDate(f.period_end_date) },
             { key: "type", header: t("financialStatements.type"), render: (f) => label("periodType", f.period_type) },
-            { key: "statement", header: t("financialStatements.statement"), render: (f) => label("statementType", f.statement_type) },
-            { key: "item", header: t("financialStatements.lineItem"), render: (f) => titleCase(f.line_item) },
+            {
+              key: "statement",
+              header: t("financialStatements.statement"),
+              render: (f) => f.statement_type === "KEY_METRICS" ? t("financialStatements.keyMetrics") : label("statementType", f.statement_type),
+            },
+            {
+              key: "item",
+              header: t("financialStatements.lineItem"),
+              render: (f) => t(`financialStatements.items.${f.line_item}`, { defaultValue: titleCase(f.line_item) }),
+            },
             {
               key: "value",
               header: t("financialStatements.value"),
               align: "right",
               render: (f) => (
                 <span className="num">
-                  {formatNumber(f.value)} {f.currency}
+                  {["EGP", "USD"].includes(f.currency)
+                    ? `${formatNumber(f.value)} ${f.currency}`
+                    : `${formatNumber(f.value, 1)}${f.currency}`}
                 </span>
               ),
             },

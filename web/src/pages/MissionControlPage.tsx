@@ -96,6 +96,7 @@ export function MissionControlPage() {
   const acquisitionDecisions = useArtifact((p) => p.getAcquisitionDecisions());
   const discoveryReport = useArtifact((p) => p.getDiscoveryReport());
   const discoveryMetrics = useArtifact((p) => p.getDiscoveryMetrics());
+  const financialCoverage = useArtifact((p) => p.getFinancialCoverage());
 
   const geneCounts = {
     promoted: (genes.data ?? []).filter((g) => g.status === "promoted").length,
@@ -132,6 +133,22 @@ export function MissionControlPage() {
             <StatTile label={t("missionStatus.totalExecutions")} value={missionStatus.data.total_executions} />
             <StatTile label={t("missionStatus.lastSuccessfulRun")} value={formatDate(missionStatus.data.last_successful_pipeline_at)} />
             <StatTile label={t("missionStatus.lastFailedRun")} value={formatDate(missionStatus.data.last_failed_pipeline_at)} />
+          </div>
+        )}
+      </Section>
+
+      <Section title={t("financialCoverage.title")} description={t("financialCoverage.description")}>
+        {financialCoverage.loading && <LoadingState rows={2} />}
+        {financialCoverage.error && <ErrorState detail={financialCoverage.error.message} onRetry={financialCoverage.reload} />}
+        {!financialCoverage.loading && !financialCoverage.error && !financialCoverage.data && (
+          <EmptyState title={t("financialCoverage.emptyTitle")} />
+        )}
+        {financialCoverage.data && (
+          <div className={styles.grid}>
+            <StatTile label={t("financialCoverage.covered")} value={`${financialCoverage.data.covered_count}/${financialCoverage.data.universe_count}`} />
+            <StatTile label={t("financialCoverage.percent")} value={formatPercent(financialCoverage.data.coverage_percent / 100)} />
+            <StatTile label={t("financialCoverage.status")} value={<Badge variant={financialCoverage.data.complete ? "positive" : "negative"}>{financialCoverage.data.complete ? t("financialCoverage.complete") : t("financialCoverage.incomplete")}</Badge>} />
+            <StatTile label={t("financialCoverage.asOf")} value={formatDate(financialCoverage.data.as_of)} />
           </div>
         )}
       </Section>

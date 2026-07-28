@@ -1,5 +1,25 @@
-import { describe, expect, it } from "vitest";
-import { dedupeEvidence, humanizeEvidence } from "../src/lib/format";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { dedupeEvidence, formatRelativeToNow, humanizeEvidence } from "../src/lib/format";
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+describe("formatRelativeToNow", () => {
+  it("keeps a date-only pipeline run labeled today late in the same day", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 6, 28, 23, 30));
+
+    expect(formatRelativeToNow("2026-07-28", "en-US")).toBe("today");
+  });
+
+  it("labels the preceding calendar date yesterday", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 6, 28, 1, 0));
+
+    expect(formatRelativeToNow("2026-07-27", "en-US")).toBe("yesterday");
+  });
+});
 
 describe("humanizeEvidence", () => {
   it("formats a single key=value evidence string", () => {

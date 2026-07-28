@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.31.2 — Human-readable Supporting Evidence
+
+Agent/pipeline evidence strings (`ResearchFinding.evidence`, threaded
+unchanged into `KnowledgeObject`/`Explanation.supporting_evidence`) are
+internal `snake_case_key=value` notation by design -- the right shape for
+every agent/gate to parse, but it read as symbol noise ("macro_correlation=
+0.532", "directional_agreement=100.00%") in the dashboard's Supporting
+Evidence lists. New `lib/format.ts#humanizeEvidence()` reformats each
+inline `key=value` it finds into "Key: value", leaving any surrounding
+free text (a headline, a stress-test note) untouched. Applied everywhere
+`supporting_evidence` renders: Opportunity Center's evidence panel and
+Company Research Workspace's investment thesis. New `test/format.test.ts`
+covers single/multi-pair/embedded/free-text shapes.
+
 ## 0.31.1 — Rank opportunities by expected return, not confidence
 
 Both places the dashboard lists discovered opportunities -- the AI

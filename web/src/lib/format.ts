@@ -86,3 +86,19 @@ export function signOf(value: number | null | undefined): "positive" | "negative
   if (value === null || value === undefined || Number.isNaN(value) || value === 0) return "neutral";
   return value > 0 ? "positive" : "negative";
 }
+
+// Backend evidence strings (ResearchFinding.evidence, threaded unchanged
+// into KnowledgeObject/Explanation.supporting_evidence -- see
+// orchestration/pipeline.py) are internal `snake_case_key=value` notation,
+// e.g. "macro_correlation=0.532" or "directional_agreement=100.00%". That's
+// the right format for a value every agent/gate can parse, but it reads as
+// symbol noise to a person. This only reformats each inline `key=value` it
+// finds (snake_case identifier + "=" + a run of non-whitespace/comma/paren
+// characters) into "Key: value" -- it never touches surrounding free text
+// (a headline, a stress-test note), so a value containing spaces just
+// continues as plain text right after its label.
+const EVIDENCE_KEY_VALUE = /\b([a-z][a-z0-9_]*)=([^\s,)]+)/g;
+
+export function humanizeEvidence(text: string): string {
+  return text.replace(EVIDENCE_KEY_VALUE, (_match, key: string, value: string) => `${titleCase(key)}: ${value}`);
+}

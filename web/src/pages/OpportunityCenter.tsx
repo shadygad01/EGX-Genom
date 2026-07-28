@@ -11,7 +11,7 @@ import { EmptyState, ErrorState, LoadingState } from "../components/primitives/S
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
-import { formatPercent, formatSignedPercent } from "../lib/format";
+import { formatPercent, formatSignedPercent, humanizeEvidence } from "../lib/format";
 import type {
   CorporateEvent,
   DecisionReadiness,
@@ -331,7 +331,7 @@ function OpportunityDetail({
         ) : (
           <ul className={styles.bulletList}>
             {explanation.supporting_evidence.map((e, i) => (
-              <li key={i}>{e}</li>
+              <li key={i}>{humanizeEvidence(e)}</li>
             ))}
           </ul>
         )}

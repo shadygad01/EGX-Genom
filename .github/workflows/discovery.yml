@@ -46,11 +46,13 @@ jobs:
       # (an honest first run) if it doesn't.
       - name: Restore prior discovery history from discovery/latest
         run: |
-          mkdir -p research/data/discovery
+          mkdir -p research/data/discovery research/data/registry
           if git ls-remote --exit-code --heads origin discovery/latest > /dev/null 2>&1; then
             git fetch origin discovery/latest
             git show origin/discovery/latest:research/data/discovery/discovery_history.json \
               > research/data/discovery/discovery_history.json 2> /dev/null || true
+            git show origin/discovery/latest:research/data/registry/company_financial_sources.json \
+              > research/data/registry/company_financial_sources.json 2> /dev/null || true
           fi
 
       - name: Run weekly source discovery
@@ -74,6 +76,17 @@ jobs:
           cp /tmp/discovery-out/discovery_metrics.json research/data/discovery/discovery_metrics.json
           cp /tmp/discovery-out/endpoint_candidates.json research/data/discovery/endpoint_candidates.json
 
+      # EGX30/EGX70 company Financial Source Registry (TD-39): resumable --
+      # skips any company already `VALIDATED` from a prior run (the file
+      # just restored above), re-attempts everything else with real network
+      # egress (this workflow's runner has it; the sandbox that built this
+      # feature did not -- see TD-39). No `--force`/history TTL here since
+      # `is_resumable_skip()` already makes re-runs cheap and honest.
+      - name: Run EGX30/EGX70 financial source registry build
+        working-directory: research
+        run: |
+          uv run python scripts/build_financial_source_registry.py --data-dir data/registry
+
       - name: Build the PR summary
         run: |
           uv run --project research python research/scripts/build_discovery_pr_summary.py \
@@ -85,7 +98,7 @@ jobs:
           git config user.name "agx-discovery-bot"
           git config user.email "actions@users.noreply.github.com"
           git checkout -B discovery/latest
-          git add research/data/discovery/
+          git add research/data/discovery/ research/data/registry/
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else

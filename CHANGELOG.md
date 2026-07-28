@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.34.0 — EGX30+EGX70 Financial Source Registry (TD-39)
+
+Follow-up to 0.33.0: build a per-company Financial Source Registry
+(Investor Relations, financial statements, quarterly/annual reports,
+source type, collector recommendation) on the existing `SourceRegistry`/
+`JsonFileRepository` architecture, resumable and incremental.
+
+- **New `discovery.financial_document.classify_financial_document()`** —
+  generic, keyword-based classification of a discovered link into annual
+  report / quarterly report / financial statements / presentation /
+  disclosure / investor-relations home.
+- **New `discovery.engine.discover_financial_documents()` /
+  `DiscoveryEngine.scan_financial_documents()`** — reuses the existing
+  page parser; no discovery logic duplicated.
+- **New `discovery.company_financial_registry.CompanyFinancialSourceRegistry`**
+  — one resumable, versioned record per company. `is_resumable_skip()`
+  only skips `VALIDATED` companies, so re-runs never restart completed
+  work.
+- **New `discovery.company_financial_discovery.discover_company_financial_sources()`**
+  — fetch → scan → classify → recommend a collector
+  (`acquisition_intelligence.config_generation.suggest_collector`), one
+  real `HttpFetcher` attempt per company.
+- **New `scripts/build_financial_source_registry.py`**, wired into
+  `.github/workflows/discovery.yml` (same `discovery/latest` bot branch
+  and weekly schedule as the existing source-discovery job; PR summary
+  extended to report registry coverage).
+- **Run for real against all 101 EGX30+EGX70 companies this session**:
+  0 `DISCOVERED`/`VALIDATED`, 26 `BLOCKED` (real fetch attempts, real
+  proxy-403 evidence), 75 `HOMEPAGE_UNRESOLVED`. The mechanism is
+  complete; the data needs a real run with network egress (queued in
+  `.github/workflows/discovery.yml`). See `docs/TECHNICAL_DEBT.md` TD-39.
+- 680 backend tests pass (16 new); `ruff check` clean.
+
 ## 0.33.0 — EGX30 company domain-hint coverage (TD-38)
 
 Project owner request to resume large-scale EGX30/EGX70 company source

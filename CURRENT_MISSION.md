@@ -1,6 +1,69 @@
 # Current Mission
 
-## Current mission: TD-38 — EGX30 company domain-hint coverage (partial freeze lift)
+## Current mission: TD-39 — EGX30+EGX70 Financial Source Registry
+
+Immediate follow-up: the project owner asked to stop company-domain
+discovery (TD-38, closed) and continue until every EGX30/EGX70 company has
+a complete Financial Source Registry — Investor Relations, financial
+statements, quarterly/annual reports, download URLs, source type,
+collector recommendation, financial metric availability, automation
+capability — built incrementally on the existing `SourceRegistry`/
+`JsonFileRepository` architecture, never restarting completed work.
+
+**Delivered** (all new, real, tested code — see TD-39 in
+`docs/TECHNICAL_DEBT.md` for the full detail):
+
+- `discovery.financial_document.classify_financial_document()` — a
+  generic, company-agnostic classifier (annual report / quarterly report /
+  financial statements / presentation / disclosure / investor-relations
+  home) by URL + anchor-text keywords, same declared-heuristic posture as
+  the existing corporate-event/ToS classifiers.
+- `discovery.engine.discover_financial_documents()` /
+  `DiscoveryEngine.scan_financial_documents()` — reuses the existing page
+  parser, no duplicated discovery logic.
+- `discovery.company_financial_registry.CompanyFinancialSourceRecord`/
+  `CompanyFinancialSourceRegistry` — one resumable, versioned
+  `JsonFileRepository` record per company (documents found, source type,
+  `collector_recommendation` reusing `acquisition_intelligence.
+  config_generation.suggest_collector()`, robots.txt status, blocked
+  reason). `is_resumable_skip()` only skips `VALIDATED` companies —
+  "never restart completed work, resume from the last validated company"
+  as actual code, not just a instruction followed by hand.
+- `discovery.company_financial_discovery.discover_company_financial_sources()`
+  — fetch → scan → classify → recommend, one real `HttpFetcher` attempt
+  per company, single-attempt retry policy (a known-blocked host doesn't
+  need retrying).
+- `scripts/build_financial_source_registry.py` — resumable EGX30+EGX70
+  runner, wired into `.github/workflows/discovery.yml` (same
+  `discovery/latest` bot branch and weekly schedule the existing source
+  discovery job already uses, PR summary extended to report registry
+  coverage).
+
+**Actually run end-to-end in this session** (not just written): 101/101
+companies processed. Real, evidenced, honest result — **not** "every
+company has a complete registry," because that requires real network
+egress this sandbox has never had (same block TD-38 already evidenced,
+confirmed again here): 26 companies (every EGX30 ticker with a TD-38
+hostname hint) reached real `HttpFetcher` attempts and were recorded
+`BLOCKED` with the exact proxy `403` as evidence; 75 companies (70 EGX70 +
+the 5 EGX30 tickers TD-38 left unresolved) are `HOMEPAGE_UNRESOLVED` —
+correctly, since no evidenced homepage exists for them yet. **Zero
+companies are `DISCOVERED` or `VALIDATED`** — none can be, honestly,
+without a real fetch actually succeeding. The registry, the resumability
+mechanism, and the CI wiring are complete and correct; the *data* needs a
+real run with egress (queued in `.github/workflows/discovery.yml`, next
+scheduled Monday or triggerable via `workflow_dispatch`) — see
+`NEXT_MISSIONS.md`.
+
+**Verified in this session**: 680 backend tests pass (16 new); `ruff
+check` clean; the script itself was executed against the real EGX30.csv/
+EGX70.csv universe and produced the exact byte-for-byte evidence quoted
+above (`blocked_reason` strings included the real proxy tunnel-403 error
+text).
+
+---
+
+## Prior mission: TD-38 — EGX30 company domain-hint coverage (partial freeze lift)
 
 The project owner asked for large-scale discovery of official/financial
 sources for every EGX30/EGX70 company — precisely the class of work the

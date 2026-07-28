@@ -25,6 +25,7 @@ class DiscoveryMethod(str, Enum):
     PDF_REPOSITORY_SCAN = "pdf_repository_scan"  # a page linking many PDFs (IR/regulatory)
     STRUCTURED_DATASET_SCAN = "structured_dataset_scan"  # CSV/XLS/JSON/XML download links
     API_DOCUMENTATION_SCAN = "api_documentation_scan"
+    FINANCIAL_DOCUMENT_SCAN = "financial_document_scan"  # keyword-matched IR/report links
     MANUAL = "manual"
 
 

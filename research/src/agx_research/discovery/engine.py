@@ -22,6 +22,10 @@ from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
 
 from agx_research.discovery.candidate import DiscoveryMethod, SourceCandidate
+from agx_research.discovery.financial_document import (
+    FinancialDocumentCategory,
+    classify_financial_document,
+)
 from agx_research.sources.spec import AccessMethod
 
 _STRUCTURED_EXTENSIONS = {
@@ -139,6 +143,63 @@ def discover_structured_datasets(html: str, page_url: str) -> list[SourceCandida
                 )
                 break
     return candidates
+
+
+_FINANCIAL_DOCUMENT_EXTENSIONS = {
+    ".pdf": AccessMethod.PDF_DOWNLOAD,
+    ".xlsx": AccessMethod.CSV_DOWNLOAD,
+    ".xls": AccessMethod.CSV_DOWNLOAD,
+    ".csv": AccessMethod.CSV_DOWNLOAD,
+    ".json": AccessMethod.JSON_API,
+    ".xml": AccessMethod.XBRL,
+}
+
+
+def discover_financial_documents(
+    html: str, page_url: str
+) -> list[tuple[SourceCandidate, FinancialDocumentCategory]]:
+    """Anchors whose URL or visible text matches a known financial-document
+    keyword (annual/quarterly report, financial statements, investor
+    relations, ...), classified by `financial_document.classify_financial_document`.
+
+    Deliberately narrower than `discover_pdf_repository`/
+    `discover_structured_datasets`: those notice *that* a page links
+    downloadable files at all; this notices *which specific report* a link
+    is, so only keyword-matched anchors become candidates -- an unlabeled
+    PDF link is still a real discoverable file (those two functions already
+    catch it), just not one this function can honestly categorize.
+    """
+    parser = _parse_page(html)
+    results: list[tuple[SourceCandidate, FinancialDocumentCategory]] = []
+    seen: set[str] = set()
+    for anchor in parser.anchors:
+        href = anchor["href"]
+        text = anchor.get("text", "").strip()
+        category = classify_financial_document(href, text)
+        if category is None:
+            continue
+        url = urljoin(page_url, href)
+        if url in seen:
+            continue
+        seen.add(url)
+        path = urlsplit(url).path.lower()
+        access_method = AccessMethod.HTML_SCRAPE
+        for ext, method in _FINANCIAL_DOCUMENT_EXTENSIONS.items():
+            if path.endswith(ext):
+                access_method = method
+                break
+        results.append((
+            SourceCandidate(
+                discovered_url=url,
+                origin_page_url=page_url,
+                discovery_method=DiscoveryMethod.FINANCIAL_DOCUMENT_SCAN,
+                access_method_guess=access_method,
+                title_hint=text,
+                evidence=f'<a href="{href}">{text[:80]}</a>',
+            ),
+            category,
+        ))
+    return results
 
 
 _API_DOC_MARKERS = ("swagger.json", "openapi.json", "openapi.yaml", "api-docs", "docs/api")
@@ -304,6 +365,19 @@ class DiscoveryEngine:
 
     def scan_sitemap(self, sitemap_xml: str, page_url: str) -> list[SourceCandidate]:
         return self._dedup(discover_sitemap_urls(sitemap_xml, page_url))
+
+    def scan_financial_documents(
+        self, html: str, page_url: str
+    ) -> list[tuple[SourceCandidate, FinancialDocumentCategory]]:
+        found = discover_financial_documents(html, page_url)
+        seen: set[str] = set()
+        result = []
+        for candidate, category in found:
+            fp = candidate.fingerprint()
+            if fp not in seen:
+                seen.add(fp)
+                result.append((candidate, category))
+        return result
 
     @staticmethod
     def _dedup(candidates: list[SourceCandidate]) -> list[SourceCandidate]:

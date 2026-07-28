@@ -42,7 +42,6 @@ from agx_research.adversarial.scientist import AdversarialScientist, apply_adver
 from agx_research.agents.base import ResearchAgent, ResearchFinding
 from agx_research.causal.assessment import CandidateCause
 from agx_research.causal.reasoner import EconomicRationaleGate
-from agx_research.config import Horizon
 from agx_research.data.adjustments import (
     HORIZON_FORWARD_TRADING_DAYS,
     horizon_forward_returns,

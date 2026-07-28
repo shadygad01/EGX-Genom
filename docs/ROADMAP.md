@@ -201,10 +201,12 @@ production entrypoint. What's next, in priority order:
   business-blocked in general, but this specific refresh needs only a cron
   job/timer once *any* deployment target exists — smaller than the
   System 18 blockers above).
-- `patterns.json` stays `[]` — and `validate_dashboard_artifacts()` enforces
-  that — until `agents.historical_patterns.HistoricalPatternsAgent` is
-  implemented (still a data/methodology gap, see `docs/PHASE_STATUS.md`
-  System 08).
+- `patterns.json` stays `[]` — and `validate_dashboard_artifacts()`
+  enforces that — until a dedicated `Pattern` pydantic model/contract
+  exists for its dashboard-specific shape (TD-15). `HistoricalPatternsAgent`
+  itself is implemented and its findings already flow through the normal
+  pipeline like any other agent's (see `docs/PHASE_STATUS.md` System 08);
+  this is only about a separate raw-pattern display artifact.
 - Once a second `IMPLEMENTED` source overlaps an existing one, wire
   `consistency_score` (see the Data Acquisition Program item above) — this
   also improves `system_status.json`'s honesty once real corroboration
@@ -217,11 +219,11 @@ production entrypoint. What's next, in priority order:
   `HorizonModel` contract and model versioning are ready.
 - Covariance-based portfolio optimization replacing capped proportional
   scoring; cost-aware portfolio-level backtesting harness.
-- Remaining scientist agents as their feeds arrive: NewsIntelligence
-  (NLP), FinancialPerformance (fundamentals), HistoricalPatterns
-  (long-history analogs) — plus the HistoricalReviewer and the three
-  remaining adversarial attacks (overfitting harness, regime labels,
-  live-degradation comparison).
+- Remaining scientist agent: FinancialPerformance (fundamentals) — still
+  genuinely data-blocked on real per-company financial statements, unlike
+  NewsIntelligence and HistoricalPatterns which are both now real — plus
+  the HistoricalReviewer and the three remaining adversarial attacks
+  (overfitting harness, regime labels, live-degradation comparison).
 - Monte Carlo experiment once a market simulator design is chosen.
 - Database-backed `Repository[T]` implementation when JSON stores hit
   scale limits; dedicated graph store behind the same interface.

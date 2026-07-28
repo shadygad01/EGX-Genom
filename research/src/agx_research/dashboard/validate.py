@@ -45,9 +45,13 @@ _OBJECT_MODELS = {
 }
 
 # market_state.json is a nullable single object (None until a run has
-# happened); patterns.json is always an empty list until
-# HistoricalPatternsAgent is implemented -- both are validated structurally
-# below rather than via the generic maps.
+# happened); patterns.json is always an empty list until a dedicated
+# Pattern pydantic model/contract exists for its dashboard-specific shape
+# (TD-15) -- HistoricalPatternsAgent itself is implemented and its findings
+# already flow through the normal finding/hypothesis/knowledge pipeline
+# like any other agent's, this is only about the separate raw-pattern
+# display artifact. Both are validated structurally below rather than via
+# the generic maps.
 
 
 class DashboardArtifactError(Exception):
@@ -139,7 +143,7 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
         raise DashboardArtifactError(f"patterns.json: expected a JSON array, got {type(payload)}")
     if payload:
         raise DashboardArtifactError(
-            "patterns.json: expected empty (HistoricalPatternsAgent is not yet implemented) "
+            "patterns.json: expected empty (no dashboard Pattern schema exists yet, TD-15) "
             f"but found {len(payload)} item(s)"
         )
     counts["patterns.json"] = 0

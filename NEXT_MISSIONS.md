@@ -1,6 +1,32 @@
 # Next Missions
 
-## Closed this phase: TD-34 web/API wiring
+## Closed this phase: TD-38 EGX30 company domain-hint coverage
+
+See `CURRENT_MISSION.md`'s "TD-38" entry and `docs/TECHNICAL_DEBT.md`'s
+matching row for full detail. **Genuinely next now** for this specific
+line of work, in priority order:
+
+1. **A real `agx discover-sources` run with network egress** (e.g. inside
+   `.github/workflows/discovery.yml`'s environment, or any environment
+   this sandbox's egress policy doesn't block) — confirms how many of the
+   26 hinted hostnames actually resolve/qualify, and is the only way to
+   move any of them from `domain_hints` to an actual registered,
+   `QUARANTINE`-stage `SourceSpec`. Nothing further can be verified from
+   inside this session (see TD-38's evidenced egress-block detail).
+2. **Extend `egx30_web_search_domain_hints.json` to EGX70** — this pass
+   deliberately scoped to EGX30 only (CLAUDE.md's stated primary focus)
+   given the size of a full EGX70 web-search pass; the same
+   `load_web_search_domain_hints()` mechanism already generalizes, only
+   the data file needs extending.
+3. **Revisit the 5 unresolved EGX30 tickers** (EGCH, HELI, MCQE, OIH,
+   PHDC) if a confidently-resolvable official domain turns up later —
+   never guess one to fill the gap now.
+
+This does not reopen the broader acquisition freeze (`MISSION_CONTROL.md`):
+new source *families* beyond company domain-hint coverage still need a
+new named business input.
+
+## Closed prior phase: TD-34 web/API wiring
 
 Item 1 from the "Genuinely next now" list below is now closed — see
 `CURRENT_MISSION.md`'s "TD-34" entry and `docs/PHASE_STATUS.md`'s

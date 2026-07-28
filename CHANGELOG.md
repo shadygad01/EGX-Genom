@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.33.0 — EGX30 company domain-hint coverage (TD-38)
+
+Project owner request to resume large-scale EGX30/EGX70 company source
+discovery, scoped (with confirmation) to extend the existing
+`acquisition_intelligence`/`discovery` architecture rather than a parallel
+system:
+
+- **New `discovery.web_search_hints.load_web_search_domain_hints()`** — a
+  third, independent `domain_hints` source for
+  `acquisition_intelligence.target.generate_company_ir_targets()`,
+  alongside `discovery.wikidata_lookup` and `discover_company_directory_links`
+  (TD-28). Reads a reviewed, evidenced snapshot
+  (`research/data/universe/egx30_web_search_domain_hints.json`) built from
+  real, live web searches for each EGX30 company's own name — 26/31
+  tickers resolved with a citable source; 5 (EGCH, HELI, MCQE, OIH, PHDC)
+  deliberately left unresolved rather than guessed.
+- Wired into `cli.py`'s `discover-sources` command, applied only to
+  tickers Wikidata's structured `P856` claim didn't already resolve.
+  Nothing from this source is trusted directly — `HeuristicDomainResolver`
+  still independently probes every hint before anything is registered.
+- **Not yet run live**: the sandbox this was built in denies outbound
+  connections to arbitrary external hosts (confirmed directly against
+  `egx.com.eg`/`cibeg.com`/`fawry.com`/`telecomegypt.eg`/`wikidata.org`/
+  `archive.org`), so the actual domain-resolution/legality/stability/
+  historical verification this feeds still needs a real
+  `agx discover-sources` run in an environment with network egress. See
+  `docs/TECHNICAL_DEBT.md` TD-38 and `CURRENT_MISSION.md` for full detail.
+- 664 backend tests pass (4 new); `ruff check` clean.
+
 ## 0.32.1 — Supporting Evidence cleanup, part 2: id prefixes and duplicate lines
 
 The 0.31.2 `humanizeEvidence()` fix only handled inline `key=value` pairs;

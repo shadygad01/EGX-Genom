@@ -10,6 +10,7 @@ from agx_research.discovery.engine import (
     is_sitemap_index,
     significant_tokens,
 )
+from agx_research.discovery.web_search_hints import load_web_search_domain_hints
 from agx_research.discovery.wikidata_lookup import (
     WikidataOfficialWebsiteClient,
     build_wikidata_claims_url,
@@ -30,6 +31,7 @@ __all__ = [
     "discover_api_documentation",
     "discover_company_directory_links",
     "significant_tokens",
+    "load_web_search_domain_hints",
     "WikidataOfficialWebsiteClient",
     "build_wikidata_search_url",
     "build_wikidata_claims_url",

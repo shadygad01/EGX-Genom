@@ -1,6 +1,73 @@
 # Current Mission
 
-## Current mission: TD-34 — `ticker_data_gap_report.json` web/API wiring
+## Current mission: TD-38 — EGX30 company domain-hint coverage (partial freeze lift)
+
+The project owner asked for large-scale discovery of official/financial
+sources for every EGX30/EGX70 company — precisely the class of work the
+standing acquisition freeze (`MISSION_CONTROL.md`) deferred pending "a new
+named business input." This request *is* that input, and was explicitly
+scoped down (with the project owner's confirmation) to: extend the
+existing `acquisition_intelligence`/`discovery` architecture's hint
+coverage, not stand up a parallel discovery system (a proposed SQLite
+"single source of truth" was explicitly declined in favor of the existing
+`JsonFileRepository`/`SourceRegistry`/`TargetOrganization` pattern this
+codebase already uses for exactly this problem).
+
+**What this session found**: the mega-spec's Phase 1-9 ("universe →
+official source discovery → financial source discovery → discovery
+strategy → coverage → extraction strategy → automation assessment →
+registry generation → validation") already exists as
+`acquisition_intelligence/` — `TargetOrganization`, `HeuristicDomainResolver`,
+`DiscoveryEngine`, `legality.py`/`stability.py`/`historical.py`,
+`ranking.py`/`config_generation.py`, `AcquisitionContinuityMonitor`, and a
+weekly-scheduled, evidenced report (`discovery_report.json`/
+`discovery_metrics.json`/`endpoint_candidates.json` via
+`.github/workflows/discovery.yml`). `generate_company_ir_targets()`
+already builds one target per EGX30/EGX70 constituent with **no
+domain hint** by design (TD-28: guessing ~100 corporate domains from
+training-data recall is exactly the fabrication this program's rules
+forbid) — real hints come only from `discovery.wikidata_lookup` and
+`discover_company_directory_links()` (which needs `egx_official` or
+`african_markets_egx` reachable first, and TD-28 notes neither has been
+exercised live yet).
+
+**Delivered**: `discovery.web_search_hints.load_web_search_domain_hints()`
+— a third, independent hint source: a reviewed, evidenced JSON snapshot
+(`research/data/universe/egx30_web_search_domain_hints.json`) built this
+session from real, live web searches (not training-data recall) for each
+EGX30 company's own name — 26 of 31 tickers resolved with a citable
+source; the other 5 (EGCH, HELI, MCQE, OIH, PHDC) were deliberately left
+unresolved rather than guessed (ambiguous/conflicting/absent results —
+see the file's own `unresolved_no_confident_hint`). Wired into `cli.py`'s
+`discover-sources` command, applied only to tickers Wikidata's own
+structured `P856` claim didn't already resolve (Wikidata preferred where
+both exist, since it's independently machine-verifiable). Like every
+other `domain_hints` entry in this architecture, nothing here is trusted
+directly — `HeuristicDomainResolver` still independently probes it for
+reachability before anything is registered.
+
+**Real, live-evidenced blocker, not assumed**: this session's sandboxed
+egress policy denies outbound connections to arbitrary external hosts —
+confirmed directly against `egx.com.eg`, `cibeg.com`, `fawry.com`,
+`telecomegypt.eg` (proxy-level `403`, `"gateway answered 403 to CONNECT
+(policy denial)"`) and, separately, `wikidata.org`/`archive.org` (also
+`403`), plus WebFetch's own path returning site-side `403` on every
+company homepage tried. Per this environment's own operating instructions
+("do not retry or route around it — report the blocked host"), no live
+`agx discover-sources` run — and therefore no actual domain-resolution/
+legality/stability/historical verification — could be executed in this
+session. See TD-38 (`docs/TECHNICAL_DEBT.md`) for the exact repayment
+trigger: the first real run in an environment with egress (e.g.
+`.github/workflows/discovery.yml`'s).
+
+**Verified in this session**: 664 backend tests pass (4 new,
+`test_web_search_hints.py`); `ruff check` clean; `cli.py` imports cleanly.
+EGX70 coverage and re-verification of the 26 EGX30 hints are explicitly
+out of scope for this pass — see `NEXT_MISSIONS.md`.
+
+---
+
+## Prior mission: TD-34 — `ticker_data_gap_report.json` web/API wiring
 
 Immediate follow-up, per the project owner's "continue all remaining
 legal/free directions" instruction: the last purely-engineering item on

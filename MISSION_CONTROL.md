@@ -21,23 +21,28 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: acquisition architecture frozen.** Per the project
-  owner's explicit instruction, this phase completed the highest-value
-  legally obtainable coverage, then froze further acquisition
-  engineering — no new `TargetOrganization`/collector/discovery work
-  without a new named business input. Closing verification, not just a
-  declaration: a real self-correction (`skynews_arabia_economy` was
-  promoted to `IMPLEMENTED` last phase without confirming an actual
-  successful collection; directly exercising it this phase returned
-  `HTTP 404`, reverted to `PLANNED`) and a real IMF probe (its current
-  DataMapper API, distinct from the deprecated endpoint found unresolvable
-  last phase, returns `403 Forbidden` — a WAF block, evidenced not
-  assumed). Verdict: no further real source remains to connect right now
-  — every named candidate is connected-and-verified, evidence-blocked, or
-  gated on a business decision. **Every subsequent sprint's engineering
-  effort goes toward generating, validating, ranking, and explaining
-  investment decisions from the evidence already flowing — not collecting
-  more data.** Full detail: `CURRENT_MISSION.md`,
+- **Current mission: acquisition freeze partially lifted — EGX30 company
+  domain-hint coverage (TD-38).** The project owner explicitly asked for
+  large-scale EGX30/EGX70 company source discovery, which is exactly what
+  the standing freeze (below) deferred pending a new named business
+  input — the project owner's ask *is* that input, scoped narrowly:
+  extend `generate_company_ir_targets()`'s hint coverage using the
+  existing `acquisition_intelligence`/`discovery` architecture, not build
+  a parallel system. Delivered: `discovery.web_search_hints` — a third,
+  independent `domain_hints` source (alongside `discovery.wikidata_lookup`
+  and `discover_company_directory_links`), reading a reviewed, evidenced
+  snapshot (26/31 EGX30 tickers, real web-search evidence, 5 tickers
+  deliberately left unresolved rather than guessed — see TD-38), wired
+  into `cli.py discover-sources` so it only fills tickers Wikidata missed.
+  **Not yet run live**: this session's sandbox egress policy blocks every
+  external host tested, including ones this platform has always used
+  (egx.com.eg, wikidata.org, archive.org) — confirmed live, not assumed —
+  so the actual `HeuristicDomainResolver` reachability probe and
+  downstream candidate discovery/legality/scoring still need a real
+  `agx discover-sources` run in an environment with network egress (e.g.
+  `.github/workflows/discovery.yml`'s environment). The freeze on
+  *unscoped* further acquisition engineering (new source families beyond
+  this) otherwise still stands. Full detail: `CURRENT_MISSION.md`,
   `docs/ACQUISITION_STRATEGY.md`'s "Final Data Acquisition Sprint"
   section, and `NEXT_MISSIONS.md` for what's next.
 - **Prior missions (same overall phase): price-data feasibility (proven

@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.32.0 — Council review follow-through: disclaimer, surfaced rationale, priority ordering
+
+Five independent review passes (data sources, decision clarity, value,
+content structure, audience/risk) against the live dashboard's actual
+source code surfaced one critical and several high-value, zero-backend
+fixes, all implemented here:
+
+- **New `Disclaimer` primitive**, shown on every page that displays a
+  concrete decision (AI Briefing, Opportunity Center, Company Workspace):
+  "AGX is an autonomous research scaffold, not a licensed investment
+  advisor..." -- previously there was no investor-facing disclaimer
+  anywhere in the product, the single largest trust/legal gap the audit
+  found.
+- **Backend-computed rationale now actually reaches the screen.** AI
+  Briefing's "Top Opportunities" table shows each recommendation's
+  `explanation.why_this_stock` under its ticker; the Portfolio section
+  shows the portfolio-level `explanation.why_this_stock` as a "Why this
+  allocation" summary. Both fields already existed in every artifact --
+  the UI was discarding them.
+- **Honest-abstention empty states, not blank ones.** When there are
+  zero opportunities/portfolio positions but knowledge objects exist and
+  are being monitored, the empty state now says so explicitly ("Monitoring
+  N knowledge object(s) -- none has cleared the promotion bar yet")
+  instead of implying the pipeline hasn't run.
+- **AI Briefing reordered**: System Health and Changes Since Yesterday
+  (operational/meta content) move from the top of the page to the bottom,
+  so Market Summary, Top Opportunities, and Portfolio -- the sections an
+  investor actually opens the page for -- lead.
+- **Decision Readiness table now ranks by proximity to a decision**
+  (ready → degraded → blocked, ticker as tiebreak) instead of raw backend
+  insertion order.
+
 ## 0.31.2 — Human-readable Supporting Evidence
 
 Agent/pipeline evidence strings (`ResearchFinding.evidence`, threaded

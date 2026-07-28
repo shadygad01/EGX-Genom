@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
+import { Disclaimer } from "../components/primitives/Disclaimer";
 import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
@@ -80,6 +81,8 @@ export function CompanyWorkspace() {
 
   return (
     <>
+      <Disclaimer />
+
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={`${styles.ticker} num`}>{ticker}</span>

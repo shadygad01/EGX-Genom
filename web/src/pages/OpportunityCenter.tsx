@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
+import { Disclaimer } from "../components/primitives/Disclaimer";
 import { Meter } from "../components/primitives/Meter";
 import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
@@ -16,12 +17,17 @@ import type {
   CorporateEvent,
   DecisionReadiness,
   Horizon,
+  ReadinessStatus,
   Recommendation,
   TickerDataGapReport,
 } from "../types";
 import styles from "./OpportunityCenter.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
+
+// Closest to a decision first: a ticker AGX can already act on outranks
+// one that's merely degraded, which outranks one still fully blocked.
+const READINESS_RANK: Record<ReadinessStatus, number> = { ready: 0, degraded: 1, blocked: 2 };
 
 /** Every opportunity AGX currently sees, ranked by expected return
  * (highest to lowest) -- the mission's "heart of AGX." Selecting a row
@@ -55,8 +61,17 @@ export function OpportunityCenter() {
   const gapReports = gapReport.data ?? [];
   const selectedGap = gapReports.find((g) => g.ticker === selectedGapTicker) ?? null;
 
+  // Readiness closest to an actual decision first (ready, then degraded,
+  // then blocked), not backend insertion order -- a user scanning this
+  // table wants the tickers nearest to "researchable" at the top.
+  const rankedReadiness = [...(readiness.data ?? [])].sort((a, b) => {
+    const rank = READINESS_RANK[a.status] - READINESS_RANK[b.status];
+    return rank !== 0 ? rank : a.ticker.localeCompare(b.ticker);
+  });
+
   return (
     <Section title={t("title")} description={t("description")}>
+      <Disclaimer />
       {recommendations.loading && <LoadingState rows={4} />}
       {recommendations.error && <ErrorState detail={recommendations.error.message} onRetry={recommendations.reload} />}
 
@@ -142,7 +157,7 @@ export function OpportunityCenter() {
           {readiness.error && <ErrorState detail={readiness.error.message} onRetry={readiness.reload} />}
           {!readiness.loading && !readiness.error && (
             <DataTable<DecisionReadiness>
-              rows={readiness.data ?? []}
+              rows={rankedReadiness}
               getRowKey={(row) => row.ticker}
               onRowClick={(row) => setSelectedGapTicker(row.ticker)}
               emptyTitle={t("decisionReadiness.emptyTitle")}

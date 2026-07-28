@@ -35,7 +35,8 @@
     "title": "Top Opportunities",
     "subtitle": "Ranked by expected return, highest to lowest",
     "emptyTitle": "No opportunities yet",
-    "emptyDetail": "Recommendations appear once the Meta Decision Engine has combined horizon predictions."
+    "emptyDetail": "Recommendations appear once the Meta Decision Engine has combined horizon predictions.",
+    "emptyDetailMonitoring": "Monitoring {{count}} knowledge object(s) -- none has cleared the promotion bar for a recommendation yet."
   },
   "biggestRisks": {
     "title": "Biggest Risks",
@@ -72,8 +73,10 @@
     "description": "Current portfolio-level recommendation, if the Meta Decision Engine has produced one.",
     "emptyTitle": "No portfolio recommendation yet",
     "emptyDetail": "A portfolio recommendation appears once produced by a full pipeline run.",
+    "emptyDetailMonitoring": "Monitoring {{count}} knowledge object(s) -- none has cleared the bar to enter a portfolio allocation yet.",
     "weight": "Weight",
     "cashWeight": "Cash Weight",
-    "positions": "Positions"
+    "positions": "Positions",
+    "rationale": "Why this allocation"
   }
 }

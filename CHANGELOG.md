@@ -1,5 +1,77 @@
 # Changelog
 
+## 0.18.1 — Benchmark-matched decision outcomes
+
+- Decision outcomes now deduct an explicit transaction-cost assumption and
+  retain the gross asset return separately.
+- Every expired decision is matched to point-in-time EGX30 entry/exit prices;
+  hit rate and excess return remain unavailable when that benchmark is absent.
+- The UI distinguishes an insufficient decision sample from incomplete
+  benchmark coverage and displays mean excess return only after the full gate.
+- A fail-closed publication gate now requires referenced external evidence,
+  positive benchmark-matched performance for all horizons, and an unexpired
+  human legal approval before any decision can become `publication_ready`.
+- Five-reviewer Council audit closed six P0 scientific defects: discovery/test
+  leakage, pair-date misalignment, horizon-unit mismatch, readiness bypass,
+  knowledge time travel, and phantom execution of WATCH/AVOID/ABSTAIN.
+- Source legal clearance is independent of collector implementation and the
+  live price adapter no longer disables the shared robots policy.
+- The landing page excludes research-only candidates from the executable
+  decision; company research uses separate horizon cards and zero size while
+  publication is blocked.
+- Publication evidence now must match an archived RawDocument by id, source,
+  SHA-256 and timestamp; stale, partial, legally uncleared, same-group or
+  tampered references fail closed.
+- Bootstrap inference now resamples moving time blocks, overlapping
+  walk-forward windows use Newey-West HAC, and Bonferroni family size includes
+  all previously persisted hypothesis attempts.
+- Buy decisions now carry a fresh reference price, numeric entry/invalidation
+  levels and a review trigger; otherwise the engine abstains.
+- Portfolio construction now occurs after publication gating and allocates only
+  publication-ready numeric buy decisions, eliminating implicit research trades.
+- The per-ticker data-gap report is now available through API and static modes
+  and visible in the Arabic decision center with missing layers and next action.
+- Core opportunity and company decision sections are Arabic, and explicitly
+  expose evidence reference kind, immutable id and version instead of hiding
+  traceability behind narrative evidence text.
+- Decision-engine narratives and readiness blockers/actions are now generated
+  in Arabic at the domain layer, keeping API and static consumers consistent.
+- The primary AI Briefing is Arabic across health, changes, market, opportunity,
+  risk, news, catalyst, knowledge, discovery and portfolio sections.
+- Primary navigation plus market, company and source-transparency surfaces are
+  Arabic, including fail-honest empty states and source health/legal labels.
+- Research Center and Knowledge Graph are Arabic across hypothesis gates,
+  knowledge lifecycle, scientific papers, graph controls and node details.
+- Mission Control and System Administration are Arabic across pipeline stages,
+  collectors, blockers, acquisition choices, artifacts, replay and logs.
+- Added the fail-closed `publication-status` CLI: it validates production
+  evidence, immutable raw-document references, benchmark performance and human
+  legal approval, returns exit code 2 while blocked, and reports missing or
+  malformed control files explicitly.
+- Dashboard validation now rejects any post-export mismatch between the
+  publication gate, decision statuses and portfolio allocation. Pages uploads
+  also require the publication, performance, history, source-truth and
+  per-ticker gap artifacts to exist.
+
+## 0.18.0 — Horizon Decision Safety
+
+- Added one `HorizonDecision` per ticker and horizon with an explicit research
+  action, validity window, risk definition, risk-adjusted score, position cap,
+  invalidation conditions, evidence references, and `research_only` status.
+- Decision readiness is evaluated per horizon and requires matching knowledge;
+  production defaults require 60 observations instead of five-observation fixtures.
+- Clean adversarial checks are confidence-neutral instead of adding `+0.02`.
+- Opportunity Center is Arabic/RTL, decision-first, risk-adjusted in ordering,
+  and carries an unconditional demo/non-advice warning.
+- Added `source_truth.json`, which separates catalogued/usable/fetched/fresh/
+  productive/corroborated sources from sources that actually reached the
+  decision path.
+- Added an append-only decision ledger, automatic post-expiry outcome
+  evaluation, and `decision_performance.json`; the UI labels fewer than 30
+  evaluated decisions per horizon as an insufficient sample.
+- Backtests now reserve an out-of-sample tail and deduct transaction costs;
+  statistical validation applies a family-wise Bonferroni correction.
+
 ## 0.17.0 — Ticker Data Gap Report
 
 - `meta.readiness.build_ticker_data_gap_report` decomposes

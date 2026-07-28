@@ -79,9 +79,18 @@ from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
+from agx_research.meta.decision_engine import Recommendation
+from agx_research.meta.decision_ledger import DecisionLedger
+from agx_research.meta.publication_gate import (
+    ExternalPublicationEvidence,
+    LegalPublicationApproval,
+    apply_publication_gate,
+    evaluate_publication_gate,
+)
 from agx_research.meta.readiness import assess_decision_readiness
 from agx_research.orchestration.pipeline import DailyResearchPipeline
 from agx_research.papers.repository import PaperRepository
+from agx_research.portfolio.constructor import PortfolioConstructor
 from agx_research.production import artifacts as production_artifacts
 from agx_research.production.collector_plan import (
     EXPECTED_RECORDS,
@@ -784,11 +793,30 @@ class ProductionPipeline:
             r.run_date for r in self.run_records_this_execution if r.status == RunStatus.SUCCEEDED
         )
         as_of = succeeded_dates[-1] if succeeded_dates else None
+        ready_horizons_by_ticker = None
+        latest_prices = None
+        if as_of is not None:
+            state = self.market_memory.reconstruct(as_of)
+            readiness_rows = assess_decision_readiness(
+                state,
+                CollectedFinancialStatementProvider(self.data_dir),
+                self.knowledge_store.all_latest(),
+            )
+            ready_horizons_by_ticker = {
+                row.ticker: set(row.ready_horizons) for row in readiness_rows
+            }
+            latest_prices = {
+                ticker: max(bars, key=lambda bar: bar.trade_date).close
+                for ticker, bars in state.dataset_snapshot.price_history.items()
+                if bars
+            }
         self.investment_cases = production_artifacts.export_investment_cases(
             self.knowledge_store,
             self.event_platform,
             tickers=self._tickers(as_of),
             as_of=as_of,
+            ready_horizons_by_ticker=ready_horizons_by_ticker,
+            latest_prices=latest_prices,
         )
         if as_of is None:
             return (
@@ -832,6 +860,82 @@ class ProductionPipeline:
             json.dumps(investment_cases, indent=2, sort_keys=True) + "\n"
         )
         counts["investment_cases.json"] = len(investment_cases["recommendations"])
+
+        decision_ledger = DecisionLedger(self.data_dir / "decision_ledger.json")
+        if as_of is not None:
+            decision_ledger.evaluate_expired(self.market_memory.reconstruct(as_of).dataset_snapshot)
+        performance_models = decision_ledger.performance_summary()
+        decision_performance = [summary.model_dump(mode="json") for summary in performance_models]
+        (dashboard_out / "decision_performance.json").write_text(
+            json.dumps(decision_performance, indent=2, sort_keys=True) + "\n"
+        )
+        counts["decision_performance.json"] = len(decision_performance)
+
+        external_path = self.data_dir / "publication_evidence.json"
+        legal_path = self.data_dir / "legal_publication_approval.json"
+        publication_input_errors: list[str] = []
+        external_evidence = None
+        legal_approval = None
+        if external_path.exists():
+            try:
+                external_evidence = ExternalPublicationEvidence.model_validate_json(
+                    external_path.read_text(encoding="utf-8")
+                )
+            except (ValueError, OSError) as exc:
+                publication_input_errors.append(f"publication_evidence.json invalid: {exc}")
+        else:
+            publication_input_errors.append("publication_evidence.json missing")
+        if legal_path.exists():
+            try:
+                legal_approval = LegalPublicationApproval.model_validate_json(
+                    legal_path.read_text(encoding="utf-8")
+                )
+            except (ValueError, OSError) as exc:
+                publication_input_errors.append(
+                    f"legal_publication_approval.json invalid: {exc}"
+                )
+        else:
+            publication_input_errors.append("legal_publication_approval.json missing")
+        publication_gate = evaluate_publication_gate(
+            performance_models,
+            as_of=as_of or end,
+            external=external_evidence,
+            legal=legal_approval,
+            raw_documents=RawDocumentRepository(
+                self.data_dir / "raw_documents.json"
+            ).all_latest(),
+            legally_cleared_source_ids={
+                source.id for source in self.registry.all_latest()
+                if source.legal_use_status.value == "cleared"
+            },
+            input_errors=publication_input_errors,
+        )
+        (dashboard_out / "publication_gate.json").write_text(
+            json.dumps(publication_gate.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
+        )
+        counts["publication_gate.json"] = 1
+
+        gated_recommendations = apply_publication_gate(
+            [Recommendation.model_validate(row) for row in investment_cases["recommendations"]],
+            publication_gate,
+        )
+        investment_cases["recommendations"] = [
+            item.model_dump(mode="json") for item in gated_recommendations
+        ]
+        investment_cases["portfolio"] = PortfolioConstructor().construct(
+            gated_recommendations, as_of or end
+        ).model_dump(mode="json")
+        (dashboard_out / "investment_cases.json").write_text(
+            json.dumps(investment_cases, indent=2, sort_keys=True) + "\n"
+        )
+        decision_ledger.record_recommendations(gated_recommendations)
+        decision_history = [
+            record.model_dump(mode="json") for record in decision_ledger.all_latest()
+        ]
+        (dashboard_out / "decision_history.json").write_text(
+            json.dumps(decision_history, indent=2, sort_keys=True) + "\n"
+        )
+        counts["decision_history.json"] = len(decision_history)
 
         collector_status = production_artifacts.export_collector_status(
             self.registry,
@@ -934,6 +1038,17 @@ class ProductionPipeline:
             json.dumps(decision_routes, indent=2, sort_keys=True) + "\n"
         )
         counts["decision_source_routes.json"] = len(decision_routes)
+
+        source_truth = production_artifacts.export_source_truth(
+            self.registry,
+            collector_status,
+            source_metrics,
+            decision_routes,
+        )
+        (dashboard_out / "source_truth.json").write_text(
+            json.dumps(source_truth, indent=2, sort_keys=True) + "\n"
+        )
+        counts["source_truth.json"] = len(source_truth)
 
         dashboard_metrics = production_artifacts.export_dashboard_metrics(dashboard_out, counts)
         (dashboard_out / "dashboard_metrics.json").write_text(

@@ -22,7 +22,7 @@ from pydantic import BaseModel, Field
 from agx_research.domain.identifiers import new_id
 from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.explainability import Explanation
-from agx_research.meta.decision_engine import Recommendation
+from agx_research.meta.decision_engine import DecisionAction, PublicationStatus, Recommendation
 
 _EPS = 1e-9
 
@@ -58,28 +58,37 @@ class PortfolioConstructor:
     ) -> PortfolioRecommendation:
         scored = []
         for rec in recommendations:
-            score = (
-                rec.confidence
-                * rec.combined_expected_return
-                / (rec.combined_expected_risk + _EPS)
-            )
-            if score > 0:
-                scored.append((score, rec))
+            eligible = [
+                decision for decision in rec.horizon_decisions.values()
+                if decision.action == DecisionAction.BUY_CANDIDATE
+                and decision.publication_status == PublicationStatus.PUBLICATION_READY
+                and decision.entry_value is not None
+                and decision.invalidation_value is not None
+            ]
+            if eligible:
+                best = max(eligible, key=lambda decision: decision.risk_adjusted_score)
+                score = best.risk_adjusted_score
+                if score > 0:
+                    scored.append((score, rec, best))
         scored.sort(key=lambda pair: (-pair[0], pair[1].ticker))
 
-        total_score = sum(score for score, _ in scored)
+        total_score = sum(score for score, _, _ in scored)
         positions: list[PortfolioPosition] = []
         if total_score > 0:
-            for score, rec in scored:
-                weight = min(score / total_score, self.max_position_weight)
+            for score, rec, decision in scored:
+                weight = min(
+                    score / total_score,
+                    self.max_position_weight,
+                    decision.max_position_pct,
+                )
                 positions.append(
                     PortfolioPosition(
                         ticker=rec.ticker,
                         weight=weight,
                         score=score,
-                        expected_return=rec.combined_expected_return,
-                        expected_risk=rec.combined_expected_risk,
-                        confidence=rec.confidence,
+                        expected_return=decision.expected_return,
+                        expected_risk=decision.expected_risk,
+                        confidence=decision.confidence,
                         supporting_knowledge_ids=rec.supporting_knowledge_ids,
                     )
                 )
@@ -121,7 +130,7 @@ class PortfolioConstructor:
                 produced_at=datetime.now(),
                 inputs=[
                     ProvenanceRef(kind="recommendation", ref_id=rec.ticker)
-                    for _, rec in scored
+                    for _, rec, _ in scored
                 ],
             ),
         )

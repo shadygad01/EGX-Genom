@@ -35,14 +35,31 @@ class RecommendationService:
             for horizon in Horizon
         }
 
-    def recommend(self, tickers: list[str], as_of: date) -> list[Recommendation]:
+    def recommend(
+        self,
+        tickers: list[str],
+        as_of: date,
+        *,
+        ready_horizons_by_ticker: dict[str, set[Horizon]] | None = None,
+        latest_prices: dict[str, float] | None = None,
+    ) -> list[Recommendation]:
         knowledge = self.knowledge_store.all_latest()
         recommendations: list[Recommendation] = []
         for ticker in sorted(tickers):
             predictions: dict[Horizon, Prediction] = {}
             for horizon, model in self.models.items():
+                if (
+                    ready_horizons_by_ticker is not None
+                    and horizon not in ready_horizons_by_ticker.get(ticker, set())
+                ):
+                    continue
                 prediction = model.predict(ticker, as_of, knowledge)
                 if prediction is not None:
+                    reference_price = (latest_prices or {}).get(ticker)
+                    if reference_price is not None and reference_price > 0:
+                        prediction = prediction.model_copy(
+                            update={"reference_price": reference_price}
+                        )
                     predictions[horizon] = prediction
             recommendation = self.engine.decide(ticker, as_of, predictions)
             if recommendation is not None:

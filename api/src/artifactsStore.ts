@@ -115,4 +115,24 @@ export class ArtifactsReader {
   decisionReadiness<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("decision_readiness.json"), []);
   }
+
+  tickerDataGapReport<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("ticker_data_gap_report.json"), []);
+  }
+
+  sourceTruth<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("source_truth.json"), []);
+  }
+
+  decisionHistory<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("decision_history.json"), []);
+  }
+
+  decisionPerformance<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("decision_performance.json"), []);
+  }
+
+  publicationGate<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("publication_gate.json"), null);
+  }
 }

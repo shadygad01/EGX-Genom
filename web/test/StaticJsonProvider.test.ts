@@ -37,6 +37,7 @@ describe("StaticJsonProvider", () => {
     await provider.getRecommendations();
     await provider.getRuntimeMetrics();
     await provider.getSourceRegistry();
+    await provider.getTickerDataGapReport();
 
     const urls = fetchMock.mock.calls.map((call) => call[0] as string);
     expect(urls.some((u) => u.includes("knowledge.json"))).toBe(true);
@@ -45,6 +46,7 @@ describe("StaticJsonProvider", () => {
     expect(urls.some((u) => u.includes("recommendations.json"))).toBe(true);
     expect(urls.some((u) => u.includes("runtime_metrics.json"))).toBe(true);
     expect(urls.some((u) => u.includes("source_registry.json"))).toBe(true);
+    expect(urls.some((u) => u.includes("ticker_data_gap_report.json"))).toBe(true);
   });
 
   it("returns [] for a list resource on 404 rather than throwing", async () => {

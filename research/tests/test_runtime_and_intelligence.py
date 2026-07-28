@@ -119,6 +119,29 @@ def test_no_knowledge_means_no_prediction():
     assert model.predict("COMI", date(2026, 6, 14), []) is None
 
 
+def test_future_knowledge_cannot_time_travel_into_prediction():
+    from agx_research.horizons.knowledge_weighted import KnowledgeWeightedHorizonModel
+
+    items = promoted_store().all_latest()
+    future = items[0].model_copy(update={"discovery_date": date(2026, 7, 1)})
+    model = KnowledgeWeightedHorizonModel(future.horizon)
+    assert model.predict("COMI", date(2026, 6, 14), [future]) is None
+
+
+def test_readiness_blocks_unready_horizons_before_recommendation():
+    store = promoted_store()
+    service = RecommendationService(store)
+    assert service.recommend(
+        ["COMI"], date(2026, 6, 14), ready_horizons_by_ticker={"COMI": set()}
+    ) == []
+    recommendations = service.recommend(
+        ["COMI"], date(2026, 6, 14),
+        ready_horizons_by_ticker={"COMI": {Horizon.MICRO}},
+    )
+    assert len(recommendations) == 1
+    assert set(recommendations[0].horizon_decisions) == {Horizon.MICRO}
+
+
 def test_recent_source_event_reduces_confidence_and_is_in_decision_provenance():
     store = promoted_store()
     baseline = RecommendationService(store).recommend(["COMI"], date(2026, 6, 14))[0]
@@ -187,7 +210,25 @@ def test_portfolio_construction_allocates_and_explains():
     total_weight = sum(p.weight for p in portfolio.positions) + portfolio.cash_weight
     assert abs(total_weight - 1.0) < 1e-9
     assert all(p.weight <= 0.25 + 1e-9 for p in portfolio.positions)
+    assert portfolio.positions == []
+    assert portfolio.cash_weight == 1.0
     assert portfolio.explanation.why_not_others
+
+
+def test_portfolio_allocates_only_publication_ready_numeric_buy():
+    recommendations = RecommendationService(promoted_store()).recommend(
+        ["COMI"], date(2026, 6, 14), latest_prices={"COMI": 50.0}
+    )
+    decision = next(iter(recommendations[0].horizon_decisions.values()))
+    decision.action = "buy_candidate"
+    decision.publication_status = "publication_ready"
+    decision.entry_value = 50.0
+    decision.invalidation_value = 45.0
+    decision.max_position_pct = 0.05
+    portfolio = PortfolioConstructor().construct(recommendations, date(2026, 6, 14))
+    assert len(portfolio.positions) == 1
+    assert portfolio.positions[0].weight == 0.05
+    assert portfolio.cash_weight == 0.95
 
 
 def test_empty_recommendations_yield_all_cash_portfolio():
@@ -200,7 +241,10 @@ def test_empty_recommendations_yield_all_cash_portfolio():
 # --- 17 Continuous Learning ---
 
 
-def _knowledge(knowledge_id: str, ticker: str, expected_return: float) -> KnowledgeObject:
+def _knowledge(
+    knowledge_id: str, ticker: str, expected_return: float,
+    horizon: Horizon = Horizon.SWING,
+) -> KnowledgeObject:
     return KnowledgeObject(
         id=knowledge_id,
         discovery_date=date(2026, 5, 1),
@@ -212,7 +256,7 @@ def _knowledge(knowledge_id: str, ticker: str, expected_return: float) -> Knowle
         ),
         economic_explanation="test",
         affected_assets=[ticker],
-        horizon=Horizon.SWING,
+        horizon=horizon,
         expected_return=expected_return,
         expected_risk=0.02,
         provenance=Provenance(produced_by="test", produced_at=datetime.now()),
@@ -231,7 +275,10 @@ def test_monitor_records_performance_and_retires_wrong_sign_knowledge():
     # honestly: the realized data is real; only the expectation is inverted.
     realized_positive = knowledge.expected_return > 0
     wrong = _knowledge(
-        "know-wrong", knowledge.affected_assets[0], -0.05 if realized_positive else 0.05
+        "know-wrong",
+        knowledge.affected_assets[0],
+        -0.05 if realized_positive else 0.05,
+        knowledge.horizon,
     )
     store._repo.add(wrong)  # test-only injection of a pre-existing object
     wrong_gene = genome.promote_to_gene(wrong)

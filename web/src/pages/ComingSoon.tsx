@@ -11,7 +11,7 @@ export interface ComingSoonProps {
 export function ComingSoon({ title, detail }: ComingSoonProps) {
   return (
     <Card title={title}>
-      <EmptyState title="Under construction" detail={detail} icon="◌" />
+      <EmptyState title="قيد الإنشاء" detail={detail} icon="◌" />
     </Card>
   );
 }

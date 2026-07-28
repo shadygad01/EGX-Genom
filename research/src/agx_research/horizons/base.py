@@ -35,6 +35,7 @@ class Prediction(BaseModel):
     expected_return: float
     expected_risk: float
     confidence: float
+    reference_price: float | None = Field(default=None, gt=0)
     explanation: Explanation
     supporting_knowledge_ids: list[str] = Field(default_factory=list)
     provenance: Provenance

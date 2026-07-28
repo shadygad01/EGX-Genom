@@ -32,7 +32,7 @@ def test_missing_fundamentals_and_knowledge_force_explicit_abstention(tmp_path):
     assert row.decision == "abstain"
     assert row.price_observations > 0
     assert row.financial_periods == 0
-    assert any("knowledge" in blocker for blocker in row.blockers)
+    assert any("معرفة" in blocker for blocker in row.blockers)
 
 
 def test_no_prices_is_blocked_not_merely_degraded(tmp_path):

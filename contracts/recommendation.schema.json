@@ -1,5 +1,16 @@
 {
   "$defs": {
+    "DecisionAction": {
+      "description": "Research actions, deliberately distinct from personalized advice.",
+      "enum": [
+        "buy_candidate",
+        "watch",
+        "avoid",
+        "abstain"
+      ],
+      "title": "DecisionAction",
+      "type": "string"
+    },
     "Explanation": {
       "description": "Answers to the questions every recommendation must be able to answer.\n\n`evidence_refs` is what keeps `supporting_evidence` from being just\nprose: each entry points at an actual, looked-up-able entity (a\nknowledge object, a dataset snapshot, a feature) rather than only a\nsentence describing one.",
       "properties": {
@@ -62,6 +73,127 @@
       "title": "Horizon",
       "type": "string"
     },
+    "PriceConditionOperator": {
+      "enum": ["at_or_below", "below", "not_applicable"],
+      "title": "PriceConditionOperator",
+      "type": "string"
+    },
+    "HorizonDecision": {
+      "description": "One executable-looking but research-only decision for exactly one horizon.\n\nHorizons are never blended here: return, risk, validity and invalidation\nretain the unit and window of their originating prediction.",
+      "properties": {
+        "abstention_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Abstention Reasons",
+          "type": "array"
+        },
+        "action": {
+          "$ref": "#/$defs/DecisionAction"
+        },
+        "confidence": {
+          "title": "Confidence",
+          "type": "number"
+        },
+        "entry_condition": {
+          "title": "Entry Condition",
+          "type": "string"
+        },
+        "entry_operator": {
+          "$ref": "#/$defs/PriceConditionOperator",
+          "default": "not_applicable"
+        },
+        "entry_value": {
+          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
+          "default": null,
+          "title": "Entry Value"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "expected_return": {
+          "title": "Expected Return",
+          "type": "number"
+        },
+        "expected_risk": {
+          "title": "Expected Risk",
+          "type": "number"
+        },
+        "horizon": {
+          "$ref": "#/$defs/Horizon"
+        },
+        "horizon_window": {
+          "title": "Horizon Window",
+          "type": "string"
+        },
+        "invalidation_conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidation Conditions",
+          "type": "array"
+        },
+        "invalidation_operator": {
+          "$ref": "#/$defs/PriceConditionOperator",
+          "default": "not_applicable"
+        },
+        "invalidation_value": {
+          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
+          "default": null,
+          "title": "Invalidation Value"
+        },
+        "max_position_pct": {
+          "default": 0.0,
+          "title": "Max Position Pct",
+          "type": "number"
+        },
+        "publication_status": {
+          "$ref": "#/$defs/PublicationStatus",
+          "default": "research_only"
+        },
+        "reference_price": {
+          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
+          "default": null,
+          "title": "Reference Price"
+        },
+        "review_condition": {
+          "title": "Review Condition",
+          "type": "string"
+        },
+        "risk_adjusted_score": {
+          "title": "Risk Adjusted Score",
+          "type": "number"
+        },
+        "risk_metric": {
+          "default": "model_expected_risk_for_horizon",
+          "title": "Risk Metric",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "horizon",
+        "horizon_window",
+        "action",
+        "expected_return",
+        "expected_risk",
+        "confidence",
+        "risk_adjusted_score",
+        "valid_until",
+        "entry_condition",
+        "review_condition"
+      ],
+      "title": "HorizonDecision",
+      "type": "object"
+    },
     "Prediction": {
       "description": "A single-horizon prediction for one ticker. Never returned without an Explanation.\n\n`model_id`/`model_version` record exactly which model artifact produced\nthis \u2014 necessary once a model is retrained, so a monitoring/retirement\ndecision (Principle 4) can tell whether a degrading result came from the\nsame model or a since-replaced one (Principle 5: models are versioned).",
       "properties": {
@@ -73,6 +205,11 @@
         "confidence": {
           "title": "Confidence",
           "type": "number"
+        },
+        "reference_price": {
+          "anyOf": [{"exclusiveMinimum": 0.0, "type": "number"}, {"type": "null"}],
+          "default": null,
+          "title": "Reference Price"
         },
         "expected_return": {
           "title": "Expected Return",
@@ -185,6 +322,14 @@
       ],
       "title": "ProvenanceRef",
       "type": "object"
+    },
+    "PublicationStatus": {
+      "enum": [
+        "research_only",
+        "publication_ready"
+      ],
+      "title": "PublicationStatus",
+      "type": "string"
     }
   },
   "description": "A final, explainable output combining every available horizon's prediction.\n\nNever constructed without an Explanation \u2014 see Principle 3. `provenance`\nlinks back to every contributing prediction's model and to every\nsupporting knowledge object, so the full chain from recommendation back\nto raw data is walkable via repository lookups.",
@@ -208,6 +353,16 @@
     },
     "explanation": {
       "$ref": "#/$defs/Explanation"
+    },
+    "horizon_decisions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/HorizonDecision"
+      },
+      "propertyNames": {
+        "$ref": "#/$defs/Horizon"
+      },
+      "title": "Horizon Decisions",
+      "type": "object"
     },
     "horizon_predictions": {
       "additionalProperties": {
@@ -241,6 +396,7 @@
     "combined_expected_risk",
     "confidence",
     "horizon_predictions",
+    "horizon_decisions",
     "explanation",
     "provenance"
   ],

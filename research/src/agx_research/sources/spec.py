@@ -52,6 +52,15 @@ class SourceStatus(str, Enum):
     DISABLED = "disabled"
 
 
+class LegalUseStatus(str, Enum):
+    """Independent legal-review state; implementation is never legal clearance."""
+
+    CLEARED = "cleared"
+    RESEARCH_ONLY = "research_only"
+    REVIEW_REQUIRED = "review_required"
+    BLOCKED = "blocked"
+
+
 class LifecycleState(str, Enum):
     """Where a source sits in the qualification pipeline (`sources.qualification`).
 
@@ -131,6 +140,7 @@ class SourceSpec(BaseModel):
     country: str = "EG"
     access_method: AccessMethod
     status: SourceStatus
+    legal_use_status: LegalUseStatus = LegalUseStatus.REVIEW_REQUIRED
     lifecycle_state: LifecycleState = LifecycleState.CANDIDATE
     health_status: HealthStatus = HealthStatus.UNKNOWN
     activation_status: ActivationStatus = ActivationStatus.ACTIVE

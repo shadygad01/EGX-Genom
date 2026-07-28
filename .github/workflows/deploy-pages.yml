@@ -132,7 +132,8 @@ jobs:
           for f in knowledge events patterns recommendations universe market_state runtime_metrics \
                    system_status source_registry investment_cases collector_status \
                    runtime_status dashboard_metrics mission_status execution_report \
-                   decision_readiness; do
+                   decision_readiness ticker_data_gap_report source_truth \
+                   decision_performance decision_history publication_gate; do
             test -f "web/dist/data/$f.json"
           done
 

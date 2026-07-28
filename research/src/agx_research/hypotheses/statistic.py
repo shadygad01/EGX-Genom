@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import statistics as _statistics
 
-from agx_research.data.adjustments import adjusted_returns_for_ticker
+from agx_research.data.adjustments import adjusted_dated_returns
 from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.features.correlation import pearson_correlation
 from agx_research.hypotheses.hypothesis import Hypothesis
@@ -31,11 +31,15 @@ def series_for_hypothesis(hypothesis: Hypothesis, snapshot: DatasetSnapshot) -> 
             f"{hypothesis.id}: no statistic is defined for {len(hypothesis.affected_assets)} "
             "affected assets; add one to hypotheses/statistic.py explicitly"
         )
-    all_series = [
-        adjusted_returns_for_ticker(snapshot, ticker) for ticker in hypothesis.affected_assets
+    dated = [
+        adjusted_dated_returns(
+            snapshot.price_history.get(ticker, []),
+            snapshot.corporate_events.get(ticker, []),
+        )
+        for ticker in hypothesis.affected_assets
     ]
-    n = min(len(series) for series in all_series)
-    return [series[-n:] for series in all_series]
+    common_dates = sorted(set.intersection(*(set(series) for series in dated)))
+    return [[series[trade_date] for trade_date in common_dates] for series in dated]
 
 
 def hypothesis_statistic(series: list[list[float]]) -> float | None:

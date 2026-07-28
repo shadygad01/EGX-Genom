@@ -66,11 +66,14 @@ class CrossValidationExperiment(Experiment):
 
 
 class BootstrapExperiment(Experiment):
-    """Resamples observations with replacement to bootstrap the statistic's stability."""
+    """Moving-block bootstrap preserving local return dependence and volatility clusters."""
 
-    def __init__(self, iterations: int = 500, seed: int = 42):
+    def __init__(
+        self, iterations: int = 500, seed: int = 42, block_size: int | None = None
+    ):
         self.iterations = iterations
         self.seed = seed
+        self.block_size = block_size
 
     def run(self, hypothesis: Hypothesis, snapshot: DatasetSnapshot) -> ExperimentResult:
         series = series_for_hypothesis(hypothesis, snapshot)
@@ -79,9 +82,15 @@ class BootstrapExperiment(Experiment):
             raise ValueError(f"Not enough data ({n} observations) to bootstrap")
 
         rng = random.Random(self.seed)
+        block_size = self.block_size or max(2, round(n ** (1 / 3)))
+        block_size = min(block_size, n)
         bootstrap_statistics = []
         for _ in range(self.iterations):
-            indices = [rng.randrange(n) for _ in range(n)]
+            indices: list[int] = []
+            while len(indices) < n:
+                start = rng.randrange(n)
+                indices.extend((start + offset) % n for offset in range(block_size))
+            indices = indices[:n]
             resampled = [[s[i] for i in indices] for s in series]
             value = hypothesis_statistic(resampled)
             if value is not None:
@@ -100,6 +109,8 @@ class BootstrapExperiment(Experiment):
             sample_size=n,
             details={
                 "iterations": total,
+                "method": "moving_block_bootstrap",
+                "block_size": block_size,
                 "bootstrap_std": statistics.pstdev(bootstrap_statistics),
             },
         )
@@ -130,7 +141,23 @@ class WalkForwardExperiment(Experiment):
         if len(window_statistics) < 2:
             raise ValueError("Not enough walk-forward windows produced a valid statistic")
 
-        statistic, p_value = scipy_stats.ttest_1samp(window_statistics, popmean=0.0)
+        mean_value = statistics.fmean(window_statistics)
+        lag = min(
+            len(window_statistics) - 1,
+            max(1, (self.window + self.step - 1) // self.step - 1),
+        )
+        centered = [value - mean_value for value in window_statistics]
+        n_windows = len(window_statistics)
+        long_run_variance = sum(value * value for value in centered) / n_windows
+        for offset in range(1, lag + 1):
+            covariance = sum(
+                centered[index] * centered[index - offset]
+                for index in range(offset, n_windows)
+            ) / n_windows
+            long_run_variance += 2 * (1 - offset / (lag + 1)) * covariance
+        standard_error = (max(long_run_variance, 0.0) / n_windows) ** 0.5
+        statistic = mean_value / standard_error if standard_error > 0 else 0.0
+        p_value = float(2 * scipy_stats.norm.sf(abs(statistic)))
         return ExperimentResult(
             statistic=float(statistic),
             p_value=float(p_value),
@@ -139,6 +166,8 @@ class WalkForwardExperiment(Experiment):
                 "window_statistics": window_statistics,
                 "window": self.window,
                 "step": self.step,
+                "inference": "newey_west_hac",
+                "hac_lag": lag,
             },
         )
 

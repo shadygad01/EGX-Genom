@@ -15,6 +15,7 @@ from typing import Any
 
 from agx_research.acquisition_intelligence.capability_engine import CapabilityDecision
 from agx_research.collectors.service import CollectionRunResult, collection_yield
+from agx_research.dashboard.schemas import SourceTruthRow
 from agx_research.events.service import EventPlatform
 from agx_research.financials.collected import CollectedFinancialStatementProvider
 from agx_research.genome.service import AlphaGenome
@@ -23,6 +24,7 @@ from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.meta.readiness import DecisionReadiness, build_ticker_data_gap_report
 from agx_research.meta.recommendation_service import RecommendationService
+from agx_research.config import Horizon
 from agx_research.papers.repository import PaperRepository
 from agx_research.portfolio.constructor import PortfolioConstructor
 from agx_research.runtime.engine import RunRecord
@@ -41,6 +43,8 @@ def export_investment_cases(
     *,
     tickers: list[str],
     as_of: date | None,
+    ready_horizons_by_ticker: dict[str, set[Horizon]] | None = None,
+    latest_prices: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """The Investment Case Generator: per-ticker recommendations (already
     `meta.RecommendationService`) plus the cross-ticker portfolio built from
@@ -52,7 +56,12 @@ def export_investment_cases(
         return {"as_of": None, "recommendations": [], "portfolio": None}
     recommendations = RecommendationService(
         knowledge_store, event_platform=event_platform
-    ).recommend(tickers, as_of)
+    ).recommend(
+        tickers,
+        as_of,
+        ready_horizons_by_ticker=ready_horizons_by_ticker,
+        latest_prices=latest_prices,
+    )
     portfolio = PortfolioConstructor().construct(recommendations, as_of)
     return {
         "as_of": as_of.isoformat(),
@@ -331,3 +340,70 @@ def export_source_metrics(
             }
         )
     return rows
+
+
+def export_source_truth(
+    registry: SourceRegistry,
+    collector_status: list[dict[str, Any]],
+    source_metrics: list[dict[str, Any]],
+    decision_routes: list[dict[str, Any]],
+    *,
+    generated_at: datetime | None = None,
+    freshness_hours: int = 48,
+) -> list[dict[str, Any]]:
+    """Join catalogue, legality, latest run, freshness and decision routing.
+
+    A declared route alone is insufficient: `reached_decision_path` is true
+    only when this run produced usable records and the source has a consumer
+    ending at the Meta Decision Engine.
+    """
+    now = generated_at or datetime.now()
+    collector_by_id = {row["source_id"]: row for row in collector_status}
+    metrics_by_id = {row["source_id"]: row for row in source_metrics}
+    routes_by_id = {row["source_id"]: row for row in decision_routes}
+    rows: list[SourceTruthRow] = []
+    for spec in registry.all_latest():
+        collector = collector_by_id.get(spec.id, {})
+        metrics = metrics_by_id.get(spec.id, {})
+        route = routes_by_id.get(spec.id, {})
+        last_run_raw = metrics.get("last_run_at")
+        last_run_at = datetime.fromisoformat(last_run_raw) if last_run_raw else None
+        comparison_now = now
+        if last_run_at and last_run_at.tzinfo and not comparison_now.tzinfo:
+            comparison_now = comparison_now.replace(tzinfo=last_run_at.tzinfo)
+        fresh = bool(
+            last_run_at
+            and (comparison_now - last_run_at).total_seconds() <= freshness_hours * 3600
+        )
+        produced_records = int(collector.get("yield", 0) or 0)
+        consumers = list(route.get("consumers", []))
+        legal = (
+            spec.legal_use_status.value == "cleared"
+            and spec.status.value == "implemented"
+            and spec.activation_status.value == "active"
+        )
+        status = str(collector.get("status", "NOT_RUN"))
+        rows.append(
+            SourceTruthRow(
+                source_id=spec.id,
+                name=spec.name,
+                category=spec.category.value,
+                legally_usable=legal,
+                attempted_this_run=status in {"COLLECTED", "DEGRADED", "FAILED"},
+                fetched_this_run=bool(collector.get("connection_success", False)),
+                fresh=fresh,
+                produced_records=produced_records,
+                reached_decision_path=(
+                    produced_records > 0 and "meta_decision_engine" in consumers
+                ),
+                corroborated=(
+                    produced_records > 0
+                    and len(route.get("providers", [])) >= 2
+                ),
+                collector_status=status,
+                blocker=collector.get("reason") if not produced_records else None,
+                last_run_at=last_run_at,
+                consumers=consumers,
+            )
+        )
+    return [row.model_dump(mode="json") for row in rows]

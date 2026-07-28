@@ -228,7 +228,7 @@ def test_universe_symbols_are_injected_without_a_fixed_ticker_list():
     assert collector.symbols == ["AAA", "BBB"]
 
 
-def test_live_wiring_scopes_owner_authorized_robots_override_to_price_collector():
+def test_live_wiring_preserves_shared_robots_policy_for_price_collector():
     shared = HttpFetcher(respect_robots=True, timeout_seconds=7)
     collector = build_live_collector(
         "egx_price_composite",
@@ -236,10 +236,9 @@ def test_live_wiring_scopes_owner_authorized_robots_override_to_price_collector(
         fetcher=shared,
         tickers=["COMI"],
     )
-    assert collector.fetcher is not shared
-    assert collector.fetcher.respect_robots is False
+    assert collector.fetcher is shared
+    assert collector.fetcher.respect_robots is True
     assert collector.fetcher.timeout_seconds == 7
-    assert shared.respect_robots is True
     assert collector.spec.retry_policy.max_attempts == 2
 
 
@@ -281,5 +280,9 @@ def test_collected_prices_reach_market_memory_and_decision_readiness(tmp_path: P
     assert state.dataset_snapshot.tickers == [ticker]
     assert readiness.price_observations == 20
     assert readiness.latest_price_date == as_of
-    assert Horizon.MICRO in readiness.ready_horizons
+    # Collection reachability is necessary but no longer sufficient for a
+    # decision: micro readiness also requires enough history and validated
+    # micro-horizon knowledge.
+    assert Horizon.MICRO not in readiness.ready_horizons
+    assert readiness.horizon_blockers[Horizon.MICRO]
     assert all("price" not in blocker.lower() for blocker in readiness.blockers)

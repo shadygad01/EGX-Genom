@@ -1,4 +1,6 @@
 import json
+import io
+import sys
 import tarfile
 from datetime import date
 
@@ -77,3 +79,78 @@ def test_cli_run_and_status_and_backup(tmp_path, capsys):
     capsys.readouterr()
     assert main([*base, "verify-backup", "--input", str(backup_path)]) == 0
     assert "OK" in capsys.readouterr().out
+
+
+def test_cli_publication_status_fails_closed_and_lists_missing_inputs(tmp_path, capsys):
+    data_dir = tmp_path / "empty_production_data"
+
+    assert main([
+        "--data-dir",
+        str(data_dir),
+        "publication-status",
+        "--date",
+        "2026-07-28",
+    ]) == 2
+
+    report = json.loads(capsys.readouterr().out)
+    assert report["publication_ready"] is False
+    validation = next(
+        check for check in report["checks"]
+        if check["id"] == "publication_input_validation"
+    )
+    assert validation["passed"] is False
+    assert "publication_evidence.json missing" in validation["blocker"]
+    assert "legal_publication_approval.json missing" in validation["blocker"]
+    assert {check["id"] for check in report["checks"]} >= {
+        "live_egx_market_data",
+        "official_disclosures_four_periods",
+        "current_cbe_capmas_macro",
+        "two_source_price_corroboration",
+        "benchmark_performance",
+        "legal_approval",
+    }
+    assert not data_dir.exists(), "publication-status must not mutate the inspected directory"
+
+
+def test_cli_publication_status_rejects_malformed_evidence(tmp_path, capsys):
+    data_dir = tmp_path / "invalid_production_data"
+    data_dir.mkdir()
+    (data_dir / "publication_evidence.json").write_text(
+        '{"live_egx_market_data": "not-a-boolean"}', encoding="utf-8"
+    )
+    (data_dir / "legal_publication_approval.json").write_text("{}", encoding="utf-8")
+
+    assert main([
+        "--data-dir",
+        str(data_dir),
+        "publication-status",
+        "--date",
+        "2026-07-28",
+    ]) == 2
+
+    report = json.loads(capsys.readouterr().out)
+    validation = next(
+        check for check in report["checks"]
+        if check["id"] == "publication_input_validation"
+    )
+    assert "publication_evidence.json invalid" in validation["blocker"]
+    assert "legal_publication_approval.json invalid" in validation["blocker"]
+
+
+def test_cli_publication_status_writes_utf8_on_windows_code_page(tmp_path, monkeypatch):
+    raw_output = io.BytesIO()
+    windows_stdout = io.TextIOWrapper(raw_output, encoding="cp1252")
+    monkeypatch.setattr(sys, "stdout", windows_stdout)
+
+    assert main([
+        "--data-dir",
+        str(tmp_path / "empty_data"),
+        "publication-status",
+        "--date",
+        "2026-07-28",
+    ]) == 2
+
+    windows_stdout.flush()
+    report = json.loads(raw_output.getvalue().decode("utf-8"))
+    assert report["publication_ready"] is False
+    assert any("بيانات" in check["label"] for check in report["checks"])

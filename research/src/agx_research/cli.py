@@ -27,6 +27,7 @@ from agx_research.acquisition_intelligence.target import (
     seed_target_organizations,
 )
 from agx_research.collectors.fetcher import HttpFetcher
+from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.service import CollectionService
@@ -39,6 +40,12 @@ from agx_research.events.service import EventPlatform
 from agx_research.infrastructure.backup import create_backup, restore_backup, verify_backup
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
+from agx_research.meta.decision_ledger import DecisionLedger
+from agx_research.meta.publication_gate import (
+    ExternalPublicationEvidence,
+    LegalPublicationApproval,
+    evaluate_publication_gate,
+)
 from agx_research.production import ExecutionMode, ProductionPipeline, StageStatus
 from agx_research.runtime.engine import RunRecordRepository
 from agx_research.sources.catalog import seed_registry
@@ -177,6 +184,13 @@ def main(argv: list[str] | None = None) -> int:
         "validate-dashboard", help="Validate a directory of exported dashboard artifacts"
     )
     validate_dashboard_parser.add_argument("--dir", type=Path, required=True)
+
+    publication_parser = sub.add_parser(
+        "publication-status",
+        help="Validate publication evidence, benchmark performance and legal approval "
+        "against archived raw documents; exits 2 while any gate remains blocked",
+    )
+    publication_parser.add_argument("--date", required=True, help="Gate evaluation date (ISO)")
 
     args = parser.parse_args(argv)
 
@@ -366,6 +380,65 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(json.dumps(counts, indent=2))
         return 0
+
+    if args.command == "publication-status":
+        as_of = date.fromisoformat(args.date)
+        input_errors: list[str] = []
+        external = None
+        legal = None
+        external_path = args.data_dir / "publication_evidence.json"
+        legal_path = args.data_dir / "legal_publication_approval.json"
+        if external_path.exists():
+            try:
+                external = ExternalPublicationEvidence.model_validate_json(
+                    external_path.read_text(encoding="utf-8")
+                )
+            except (ValueError, OSError) as exc:
+                input_errors.append(f"publication_evidence.json invalid: {exc}")
+        else:
+            input_errors.append("publication_evidence.json missing")
+        if legal_path.exists():
+            try:
+                legal = LegalPublicationApproval.model_validate_json(
+                    legal_path.read_text(encoding="utf-8")
+                )
+            except (ValueError, OSError) as exc:
+                input_errors.append(f"legal_publication_approval.json invalid: {exc}")
+        else:
+            input_errors.append("legal_publication_approval.json missing")
+
+        registry_path = args.data_dir / "source_registry.json"
+        # Status inspection must be read-only. Use the persisted registry when
+        # it exists; otherwise evaluate against an in-memory seeded registry
+        # without creating files in the inspected production directory.
+        registry = seed_registry(
+            SourceRegistry(registry_path) if registry_path.exists() else SourceRegistry()
+        )
+        report = evaluate_publication_gate(
+            DecisionLedger(args.data_dir / "decision_ledger.json").performance_summary(),
+            as_of=as_of,
+            external=external,
+            legal=legal,
+            raw_documents=RawDocumentRepository(
+                args.data_dir / "raw_documents.json"
+            ).all_latest(),
+            legally_cleared_source_ids={
+                source.id for source in registry.all_latest()
+                if source.legal_use_status.value == "cleared"
+            },
+            input_errors=input_errors,
+        )
+        payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
+        try:
+            payload.encode(sys.stdout.encoding or "utf-8")
+        except UnicodeEncodeError:
+            # Windows terminals commonly expose cp1252 even though the report
+            # intentionally contains Arabic. Preserve readable JSON and the
+            # meaningful 0/2 exit code instead of crashing during output.
+            sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
+        else:
+            print(payload)
+        return 0 if report.publication_ready else 2
 
     return 1
 

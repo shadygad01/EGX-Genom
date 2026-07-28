@@ -20,12 +20,12 @@ const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
 function hypothesisStatus(h: Hypothesis): { label: string; variant: BadgeVariant } {
   const lastStage = h.stage_history[h.stage_history.length - 1];
   if (lastStage && !lastStage.passed) {
-    return { label: `Failed at ${titleCase(lastStage.stage_name)}`, variant: "negative" };
+    return { label: `فشلت عند ${researchTokenLabel(lastStage.stage_name)}`, variant: "negative" };
   }
   if (h.stage_index >= h.pipeline.length) {
-    return { label: "Completed all gates", variant: "positive" };
+    return { label: "اجتازت كل البوابات", variant: "positive" };
   }
-  return { label: `Stage ${h.stage_index + 1} of ${h.pipeline.length}`, variant: "accent" };
+  return { label: `المرحلة ${h.stage_index + 1} من ${h.pipeline.length}`, variant: "accent" };
 }
 
 /** Where a discovered relationship's whole lifecycle is visible: the
@@ -58,15 +58,15 @@ export function ResearchCenter() {
   return (
     <>
       <Section
-        title="Hypothesis Pipeline"
-        description="Discovery History, Active Research, and the Validation Queue are all this same 8-gate pipeline, viewed by stage."
+        title="خط الفرضيات"
+        description="سجل الاكتشاف والبحث النشط وقائمة التحقق هي مناظير مختلفة لنفس خط البوابات الثماني."
       >
         {hypotheses.loading && <LoadingState rows={4} />}
         {hypotheses.error && <ErrorState detail={hypotheses.error.message} onRetry={hypotheses.reload} />}
         {!hypotheses.loading && !hypotheses.error && (
           <div className={styles.grid} style={{ marginBottom: "var(--space-4)" }}>
-            <StatTile label="Total Hypotheses" value={allHypotheses.length} />
-            <StatTile label="Active Research" value={activeCount} />
+            <StatTile label="إجمالي الفرضيات" value={allHypotheses.length} />
+            <StatTile label="البحث النشط" value={activeCount} />
           </div>
         )}
         {!hypotheses.loading && !hypotheses.error && (
@@ -76,26 +76,26 @@ export function ResearchCenter() {
                 rows={allHypotheses}
                 getRowKey={(h) => h.id}
                 onRowClick={(h) => setSelectedId(h.id)}
-                emptyTitle="No hypotheses yet"
-                emptyDetail="Hypotheses appear once an agent's research finding enters the validation pipeline."
+                emptyTitle="لا توجد فرضيات بعد"
+                emptyDetail="تظهر الفرضيات عندما تدخل نتيجة بحثية إلى خط التحقق."
                 columns={[
-                  { key: "statement", header: "Statement", render: (h) => h.statement },
-                  { key: "horizon", header: "Horizon", render: (h) => <Badge variant="neutral">{titleCase(h.horizon)}</Badge> },
+                  { key: "statement", header: "الفرضية", render: (h) => h.statement },
+                  { key: "horizon", header: "الأفق", render: (h) => <Badge variant="neutral">{researchTokenLabel(h.horizon)}</Badge> },
                   {
                     key: "status",
-                    header: "Status",
+                    header: "الحالة",
                     render: (h) => {
                       const s = hypothesisStatus(h);
                       return <Badge variant={s.variant}>{s.label}</Badge>;
                     },
                   },
-                  { key: "created", header: "Created", align: "right", render: (h) => formatDate(h.created_at) },
+                  { key: "created", header: "تاريخ الإنشاء", align: "right", render: (h) => formatDate(h.created_at) },
                 ]}
               />
             </Card>
 
-            <Card title={selected ? "Stage History" : "Stage History"} dense>
-              {!selected && <EmptyState title="No hypothesis selected" detail="Select a row to see its full gate history." />}
+            <Card title="سجل المراحل" dense>
+              {!selected && <EmptyState title="لم تُحدد فرضية" detail="اختر صفًا لرؤية سجل البوابات كاملًا." />}
               {selected && (
                 <div>
                   <div className={styles.detailHeader}>{selected.statement}</div>
@@ -103,16 +103,16 @@ export function ResearchCenter() {
                     {selected.created_by} · {formatDate(selected.created_at)} · {selected.affected_assets.join(", ")}
                   </div>
                   {selected.stage_history.length === 0 ? (
-                    <EmptyState title="No stages evaluated yet" />
+                    <EmptyState title="لم تُقيّم مراحل بعد" />
                   ) : (
                     <div className={styles.stageList}>
                       {selected.stage_history.map((s, i) => (
                         <div key={i} className={styles.stageRow}>
                           <div>
-                            <div className={styles.stageName}>{titleCase(s.stage_name)}</div>
+                            <div className={styles.stageName}>{researchTokenLabel(s.stage_name)}</div>
                             {s.notes && <div className={styles.stageNotes}>{s.notes}</div>}
                           </div>
-                          <Badge variant={s.passed ? "positive" : "negative"}>{s.passed ? "Passed" : "Failed"}</Badge>
+                          <Badge variant={s.passed ? "positive" : "negative"}>{s.passed ? "اجتازت" : "فشلت"}</Badge>
                         </div>
                       ))}
                     </div>
@@ -124,22 +124,22 @@ export function ResearchCenter() {
         )}
       </Section>
 
-      <Section title="Knowledge Objects" description="Every knowledge object the validation pipeline has promoted, monitored, or retired.">
+      <Section title="كائنات المعرفة" description="كل معرفة رقّاها خط التحقق أو وضعها تحت المراقبة أو سحبها.">
         <div className={styles.grid} style={{ marginBottom: "var(--space-4)" }}>
-          <StatTile label="Promoted" value={knowledgeByStatus.promoted} />
-          <StatTile label="Monitoring" value={knowledgeByStatus.monitoring} />
-          <StatTile label="Retired" value={knowledgeByStatus.retired} />
+          <StatTile label="مرقّاة" value={knowledgeByStatus.promoted} />
+          <StatTile label="تحت المراقبة" value={knowledgeByStatus.monitoring} />
+          <StatTile label="مسحوبة" value={knowledgeByStatus.retired} />
         </div>
         {knowledge.error && <ErrorState detail={knowledge.error.message} onRetry={knowledge.reload} />}
         {!knowledge.error && (
           <DataTable
             rows={sortedKnowledge}
             getRowKey={(k) => k.id}
-            emptyTitle="No knowledge objects yet"
+            emptyTitle="لا توجد كائنات معرفة بعد"
             columns={[
               {
                 key: "assets",
-                header: "Assets",
+                header: "الأسهم",
                 render: (k) => (
                   <div className={styles.tickerLinks}>
                     {k.affected_assets.map((t) => (
@@ -150,19 +150,19 @@ export function ResearchCenter() {
                   </div>
                 ),
               },
-              { key: "status", header: "Status", render: (k) => <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{titleCase(k.status)}</Badge> },
-              { key: "horizon", header: "Horizon", render: (k) => titleCase(k.horizon) },
-              { key: "confidence", header: "Confidence", align: "right", render: (k) => formatPercent(k.confidence) },
-              { key: "discovered", header: "Discovered", align: "right", render: (k) => formatDate(k.discovery_date) },
+              { key: "status", header: "الحالة", render: (k) => <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{researchTokenLabel(k.status)}</Badge> },
+              { key: "horizon", header: "الأفق", render: (k) => researchTokenLabel(k.horizon) },
+              { key: "confidence", header: "الثقة", align: "right", render: (k) => formatPercent(k.confidence) },
+              { key: "discovered", header: "تاريخ الاكتشاف", align: "right", render: (k) => formatDate(k.discovery_date) },
             ]}
           />
         )}
       </Section>
 
       <div className={styles.layout}>
-        <Card title="Scientific Papers" subtitle="Every paper published from promoted knowledge">
+        <Card title="الأوراق العلمية" subtitle="كل ورقة منشورة من معرفة مرقّاة">
           {papers.error && <ErrorState detail={papers.error.message} onRetry={papers.reload} />}
-          {!papers.error && sortedPapers.length === 0 && <EmptyState title="No papers yet" />}
+          {!papers.error && sortedPapers.length === 0 && <EmptyState title="لا توجد أوراق بعد" />}
           {sortedPapers.length > 0 && (
             <div className={styles.list}>
               {sortedPapers.map((p) => (
@@ -178,13 +178,24 @@ export function ResearchCenter() {
           )}
         </Card>
 
-        <Card title="Review Board">
+        <Card title="مجلس المراجعة">
           <EmptyState
-            title="Not yet available"
-            detail="No repository persists past ScientificReviewBoard decisions yet -- this section will populate once one exists (see docs/TECHNICAL_DEBT.md), never a fabricated review history."
+            title="غير متاح بعد"
+            detail="لا يوجد مستودع يحفظ قرارات مجلس المراجعة العلمية السابقة؛ سيظهر القسم عند وجود سجل حقيقي ولن يختلق تاريخًا للمراجعات."
           />
         </Card>
       </div>
     </>
   );
+}
+
+function researchTokenLabel(value: string): string {
+  const labels: Record<string, string> = {
+    micro: "قصير", swing: "متوسط", investment: "طويل",
+    promoted: "مرقّاة", monitoring: "تحت المراقبة", retired: "مسحوبة",
+    discovery: "الاكتشاف", data_quality: "جودة البيانات", statistical_validation: "التحقق الإحصائي",
+    backtest: "الاختبار التاريخي", adversarial_review: "المراجعة المعارضة",
+    scientific_review: "المراجعة العلمية", promotion: "الترقية",
+  };
+  return labels[value.toLowerCase()] ?? titleCase(value);
 }

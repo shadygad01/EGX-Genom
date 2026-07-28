@@ -75,7 +75,9 @@ not silently force the index name to equal a hard-coded row count.
 - `agx_research.learning` — `ContinuousLearningMonitor`: realized
   performance recording + mechanical retirement.
 - `agx_research.infrastructure` — integrity-checked backup/verify/restore.
-- `agx_research.cli` — `python -m agx_research.cli run|status|backup|restore`.
+- `agx_research.cli` — operational commands including
+  `run|status|backup|restore|publication-status`. Publication checks and input
+  schemas are in [`docs/PUBLICATION_EVIDENCE_RUNBOOK.md`](../docs/PUBLICATION_EVIDENCE_RUNBOOK.md).
 
 ## Regenerating the API contract
 

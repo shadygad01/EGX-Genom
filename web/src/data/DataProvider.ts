@@ -13,6 +13,8 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  DecisionPerformanceSummary,
+  DecisionRecord,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -24,11 +26,14 @@ import type {
   MarketState,
   MissionStatus,
   Pattern,
+  PublicationGateReport,
   Recommendation,
   ResearchPaper,
   RunRecord,
   SourceMetricsRow,
   SourceSpec,
+  SourceTruthRow,
+  TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
 
@@ -64,4 +69,9 @@ export interface DashboardDataProvider {
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;
+  getTickerDataGapReport(): Promise<TickerDataGapReport[]>;
+  getSourceTruth(): Promise<SourceTruthRow[]>;
+  getDecisionHistory(): Promise<DecisionRecord[]>;
+  getDecisionPerformance(): Promise<DecisionPerformanceSummary[]>;
+  getPublicationGate(): Promise<PublicationGateReport | null>;
 }

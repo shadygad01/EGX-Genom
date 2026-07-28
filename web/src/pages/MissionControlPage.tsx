@@ -80,84 +80,84 @@ export function MissionControlPage() {
 
   return (
     <>
-      <Section title="Mission Status" description="The current production pipeline's status, per the most recent Mission Control update.">
+      <Section title="حالة المهمة" description="حالة خط الإنتاج وفق أحدث تحديث لمراقبة التشغيل.">
         {missionStatus.loading && <LoadingState rows={2} />}
         {missionStatus.error && <ErrorState detail={missionStatus.error.message} onRetry={missionStatus.reload} />}
         {!missionStatus.loading && !missionStatus.error && !missionStatus.data && (
-          <EmptyState title="No mission status yet" detail="Available once the full production pipeline (agx run) executes." />
+          <EmptyState title="لا توجد حالة للمهمة بعد" detail="تظهر بعد تشغيل خط الإنتاج الكامل." />
         )}
         {missionStatus.data && (
           <div className={styles.grid}>
-            <StatTile label="Pipeline Status" value={<Badge variant={STAGE_VARIANT[missionStatus.data.pipeline_status]}>{titleCase(missionStatus.data.pipeline_status)}</Badge>} />
-            <StatTile label="Pipeline Version" value={missionStatus.data.pipeline_version} />
-            <StatTile label="Execution Mode" value={titleCase(missionStatus.data.current_execution_mode)} />
-            <StatTile label="Duration" value={`${formatNumber(missionStatus.data.execution_duration_seconds, 2)}s`} />
-            <StatTile label="Total Executions" value={missionStatus.data.total_executions} />
-            <StatTile label="Last Successful Run" value={formatDate(missionStatus.data.last_successful_pipeline_at)} />
-            <StatTile label="Last Failed Run" value={formatDate(missionStatus.data.last_failed_pipeline_at)} />
+            <StatTile label="حالة الخط" value={<Badge variant={STAGE_VARIANT[missionStatus.data.pipeline_status]}>{runtimeTokenLabel(missionStatus.data.pipeline_status)}</Badge>} />
+            <StatTile label="إصدار الخط" value={missionStatus.data.pipeline_version} />
+            <StatTile label="وضع التنفيذ" value={runtimeTokenLabel(missionStatus.data.current_execution_mode)} />
+            <StatTile label="المدة" value={`${formatNumber(missionStatus.data.execution_duration_seconds, 2)} ث`} />
+            <StatTile label="إجمالي التنفيذات" value={missionStatus.data.total_executions} />
+            <StatTile label="آخر تشغيل ناجح" value={formatDate(missionStatus.data.last_successful_pipeline_at)} />
+            <StatTile label="آخر تشغيل فاشل" value={formatDate(missionStatus.data.last_failed_pipeline_at)} />
           </div>
         )}
       </Section>
 
-      <Section title="Pipeline Health" description="Every stage of the most recent execution, in order.">
+      <Section title="صحة خط الإنتاج" description="كل مرحلة من أحدث تنفيذ بالترتيب.">
         {executionReport.loading && <LoadingState rows={3} />}
         {executionReport.error && <ErrorState detail={executionReport.error.message} onRetry={executionReport.reload} />}
         {!executionReport.loading && !executionReport.error && !executionReport.data && (
-          <EmptyState title="No execution report yet" />
+          <EmptyState title="لا يوجد تقرير تنفيذ بعد" />
         )}
         {executionReport.data && (
           <DataTable
             rows={executionReport.data.stages}
             getRowKey={(s) => s.name}
-            emptyTitle="No stages recorded"
+            emptyTitle="لا توجد مراحل مسجلة"
             columns={[
-              { key: "name", header: "Stage", render: (s) => titleCase(s.name) },
-              { key: "status", header: "Status", render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{titleCase(s.status)}</Badge> },
-              { key: "duration", header: "Duration", align: "right", render: (s) => `${formatNumber(s.duration_seconds, 2)}s` },
-              { key: "detail", header: "Detail", render: (s) => s.detail },
-              { key: "warnings", header: "Warnings", align: "right", render: (s) => s.warnings.length },
+              { key: "name", header: "المرحلة", render: (s) => runtimeTokenLabel(s.name) },
+              { key: "status", header: "الحالة", render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{runtimeTokenLabel(s.status)}</Badge> },
+              { key: "duration", header: "المدة", align: "right", render: (s) => `${formatNumber(s.duration_seconds, 2)} ث` },
+              { key: "detail", header: "التفاصيل", render: (s) => s.detail },
+              { key: "warnings", header: "التحذيرات", align: "right", render: (s) => s.warnings.length },
             ]}
           />
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Knowledge Status" subtitle="Knowledge objects by lifecycle status">
+        <Card title="حالة المعرفة" subtitle="كائنات المعرفة حسب دورة الحياة">
           {systemStatus.data ? (
             <div className={styles.grid}>
-              <StatTile label="Total" value={systemStatus.data.knowledge_objects} />
+              <StatTile label="الإجمالي" value={systemStatus.data.knowledge_objects} />
               {Object.entries(systemStatus.data.by_status).map(([status, count]) => (
-                <StatTile key={status} label={titleCase(status)} value={count} />
+                <StatTile key={status} label={runtimeTokenLabel(status)} value={count} />
               ))}
             </div>
           ) : (
-            <EmptyState title="No knowledge status yet" />
+            <EmptyState title="لا توجد حالة معرفة بعد" />
           )}
         </Card>
 
-        <Card title="Genome Status" subtitle="Genes by lifecycle status">
+        <Card title="حالة الجينوم" subtitle="الجينات حسب دورة الحياة">
           {(genes.data ?? []).length === 0 ? (
-            <EmptyState title="No genes yet" />
+            <EmptyState title="لا توجد جينات بعد" />
           ) : (
             <div className={styles.grid}>
-              <StatTile label="Total" value={genes.data!.length} />
-              <StatTile label="Promoted" value={geneCounts.promoted} />
-              <StatTile label="Monitoring" value={geneCounts.monitoring} />
-              <StatTile label="Replaced" value={geneCounts.replaced} />
-              <StatTile label="Retired" value={geneCounts.retired} />
+              <StatTile label="الإجمالي" value={genes.data!.length} />
+              <StatTile label="مرقّاة" value={geneCounts.promoted} />
+              <StatTile label="تحت المراقبة" value={geneCounts.monitoring} />
+              <StatTile label="مستبدلة" value={geneCounts.replaced} />
+              <StatTile label="مسحوبة" value={geneCounts.retired} />
             </div>
           )}
         </Card>
       </div>
 
-      <Section title="Collectors" description="Output of each source's most recent collection run.">
+      <Section title="جامعو البيانات" description="ناتج أحدث تشغيل جمع لكل مصدر.">
         <div className={styles.grid}>
-          <StatTile label="Catalogued" value={(sourceRegistry.data ?? []).length} />
-          <StatTile label="Collected" value={collectedCount} />
-          <StatTile label="Degraded" value={degradedCount} />
-          <StatTile label="Wired Standby" value={standbyCount} />
-          <StatTile label="Failed" value={failedCount} />
-          <StatTile label="Not Yet Wired" value={unavailableCount} />
+          <StatTile label="مفهرسة" value={(sourceRegistry.data ?? []).length} />
+          <StatTile label="جُمعت" value={collectedCount} />
+          <StatTile label="متراجعة" value={degradedCount} />
+          <StatTile label="احتياطية موصلة" value={standbyCount} />
+          <StatTile label="فاشلة" value={failedCount} />
+          <StatTile label="غير موصلة" value={unavailableCount} />
         </div>
         {collectorStatus.loading && <LoadingState rows={3} />}
         {collectorStatus.error && <ErrorState detail={collectorStatus.error.message} onRetry={collectorStatus.reload} />}
@@ -165,72 +165,72 @@ export function MissionControlPage() {
           <DataTable
             rows={collectorStatus.data ?? []}
             getRowKey={(c) => c.source_id}
-            emptyTitle="No collector runs yet"
+            emptyTitle="لا توجد تشغيلات جمع بعد"
             columns={[
-              { key: "source", header: "Source", render: (c) => c.source_id },
+              { key: "source", header: "المصدر", render: (c) => c.source_id },
               {
                 key: "status",
-                header: "Status",
-                render: (c) => <Badge variant={STATUS_VARIANT[c.status]}>{titleCase(c.status)}</Badge>,
+                header: "الحالة",
+                render: (c) => <Badge variant={STATUS_VARIANT[c.status]}>{runtimeTokenLabel(c.status)}</Badge>,
               },
               {
                 key: "health",
-                header: "Health",
+                header: "الصحة",
                 render: (c) => c.status === "STANDBY"
-                  ? <Badge variant="accent">Not Measured</Badge>
-                  : (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{titleCase(c.health_status)}</Badge> : "—"),
+                  ? <Badge variant="accent">غير مقاس</Badge>
+                  : (c.health_status ? <Badge variant={HEALTH_VARIANT[c.health_status]}>{runtimeTokenLabel(c.health_status)}</Badge> : "—"),
               },
               {
                 key: "connection",
-                header: "Connected",
+                header: "الاتصال",
                 render: (c) => c.status === "STANDBY"
-                  ? <Badge variant="neutral">Not Run</Badge>
-                  : <Badge variant={c.connection_success ? "positive" : "negative"}>{c.connection_success ? "Yes" : "No"}</Badge>,
+                  ? <Badge variant="neutral">لم يعمل</Badge>
+                  : <Badge variant={c.connection_success ? "positive" : "negative"}>{c.connection_success ? "نعم" : "لا"}</Badge>,
               },
               {
                 key: "parsed",
-                header: "Parsed",
+                header: "التحليل",
                 render: (c) => c.status === "STANDBY"
-                  ? <Badge variant="neutral">Not Run</Badge>
-                  : <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? "Yes" : "No"}</Badge>,
+                  ? <Badge variant="neutral">لم يعمل</Badge>
+                  : <Badge variant={c.parse_success ? "positive" : "negative"}>{c.parse_success ? "نعم" : "لا"}</Badge>,
               },
-              { key: "yield", header: "Yield", align: "right", render: (c) => formatNumber(c.yield) },
-              { key: "events", header: "Events", align: "right", render: (c) => formatNumber(c.events_produced) },
-              { key: "docs", header: "Documents", align: "right", render: (c) => formatNumber(c.documents_fetched) },
-              { key: "quality", header: "Quality", align: "right", render: (c) => (c.data_quality_score != null ? formatPercent(c.data_quality_score) : "—") },
-              { key: "reason", header: "Reason", render: (c) => c.reason ?? "—" },
+              { key: "yield", header: "الناتج", align: "right", render: (c) => formatNumber(c.yield) },
+              { key: "events", header: "الأحداث", align: "right", render: (c) => formatNumber(c.events_produced) },
+              { key: "docs", header: "المستندات", align: "right", render: (c) => formatNumber(c.documents_fetched) },
+              { key: "quality", header: "الجودة", align: "right", render: (c) => (c.data_quality_score != null ? formatPercent(c.data_quality_score) : "—") },
+              { key: "reason", header: "السبب", render: (c) => c.reason ?? "—" },
             ]}
           />
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Source Health" subtitle="Rollup across the full source registry -- see Source Intelligence for per-source detail">
+        <Card title="صحة المصادر" subtitle="ملخص سجل المصادر الكامل؛ راجع شفافية المصادر للتفاصيل">
           {(sourceRegistry.data ?? []).length === 0 ? (
-            <EmptyState title="No source registry yet" />
+            <EmptyState title="لا يوجد سجل مصادر بعد" />
           ) : (
             <div className={styles.grid}>
-              <StatTile label="Implemented" value={implementedCount} />
-              <StatTile label="Healthy" value={sourceHealthCounts.healthy} />
-              <StatTile label="Degraded" value={sourceHealthCounts.degraded} />
-              <StatTile label="Down" value={sourceHealthCounts.down} />
+              <StatTile label="منفذة" value={implementedCount} />
+              <StatTile label="سليمة" value={sourceHealthCounts.healthy} />
+              <StatTile label="متراجعة" value={sourceHealthCounts.degraded} />
+              <StatTile label="متوقفة" value={sourceHealthCounts.down} />
             </div>
           )}
         </Card>
 
-        <Card title="Current Blockers">
+        <Card title="العوائق الحالية">
           {!executionReport.data || (executionReport.data.errors.length === 0 && executionReport.data.warnings.length === 0) ? (
-            <EmptyState title="No blockers" detail="The most recent execution reported no errors or warnings." />
+            <EmptyState title="لا توجد عوائق" detail="لم يسجل أحدث تنفيذ أخطاء أو تحذيرات." />
           ) : (
             <div className={styles.list}>
               {executionReport.data.errors.map((e, i) => (
                 <div key={`e-${i}`} className={styles.listItem}>
-                  <Badge variant="negative">Error</Badge> {e}
+                  <Badge variant="negative">خطأ</Badge> {e}
                 </div>
               ))}
               {executionReport.data.warnings.map((w, i) => (
                 <div key={`w-${i}`} className={styles.listItem}>
-                  <Badge variant="warning">Warning</Badge> {w}
+                  <Badge variant="warning">تحذير</Badge> {w}
                 </div>
               ))}
             </div>
@@ -238,24 +238,24 @@ export function MissionControlPage() {
         </Card>
       </div>
 
-      <Section title="Execution History" description="Every research-cycle run recorded.">
+      <Section title="سجل التنفيذ" description="كل تشغيل مسجل لدورة البحث.">
         <DataTable
           rows={runHistory}
           getRowKey={(r) => r.id}
-          emptyTitle="No runs recorded yet"
+          emptyTitle="لا توجد تشغيلات مسجلة بعد"
           columns={[
-            { key: "date", header: "Run Date", render: (r) => formatDate(r.run_date) },
-            { key: "status", header: "Status", render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{titleCase(r.status)}</Badge> },
-            { key: "hypotheses", header: "Hypotheses", align: "right", render: (r) => r.hypotheses },
-            { key: "promoted", header: "Promoted", align: "right", render: (r) => r.promoted },
-            { key: "completed", header: "Completed", align: "right", render: (r) => formatDateTime(r.completed_at) },
+            { key: "date", header: "تاريخ التشغيل", render: (r) => formatDate(r.run_date) },
+            { key: "status", header: "الحالة", render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{runtimeTokenLabel(r.status)}</Badge> },
+            { key: "hypotheses", header: "الفرضيات", align: "right", render: (r) => r.hypotheses },
+            { key: "promoted", header: "المرقّاة", align: "right", render: (r) => r.promoted },
+            { key: "completed", header: "اكتمل", align: "right", render: (r) => formatDateTime(r.completed_at) },
           ]}
         />
       </Section>
 
       <Section
-        title="Acquisition Decisions"
-        description="Every capability's ranked acquisition strategies this run -- which source was selected, and why every other candidate was skipped, failed, or produced nothing usable. A capability is never tied to one website: this is the runtime Acquisition Decision Engine's own record of the fallback chain it evaluated."
+        title="قرارات الحصول على البيانات"
+        description="استراتيجيات المصادر المرتبة لكل قدرة في هذا التشغيل: ما المصدر المختار ولماذا تخطى النظام البدائل أو فشلت أو لم تنتج سجلات صالحة."
       >
         {acquisitionDecisions.loading && <LoadingState rows={3} />}
         {acquisitionDecisions.error && (
@@ -265,34 +265,34 @@ export function MissionControlPage() {
           <DataTable
             rows={acquisitionDecisions.data ?? []}
             getRowKey={(d) => d.capability}
-            emptyTitle="No acquisition decisions yet"
+            emptyTitle="لا توجد قرارات حصول على البيانات بعد"
             columns={[
-              { key: "capability", header: "Capability", render: (d) => titleCase(d.capability) },
+              { key: "capability", header: "القدرة", render: (d) => runtimeTokenLabel(d.capability) },
               {
                 key: "status",
-                header: "Status",
+                header: "الحالة",
                 render: (d) => (
                   <Badge variant={d.succeeded ? "positive" : "neutral"}>
-                    {d.succeeded ? "Satisfied" : "Unsatisfied"}
+                    {d.succeeded ? "مستوفاة" : "غير مستوفاة"}
                   </Badge>
                 ),
               },
               {
                 key: "selected",
-                header: "Selected Strategy",
+                header: "الاستراتيجية المختارة",
                 render: (d) => (d.selected_source_ids.length ? d.selected_source_ids.join(", ") : "—"),
               },
               {
                 key: "attempts",
-                header: "Strategies Considered",
+                header: "الاستراتيجيات المدروسة",
                 align: "right",
                 render: (d) => d.attempts.length,
               },
               {
                 key: "top",
-                header: "Top-Ranked Strategy",
+                header: "أعلى استراتيجية ترتيبًا",
                 render: (d) =>
-                  d.attempts[0] ? `${d.attempts[0].source_id} (${titleCase(d.attempts[0].outcome)})` : "—",
+                  d.attempts[0] ? `${d.attempts[0].source_id} (${runtimeTokenLabel(d.attempts[0].outcome)})` : "—",
               },
             ]}
           />
@@ -300,4 +300,18 @@ export function MissionControlPage() {
       </Section>
     </>
   );
+}
+
+function runtimeTokenLabel(value: string): string {
+  const labels: Record<string, string> = {
+    succeeded: "ناجح", failed: "فاشل", partial: "جزئي", skipped: "متخطى",
+    collected: "جُمع", degraded: "متراجع", standby: "احتياطي", unavailable: "غير متاح",
+    healthy: "سليم", down: "متوقف", unknown: "غير معروف",
+    promoted: "مرقّاة", monitoring: "تحت المراقبة", retired: "مسحوبة", replaced: "مستبدلة",
+    live: "حي", mock: "تجريبي", replay: "إعادة تشغيل",
+    usable: "صالح", empty: "فارغ", skipped_candidate: "بديل متخطى", fetch_failed: "فشل الجلب",
+    price_history: "سجل الأسعار", macro_context: "سياق الاقتصاد الكلي", news: "الأخبار",
+    corporate_events: "الأحداث المؤسسية", financial_statements: "القوائم المالية", universe: "نطاق الأسهم",
+  };
+  return labels[value.toLowerCase()] ?? titleCase(value);
 }

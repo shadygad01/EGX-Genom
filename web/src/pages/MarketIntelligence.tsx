@@ -49,27 +49,27 @@ export function MarketIntelligence() {
 
   return (
     <>
-      <Section title="Market Summary" description="Universe and trading session snapshot as of the last research cycle.">
+      <Section title="ملخص السوق" description="نطاق الأسهم وجلسة التداول في آخر دورة بحث.">
         {!marketState.data ? (
-          <EmptyState title="No market state yet" detail="Available once the first research cycle runs." />
+          <EmptyState title="لا توجد حالة سوق بعد" detail="تظهر بعد تشغيل أول دورة بحث." />
         ) : (
           <div className={styles.grid}>
-            <StatTile label="As Of" value={formatDate(marketState.data.as_of)} />
+            <StatTile label="حتى تاريخ" value={formatDate(marketState.data.as_of)} />
             <StatTile
-              label="Trading Session"
-              value={marketState.data.trading_session.is_trading_day ? "Open" : "Closed"}
+              label="جلسة التداول"
+              value={marketState.data.trading_session.is_trading_day ? "مفتوحة" : "مغلقة"}
               caption={marketState.data.trading_session.holiday_name ?? undefined}
             />
-            <StatTile label="Constituents" value={Object.keys(constituents).length} />
-            <StatTile label="Sectors" value={bySector.size} />
+            <StatTile label="الأسهم" value={Object.keys(constituents).length} />
+            <StatTile label="القطاعات" value={bySector.size} />
           </div>
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Sector Composition" subtitle="Covered constituents with known sectors">
+        <Card title="توزيع القطاعات" subtitle="الأسهم المغطاة ذات القطاعات المعروفة">
           {bySector.size === 0 ? (
-            <EmptyState title="No sector data yet" />
+            <EmptyState title="لا توجد بيانات قطاعات بعد" />
           ) : (
             <div>
               {[...bySector.entries()].map(([sector, tickers]) => (
@@ -82,9 +82,9 @@ export function MarketIntelligence() {
           )}
         </Card>
 
-        <Card title="Macro Dashboard" subtitle="Latest observation per tracked macro series">
+        <Card title="لوحة الاقتصاد الكلي" subtitle="أحدث مشاهدة لكل سلسلة متابعة">
           {latestMacro.length === 0 ? (
-            <EmptyState title="No macro data yet" />
+            <EmptyState title="لا توجد بيانات اقتصاد كلي بعد" />
           ) : (
             <div className={styles.grid}>
               {latestMacro.map(({ seriesId, observation }) => (
@@ -92,7 +92,7 @@ export function MarketIntelligence() {
                   key={seriesId}
                   label={titleCase(seriesId)}
                   value={observation ? formatNumber(observation.value, 2) : "—"}
-                  caption={observation ? formatDate(observation.observation_date) : "No observations"}
+                  caption={observation ? formatDate(observation.observation_date) : "لا توجد مشاهدات"}
                 />
               ))}
             </div>
@@ -101,9 +101,9 @@ export function MarketIntelligence() {
       </div>
 
       <div className={styles.twoCol}>
-        <Card title="Upcoming Earnings, Corporate Actions & Disclosures" subtitle="Scheduled events across the covered universe">
+        <Card title="الأرباح والإجراءات والإفصاحات القادمة" subtitle="الأحداث المجدولة عبر نطاق الأسهم المغطى">
           {upcoming.length === 0 ? (
-            <EmptyState title="No scheduled events" detail="No known corporate events are upcoming for the covered universe." />
+            <EmptyState title="لا توجد أحداث مجدولة" detail="لا توجد أحداث مؤسسية قادمة معروفة لنطاق الأسهم المغطى." />
           ) : (
             <div className={styles.list}>
               {upcoming.map((e, i) => (
@@ -119,9 +119,9 @@ export function MarketIntelligence() {
           )}
         </Card>
 
-        <Card title="Recent Corporate Actions" subtitle="Past corporate events across the covered universe">
+        <Card title="الإجراءات المؤسسية الأخيرة" subtitle="الأحداث المؤسسية السابقة عبر نطاق الأسهم المغطى">
           {past.length === 0 ? (
-            <EmptyState title="No corporate actions recorded" />
+            <EmptyState title="لا توجد إجراءات مؤسسية مسجلة" />
           ) : (
             <div className={styles.list}>
               {past.map((e, i) => (
@@ -139,17 +139,17 @@ export function MarketIntelligence() {
       </div>
 
       <div className={styles.twoCol}>
-        <Card title="Market Breadth & Liquidity">
+        <Card title="اتساع السوق والسيولة">
           <EmptyState
-            title="Not yet available"
-            detail="Breadth and liquidity require a backend-computed artifact (advancers/decliners, adjusted volume) this platform doesn't export yet -- the frontend never computes returns from raw price bars directly, per the platform's data.adjustments rule."
+            title="غير متاح بعد"
+            detail="يتطلب اتساع السوق والسيولة ملفًا محسوبًا خلفيًا للأسهم الصاعدة والهابطة والحجم المعدل؛ لا تحسب الواجهة هذه القيم من الأسعار الخام."
           />
         </Card>
 
-        <Card title="Market Regime & Historical Comparison">
+        <Card title="نظام السوق والمقارنة التاريخية">
           <EmptyState
-            title="Not yet available"
-            detail="No market regime classification or historical-comparison artifact exists upstream yet. This section will populate once the research engine produces one."
+            title="غير متاح بعد"
+            detail="لا يوجد حتى الآن تصنيف لنظام السوق أو ملف مقارنة تاريخية من محرك البحث؛ سيظهر القسم عند إنتاجه."
           />
         </Card>
       </div>

@@ -30,6 +30,8 @@ Honesty rules encoded here, not just documented:
 
 from __future__ import annotations
 
+import hashlib
+import json
 import statistics as _stats
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -40,6 +42,12 @@ from agx_research.adversarial.scientist import AdversarialScientist, apply_adver
 from agx_research.agents.base import ResearchAgent, ResearchFinding
 from agx_research.causal.assessment import CandidateCause
 from agx_research.causal.reasoner import EconomicRationaleGate
+from agx_research.config import Horizon
+from agx_research.data.adjustments import (
+    HORIZON_FORWARD_TRADING_DAYS,
+    horizon_forward_returns,
+)
+from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.domain.identifiers import new_id
 from agx_research.domain.provenance import Provenance
 from agx_research.events.graph_integration import project_events
@@ -75,14 +83,49 @@ from agx_research.validation.stress_test import HistoricalWorstWindowStressTeste
 @dataclass
 class PipelineConfig:
     alpha: float = 0.05
-    min_observations: int = 6
-    min_sample_size_for_review: int = 5
+    # Production defaults are conservative. Tests may opt into smaller
+    # fixtures explicitly, but a real run must not promote five observations.
+    min_observations: int = 60
+    min_sample_size_for_review: int = 60
     max_expected_risk: float = 0.10
-    min_hit_rate: float = 0.5
-    min_sharpe: float = 0.0
+    min_hit_rate: float = 0.55
+    min_sharpe: float = 0.25
+    transaction_cost_bps: float = 20.0
+    out_of_sample_fraction: float = 0.30
     confidence_cap: float = 0.9
-    adversarial_min_sample_size: int = 5
+    adversarial_min_sample_size: int = 60
     extra_agents: list[ResearchAgent] = field(default_factory=list)
+
+
+def _sealed_discovery_snapshot(
+    snapshot: DatasetSnapshot, train_fraction: float
+) -> DatasetSnapshot:
+    """Hide the chronological test tail before any agent can select a finding."""
+    dates = sorted({bar.trade_date for bars in snapshot.price_history.values() for bar in bars})
+    if len(dates) < 2:
+        return snapshot
+    cutoff_index = max(0, min(len(dates) - 2, int(len(dates) * train_fraction) - 1))
+    cutoff = dates[cutoff_index]
+    payload = snapshot.model_dump(mode="json")
+    payload.update({
+        "as_of": cutoff,
+        "price_history": {
+            ticker: [bar for bar in bars if bar.trade_date <= cutoff]
+            for ticker, bars in snapshot.price_history.items()
+        },
+        "corporate_events": {
+            ticker: [event for event in events if event.event_date <= cutoff]
+            for ticker, events in snapshot.corporate_events.items()
+        },
+        "macro_series": {
+            series_id: [item for item in items if item.observation_date <= cutoff]
+            for series_id, items in snapshot.macro_series.items()
+        },
+        "news": [item for item in snapshot.news if item.published_at <= cutoff],
+    })
+    canonical = json.dumps(payload, default=str, sort_keys=True)
+    payload["id"] = "snap_train_" + hashlib.sha256(canonical.encode()).hexdigest()[:16]
+    return DatasetSnapshot.model_validate(payload)
 
 
 class HypothesisOutcome(BaseModel):
@@ -133,15 +176,25 @@ class DailyResearchPipeline:
         try:
             market_state = self.market_memory.reconstruct(as_of)
             snapshot = market_state.dataset_snapshot
+            discovery_snapshot = _sealed_discovery_snapshot(
+                snapshot, 1.0 - self.config.out_of_sample_fraction
+            )
             project_events(self.graph, market_state.events)
 
             findings: list[ResearchFinding] = []
             for agent in self.agents:
-                findings.extend(agent.research(snapshot))
+                findings.extend(agent.research(discovery_snapshot))
 
             artifact_ids: list[str] = []
+            cumulative_family_size = max(
+                1, len(self.hypotheses.all_latest()) + len(findings)
+            )
             outcomes = [
-                self._process_finding(finding, market_state, artifact_ids) for finding in findings
+                self._process_finding(
+                    finding, market_state, artifact_ids,
+                    hypothesis_family_size=cumulative_family_size,
+                )
+                for finding in findings
             ]
 
             session = ResearchSession(
@@ -172,6 +225,7 @@ class DailyResearchPipeline:
         finding: ResearchFinding,
         market_state: MarketState,
         artifact_ids: list[str],
+        hypothesis_family_size: int = 1,
     ) -> HypothesisOutcome:
         snapshot = market_state.dataset_snapshot
         hypothesis = Hypothesis.from_finding(finding)
@@ -261,12 +315,14 @@ class DailyResearchPipeline:
         if bootstrap is None:
             advance(StageName.STATISTICAL_VALIDATION, False, "No bootstrap result")
             return rejected("No bootstrap evidence")
-        validation = SignificanceThresholdValidator(alpha=cfg.alpha).validate(bootstrap)
+        corrected_alpha = cfg.alpha / hypothesis_family_size
+        validation = SignificanceThresholdValidator(alpha=corrected_alpha).validate(bootstrap)
         ok = advance(
             StageName.STATISTICAL_VALIDATION,
             validation.passed,
-            validation.notes,
+            f"{validation.notes}; persistent Bonferroni family_size={hypothesis_family_size}",
             p_value=bootstrap.p_value,
+            corrected_alpha=corrected_alpha,
         )
         if not ok:
             return rejected(f"Not statistically significant: {validation.notes}")
@@ -279,7 +335,10 @@ class DailyResearchPipeline:
 
         # 7. BACKTEST
         backtest = NaiveDirectionalBacktester(
-            min_hit_rate=cfg.min_hit_rate, min_sharpe=cfg.min_sharpe
+            min_hit_rate=cfg.min_hit_rate,
+            min_sharpe=cfg.min_sharpe,
+            transaction_cost_bps=cfg.transaction_cost_bps,
+            out_of_sample_fraction=cfg.out_of_sample_fraction,
         ).run(hypothesis, snapshot)
         ok = advance(
             StageName.BACKTEST,
@@ -302,7 +361,16 @@ class DailyResearchPipeline:
             hypothesis, candidate_causes=candidate_causes, economic_rationale=rationale
         )
 
-        primary_returns = series[0]
+        forward_returns = horizon_forward_returns(
+            snapshot, hypothesis.affected_assets[0], hypothesis.horizon
+        )
+        if not forward_returns:
+            advance(
+                StageName.BACKTEST,
+                False,
+                "No forward-return labels exist for the hypothesis horizon.",
+            )
+            return rejected("Insufficient horizon-matched forward returns")
         evidence = StatisticalEvidence(
             method="BootstrapExperiment",
             statistic=bootstrap.statistic,
@@ -313,19 +381,22 @@ class DailyResearchPipeline:
         attack_results = self.adversarial.attack(
             hypothesis, experiment_results, snapshot, economic_rationale=rationale
         )
-        base_confidence = min(1.0 - bootstrap.p_value, cfg.confidence_cap)
+        base_confidence = min(backtest.hit_rate or 0.0, cfg.confidence_cap)
         confidence = apply_adversarial_review(base_confidence, attack_results)
 
         candidate = PromotionCandidate(
             confidence=confidence,
             statistical_evidence=evidence,
             economic_explanation=rationale or "",
-            expected_return=_stats.fmean(primary_returns),
-            expected_risk=_stats.pstdev(primary_returns),
+            expected_return=_stats.fmean(forward_returns),
+            expected_risk=_stats.pstdev(forward_returns),
             supporting_evidence=[
                 *finding.evidence,
                 f"backtest_hit_rate={backtest.hit_rate:.3f}",
                 f"backtest_sharpe={backtest.sharpe_ratio:.3f}",
+                f"backtest_net_mean_return={backtest.net_mean_return:.6f}",
+                f"backtest_transaction_cost_bps={backtest.transaction_cost_bps:.1f}",
+                f"forward_return_horizon_days={HORIZON_FORWARD_TRADING_DAYS[hypothesis.horizon]}",
                 f"stress={stress.notes}",
             ],
         )

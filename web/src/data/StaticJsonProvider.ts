@@ -11,6 +11,8 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  DecisionPerformanceSummary,
+  DecisionRecord,
   Event,
   ExecutionReport,
   FinancialStatementLineItem,
@@ -22,11 +24,14 @@ import type {
   MarketState,
   MissionStatus,
   Pattern,
+  PublicationGateReport,
   Recommendation,
   ResearchPaper,
   RunRecord,
   SourceMetricsRow,
   SourceSpec,
+  SourceTruthRow,
+  TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
 import type { DashboardDataProvider } from "./DataProvider";
@@ -141,5 +146,25 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getDecisionReadiness(): Promise<DecisionReadiness[]> {
     return fetchList<DecisionReadiness>("decision_readiness.json");
+  }
+
+  getTickerDataGapReport(): Promise<TickerDataGapReport[]> {
+    return fetchList<TickerDataGapReport>("ticker_data_gap_report.json");
+  }
+
+  getSourceTruth(): Promise<SourceTruthRow[]> {
+    return fetchList<SourceTruthRow>("source_truth.json");
+  }
+
+  getDecisionHistory(): Promise<DecisionRecord[]> {
+    return fetchList<DecisionRecord>("decision_history.json");
+  }
+
+  getDecisionPerformance(): Promise<DecisionPerformanceSummary[]> {
+    return fetchList<DecisionPerformanceSummary>("decision_performance.json");
+  }
+
+  getPublicationGate(): Promise<PublicationGateReport | null> {
+    return fetchObject<PublicationGateReport>("publication_gate.json");
   }
 }

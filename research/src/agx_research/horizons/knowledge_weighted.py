@@ -48,7 +48,11 @@ class KnowledgeWeightedHorizonModel(HorizonModel):
             for k in knowledge
             if k.horizon == self.horizon
             and ticker in k.affected_assets
-            and k.status != KnowledgeStatus.RETIRED
+            and k.discovery_date <= as_of
+            and (
+                k.status != KnowledgeStatus.RETIRED
+                or (k.retired_at is not None and k.retired_at > as_of)
+            )
             and k.confidence > 0
         ]
         if not relevant:

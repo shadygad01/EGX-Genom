@@ -23,3 +23,23 @@ class DashboardSystemStatus(BaseModel):
     failed: int = 0
     knowledge_objects: int = 0
     by_status: dict[str, int] = Field(default_factory=dict)
+
+
+class SourceTruthRow(BaseModel):
+    """Operational truth for one catalogued source in the latest run."""
+
+    source_id: str
+    name: str
+    category: str
+    catalogued: bool = True
+    legally_usable: bool
+    attempted_this_run: bool
+    fetched_this_run: bool
+    fresh: bool
+    produced_records: int = 0
+    reached_decision_path: bool
+    corroborated: bool = False
+    collector_status: str
+    blocker: str | None = None
+    last_run_at: datetime | None = None
+    consumers: list[str] = Field(default_factory=list)

@@ -11,11 +11,16 @@ import csv
 import json
 import urllib.error
 import urllib.request
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 
 from agx_research.collectors.fetcher import HttpFetcher
+from agx_research.config import Horizon
+from agx_research.domain.provenance import Provenance
+from agx_research.explainability import Explanation
+from agx_research.horizons.base import Prediction
+from agx_research.meta.decision_engine import MetaDecisionEngine
 from agx_research.production.collector_plan import (
     LIVE_FRED_SERIES_IDS,
     LIVE_STOOQ_TICKER_SUFFIX,
@@ -320,6 +325,82 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     assert counts["source_registry.json"] == len(seed_sources())
     assert "execution_report.json" in counts
     assert "mission_status.json" in counts
+
+
+def test_pipeline_reports_missing_publication_controls_and_stays_all_cash(tmp_path):
+    dashboard_out = tmp_path / "dashboard"
+    make_pipeline(tmp_path / "data").run(
+        RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out
+    )
+
+    gate = json.loads((dashboard_out / "publication_gate.json").read_text())
+    validation = next(
+        check for check in gate["checks"]
+        if check["id"] == "publication_input_validation"
+    )
+    assert "publication_evidence.json missing" in validation["blocker"]
+    assert "legal_publication_approval.json missing" in validation["blocker"]
+    assert gate["publication_ready"] is False
+
+    cases = json.loads((dashboard_out / "investment_cases.json").read_text())
+    assert cases["portfolio"]["positions"] == []
+    assert cases["portfolio"]["cash_weight"] == 1.0
+
+
+def test_dashboard_validator_rejects_non_cash_portfolio_while_publication_blocked(tmp_path):
+    from agx_research.dashboard.validate import DashboardArtifactError, validate_dashboard_artifacts
+
+    dashboard_out = tmp_path / "dashboard"
+    make_pipeline(tmp_path / "data").run(
+        RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out
+    )
+    cases_path = dashboard_out / "investment_cases.json"
+    cases = json.loads(cases_path.read_text())
+    cases["portfolio"]["cash_weight"] = 0.9
+    cases_path.write_text(json.dumps(cases))
+
+    with pytest.raises(DashboardArtifactError, match="all-cash portfolio"):
+        validate_dashboard_artifacts(dashboard_out)
+
+
+def test_dashboard_validator_rejects_ready_decision_behind_blocked_gate(tmp_path):
+    from agx_research.dashboard.validate import DashboardArtifactError, validate_dashboard_artifacts
+
+    dashboard_out = tmp_path / "dashboard"
+    make_pipeline(tmp_path / "data").run(
+        RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out
+    )
+    cases_path = dashboard_out / "investment_cases.json"
+    cases = json.loads(cases_path.read_text())
+    prediction = Prediction(
+        ticker="COMI",
+        horizon=Horizon.MICRO,
+        as_of=RUN_DATE,
+        model_id="test-model",
+        model_version="1",
+        expected_return=0.02,
+        expected_risk=0.01,
+        confidence=0.8,
+        reference_price=100.0,
+        explanation=Explanation(
+            why_this_stock="test",
+            why_now="test",
+            why_not_others="test",
+        ),
+        provenance=Provenance(produced_by="test", produced_at=datetime.now()),
+    )
+    recommendation = MetaDecisionEngine().decide(
+        "COMI", RUN_DATE, {Horizon.MICRO: prediction}
+    )
+    assert recommendation is not None
+    cases["recommendations"] = [recommendation.model_dump(mode="json")]
+    first = cases["recommendations"][0]
+    first_decision = next(iter(first["horizon_decisions"].values()))
+    first_decision["publication_status"] = "publication_ready"
+    cases_path.write_text(json.dumps(cases))
+
+    with pytest.raises(DashboardArtifactError, match="without a passing"):
+        validate_dashboard_artifacts(dashboard_out)
 
 
 def test_mission_control_tracks_pipeline_execution_across_runs(tmp_path):

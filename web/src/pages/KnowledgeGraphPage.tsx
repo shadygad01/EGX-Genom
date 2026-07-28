@@ -94,13 +94,13 @@ export function KnowledgeGraphPage() {
 
   return (
     <Section
-      title="Knowledge Graph"
-      description="Every relationship AGX has recorded between companies, events, knowledge, genes, and research -- mechanically derived from provenance, not hand-built."
+      title="خريطة المعرفة"
+      description="كل علاقة سجلها AGX بين الشركات والأحداث والمعرفة والجينات والأبحاث، مشتقة آليًا من المصدر وليست مرسومة يدويًا."
     >
       {graph.loading && <LoadingState rows={6} />}
       {graph.error && <ErrorState detail={graph.error.message} onRetry={graph.reload} />}
       {!graph.loading && !graph.error && nodes.length === 0 && (
-        <EmptyState title="No graph data yet" detail="The knowledge graph populates as entities are created and their provenance links are projected." />
+        <EmptyState title="لا توجد بيانات للخريطة بعد" detail="تمتلئ الخريطة عند إنشاء الكيانات وإسقاط روابط مصدرها." />
       )}
 
       {!graph.loading && !graph.error && nodes.length > 0 && (
@@ -110,11 +110,11 @@ export function KnowledgeGraphPage() {
               <input
                 className={styles.searchInput}
                 type="text"
-                placeholder="Search nodes by label…"
+                placeholder="ابحث في العقد بالاسم…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
-              <span className={styles.hint}>Scroll to zoom · drag to pan · click a node for detail</span>
+              <span className={styles.hint}>مرّر للتكبير · اسحب للتحريك · انقر عقدة للتفاصيل</span>
             </div>
             <div className={styles.canvasWrap}>
               <svg
@@ -176,8 +176,8 @@ export function KnowledgeGraphPage() {
             </div>
           </div>
 
-          <Card title="Node Detail" dense>
-            {!selected && <EmptyState title="No node selected" detail="Click a node to see its metadata and relationships." />}
+          <Card title="تفاصيل العقدة" dense>
+            {!selected && <EmptyState title="لم تُحدد عقدة" detail="انقر عقدة لرؤية بياناتها وعلاقاتها." />}
             {selected && (
               <div>
                 <div className={styles.detailTitle}>{selected.label}</div>
@@ -187,14 +187,14 @@ export function KnowledgeGraphPage() {
 
                 {selected.node_type === "company" && (
                   <Link to={`/company/${selected.id}`} style={{ color: "var(--accent-strong)", fontWeight: 600, fontSize: "var(--text-xs)" }}>
-                    Open research workspace →
+                    افتح مساحة البحث ←
                   </Link>
                 )}
 
                 {Object.keys(selected.metadata).length > 0 && (
                   <>
                     <div className={styles.blockTitle} style={{ marginTop: "var(--space-4)" }}>
-                      Metadata
+                      البيانات الوصفية
                     </div>
                     <div className={styles.metaTable}>
                       {Object.entries(selected.metadata).map(([k, v]) => (
@@ -207,9 +207,9 @@ export function KnowledgeGraphPage() {
                   </>
                 )}
 
-                <div className={styles.blockTitle}>Relationships ({selectedEdges.length})</div>
+                <div className={styles.blockTitle}>العلاقات ({selectedEdges.length})</div>
                 {selectedEdges.length === 0 ? (
-                  <EmptyState title="No connected edges" />
+                  <EmptyState title="لا توجد روابط متصلة" />
                 ) : (
                   <div className={styles.edgeList}>
                     {selectedEdges.map((e) => {
@@ -218,7 +218,7 @@ export function KnowledgeGraphPage() {
                       const otherLabel = nodeById.get(otherId)?.label ?? otherId;
                       return (
                         <div key={e.id} className={styles.edgeRow}>
-                          {outgoing ? "→" : "←"} {titleCase(e.relationship)} {outgoing ? "to" : "from"} <strong>{otherLabel}</strong>
+                          {outgoing ? "→" : "←"} {titleCase(e.relationship)} {outgoing ? "إلى" : "من"} <strong>{otherLabel}</strong>
                         </div>
                       );
                     })}

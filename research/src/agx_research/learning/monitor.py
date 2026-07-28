@@ -22,7 +22,7 @@ from datetime import date
 
 from pydantic import BaseModel
 
-from agx_research.data.adjustments import adjusted_returns_for_ticker
+from agx_research.data.adjustments import horizon_forward_returns
 from agx_research.genome.gene import GeneStatus
 from agx_research.genome.service import AlphaGenome
 from agx_research.knowledge.lifecycle import KnowledgeStatus
@@ -89,8 +89,8 @@ class ContinuousLearningMonitor:
             primary = knowledge.affected_assets[0] if knowledge.affected_assets else None
             if primary is None:
                 continue
-            returns = adjusted_returns_for_ticker(snapshot, primary)
-            if len(returns) < 3:
+            returns = horizon_forward_returns(snapshot, primary, knowledge.horizon)
+            if not returns:
                 outcomes.append(
                     EvaluationOutcome(
                         knowledge_id=knowledge.id,
@@ -103,7 +103,8 @@ class ContinuousLearningMonitor:
             record = PerformanceRecord(
                 as_of=as_of,
                 realized_return=realized,
-                notes=f"Realized mean adjusted daily return of {primary} over the window ending {as_of.isoformat()}.",
+                notes=(f"Realized mean {knowledge.horizon.value}-horizon forward total return "
+                       f"of {primary} over the window ending {as_of.isoformat()}.")
             )
             updated = self.knowledge_store.record_performance(knowledge.id, record)
             if updated.status == KnowledgeStatus.PROMOTED:

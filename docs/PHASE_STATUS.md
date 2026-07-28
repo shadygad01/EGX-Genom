@@ -12,6 +12,12 @@ Production 1.0 is the licensed EGX data vendor — a business decision
 (cost/coverage/contract) explicitly reserved for the user. See
 `docs/ROADMAP.md`.
 
+Decision-safety update (2026-07-28): outputs now include a conservative,
+`research_only` decision per horizon and the Arabic Opportunity Center shows
+those decisions before evidence. This does not remove the live-data or legal
+publication blockers; it makes them visible and prevents a blended summary
+from masquerading as an executable recommendation.
+
 Current acquisition registry after the live UN Statistics and CAPMAS API
 connections: **52 sources (12 IMPLEMENTED / 28 PLANNED / 4 NEEDS_KEY /
 8 TOS_REVIEW)**. This current count supersedes older counts embedded in the

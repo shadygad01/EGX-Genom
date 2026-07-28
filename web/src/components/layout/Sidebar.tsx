@@ -10,14 +10,14 @@ interface NavItem {
 // The 9 sections, in the mission's canonical order -- AI Briefing is the
 // landing page (index route), everything else is a first-class nav entry.
 const NAV_ITEMS: NavItem[] = [
-  { to: "/", label: "AI Briefing", icon: "◆" },
-  { to: "/opportunities", label: "Opportunity Center", icon: "◎" },
-  { to: "/market", label: "Market Intelligence", icon: "▤" },
-  { to: "/research", label: "Research Center", icon: "⚗" },
-  { to: "/knowledge-graph", label: "Knowledge Graph", icon: "◈" },
-  { to: "/mission-control", label: "Mission Control", icon: "⌘" },
-  { to: "/sources", label: "Source Intelligence", icon: "⛁" },
-  { to: "/admin", label: "System Administration", icon: "⚙" },
+  { to: "/", label: "الملخص الذكي", icon: "◆" },
+  { to: "/opportunities", label: "مركز القرارات", icon: "◎" },
+  { to: "/market", label: "تحليل السوق", icon: "▤" },
+  { to: "/research", label: "مركز الأبحاث", icon: "⚗" },
+  { to: "/knowledge-graph", label: "خريطة المعرفة", icon: "◈" },
+  { to: "/mission-control", label: "مراقبة التشغيل", icon: "⌘" },
+  { to: "/sources", label: "شفافية المصادر", icon: "⛁" },
+  { to: "/admin", label: "إدارة النظام", icon: "⚙" },
 ];
 
 export function Sidebar() {
@@ -40,7 +40,7 @@ export function Sidebar() {
           </NavLink>
         ))}
       </div>
-      <div className={styles.footer}>EGX30 + EGX70 · Research Only</div>
+      <div className={styles.footer}>EGX30 + EGX70 · للاستخدام البحثي فقط</div>
     </nav>
   );
 }

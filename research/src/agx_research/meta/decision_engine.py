@@ -11,14 +11,65 @@ intuition about what weights "feel right."
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from agx_research.config import Horizon
+from agx_research.config import HORIZON_WINDOWS, Horizon
 from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.explainability import Explanation
 from agx_research.horizons.base import Prediction
+
+
+class DecisionAction(str, Enum):
+    """Research actions, deliberately distinct from personalized advice."""
+
+    BUY_CANDIDATE = "buy_candidate"
+    WATCH = "watch"
+    AVOID = "avoid"
+    ABSTAIN = "abstain"
+
+
+class PublicationStatus(str, Enum):
+    RESEARCH_ONLY = "research_only"
+    PUBLICATION_READY = "publication_ready"
+
+
+class PriceConditionOperator(str, Enum):
+    AT_OR_BELOW = "at_or_below"
+    BELOW = "below"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class HorizonDecision(BaseModel):
+    """One executable-looking but research-only decision for exactly one horizon.
+
+    Horizons are never blended here: return, risk, validity and invalidation
+    retain the unit and window of their originating prediction.
+    """
+
+    horizon: Horizon
+    horizon_window: str
+    action: DecisionAction
+    expected_return: float
+    expected_risk: float
+    risk_metric: str = "model_expected_risk_for_horizon"
+    confidence: float
+    risk_adjusted_score: float
+    valid_until: date
+    entry_condition: str
+    reference_price: float | None = Field(default=None, gt=0)
+    entry_operator: PriceConditionOperator = PriceConditionOperator.NOT_APPLICABLE
+    entry_value: float | None = Field(default=None, gt=0)
+    invalidation_operator: PriceConditionOperator = PriceConditionOperator.NOT_APPLICABLE
+    invalidation_value: float | None = Field(default=None, gt=0)
+    review_condition: str
+    invalidation_conditions: list[str] = Field(default_factory=list)
+    max_position_pct: float = 0.0
+    publication_status: PublicationStatus = PublicationStatus.RESEARCH_ONLY
+    abstention_reasons: list[str] = Field(default_factory=list)
+    evidence_refs: list[ProvenanceRef] = Field(default_factory=list)
 
 
 class Recommendation(BaseModel):
@@ -36,6 +87,7 @@ class Recommendation(BaseModel):
     combined_expected_risk: float
     confidence: float
     horizon_predictions: dict[Horizon, Prediction]
+    horizon_decisions: dict[Horizon, HorizonDecision]
     supporting_knowledge_ids: list[str] = Field(default_factory=list)
     explanation: Explanation
     provenance: Provenance
@@ -71,6 +123,11 @@ class MetaDecisionEngine:
         weighted_confidence = 0.0
         knowledge_ids: list[str] = []
 
+        horizon_decisions = {
+            horizon: self._decision_for_prediction(prediction)
+            for horizon, prediction in predictions.items()
+        }
+
         for horizon, prediction in predictions.items():
             weight = self.horizon_weights.get(horizon, 0.0) * prediction.confidence
             total_weight += weight
@@ -88,18 +145,17 @@ class MetaDecisionEngine:
 
         explanation = Explanation(
             why_this_stock=(
-                f"{len(predictions)} horizon model(s) "
-                f"({', '.join(h.value for h in predictions)}) found supporting evidence for {ticker}."
+                f"وجدت نماذج {len(predictions)} أفق/آفاق "
+                f"({', '.join(_horizon_label(h) for h in predictions)}) أدلة مؤيدة للسهم {ticker}."
             ),
-            why_now=f"Based on knowledge and market data available as of {as_of.isoformat()}.",
+            why_now=f"استنادًا إلى المعرفة وبيانات السوق المتاحة حتى {as_of.isoformat()}.",
             why_not_others=(
-                "This engine only combines predictions it was given; it does not "
-                "rank against other tickers by itself — that comparison happens "
-                "upstream, across every ticker's Recommendation."
+                "يجمع هذا المحرك التنبؤات المتاحة فقط؛ أما المقارنة مع الأسهم الأخرى "
+                "فتُجرى في مرحلة الترتيب على مستوى السوق كله."
             ),
             supporting_evidence=[
-                f"{h.value}: expected_return={p.expected_return:.4f}, "
-                f"expected_risk={p.expected_risk:.4f}, confidence={p.confidence:.2f}"
+                f"{_horizon_label(h)}: العائد المتوقع={p.expected_return:.4f}، "
+                f"المخاطر المتوقعة={p.expected_risk:.4f}، الثقة={p.confidence:.2f}"
                 for h, p in predictions.items()
             ]
             + [
@@ -119,7 +175,7 @@ class MetaDecisionEngine:
             ],
             similar_historical_cases=[],
             invalidation_conditions=[
-                "Underlying knowledge is retired or its performance history degrades below threshold."
+                "تُسحب المعرفة الأساسية أو يتراجع سجل أدائها عن حد القبول."
             ],
         )
 
@@ -130,6 +186,7 @@ class MetaDecisionEngine:
             combined_expected_risk=combined_risk,
             confidence=combined_confidence,
             horizon_predictions=predictions,
+            horizon_decisions=horizon_decisions,
             supporting_knowledge_ids=sorted(set(knowledge_ids)),
             explanation=explanation,
             provenance=Provenance(
@@ -153,3 +210,93 @@ class MetaDecisionEngine:
                 ],
             ),
         )
+
+    @staticmethod
+    def _decision_for_prediction(prediction: Prediction) -> HorizonDecision:
+        """Translate one prediction into a transparent research action.
+
+        This is intentionally conservative. It never emits personalized advice
+        and keeps publication blocked until legal review and validated live data
+        are represented by an explicit future publication gate.
+        """
+        risk = max(prediction.expected_risk, 1e-9)
+        score = prediction.expected_return * prediction.confidence / risk
+        abstention_reasons: list[str] = []
+        if prediction.confidence < 0.60:
+            action = DecisionAction.ABSTAIN
+            abstention_reasons.append("الثقة أقل من حد البحث البالغ 60٪.")
+        elif prediction.expected_return <= 0:
+            action = DecisionAction.AVOID
+        elif score >= 1.0:
+            action = DecisionAction.BUY_CANDIDATE
+        else:
+            action = DecisionAction.WATCH
+
+        if action == DecisionAction.BUY_CANDIDATE and prediction.reference_price is None:
+            action = DecisionAction.ABSTAIN
+            abstention_reasons.append(
+                "لا يوجد سعر مرجعي حديث وموجب مرتبط بهذا التنبؤ."
+            )
+
+        reference_price = prediction.reference_price
+        entry_value = reference_price if action == DecisionAction.BUY_CANDIDATE else None
+        risk_buffer = min(0.25, max(0.02, prediction.expected_risk))
+        invalidation_value = (
+            reference_price * (1.0 - risk_buffer)
+            if action == DecisionAction.BUY_CANDIDATE and reference_price is not None
+            else None
+        )
+        if action == DecisionAction.BUY_CANDIDATE:
+            entry_condition = (
+                f"إغلاق معدل عند {entry_value:.2f} جنيه أو أقل، مع بقاء الأدلة "
+                "وبوابة النشر صالحتين."
+            )
+            review_condition = (
+                f"تُراجع الحالة عند {reference_price * (1 + max(0.0, prediction.expected_return)):.2f} جنيه "
+                "أو عند انتهاء الصلاحية، أيهما أسبق."
+            )
+        else:
+            entry_condition = "لا يوجد دخول قابل للتنفيذ ما دام القرار ليس مرشح شراء."
+            review_condition = "تُراجع الحالة عند ظهور دليل جديد أو انتهاء الصلاحية."
+
+        validity_days = {
+            Horizon.MICRO: 3,
+            Horizon.SWING: 28,
+            Horizon.INVESTMENT: 183,
+        }[prediction.horizon]
+        return HorizonDecision(
+            horizon=prediction.horizon,
+            horizon_window=HORIZON_WINDOWS[prediction.horizon],
+            action=action,
+            expected_return=prediction.expected_return,
+            expected_risk=prediction.expected_risk,
+            confidence=prediction.confidence,
+            risk_adjusted_score=score,
+            valid_until=prediction.as_of + timedelta(days=validity_days),
+            entry_condition=entry_condition,
+            reference_price=reference_price,
+            entry_operator=(
+                PriceConditionOperator.AT_OR_BELOW
+                if entry_value is not None else PriceConditionOperator.NOT_APPLICABLE
+            ),
+            entry_value=entry_value,
+            invalidation_operator=(
+                PriceConditionOperator.BELOW
+                if invalidation_value is not None else PriceConditionOperator.NOT_APPLICABLE
+            ),
+            invalidation_value=invalidation_value,
+            review_condition=review_condition,
+            invalidation_conditions=list(prediction.explanation.invalidation_conditions)
+            + ([f"إغلاق معدل دون {invalidation_value:.2f} جنيه."] if invalidation_value else []),
+            max_position_pct=0.0,
+            abstention_reasons=abstention_reasons,
+            evidence_refs=list(prediction.explanation.evidence_refs),
+        )
+
+
+def _horizon_label(horizon: Horizon) -> str:
+    return {
+        Horizon.MICRO: "قصير",
+        Horizon.SWING: "متوسط",
+        Horizon.INVESTMENT: "طويل",
+    }[horizon]

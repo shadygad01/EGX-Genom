@@ -22,7 +22,12 @@ from agx_research.graph.nodes import GraphNode
 from agx_research.hypotheses.hypothesis import Hypothesis
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
-from agx_research.meta.decision_engine import Recommendation
+from agx_research.meta.decision_engine import (
+    DecisionAction,
+    PublicationStatus,
+    Recommendation,
+)
+from agx_research.meta.publication_gate import PublicationGateReport
 from agx_research.meta.readiness import DecisionReadiness, TickerDataGapReport
 from agx_research.papers.paper import ResearchPaper
 from agx_research.portfolio.constructor import PortfolioRecommendation
@@ -151,6 +156,7 @@ def validate_dashboard_artifacts(directory: Path) -> dict[str, int]:
     _validate_optional_execution_report(directory, counts)
     _validate_optional_mission_status(directory, counts)
     _validate_optional_investment_cases(directory, counts)
+    _validate_optional_publication_safety(directory, counts)
     _validate_optional_collector_status(directory, counts)
     _validate_optional_runtime_status(directory, counts)
     _validate_optional_dashboard_metrics(directory, counts)
@@ -238,6 +244,72 @@ def _validate_optional_investment_cases(directory: Path, counts: dict[str, int])
     except Exception as exc:
         raise DashboardArtifactError(f"investment_cases.json: {exc}") from exc
     counts["investment_cases.json"] = len(payload["recommendations"])
+
+
+def _validate_optional_publication_safety(directory: Path, counts: dict[str, int]) -> None:
+    gate_payload, gate_present = _load_optional_json(directory, "publication_gate.json")
+    cases_payload, cases_present = _load_optional_json(directory, "investment_cases.json")
+    if not gate_present and not cases_present:
+        return
+
+    gate = None
+    if gate_present:
+        try:
+            gate = PublicationGateReport.model_validate(gate_payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"publication_gate.json: {exc}") from exc
+        counts["publication_gate.json"] = 1
+
+    if not cases_present:
+        return
+    recommendations = [
+        Recommendation.model_validate(item)
+        for item in cases_payload.get("recommendations", [])
+    ]
+    ready_decisions = {
+        (recommendation.ticker, decision.horizon)
+        for recommendation in recommendations
+        for decision in recommendation.horizon_decisions.values()
+        if decision.publication_status == PublicationStatus.PUBLICATION_READY
+    }
+    if ready_decisions and (gate is None or not gate.publication_ready):
+        raise DashboardArtifactError(
+            "investment_cases.json: publication_ready decision exists without a passing "
+            "publication_gate.json"
+        )
+
+    portfolio_payload = cases_payload.get("portfolio")
+    if portfolio_payload is None:
+        return
+    portfolio = PortfolioRecommendation.model_validate(portfolio_payload)
+    if gate is None or not gate.publication_ready:
+        if portfolio.positions or abs(portfolio.cash_weight - 1.0) > 1e-9:
+            raise DashboardArtifactError(
+                "investment_cases.json: blocked or missing publication gate requires "
+                "an all-cash portfolio"
+            )
+        return
+
+    eligible_tickers = {
+        recommendation.ticker
+        for recommendation in recommendations
+        if any(
+            decision.publication_status == PublicationStatus.PUBLICATION_READY
+            and decision.action == DecisionAction.BUY_CANDIDATE
+            and decision.entry_value is not None
+            and decision.invalidation_value is not None
+            for decision in recommendation.horizon_decisions.values()
+        )
+    }
+    ineligible = sorted(
+        position.ticker for position in portfolio.positions
+        if position.ticker not in eligible_tickers
+    )
+    if ineligible:
+        raise DashboardArtifactError(
+            "investment_cases.json: portfolio contains tickers without a publication-ready "
+            f"numeric buy decision: {', '.join(ineligible)}"
+        )
 
 
 def _validate_optional_collector_status(directory: Path, counts: dict[str, int]) -> None:

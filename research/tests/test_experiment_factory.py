@@ -6,6 +6,8 @@ import pytest
 from agx_research.config import Horizon
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.data.snapshot import build_snapshot
+from agx_research.data.snapshot import DatasetSnapshot
+from agx_research.data.schemas import PriceBar
 from agx_research.domain.provenance import Provenance
 from agx_research.hypotheses.experiment_factory import (
     BootstrapExperiment,
@@ -17,6 +19,7 @@ from agx_research.hypotheses.experiment_factory import (
     WalkForwardExperiment,
 )
 from agx_research.hypotheses.hypothesis import Hypothesis
+from agx_research.hypotheses.statistic import series_for_hypothesis
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
 
@@ -40,6 +43,26 @@ def hypothesis(affected_assets=("COMI", "MFPC")) -> Hypothesis:
     )
 
 
+def test_pair_series_align_on_shared_trade_dates_not_equal_tail_length():
+    def price(ticker: str, day: int, close: float) -> PriceBar:
+        return PriceBar(
+            ticker=ticker, trade_date=date(2026, 6, day), open=close,
+            high=close, low=close, close=close, volume=100,
+        )
+
+    state = DatasetSnapshot(
+        id="alignment", as_of=date(2026, 6, 3), lookback_days=3,
+        tickers=["COMI", "MFPC"], macro_series_ids=[],
+        price_history={
+            "COMI": [price("COMI", 1, 100), price("COMI", 2, 110), price("COMI", 3, 121)],
+            "MFPC": [price("MFPC", 1, 100), price("MFPC", 3, 120)],
+        },
+    )
+    left, right = series_for_hypothesis(hypothesis(), state)
+    assert left == pytest.approx([0.1])
+    assert right == pytest.approx([0.2])
+
+
 def test_cross_validation_produces_a_significance_test_across_folds():
     result = CrossValidationExperiment(folds=3).run(hypothesis(), snapshot())
     assert result.sample_size == 9
@@ -52,11 +75,15 @@ def test_bootstrap_is_deterministic_given_a_seed():
     result_b = BootstrapExperiment(iterations=200, seed=7).run(hypothesis(), snapshot())
     assert result_a.statistic == result_b.statistic
     assert result_a.p_value == result_b.p_value
+    assert result_a.details["method"] == "moving_block_bootstrap"
+    assert result_a.details["block_size"] > 1
 
 
 def test_walk_forward_produces_a_rolling_window_series():
     result = WalkForwardExperiment(window=5, step=1).run(hypothesis(), snapshot())
     assert len(result.details["window_statistics"]) == 5  # 9 obs, window 5, step 1 -> 5 windows
+    assert result.details["inference"] == "newey_west_hac"
+    assert result.details["hac_lag"] == 4
 
 
 def test_out_of_sample_reports_both_halves():

@@ -38,108 +38,119 @@ export function SystemAdministration() {
 
   return (
     <>
-      <Section title="Runtime & Versions" description="The pipeline version and mode behind the most recent execution.">
+      <Section title="التشغيل والإصدارات" description="إصدار خط الإنتاج ووضع أحدث تنفيذ.">
         {executionReport.loading && <LoadingState rows={2} />}
         {executionReport.error && <ErrorState detail={executionReport.error.message} onRetry={executionReport.reload} />}
         {!executionReport.loading && !executionReport.error && !executionReport.data && (
-          <EmptyState title="No execution report yet" />
+          <EmptyState title="لا يوجد تقرير تنفيذ بعد" />
         )}
         {executionReport.data && (
           <div className={styles.grid}>
-            <StatTile label="Pipeline Version" value={executionReport.data.pipeline_version} />
-            <StatTile label="Execution Mode" value={titleCase(executionReport.data.execution_mode)} />
-            <StatTile label="Overall Status" value={<Badge variant={STAGE_VARIANT[executionReport.data.overall_status]}>{titleCase(executionReport.data.overall_status)}</Badge>} />
-            <StatTile label="Run Dates" value={executionReport.data.run_dates.length} />
-            <StatTile label="Started" value={formatDateTime(executionReport.data.started_at)} />
-            <StatTile label="Completed" value={formatDateTime(executionReport.data.completed_at)} />
-            <StatTile label="Duration" value={`${formatNumber(executionReport.data.duration_seconds, 2)}s`} />
+            <StatTile label="إصدار الخط" value={executionReport.data.pipeline_version} />
+            <StatTile label="وضع التنفيذ" value={adminTokenLabel(executionReport.data.execution_mode)} />
+            <StatTile label="الحالة العامة" value={<Badge variant={STAGE_VARIANT[executionReport.data.overall_status]}>{adminTokenLabel(executionReport.data.overall_status)}</Badge>} />
+            <StatTile label="تواريخ التشغيل" value={executionReport.data.run_dates.length} />
+            <StatTile label="بدأ" value={formatDateTime(executionReport.data.started_at)} />
+            <StatTile label="اكتمل" value={formatDateTime(executionReport.data.completed_at)} />
+            <StatTile label="المدة" value={`${formatNumber(executionReport.data.duration_seconds, 2)} ث`} />
           </div>
         )}
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Configuration" subtitle="Where this run's artifacts were written, and which stages were skipped">
+        <Card title="الإعدادات" subtitle="مكان كتابة ملفات هذا التشغيل والمراحل المتخطاة">
           {!executionReport.data && !dashboardMetrics.data ? (
-            <EmptyState title="No configuration data yet" />
+            <EmptyState title="لا توجد بيانات إعدادات بعد" />
           ) : (
             <div>
               {dashboardMetrics.data && (
                 <div className={styles.listItem}>
-                  <strong>Dashboard directory:</strong> <span className={styles.path}>{dashboardMetrics.data.dashboard_dir}</span>
+                  <strong>مجلد اللوحة:</strong> <span className={styles.path}>{dashboardMetrics.data.dashboard_dir}</span>
                 </div>
               )}
               {executionReport.data && executionReport.data.skipped_stages.length > 0 && (
                 <div className={styles.listItem}>
-                  <strong>Skipped stages:</strong> {executionReport.data.skipped_stages.map((s) => titleCase(s)).join(", ")}
+                  <strong>المراحل المتخطاة:</strong> {executionReport.data.skipped_stages.map(adminTokenLabel).join("، ")}
                 </div>
               )}
               {executionReport.data && executionReport.data.skipped_stages.length === 0 && (
-                <div className={styles.listItem}>No stages were skipped in the most recent run.</div>
+                <div className={styles.listItem}>لم تُتخط أي مرحلة في أحدث تشغيل.</div>
               )}
             </div>
           )}
         </Card>
 
-        <Card title="Replay">
+        <Card title="إعادة التشغيل">
           <EmptyState
-            title={executionReport.data ? `Current mode: ${titleCase(executionReport.data.execution_mode)}` : "Not yet run"}
-            detail="Replay mode re-executes the identical pipeline against already-archived RawDocuments from a prior run, proving the pipeline cannot distinguish live data from replayed data. No dedicated replay-history artifact exists separately from Execution History below."
+            title={executionReport.data ? `الوضع الحالي: ${adminTokenLabel(executionReport.data.execution_mode)}` : "لم يعمل بعد"}
+            detail="يعيد وضع الإعادة تنفيذ الخط نفسه على المستندات الخام المؤرشفة من تشغيل سابق. لا يوجد سجل إعادة مستقل عن سجل التنفيذ أدناه."
           />
         </Card>
       </div>
 
-      <Section title="Artifacts" description="Every dashboard artifact file written by the most recent run, and how many records it holds.">
+      <Section title="ملفات النتائج" description="كل ملف لوحة كتبه أحدث تشغيل وعدد السجلات التي يحتويها.">
         {dashboardMetrics.error && <ErrorState detail={dashboardMetrics.error.message} onRetry={dashboardMetrics.reload} />}
         {!dashboardMetrics.error && dashboardMetrics.data && (
-          <StatTile label="Total Artifacts" value={dashboardMetrics.data.total_artifacts} caption={formatDateTime(dashboardMetrics.data.generated_at)} />
+          <StatTile label="إجمالي الملفات" value={dashboardMetrics.data.total_artifacts} caption={formatDateTime(dashboardMetrics.data.generated_at)} />
         )}
         <div style={{ marginTop: "var(--space-4)" }}>
           <DataTable
             rows={artifactRows}
             getRowKey={([name]) => name}
-            emptyTitle="No artifacts recorded yet"
+            emptyTitle="لا توجد ملفات نتائج مسجلة بعد"
             columns={[
-              { key: "name", header: "Artifact", render: ([name]) => name },
-              { key: "count", header: "Records", align: "right", render: ([, count]) => formatNumber(count) },
+              { key: "name", header: "الملف", render: ([name]) => name },
+              { key: "count", header: "السجلات", align: "right", render: ([, count]) => formatNumber(count) },
             ]}
           />
         </div>
       </Section>
 
-      <Section title="Performance" description="Every stage of the most recent execution, slowest first.">
+      <Section title="الأداء" description="مراحل أحدث تنفيذ مرتبة من الأبطأ.">
         <DataTable
           rows={stagesByDuration}
           getRowKey={(s) => s.name}
-          emptyTitle="No stage timing recorded yet"
+          emptyTitle="لم تُسجل أزمنة مراحل بعد"
           columns={[
-            { key: "name", header: "Stage", render: (s) => titleCase(s.name) },
-            { key: "status", header: "Status", render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{titleCase(s.status)}</Badge> },
-            { key: "duration", header: "Duration", align: "right", render: (s) => `${formatNumber(s.duration_seconds, 3)}s` },
+            { key: "name", header: "المرحلة", render: (s) => adminTokenLabel(s.name) },
+            { key: "status", header: "الحالة", render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{adminTokenLabel(s.status)}</Badge> },
+            { key: "duration", header: "المدة", align: "right", render: (s) => `${formatNumber(s.duration_seconds, 3)} ث` },
           ]}
         />
       </Section>
 
-      <Section title="Execution History" description="Every research-cycle run, including error and session detail.">
+      <Section title="سجل التنفيذ" description="كل تشغيل لدورة البحث مع تفاصيل الخطأ والجلسة.">
         <DataTable
           rows={runHistory}
           getRowKey={(r) => r.id}
-          emptyTitle="No runs recorded yet"
+          emptyTitle="لا توجد تشغيلات مسجلة بعد"
           columns={[
-            { key: "date", header: "Run Date", render: (r) => r.run_date },
-            { key: "status", header: "Status", render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{titleCase(r.status)}</Badge> },
-            { key: "session", header: "Session", render: (r) => r.session_id ?? "—" },
-            { key: "error", header: "Error", render: (r) => r.error ?? "—" },
-            { key: "completed", header: "Completed", align: "right", render: (r) => formatDateTime(r.completed_at) },
+            { key: "date", header: "تاريخ التشغيل", render: (r) => r.run_date },
+            { key: "status", header: "الحالة", render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{adminTokenLabel(r.status)}</Badge> },
+            { key: "session", header: "الجلسة", render: (r) => r.session_id ?? "—" },
+            { key: "error", header: "الخطأ", render: (r) => r.error ?? "—" },
+            { key: "completed", header: "اكتمل", align: "right", render: (r) => formatDateTime(r.completed_at) },
           ]}
         />
       </Section>
 
-      <Card title="Logs">
+      <Card title="السجلات النصية">
         <EmptyState
-          title="Not yet available"
-          detail="No artifact carries raw log lines yet -- this section will populate once one exists, rather than fabricating a log stream."
+          title="غير متاح بعد"
+          detail="لا يحمل أي ملف سطور السجل الخام بعد؛ سيظهر القسم عند وجود سجل حقيقي بدل اختلاق تدفق سجلات."
         />
       </Card>
     </>
   );
+}
+
+function adminTokenLabel(value: string): string {
+  const labels: Record<string, string> = {
+    succeeded: "ناجح", partial: "جزئي", failed: "فاشل", skipped: "متخطى",
+    skipped_non_trading: "تخطي يوم غير متداول", live: "حي", mock: "تجريبي", replay: "إعادة تشغيل",
+    entry_point: "نقطة الدخول", source_registry: "سجل المصادر", collector_execution: "تنفيذ الجمع",
+    research_pipeline: "خط البحث", investment_case_generator: "مولد الحالة الاستثمارية",
+    dashboard_artifact_generator: "مولد ملفات اللوحة", mission_control_update: "تحديث مراقبة التشغيل",
+  };
+  return labels[value.toLowerCase()] ?? titleCase(value);
 }

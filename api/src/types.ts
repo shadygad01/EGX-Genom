@@ -151,6 +151,7 @@ export interface Recommendation {
   combined_expected_risk: number;
   confidence: number;
   horizon_predictions: Partial<Record<Horizon, Prediction>>;
+  horizon_decisions?: Partial<Record<Horizon, HorizonDecision>>;
   supporting_knowledge_ids: string[];
   explanation: Explanation;
   provenance: Provenance;
@@ -217,6 +218,34 @@ export interface MarketState {
   sectors: Record<string, string>;
   trading_session: TradingSession;
   events: Event[];
+}
+
+export type DecisionAction = "buy_candidate" | "watch" | "avoid" | "abstain";
+export type PublicationStatus = "research_only" | "publication_ready";
+export type PriceConditionOperator = "at_or_below" | "below" | "not_applicable";
+
+export interface HorizonDecision {
+  horizon: Horizon;
+  horizon_window: string;
+  action: DecisionAction;
+  expected_return: number;
+  expected_risk: number;
+  risk_metric: string;
+  confidence: number;
+  risk_adjusted_score: number;
+  valid_until: string;
+  entry_condition: string;
+  reference_price: number | null;
+  entry_operator: PriceConditionOperator;
+  entry_value: number | null;
+  invalidation_operator: PriceConditionOperator;
+  invalidation_value: number | null;
+  review_condition: string;
+  invalidation_conditions: string[];
+  max_position_pct: number;
+  publication_status: PublicationStatus;
+  abstention_reasons: string[];
+  evidence_refs: ProvenanceRef[];
 }
 
 export interface UniverseArtifact {
@@ -620,6 +649,7 @@ export interface SourceSpec {
   country: string;
   access_method: AccessMethod;
   status: SourceStatus;
+  legal_use_status: "cleared" | "research_only" | "review_required" | "blocked";
   lifecycle_state: LifecycleState;
   health_status: HealthStatus;
   activation_status: ActivationStatus;

@@ -19,6 +19,7 @@ export interface DecisionReadiness {
   status: ReadinessStatus;
   decision: "researchable" | "abstain";
   ready_horizons: Horizon[];
+  horizon_blockers?: Partial<Record<Horizon, string[]>>;
   price_observations: number;
   latest_price_date: string | null;
   news_items: number;
@@ -26,6 +27,30 @@ export interface DecisionReadiness {
   financial_periods: number;
   macro_series: number;
   active_knowledge: number;
+  blockers: string[];
+  next_actions: string[];
+}
+
+export interface DataLayerGap {
+  layer: "financials" | "disclosures" | "news" | "macro" | "knowledge";
+  count: number;
+  threshold: number;
+  complete: boolean;
+  completeness_pct: number;
+}
+
+export interface TickerDataGapReport {
+  ticker: string;
+  as_of: string;
+  status: ReadinessStatus;
+  decision: "researchable" | "abstain";
+  ready_horizons: Horizon[];
+  swing_ready: boolean;
+  investment_ready: boolean;
+  price_observations: number;
+  latest_price_date: string | null;
+  layers: DataLayerGap[];
+  overall_completeness_pct: number;
   blockers: string[];
   next_actions: string[];
 }
@@ -172,9 +197,114 @@ export interface Recommendation {
   combined_expected_risk: number;
   confidence: number;
   horizon_predictions: Partial<Record<Horizon, Prediction>>;
+  horizon_decisions: Partial<Record<Horizon, HorizonDecision>>;
   supporting_knowledge_ids: string[];
   explanation: Explanation;
   provenance: Provenance;
+}
+
+export interface SourceTruthRow {
+  source_id: string;
+  name: string;
+  category: string;
+  catalogued: boolean;
+  legally_usable: boolean;
+  attempted_this_run: boolean;
+  fetched_this_run: boolean;
+  fresh: boolean;
+  produced_records: number;
+  reached_decision_path: boolean;
+  corroborated: boolean;
+  collector_status: string;
+  blocker: string | null;
+  last_run_at: string | null;
+  consumers: string[];
+}
+
+export interface DecisionRecord {
+  id: string;
+  version: number;
+  ticker: string;
+  horizon: Horizon;
+  as_of: string;
+  action: DecisionAction;
+  expected_return: number;
+  expected_risk: number;
+  confidence: number;
+  valid_until: string;
+  publication_status: string;
+  outcome_status: "pending" | "evaluated" | "insufficient_data";
+  entry_price: number | null;
+  exit_price: number | null;
+  gross_asset_return: number | null;
+  realized_return: number | null;
+  transaction_cost_bps: number | null;
+  benchmark_ticker: string | null;
+  benchmark_return: number | null;
+  excess_return: number | null;
+  hit: boolean | null;
+}
+
+export interface DecisionPerformanceSummary {
+  horizon: Horizon;
+  decisions: number;
+  evaluated: number;
+  pending: number;
+  insufficient_data: number;
+  hit_rate: number | null;
+  mean_realized_return: number | null;
+  benchmark_evaluated: number;
+  mean_benchmark_return: number | null;
+  mean_excess_return: number | null;
+  median_excess_return: number | null;
+  excess_return_lower_95: number | null;
+  max_drawdown: number | null;
+  mean_expected_return: number | null;
+  calibration_error: number | null;
+  sample_status: "sufficient" | "insufficient_sample" | "insufficient_benchmark";
+}
+
+export interface PublicationGateCheck {
+  id: string;
+  label: string;
+  passed: boolean;
+  evidence_refs: string[];
+  blocker: string | null;
+}
+
+export interface PublicationGateReport {
+  as_of: string;
+  publication_ready: boolean;
+  checks: PublicationGateCheck[];
+  blockers: string[];
+}
+
+export type DecisionAction = "buy_candidate" | "watch" | "avoid" | "abstain";
+export type PublicationStatus = "research_only" | "publication_ready";
+export type PriceConditionOperator = "at_or_below" | "below" | "not_applicable";
+
+export interface HorizonDecision {
+  horizon: Horizon;
+  horizon_window: string;
+  action: DecisionAction;
+  expected_return: number;
+  expected_risk: number;
+  risk_metric: string;
+  confidence: number;
+  risk_adjusted_score: number;
+  valid_until: string;
+  entry_condition: string;
+  reference_price: number | null;
+  entry_operator: PriceConditionOperator;
+  entry_value: number | null;
+  invalidation_operator: PriceConditionOperator;
+  invalidation_value: number | null;
+  review_condition: string;
+  invalidation_conditions: string[];
+  max_position_pct: number;
+  publication_status: PublicationStatus;
+  abstention_reasons: string[];
+  evidence_refs: ProvenanceRef[];
 }
 
 // --- market_state.json / MarketState (nullable: null until a run has happened) ---
@@ -643,6 +773,7 @@ export interface SourceSpec {
   country: string;
   access_method: AccessMethod;
   status: SourceStatus;
+  legal_use_status: "cleared" | "research_only" | "review_required" | "blocked";
   lifecycle_state: LifecycleState;
   health_status: HealthStatus;
   activation_status: ActivationStatus;

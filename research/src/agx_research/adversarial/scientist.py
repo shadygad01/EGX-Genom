@@ -11,9 +11,9 @@ exist yet — `attack()` still reports all nine attack types, marking the
 unimplemented ones `attempted=False` rather than omitting them or faking
 a result.
 
-Successful attacks (a real problem found) reduce confidence; failed
-attacks (the check ran and found nothing) strengthen it slightly.
-Unattempted attacks contribute nothing either way.
+Successful attacks (a real problem found) reduce confidence. A check that
+finds no problem is neutral: absence of a detected flaw is not independent
+positive evidence. Unattempted attacks also contribute nothing.
 """
 
 from __future__ import annotations
@@ -110,7 +110,7 @@ class AdversarialScientist:
             attack_type=AttackType.SMALL_SAMPLE_BIAS,
             attempted=True,
             succeeded=succeeded,
-            confidence_delta=-0.2 if succeeded else 0.02,
+            confidence_delta=-0.2 if succeeded else 0.0,
             notes=(
                 f"Smallest experiment sample size ({smallest}) is below the "
                 f"{self.min_sample_size} threshold."
@@ -126,7 +126,7 @@ class AdversarialScientist:
             attack_type=AttackType.TIME_LEAKAGE,
             attempted=True,
             succeeded=leaked,
-            confidence_delta=-0.3 if leaked else 0.02,
+            confidence_delta=-0.3 if leaked else 0.0,
             notes=(
                 f"Hypothesis created_at ({hypothesis.created_at}) is after the dataset "
                 f"snapshot's as_of ({snapshot.as_of}) -- it could not have been discovered "
@@ -166,7 +166,7 @@ class AdversarialScientist:
             attack_type=AttackType.LOOK_AHEAD_BIAS,
             attempted=True,
             succeeded=succeeded,
-            confidence_delta=-0.3 if succeeded else 0.02,
+            confidence_delta=-0.3 if succeeded else 0.0,
             notes=(
                 f"Found {len(violations)} record(s) in the snapshot dated after its as_of "
                 f"({snapshot.as_of}): {violations[:5]}"
@@ -185,7 +185,7 @@ class AdversarialScientist:
             attack_type=AttackType.WEAK_ECONOMIC_RATIONALE,
             attempted=True,
             succeeded=weak,
-            confidence_delta=-0.15 if weak else 0.02,
+            confidence_delta=-0.15 if weak else 0.0,
             notes=(
                 f"No economic rationale (or one shorter than {self.min_rationale_length} "
                 "characters) was provided."
@@ -246,7 +246,7 @@ class AdversarialScientist:
             attack_type=AttackType.RANDOM_COINCIDENCE,
             attempted=True,
             succeeded=succeeded,
-            confidence_delta=-0.2 if succeeded else 0.02,
+            confidence_delta=-0.2 if succeeded else 0.0,
             notes=(
                 f"Permutation test ({self.permutation_iterations} shuffles, seed "
                 f"{self.permutation_seed}): empirical p={empirical_p:.4f} "
@@ -305,7 +305,7 @@ class AdversarialScientist:
             attack_type=AttackType.PARAMETER_INSTABILITY,
             attempted=True,
             succeeded=succeeded,
-            confidence_delta=-0.15 if succeeded else 0.02,
+            confidence_delta=-0.15 if succeeded else 0.0,
             notes=(
                 f"Statistic sign flipped in {flips}/{settings} trailing-window settings."
                 if settings
@@ -316,6 +316,6 @@ class AdversarialScientist:
 
 
 def apply_adversarial_review(confidence: float, attack_results: list[AttackResult]) -> float:
-    """Successful attacks reduce confidence; failed (attempted) attacks strengthen it slightly."""
+    """Apply only evidence-backed penalties; clean checks are confidence-neutral."""
     adjusted = confidence + sum(result.confidence_delta for result in attack_results)
     return max(0.0, min(1.0, adjusted))

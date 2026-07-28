@@ -5,14 +5,14 @@ import { formatRelativeToNow } from "../../lib/format";
 import styles from "./TopBar.module.css";
 
 const PAGE_TITLES: Record<string, string> = {
-  "/": "AI Briefing",
-  "/opportunities": "Opportunity Center",
-  "/market": "Market Intelligence",
-  "/research": "Research Center",
-  "/knowledge-graph": "Knowledge Graph",
-  "/mission-control": "Mission Control",
-  "/sources": "Source Intelligence",
-  "/admin": "System Administration",
+  "/": "الملخص الذكي",
+  "/opportunities": "مركز القرارات",
+  "/market": "تحليل السوق",
+  "/research": "مركز الأبحاث",
+  "/knowledge-graph": "خريطة المعرفة",
+  "/mission-control": "مراقبة التشغيل",
+  "/sources": "شفافية المصادر",
+  "/admin": "إدارة النظام",
 };
 
 function titleForPath(pathname: string): string {

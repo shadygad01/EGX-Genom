@@ -28,6 +28,14 @@ from datetime import date
 
 from agx_research.data.schemas import CorporateEvent, PriceBar
 from agx_research.data.snapshot import DatasetSnapshot
+from agx_research.config import Horizon
+
+
+HORIZON_FORWARD_TRADING_DAYS = {
+    Horizon.MICRO: 3,
+    Horizon.SWING: 20,
+    Horizon.INVESTMENT: 126,
+}
 
 
 def _split_factor(event: CorporateEvent) -> float | None:
@@ -93,6 +101,20 @@ def adjusted_daily_returns(bars: list[PriceBar], events: list[CorporateEvent]) -
     ]
 
 
+def adjusted_dated_returns(
+    bars: list[PriceBar], events: list[CorporateEvent]
+) -> dict[date, float]:
+    """Return keyed by its ending trade date, preserving alignment semantics."""
+    adjusted = compute_adjusted_closes(bars, events)
+    dates = sorted(adjusted)
+    return {
+        dates[index]: (adjusted[dates[index]] - adjusted[dates[index - 1]])
+        / adjusted[dates[index - 1]]
+        for index in range(1, len(dates))
+        if adjusted[dates[index - 1]] != 0
+    }
+
+
 def adjusted_returns_for_ticker(snapshot: DatasetSnapshot, ticker: str) -> list[float]:
     """Convenience: pulls both `price_history` and `corporate_events` for `ticker`
     straight out of a `DatasetSnapshot`. This is what `features.correlation` and
@@ -102,3 +124,20 @@ def adjusted_returns_for_ticker(snapshot: DatasetSnapshot, ticker: str) -> list[
     bars = snapshot.price_history.get(ticker, [])
     events = snapshot.corporate_events.get(ticker, [])
     return adjusted_daily_returns(bars, events)
+
+
+def horizon_forward_returns(
+    snapshot: DatasetSnapshot, ticker: str, horizon: Horizon
+) -> list[float]:
+    """Forward total returns in the same unit as a decision horizon."""
+    adjusted = compute_adjusted_closes(
+        snapshot.price_history.get(ticker, []),
+        snapshot.corporate_events.get(ticker, []),
+    )
+    closes = [adjusted[day] for day in sorted(adjusted)]
+    period = HORIZON_FORWARD_TRADING_DAYS[horizon]
+    return [
+        (closes[index + period] - closes[index]) / closes[index]
+        for index in range(len(closes) - period)
+        if closes[index] != 0
+    ]

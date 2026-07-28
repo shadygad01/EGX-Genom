@@ -73,7 +73,8 @@ def test_small_sample_bias_fails_above_threshold():
     )
     attack = next(r for r in results if r.attack_type == AttackType.SMALL_SAMPLE_BIAS)
     assert attack.succeeded is False
-    assert attack.confidence_delta > 0
+    # A clean check is not new independent evidence; it must not inflate confidence.
+    assert attack.confidence_delta == 0
 
 
 def test_time_leakage_detected_when_hypothesis_postdates_snapshot():

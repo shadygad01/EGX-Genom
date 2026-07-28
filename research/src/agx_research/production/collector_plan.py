@@ -323,19 +323,7 @@ def build_live_collector(
     this deployment has no live wiring for yet -- never a guess.
     """
     if source_id == "egx_price_composite":
-        # The repository owner explicitly authorized operational collection
-        # even where a provider's robots policy blocks the endpoint. Keep
-        # that override scoped to this price adapter; every other live source
-        # continues to use the shared robots-enforcing fetcher.
-        price_fetcher = (
-            HttpFetcher(
-                respect_robots=False,
-                timeout_seconds=min(fetcher.timeout_seconds, 8.0),
-            )
-            if isinstance(fetcher, HttpFetcher)
-            else fetcher
-        )
-        return EgxCompositePriceCollector(spec, symbols=tickers, fetcher=price_fetcher)
+        return EgxCompositePriceCollector(spec, symbols=tickers, fetcher=fetcher)
     if source_id == "stooq":
         symbols = {t: f"{t.lower()}{LIVE_STOOQ_TICKER_SUFFIX}" for t in tickers}
         return StooqPriceCollector(spec, symbols=symbols, fetcher=fetcher)

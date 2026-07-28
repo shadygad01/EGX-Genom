@@ -32,11 +32,14 @@ from agx_research.production.artifacts import (
     export_knowledge_graph,
     export_papers,
     export_source_metrics,
+    export_source_truth,
 )
 from agx_research.sources.catalog import seed_registry
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
-from agx_research.sources.spec import AccessMethod, SourceCategory, SourceSpec, SourceStatus
+from agx_research.sources.spec import (
+    AccessMethod, LegalUseStatus, SourceCategory, SourceSpec, SourceStatus,
+)
 
 
 def make_result(**overrides) -> CollectionRunResult:
@@ -297,6 +300,7 @@ def _implemented_spec(source_id: str) -> SourceSpec:
     return SourceSpec(
         id=source_id, name=source_id.title(), category=SourceCategory.MARKET_DATA,
         access_method=AccessMethod.CSV_DOWNLOAD, status=SourceStatus.IMPLEMENTED,
+        legal_use_status=LegalUseStatus.CLEARED,
         reliability_score=0.9, freshness_score=0.8,
     )
 
@@ -325,3 +329,52 @@ def test_export_source_metrics_reports_none_reputation_when_never_run():
     result = export_source_metrics(registry, SourceMetricsRepository())
     assert result[0]["runs_total"] == 0
     assert result[0]["reputation"] is None
+
+
+def test_source_truth_requires_output_and_real_decision_consumer():
+    registry = SourceRegistry()
+    registry.add(_implemented_spec("stooq"))
+    collector_rows = export_collector_status(
+        registry,
+        {"stooq": make_result(
+            source_id="stooq", price_bars_written=10, news_items_written=0,
+            corporate_events_written=0, index_constituents_written=0,
+            financial_statement_line_items_written=0, events_registered=0,
+        )},
+    )
+    metrics = SourceMetricsRepository()
+    metrics.record_run(
+        "stooq", succeeded=True, records_expected=10, records_produced=10,
+        confidence_score=0.9, freshness_score=1.0, coverage_score=1.0,
+        materialized=True,
+    )
+    metric_rows = export_source_metrics(registry, metrics)
+
+    [row] = export_source_truth(
+        registry,
+        collector_rows,
+        metric_rows,
+        [{"source_id": "stooq", "consumers": ["validation", "meta_decision_engine"]}],
+        generated_at=datetime.now(),
+    )
+
+    assert row["legally_usable"] is True
+    assert row["produced_records"] == 10
+    assert row["reached_decision_path"] is True
+    assert row["fresh"] is True
+
+
+def test_source_truth_does_not_confuse_declared_route_with_actual_output():
+    registry = SourceRegistry()
+    registry.add(_implemented_spec("stooq"))
+
+    [row] = export_source_truth(
+        registry,
+        [],
+        [],
+        [{"source_id": "stooq", "consumers": ["meta_decision_engine"]}],
+    )
+
+    assert row["collector_status"] == "NOT_RUN"
+    assert row["produced_records"] == 0
+    assert row["reached_decision_path"] is False

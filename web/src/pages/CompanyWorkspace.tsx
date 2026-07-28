@@ -2,9 +2,7 @@ import { useParams } from "react-router-dom";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
-import { Meter } from "../components/primitives/Meter";
 import { Section } from "../components/primitives/Section";
-import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { useArtifact } from "../hooks/useArtifact";
 import {
@@ -15,7 +13,7 @@ import {
   formatSignedPercent,
   titleCase,
 } from "../lib/format";
-import type { GeneStatus, KnowledgeStatus } from "../types";
+import type { GeneStatus, Horizon, HorizonDecision, KnowledgeStatus } from "../types";
 import styles from "./CompanyWorkspace.module.css";
 
 const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
@@ -24,12 +22,27 @@ const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
   retired: "neutral",
 };
 
+const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
+
 const GENE_VARIANT: Record<GeneStatus, BadgeVariant> = {
   promoted: "positive",
   monitoring: "accent",
   replaced: "warning",
   retired: "neutral",
 };
+
+function actionLabel(action: HorizonDecision["action"]): string {
+  return {
+    buy_candidate: "مرشح شراء مشروط",
+    watch: "راقب",
+    avoid: "تجنب",
+    abstain: "امتناع",
+  }[action];
+}
+
+function horizonLabel(horizon: Horizon): string {
+  return { micro: "قصير", swing: "متوسط", investment: "طويل" }[horizon];
+}
 
 /** The per-company deep-dive: every recommendation must be explainable, so
  * this page assembles everything AGX knows about one ticker from already-
@@ -94,41 +107,63 @@ export function CompanyWorkspace() {
       {loading && <LoadingState rows={4} />}
 
       <div className={styles.twoCol}>
-        <Card title="Current Investment Thesis">
+        <Card title="القرار حسب الأفق">
           {!recommendation && !recommendations.loading && (
             <EmptyState
-              title="No active recommendation"
-              detail="AGX has no current recommendation for this ticker -- it may not yet have cleared the validation pipeline, or no supporting knowledge exists."
+              title="لا يوجد قرار نشط"
+              detail="لا يملك AGX قرارًا حاليًا لهذا السهم؛ قد لا يكون اجتاز التحقق أو لا توجد معرفة مؤيدة كافية."
             />
           )}
           {recommendation && (
             <div>
-              <div className={styles.grid}>
-                <StatTile label="Confidence" value={formatPercent(recommendation.confidence)} />
-                <StatTile
-                  label="Exp. Return"
-                  value={formatSignedPercent(recommendation.combined_expected_return)}
-                  deltaSign={recommendation.combined_expected_return >= 0 ? 1 : -1}
-                />
-                <StatTile label="Exp. Risk" value={formatPercent(recommendation.combined_expected_risk)} />
-              </div>
+              {HORIZON_ORDER.map((horizon) => recommendation.horizon_decisions[horizon])
+                .filter((decision): decision is HorizonDecision => Boolean(decision))
+                .map((decision) => (
+                  <div className={styles.block} key={decision.horizon}>
+                    <div className={styles.blockTitle}>
+                      {horizonLabel(decision.horizon)} — {actionLabel(decision.action)}
+                    </div>
+                    <p className={styles.blockText}>
+                      الحالة: {decision.publication_status === "publication_ready" ? "قابل للنشر" : "بحث فقط — لا تنفذ"}
+                      {" · "}صالح حتى {formatDate(decision.valid_until)}
+                    </p>
+                    <p className={styles.blockText}>
+                      عائد {formatSignedPercent(decision.expected_return)} · مخاطر {formatPercent(decision.expected_risk)} · ثقة {formatPercent(decision.confidence)}
+                    </p>
+                    <p className={styles.blockText}>شرط الدخول: {decision.entry_condition}</p>
+                    {decision.entry_value !== null && (
+                      <p className={styles.blockText}>
+                        سعر الدخول الأقصى: {decision.entry_value.toFixed(2)} جنيه · إبطال أسفل {decision.invalidation_value?.toFixed(2)} جنيه
+                      </p>
+                    )}
+                    <p className={styles.blockText}>موعد المراجعة: {decision.review_condition}</p>
+                    <p className={styles.blockText}>
+                      حد المخاطر: {decision.publication_status === "publication_ready" ? formatPercent(decision.max_position_pct) : "0%"}
+                    </p>
+                    {decision.invalidation_conditions.length > 0 && (
+                      <ul className={styles.bulletList}>
+                        {decision.invalidation_conditions.map((condition) => <li key={condition}>{condition}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                ))}
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Research Summary</div>
+                <div className={styles.blockTitle}>ملخص البحث</div>
                 <p className={styles.blockText}>
                   {recommendation.explanation.why_this_stock} {recommendation.explanation.why_now}
                 </p>
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Risk Summary</div>
+                <div className={styles.blockTitle}>ملخص المخاطر</div>
                 <p className={styles.blockText}>{recommendation.explanation.why_not_others}</p>
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Supporting Evidence</div>
+                <div className={styles.blockTitle}>الأدلة المؤيدة</div>
                 {recommendation.explanation.supporting_evidence.length === 0 ? (
-                  <span className={styles.blockText}>None recorded.</span>
+                  <span className={styles.blockText}>لا توجد أدلة مسجلة.</span>
                 ) : (
                   <ul className={styles.bulletList}>
                     {recommendation.explanation.supporting_evidence.map((e, i) => (
@@ -139,9 +174,24 @@ export function CompanyWorkspace() {
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Contradicting Evidence / Invalidation Conditions</div>
+                <div className={styles.blockTitle}>مراجع الأدلة القابلة للتتبع</div>
+                {recommendation.explanation.evidence_refs.length === 0 ? (
+                  <span className={styles.blockText}>لا توجد مراجع؛ لا يُعامل الملخص كقرار قابل للنشر.</span>
+                ) : (
+                  <ul className={styles.bulletList}>
+                    {recommendation.explanation.evidence_refs.map((ref, i) => (
+                      <li key={`${ref.kind}-${ref.ref_id}-${i}`}>
+                        {ref.kind}: <code>{ref.ref_id}</code>{ref.ref_version !== null ? ` · الإصدار: ${ref.ref_version}` : ""}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className={styles.block}>
+                <div className={styles.blockTitle}>الأدلة المخالفة وشروط الإبطال</div>
                 {recommendation.explanation.invalidation_conditions.length === 0 ? (
-                  <span className={styles.blockText}>None recorded.</span>
+                  <span className={styles.blockText}>لا توجد شروط مسجلة.</span>
                 ) : (
                   <ul className={styles.bulletList}>
                     {recommendation.explanation.invalidation_conditions.map((e, i) => (
@@ -152,9 +202,9 @@ export function CompanyWorkspace() {
               </div>
 
               <div className={styles.block}>
-                <div className={styles.blockTitle}>Historical Similar Cases</div>
+                <div className={styles.blockTitle}>الحالات التاريخية المشابهة</div>
                 {recommendation.explanation.similar_historical_cases.length === 0 ? (
-                  <span className={styles.blockText}>None recorded.</span>
+                  <span className={styles.blockText}>لا توجد حالات مسجلة.</span>
                 ) : (
                   <ul className={styles.bulletList}>
                     {recommendation.explanation.similar_historical_cases.map((e, i) => (
@@ -167,9 +217,9 @@ export function CompanyWorkspace() {
           )}
         </Card>
 
-        <Card title="Upcoming Catalysts" subtitle="Scheduled corporate events on or after the last cycle date">
+        <Card title="المحفزات القادمة" subtitle="الأحداث المؤسسية المجدولة من تاريخ آخر دورة فصاعدًا">
           {upcomingCatalysts.length === 0 ? (
-            <EmptyState title="No scheduled catalysts" detail="No known corporate events are upcoming for this ticker." />
+            <EmptyState title="لا توجد محفزات مجدولة" detail="لا توجد أحداث مؤسسية قادمة معروفة لهذا السهم." />
           ) : (
             <div className={styles.list}>
               {upcomingCatalysts.map((ce, i) => (
@@ -186,10 +236,10 @@ export function CompanyWorkspace() {
         </Card>
       </div>
 
-      <Section title="Knowledge Timeline" description="Knowledge objects that name this ticker as an affected asset.">
+      <Section title="الخط الزمني للمعرفة" description="كائنات المعرفة التي تسمي هذا السهم أصلًا متأثرًا.">
         {knowledge.error && <ErrorState detail={knowledge.error.message} onRetry={knowledge.reload} />}
         {!knowledge.error && tickerKnowledge.length === 0 && !knowledge.loading && (
-          <EmptyState title="No knowledge objects yet" detail="No promoted or monitored knowledge names this ticker." />
+          <EmptyState title="لا توجد كائنات معرفة بعد" detail="لا توجد معرفة مرقّاة أو مراقبة تسمي هذا السهم." />
         )}
         {tickerKnowledge.length > 0 && (
           <div className={styles.list}>
@@ -202,7 +252,7 @@ export function CompanyWorkspace() {
                 <div className={styles.badgeRow}>
                   <Badge variant={KNOWLEDGE_VARIANT[k.status]}>{titleCase(k.status)}</Badge>
                   <Badge variant="neutral">{titleCase(k.horizon)}</Badge>
-                  <Badge variant="neutral">{formatPercent(k.confidence)} confidence</Badge>
+                  <Badge variant="neutral">ثقة {formatPercent(k.confidence)}</Badge>
                 </div>
                 <span className={styles.listItemDetail}>{k.economic_explanation}</span>
               </div>
@@ -212,9 +262,9 @@ export function CompanyWorkspace() {
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Research Papers" subtitle="Papers published from knowledge naming this ticker">
+        <Card title="الأوراق البحثية" subtitle="الأوراق المنشورة من معرفة مرتبطة بهذا السهم">
           {tickerPapers.length === 0 ? (
-            <EmptyState title="No papers yet" detail="No published research paper traces back to this ticker's knowledge." />
+            <EmptyState title="لا توجد أوراق بعد" detail="لا توجد ورقة منشورة قابلة للتتبع إلى معرفة هذا السهم." />
           ) : (
             <div className={styles.list}>
               {tickerPapers.map((p) => (
@@ -230,15 +280,15 @@ export function CompanyWorkspace() {
           )}
         </Card>
 
-        <Card title="Genes" subtitle="Lineage of this ticker's knowledge as it mutates over time">
+        <Card title="الجينات البحثية" subtitle="تسلسل معرفة هذا السهم وتغيرها بمرور الوقت">
           {tickerGenes.length === 0 ? (
-            <EmptyState title="No genes yet" detail="No gene lineage exists for this ticker's knowledge." />
+            <EmptyState title="لا توجد جينات بعد" detail="لا يوجد تسلسل جيني بحثي لمعرفة هذا السهم." />
           ) : (
             <div className={styles.list}>
               {tickerGenes.map((g) => (
                 <div key={g.id} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{g.id} · gen {g.generation}</span>
+                    <span className={styles.listItemTitle}>{g.id} · الجيل {g.generation}</span>
                   </div>
                   <div className={styles.badgeRow}>
                     <Badge variant={GENE_VARIANT[g.status]}>{titleCase(g.status)}</Badge>
@@ -251,20 +301,20 @@ export function CompanyWorkspace() {
         </Card>
       </div>
 
-      <Section title="Financial Statements" description="Line items collected for this ticker.">
+      <Section title="القوائم المالية" description="البنود المالية المجمعة لهذا السهم.">
         <DataTable
           rows={tickerStatements}
           getRowKey={(f, i) => `${f.period_end_date}-${f.statement_type}-${f.line_item}-${i}`}
-          emptyTitle="No financial statements collected"
-          emptyDetail="Financial statement collection is built but not yet wired to a live, verified filing source (see docs/TECHNICAL_DEBT.md)."
+          emptyTitle="لم تُجمع قوائم مالية"
+          emptyDetail="مسار الجمع مبني لكنه غير مرتبط بعد بمصدر إفصاحات حي ومتحقق منه."
           columns={[
-            { key: "period", header: "Period End", render: (f) => formatDate(f.period_end_date) },
-            { key: "type", header: "Type", render: (f) => titleCase(f.period_type) },
-            { key: "statement", header: "Statement", render: (f) => titleCase(f.statement_type) },
-            { key: "item", header: "Line Item", render: (f) => titleCase(f.line_item) },
+            { key: "period", header: "نهاية الفترة", render: (f) => formatDate(f.period_end_date) },
+            { key: "type", header: "النوع", render: (f) => titleCase(f.period_type) },
+            { key: "statement", header: "القائمة", render: (f) => titleCase(f.statement_type) },
+            { key: "item", header: "البند", render: (f) => titleCase(f.line_item) },
             {
               key: "value",
-              header: "Value",
+              header: "القيمة",
               align: "right",
               render: (f) => (
                 <span className="num">
@@ -277,9 +327,9 @@ export function CompanyWorkspace() {
       </Section>
 
       <div className={styles.twoCol}>
-        <Card title="Corporate Actions" subtitle="Past corporate events for this ticker">
+        <Card title="الإجراءات المؤسسية" subtitle="الأحداث المؤسسية السابقة لهذا السهم">
           {pastActions.length === 0 ? (
-            <EmptyState title="No corporate actions recorded" />
+            <EmptyState title="لا توجد إجراءات مؤسسية مسجلة" />
           ) : (
             <div className={styles.list}>
               {pastActions.map((ce, i) => (
@@ -295,9 +345,9 @@ export function CompanyWorkspace() {
           )}
         </Card>
 
-        <Card title="News Timeline" subtitle="Headlines mentioning this ticker">
+        <Card title="الخط الزمني للأخبار" subtitle="العناوين التي تذكر هذا السهم">
           {news.length === 0 ? (
-            <EmptyState title="No news yet" />
+            <EmptyState title="لا توجد أخبار بعد" />
           ) : (
             <div className={styles.list}>
               {news.map((n, i) => (
@@ -314,10 +364,10 @@ export function CompanyWorkspace() {
         </Card>
       </div>
 
-      <Card title="Market Regime & Macro Exposure">
+      <Card title="نظام السوق والتعرض للاقتصاد الكلي">
         <EmptyState
-          title="Not yet available"
-          detail="No market regime classification or per-ticker macro-exposure artifact exists yet upstream -- this section will populate once the research engine produces one, per the platform's anti-fabrication principle."
+          title="غير متاح بعد"
+          detail="لا يوجد حتى الآن تصنيف لنظام السوق أو تعرض للاقتصاد الكلي لكل سهم؛ سيظهر القسم عندما ينتجه محرك البحث دون اختلاق بيانات."
         />
       </Card>
     </>

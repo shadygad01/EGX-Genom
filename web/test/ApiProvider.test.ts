@@ -24,6 +24,7 @@ describe("ApiProvider", () => {
     await provider.getRecommendations();
     await provider.getRuntimeMetrics();
     await provider.getSourceRegistry();
+    await provider.getTickerDataGapReport();
 
     const urls = fetchMock.mock.calls.map((call) => call[0] as string);
     expect(urls).toEqual([
@@ -33,6 +34,7 @@ describe("ApiProvider", () => {
       "/api/recommendations",
       "/api/runtime-metrics",
       "/api/source-registry",
+      "/api/ticker-data-gaps",
     ]);
   });
 

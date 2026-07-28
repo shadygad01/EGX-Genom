@@ -150,4 +150,18 @@ describe("dashboard artifact routes", () => {
     expect(body).toHaveLength(1);
     expect(body[0].id).toBe("stooq");
   });
+
+  it("GET /publication-gate fails closed to null when no report exists", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/publication-gate" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
+  it("GET /ticker-data-gaps returns an honest empty list when absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/ticker-data-gaps" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual([]);
+  });
 });

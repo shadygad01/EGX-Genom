@@ -89,9 +89,9 @@ jobs:
           START_DATE: ${{ steps.dates.outputs.start }}
           END_DATE: ${{ steps.dates.outputs.end }}
         run: |
-          uv run python -m agx_research.cli collect \
+          set -o pipefail
+          uv run python -m agx_research.cli --data-dir data/news_history collect \
             --source gdelt \
-            --data-dir data/news_history \
             --query "$GDELT_QUERY" \
             --start-date "$START_DATE" \
             --end-date "$END_DATE" \

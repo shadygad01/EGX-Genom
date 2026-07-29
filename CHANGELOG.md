@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.36.0 — GDELT historical news backfill; daily cross-run persistence gap named
+
+Project owner request: with no paid data vendor (permanent per AD-32),
+investigate why the platform produces few confident recommendations and
+collect/employ real old news.
+
+- **Root-cause finding (TD-40)**: the daily production pipeline
+  (`deploy-pages.yml`'s `agx run --mode live`) has no cross-run
+  persistence — it runs against an ephemeral `/tmp` data directory with no
+  restore/commit step, unlike `discovery.yml`. Every calendar day starts
+  from an empty knowledge store/genome/event repository; real multi-year
+  price history is refetched fine, but promoted knowledge and news/event
+  history never carry from one day to the next. Flagged as the highest-
+  leverage engineering-closeable gap (`docs/ROADMAP.md`), pending
+  project-owner sizing given its repo-growth/CI-behavior implications —
+  not implemented in this change.
+- **`GdeltDocCollector` historical backfill mode** (TD-41): real
+  windowed `startdatetime`/`enddatetime` queries (`start_date`/`end_date`/
+  `window_days`), going around GDELT DOC 2.0's 250-articles-per-response
+  cap, alongside the existing relative `timespan` daily-live behavior
+  (unchanged). Wired into `cli.py collect --source gdelt` and a new
+  `.github/workflows/news-history-backfill.yml` (`workflow_dispatch`,
+  real network egress, review-gated PR into `main` under
+  `research/data/news_history/`, same discipline as `discovery.yml`).
+  Tested with fakes (windowing, cross-window dedup); not yet wired into
+  the production data-dir the daily pipeline reads (see TD-40/41).
+
 ## 0.35.0 — Retire evidence-dead-end PLANNED sources, no-paid-services enforced
 
 Project owner request: the dashboard's Source Intelligence page showed

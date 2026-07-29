@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
 from agx_research.collectors.base import CollectionBatch, Collector
@@ -14,7 +14,7 @@ from agx_research.universe.entity_resolution import resolve_ticker_mentions
 
 class GdeltDocCollector(Collector):
     name = "GdeltDocCollector"
-    version = "1.0.0"
+    version = "1.1.0"
 
     def __init__(
         self,
@@ -24,6 +24,9 @@ class GdeltDocCollector(Collector):
         ticker_hints: dict[str, str] | list[str] | None = None,
         max_records: int = 250,
         timespan: str = "7d",
+        start_date: date | None = None,
+        end_date: date | None = None,
+        window_days: int = 7,
         fetcher=None,
     ):
         super().__init__(spec, fetcher)
@@ -36,31 +39,78 @@ class GdeltDocCollector(Collector):
         )
         self.max_records = min(max(max_records, 1), 250)
         self.timespan = timespan
+        # Historical backfill mode: when both dates are given, `fetch()`
+        # issues one request per `window_days`-sized slice of
+        # [start_date, end_date] using GDELT's absolute `startdatetime`/
+        # `enddatetime` parameters instead of the relative `timespan` the
+        # daily live run uses -- the only way to reach news older than
+        # `timespan` covers. Windowed rather than one wide query because
+        # the DOC 2.0 API caps every response at 250 articles regardless
+        # of range; a multi-month request would silently drop everything
+        # past the cap for a busy query instead of raising.
+        self.start_date = start_date
+        self.end_date = end_date
+        self.window_days = max(window_days, 1)
+
+    def _windows(self) -> list[tuple[datetime, datetime]]:
+        assert self.start_date is not None and self.end_date is not None
+        windows: list[tuple[datetime, datetime]] = []
+        cursor = datetime.combine(self.start_date, datetime.min.time())
+        end = datetime.combine(self.end_date, datetime.min.time()) + timedelta(days=1)
+        step = timedelta(days=self.window_days)
+        while cursor < end:
+            window_end = min(cursor + step, end)
+            windows.append((cursor, window_end))
+            cursor = window_end
+        return windows
+
+    def _url_for(self, params: dict) -> str:
+        return f"{self.spec.base_url}?{urlencode(params)}"
 
     def fetch(self) -> list[RawDocument]:
-        params = urlencode(
-            {
-                "query": self.query,
-                "mode": "artlist",
-                "maxrecords": self.max_records,
-                "timespan": self.timespan,
-                "sort": "datedesc",
-                "format": "json",
-            }
-        )
-        url = f"{self.spec.base_url}?{params}"
-        text = self.fetcher.fetch_text(url, self.spec)
-        return [
-            build_raw_document(
-                source_id=self.spec.id,
-                collector=self.name,
-                collector_version=self.version,
-                original_url=url,
-                content_text=text,
-                schema_version=self.spec.schema_version,
-                license=self.spec.license,
+        if self.start_date is None or self.end_date is None:
+            urls = [
+                self._url_for(
+                    {
+                        "query": self.query,
+                        "mode": "artlist",
+                        "maxrecords": self.max_records,
+                        "timespan": self.timespan,
+                        "sort": "datedesc",
+                        "format": "json",
+                    }
+                )
+            ]
+        else:
+            urls = [
+                self._url_for(
+                    {
+                        "query": self.query,
+                        "mode": "artlist",
+                        "maxrecords": self.max_records,
+                        "startdatetime": window_start.strftime("%Y%m%d%H%M%S"),
+                        "enddatetime": window_end.strftime("%Y%m%d%H%M%S"),
+                        "sort": "datedesc",
+                        "format": "json",
+                    }
+                )
+                for window_start, window_end in self._windows()
+            ]
+        documents = []
+        for url in urls:
+            text = self.fetcher.fetch_text(url, self.spec)
+            documents.append(
+                build_raw_document(
+                    source_id=self.spec.id,
+                    collector=self.name,
+                    collector_version=self.version,
+                    original_url=url,
+                    content_text=text,
+                    schema_version=self.spec.schema_version,
+                    license=self.spec.license,
+                )
             )
-        ]
+        return documents
 
     def parse(self, document: RawDocument) -> CollectionBatch:
         batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)

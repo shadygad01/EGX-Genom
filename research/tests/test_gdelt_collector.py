@@ -1,6 +1,8 @@
 import json
 from datetime import date
 
+import pytest
+
 from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.production.collector_plan import MockFetcher
 from agx_research.sources.catalog import seed_sources
@@ -138,3 +140,58 @@ def test_gdelt_historical_mode_dedups_across_windows_by_url():
     assert len(documents) == 2
     headlines = [item.headline for doc in documents for item in collector.parse(doc).news_items]
     assert headlines == ["Old EGX story", "Newer EGX story"]
+
+
+def test_gdelt_historical_mode_skips_a_failed_window_and_keeps_the_rest():
+    # Live evidence (2026-07-29): GDELT returned HTTP 429 on some individual
+    # windows partway through an otherwise-succeeding historical backfill --
+    # one bad window must not discard every window already fetched.
+    spec = next(source for source in seed_sources() if source.id == "gdelt")
+    window_a_url = (
+        f"{spec.base_url}?query=Egypt&mode=artlist&maxrecords=25&"
+        "startdatetime=20260101000000&enddatetime=20260108000000&"
+        "sort=datedesc&format=json"
+    )
+    window_c_url = (
+        f"{spec.base_url}?query=Egypt&mode=artlist&maxrecords=25&"
+        "startdatetime=20260115000000&enddatetime=20260116000000&"
+        "sort=datedesc&format=json"
+    )
+    # window_b (the 2026-01-08..2026-01-15 slice) is deliberately absent from
+    # the canned content, so MockFetcher raises for it -- simulating GDELT's
+    # real mid-batch 429.
+    fetcher = MockFetcher(
+        {
+            window_a_url: json.dumps({"articles": []}),
+            window_c_url: json.dumps({"articles": []}),
+        }
+    )
+    collector = GdeltDocCollector(
+        spec,
+        query="Egypt",
+        max_records=25,
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 15),
+        window_days=7,
+        fetcher=fetcher,
+    )
+    documents = collector.fetch()
+    assert [doc.original_url for doc in documents] == [window_a_url, window_c_url]
+    assert len(collector.fetch_warnings) == 1
+    assert "2026-01-08..2026-01-15" in collector.fetch_warnings[0]
+
+
+def test_gdelt_historical_mode_raises_only_if_every_window_fails():
+    spec = next(source for source in seed_sources() if source.id == "gdelt")
+    fetcher = MockFetcher({})  # no canned content at all -- every window fails
+    collector = GdeltDocCollector(
+        spec,
+        query="Egypt",
+        max_records=25,
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 1, 7),
+        window_days=7,
+        fetcher=fetcher,
+    )
+    with pytest.raises(RuntimeError, match="Every GDELT historical window failed"):
+        collector.fetch()

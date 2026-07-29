@@ -39,6 +39,7 @@ class GdeltDocCollector(Collector):
         )
         self.max_records = min(max(max_records, 1), 250)
         self.timespan = timespan
+        self.fetch_warnings: list[str] = []
         # Historical backfill mode: when both dates are given, `fetch()`
         # issues one request per `window_days`-sized slice of
         # [start_date, end_date] using GDELT's absolute `startdatetime`/
@@ -69,36 +70,56 @@ class GdeltDocCollector(Collector):
 
     def fetch(self) -> list[RawDocument]:
         if self.start_date is None or self.end_date is None:
-            urls = [
-                self._url_for(
-                    {
-                        "query": self.query,
-                        "mode": "artlist",
-                        "maxrecords": self.max_records,
-                        "timespan": self.timespan,
-                        "sort": "datedesc",
-                        "format": "json",
-                    }
-                )
-            ]
-        else:
-            urls = [
-                self._url_for(
-                    {
-                        "query": self.query,
-                        "mode": "artlist",
-                        "maxrecords": self.max_records,
-                        "startdatetime": window_start.strftime("%Y%m%d%H%M%S"),
-                        "enddatetime": window_end.strftime("%Y%m%d%H%M%S"),
-                        "sort": "datedesc",
-                        "format": "json",
-                    }
-                )
-                for window_start, window_end in self._windows()
-            ]
-        documents = []
-        for url in urls:
+            url = self._url_for(
+                {
+                    "query": self.query,
+                    "mode": "artlist",
+                    "maxrecords": self.max_records,
+                    "timespan": self.timespan,
+                    "sort": "datedesc",
+                    "format": "json",
+                }
+            )
             text = self.fetcher.fetch_text(url, self.spec)
+            return [
+                build_raw_document(
+                    source_id=self.spec.id,
+                    collector=self.name,
+                    collector_version=self.version,
+                    original_url=url,
+                    content_text=text,
+                    schema_version=self.spec.schema_version,
+                    license=self.spec.license,
+                )
+            ]
+
+        # Historical backfill mode issues one request per window and can run
+        # to over a hundred windows for a multi-year range -- a live run
+        # evidenced GDELT returning HTTP 429 on some individual windows
+        # partway through an otherwise-succeeding batch (real server-side
+        # throttling, not a client-pacing bug; see TD-41). Same posture as
+        # `FredCsvCollector`: a failed window is skipped and recorded in
+        # `self.fetch_warnings`, not allowed to discard every window
+        # already fetched -- only raising if every single window failed.
+        documents = []
+        self.fetch_warnings = []
+        for window_start, window_end in self._windows():
+            url = self._url_for(
+                {
+                    "query": self.query,
+                    "mode": "artlist",
+                    "maxrecords": self.max_records,
+                    "startdatetime": window_start.strftime("%Y%m%d%H%M%S"),
+                    "enddatetime": window_end.strftime("%Y%m%d%H%M%S"),
+                    "sort": "datedesc",
+                    "format": "json",
+                }
+            )
+            try:
+                text = self.fetcher.fetch_text(url, self.spec)
+            except Exception as exc:  # noqa: BLE001 - fetchers share no exception base
+                self.fetch_warnings.append(f"{window_start.date()}..{window_end.date()}: {type(exc).__name__}: {exc}")
+                continue
             documents.append(
                 build_raw_document(
                     source_id=self.spec.id,
@@ -109,6 +130,10 @@ class GdeltDocCollector(Collector):
                     schema_version=self.spec.schema_version,
                     license=self.spec.license,
                 )
+            )
+        if not documents:
+            raise RuntimeError(
+                "Every GDELT historical window failed: " + "; ".join(self.fetch_warnings)
             )
         return documents
 

@@ -1,0 +1,2498 @@
+{
+  "ABUK": [
+    {
+      "id": "ABUK",
+      "version": 1,
+      "ticker": "ABUK",
+      "company_name": "Abou Kir Fertilizers",
+      "isin": "EGS38191C010",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://abuqir.net",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://abuqir.net/investor-relations/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://abuqir.net/investor-relations/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:03.804977"
+        },
+        {
+          "url": "https://abuqir.net/investor-relations/financial-statements/",
+          "category": "financial_statements",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://abuqir.net/investor-relations/financial-statements/\"></a>",
+          "discovered_at": "2026-07-29T05:21:03.804983"
+        },
+        {
+          "url": "https://abuqir.net/investor-relations/shareholders-disclosure-reports/",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://abuqir.net/investor-relations/shareholders-disclosure-reports/\"></a>",
+          "discovered_at": "2026-07-29T05:21:03.804986"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:03.203501",
+      "notes": ""
+    }
+  ],
+  "ADIB": [
+    {
+      "id": "ADIB",
+      "version": 1,
+      "ticker": "ADIB",
+      "company_name": "Abu Dhabi Islamic Bank- Egypt",
+      "isin": "EGS60111C019",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.adib.eg",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.adib.eg/investor-relations",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/investor-relations\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:06.640864"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:03.805679",
+      "notes": ""
+    }
+  ],
+  "AMOC": [
+    {
+      "id": "AMOC",
+      "version": 1,
+      "ticker": "AMOC",
+      "company_name": "Alexandria Mineral Oils Company",
+      "isin": "EGS380P1C010",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.amoceg.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.amoceg.com/en/media-center/annual-report",
+          "category": "annual_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/media-center/annual-report\">Annual Reports</a>",
+          "discovered_at": "2026-07-29T05:21:08.048552"
+        },
+        {
+          "url": "https://www.amoceg.com",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"#\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:08.048557"
+        },
+        {
+          "url": "javascript:void(0);",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"javascript:void(0);\">Disclosures</a>",
+          "discovered_at": "2026-07-29T05:21:08.048560"
+        },
+        {
+          "url": "https://www.amoceg.com/en/investor/corporate-governance/disclosures/bod-activity-report",
+          "category": "annual_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/investor/corporate-governance/disclosures/bod-activity-report\">BOD Annual Reports</a>",
+          "discovered_at": "2026-07-29T05:21:08.048562"
+        },
+        {
+          "url": "https://www.amoceg.com/en/investor/corporate-governance/disclosures/audit-committee-report",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/investor/corporate-governance/disclosures/audit-committee-report\">Audit and Corporate Governance Committee Reports</a>",
+          "discovered_at": "2026-07-29T05:21:08.048564"
+        },
+        {
+          "url": "https://www.amoceg.com/en/investor/corporate-governance/disclosures/bod-reselutions-reports",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/investor/corporate-governance/disclosures/bod-reselutions-reports\">BOD Resolutions</a>",
+          "discovered_at": "2026-07-29T05:21:08.048572"
+        },
+        {
+          "url": "https://www.amoceg.com/en/investor/corporate-governance/disclosures/disclosure-reports",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/investor/corporate-governance/disclosures/disclosure-reports\">Disclosure Reports</a>",
+          "discovered_at": "2026-07-29T05:21:08.048580"
+        },
+        {
+          "url": "https://www.amoceg.com/en/investor/corporate-governance/disclosures/corporate-governance-reports",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/investor/corporate-governance/disclosures/corporate-governance-reports\">Corporate Governance Reports</a>",
+          "discovered_at": "2026-07-29T05:21:08.048583"
+        },
+        {
+          "url": "https://www.amoceg.com/en/investor/financial-report/financial-statement",
+          "category": "financial_statements",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/investor/financial-report/financial-statement\">Financial Statement</a>",
+          "discovered_at": "2026-07-29T05:21:08.048587"
+        },
+        {
+          "url": "https://www.amoceg.com/en/investor/financial-report/ir-presentation",
+          "category": "presentation",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/investor/financial-report/ir-presentation\">IR Presentation</a>",
+          "discovered_at": "2026-07-29T05:21:08.048591"
+        },
+        {
+          "url": "https://www.amoceg.com/en/media-center/press-release",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.amoceg.com/en/media-center/press-release\">Press Releases</a>",
+          "discovered_at": "2026-07-29T05:21:08.048602"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:06.641595",
+      "notes": ""
+    }
+  ],
+  "ARCC": [
+    {
+      "id": "ARCC",
+      "version": 1,
+      "ticker": "ARCC",
+      "company_name": "Arabian Cement Company",
+      "isin": "EGS3C0O1C016",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://arabiancementcompany.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://arabiancementcompany.com/investor-relations/about-us",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://arabiancementcompany.com/investor-relations/about-us\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:10.444751"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:08.049554",
+      "notes": ""
+    }
+  ],
+  "BTFH": [
+    {
+      "id": "BTFH",
+      "version": 1,
+      "ticker": "BTFH",
+      "company_name": "Beltone Holding",
+      "isin": "EGS691G1C015",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.beltoneholding.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.beltoneholding.com/en/investor-relations",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:14.797353"
+        }
+      ],
+      "robots_allowed": null,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:10.446061",
+      "notes": ""
+    }
+  ],
+  "COMI": [
+    {
+      "id": "COMI",
+      "version": 1,
+      "ticker": "COMI",
+      "company_name": "Commercial International Bank-Egypt (CIB)",
+      "isin": "EGS60121C018",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.cibeg.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.cibeg.com",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"#\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:18.219688"
+        },
+        {
+          "url": "https://www.cibeg.com/en/investor-relations",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations\">IR Home</a>",
+          "discovered_at": "2026-07-29T05:21:18.219693"
+        },
+        {
+          "url": "https://www.cibeg.com#tab-mega-D85A1F7F05D74B8BA18F387DCCC7BC28",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"#tab-mega-D85A1F7F05D74B8BA18F387DCCC7BC28\">IR Home</a>",
+          "discovered_at": "2026-07-29T05:21:18.219695"
+        },
+        {
+          "url": "https://www.cibeg.com/en/investor-relations/ir-library/financial-statements",
+          "category": "financial_statements",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations/ir-library/financial-statements\">Financials Statements</a>",
+          "discovered_at": "2026-07-29T05:21:18.219698"
+        },
+        {
+          "url": "https://www.cibeg.com/en/investor-relations/governance/board-resolutions",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations/governance/board-resolutions\">Board Resolutions</a>",
+          "discovered_at": "2026-07-29T05:21:18.219700"
+        }
+      ],
+      "robots_allowed": null,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:14.798367",
+      "notes": ""
+    }
+  ],
+  "EAST": [
+    {
+      "id": "EAST",
+      "version": 1,
+      "ticker": "EAST",
+      "company_name": "Eastern Company",
+      "isin": "EGS37091C013",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.easternegypt.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.easternegypt.com/disclosures_ar/",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.easternegypt.com/disclosures_ar/\">\u0627\u0644\u0625\u0641\u0635\u0627\u062d\u0627\u062a</a>",
+          "discovered_at": "2026-07-29T05:21:20.429232"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:18.220931",
+      "notes": ""
+    }
+  ],
+  "EFID": [
+    {
+      "id": "EFID",
+      "version": 1,
+      "ticker": "EFID",
+      "company_name": "Edita Food Industries S.A.E",
+      "isin": "EGS305I1C011",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://ir.edita.com.eg",
+      "homepage_hint_source": "web_search",
+      "status": "blocked",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "FetchError: __company_financial_discovery_probe__: 1 attempt(s) failed for https://ir.edita.com.eg: HTTP Error 403: Forbidden",
+      "last_attempted_at": "2026-07-29T05:21:20.430414",
+      "notes": ""
+    }
+  ],
+  "HRHO": [
+    {
+      "id": "HRHO",
+      "version": 1,
+      "ticker": "HRHO",
+      "company_name": "EFG Holding",
+      "isin": "EGS69101C011",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.efghermes.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.efghermes.com/en/investor-relations",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:25.795798"
+        },
+        {
+          "url": "https://www.efghermes.com/en/investor-relations/investor-presentations",
+          "category": "presentation",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations/investor-presentations\">Investor Presentations</a>",
+          "discovered_at": "2026-07-29T05:21:25.795803"
+        },
+        {
+          "url": "https://www.efghermes.com/en/investor-relations/disclosures",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations/disclosures\">Disclosures</a>",
+          "discovered_at": "2026-07-29T05:21:25.795806"
+        },
+        {
+          "url": "https://www.efghermes.com/en/investor-relations/financial-statements",
+          "category": "financial_statements",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations/financial-statements\">Financial Statements</a>",
+          "discovered_at": "2026-07-29T05:21:25.795808"
+        },
+        {
+          "url": "https://www.efghermes.com/en/investor-relations/annual-reports",
+          "category": "annual_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations/annual-reports\">Annual Reports</a>",
+          "discovered_at": "2026-07-29T05:21:25.795810"
+        },
+        {
+          "url": "https://www.efghermes.com/en/investor-relations/investor-relations-contacts",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/en/investor-relations/investor-relations-contacts\">Investor Relations Contacts</a>",
+          "discovered_at": "2026-07-29T05:21:25.795813"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:21.389627",
+      "notes": ""
+    }
+  ],
+  "EFIH": [
+    {
+      "id": "EFIH",
+      "version": 1,
+      "ticker": "EFIH",
+      "company_name": "E-finance For Digital and Financial Investments",
+      "isin": "EGS743O1C013",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://investors.efinanceinvestment.com",
+      "homepage_hint_source": "web_search",
+      "status": "blocked",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "FetchError: __company_financial_discovery_probe__: 1 attempt(s) failed for https://investors.efinanceinvestment.com: HTTP Error 403: Forbidden",
+      "last_attempted_at": "2026-07-29T05:21:25.797134",
+      "notes": ""
+    }
+  ],
+  "EGAL": [
+    {
+      "id": "EGAL",
+      "version": 1,
+      "ticker": "EGAL",
+      "company_name": "Egypt Aluminum",
+      "isin": "EGS3E181C010",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.egyptalum.com.eg",
+      "homepage_hint_source": "web_search",
+      "status": "blocked",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "Homepage fetched successfully but no financial-document links matched (annual report/quarterly report/financial statements/investor relations keywords) -- needs manual IR-page review.",
+      "last_attempted_at": "2026-07-29T05:21:26.196409",
+      "notes": ""
+    }
+  ],
+  "EGCH": [
+    {
+      "id": "EGCH",
+      "version": 1,
+      "ticker": "EGCH",
+      "company_name": "Egyptian Chemical Industries (Kima)",
+      "isin": "EGS38201C017",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:21:29.180345",
+      "notes": ""
+    }
+  ],
+  "EMFD": [
+    {
+      "id": "EMFD",
+      "version": 1,
+      "ticker": "EMFD",
+      "company_name": "Emaar Misr for Development",
+      "isin": "EGS673Y1C015",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.emaarmisr.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.emaarmisr.com/about-emaar/investor-relations/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.emaarmisr.com/about-emaar/investor-relations/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:30.866566"
+        },
+        {
+          "url": "https://www.emaarmisr.com/press-releases/",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.emaarmisr.com/press-releases/\">Press Releases</a>",
+          "discovered_at": "2026-07-29T05:21:30.866573"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:29.181483",
+      "notes": ""
+    }
+  ],
+  "FWRY": [
+    {
+      "id": "FWRY",
+      "version": 1,
+      "ticker": "FWRY",
+      "company_name": "Fawry For Banking Technology And Electronic Payment",
+      "isin": "EGS745L1C014",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.fawry.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.fawry.com/investor-relations/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.fawry.com/investor-relations/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:34.309393"
+        },
+        {
+          "url": "https://www.fawry.com/financials-and-earning-releases/",
+          "category": "financial_statements",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.fawry.com/financials-and-earning-releases/\">Financials and Earning Releases</a>",
+          "discovered_at": "2026-07-29T05:21:34.309399"
+        },
+        {
+          "url": "https://www.fawry.com/investor-relations/press-releases/",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.fawry.com/investor-relations/press-releases/\">Press Releases</a>",
+          "discovered_at": "2026-07-29T05:21:34.309402"
+        },
+        {
+          "url": "https://www.fawry.com/investor-relations/disclosures/",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.fawry.com/investor-relations/disclosures/\">Disclosures</a>",
+          "discovered_at": "2026-07-29T05:21:34.309404"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:30.868154",
+      "notes": ""
+    }
+  ],
+  "GBCO": [
+    {
+      "id": "GBCO",
+      "version": 1,
+      "ticker": "GBCO",
+      "company_name": "GB Corp",
+      "isin": "EGS673T1C012",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://gb-corporation.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://gb-corporation.com/investor-relations/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://gb-corporation.com/investor-relations/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:39.513684"
+        },
+        {
+          "url": "https://ir.gb-corporation.com/en/Annual-Reports",
+          "category": "annual_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://ir.gb-corporation.com/en/Annual-Reports\">Annual Reports</a>",
+          "discovered_at": "2026-07-29T05:21:39.513689"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:34.310981",
+      "notes": ""
+    }
+  ],
+  "HELI": [
+    {
+      "id": "HELI",
+      "version": 1,
+      "ticker": "HELI",
+      "company_name": "Heliopolis Housing",
+      "isin": "EGS65591C017",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:21:39.515347",
+      "notes": ""
+    }
+  ],
+  "ISPH": [
+    {
+      "id": "ISPH",
+      "version": 1,
+      "ticker": "ISPH",
+      "company_name": "Ibnsina Pharma",
+      "isin": "EGS512O1C012",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://ir.ibnsina-pharma.com",
+      "homepage_hint_source": "web_search",
+      "status": "blocked",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "FetchError: __company_financial_discovery_probe__: 1 attempt(s) failed for https://ir.ibnsina-pharma.com: HTTP Error 403: Forbidden",
+      "last_attempted_at": "2026-07-29T05:21:39.516706",
+      "notes": ""
+    }
+  ],
+  "JUFO": [
+    {
+      "id": "JUFO",
+      "version": 1,
+      "ticker": "JUFO",
+      "company_name": "Juhayna Food Industries",
+      "isin": "EGS30901C010",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.juhayna.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.juhayna.com/investor-home",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/investor-home\">Investors</a>",
+          "discovered_at": "2026-07-29T05:21:44.159489"
+        },
+        {
+          "url": "https://www.juhayna.com/investor-home/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://www.juhayna.com/investor-home/\">Investors</a>",
+          "discovered_at": "2026-07-29T05:21:44.159494"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:40.055218",
+      "notes": ""
+    }
+  ],
+  "MCQE": [
+    {
+      "id": "MCQE",
+      "version": 1,
+      "ticker": "MCQE",
+      "company_name": "Misr Cement (Qena)",
+      "isin": "EGS3C391C017",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:21:44.161242",
+      "notes": ""
+    }
+  ],
+  "ORAS": [
+    {
+      "id": "ORAS",
+      "version": 1,
+      "ticker": "ORAS",
+      "company_name": "Orascom Construction PLC",
+      "isin": "EGS95001C011",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://orascom.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://orascom.com/investors-updates/?_sfm_shareholder_meetings_year=2026&_sfm_corporate_presentations_year=2026&_sfm_financial_reports_year=2026",
+          "category": "presentation",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://orascom.com/investors-updates/?_sfm_shareholder_meetings_year=2026&_sfm_corporate_presentations_year=2026&_sfm_financial_reports_year=2026\">Investors</a>",
+          "discovered_at": "2026-07-29T05:21:45.424902"
+        },
+        {
+          "url": "https://orascom.com/updates/orascom-construction-reports-backlog-of-usd-9-4-billion-and-net-profit-of-usd-53-4-million-in-q1-2026/",
+          "category": "quarterly_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://orascom.com/updates/orascom-construction-reports-backlog-of-usd-9-4-billion-and-net-profit-of-usd-53-4-million-in-q1-2026/\">14 May, 2026\n              Orascom Construction Reports Backlog of USD 9.4 Billi</a>",
+          "discovered_at": "2026-07-29T05:21:45.424906"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:44.162724",
+      "notes": ""
+    }
+  ],
+  "ORHD": [
+    {
+      "id": "ORHD",
+      "version": 1,
+      "ticker": "ORHD",
+      "company_name": "Orascom Development Egypt",
+      "isin": "EGS70321C012",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.orascomde.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://www.orascomde.com/investor-relations",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/investor-relations\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:47.267417"
+        },
+        {
+          "url": "https://www.orascomde.com/investor-relations/press-releases",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"/investor-relations/press-releases\">Press Releases</a>",
+          "discovered_at": "2026-07-29T05:21:47.267422"
+        }
+      ],
+      "robots_allowed": null,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:45.426788",
+      "notes": ""
+    }
+  ],
+  "OIH": [
+    {
+      "id": "OIH",
+      "version": 1,
+      "ticker": "OIH",
+      "company_name": "Orascom Investment Holding",
+      "isin": "EGS693V1C014",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:21:47.269393",
+      "notes": ""
+    }
+  ],
+  "ORWE": [
+    {
+      "id": "ORWE",
+      "version": 1,
+      "ticker": "ORWE",
+      "company_name": "Oriental Weavers",
+      "isin": "EGS33041C012",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://orientalweavers.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://orientalweavers.com/investor-relations/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://orientalweavers.com/investor-relations/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:21:49.858633"
+        },
+        {
+          "url": "https://orientalweavers.com/presentation-publication/",
+          "category": "presentation",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://orientalweavers.com/presentation-publication/\">Presentations & Publications</a>",
+          "discovered_at": "2026-07-29T05:21:49.858638"
+        },
+        {
+          "url": "https://orientalweavers.com/reports-disclosures/",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://orientalweavers.com/reports-disclosures/\">Reports & Disclosures</a>",
+          "discovered_at": "2026-07-29T05:21:49.858641"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:47.270986",
+      "notes": ""
+    }
+  ],
+  "PHDC": [
+    {
+      "id": "PHDC",
+      "version": 1,
+      "ticker": "PHDC",
+      "company_name": "Palm Hills Development Company",
+      "isin": "EGS655L1C012",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:21:49.860732",
+      "notes": ""
+    }
+  ],
+  "CCAP": [
+    {
+      "id": "CCAP",
+      "version": 1,
+      "ticker": "CCAP",
+      "company_name": "QALAA For Financial Investments",
+      "isin": "EGS73541C012",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.qalaaholdings.com",
+      "homepage_hint_source": "web_search",
+      "status": "blocked",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "FetchError: __company_financial_discovery_probe__: 1 attempt(s) failed for https://www.qalaaholdings.com: ('Windows trust store is unavailable',)",
+      "last_attempted_at": "2026-07-29T05:21:49.862806",
+      "notes": ""
+    }
+  ],
+  "RAYA": [
+    {
+      "id": "RAYA",
+      "version": 1,
+      "ticker": "RAYA",
+      "company_name": "Raya Holding For Financial Investments",
+      "isin": "EGS690C1C010",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://rayacorp.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://rayacorp.com#!",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"#!\">INVESTOR RELATIONS</a>",
+          "discovered_at": "2026-07-29T05:21:53.277138"
+        },
+        {
+          "url": "https://rayacorp.com/disclosures/",
+          "category": "disclosure",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://rayacorp.com/disclosures/\">DISCLOSURES</a>",
+          "discovered_at": "2026-07-29T05:21:53.277143"
+        },
+        {
+          "url": "https://rayacorp.com/annual-report/",
+          "category": "annual_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://rayacorp.com/annual-report/\">ANNUALREPORTS</a>",
+          "discovered_at": "2026-07-29T05:21:53.277148"
+        },
+        {
+          "url": "https://rayacorp.com/financial-statements/",
+          "category": "financial_statements",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://rayacorp.com/financial-statements/\">FINANCIALSTATEMENTS</a>",
+          "discovered_at": "2026-07-29T05:21:53.277150"
+        },
+        {
+          "url": "https://rayacorp.com/investor-presentations/",
+          "category": "presentation",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://rayacorp.com/investor-presentations/\">INVESTORPRESENTATIONS</a>",
+          "discovered_at": "2026-07-29T05:21:53.277152"
+        },
+        {
+          "url": "https://rayacorp.com/raya-holding-reports-record-breaking-results-for-q3-and-9m-2025/",
+          "category": "quarterly_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://rayacorp.com/raya-holding-reports-record-breaking-results-for-q3-and-9m-2025/\">13 November, 2025\n\t\t\t\t\t\t\t\t\t\t\t\t\tRaya Holding Reports Record-Breaking Results for </a>",
+          "discovered_at": "2026-07-29T05:21:53.277155"
+        },
+        {
+          "url": "https://rayacorp.com/news-placeholderraya-holding-delivers-strong-revenue-and-profit-growth-in-h1-2025-driven-by-exceptional-q2-performance/",
+          "category": "quarterly_report",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://rayacorp.com/news-placeholderraya-holding-delivers-strong-revenue-and-profit-growth-in-h1-2025-driven-by-exceptional-q2-performance/\">14 August, 2025\n\t\t\t\t\t\t\t\t\t\t\t\t\tRaya Holding Delivers Strong Revenue and Profit Gro</a>",
+          "discovered_at": "2026-07-29T05:21:53.277157"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:50.980573",
+      "notes": ""
+    }
+  ],
+  "TMGH": [
+    {
+      "id": "TMGH",
+      "version": 1,
+      "ticker": "TMGH",
+      "company_name": "T M G Holding",
+      "isin": "EGS691S1C011",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://talaatmoustafa.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://talaatmoustafa.com/investor-relations/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://talaatmoustafa.com/investor-relations/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:22:02.976631"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:21:53.279401",
+      "notes": ""
+    }
+  ],
+  "ETEL": [
+    {
+      "id": "ETEL",
+      "version": 1,
+      "ticker": "ETEL",
+      "company_name": "Telecom Egypt",
+      "isin": "EGS48031C016",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://www.telecomegypt.eg",
+      "homepage_hint_source": "web_search",
+      "status": "blocked",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "FetchError: __company_financial_discovery_probe__: 1 attempt(s) failed for https://www.telecomegypt.eg: <urlopen error timed out>",
+      "last_attempted_at": "2026-07-29T05:22:02.978952",
+      "notes": ""
+    }
+  ],
+  "RMDA": [
+    {
+      "id": "RMDA",
+      "version": 1,
+      "ticker": "RMDA",
+      "company_name": "Tenth Of Ramadan Pharmaceutical Industries&Diagnostic-Rameda",
+      "isin": "EGS381B1C015",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://ramedapharma.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://ramedapharma-ir.com",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://ramedapharma-ir.com\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:23:05.340320"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:23:03.773167",
+      "notes": ""
+    }
+  ],
+  "VLMR": [
+    {
+      "id": "VLMR",
+      "version": 1,
+      "ticker": "VLMR",
+      "company_name": "Valmore Holding",
+      "isin": "EGS69082C013",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://valmore.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://ir.valmore.com/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://ir.valmore.com/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:23:06.597176"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:23:05.342748",
+      "notes": ""
+    }
+  ],
+  "VLMRA": [
+    {
+      "id": "VLMRA",
+      "version": 1,
+      "ticker": "VLMRA",
+      "company_name": "Valmore Holding-EGP",
+      "isin": "EGS69081C023",
+      "index_membership": [
+        "EGX30"
+      ],
+      "homepage_url": "https://valmore.com",
+      "homepage_hint_source": "web_search",
+      "status": "discovered",
+      "documents": [
+        {
+          "url": "https://ir.valmore.com/",
+          "category": "investor_relations_home",
+          "source_type": "html_scrape",
+          "collector_recommendation": null,
+          "evidence": "<a href=\"https://ir.valmore.com/\">Investor Relations</a>",
+          "discovered_at": "2026-07-29T05:23:08.681900"
+        }
+      ],
+      "robots_allowed": true,
+      "blocked_reason": null,
+      "last_attempted_at": "2026-07-29T05:23:06.599598",
+      "notes": ""
+    }
+  ],
+  "ACTF": [
+    {
+      "id": "ACTF",
+      "version": 1,
+      "ticker": "ACTF",
+      "company_name": "Act Financial",
+      "isin": "EGS7D5P1C019",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.684380",
+      "notes": ""
+    }
+  ],
+  "KRDI": [
+    {
+      "id": "KRDI",
+      "version": 1,
+      "ticker": "KRDI",
+      "company_name": "Al Khair River For Development Agricultural Investment&Envir",
+      "isin": "EGS02291C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.686539",
+      "notes": ""
+    }
+  ],
+  "ATLC": [
+    {
+      "id": "ATLC",
+      "version": 1,
+      "ticker": "ATLC",
+      "company_name": "Al Tawfeek Leasing Company-A.T.LEASE",
+      "isin": "EGS676N1C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.688644",
+      "notes": ""
+    }
+  ],
+  "ALCN": [
+    {
+      "id": "ALCN",
+      "version": 1,
+      "ticker": "ALCN",
+      "company_name": "Alexandria Containers and goods",
+      "isin": "EGS42111C012",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.691067",
+      "notes": ""
+    }
+  ],
+  "AFMC": [
+    {
+      "id": "AFMC",
+      "version": 1,
+      "ticker": "AFMC",
+      "company_name": "Alexandria Flour Mills",
+      "isin": "EGS30471C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.693238",
+      "notes": ""
+    }
+  ],
+  "AMER": [
+    {
+      "id": "AMER",
+      "version": 1,
+      "ticker": "AMER",
+      "company_name": "Amer Group Holding",
+      "isin": "EGS675S1C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.695509",
+      "notes": ""
+    }
+  ],
+  "ARAB": [
+    {
+      "id": "ARAB",
+      "version": 1,
+      "ticker": "ARAB",
+      "company_name": "Arab Developers Holding",
+      "isin": "EGS694A1C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.697718",
+      "notes": ""
+    }
+  ],
+  "AMIA": [
+    {
+      "id": "AMIA",
+      "version": 1,
+      "ticker": "AMIA",
+      "company_name": "Arab Moltaka Investments Co",
+      "isin": "EGS67221C019",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.699984",
+      "notes": ""
+    }
+  ],
+  "AIDC": [
+    {
+      "id": "AIDC",
+      "version": 1,
+      "ticker": "AIDC",
+      "company_name": "Arabia for Investment and Development",
+      "isin": "EGS65R01C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.702261",
+      "notes": ""
+    }
+  ],
+  "AIHC": [
+    {
+      "id": "AIHC",
+      "version": 1,
+      "ticker": "AIHC",
+      "company_name": "Arabia Investments Holding",
+      "isin": "EGS21351C019",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.704576",
+      "notes": ""
+    }
+  ],
+  "ASCM": [
+    {
+      "id": "ASCM",
+      "version": 1,
+      "ticker": "ASCM",
+      "company_name": "ASEC Company For Mining - ASCOM",
+      "isin": "EGS10001C013",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.706936",
+      "notes": ""
+    }
+  ],
+  "ASPI": [
+    {
+      "id": "ASPI",
+      "version": 1,
+      "ticker": "ASPI",
+      "company_name": "Aspire Capital Holding For Financial Investments",
+      "isin": "EGS691L1C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.709333",
+      "notes": ""
+    }
+  ],
+  "COSG": [
+    {
+      "id": "COSG",
+      "version": 1,
+      "ticker": "COSG",
+      "company_name": "Cairo Oils & Soap",
+      "isin": "EGS30581C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.711770",
+      "notes": ""
+    }
+  ],
+  "POUL": [
+    {
+      "id": "POUL",
+      "version": 1,
+      "ticker": "POUL",
+      "company_name": "Cairo Poultry",
+      "isin": "EGS02051C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.714194",
+      "notes": ""
+    }
+  ],
+  "CSAG": [
+    {
+      "id": "CSAG",
+      "version": 1,
+      "ticker": "CSAG",
+      "company_name": "Canal Shipping Agencies",
+      "isin": "EGS44031C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.716690",
+      "notes": ""
+    }
+  ],
+  "PRCL": [
+    {
+      "id": "PRCL",
+      "version": 1,
+      "ticker": "PRCL",
+      "company_name": "Ceramic & Porcelain",
+      "isin": "EGS3C111C019",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.719198",
+      "notes": ""
+    }
+  ],
+  "CNFN": [
+    {
+      "id": "CNFN",
+      "version": 1,
+      "ticker": "CNFN",
+      "company_name": "Contact Financial Holding",
+      "isin": "EGS738I1C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.721698",
+      "notes": ""
+    }
+  ],
+  "CIEB": [
+    {
+      "id": "CIEB",
+      "version": 1,
+      "ticker": "CIEB",
+      "company_name": "Credit Agricole Egypt",
+      "isin": "EGS60041C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.724235",
+      "notes": ""
+    }
+  ],
+  "DAPH": [
+    {
+      "id": "DAPH",
+      "version": 1,
+      "ticker": "DAPH",
+      "company_name": "Development & Engineering Consultants",
+      "isin": "EGS65081C019",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.726828",
+      "notes": ""
+    }
+  ],
+  "DSCW": [
+    {
+      "id": "DSCW",
+      "version": 1,
+      "ticker": "DSCW",
+      "company_name": "Dice Sport & Casual Wear",
+      "isin": "EGS33321C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.729520",
+      "notes": ""
+    }
+  ],
+  "EGTS": [
+    {
+      "id": "EGTS",
+      "version": 1,
+      "ticker": "EGTS",
+      "company_name": "Egyptian for Tourism Resorts",
+      "isin": "EGS70431C019",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.732138",
+      "notes": ""
+    }
+  ],
+  "PHAR": [
+    {
+      "id": "PHAR",
+      "version": 1,
+      "ticker": "PHAR",
+      "company_name": "Egyptian International Pharmaceuticals (EIPICO)",
+      "isin": "EGS38081C013",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.734837",
+      "notes": ""
+    }
+  ],
+  "MPRC": [
+    {
+      "id": "MPRC",
+      "version": 1,
+      "ticker": "MPRC",
+      "company_name": "Egyptian Media Production City",
+      "isin": "EGS78021C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.737507",
+      "notes": ""
+    }
+  ],
+  "ETRS": [
+    {
+      "id": "ETRS",
+      "version": 1,
+      "ticker": "ETRS",
+      "company_name": "Egyptian Transport & Commercial Services Co. -EGYTRANS NOSCO",
+      "isin": "EGS42051C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.740230",
+      "notes": ""
+    }
+  ],
+  "EHDR": [
+    {
+      "id": "EHDR",
+      "version": 1,
+      "ticker": "EHDR",
+      "company_name": "Egyptians Housing Development & Reconstruction",
+      "isin": "EGS65341C017",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.743006",
+      "notes": ""
+    }
+  ],
+  "AFDI": [
+    {
+      "id": "AFDI",
+      "version": 1,
+      "ticker": "AFDI",
+      "company_name": "El Ahli Investment and Development",
+      "isin": "EGS69021C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.745769",
+      "notes": ""
+    }
+  ],
+  "ECAP": [
+    {
+      "id": "ECAP",
+      "version": 1,
+      "ticker": "ECAP",
+      "company_name": "El Ezz Porcelain (Gemma)",
+      "isin": "EGS3C071C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.748600",
+      "notes": ""
+    }
+  ],
+  "KABO": [
+    {
+      "id": "KABO",
+      "version": 1,
+      "ticker": "KABO",
+      "company_name": "El Nasr Clothes & Textiles (Kabo)",
+      "isin": "EGS33061C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.751461",
+      "notes": ""
+    }
+  ],
+  "OBRI": [
+    {
+      "id": "OBRI",
+      "version": 1,
+      "ticker": "OBRI",
+      "company_name": "El Obour Real Estate Investment",
+      "isin": "EGS65551C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.754281",
+      "notes": ""
+    }
+  ],
+  "ELSH": [
+    {
+      "id": "ELSH",
+      "version": 1,
+      "ticker": "ELSH",
+      "company_name": "El Shams Housing & Urbanization",
+      "isin": "EGS65091C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.757229",
+      "notes": ""
+    }
+  ],
+  "NIPH": [
+    {
+      "id": "NIPH",
+      "version": 1,
+      "ticker": "NIPH",
+      "company_name": "El-Nile Co. For Pharmaceuticals And Chemical Industries",
+      "isin": "EGS38331C012",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.760163",
+      "notes": ""
+    }
+  ],
+  "UEGC": [
+    {
+      "id": "UEGC",
+      "version": 1,
+      "ticker": "UEGC",
+      "company_name": "Elsaeed Contracting& Real Estate Investment Company SCCD",
+      "isin": "EGS21531C016",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.763143",
+      "notes": ""
+    }
+  ],
+  "SWDY": [
+    {
+      "id": "SWDY",
+      "version": 1,
+      "ticker": "SWDY",
+      "company_name": "ELSWEDY ELECTRIC",
+      "isin": "EGS3G0Z1C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.766113",
+      "notes": ""
+    }
+  ],
+  "ENGC": [
+    {
+      "id": "ENGC",
+      "version": 1,
+      "ticker": "ENGC",
+      "company_name": "Engineering Industries (ICON)",
+      "isin": "EGS3F021C017",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.769130",
+      "notes": ""
+    }
+  ],
+  "EXPA": [
+    {
+      "id": "EXPA",
+      "version": 1,
+      "ticker": "EXPA",
+      "company_name": "Export Development Bank of Egypt",
+      "isin": "EGS60241C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.772272",
+      "notes": ""
+    }
+  ],
+  "ZEOT": [
+    {
+      "id": "ZEOT",
+      "version": 1,
+      "ticker": "ZEOT",
+      "company_name": "Extracted Oils",
+      "isin": "EGS38251C012",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.775351",
+      "notes": ""
+    }
+  ],
+  "BIOC": [
+    {
+      "id": "BIOC",
+      "version": 1,
+      "ticker": "BIOC",
+      "company_name": "Glaxo Smith Kline",
+      "isin": "EGS38171C012",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.778508",
+      "notes": ""
+    }
+  ],
+  "GPIM": [
+    {
+      "id": "GPIM",
+      "version": 1,
+      "ticker": "GPIM",
+      "company_name": "GPI For Urban Growth",
+      "isin": "EGS213S1C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.781590",
+      "notes": ""
+    }
+  ],
+  "HDBK": [
+    {
+      "id": "HDBK",
+      "version": 1,
+      "ticker": "HDBK",
+      "company_name": "Housing & Development Bank",
+      "isin": "EGS60301C016",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.784715",
+      "notes": ""
+    }
+  ],
+  "IEEC": [
+    {
+      "id": "IEEC",
+      "version": 1,
+      "ticker": "IEEC",
+      "company_name": "Industrial & Engineering Projects",
+      "isin": "EGS22171C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.787860",
+      "notes": ""
+    }
+  ],
+  "IFAP": [
+    {
+      "id": "IFAP",
+      "version": 1,
+      "ticker": "IFAP",
+      "company_name": "International Agricultural Products",
+      "isin": "EGS07061C012",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.791057",
+      "notes": ""
+    }
+  ],
+  "ICFC": [
+    {
+      "id": "ICFC",
+      "version": 1,
+      "ticker": "ICFC",
+      "company_name": "International Company For Fertilizers & Chemicals",
+      "isin": "EGS520D1C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.794307",
+      "notes": ""
+    }
+  ],
+  "ISMQ": [
+    {
+      "id": "ISMQ",
+      "version": 1,
+      "ticker": "ISMQ",
+      "company_name": "Iron And Steel for Mines and Quarries",
+      "isin": "EGS102S1C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.797636",
+      "notes": ""
+    }
+  ],
+  "IDRE": [
+    {
+      "id": "IDRE",
+      "version": 1,
+      "ticker": "IDRE",
+      "company_name": "Ismailia Development and Real Estate Co",
+      "isin": "EGS214Q1C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.800943",
+      "notes": ""
+    }
+  ],
+  "ISMA": [
+    {
+      "id": "ISMA",
+      "version": 1,
+      "ticker": "ISMA",
+      "company_name": "Ismailia Misr Poultry",
+      "isin": "EGS02021C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.804258",
+      "notes": ""
+    }
+  ],
+  "LCSW": [
+    {
+      "id": "LCSW",
+      "version": 1,
+      "ticker": "LCSW",
+      "company_name": "Lecico Egypt",
+      "isin": "EGS3C161C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.807617",
+      "notes": ""
+    }
+  ],
+  "MCRO": [
+    {
+      "id": "MCRO",
+      "version": 1,
+      "ticker": "MCRO",
+      "company_name": "Macro Group Pharmaceuticals -Macro Capital",
+      "isin": "EGS7D971C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.810964",
+      "notes": ""
+    }
+  ],
+  "MASR": [
+    {
+      "id": "MASR",
+      "version": 1,
+      "ticker": "MASR",
+      "company_name": "Madinet Masr For Housing and Development",
+      "isin": "EGS65571C019",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.814421",
+      "notes": ""
+    }
+  ],
+  "MPCO": [
+    {
+      "id": "MPCO",
+      "version": 1,
+      "ticker": "MPCO",
+      "company_name": "Mansourah Poultry",
+      "isin": "EGS02091C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.817870",
+      "notes": ""
+    }
+  ],
+  "MEPA": [
+    {
+      "id": "MEPA",
+      "version": 1,
+      "ticker": "MEPA",
+      "company_name": "Medical Packaging Company",
+      "isin": "EGS3C4L1C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.821353",
+      "notes": ""
+    }
+  ],
+  "MPCI": [
+    {
+      "id": "MPCI",
+      "version": 1,
+      "ticker": "MPCI",
+      "company_name": "Memphis Pharmaceuticals",
+      "isin": "EGS38351C010",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.824837",
+      "notes": ""
+    }
+  ],
+  "MFPC": [
+    {
+      "id": "MFPC",
+      "version": 1,
+      "ticker": "MFPC",
+      "company_name": "Misr Fertilizers Production Company - Mopco",
+      "isin": "EGS39061C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.828361",
+      "notes": ""
+    }
+  ],
+  "ATQA": [
+    {
+      "id": "ATQA",
+      "version": 1,
+      "ticker": "ATQA",
+      "company_name": "Misr National Steel - Ataqa",
+      "isin": "EGS3D0C1C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.831904",
+      "notes": ""
+    }
+  ],
+  "MTIE": [
+    {
+      "id": "MTIE",
+      "version": 1,
+      "ticker": "MTIE",
+      "company_name": "MM Group For Industry And International Trade",
+      "isin": "EGS75011C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.835483",
+      "notes": ""
+    }
+  ],
+  "NCCW": [
+    {
+      "id": "NCCW",
+      "version": 1,
+      "ticker": "NCCW",
+      "company_name": "Nasr Company for Civil Works",
+      "isin": "EGS23111C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.839162",
+      "notes": ""
+    }
+  ],
+  "OFH": [
+    {
+      "id": "OFH",
+      "version": 1,
+      "ticker": "OFH",
+      "company_name": "O B Financial Holding",
+      "isin": "EGS696S1C016",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.842757",
+      "notes": ""
+    }
+  ],
+  "RACC": [
+    {
+      "id": "RACC",
+      "version": 1,
+      "ticker": "RACC",
+      "company_name": "Raya Customer Experience",
+      "isin": "EGS74191C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.846423",
+      "notes": ""
+    }
+  ],
+  "SIPC": [
+    {
+      "id": "SIPC",
+      "version": 1,
+      "ticker": "SIPC",
+      "company_name": "Sabaa International Company for Pharmaceutical and Chemical",
+      "isin": "EGS382M1C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.850131",
+      "notes": ""
+    }
+  ],
+  "SDTI": [
+    {
+      "id": "SDTI",
+      "version": 1,
+      "ticker": "SDTI",
+      "company_name": "Sharm Dreams Co. for Tourism Investment",
+      "isin": "EGS70571C012",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.853923",
+      "notes": ""
+    }
+  ],
+  "SKPC": [
+    {
+      "id": "SKPC",
+      "version": 1,
+      "ticker": "SKPC",
+      "company_name": "Sidi Kerir Petrochemicals - SIDPEC",
+      "isin": "EGS380S1C017",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.857753",
+      "notes": ""
+    }
+  ],
+  "SCEM": [
+    {
+      "id": "SCEM",
+      "version": 1,
+      "ticker": "SCEM",
+      "company_name": "Sinai Cement",
+      "isin": "EGS3C401C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.861629",
+      "notes": ""
+    }
+  ],
+  "OCDI": [
+    {
+      "id": "OCDI",
+      "version": 1,
+      "ticker": "OCDI",
+      "company_name": "Six of October Development & Investment (SODIC)",
+      "isin": "EGS65851C015",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.865423",
+      "notes": ""
+    }
+  ],
+  "SVCE": [
+    {
+      "id": "SVCE",
+      "version": 1,
+      "ticker": "SVCE",
+      "company_name": "South Valley Cement",
+      "isin": "EGS3C351C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.869280",
+      "notes": ""
+    }
+  ],
+  "TALM": [
+    {
+      "id": "TALM",
+      "version": 1,
+      "ticker": "TALM",
+      "company_name": "Taaleem Management Services",
+      "isin": "EGS597R1C017",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.873094",
+      "notes": ""
+    }
+  ],
+  "TANM": [
+    {
+      "id": "TANM",
+      "version": 1,
+      "ticker": "TANM",
+      "company_name": "Tanmiya for Real Estate Investment",
+      "isin": "EGS21EB1C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.877022",
+      "notes": ""
+    }
+  ],
+  "TAQA": [
+    {
+      "id": "TAQA",
+      "version": 1,
+      "ticker": "TAQA",
+      "company_name": "Taqa Arabia",
+      "isin": "EGS490S1C014",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.883208",
+      "notes": ""
+    }
+  ],
+  "MOED": [
+    {
+      "id": "MOED",
+      "version": 1,
+      "ticker": "MOED",
+      "company_name": "The Egyptian Modern Education Systems",
+      "isin": "EGS729F1C012",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.888527",
+      "notes": ""
+    }
+  ],
+  "VALU": [
+    {
+      "id": "VALU",
+      "version": 1,
+      "ticker": "VALU",
+      "company_name": "U Consumer Finance",
+      "isin": "EGS505Z1C018",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.892509",
+      "notes": ""
+    }
+  ],
+  "UNIP": [
+    {
+      "id": "UNIP",
+      "version": 1,
+      "ticker": "UNIP",
+      "company_name": "Universal For Paper and Packaging Materials (Unipack",
+      "isin": "EGS38161C013",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.896542",
+      "notes": ""
+    }
+  ],
+  "ZMID": [
+    {
+      "id": "ZMID",
+      "version": 1,
+      "ticker": "ZMID",
+      "company_name": "Zahraa Maadi Investment & Development",
+      "isin": "EGS21171C011",
+      "index_membership": [
+        "EGX70"
+      ],
+      "homepage_url": null,
+      "homepage_hint_source": null,
+      "status": "homepage_unresolved",
+      "documents": [],
+      "robots_allowed": null,
+      "blocked_reason": "No evidenced homepage hint available yet (see TD-38/TD-39).",
+      "last_attempted_at": "2026-07-29T05:23:08.900562",
+      "notes": ""
+    }
+  ]
+}

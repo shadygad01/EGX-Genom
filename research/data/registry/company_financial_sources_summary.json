@@ -1,0 +1,13 @@
+{
+  "by_status": {
+    "blocked": 6,
+    "discovered": 20,
+    "homepage_unresolved": 75,
+    "pending": 0,
+    "validated": 0
+  },
+  "companies_total": 101,
+  "documents_discovered_total": 57,
+  "processed_this_run": 101,
+  "skipped_already_validated": 0
+}

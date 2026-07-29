@@ -395,9 +395,22 @@ def build_live_collector(
             spec, indicators=dict(LIVE_CAPMAS_INDICATORS), fetcher=fetcher
         )
     if source_id == "gdelt":
+        # AND-of-ORs, not a single broad OR: a real historical run of the
+        # old query (Egypt OR Egyptian OR "Egyptian Exchange" OR EGX) pulled
+        # 13,464 articles of which only ~3.8% even mentioned "Egypt" in the
+        # headline (see sources.catalog's gdelt evidence_tier note) --
+        # requiring an Egypt term AND a finance term cuts the same false
+        # positives (Nigeria telecom, Gaza ceasefire, Spanish tourism, ...)
+        # without needing to guess at a stricter single-clause query. Still
+        # discovery-tier regardless -- this narrows the candidate pool, it
+        # doesn't replace `reconcile_discovery_news()`'s primary-source gate.
         return GdeltDocCollector(
             spec,
-            query='(Egypt OR Egyptian OR "Egyptian Exchange" OR EGX)',
+            query=(
+                '(Egypt OR Egyptian OR "Egyptian Exchange" OR "EGX30" OR "Cairo Stock Exchange") '
+                "(stock OR shares OR exchange OR economy OR pound OR inflation OR "
+                '"interest rate" OR IPO OR earnings OR investors OR market OR trading)'
+            ),
             ticker_hints=companies if companies is not None else tickers,
             max_records=50,
             fetcher=fetcher,

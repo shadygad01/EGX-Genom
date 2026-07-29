@@ -13,7 +13,13 @@ from agx_research.data.mock_provider import LocalCsvDataProvider
 from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem, PriceBar
 from agx_research.events.service import EventPlatform
 from agx_research.financials.schema import FinancialStatementLineItem
-from agx_research.sources.spec import AccessMethod, SourceCategory, SourceSpec, SourceStatus
+from agx_research.sources.spec import (
+    AccessMethod,
+    EvidenceTier,
+    SourceCategory,
+    SourceSpec,
+    SourceStatus,
+)
 from agx_research.universe.constituent import IndexConstituent
 
 
@@ -163,6 +169,29 @@ def test_news_items_materialized_and_registered_as_events(tmp_path):
     assert result.events_registered == 1
     assert (tmp_path / "news.csv").exists()
     assert len(event_platform.repository.all_latest()) == 1
+
+
+def test_discovery_tier_news_never_reaches_news_csv_or_the_event_platform(tmp_path):
+    # GDELT (and any future DISCOVERY-tier source) must never independently
+    # become evidence -- see sources.spec.EvidenceTier.
+    event_platform = EventPlatform()
+    service = CollectionService(tmp_path, event_platform=event_platform, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        news_items=[
+            NewsItem(published_at=date(2026, 6, 1), source="gdelt", headline="COMI mentioned", tickers=["COMI"])
+        ],
+    )
+    collector = StubCollector(make_spec(evidence_tier=EvidenceTier.DISCOVERY), {"https://x/1": batch})
+
+    result = service.run(collector, expected_records=1)
+
+    assert result.news_items_written == 0
+    assert result.news_discovery_items_written == 1
+    assert result.events_registered == 0
+    assert not (tmp_path / "news.csv").exists()
+    assert (tmp_path / "news_discovery.csv").exists()
+    assert len(event_platform.repository.all_latest()) == 0
 
 
 def test_arabic_news_is_persisted_as_utf8(tmp_path):

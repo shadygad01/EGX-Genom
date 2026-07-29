@@ -61,6 +61,29 @@ class LegalUseStatus(str, Enum):
     BLOCKED = "blocked"
 
 
+class EvidenceTier(str, Enum):
+    """Whether this source's news items may independently seed evidence.
+
+    PRIMARY: the source's own reporting is materialized into news.csv and
+    registered with the Event Platform directly (every source's behavior
+    before this field existed).
+
+    DISCOVERY: a broad, low-precision aggregator (GDELT is the only one
+    today) whose items are collected as candidates only -- materialized to
+    a separate news_discovery.csv, never registered with the Event
+    Platform directly. `collectors.discovery_reconciliation
+    .reconcile_discovery_news()` is the only path that promotes a
+    discovery item into news.csv/evidence, and only once a PRIMARY source
+    independently reports something about the same ticker within a
+    tolerance window -- "GDELT never becomes evidence by itself" is
+    enforced structurally, not by a downstream filter an agent could
+    bypass.
+    """
+
+    PRIMARY = "primary"
+    DISCOVERY = "discovery"
+
+
 class LifecycleState(str, Enum):
     """Where a source sits in the qualification pipeline (`sources.qualification`).
 
@@ -185,4 +208,5 @@ class SourceSpec(BaseModel):
         default=None,
         description="Composite score from sources.reputation; measured only, never declared.",
     )
+    evidence_tier: EvidenceTier = EvidenceTier.PRIMARY
     notes: str = ""

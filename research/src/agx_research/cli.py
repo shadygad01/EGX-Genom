@@ -37,6 +37,7 @@ from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.rss import RssNewsCollector
+from agx_research.collectors.discovery_reconciliation import reconcile_discovery_news
 from agx_research.collectors.service import CollectionService
 from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.dashboard import validate_dashboard_artifacts, write_dashboard_artifacts
@@ -252,6 +253,17 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
 
+    reconcile_discovery_parser = sub.add_parser(
+        "reconcile-discovery-news",
+        help="Promote DISCOVERY-tier news candidates (news_discovery.csv, e.g. GDELT) into "
+        "news.csv wherever a PRIMARY source independently reported the same ticker nearby "
+        "in time -- see sources.spec.EvidenceTier",
+    )
+    reconcile_discovery_parser.add_argument(
+        "--window-days", type=int, default=2,
+        help="Max days between a discovery candidate and a matching primary-source report",
+    )
+
     publication_parser = sub.add_parser(
         "publication-status",
         help="Validate publication evidence, benchmark performance and legal approval "
@@ -382,6 +394,7 @@ def main(argv: list[str] | None = None) -> int:
                     "price_bars_written": result.price_bars_written,
                     "macro_observations_written": result.macro_observations_written,
                     "news_items_written": result.news_items_written,
+                    "news_discovery_items_written": result.news_discovery_items_written,
                     "events_registered": result.events_registered,
                 },
                 indent=2,
@@ -532,6 +545,21 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(
             json.dumps({"as_of": as_of.isoformat() if as_of else None, "counts": counts}, indent=2)
+        )
+        return 0
+
+    if args.command == "reconcile-discovery-news":
+        args.data_dir.mkdir(parents=True, exist_ok=True)
+        result = reconcile_discovery_news(args.data_dir, window_days=args.window_days)
+        print(
+            json.dumps(
+                {
+                    "candidates_checked": result.candidates_checked,
+                    "promoted": result.promoted,
+                    "still_pending": result.still_pending,
+                },
+                indent=2,
+            )
         )
         return 0
 

@@ -17,6 +17,13 @@ A batch scoring below the confidence floor is recorded (via its
 RawDocument's validation_history) but never materialized or registered —
 "no downstream system may ignore data quality" means low-quality data
 doesn't quietly become knowledge, it's visibly withheld.
+
+A source whose `SourceSpec.evidence_tier` is DISCOVERY (GDELT today) never
+reaches news.csv/the Event Platform through this path at all, regardless
+of confidence score: its news items go to news_discovery.csv instead, and
+`collectors.discovery_reconciliation.reconcile_discovery_news()` is the
+only way one is promoted into news.csv, once a PRIMARY source
+independently reports something about the same ticker nearby in time.
 """
 
 from __future__ import annotations
@@ -39,7 +46,7 @@ from agx_research.events.taxonomy import EventSubtype
 from agx_research.sources.health import HealthMonitor
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository, compute_reputation
-from agx_research.sources.spec import SourceSpec
+from agx_research.sources.spec import EvidenceTier, SourceSpec
 
 
 @dataclass
@@ -59,6 +66,7 @@ class CollectionRunResult:
     provider_documents: dict[str, int] = field(default_factory=dict)
     provider_yields: dict[str, int] = field(default_factory=dict)
     fetch_warnings: list[str] = field(default_factory=list)
+    news_discovery_items_written: int = 0
 
 
 def collection_yield(result: CollectionRunResult) -> int:
@@ -66,11 +74,17 @@ def collection_yield(result: CollectionRunResult) -> int:
     definition of "yield" every health/status/decision computation in this
     platform shares, so a collector that fetched successfully but parsed
     nothing is never mistaken for one that actually produced data.
+
+    Discovery-tier writes (`news_discovery_items_written`) count toward
+    yield too -- a discovery-tier collector's fetch was still real,
+    successful work, even though none of it reaches news.csv/evidence
+    without a later primary-source match.
     """
     return (
         result.price_bars_written + result.macro_observations_written
         + result.news_items_written + result.corporate_events_written
         + result.index_constituents_written + result.financial_statement_line_items_written
+        + result.news_discovery_items_written
     )
 
 
@@ -222,14 +236,13 @@ def _write_index_constituents(
     return len(constituents)
 
 
-def _append_news(data_dir: Path, items) -> int:
+def _append_news_to(path: Path, items) -> int:
     # Merged idempotently by (date, source, headline), matching every
     # sibling writer above (_write_price_bars/_write_macro_observations/
     # _write_corporate_events) -- collecting the same feed twice (e.g. a
     # mock run followed by a replay run reading the same archive) must not
     # duplicate rows, since a downstream agent may treat each row as one
     # independent observation.
-    path = data_dir / "news.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[tuple[str, str, str], dict] = {}
     if path.exists():
@@ -251,6 +264,24 @@ def _append_news(data_dir: Path, items) -> int:
         for key in sorted(existing):
             writer.writerow(existing[key])
     return len(items)
+
+
+def append_news(data_dir: Path, items) -> int:
+    """Materialize PRIMARY-tier news items into news.csv -- the file
+    LocalCsvDataProvider/DatasetSnapshot reads. Never call this for a
+    DISCOVERY-tier source's items; use `append_discovery_news` instead
+    (see `sources.spec.EvidenceTier`).
+    """
+    return _append_news_to(data_dir / "news.csv", items)
+
+
+def append_discovery_news(data_dir: Path, items) -> int:
+    """Materialize DISCOVERY-tier news items (candidates only) into
+    news_discovery.csv -- never read by DatasetSnapshot/agents directly.
+    `collectors.discovery_reconciliation.reconcile_discovery_news()` is the
+    only path that promotes a row from here into news.csv.
+    """
+    return _append_news_to(data_dir / "news_discovery.csv", items)
 
 
 def _news_event_candidates(batch, spec: SourceSpec, raw_document_id: str):
@@ -432,8 +463,17 @@ class CollectionService:
                         ),
                     )
 
-                if batch.news_items:
-                    result.news_items_written += _append_news(self.data_dir, batch.news_items)
+                if batch.news_items and collector.spec.evidence_tier == EvidenceTier.DISCOVERY:
+                    # Never news.csv, never the Event Platform, regardless of
+                    # confidence -- a DISCOVERY-tier source's items are
+                    # candidates only. reconcile_discovery_news() is the sole
+                    # promotion path, and it requires an independent PRIMARY
+                    # source (see sources.spec.EvidenceTier).
+                    result.news_discovery_items_written += append_discovery_news(
+                        self.data_dir, batch.news_items
+                    )
+                elif batch.news_items:
+                    result.news_items_written += append_news(self.data_dir, batch.news_items)
                     candidates = _news_event_candidates(batch, collector.spec, document.id)
                     for candidate in candidates:
                         registered = self.event_platform.register(candidate)

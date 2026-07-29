@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.37.0 — Close TD-40: daily cross-run persistence; fix news-history-backfill bug
+
+Project owner approval to proceed with the TD-40 fix flagged in 0.36.0.
+
+- **`deploy-pages.yml` gains real cross-run persistence**: `--data-dir`
+  changed from an ephemeral `/tmp` path to `data/production`, restored
+  from and force-committed back to a dedicated `production/state-latest`
+  branch around each run (same restore/commit discipline `discovery.yml`
+  already used, auto rather than PR-gated — this is accumulated
+  operational state, not evidence for human review). Every calendar day's
+  research cycle now builds on yesterday's promoted knowledge/genome/event
+  history instead of starting empty.
+- **Same-date dedup guard**: `RuntimeEngine.run_day` has no built-in
+  same-date dedup (by design, for replay/backfill), so persistence alone
+  would let a same-day double trigger (e.g. the daily `schedule` plus a
+  same-day `push`) duplicate a date's hypotheses/knowledge. A new step
+  checks the restored `RunRecordRepository` for an existing `SUCCEEDED`
+  run for today's date and, if found, skips the rest of the `build` job
+  and the `deploy` job entirely rather than rebuilding/republishing
+  redundantly.
+- **Real bug found and fixed in `news-history-backfill.yml`**: its first
+  real run (2026-07-29) silently collected zero articles. `--data-dir` was
+  placed after the `collect` subcommand instead of before it (a global
+  `argparse` argument added before `add_subparsers()` in `cli.py`, not a
+  `collect`-specific one) — `agx: error: unrecognized arguments` was
+  raised and then swallowed by an unguarded `| tee` (no `pipefail`), so the
+  step falsely reported success. Fixed (argument order corrected,
+  `set -o pipefail` added) and verified locally against a real invocation.
+- `docs/TECHNICAL_DEBT.md` (TD-40 closed, TD-41 updated), `docs/ROADMAP.md`,
+  `docs/PHASE_STATUS.md` updated accordingly.
+
 ## 0.36.0 — GDELT historical news backfill; daily cross-run persistence gap named
 
 Project owner request: with no paid data vendor (permanent per AD-32),

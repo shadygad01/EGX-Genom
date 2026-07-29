@@ -46,35 +46,35 @@ Required user/business inputs, in priority order:
 3. **Authoritative EGX trading calendar + universe/sector membership
    feeds** (replace the placeholder tables).
 
-## Highest-leverage engineering-closeable gap: daily cross-run persistence
+## Closed: daily cross-run persistence (TD-40)
 
-Not business-blocked, and higher-impact than any single new source: the
-daily production pipeline (`.github/workflows/deploy-pages.yml`'s `agx run
---mode live` step) runs against an ephemeral `/tmp` data directory with no
-restore-before/commit-after step, unlike `.github/workflows/discovery.yml`
-(see TD-40). Every calendar day starts from an empty `KnowledgeStore`/
-`AlphaGenome`/`EventRepository`/run ledger — real multi-year price history
-is re-fetched fresh every time (unaffected), but promoted knowledge, gene
-lineage, and any news/event history outside GDELT/RSS's rolling window
-never survive from one day to the next. This is very likely the dominant
-reason the live dashboard rarely surfaces a confident, cross-day-
-corroborated recommendation, more so than data source coverage. Proposed
-fix, pending project-owner sizing/approval given its repo-growth and
-CI-behavior implications: give `agx run --mode live` a persisted
-`--data-dir`, restored/committed around the run the same way
-`discovery.yml` already does for its own data (a dedicated data branch,
-not PR-gated — this is accumulated operational state, not evidence for
-human review).
+Was the highest-leverage engineering-closeable gap, not business-blocked:
+the daily production pipeline (`deploy-pages.yml`'s `agx run --mode live`
+step) used to run against an ephemeral `/tmp` data directory with no
+restore-before/commit-after step, unlike `discovery.yml` — every calendar
+day started from an empty `KnowledgeStore`/`AlphaGenome`/`EventRepository`/
+run ledger, very likely the dominant reason the live dashboard rarely
+surfaced a confident, cross-day-corroborated recommendation. **Now fixed**:
+`deploy-pages.yml` restores `research/data/production/` from a
+`production/state-latest` branch before running (`--data-dir
+data/production`), auto-commits/force-pushes it back after a successful,
+validated run (never PR-gated — operational state, not reviewed evidence),
+and skips the rest of the job entirely on a same-day re-trigger (checked
+against the real `RunRecordRepository`, since `RuntimeEngine` has no
+built-in same-date dedup) so a double trigger can't duplicate a date's
+hypotheses/knowledge. Accepted, disclosed tradeoff: real repo growth over
+time (raw payload text accumulates) — watch it; see TD-40.
 
-A first, complementary, already-shipped piece: `GdeltDocCollector` now
-supports a historical windowed backfill mode (absolute `startdatetime`/
-`enddatetime`, `window_days`-sized slices around GDELT DOC 2.0's 250-
-articles-per-response cap) and `.github/workflows/news-history-backfill.yml`
-runs it for real (`workflow_dispatch`), landing old news in
-`research/data/news_history/` via a reviewed PR — see TD-41. It seeds real
-historical news but isn't yet wired into the production data-dir the
-pipeline actually reads; that wiring is the natural follow-up once the
-persistence fix above lands.
+A complementary, already-shipped piece: `GdeltDocCollector` supports a
+historical windowed backfill mode (absolute `startdatetime`/`enddatetime`,
+`window_days`-sized slices around GDELT DOC 2.0's 250-articles-per-response
+cap) and `.github/workflows/news-history-backfill.yml` runs it for real
+(`workflow_dispatch`), landing old news in `research/data/news_history/`
+via a reviewed PR — see TD-41. It seeds real historical news but still
+lands in its own directory, separate from `research/data/production/`;
+wiring the two together (so backfilled history is visible to
+`DatasetSnapshot`-consuming agents) is the natural next step now that
+persistence exists to wire it into.
 
 ## Data Acquisition Platform: next engineering-closeable steps
 

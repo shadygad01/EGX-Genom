@@ -18,7 +18,7 @@ on:
     - cron: "30 15 * * 0-4"
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -46,6 +46,45 @@ jobs:
 
       - run: uv sync
 
+      # Cross-run persistence (TD-40): without this, `--data-dir` below
+      # would be a brand-new, empty directory every single day -- every
+      # calendar day's research cycle would start from an empty
+      # KnowledgeStore/AlphaGenome/EventRepository/run ledger, never
+      # carrying yesterday's promoted knowledge or accumulated news/event
+      # history forward, even though real multi-year price history has
+      # always been available. Same restore-before-run discipline
+      # discovery.yml already uses for its own data, just auto-committed
+      # (never PR-gated) -- this is accumulated operational state, not
+      # evidence for a human to review line by line.
+      - name: Restore prior production state from production/state-latest
+        run: |
+          mkdir -p data/production
+          if git ls-remote --exit-code --heads origin production/state-latest > /dev/null 2>&1; then
+            git fetch origin production/state-latest
+            git archive origin/production/state-latest -- data/production | tar -x || true
+          fi
+
+      # Persistence means today's date could already have a SUCCEEDED
+      # RunRecord in the state just restored (e.g. this workflow's own
+      # `schedule` trigger and a same-day `push` trigger both firing) --
+      # `RuntimeEngine.run_day` has no built-in same-date dedup (by
+      # design: `run_range` replay/backfill needs to be able to re-run a
+      # date on purpose), so re-running the research pipeline here would
+      # append a second, near-duplicate set of hypotheses/findings for a
+      # date already recorded. Checked via the real `RunRecordRepository`
+      # model, not a hand-rolled JSON scan.
+      - name: Check whether today's date already ran
+        id: check_run
+        run: |
+          ALREADY_RAN=$(uv run python -c "
+          from datetime import date
+          from agx_research.runtime.engine import RunRecordRepository, RunStatus
+          runs = RunRecordRepository('data/production/runs.json').all_latest()
+          today = date.today()
+          print('true' if any(r.run_date == today and r.status == RunStatus.SUCCEEDED for r in runs) else 'false')
+          ")
+          echo "already_ran=$ALREADY_RAN" >> "$GITHUB_OUTPUT"
+
       # Runs the complete production pipeline against REAL public market
       # data -- this is the single entry point (`agx run`), unchanged in
       # shape from every prior mock-mode run: Source Registry -> Discovery
@@ -68,9 +107,23 @@ jobs:
       # honest "nothing promoted yet" from real data is an expected result,
       # not a failure.
       - name: Run the complete production pipeline (live data)
+        if: steps.check_run.outputs.already_ran != 'true'
         run: |
-          uv run python -m agx_research.cli --data-dir /tmp/agx_dashboard_data \
+          uv run python -m agx_research.cli --data-dir data/production \
             run --date "$(date -u +%F)" --mode live --dashboard-out ../web/public/data
+
+      # Today already has a SUCCEEDED run in the persisted state (see the
+      # check above, e.g. this workflow's own `schedule` trigger and a
+      # same-day `push` trigger both firing) -- today's Pages deployment
+      # already published from that earlier run, so every remaining step
+      # (including `deploy`, gated the same way below) is skipped rather
+      # than rebuilding/republishing a redundant, no-new-information build.
+      # `export-dashboard` was deliberately not used as a "regenerate only"
+      # fallback here: it writes the older, narrower Epoch I/II artifact
+      # set (`write_dashboard_artifacts`), not the full production set this
+      # job's own "Verify build output" step requires (execution_report,
+      # collector_status, acquisition_decisions, mission_status, ...) --
+      # producing a broken partial deploy is worse than skipping outright.
 
       # discovery_report.json/discovery_metrics.json/endpoint_candidates.json
       # are written by the separate, weekly .github/workflows/discovery.yml
@@ -80,6 +133,7 @@ jobs:
       # Discovery PR merges -- an honest gap, not a missing step; the
       # dashboard renders an empty state until then.
       - name: Copy Discovery workflow evidence into the dashboard data dir (if present)
+        if: steps.check_run.outputs.already_ran != 'true'
         run: |
           for f in discovery_report.json discovery_metrics.json endpoint_candidates.json; do
             if [ -f "data/discovery/$f" ]; then
@@ -88,11 +142,37 @@ jobs:
           done
 
       - name: Validate dashboard JSON artifacts
+        if: steps.check_run.outputs.already_ran != 'true'
         # Publishing partial, explicitly measured coverage is valid. The
         # validator still rejects malformed, stale, or internally inconsistent
         # financial artifacts; missing tickers remain visible in the coverage
         # report instead of blocking the whole dashboard deployment.
         run: uv run python -m agx_research.cli validate-dashboard --dir ../web/public/data
+
+      # Persist today's updated state (TD-40) now that it's run and passed
+      # dashboard validation -- auto-committed, never PR-gated (this is
+      # accumulated operational state, not evidence for a human to review
+      # line by line, unlike discovery.yml's/news-history-backfill.yml's
+      # data). `git checkout -B` always branches fresh off the `main` HEAD
+      # already checked out above rather than off any prior
+      # `production/state-latest` history, so the branch never accumulates
+      # its own growing commit history -- only the restore-then-run above
+      # makes the underlying data *content* (knowledge/genome/events/etc.)
+      # accumulate across days; each day's commit here is a fresh single
+      # snapshot, same discipline as discovery.yml's own `discovery/latest`.
+      - name: Persist updated production state to production/state-latest
+        if: steps.check_run.outputs.already_ran != 'true'
+        working-directory: .
+        run: |
+          git config user.name "agx-production-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -B production/state-latest
+          git add research/data/production/
+          if ! git diff --cached --quiet; then
+            git commit -m "Production state: $(date -u +%F)"
+            git push --force origin production/state-latest
+          fi
+          git checkout -B main
 
       # Acquisition-architecture audit/verification is complete and frozen
       # (see docs/ACQUISITION_STRATEGY.md's "Final Data Acquisition Sprint"
@@ -105,6 +185,7 @@ jobs:
       # below is fast (local JSON reads, no extra network calls) and
       # genuinely useful for monitoring any future deploy's health.
       - name: Show per-collector live results
+        if: steps.check_run.outputs.already_ran != 'true'
         run: |
           uv run python -c "
           import json
@@ -133,6 +214,7 @@ jobs:
               print(' -', w)
           "
       - name: Show acquisition decisions (every capability, ranked strategies, outcome)
+        if: steps.check_run.outputs.already_ran != 'true'
         run: |
           uv run python -c "
           import json
@@ -145,11 +227,14 @@ jobs:
           "
 
       - run: npm install
+        if: steps.check_run.outputs.already_ran != 'true'
         working-directory: .
       - run: npm run build -w web
+        if: steps.check_run.outputs.already_ran != 'true'
         working-directory: .
 
       - name: Verify build output has an index.html and every production artifact at its root
+        if: steps.check_run.outputs.already_ran != 'true'
         working-directory: .
         run: |
           test -f web/dist/index.html
@@ -164,8 +249,12 @@ jobs:
           done
 
       - uses: actions/upload-pages-artifact@v3
+        if: steps.check_run.outputs.already_ran != 'true'
         with:
           path: web/dist
+
+    outputs:
+      already_ran: ${{ steps.check_run.outputs.already_ran }}
 
   deploy:
     needs: build
@@ -175,8 +264,10 @@ jobs:
     # ever run) with a misleading top-level workflow "failure", even though
     # `build` (the actual production pipeline run) succeeded. Gate it
     # explicitly so a feature-branch test run reports an honest "skipped"
-    # deploy instead of a false failure.
-    if: github.ref == 'refs/heads/main'
+    # deploy instead of a false failure. Also skipped outright when `build`
+    # found today's date already ran (see its own steps.check_run) --
+    # nothing new to publish, and no `upload-pages-artifact` was produced.
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.already_ran != 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

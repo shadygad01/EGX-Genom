@@ -70,11 +70,41 @@ historical windowed backfill mode (absolute `startdatetime`/`enddatetime`,
 `window_days`-sized slices around GDELT DOC 2.0's 250-articles-per-response
 cap) and `.github/workflows/news-history-backfill.yml` runs it for real
 (`workflow_dispatch`), landing old news in `research/data/news_history/`
-via a reviewed PR — see TD-41. It seeds real historical news but still
-lands in its own directory, separate from `research/data/production/`;
-wiring the two together (so backfilled history is visible to
-`DatasetSnapshot`-consuming agents) is the natural next step now that
-persistence exists to wire it into.
+via a reviewed PR — see TD-41.
+
+## Closed: GDELT evidence-tier gate (TD-43)
+
+Real 2026-07-29 evidence forced a bigger design question than "wire
+GDELT's backfill into production": a live historical run's plain-OR query
+returned 13,464 articles of which only ~3.8% even mentioned Egypt — GDELT
+is a broad, low-precision global-news aggregator, not a source AGX should
+ever let independently seed a `KnowledgeObject` or influence a
+recommendation. Project owner direction: **GDELT is discovery-tier, not
+primary-tier — every GDELT event must resolve to an independent PRIMARY
+source (Enterprise, FRA, Al Borsa, Masrawy, company IR, official
+announcements) before it counts as evidence.**
+
+Implemented as `sources.spec.EvidenceTier` (`PRIMARY`/`DISCOVERY`) —
+`collectors.service.CollectionService` now structurally routes a
+DISCOVERY-tier source's news items to `news_discovery.csv` instead of
+`news.csv`, and never registers them with the Event Platform directly.
+`collectors.discovery_reconciliation.reconcile_discovery_news()` (wired
+into `ProductionPipeline`'s Event Platform stage, runs every `agx run`)
+is the only promotion path: a discovery candidate becomes a real
+`news.csv` row only once a PRIMARY source independently reports the same
+ticker within a tolerance window. GDELT's default query (daily-live and
+backfill) was also tightened to require an Egypt term AND a finance term,
+cutting the same false-positive class the query itself can address. The
+already-collected historical batch was refiltered to 284 genuinely
+Egypt-relevant headlines and re-pushed to its PR as `news_discovery.csv`
+— see TD-41/TD-42/TD-43 for the full evidence trail, including a real
+ticker-collision false-positive bug (TD-42) this reprocessing found.
+
+"Wiring backfilled history into production" (the previous version of
+this section) is superseded by this: the discovery pool is designed to be
+folded into `research/data/production/news_discovery.csv` and continuously
+re-checked by the daily reconciliation stage as PRIMARY-source coverage
+grows, rather than merged into `news.csv` directly.
 
 ## Data Acquisition Platform: next engineering-closeable steps
 

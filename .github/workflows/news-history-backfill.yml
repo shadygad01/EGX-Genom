@@ -17,6 +17,18 @@ name: Historical news backfill (GDELT)
 # safe and cheap -- collected documents are content-addressed
 # (source, url, content hash), so re-fetching a window already collected
 # is a no-op, not a duplicate.
+#
+# GDELT is a DISCOVERY-tier source (sources.spec.EvidenceTier, project
+# owner decision 2026-07-29): it materializes to news_discovery.csv, never
+# news.csv, and never registers an Event directly -- collectors.service
+# enforces that structurally regardless of what --data-dir this workflow
+# points at. A candidate only becomes usable evidence via
+# `agx reconcile-discovery-news` finding a PRIMARY source (Enterprise,
+# FRA, Al Borsa, Masrawy, company IR) independently reporting the same
+# ticker nearby in time -- GDELT is never allowed to become evidence by
+# itself. The first real run's query (a plain OR of Egypt-related terms)
+# also evidenced 96% headline-irrelevant noise; the current query ANDs an
+# Egypt term with a finance term to cut that down (see TD-41).
 
 on:
   workflow_dispatch:
@@ -34,9 +46,11 @@ on:
         required: false
         default: "7"
       query:
-        description: "GDELT DOC 2.0 query string."
+        description: "GDELT DOC 2.0 query string. Default requires an Egypt term AND a finance term -- the old plain-OR query (2026-07-29 run) returned 13,464 articles of which only ~3.8% mentioned Egypt at all."
         required: false
-        default: '(Egypt OR Egyptian OR "Egyptian Exchange" OR EGX)'
+        default: >-
+          (Egypt OR Egyptian OR "Egyptian Exchange" OR "EGX30" OR "Cairo Stock Exchange")
+          (stock OR shares OR exchange OR economy OR pound OR inflation OR "interest rate" OR IPO OR earnings OR investors OR market OR trading)
 
 permissions:
   contents: write
@@ -122,7 +136,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          BODY="Historical GDELT DOC 2.0 backfill for ${{ steps.dates.outputs.start }} to ${{ steps.dates.outputs.end }} (window: ${{ github.event.inputs.window_days }} days/query). Materialized into \`research/data/news_history/\` via the same CollectionService path every other real collector uses -- withheld batches (below the confidence floor) are recorded, not fabricated. Review the diff before merging into the accumulating dataset. Note: this dataset is not yet read by the daily production pipeline (\`deploy-pages.yml\` runs its own ephemeral \`--data-dir\` per day) -- see TECHNICAL_DEBT.md's cross-run persistence gap. Merging this PR preserves the collected history for when that gap is closed; it does not yet change dashboard output on its own."
+          BODY="Historical GDELT DOC 2.0 backfill for ${{ steps.dates.outputs.start }} to ${{ steps.dates.outputs.end }} (window: ${{ github.event.inputs.window_days }} days/query). Materialized into \`research/data/news_history/news_discovery.csv\` via the same CollectionService path every other real collector uses -- withheld batches (below the confidence floor) are recorded, not fabricated. GDELT is DISCOVERY-tier (sources.spec.EvidenceTier): these rows never become evidence by themselves -- only \`agx reconcile-discovery-news\` finding an independent PRIMARY-source report of the same ticker nearby in time promotes one into news.csv. Review the diff before merging into the accumulating archive."
           gh pr create --base main --head news-history/latest \
             --title "Historical GDELT news backfill: ${{ steps.dates.outputs.start }}..${{ steps.dates.outputs.end }}" \
             --body "$BODY" \

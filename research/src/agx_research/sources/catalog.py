@@ -28,6 +28,7 @@ from __future__ import annotations
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.spec import (
     AccessMethod,
+    EvidenceTier,
     LegalUseStatus,
     RateLimit,
     RetryPolicy,
@@ -590,8 +591,23 @@ def seed_sources() -> list[SourceSpec]:
             terms_of_use_url="https://www.gdeltproject.org/about.html",
             supported_event_types=["news"],
             supported_languages=["en", "ar"],
+            # Discovery-tier, not primary (project owner decision, 2026-07-29):
+            # a real historical backfill run's query (Egypt OR Egyptian OR
+            # "Egyptian Exchange" OR EGX) returned 13,464 articles of which
+            # only ~514 (3.8%) even mentioned "Egypt"/"Egyptian" in the
+            # headline -- GDELT's broad global-news index matches far more
+            # loosely than a plain OR query implies. GDELT items are
+            # collected as candidates only (materialized to
+            # news_discovery.csv, never registered with the Event Platform
+            # directly) and only promoted into news.csv/evidence once
+            # `collectors.discovery_reconciliation.reconcile_discovery_news()`
+            # finds a PRIMARY source (Enterprise, FRA, Al Borsa, Masrawy,
+            # company IR) independently reporting something about the same
+            # ticker within a tolerance window. See sources.spec.EvidenceTier.
+            evidence_tier=EvidenceTier.DISCOVERY,
             notes="Official free no-key DOC 2.0 JSON API, queried for Egypt/EGX coverage. "
-            "Lower conflict priority than first-party and established direct publishers.",
+            "Lower conflict priority than first-party and established direct publishers. "
+            "Discovery-tier (see evidence_tier) -- never independently becomes evidence.",
         ),
         # ---- NEWS (English) -- each a config of rss_generic once feed URL verified ----
         _spec(

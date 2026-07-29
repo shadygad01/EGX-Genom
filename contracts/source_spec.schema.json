@@ -23,6 +23,15 @@
       "title": "ActivationStatus",
       "type": "string"
     },
+    "EvidenceTier": {
+      "description": "Whether this source's news items may independently seed evidence.\n\nPRIMARY: the source's own reporting is materialized into news.csv and\nregistered with the Event Platform directly (every source's behavior\nbefore this field existed).\n\nDISCOVERY: a broad, low-precision aggregator (GDELT is the only one\ntoday) whose items are collected as candidates only -- materialized to\na separate news_discovery.csv, never registered with the Event\nPlatform directly. `collectors.discovery_reconciliation\n.reconcile_discovery_news()` is the only path that promotes a\ndiscovery item into news.csv/evidence, and only once a PRIMARY source\nindependently reports something about the same ticker within a\ntolerance window -- \"GDELT never becomes evidence by itself\" is\nenforced structurally, not by a downstream filter an agent could\nbypass.",
+      "enum": [
+        "primary",
+        "discovery"
+      ],
+      "title": "EvidenceTier",
+      "type": "string"
+    },
     "HealthStatus": {
       "description": "Current operational health, maintained by `sources.health`.",
       "enum": [
@@ -196,6 +205,10 @@
       "default": null,
       "description": "Measured only; never declared.",
       "title": "Data Quality Score"
+    },
+    "evidence_tier": {
+      "$ref": "#/$defs/EvidenceTier",
+      "default": "primary"
     },
     "expected_latency": {
       "default": "unknown",

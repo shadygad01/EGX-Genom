@@ -67,6 +67,7 @@ from agx_research.agents.market_structure import MarketStructureAgent
 from agx_research.agents.news_intelligence import NewsIntelligenceAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
 from agx_research.collectors.fetcher import HttpFetcher
+from agx_research.collectors.discovery_reconciliation import reconcile_discovery_news
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.service import CollectionRunResult, CollectionService
@@ -722,9 +723,19 @@ class ProductionPipeline:
                 repository=EventRepository(self.data_dir / "events.json")
             )
         self.events_before = len(self.event_platform.repository.all_latest())
+        # DISCOVERY-tier sources (GDELT) never reach news.csv/the Event
+        # Platform directly (collectors.service enforces that structurally)
+        # -- this is the one place a candidate gets promoted, and only once
+        # a PRIMARY source independently reported the same ticker nearby in
+        # time. Runs every day so a discovery item collected before a
+        # matching primary report existed still gets promoted once one
+        # appears, not just on the day both happen to land together.
+        reconciliation = reconcile_discovery_news(self.data_dir)
         return (
             StageStatus.SUCCEEDED,
-            f"{self.events_before} event(s) registered in the Event Platform so far.",
+            f"{self.events_before} event(s) registered in the Event Platform so far. "
+            f"Discovery reconciliation: {reconciliation.promoted} promoted, "
+            f"{reconciliation.still_pending} still pending primary-source corroboration.",
             [],
         )
 

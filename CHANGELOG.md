@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.39.0 — GDELT evidence-tier gate: discovery-only, never independent evidence
+
+Project owner direction after inspecting the real backfilled content
+(0.38.0's successful run collected 14,984 articles, but only ~3.8%
+mentioned Egypt): GDELT must never independently become evidence. Every
+GDELT event must resolve to an independent PRIMARY source (Enterprise,
+FRA, Al Borsa, Masrawy, company IR, official announcements) before it
+counts.
+
+- **`sources.spec.EvidenceTier`** (`PRIMARY`/`DISCOVERY`): a new
+  `SourceSpec` field. `gdelt`'s catalog entry is now `DISCOVERY`-tier.
+- **`collectors.service.CollectionService`** now routes a DISCOVERY-tier
+  source's news items to `news_discovery.csv` instead of `news.csv`, and
+  never registers them with the Event Platform directly -- structural,
+  not a downstream filter an agent could bypass. `_append_news` split
+  into `append_news`/`append_discovery_news` (shared `_append_news_to`
+  helper) to serve both paths.
+- **`collectors.discovery_reconciliation.reconcile_discovery_news()`**:
+  the only promotion path. A discovery candidate becomes a real
+  `news.csv` row only once a PRIMARY source independently reports the
+  same ticker within a tolerance window (default 2 days). Wired into
+  `ProductionPipeline`'s Event Platform stage, runs every `agx run`, and
+  a new `agx reconcile-discovery-news` CLI subcommand for manual/one-off
+  runs.
+- **Tightened GDELT's default query** (daily-live and backfill) to
+  require an Egypt term AND a finance term, cutting the same
+  false-positive class the query itself can address.
+- **Reprocessed the already-collected historical batch** (PR from
+  0.38.0): filtered 13,463 raw articles down to 284 genuinely
+  Egypt-relevant headlines; ticker re-resolution was attempted but
+  proved unreliable (`EAST`/`ARAB` collide with common English words,
+  a real false-positive bug filed as TD-42) so tickers are left empty
+  rather than propagate a false attribution. Renamed the PR's
+  `news.csv` to `news_discovery.csv` to match the new architecture.
+- `docs/TECHNICAL_DEBT.md` (TD-41 updated, TD-42/TD-43 new),
+  `docs/ROADMAP.md` updated accordingly.
+
 ## 0.38.0 — GDELT historical backfill: per-window resilience + widened rate limit
 
 A third live re-trigger of `news-history-backfill.yml` refined the 0.37.1

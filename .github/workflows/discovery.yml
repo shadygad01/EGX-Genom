@@ -44,15 +44,27 @@ jobs:
       # dedicated bot branch, never on main -- so this restores from
       # discovery/latest if that branch already exists, and starts cold
       # (an honest first run) if it doesn't.
+      # `git show <ref>:<path>` writing straight to `> <path>` would
+      # truncate the destination to 0 bytes even when `<path>` doesn't
+      # exist yet at `<ref>` and the command fails -- the shell redirect
+      # happens before the command runs, and a 0-byte file used to crash
+      # `JsonFileRepository._load()` (real failure, see TD-39's first live
+      # run). Writing to a temp file and only moving it into place on
+      # success means a not-yet-existing path degrades to the same cold
+      # start as a genuinely missing file, every time.
       - name: Restore prior discovery history from discovery/latest
         run: |
           mkdir -p research/data/discovery research/data/registry
           if git ls-remote --exit-code --heads origin discovery/latest > /dev/null 2>&1; then
             git fetch origin discovery/latest
-            git show origin/discovery/latest:research/data/discovery/discovery_history.json \
-              > research/data/discovery/discovery_history.json 2> /dev/null || true
-            git show origin/discovery/latest:research/data/registry/company_financial_sources.json \
-              > research/data/registry/company_financial_sources.json 2> /dev/null || true
+            if git show origin/discovery/latest:research/data/discovery/discovery_history.json \
+              > /tmp/discovery_history.json.tmp 2> /dev/null; then
+              mv /tmp/discovery_history.json.tmp research/data/discovery/discovery_history.json
+            fi
+            if git show origin/discovery/latest:research/data/registry/company_financial_sources.json \
+              > /tmp/company_financial_sources.json.tmp 2> /dev/null; then
+              mv /tmp/company_financial_sources.json.tmp research/data/registry/company_financial_sources.json
+            fi
           fi
 
       - name: Run weekly source discovery

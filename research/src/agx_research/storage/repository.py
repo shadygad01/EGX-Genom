@@ -134,7 +134,20 @@ class JsonFileRepository(Repository[T]):
                 temp_path.unlink()
 
     def _load(self) -> None:
-        payload = json.loads(self.persist_path.read_text(encoding="utf-8"))
+        content = self.persist_path.read_text(encoding="utf-8")
+        if not content.strip():
+            # A real failure mode, not a hypothetical: a restore step that
+            # redirects `git show <ref>:<path>` output straight to this
+            # path (e.g. `.github/workflows/discovery.yml` seeding a
+            # previous run's state) truncates the destination to 0 bytes
+            # even when `<path>` doesn't exist yet at `<ref>` and the
+            # command fails -- the shell redirect happens before the
+            # command runs. An empty file unambiguously means "nothing
+            # persisted yet", not malformed data, so this degrades to the
+            # same cold start as a missing file rather than crashing.
+            self._revisions = {}
+            return
+        payload = json.loads(content)
         self._revisions = {
             entity_id: [self._model_cls.model_validate(rev) for rev in revisions]
             for entity_id, revisions in payload.items()

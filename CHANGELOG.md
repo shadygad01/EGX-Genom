@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.35.0 — Retire evidence-dead-end PLANNED sources, no-paid-services enforced
+
+Project owner request: the dashboard's Source Intelligence page showed
+dozens of sources stuck at `PLANNED`/`TOS_REVIEW` indefinitely with no
+visible progress. Audited every non-`IMPLEMENTED` catalog entry against
+the concrete live evidence already gathered across prior sessions
+(`docs/ACQUISITION_STRATEGY.md`) and today's automated weekly discovery
+run (`research/data/discovery/discovery_report.json`, 2026-07-29).
+
+- **10 sources moved `PLANNED` -> `DISABLED`**, each with a notes
+  citation of its specific dead-end evidence rather than a generic label:
+  `egx_official` (TCP reset, network-level anti-bot), `cbe` (WAF
+  rejection page), `imf` (403 on every real DataMapper indicator probed),
+  `yahoo_finance`/`tradingview`/`investing_com` (quoted ToS
+  prohibition/403), `mubasher` (robots.txt disallow), `stockanalysis`
+  (redundant standalone entry -- already live as an `egx_price_composite`
+  leg, no separate collector was ever going to be built), `investing_news`
+  (same domain as the already-403'd `investing_com`), and
+  `trading_economics` (free tier insufficient for real use -- per the
+  existing no-`NEEDS_KEY`/no-paid-service policy that already removed
+  FMP/AlphaVantage/Polygon/Tiingo, a source whose only real path is a
+  paid subscription does not stay `PLANNED`).
+- Genuinely still-open `PLANNED` sources (no documented permanent block
+  yet -- the ~28 remaining outlets/APIs/research feeds the weekly
+  Discovery workflow keeps retrying with real network egress) are
+  unchanged; `PLANNED` now means "actively re-attempted," not "abandoned."
+  `egid_financial_filings` stays `TOS_REVIEW` (a genuine legal-ambiguity
+  case needing the issuer's own confirmation, not an engineering dead end).
+- `docs/DATA_ACQUISITION.md`'s status-policy section documents this
+  convention: `DISABLED` for a source with repeatable dead-end evidence or
+  a paid-only requirement, reversible by a human once the real blocker
+  clears -- never silent deletion, the spec and its evidence stay in the
+  versioned registry.
+- Verified `discovery_report.plan_discovery_targets()` already filters to
+  `status == PLANNED` only, so the 10 newly-`DISABLED` sources are
+  automatically excluded from future weekly re-probing with no code
+  change needed there.
+- 682 backend tests pass (one assertion updated for `egx_official`'s new
+  status/reason text); `ruff check` clean.
+
 ## 0.34.0 — EGX30+EGX70 Financial Source Registry (TD-39)
 
 Follow-up to 0.33.0: build a per-company Financial Source Registry

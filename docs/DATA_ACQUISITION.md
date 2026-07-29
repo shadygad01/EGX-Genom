@@ -151,6 +151,22 @@ scheduling priority, plus three *independent* state axes:
 
 - **`status`** (`SourceStatus`) — whether a collector may run at all:
   `IMPLEMENTED` / `PLANNED` / `NEEDS_KEY` / `TOS_REVIEW` / `DISABLED`.
+  `PLANNED` means genuinely open, unresolved work (the weekly Discovery
+  workflow will keep re-attempting it with real network egress). Once a
+  source accumulates concrete, repeatable evidence of a permanent block --
+  a quoted ToS prohibition, a WAF/403 on every real endpoint, a robots.txt
+  disallow, a network-level reset, or (per the project owner's no-paid-
+  services policy) a requirement for a paid tier -- it is reclassified to
+  `DISABLED` rather than left sitting as `PLANNED` forever with no real
+  path forward; `discovery_report.plan_discovery_targets()` only ever
+  attempts `PLANNED` sources, so a `DISABLED` source stops being re-probed
+  automatically. `DISABLED` is not silent deletion: the spec, its evidence
+  citation, and its full history stay in the versioned registry (see
+  `catalog.py`'s `egx_official`/`cbe`/`imf`/`trading_economics`/
+  `yahoo_finance`/`stockanalysis`/`mubasher`/`tradingview`/`investing_com`/
+  `investing_news` for the current examples), and a human can move it back
+  to `PLANNED` if the underlying blocker is ever cleared by a real business
+  action (EGX/CBE outreach, a paid license decision, a changed ToS).
 - **`lifecycle_state`** (`LifecycleState`) — how much the rest of the
   platform trusts it: `CANDIDATE` -> `QUARANTINE` -> `EVALUATION` ->
   `TRUSTED` -> `CORE`. Distinct from `status`: a source can be

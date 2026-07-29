@@ -205,7 +205,7 @@ def seed_sources() -> list[SourceSpec]:
             name="Egyptian Exchange (EGX)",
             category=SourceCategory.OFFICIAL,
             access_method=AccessMethod.CSV_DOWNLOAD,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.DISABLED,
             reliability_score=0.9,
             freshness_score=0.8,
             historical_coverage="official listings/indices/disclosures",
@@ -213,7 +213,15 @@ def seed_sources() -> list[SourceSpec]:
             conflict_priority=95,
             supported_event_types=["corporate", "market"],
             supported_languages=["ar", "en"],
-            notes="Official downloads exist (indices, disclosures); exact endpoints to be verified from egx.com.eg before a collector is written -- never guessed.",
+            notes=(
+                "Not a paid-service block -- egx.com.eg/www.egx.com.eg actively reset the TCP "
+                "connection, reconfirmed across 6+ live sessions including automated weekly "
+                "discovery. This program's rules forbid defeating a network-level anti-bot "
+                "measure, so it cannot become IMPLEMENTED by further engineering attempts; "
+                "disabled rather than left as an open 'planned' item with no real path forward. "
+                "Reopen only on a business/legal action (EGX outreach for allowlisting, or a "
+                "licensed EGX data vendor) -- see docs/ACQUISITION_STRATEGY.md capability 1/2/8/9/10."
+            ),
         ),
         _spec(
             id="egid_financial_filings",
@@ -291,14 +299,21 @@ def seed_sources() -> list[SourceSpec]:
             name="Central Bank of Egypt",
             category=SourceCategory.OFFICIAL,
             access_method=AccessMethod.CSV_DOWNLOAD,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.DISABLED,
             reliability_score=0.95,
             freshness_score=0.8,
             conflict_priority=98,
             supported_entities=["EGP rates", "policy rates", "inflation"],
             supported_event_types=["macroeconomic"],
             supported_languages=["ar", "en"],
-            notes="Publishes exchange/policy rates and time series; endpoint verification pending.",
+            notes=(
+                "Not a paid-service block -- cbe.org.eg's WAF returns an explicit 'Request "
+                "Rejected... consult with your administrator' page, confirmed repeatedly "
+                "including today's automated discovery run. Disabled rather than left "
+                "'planned' with no real path forward; a separate, non-WAF-protected CBE data "
+                "API/subdomain remains an unverified possibility, not assumed -- reopen if one "
+                "is found. See docs/ACQUISITION_STRATEGY.md capability 7/12."
+            ),
         ),
         _spec(
             id="mof_egypt",
@@ -435,50 +450,77 @@ def seed_sources() -> list[SourceSpec]:
             name="Yahoo Finance",
             category=SourceCategory.MARKET_DATA,
             access_method=AccessMethod.JSON_API,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.DISABLED,
             reliability_score=0.7,
             freshness_score=0.9,
             conflict_priority=55,
             supported_entities=["EGX tickers (.CA suffix)", "global"],
             integrated_via="egx_price_composite",
             integrated_capabilities=["price_data"],
-            notes="Live provider leg inside EgxCompositePriceCollector; standalone collector status is intentionally separate.",
+            notes=(
+                "Not a paid-service block -- Yahoo's own Terms of Service, fetched and quoted "
+                "live (guce.yahoo.com/terms), explicitly prohibits 'automated means... robots, "
+                "spiders, scrapers, data mining tools... without our express, prior permission.' "
+                "This id exists only to record that leg's role inside egx_price_composite "
+                "(already IMPLEMENTED, operated under the repository owner's own authorization "
+                "-- see that spec's license note); no separate standalone collector will be "
+                "built against this id, so it is disabled rather than left as a fake 'planned' "
+                "work item. See docs/ACQUISITION_STRATEGY.md's Price Data Feasibility Mission."
+            ),
         ),
         _spec(
             id="stockanalysis",
             name="StockAnalysis EGX history",
             category=SourceCategory.MARKET_DATA,
             access_method=AccessMethod.HTML_SCRAPE,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.DISABLED,
             reliability_score=0.7,
             freshness_score=0.9,
             conflict_priority=60,
             supported_entities=["UniverseProvider EGX tickers"],
             integrated_via="egx_price_composite",
             integrated_capabilities=["price_data"],
-            notes="Live recent-history provider leg inside EgxCompositePriceCollector.",
+            notes=(
+                "Not blocked and not a paid service -- this id exists only to record that "
+                "StockAnalysis's role is already served as a live provider leg inside "
+                "egx_price_composite (IMPLEMENTED). No standalone collector is planned against "
+                "this id by design, so it is disabled rather than left as an open 'planned' "
+                "item nothing is actually working toward."
+            ),
         ),
         _spec(
             id="investing_com",
             name="Investing.com",
             category=SourceCategory.MARKET_DATA,
             access_method=AccessMethod.HTML_SCRAPE,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.DISABLED,
             reliability_score=0.6,
             freshness_score=0.8,
             conflict_priority=40,
-            notes="Standalone collector not implemented; upstream automation policy must be monitored operationally.",
+            notes=(
+                "Not a paid-service block -- investing.com returns 403 Forbidden site-wide, "
+                "confirmed on a direct fetch and reconfirmed by today's automated discovery run "
+                "('no reachable domain'). No structured/legal acquisition method exists to build "
+                "a collector against; disabled rather than left as an open 'planned' item."
+            ),
         ),
         _spec(
             id="tradingview",
             name="TradingView (incl. news)",
             category=SourceCategory.MARKET_DATA,
             access_method=AccessMethod.JSON_API,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.DISABLED,
             reliability_score=0.6,
             freshness_score=0.9,
             conflict_priority=40,
-            notes="Standalone collector not implemented; upstream automation policy must be monitored operationally.",
+            notes=(
+                "Not a paid-service block per se, though TradingView's paid data plans are the "
+                "only sanctioned way to use this data at all -- its real policies page "
+                "(tradingview.com/policies/), fetched and quoted live, carries explicit "
+                "data-ownership/redistribution restriction language forbidding non-display "
+                "automated use. Disabled rather than left as an open 'planned' item with no "
+                "free, legal path forward."
+            ),
         ),
         # Coverage-expansion mission: a free, independent third-party EGX
         # listed-companies directory (found via public web search, not
@@ -590,13 +632,25 @@ def seed_sources() -> list[SourceSpec]:
                 name=name,
                 category=SourceCategory.NEWS,
                 access_method=AccessMethod.RSS_FEED,
-                status=SourceStatus.PLANNED,
+                status=(
+                    SourceStatus.DISABLED
+                    if source_id == "investing_news"
+                    else SourceStatus.PLANNED
+                ),
                 reliability_score=rel,
                 freshness_score=0.9,
                 collector="RssNewsCollector",
                 conflict_priority=priority,
                 supported_event_types=["news"],
-                notes="Feed URL to be verified, then this becomes RssNewsCollector configuration.",
+                notes=(
+                    "Not a paid-service block -- investing.com (the same domain this feed would "
+                    "live on) returns 403 Forbidden site-wide, confirmed on a direct fetch and "
+                    "reconfirmed by today's automated discovery run. Disabled alongside the "
+                    "investing_com market-data entry rather than left as a separately-open "
+                    "'planned' item on a domain already known to be unreachable."
+                    if source_id == "investing_news"
+                    else "Feed URL to be verified, then this becomes RssNewsCollector configuration."
+                ),
             )
             for source_id, name, rel, priority in [
                 ("reuters", "Reuters", 0.8, 70),
@@ -613,14 +667,21 @@ def seed_sources() -> list[SourceSpec]:
             name="Mubasher",
             category=SourceCategory.NEWS,
             access_method=AccessMethod.HTML_SCRAPE,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.DISABLED,
             reliability_score=0.6,
             freshness_score=0.9,
             conflict_priority=55,
             supported_event_types=["news", "market"],
             integrated_via="egx_price_composite",
             integrated_capabilities=["price_data"],
-            notes="Live post-close price fallback inside EgxCompositePriceCollector; standalone news collection remains planned.",
+            notes=(
+                "Not a paid-service block -- robots.txt disallows both mubasher.info and "
+                "www.mubasher.info outright, and a full anchor scan of the homepage found no "
+                "download/historical/export link anyway (it is a news portal, not a "
+                "price-data provider). Standalone news scraping is disabled rather than left "
+                "'planned' with no legal path forward; the separate post-close price snapshot "
+                "leg inside egx_price_composite (IMPLEMENTED) is unaffected."
+            ),
         ),
         # ---- ARABIC NEWS ----
         # Coverage-expansion mission: RSS autodiscovery found a real,
@@ -676,7 +737,11 @@ def seed_sources() -> list[SourceSpec]:
                 category=SourceCategory.MACROECONOMIC,
                 access_method=access,
                 status=(
-                    SourceStatus.IMPLEMENTED if source_id == "undata" else SourceStatus.PLANNED
+                    SourceStatus.IMPLEMENTED
+                    if source_id == "undata"
+                    else SourceStatus.DISABLED
+                    if source_id in ("imf", "trading_economics")
+                    else SourceStatus.PLANNED
                 ),
                 base_url=("https://unstats.un.org/SDGAPI/v1/sdg" if source_id == "undata" else ""),
                 collector="UnSdgCollector" if source_id == "undata" else "",
@@ -696,7 +761,11 @@ def seed_sources() -> list[SourceSpec]:
                     "imf",
                     "IMF",
                     AccessMethod.JSON_API,
-                    "IMF SDMX/JSON APIs are free; series mapping pending.",
+                    "Not a paid-service block -- IMF's real current public endpoint "
+                    "(imf.org/external/datamapper/api/v1/{indicator}/EGY, free and keyless) "
+                    "returned 403 Forbidden on every real indicator probed live, a WAF/bot-"
+                    "detection block in the same class as CBE's. Disabled rather than left "
+                    "'planned' with no real path forward.",
                 ),
                 ("oecd", "OECD", AccessMethod.JSON_API, "SDMX API free; Egypt coverage partial."),
                 (
@@ -712,7 +781,12 @@ def seed_sources() -> list[SourceSpec]:
                     "trading_economics",
                     "Trading Economics",
                     AccessMethod.JSON_API,
-                    "Free tier limited; ToS/key requirements to review.",
+                    "Real production use requires a paid subscription -- the free tier is too "
+                    "limited to serve as a genuine data source, and this platform is scoped to "
+                    "sources collectable with no paid service or key of any kind (same policy "
+                    "that already removed FMP/AlphaVantage/Polygon/Tiingo). Live discovery also "
+                    "confirms no candidate on the free tier clears legal review. Disabled, not "
+                    "left as an open 'planned' item a free collector will eventually satisfy.",
                 ),
             ]
         ],

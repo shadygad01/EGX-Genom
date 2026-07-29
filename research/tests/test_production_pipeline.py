@@ -531,9 +531,11 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
     # must show up as UNAVAILABLE with a reason, never silently omitted.
     assert by_id["rss_generic"]["status"] == "UNAVAILABLE"
     assert "feed URL" in by_id["rss_generic"]["reason"]
-    # PLANNED sources (never guessed a URL) are visible too, with why.
+    # DISABLED sources (an evidenced, permanent legal/technical block --
+    # egx_official is network-reset at the TCP level, not merely unverified)
+    # are visible too, with why.
     assert by_id["egx_official"]["status"] == "UNAVAILABLE"
-    assert "not yet verified" in by_id["egx_official"]["reason"]
+    assert "disabled" in by_id["egx_official"]["reason"].lower()
     assert by_id["egx_universe_seed"]["status"] == "COLLECTED"
     assert by_id["egx_universe_seed"]["index_constituents_written"] == len(TICKERS)
 

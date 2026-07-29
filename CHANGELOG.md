@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.37.1 — Document real GDELT 429 evidence from the fixed backfill workflow
+
+The 0.37.0 fix was re-verified live: re-triggering `news-history-backfill.yml`
+now fails loudly (as intended) instead of silently reporting success —
+GDELT's DOC 2.0 API returned HTTP 429 Too Many Requests on the very first
+windowed historical request, all 3 retries still 429. Not our own client
+pacing (this was the first request of the run); likely GDELT rate-limiting
+the shared GitHub Actions IP range, or a stricter real quota on bulk
+historical queries than assumed. Documented as evidence in TD-41 rather
+than guessed at with an unverified "fix" — no `news-history/latest`
+branch/PR exists yet; `research/data/news_history/` stays empty pending a
+successful run.
+
 ## 0.37.0 — Close TD-40: daily cross-run persistence; fix news-history-backfill bug
 
 Project owner approval to proceed with the TD-40 fix flagged in 0.36.0.

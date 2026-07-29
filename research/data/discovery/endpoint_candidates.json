@@ -1,13 +1,1 @@
-[
-  {
-    "access_method_guess": "rss_feed",
-    "composite_score": 0.5,
-    "discovered_url": "https://skynewsarabia.com/rss.xml",
-    "historical_score": 1.0,
-    "legality_verdict": "allowed",
-    "robots_allows": true,
-    "selected": true,
-    "source_id": "skynews_arabia_economy",
-    "stability_score": 0.0
-  }
-]
+[]

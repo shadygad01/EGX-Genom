@@ -441,6 +441,8 @@ export type HealthStatus = "unknown" | "healthy" | "degraded" | "down";
 
 export type ActivationStatus = "active" | "paused" | "retired";
 
+export type EvidenceTier = "primary" | "discovery";
+
 export interface RetryPolicy {
   max_attempts: number;
   backoff_seconds: number;
@@ -869,5 +871,6 @@ export interface SourceSpec {
   supported_languages: string[];
   data_quality_score: number | null;
   reputation_score: number | null;
+  evidence_tier: EvidenceTier;
   notes: string;
 }

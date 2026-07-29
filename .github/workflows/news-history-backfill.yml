@@ -1,0 +1,129 @@
+name: Historical news backfill (GDELT)
+
+# Manually-triggered, not scheduled: a one-off (or occasional, re-runnable)
+# real collection of OLD news via GDELT DOC 2.0's absolute startdatetime/
+# enddatetime windowing (see `GdeltDocCollector`'s historical mode and
+# docs/DATA_ACQUISITION.md). The daily production pipeline
+# (deploy-pages.yml) only ever asks GDELT for a rolling 7-day window, so it
+# never reaches further back -- this workflow is the only path that seeds
+# older real (non-mock) news into the platform. Runs on a GitHub-hosted
+# runner because this is the one place in AGX's toolchain with real
+# internet egress to GDELT; no sandboxed development environment this
+# platform has been built in has ever had it (see PHASE_STATUS.md).
+#
+# Deliberately its own workflow on its own branch, same discipline as
+# discovery.yml: writes to a dedicated `news-history/latest` branch and
+# opens a PR to main, never committing straight to main. Re-running it is
+# safe and cheap -- collected documents are content-addressed
+# (source, url, content hash), so re-fetching a window already collected
+# is a no-op, not a duplicate.
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: "ISO start date (inclusive). Default: 24 months before end_date."
+        required: false
+        default: ""
+      end_date:
+        description: "ISO end date (inclusive). Default: today (UTC)."
+        required: false
+        default: ""
+      window_days:
+        description: "Days per windowed GDELT query (GDELT caps 250 articles/response)."
+        required: false
+        default: "7"
+      query:
+        description: "GDELT DOC 2.0 query string."
+        required: false
+        default: '(Egypt OR Egyptian OR "Egyptian Exchange" OR EGX)'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: news-history-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Install research package
+        working-directory: research
+        run: uv sync
+
+      - name: Resolve date range
+        id: dates
+        run: |
+          END="${{ github.event.inputs.end_date }}"
+          START="${{ github.event.inputs.start_date }}"
+          if [ -z "$END" ]; then END="$(date -u +%F)"; fi
+          if [ -z "$START" ]; then START="$(date -u -d "$END -24 months" +%F)"; fi
+          echo "start=$START" >> "$GITHUB_OUTPUT"
+          echo "end=$END" >> "$GITHUB_OUTPUT"
+
+      # Same restore-before-collect discipline as discovery.yml: this
+      # runner is stateless, so without restoring the prior result the
+      # every run would "forget" every earlier backfill instead of
+      # accumulating one.
+      - name: Restore prior news-history data from news-history/latest
+        run: |
+          mkdir -p research/data/news_history
+          if git ls-remote --exit-code --heads origin news-history/latest > /dev/null 2>&1; then
+            git fetch origin news-history/latest
+            git archive origin/news-history/latest -- research/data/news_history \
+              | tar -x || true
+          fi
+
+      - name: Collect historical GDELT news
+        working-directory: research
+        env:
+          GDELT_QUERY: ${{ github.event.inputs.query }}
+          WINDOW_DAYS: ${{ github.event.inputs.window_days }}
+          START_DATE: ${{ steps.dates.outputs.start }}
+          END_DATE: ${{ steps.dates.outputs.end }}
+        run: |
+          uv run python -m agx_research.cli collect \
+            --source gdelt \
+            --data-dir data/news_history \
+            --query "$GDELT_QUERY" \
+            --start-date "$START_DATE" \
+            --end-date "$END_DATE" \
+            --window-days "$WINDOW_DAYS" \
+            --expected-records 1 \
+            | tee collect_result.json
+
+      - name: Show collection result
+        run: cat research/collect_result.json
+
+      - name: Commit collected history to news-history/latest (never main)
+        id: commit
+        run: |
+          git config user.name "agx-news-history-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -B news-history/latest
+          git add research/data/news_history/
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Historical GDELT news backfill: ${{ steps.dates.outputs.start }}..${{ steps.dates.outputs.end }}"
+            git push --force origin news-history/latest
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update the news-history backfill PR
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY="Historical GDELT DOC 2.0 backfill for ${{ steps.dates.outputs.start }} to ${{ steps.dates.outputs.end }} (window: ${{ github.event.inputs.window_days }} days/query). Materialized into \`research/data/news_history/\` via the same CollectionService path every other real collector uses -- withheld batches (below the confidence floor) are recorded, not fabricated. Review the diff before merging into the accumulating dataset. Note: this dataset is not yet read by the daily production pipeline (\`deploy-pages.yml\` runs its own ephemeral \`--data-dir\` per day) -- see TECHNICAL_DEBT.md's cross-run persistence gap. Merging this PR preserves the collected history for when that gap is closed; it does not yet change dashboard output on its own."
+          gh pr create --base main --head news-history/latest \
+            --title "Historical GDELT news backfill: ${{ steps.dates.outputs.start }}..${{ steps.dates.outputs.end }}" \
+            --body "$BODY" \
+            || gh pr edit news-history/latest --body "$BODY"

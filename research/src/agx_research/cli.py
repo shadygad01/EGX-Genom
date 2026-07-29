@@ -35,6 +35,7 @@ from agx_research.acquisition_intelligence.target import (
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.fred import FredCsvCollector
+from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.rss import RssNewsCollector
 from agx_research.collectors.service import CollectionService
 from agx_research.collectors.stooq import StooqPriceCollector
@@ -152,7 +153,30 @@ def main(argv: list[str] | None = None) -> int:
     collect_parser.add_argument("--series", help="fred only: comma-separated FRED series ids")
     collect_parser.add_argument("--feed-url", help="rss_generic only: the feed URL to collect")
     collect_parser.add_argument(
-        "--ticker-hints", help="rss_generic only: comma-separated tickers to match"
+        "--ticker-hints", help="rss_generic/gdelt only: comma-separated tickers to match"
+    )
+    collect_parser.add_argument(
+        "--query", help="gdelt only: the GDELT DOC 2.0 query string, e.g. 'Egypt OR EGX'"
+    )
+    collect_parser.add_argument(
+        "--start-date",
+        help="gdelt only: ISO date; with --end-date, switches gdelt to historical "
+        "windowed backfill (absolute startdatetime/enddatetime) instead of the "
+        "relative --timespan the daily live run uses",
+    )
+    collect_parser.add_argument("--end-date", help="gdelt only: ISO date, inclusive")
+    collect_parser.add_argument(
+        "--window-days",
+        type=int,
+        default=7,
+        help="gdelt historical backfill only: days per windowed request (default 7; "
+        "GDELT DOC 2.0 caps each response at 250 articles regardless of window size)",
+    )
+    collect_parser.add_argument(
+        "--timespan", default="7d", help="gdelt only, non-historical mode: GDELT relative timespan"
+    )
+    collect_parser.add_argument(
+        "--max-records", type=int, default=250, help="gdelt only: max articles per window"
     )
     collect_parser.add_argument("--expected-records", type=int, required=True)
     collect_parser.add_argument("--min-confidence", type=float, default=0.5)
@@ -321,6 +345,24 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             hints = args.ticker_hints.split(",") if args.ticker_hints else None
             collector = RssNewsCollector(spec, feed_url=args.feed_url, ticker_hints=hints)
+        elif spec.collector == "GdeltDocCollector":
+            if not args.query:
+                print("--query is required for gdelt", file=sys.stderr)
+                return 1
+            hints = args.ticker_hints.split(",") if args.ticker_hints else None
+            if bool(args.start_date) != bool(args.end_date):
+                print("--start-date and --end-date must be given together", file=sys.stderr)
+                return 1
+            collector = GdeltDocCollector(
+                spec,
+                query=args.query,
+                ticker_hints=hints,
+                max_records=args.max_records,
+                timespan=args.timespan,
+                start_date=date.fromisoformat(args.start_date) if args.start_date else None,
+                end_date=date.fromisoformat(args.end_date) if args.end_date else None,
+                window_days=args.window_days,
+            )
         else:
             print(
                 f"No collector wired for source {args.source} (status={spec.status.value})",

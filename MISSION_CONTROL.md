@@ -21,25 +21,32 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: acquisition architecture frozen.** Per the project
-  owner's explicit instruction, this phase completed the highest-value
-  legally obtainable coverage, then froze further acquisition
-  engineering — no new `TargetOrganization`/collector/discovery work
-  without a new named business input. Closing verification, not just a
-  declaration: a real self-correction (`skynews_arabia_economy` was
-  promoted to `IMPLEMENTED` last phase without confirming an actual
-  successful collection; directly exercising it this phase returned
-  `HTTP 404`, reverted to `PLANNED`) and a real IMF probe (its current
-  DataMapper API, distinct from the deprecated endpoint found unresolvable
-  last phase, returns `403 Forbidden` — a WAF block, evidenced not
-  assumed). Verdict: no further real source remains to connect right now
-  — every named candidate is connected-and-verified, evidence-blocked, or
-  gated on a business decision. **Every subsequent sprint's engineering
-  effort goes toward generating, validating, ranking, and explaining
-  investment decisions from the evidence already flowing — not collecting
-  more data.** Full detail: `CURRENT_MISSION.md`,
-  `docs/ACQUISITION_STRATEGY.md`'s "Final Data Acquisition Sprint"
-  section, and `NEXT_MISSIONS.md` for what's next.
+- **Current mission: acquisition freeze partially lifted — EGX30+EGX70
+  Financial Source Registry (TD-38, TD-39).** The project owner asked for
+  large-scale EGX30/EGX70 company source discovery, exactly what the
+  standing freeze (below) deferred pending a new named business input —
+  scoped narrowly to extending the existing `acquisition_intelligence`/
+  `discovery` architecture, not a parallel system. TD-38 added a third
+  `domain_hints` source (real web-search evidence, 26/31 EGX30 tickers).
+  TD-39 built the per-company **Financial Source Registry** itself —
+  `discovery.company_financial_registry`/`company_financial_discovery`
+  (IR/annual/quarterly/statements classification, source type, collector
+  recommendation, all in a resumable `JsonFileRepository`) plus
+  `scripts/build_financial_source_registry.py`, wired into
+  `.github/workflows/discovery.yml` alongside the existing weekly job.
+  **Actually run against all 101 EGX30+EGX70 companies this session**:
+  0 `DISCOVERED`/`VALIDATED`, 26 `BLOCKED` (real fetch attempts, real
+  proxy-403 evidence — same egress block TD-38 found), 75
+  `HOMEPAGE_UNRESOLVED` (no evidenced homepage yet). This is the honest
+  result, not a shortfall to paper over: this sandbox has never had
+  network egress to any external host tested, confirmed repeatedly, not
+  assumed. The mechanism, classifier, and CI wiring are complete and
+  tested; the actual registry data needs a real `discovery.yml` run (next
+  scheduled Monday, or `workflow_dispatch` now). The freeze on *unscoped*
+  further acquisition engineering (new source families beyond this) still
+  stands. Full detail: `CURRENT_MISSION.md`, `docs/ACQUISITION_STRATEGY.md`'s
+  "Final Data Acquisition Sprint" section, and `NEXT_MISSIONS.md` for
+  what's next.
 - **Prior missions (same overall phase): price-data feasibility (proven
   impossible autonomously, with live evidence — Stooq's robots.txt is a
   confirmed blanket block, Yahoo Finance's real ToS explicitly prohibits

@@ -5,13 +5,58 @@ from agx_research.discovery.engine import (
     DiscoveryEngine,
     discover_api_documentation,
     discover_company_directory_links,
+    discover_financial_documents,
     discover_pdf_repository,
     discover_rss_feeds,
     discover_sitemap_urls,
     discover_structured_datasets,
     is_sitemap_index,
 )
+from agx_research.discovery.financial_document import FinancialDocumentCategory
 from agx_research.sources.spec import AccessMethod
+
+IR_PAGE = """
+<html><body>
+<a href="/reports/annual-report-2025.pdf">Annual Report 2025</a>
+<a href="/reports/q1-2026.pdf">Q1 2026 Results</a>
+<a href="/reports/financial-statements.xlsx">Financial Statements</a>
+<a href="/investor-relations">Investor Relations</a>
+<a href="/about-us">About Us</a>
+</body></html>
+"""
+
+
+def test_discover_financial_documents_categorizes_each_match():
+    found = discover_financial_documents(IR_PAGE, "https://example.com/")
+    by_category = {category: candidate for candidate, category in found}
+    assert (
+        by_category[FinancialDocumentCategory.ANNUAL_REPORT].discovered_url
+        == "https://example.com/reports/annual-report-2025.pdf"
+    )
+    assert by_category[FinancialDocumentCategory.ANNUAL_REPORT].access_method_guess == AccessMethod.PDF_DOWNLOAD
+    assert by_category[FinancialDocumentCategory.QUARTERLY_REPORT].discovered_url == (
+        "https://example.com/reports/q1-2026.pdf"
+    )
+    assert (
+        by_category[FinancialDocumentCategory.FINANCIAL_STATEMENTS].access_method_guess
+        == AccessMethod.CSV_DOWNLOAD
+    )
+    assert by_category[FinancialDocumentCategory.INVESTOR_RELATIONS_HOME].discovered_url == (
+        "https://example.com/investor-relations"
+    )
+
+
+def test_discover_financial_documents_ignores_unrelated_links():
+    found = discover_financial_documents(IR_PAGE, "https://example.com/")
+    urls = {candidate.discovered_url for candidate, _ in found}
+    assert "https://example.com/about-us" not in urls
+
+
+def test_discover_financial_documents_dedups_repeated_links():
+    html = IR_PAGE + '<a href="/reports/annual-report-2025.pdf">Annual Report (again)</a>'
+    found = DiscoveryEngine().scan_financial_documents(html, "https://example.com/")
+    annual_report_urls = [c.discovered_url for c, cat in found if cat == FinancialDocumentCategory.ANNUAL_REPORT]
+    assert len(annual_report_urls) == 1
 
 HOMEPAGE = """
 <html><head>

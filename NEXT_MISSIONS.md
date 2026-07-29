@@ -1,6 +1,62 @@
 # Next Missions
 
-## Closed this phase: TD-34 web/API wiring
+## Closed this phase: TD-39 EGX30+EGX70 Financial Source Registry
+
+See `CURRENT_MISSION.md`'s "TD-39" entry and `docs/TECHNICAL_DEBT.md`'s
+matching row. The registry mechanism, classifier, and CI wiring are done
+and tested; the actual per-company data is not, because no company's
+homepage could be reached from this sandbox. **Genuinely next now**:
+
+1. **A real `.github/workflows/discovery.yml` run with network egress**
+   (next scheduled Monday, or `workflow_dispatch` now) — the single
+   blocking step for everything else in this list. Confirms how many of
+   the 26 `BLOCKED` EGX30 companies move to `DISCOVERED`, and is the only
+   way any company can honestly reach `VALIDATED`.
+2. **Calibrate `classify_financial_document()`'s keyword lists** once real
+   IR-page anchor text/URLs exist to check them against (currently an
+   uncalibrated starting heuristic, same posture as TD-28/TD-29).
+3. **Extend `egx30_web_search_domain_hints.json` to EGX70** (TD-38's own
+   next item — unblocks `HOMEPAGE_UNRESOLVED` for 70 of the 75 companies
+   currently stuck there).
+4. **Financial metric availability / automation capability fields**
+   requested alongside the registry are represented in the schema
+   (`CompanyFinancialSourceRecord.robots_allowed`, per-document
+   `source_type`/`collector_recommendation`) but a *metric-level*
+   breakdown (which of revenue/EPS/assets/... a given statement actually
+   contains) needs a real fetched financial-statement document to inspect
+   — same "can't invent it, needs a real document" constraint as
+   everything else on this list, deferred until item 1 produces one.
+
+None of these are engineering tasks this session can advance further
+without either real network egress or a document item 1 produces.
+
+## Closed prior phase: TD-38 EGX30 company domain-hint coverage
+
+See `CURRENT_MISSION.md`'s "TD-38" entry and `docs/TECHNICAL_DEBT.md`'s
+matching row for full detail. **Genuinely next now** for this specific
+line of work, in priority order:
+
+1. **A real `agx discover-sources` run with network egress** (e.g. inside
+   `.github/workflows/discovery.yml`'s environment, or any environment
+   this sandbox's egress policy doesn't block) — confirms how many of the
+   26 hinted hostnames actually resolve/qualify, and is the only way to
+   move any of them from `domain_hints` to an actual registered,
+   `QUARANTINE`-stage `SourceSpec`. Nothing further can be verified from
+   inside this session (see TD-38's evidenced egress-block detail).
+2. **Extend `egx30_web_search_domain_hints.json` to EGX70** — this pass
+   deliberately scoped to EGX30 only (CLAUDE.md's stated primary focus)
+   given the size of a full EGX70 web-search pass; the same
+   `load_web_search_domain_hints()` mechanism already generalizes, only
+   the data file needs extending.
+3. **Revisit the 5 unresolved EGX30 tickers** (EGCH, HELI, MCQE, OIH,
+   PHDC) if a confidently-resolvable official domain turns up later —
+   never guess one to fill the gap now.
+
+This does not reopen the broader acquisition freeze (`MISSION_CONTROL.md`):
+new source *families* beyond company domain-hint coverage still need a
+new named business input.
+
+## Closed prior phase: TD-34 web/API wiring
 
 Item 1 from the "Genuinely next now" list below is now closed — see
 `CURRENT_MISSION.md`'s "TD-34" entry and `docs/PHASE_STATUS.md`'s

@@ -40,6 +40,7 @@ from agx_research.collectors.service import CollectionService
 from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.dashboard import validate_dashboard_artifacts, write_dashboard_artifacts
 from agx_research.dashboard.validate import DashboardArtifactError
+from agx_research.discovery.web_search_hints import load_web_search_domain_hints
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
@@ -381,6 +382,24 @@ def main(argv: list[str] | None = None) -> int:
             company_ir_targets = [
                 t.model_copy(update={"domain_hints": [wikidata_hints[t.company_ticker]]})
                 if t.company_ticker in wikidata_hints
+                else t
+                for t in company_ir_targets
+            ]
+
+        # A third, independent hint source (see TD-38): a reviewed, evidenced
+        # web-search snapshot (`discovery.load_web_search_domain_hints`),
+        # applied only to tickers Wikidata's own structured P856 claim did
+        # not already resolve -- Wikidata is preferred where both exist
+        # since it's independently machine-verifiable, not just text search
+        # evidence. Like every other hint here, nothing is trusted directly:
+        # `HeuristicDomainResolver` still independently probes it.
+        web_search_hints = load_web_search_domain_hints(
+            args.universe_seed_dir / "egx30_web_search_domain_hints.json"
+        )
+        if web_search_hints:
+            company_ir_targets = [
+                t.model_copy(update={"domain_hints": [web_search_hints[t.company_ticker]]})
+                if t.company_ticker in web_search_hints and t.company_ticker not in wikidata_hints
                 else t
                 for t in company_ir_targets
             ]

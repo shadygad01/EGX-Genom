@@ -60,6 +60,24 @@ def main() -> int:
     lines.append("Every ranked candidate considered (not just winners): "
                  "`research/data/discovery/endpoint_candidates.json`.")
 
+    registry_summary_path = discovery_dir.parent / "registry" / "company_financial_sources_summary.json"
+    if registry_summary_path.exists():
+        registry_summary = json.loads(registry_summary_path.read_text())
+        by_status = registry_summary["by_status"]
+        lines += [
+            "",
+            "### EGX30/EGX70 Financial Source Registry (TD-39)",
+            "",
+            f"- Companies total: **{registry_summary['companies_total']}**",
+            f"- Discovered (>=1 categorized financial document found): **{by_status.get('discovered', 0)}**",
+            f"- Validated (discovered + reviewed): **{by_status.get('validated', 0)}**",
+            f"- Blocked (fetch failed or nothing categorizable): **{by_status.get('blocked', 0)}**",
+            f"- Homepage unresolved (no evidenced domain hint yet): **{by_status.get('homepage_unresolved', 0)}**",
+            f"- Financial documents discovered total: **{registry_summary['documents_discovered_total']}**",
+            "",
+            "Full per-company detail: `research/data/registry/company_financial_sources.json`.",
+        ]
+
     out_path.write_text("\n".join(lines) + "\n")
     return 0
 

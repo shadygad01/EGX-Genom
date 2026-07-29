@@ -1,0 +1,40 @@
+{
+  "collection_method": "web_search",
+  "searched_at": "2026-07-28",
+  "notes": "Third, independent hint source for acquisition_intelligence.target.generate_company_ir_targets(), alongside discovery.wikidata_lookup.WikidataOfficialWebsiteClient and discover_company_directory_links() -- see docs/TECHNICAL_DEBT.md TD-38. Each hostname below was returned by a live web search for the company's own name plus 'EGX official website' and is never asserted as collectable: acquisition_intelligence.domain_resolution.HeuristicDomainResolver still independently probes it for reachability before anything is trusted, exactly like every other domain_hints entry in target.py. Entries omitted here (EGCH, HELI, MCQE, OIH, PHDC) had no single, confidently-resolvable official domain in search results -- either nothing found, only a parent-group page, or multiple conflicting look-alike domains -- and are deliberately left for manual review rather than guessed.",
+  "hints": {
+    "ABUK": {"hostname": "abuqir.net", "evidence": "https://abuqir.net/ -- 'Abuqir Fertilizers' (web search result)"},
+    "ADIB": {"hostname": "www.adib.eg", "evidence": "https://www.adib.eg/ -- 'Abu Dhabi Islamic Bank (ADIB) - Egypt' (web search result)"},
+    "AMOC": {"hostname": "www.amoceg.com", "evidence": "https://www.amoceg.com/en -- 'Alexandria Mineral Oils Company (AMOC)' (web search result)"},
+    "ARCC": {"hostname": "arabiancementcompany.com", "evidence": "https://arabiancementcompany.com/ -- 'Arabian Cement Company' (web search result)"},
+    "BTFH": {"hostname": "www.beltoneholding.com", "evidence": "https://www.beltoneholding.com/en -- 'Beltone' (web search result)"},
+    "COMI": {"hostname": "www.cibeg.com", "evidence": "https://www.cibeg.com -- 'Commercial International Bank (CIB)'; also matches the P856 claim in research/tests/test_wikidata_lookup.py's real Wikidata fixture (https://www.cibeg.com/en)"},
+    "EAST": {"hostname": "www.easternegypt.com", "evidence": "https://www.easternegypt.com/?lang=en -- 'Eastern Company' (web search result)"},
+    "EFID": {"hostname": "ir.edita.com.eg", "evidence": "https://ir.edita.com.eg/en/news-and-disclosures -- 'News and Disclosures- Edita IR' (web search result; investor-relations subdomain, not yet confirmed to redirect from a bare edita.com.eg)"},
+    "HRHO": {"hostname": "www.efghermes.com", "evidence": "www.efg-hermes.com / www.efghermes.com cited across multiple web search results for EFG Holding (EGX:HRHO)"},
+    "EFIH": {"hostname": "investors.efinanceinvestment.com", "evidence": "https://investors.efinanceinvestment.com/ -- 'E-finance - Investor Relations' (web search result)"},
+    "EGAL": {"hostname": "www.egyptalum.com.eg", "evidence": "www.egyptalum.com.eg cited for Egypt Aluminum Co SAE (Egyptalum) (web search result)"},
+    "EMFD": {"hostname": "www.emaarmisr.com", "evidence": "https://www.emaarmisr.com/about-emaar/investor-relations/ -- 'Investor Relations - Emaar Misr' (web search result)"},
+    "GBCO": {"hostname": "gb-corporation.com", "evidence": "https://gb-corporation.com/ -- official website for GB Corp (formerly GB Auto/Ghabbour) (web search result)"},
+    "ISPH": {"hostname": "ir.ibnsina-pharma.com", "evidence": "https://ir.ibnsina-pharma.com/ -- 'Home- Ibnsina Pharma IR' (web search result)"},
+    "JUFO": {"hostname": "www.juhayna.com", "evidence": "https://www.juhayna.com/investor-home/ -- 'Investors - Juhayna' (web search result)"},
+    "ORAS": {"hostname": "orascom.com", "evidence": "https://orascom.com/investors-updates/ -- 'Investors Updates - Orascom Construction' (web search result)"},
+    "ORHD": {"hostname": "www.orascomde.com", "evidence": "https://www.orascomde.com/investor-relations -- 'Investor Relations | Orascom Development Holding' (web search result)"},
+    "ORWE": {"hostname": "orientalweavers.com", "evidence": "https://orientalweavers.com/investor-relations/ -- 'Investor Relations | Oriental Weavers' (web search result)"},
+    "CCAP": {"hostname": "www.qalaaholdings.com", "evidence": "www.qalaaholdings.com; IR portal ir.qalaaholdings.com (web search results for Qalaa Holdings / EGX:CCAP)"},
+    "RAYA": {"hostname": "rayacorp.com", "evidence": "https://rayacorp.com/ -- 'Home - Raya Corp' (web search result)"},
+    "TMGH": {"hostname": "talaatmoustafa.com", "evidence": "https://talaatmoustafa.com/investor-relations/ -- 'Investor Relations, Financial Results & Stock Data | TMG' (web search result)"},
+    "RMDA": {"hostname": "ramedapharma.com", "evidence": "https://ramedapharma.com/ -- official site for Rameda (Tenth of Ramadan Pharmaceutical); IR portal ramedapharma-ir.com (web search result)"},
+    "VLMR": {"hostname": "valmore.com", "evidence": "https://valmore.com/en -- 'Valmore Holding: Future-Focused Investment Holding Company' (web search result; company renamed from Egyptian Kuwaiti Holding, effective 2025-12-01)"},
+    "VLMRA": {"hostname": "valmore.com", "evidence": "Same company as VLMR (Valmore Holding), second share class -- see VLMR entry"},
+    "FWRY": {"hostname": "www.fawry.com", "evidence": "https://www.fawry.com -- well-known official domain for Fawry For Banking Technology And Electronic Payment; direct WebFetch verification returned HTTP 403 (site-side bot block, same pattern documented in docs/ACQUISITION_STRATEGY.md for other EGX-adjacent sites), so treat as a hint, not a verified fetch"},
+    "ETEL": {"hostname": "www.telecomegypt.eg", "evidence": "https://www.telecomegypt.eg -- official domain for Telecom Egypt; direct WebFetch verification returned HTTP 403 (site-side bot block), so treat as a hint, not a verified fetch"}
+  },
+  "unresolved_no_confident_hint": {
+    "EGCH": "No official website found in search results (Egyptian Chemical Industries / Kima) -- only third-party financial-data aggregator pages.",
+    "HELI": "Only one low-confidence, unverified mention of 'HeliopolisCompany.com' (no scheme, no corroborating result) -- not confident enough to record as a hint.",
+    "MCQE": "Only a parent-group subsidiary page (misrcementgroup.com/subsidiaries-and-locations/misr-cement-qena/) found, not a dedicated Misr Cement (Qena) domain.",
+    "OIH": "No official website found in search results (Orascom Investment Holding) -- only third-party financial-data aggregator pages.",
+    "PHDC": "Multiple similar but conflicting domains found for Palm Hills Developments (palmhillsdevelopments.com, palmhillsdevelopmentz.com, palmhillsdeveloper.com) with no way to confidently pick the genuine one from search results alone."
+  }
+}

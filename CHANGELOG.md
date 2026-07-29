@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.38.0 — GDELT historical backfill: per-window resilience + widened rate limit
+
+A third live re-trigger of `news-history-backfill.yml` refined the 0.37.1
+evidence: window 1 succeeded this time, window 2 hit HTTP 429 -- proving
+GDELT's throttle is real per-request cadence, not an outright IP block,
+and exposing a real bug: `GdeltDocCollector.fetch()` collected every window
+into one list and only returned it at the end, so one failed window
+discarded every already-fetched window's real data.
+
+- `GdeltDocCollector`'s historical mode now catches a per-window failure,
+  records it in `self.fetch_warnings` (same posture as `FredCsvCollector`'s
+  per-series resilience), and continues to the next window -- raising only
+  if every single window fails. New tests cover skip-and-continue and the
+  all-fail case.
+- `gdelt`'s `SourceSpec.rate_limit` widened from 5 req/min (12s) to 2
+  req/min (30s), a bounded adjustment motivated directly by the observed
+  failure point (not a blind guess).
+- `docs/TECHNICAL_DEBT.md` (TD-41) updated with the refined evidence.
+
 ## 0.37.1 — Document real GDELT 429 evidence from the fixed backfill workflow
 
 The 0.37.0 fix was re-verified live: re-triggering `news-history-backfill.yml`

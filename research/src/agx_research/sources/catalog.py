@@ -581,7 +581,11 @@ def seed_sources() -> list[SourceSpec]:
             historical_coverage="rolling global multilingual news window",
             expected_latency="minutes",
             update_frequency="continuous",
-            rate_limit=RateLimit(requests_per_minute=5, min_seconds_between_requests=12.0),
+            # Widened from 5 req/min (12s) after a live historical-backfill run
+            # (2026-07-29) evidenced GDELT returning HTTP 429 as early as the
+            # second request at that pace, on two separate attempts -- a real,
+            # observed server-side throttle, not a guess (see TD-41).
+            rate_limit=RateLimit(requests_per_minute=2, min_seconds_between_requests=30.0),
             license="GDELT metadata; AGX stores headline/link metadata only, not article text.",
             terms_of_use_url="https://www.gdeltproject.org/about.html",
             supported_event_types=["news"],

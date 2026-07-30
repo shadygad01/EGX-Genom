@@ -19,6 +19,7 @@ from agx_research.data.provider import DataProvider
 from agx_research.data.snapshot import build_snapshot
 from agx_research.events.adapters import derive_events_from_snapshot
 from agx_research.events.service import EventPlatform
+from agx_research.financials.provider import FinancialStatementProvider
 from agx_research.market_memory.calendar import StaticEGXCalendar, TradingCalendar
 from agx_research.market_memory.state import MarketState, TradingSession
 from agx_research.universe.provider import UniverseProvider
@@ -45,6 +46,7 @@ class MarketMemory:
         pattern_lookback_days: int = 0,
         calendar: TradingCalendar | None = None,
         event_platform: EventPlatform | None = None,
+        financials_provider: FinancialStatementProvider | None = None,
     ):
         self.data_provider = data_provider
         self.universe_provider = universe_provider
@@ -56,6 +58,7 @@ class MarketMemory:
         self.pattern_lookback_days = pattern_lookback_days
         self.calendar = calendar or StaticEGXCalendar()
         self.event_platform = event_platform or EventPlatform()
+        self.financials_provider = financials_provider
 
     def reconstruct(self, as_of: date) -> MarketState:
         constituents = self.universe_provider.constituents(as_of)
@@ -69,6 +72,7 @@ class MarketMemory:
             macro_lookback_days=self.macro_lookback_days,
             macro_series_sources=self.macro_series_sources,
             pattern_lookback_days=self.pattern_lookback_days,
+            financials_provider=self.financials_provider,
         )
         sectors = {
             ticker: sector

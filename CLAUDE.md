@@ -66,6 +66,10 @@ licensed (a business decision reserved for the user) — no output is real
 research until then. A handful of components remain honest
 `NotImplementedError` stubs where their data source doesn't exist; the
 gap inventory lives in `docs/PHASE_STATUS.md` and `docs/TECHNICAL_DEBT.md`.
+`agents.financial_performance.FinancialPerformanceAgent` is no longer one
+of those stubs (Decision-Centric Redesign, 2026-07-30) — it produces real
+revenue-growth-trend and leverage-trend findings from
+`DatasetSnapshot.financial_statements`.
 
 Layout:
 
@@ -85,7 +89,11 @@ Layout:
   `events/`, `market_memory/`, `features/` extensions, `genome/`,
   `causal/`, `graph/`, `papers/`, `review/`, `adversarial/`; the Data
   Acquisition Program adds `sources/` and `collectors/`, see
-  `docs/DATA_ACQUISITION.md`).
+  `docs/DATA_ACQUISITION.md`; the Decision-Centric Redesign (see
+  `docs/DECISION_CENTRIC_AUDIT_2026-07-30.md`,
+  `docs/FREE_DECISION_DATA_BLUEPRINT.md`,
+  `docs/DECISION_EVIDENCE_MATRIX.md`,
+  `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) adds `decision_service/`).
 - `api/` — TypeScript (Fastify) service exposing the knowledge base over
   HTTP. Currently reads a JSON knowledge store; has no business logic of
   its own by design (logic lives in `research/`). Epoch II added no new
@@ -187,6 +195,45 @@ Layout:
   corroboration silently stop working. A factual correction is
   `EventPlatform.supersede()` (a new event linked to the old), never an
   in-place edit.
+- `decision_service/` is the position-aware layer between promoted
+  knowledge and a Buy/Increase Position/Hold/Reduce Position/Exit/No
+  Action action — deliberately its own package, never a new stage inside
+  `orchestration.pipeline.DailyResearchPipeline` or
+  `production.pipeline.ProductionPipeline`. Those pipelines' core, tested
+  property is determinism; a position-aware decision depends on
+  externally-supplied `PositionState`, which no autonomous run can
+  discover (a real portfolio's holdings are inherently the investor's own
+  data). `DecisionService.decide_portfolio()` is stateless-per-call,
+  queried on demand — do not wire it into a scheduled/autonomous run. It
+  computes one continuous target weight per ticker (extending
+  `portfolio.constructor.PortfolioConstructor`'s existing risk-adjusted,
+  confidence-discounted scoring) and derives the six-way action as a
+  *label* from comparing that target to the current weight — never build
+  a discrete lookup table over signal-strength buckets instead; that was
+  tried and rejected under adversarial review for combinatorial-growth
+  risk. Only the INVESTMENT horizon drives an action here (`AD-35`'s
+  existing "never blend horizons into one action" rule), since this
+  layer exists for the long-term-investor mission specifically.
+- `decision_service.country_risk.assess_country_risk()` classifies
+  Country & Macro Risk severity (NORMAL/DETERIORATING/CRISIS) from macro
+  series data. `CRISIS` must never be inferred from a currency/macro move
+  alone — it requires a real, discrete `SovereignRatingAction` (a
+  downgrade). No collector for that exists yet
+  (`moodys_ratings`/`sp_global_ratings`/`fitch_ratings` are `PLANNED`), so
+  `CRISIS` is honestly unreachable in a real run today; do not lower that
+  bar to make the override "do something" before real evidence exists.
+  `decision_service.liquidity_floor.compute_illiquid_tickers()` is a
+  second, symmetric hard override (a ticker below the floor caps out at
+  target weight zero regardless of thesis strength) — both overrides are
+  reused as-is by `meta.readiness.assess_decision_readiness`'s gate
+  extension; do not build a second, parallel readiness/gate mechanism
+  alongside the existing one.
+- `data.snapshot.DatasetSnapshot.financial_statements` (populated only
+  when `build_snapshot()` is given a `financials_provider`) is how
+  `agents.financial_performance.FinancialPerformanceAgent` sees financial
+  statements — the same "agents never touch a live provider directly"
+  rule every other agent already follows, extended, not bypassed. Don't
+  have an agent call `FinancialStatementProvider` directly.
 - The web dashboard reads every resource through `DashboardDataProvider`
   (`web/src/data/DataProvider.ts`); components never call `fetch()` or
   import `StaticJsonProvider`/`ApiProvider` directly — only

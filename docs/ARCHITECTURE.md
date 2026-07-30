@@ -145,6 +145,35 @@ research/        Python package `agx_research` — the research engine
                   execution continues regardless. Wired into cli.py's `run`
                   subcommand -- the single production entrypoint.
 
+  # Decision-Centric Redesign: position-aware decisions
+  decision_service/
+                  DecisionService: the position-aware layer between
+                  promoted knowledge and a Buy/Increase Position/Hold/
+                  Reduce Position/Exit/No Action action. Deliberately its
+                  own package, never a stage inside orchestration/
+                  or production/ -- decide_portfolio() is stateless-per-
+                  call, queried on demand with externally-supplied
+                  PositionState (a real portfolio's holdings this
+                  platform cannot autonomously discover), preserving the
+                  daily pipeline's determinism guarantee unchanged.
+                  Computes one continuous target weight per ticker
+                  (extending portfolio/'s existing risk-adjusted,
+                  confidence-discounted scoring) and derives the six-way
+                  action as a label from target-vs-current weight, never
+                  a discrete lookup table. country_risk.py classifies
+                  Country & Macro Risk severity (NORMAL/DETERIORATING/
+                  CRISIS -- CRISIS requires a real SovereignRatingAction,
+                  never inferred from a currency move alone) as a hard
+                  override; liquidity_floor.py is a second, symmetric
+                  hard override for tradability. Both are reused as-is by
+                  meta.readiness's gate extension -- one mechanism, not
+                  two. Exposed as `agx decide --date ... [--positions
+                  positions.json]` (cli.py) -- read-only, on-demand,
+                  never wired into production/pipeline.py's autonomous
+                  stage list (AD-45). See
+                  docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md Part 3 for the
+                  full design and reasoning.
+
 api/              TypeScript (Fastify) — HTTP surface over the knowledge base
 web/              TypeScript (Vite + React) — dashboard for knowledge/recs
 contracts/        Generated JSON Schema for API-facing pydantic models

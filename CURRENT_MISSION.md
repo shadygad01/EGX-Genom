@@ -1,6 +1,27 @@
 # Current Mission
 
-## Current mission: Decision-Centric Gap Audit (2026-07-30)
+## Current mission: Decision-Centric Redesign implementation (2026-07-30)
+
+The project owner authorized full implementation of the roadmap the prior
+four research/architecture documents settled on
+(`docs/DECISION_CENTRIC_AUDIT_2026-07-30.md` →
+`docs/FREE_DECISION_DATA_BLUEPRINT.md` → `docs/DECISION_EVIDENCE_MATRIX.md`
+→ `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`), explicitly instructed to
+keep challenging those documents rather than follow them mechanically,
+using only free/legal data, never fabricating, preferring simplicity,
+and ending with a full-system review before declaring completion.
+
+**Delivered**: see `docs/PHASE_STATUS.md`'s "Decision-Centric Redesign
+implementation" section for the complete list (registry cleanup,
+`DatasetSnapshot.financial_statements`, a real
+`FinancialPerformanceAgent`, the new `decision_service/` package, the
+extended `meta.readiness` gate) and every place implementation diverged
+from the prior documents under further scrutiny. `docs/CHANGELOG.md`'s
+0.40.0 entry has the condensed version. `docs/MISSION_COMPLETION_REVIEW.md`
+is the mandated final full-system review against the mission's eight
+completion criteria. 734 backend tests pass; `ruff check` clean.
+
+## Prior mission: Decision-Centric Gap Audit (2026-07-30)
 
 The project owner redefined the "redesign from first principles" ask
 after a review found most of the original 7-phase mission (free data

@@ -30,7 +30,14 @@ class SourceCategory(str, Enum):
     ARABIC_NEWS = "arabic_news"
     MACROECONOMIC = "macroeconomic"
     GLOBAL_MARKETS = "global_markets"
-    ALTERNATIVE = "alternative"
+    # ALTERNATIVE removed (Architecture Adversarial Review, 2026-07-30):
+    # every source ever catalogued under it (social/search/patents/hiring/
+    # tech signals) was evaluated against the platform's ten first-
+    # principles investment questions and removed on the merits -- see
+    # docs/FREE_DECISION_DATA_BLUEPRINT.md Part 3. An empty category left
+    # in the enum is exactly the kind of unnecessary abstraction this
+    # review's mandate ("eliminate unnecessary abstractions") exists to
+    # catch; it is not reintroduced speculatively.
     RESEARCH = "research"
 
 

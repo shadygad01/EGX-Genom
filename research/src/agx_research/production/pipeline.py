@@ -60,6 +60,7 @@ from agx_research.acquisition_intelligence.target import (
     seed_target_organizations,
 )
 from agx_research.agents.corporate_events import CorporateEventsAgent
+from agx_research.agents.financial_performance import FinancialPerformanceAgent
 from agx_research.agents.historical_patterns import HistoricalPatternsAgent
 from agx_research.agents.liquidity import LiquidityAgent
 from agx_research.agents.macro import MacroAgent
@@ -754,6 +755,7 @@ class ProductionPipeline:
             macro_series_sources=self.macro_series_sources,
             pattern_lookback_days=self.pattern_lookback_days,
             event_platform=self.event_platform,
+            financials_provider=CollectedFinancialStatementProvider(self.data_dir),
         )
         state = self.market_memory.reconstruct(as_of)
         self.market_state_summary = (
@@ -789,6 +791,7 @@ class ProductionPipeline:
             TechnicalStructureAgent(),
             NewsIntelligenceAgent(),
             HistoricalPatternsAgent(),
+            FinancialPerformanceAgent(),
         ]
         daily_pipeline = DailyResearchPipeline(
             self.market_memory,

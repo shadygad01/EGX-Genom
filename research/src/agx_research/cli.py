@@ -42,10 +42,15 @@ from agx_research.collectors.service import CollectionService
 from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.dashboard import validate_dashboard_artifacts, write_dashboard_artifacts
 from agx_research.dashboard.validate import DashboardArtifactError
+from agx_research.decision_service.country_risk import assess_country_risk
+from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
+from agx_research.decision_service.position import PositionState
+from agx_research.decision_service.service import DecisionService
 from agx_research.discovery.web_search_hints import load_web_search_domain_hints
-from agx_research.data.mock_provider import MockDataProvider
+from agx_research.data.mock_provider import LocalCsvDataProvider, MockDataProvider
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
+from agx_research.financials.collected import CollectedFinancialStatementProvider
 from agx_research.infrastructure.backup import create_backup, restore_backup, verify_backup
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
@@ -55,6 +60,7 @@ from agx_research.meta.publication_gate import (
     LegalPublicationApproval,
     evaluate_publication_gate,
 )
+from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.production import ExecutionMode, ProductionPipeline, StageStatus
 from agx_research.runtime.engine import RunRecordRepository
 from agx_research.sources.catalog import seed_registry
@@ -270,6 +276,23 @@ def main(argv: list[str] | None = None) -> int:
         "against archived raw documents; exits 2 while any gate remains blocked",
     )
     publication_parser.add_argument("--date", required=True, help="Gate evaluation date (ISO)")
+
+    decide_parser = sub.add_parser(
+        "decide",
+        help="Compute position-aware Buy/Increase Position/Hold/Reduce Position/Exit/"
+        "No Action decisions from --data-dir's collected knowledge, macro data, and an "
+        "optional positions file. Read-only; queried on demand, never run on a schedule "
+        "(see decision_service/__init__.py -- a real portfolio's holdings cannot be "
+        "autonomously discovered).",
+    )
+    decide_parser.add_argument("--date", required=True, help="Decision date (ISO)")
+    decide_parser.add_argument(
+        "--positions",
+        type=Path,
+        default=None,
+        help='JSON file: {"TICKER": {"held": true, "current_weight": 0.05, '
+        '"average_cost": 12.3}}. A ticker absent from this file is treated as not held.',
+    )
 
     args = parser.parse_args(argv)
 
@@ -632,6 +655,59 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(payload)
         return 0 if report.publication_ready else 2
+
+    if args.command == "decide":
+        as_of = date.fromisoformat(args.date)
+        materialize_universe_seed(args.universe_seed_dir, args.data_dir)
+        market_memory = MarketMemory(
+            LocalCsvDataProvider(args.data_dir),
+            CollectedUniverseProvider(args.data_dir),
+            StaticSectorProvider(),
+            macro_series_ids=MACRO_SERIES_IDS,
+            lookback_days=30,
+            event_platform=EventPlatform(repository=EventRepository(args.data_dir / "events.json")),
+            financials_provider=CollectedFinancialStatementProvider(args.data_dir),
+        )
+        market_state = market_memory.reconstruct(as_of)
+        snapshot = market_state.dataset_snapshot
+
+        positions: dict[str, PositionState] = {}
+        if args.positions is not None:
+            raw_positions = json.loads(args.positions.read_text(encoding="utf-8"))
+            positions = {
+                ticker: PositionState(ticker=ticker, **fields)
+                for ticker, fields in raw_positions.items()
+            }
+
+        knowledge_store = KnowledgeStore(args.data_dir / "knowledge.json")
+        recommendation_service = RecommendationService(
+            knowledge_store, event_platform=market_memory.event_platform
+        )
+        tickers = sorted(set(snapshot.tickers) | set(positions))
+        recommendations = recommendation_service.recommend(tickers, as_of)
+
+        country_risk = assess_country_risk(snapshot.macro_series, as_of)
+        illiquid_tickers = compute_illiquid_tickers(snapshot)
+
+        decisions = DecisionService().decide_portfolio(
+            recommendations,
+            positions,
+            as_of,
+            country_risk=country_risk,
+            illiquid_tickers=illiquid_tickers,
+        )
+        payload = json.dumps(
+            [decision.model_dump(mode="json") for decision in decisions],
+            ensure_ascii=False,
+            indent=2,
+        )
+        try:
+            payload.encode(sys.stdout.encoding or "utf-8")
+        except UnicodeEncodeError:
+            sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
+        else:
+            print(payload)
+        return 0
 
     return 1
 

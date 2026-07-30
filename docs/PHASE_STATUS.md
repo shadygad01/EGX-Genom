@@ -14,10 +14,15 @@ data gap, including per-company fundamentals, must be closed exclusively
 through free, publicly-reachable sources. See `docs/ROADMAP.md`.
 
 Current acquisition registry, after removing every `NEEDS_KEY` source per
-the project owner's no-API-key-sources decision: **52 sources
-(14 IMPLEMENTED / 38 PLANNED / 0 NEEDS_KEY / 0 TOS_REVIEW)**. This current
-count supersedes older counts embedded in the long-form phase evidence
-below.
+the project owner's no-API-key-sources decision, and after the
+Decision-Centric Redesign's removal of 11 sources with zero mapping in
+`acquisition_intelligence.capability.CAPABILITY_STRATEGIES` (2026-07-30 —
+see `docs/DECISION_CENTRIC_AUDIT_2026-07-30.md`/
+`docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) and addition of 4 new Sovereign
+& Credit Context / Amwal Al Ghad candidates: **48 sources
+(16 IMPLEMENTED / 23 PLANNED / 0 NEEDS_KEY / 1 TOS_REVIEW / 8 DISABLED)**.
+This current count supersedes older counts embedded in the long-form
+phase evidence below.
 
 | # | System | Status | Evidence / remaining gaps |
 |---|--------|--------|---------------------------|
@@ -28,7 +33,7 @@ below.
 | 05 | Knowledge Graph | **DONE** | Versioned nodes/edges, provenance-derived builder, shortest-path + n-hop subgraph queries. Deferred by choice: dedicated graph DB (swap behind `Repository[T]` when scale demands). |
 | 06 | Alpha Genome | **DONE** | Immutable genes, `mutate()` (single-parent), `merge()` (multi-parent synthesis), lineage walk, status machine; never overwrites. |
 | 07 | Research OS | **DONE** | TaskGraph/Artifacts/Sessions plus `DailyResearchPipeline` — the full 8-gate walk wired to real validators, board, causal gate, adversarial scientist, genome, papers, graph. End-to-end tested incl. rejection honesty and determinism. |
-| 08 | Scientist Framework | **DONE** (7 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure, NewsIntelligence, HistoricalPatterns real; only FinancialPerformance remains an honest stub, genuinely data-blocked (no real per-company fundamentals feed exists yet — see "Universe Engine + Corporate Disclosures" section). HistoricalPatternsAgent closed once `data/snapshot.py` gained a `pattern_lookback_days`-windowed `long_price_history` (the same "one field needs its own window" pattern `macro_lookback_days` already established) — LIVE mode's `egx_price_composite` collector already returns full (Yahoo `range=max`) history on every run, so the data existed; only the agent's own analog-matching methodology (mean-centered Euclidean distance over a sliding return window, non-overlapping top-k historical episodes, honest abstain below a directional-agreement threshold) was missing. Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
+| 08 | Scientist Framework | **DONE** (8 of 8 agents real) | MarketStructure, Macro, CorporateEvents, Liquidity, TechnicalStructure, NewsIntelligence, HistoricalPatterns, **and now FinancialPerformance** real. HistoricalPatternsAgent closed once `data/snapshot.py` gained a `pattern_lookback_days`-windowed `long_price_history` (the same "one field needs its own window" pattern `macro_lookback_days` already established) — LIVE mode's `egx_price_composite` collector already returns full (Yahoo `range=max`) history on every run, so the data existed; only the agent's own analog-matching methodology (mean-centered Euclidean distance over a sliding return window, non-overlapping top-k historical episodes, honest abstain below a directional-agreement threshold) was missing. **FinancialPerformanceAgent closed in the Decision-Centric Redesign (2026-07-30)** the same way: `data/snapshot.py` gained a `financials_provider`-populated `financial_statements` field (mirroring the `pattern_lookback_days` precedent exactly — "one field needs its own window/source", not a `DataProvider` redesign), and the agent computes real revenue-growth-trend and leverage-trend findings from whatever periods a collector actually reports, `min_periods=4` matching `meta.readiness`'s own INVESTMENT floor. Zero findings in practice today (only `telecom_egypt_ir`/`orascom_ir` are `IMPLEMENTED`, both with 1-2 real collected periods, below the 4-period floor) — honest, not fabricated; the mechanism is real and ready the moment more periods accumulate. Adversarial: 6 of 9 attacks real; 3 data/harness-blocked, reported `attempted=False`. |
 | 09 | Feature Discovery | **DONE** | Three autonomous generators (pairwise correlation, momentum, volatility) over three registered feature definitions; candidates versioned+evidenced. |
 | 10 | Experiment Factory | **DONE** | Statistic dispatch by asset arity; CV/bootstrap/walk-forward/OOS/sensitivity real (scipy-backed); stress adapter; Monte Carlo now a real block-bootstrap simulator (`MonteCarloBlockBootstrapStressTester`), not a placeholder. |
 | 11 | Validation Framework | **DONE** | `SignificanceThresholdValidator`, `NaiveDirectionalBacktester` (costs explicitly out of scope, stated), `HistoricalWorstWindowStressTester` (scenario located in real data, not simulated). Deferred: cost-aware portfolio-level backtesting (with 15's future optimizer). |
@@ -1138,3 +1143,103 @@ marker (already correctly handled by `generate_company_ir_targets`).
 
 See `CURRENT_MISSION.md`'s "target the closeable half of not_targeted"
 entry and `NEXT_MISSIONS.md` for what's genuinely next.
+
+## Decision-Centric Redesign implementation (2026-07-30)
+
+The project owner authorized full implementation of the roadmap four
+research/architecture documents produced this same day settled on
+(`docs/DECISION_CENTRIC_AUDIT_2026-07-30.md` →
+`docs/FREE_DECISION_DATA_BLUEPRINT.md` →
+`docs/DECISION_EVIDENCE_MATRIX.md` →
+`docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`'s final revised roadmap),
+explicitly instructed to keep challenging those documents during
+implementation rather than follow them mechanically. What actually
+shipped, and where it deliberately deviated from the prior documents
+under further scrutiny:
+
+- **Registry cleanup**: removed the 11 sources with zero mapping in
+  `acquisition_intelligence.capability.CAPABILITY_STRATEGIES`
+  (`wikipedia_pageviews`/`google_trends`/`github_releases`/
+  `company_social_official`/`public_telegram`/`patents`/`hiring_signals`/
+  `google_scholar`/`researchgate`/`investing_com`/`tradingview`) and, once
+  that emptied `SourceCategory.ALTERNATIVE` entirely, removed the enum
+  value itself rather than leave a permanently-empty category — a
+  deviation the prior documents didn't call for but the "eliminate
+  unnecessary abstractions" mandate justified once the removal made it
+  visible. Merged `Capability.ECONOMIC_RELEASES` into `MACROECONOMIC`
+  (same source pool, no independent consumer). Added `moodys_ratings`/
+  `sp_global_ratings`/`fitch_ratings` (Sovereign & Credit Context,
+  `PLANNED`) and `amwal_alghad` (Egypt-specific news, `PLANNED`) as new
+  catalogued sources and matching `TargetOrganization` entries for the
+  existing, unmodified Acquisition Intelligence Engine to resolve.
+- **`DatasetSnapshot.financial_statements`** (new field, populated only
+  when `build_snapshot()` is given a `financials_provider`, mirroring the
+  `pattern_lookback_days` precedent exactly): the correct way to give
+  `FinancialPerformanceAgent` fundamentals data without breaking "agents
+  never touch a live provider directly" — considered and rejected an
+  alternative (inject `FinancialStatementProvider` straight into the
+  agent's constructor) specifically because that would have violated the
+  rule every other agent already follows.
+- **`FinancialPerformanceAgent`** (System 08, above): real revenue-growth-
+  trend and leverage-trend findings, mirroring `CorporateEventsAgent`'s
+  event-study-lite structure. Deliberately *not* split into three
+  separately-maintained "Reads" (Valuation/Growth/Balance-Sheet Safety) as
+  `docs/DECISION_EVIDENCE_MATRIX.md` had implied — one extraction pass,
+  two related findings, closing the three-way-disagreement risk the
+  Adversarial Review's Section 1.9 named. Valuation (Q1) deliberately not
+  attempted in this agent at all: it needs a current price *and* a peer/
+  own-history multiple band, which is a decision-time computation (the
+  Decision Service), not a research-time finding.
+- **`decision_service/`** (new package — `country_risk.py`,
+  `liquidity_floor.py`, `position.py`, `service.py`): the position-aware
+  Decision Service, built exactly to the Adversarial Review's final
+  architecture (Part 3) — a continuous target weight per ticker (extending
+  `PortfolioConstructor`'s existing scoring), Buy/Increase/Hold/Reduce/
+  Exit/No Action derived as a label from target-vs-current weight, a hard
+  hard country-risk-crisis override and a hard liquidity-floor override
+  (both short-circuit to target weight zero, never a votable weight), and
+  an Abstain overlay resolving to Hold (if held) or No Action (if not).
+  Deliberately its own package, never a stage inside
+  `orchestration.pipeline.DailyResearchPipeline` or
+  `production.pipeline.ProductionPipeline` — the daily pipeline's
+  determinism guarantee and a position-aware decision's dependency on
+  externally-supplied, non-autonomously-discoverable `PositionState` need
+  to stay structurally separate (Section 1.10 of the Adversarial Review).
+  Exposed as a read-only, on-demand `agx decide --date ...
+  [--positions positions.json]` CLI command (TD-47, closed same
+  session) — reconstructs a real `MarketState` from `--data-dir`,
+  computes real `Recommendation`s via the existing `RecommendationService`,
+  and prints the resulting position-aware decisions as JSON. Never wired
+  into `production.pipeline.ProductionPipeline`'s autonomous stage list.
+- **`assess_country_risk()`**: `CRISIS` severity requires a real, discrete
+  `SovereignRatingAction` (a downgrade) — never inferred from a currency/
+  macro move alone, since no collector exists yet for rating actions and
+  a currency move of any declared threshold is exactly the kind of number
+  this platform's anti-fabrication discipline says shouldn't stand in for
+  a real event. Honestly unreachable in a real run today; the mechanism
+  is real and ready the moment `moodys_ratings`/`sp_global_ratings`/
+  `fitch_ratings` go `IMPLEMENTED`.
+- **`meta.readiness.assess_decision_readiness`** extended (not duplicated
+  — R2 of the Adversarial Review) with two new checks reusing the exact
+  same `compute_illiquid_tickers`/`assess_country_risk` mechanisms the
+  Decision Service uses: a liquidity-floor blocker (all three horizons)
+  and a country-risk-currency-data-presence blocker (INVESTMENT only,
+  checking specifically for `EGP_USD` coverage — a real refinement over
+  the existing generic "fewer than 3 macro series" check, which doesn't
+  verify *which* series are present).
+- One deliberate, named non-deviation: the Evidence Matrix's 31-row
+  Critical/High/Medium/Low weight table was **not** implemented as a
+  coded scoring formula (per the Adversarial Review's R1) — every score
+  in this redesign still comes from the existing, transparent
+  `confidence * expected_return / risk`-style formula
+  `HorizonDecision`/`PortfolioConstructor` already compute, extended only
+  by the two hard overrides above.
+- 41 new tests (`test_country_risk.py`, `test_decision_service.py`, new
+  cases in `test_scientist_agents.py`/`test_dataset_snapshot.py`/
+  `test_decision_readiness.py`, plus `test_capability_catalog.py` and new
+  `test_source_registry.py` regression cases); 734 backend tests pass;
+  `ruff check` clean; a real mock-mode `agx run` end to end confirms no
+  regression.
+
+See `docs/MISSION_COMPLETION_REVIEW.md` for the full final system review
+against the mission's eight completion criteria.

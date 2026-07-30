@@ -32,12 +32,16 @@ class Capability(str, Enum):
     FINANCIAL_STATEMENTS = "financial_statements"
     INVESTOR_RELATIONS = "investor_relations"
     NEWS = "news"
+    # MACROECONOMIC absorbs the former ECONOMIC_RELEASES capability
+    # (Architecture Adversarial Review, 2026-07-30): both drew on the
+    # exact same source pool (trading_economics/cbe/capmas/mof_egypt) with
+    # no independent consumer distinguishing them -- one label, not two,
+    # per the review's "what could be merged" finding.
     MACROECONOMIC = "macroeconomic"
     MARKET_BREADTH = "market_breadth"
     TRADING_CALENDAR = "trading_calendar"
     INDEX_CONSTITUENTS = "index_constituents"
     SECTOR_MEMBERSHIP = "sector_membership"
-    ECONOMIC_RELEASES = "economic_releases"
     RESEARCH_PAPERS = "research_papers"
 
 
@@ -105,7 +109,12 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "youm7_economy",
         "skynews_arabia_economy",
         "asharq_economy",
+        "amwal_alghad",
     ],
+    # Merged with the former ECONOMIC_RELEASES pool (trading_economics/cbe/
+    # capmas/mof_egypt -- already present here) plus the new Sovereign &
+    # Credit Context sources feeding the Country & Macro Risk severity
+    # classification's crisis rung (Architecture Adversarial Review R3/R8).
     Capability.MACROECONOMIC: [
         "worldbank",
         "fred",
@@ -116,11 +125,25 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "cbe",
         "mof_egypt",
         "capmas",
+        "moodys_ratings",
+        "sp_global_ratings",
+        "fitch_ratings",
+        # Added during the Mission Completion Review's final-consistency
+        # pass (2026-07-30): both catalogued but previously had zero
+        # capability mapping at all, despite being real, named macro/
+        # external-sector candidates in docs/FREE_DECISION_DATA_BLUEPRINT.md
+        # (Egypt Open Data, §1.1; Suez Canal Authority, §7) --
+        # egypt_open_data as further macro context, suez_canal_stats as the
+        # External-Sector/FX-driver candidate the Adversarial Review's R11
+        # deliberately scoped down to "low-priority, validation-only"
+        # rather than a whole new capability -- this gives it a real, if
+        # low-ranked, path to collection instead of a dangling catalog row.
+        "egypt_open_data",
+        "suez_canal_stats",
     ],
     Capability.MARKET_BREADTH: [],
     Capability.TRADING_CALENDAR: ["egx_official"],
     Capability.INDEX_CONSTITUENTS: ["egx_universe_seed", "egx_official"],
     Capability.SECTOR_MEMBERSHIP: ["egx_official"],
-    Capability.ECONOMIC_RELEASES: ["trading_economics", "cbe", "capmas", "mof_egypt"],
     Capability.RESEARCH_PAPERS: ["arxiv", "ssrn", "nber"],
 }

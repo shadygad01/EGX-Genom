@@ -489,40 +489,12 @@ def seed_sources() -> list[SourceSpec]:
                 "item nothing is actually working toward."
             ),
         ),
-        _spec(
-            id="investing_com",
-            name="Investing.com",
-            category=SourceCategory.MARKET_DATA,
-            access_method=AccessMethod.HTML_SCRAPE,
-            status=SourceStatus.DISABLED,
-            reliability_score=0.6,
-            freshness_score=0.8,
-            conflict_priority=40,
-            notes=(
-                "Not a paid-service block -- investing.com returns 403 Forbidden site-wide, "
-                "confirmed on a direct fetch and reconfirmed by today's automated discovery run "
-                "('no reachable domain'). No structured/legal acquisition method exists to build "
-                "a collector against; disabled rather than left as an open 'planned' item."
-            ),
-        ),
-        _spec(
-            id="tradingview",
-            name="TradingView (incl. news)",
-            category=SourceCategory.MARKET_DATA,
-            access_method=AccessMethod.JSON_API,
-            status=SourceStatus.DISABLED,
-            reliability_score=0.6,
-            freshness_score=0.9,
-            conflict_priority=40,
-            notes=(
-                "Not a paid-service block per se, though TradingView's paid data plans are the "
-                "only sanctioned way to use this data at all -- its real policies page "
-                "(tradingview.com/policies/), fetched and quoted live, carries explicit "
-                "data-ownership/redistribution restriction language forbidding non-display "
-                "automated use. Disabled rather than left as an open 'planned' item with no "
-                "free, legal path forward."
-            ),
-        ),
+        # investing_com/tradingview removed (Decision-Centric Gap Audit,
+        # 2026-07-30 / Architecture Adversarial Review): both DISABLED with
+        # no free legal path forward AND zero mapping in
+        # acquisition_intelligence.capability.CAPABILITY_STRATEGIES -- no
+        # capability, no agent, no decision ever depended on either id.
+        # Pure registry cleanup, zero loss of decision-relevant capability.
         # Coverage-expansion mission: a free, independent third-party EGX
         # listed-companies directory (found via public web search, not
         # training-data recall), targeted primarily as a company-directory
@@ -851,71 +823,21 @@ def seed_sources() -> list[SourceSpec]:
             supported_languages=["ar", "en"],
         ),
         # ---- ALTERNATIVE ----
-        *[
-            _spec(
-                id=source_id,
-                name=name,
-                category=SourceCategory.ALTERNATIVE,
-                access_method=access,
-                status=status,
-                reliability_score=0.35,
-                freshness_score=0.8,
-                conflict_priority=20,
-                notes=note,
-            )
-            for source_id, name, access, status, note in [
-                (
-                    "wikipedia_pageviews",
-                    "Wikipedia Page Views",
-                    AccessMethod.JSON_API,
-                    SourceStatus.PLANNED,
-                    "Official free Wikimedia API; collector pending.",
-                ),
-                (
-                    "google_trends",
-                    "Google Trends",
-                    AccessMethod.JSON_API,
-                    SourceStatus.PLANNED,
-                    "No official API; standalone collector not implemented.",
-                ),
-                (
-                    "github_releases",
-                    "GitHub Releases (listed-company tech signals)",
-                    AccessMethod.JSON_API,
-                    SourceStatus.PLANNED,
-                    "Official free API.",
-                ),
-                (
-                    "company_social_official",
-                    "Official company social accounts (LinkedIn/FB/X/YouTube)",
-                    AccessMethod.RSS_FEED,
-                    SourceStatus.PLANNED,
-                    "Platform APIs require keys and restrict automation; per-platform review needed.",
-                ),
-                (
-                    "public_telegram",
-                    "Public Telegram channels",
-                    AccessMethod.JSON_API,
-                    SourceStatus.PLANNED,
-                    "Bot API needs a user bot token; channel-content licensing varies.",
-                ),
-                (
-                    "patents",
-                    "Patent databases",
-                    AccessMethod.JSON_API,
-                    SourceStatus.PLANNED,
-                    "EPO/WIPO free APIs; Egypt-relevant mapping pending.",
-                ),
-                (
-                    "hiring_signals",
-                    "Hiring signals (official career pages/feeds)",
-                    AccessMethod.RSS_FEED,
-                    SourceStatus.PLANNED,
-                    "Only official postings; no scraping of third-party job boards without ToS review.",
-                ),
-            ]
-        ],
+        # wikipedia_pageviews, google_trends, github_releases,
+        # company_social_official, public_telegram, patents, hiring_signals
+        # removed (Decision-Centric Gap Audit / Free Decision Data
+        # Blueprint, 2026-07-30): each evaluated explicitly against the
+        # platform's ten first-principles investment questions and
+        # rejected on the merits (weak/no demonstrated causal channel into
+        # an EGX30/EGX70 decision, or -- for patents/GitHub -- a sector mix
+        # that makes the signal near-irrelevant), not omitted by default.
+        # See docs/FREE_DECISION_DATA_BLUEPRINT.md Part 3.
+        #
         # ---- RESEARCH ----
+        # google_scholar/researchgate removed: redundant with arxiv/ssrn/
+        # nber (below) for the same "new quant-finance papers" need, via a
+        # strictly worse access method (HTML_SCRAPE vs. RSS/API), and never
+        # mapped in acquisition_intelligence.capability.CAPABILITY_STRATEGIES.
         *[
             _spec(
                 id=source_id,
@@ -950,22 +872,62 @@ def seed_sources() -> list[SourceSpec]:
                     SourceStatus.PLANNED,
                     "Public new-papers feed.",
                 ),
-                (
-                    "google_scholar",
-                    "Google Scholar",
-                    AccessMethod.HTML_SCRAPE,
-                    SourceStatus.PLANNED,
-                    "Standalone collector not implemented; prefer an available public feed/API.",
-                ),
-                (
-                    "researchgate",
-                    "ResearchGate",
-                    AccessMethod.HTML_SCRAPE,
-                    SourceStatus.PLANNED,
-                    "Standalone collector not implemented; prefer an available public feed/API.",
-                ),
             ]
         ],
+        # ---- SOVEREIGN & CREDIT (Architecture Adversarial Review, R3/R8:
+        # feeds the merged Country & Macro Risk severity classification's
+        # crisis rung -- rating actions are the one free, discrete, public
+        # signal for this, alongside the CBE/World Bank series already
+        # catalogued above). Public press releases only; full rating
+        # reports remain a paid product and are out of scope.
+        *[
+            _spec(
+                id=source_id,
+                name=name,
+                category=SourceCategory.MACROECONOMIC,
+                access_method=AccessMethod.RSS_FEED,
+                status=SourceStatus.PLANNED,
+                legal_use_status=LegalUseStatus.REVIEW_REQUIRED,
+                reliability_score=0.9,
+                freshness_score=0.9,
+                historical_coverage="rating actions and outlook changes only; full reports are paid",
+                update_frequency="event driven (rare)",
+                conflict_priority=80,
+                supported_entities=["Egypt sovereign credit rating"],
+                supported_event_types=["macroeconomic"],
+                notes=(
+                    "Public press releases on rating actions/outlook changes are free; the full "
+                    "rating report is a paid product and is explicitly out of scope. Feed/RSS "
+                    "endpoint not yet verified -- PLANNED, not asserted reachable."
+                ),
+            )
+            for source_id, name in [
+                ("moodys_ratings", "Moody's Ratings (Egypt sovereign, public press releases)"),
+                ("sp_global_ratings", "S&P Global Ratings (Egypt sovereign, public press releases)"),
+                ("fitch_ratings", "Fitch Ratings (Egypt sovereign, public press releases)"),
+            ]
+        ],
+        # ---- Amwal Al Ghad: Egypt-specific stock-market news outlet
+        # (distinct from the general Arabic business press already
+        # catalogued) named as a census candidate in
+        # docs/FREE_DECISION_DATA_BLUEPRINT.md Part 1.2. Not asserted
+        # reachable or legal to scrape -- that is the Acquisition
+        # Intelligence Engine's job on its next real run, exactly like
+        # every other PLANNED news source above.
+        _spec(
+            id="amwal_alghad",
+            name="Amwal Al Ghad",
+            category=SourceCategory.ARABIC_NEWS,
+            access_method=AccessMethod.RSS_FEED,
+            status=SourceStatus.PLANNED,
+            reliability_score=0.5,
+            freshness_score=0.9,
+            conflict_priority=40,
+            supported_event_types=["news"],
+            supported_languages=["ar"],
+            notes="Egypt-specific stock-market news outlet; feed URL to be verified, then this "
+            "becomes RssNewsCollector configuration.",
+        ),
     ]
 
 

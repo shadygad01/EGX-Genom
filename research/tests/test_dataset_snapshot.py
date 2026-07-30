@@ -53,6 +53,108 @@ def test_bundles_corporate_events_and_macro_and_news():
     assert len(snapshot.news) > 0
 
 
+def test_financial_statements_empty_when_no_provider_given():
+    snapshot = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=[], as_of=date(2026, 6, 14), lookback_days=30
+    )
+    assert snapshot.financial_statements == {}
+
+
+def test_financial_statements_populated_when_provider_given():
+    from agx_research.financials.provider import FinancialStatementProvider
+    from agx_research.financials.schema import FinancialStatementLineItem
+
+    class FakeProvider(FinancialStatementProvider):
+        def get_line_items(self, ticker, start, end, *, statement_type=None):
+            if ticker != "COMI":
+                return []
+            return [
+                FinancialStatementLineItem(
+                    ticker="COMI",
+                    period_end_date=date(2025, 12, 31),
+                    period_type="ANNUAL",
+                    statement_type="INCOME_STATEMENT",
+                    line_item="revenue",
+                    value=1_000_000,
+                )
+            ]
+
+    snapshot = build_snapshot(
+        provider(),
+        tickers=["COMI", "MFPC"],
+        macro_series_ids=[],
+        as_of=date(2026, 6, 14),
+        lookback_days=30,
+        financials_provider=FakeProvider(),
+    )
+    assert len(snapshot.financial_statements["COMI"]) == 1
+    assert snapshot.financial_statements["COMI"][0].line_item == "revenue"
+    assert snapshot.financial_statements["MFPC"] == []
+
+
+def test_financial_statements_respects_financials_lookback_days():
+    from agx_research.financials.provider import FinancialStatementProvider
+    from agx_research.financials.schema import FinancialStatementLineItem
+
+    class FakeProvider(FinancialStatementProvider):
+        def get_line_items(self, ticker, start, end, *, statement_type=None):
+            period_end_date = date(2020, 1, 1)  # far outside any reasonable window
+            if not (start <= period_end_date <= end):
+                return []
+            return [
+                FinancialStatementLineItem(
+                    ticker=ticker,
+                    period_end_date=period_end_date,
+                    period_type="ANNUAL",
+                    statement_type="INCOME_STATEMENT",
+                    line_item="revenue",
+                    value=1.0,
+                )
+            ]
+
+    snapshot = build_snapshot(
+        provider(),
+        tickers=["COMI"],
+        macro_series_ids=[],
+        as_of=date(2026, 6, 14),
+        lookback_days=30,
+        financials_provider=FakeProvider(),
+        financials_lookback_days=365,
+    )
+    assert snapshot.financial_statements["COMI"] == []
+
+
+def test_two_snapshots_differing_only_in_financials_provider_get_different_ids():
+    from agx_research.financials.provider import FinancialStatementProvider
+    from agx_research.financials.schema import FinancialStatementLineItem
+
+    class FakeProvider(FinancialStatementProvider):
+        def get_line_items(self, ticker, start, end, *, statement_type=None):
+            return [
+                FinancialStatementLineItem(
+                    ticker=ticker,
+                    period_end_date=date(2026, 1, 1),
+                    period_type="ANNUAL",
+                    statement_type="INCOME_STATEMENT",
+                    line_item="revenue",
+                    value=1.0,
+                )
+            ]
+
+    without = build_snapshot(
+        provider(), tickers=["COMI"], macro_series_ids=[], as_of=date(2026, 6, 14), lookback_days=30
+    )
+    with_financials = build_snapshot(
+        provider(),
+        tickers=["COMI"],
+        macro_series_ids=[],
+        as_of=date(2026, 6, 14),
+        lookback_days=30,
+        financials_provider=FakeProvider(),
+    )
+    assert without.id != with_financials.id
+
+
 def test_macro_lookback_days_defaults_to_lookback_days():
     snapshot = build_snapshot(
         provider(), tickers=["COMI"], macro_series_ids=["BRENT_USD"],

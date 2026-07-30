@@ -1,5 +1,55 @@
 # Changelog
 
+## 0.40.0 — Decision-Centric Redesign: position-aware Decision Service + real FinancialPerformanceAgent
+
+Full implementation of the roadmap four research/architecture documents
+(`docs/DECISION_CENTRIC_AUDIT_2026-07-30.md` →
+`docs/FREE_DECISION_DATA_BLUEPRINT.md` → `docs/DECISION_EVIDENCE_MATRIX.md`
+→ `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) settled on, with continued
+adversarial scrutiny during implementation itself.
+
+- **`decision_service/`** (new package): the position-aware layer between
+  promoted knowledge and a Buy/Increase Position/Hold/Reduce Position/
+  Exit/No Action action. `DecisionService.decide_portfolio()` computes a
+  continuous target weight per ticker (extending `PortfolioConstructor`'s
+  existing scoring) and derives the six-way action as a label from
+  target-vs-current weight -- never a discrete lookup table.
+  `country_risk.assess_country_risk()` classifies Country & Macro Risk
+  severity (NORMAL/DETERIORATING/CRISIS); `CRISIS` requires a real,
+  discrete `SovereignRatingAction`, never inferred from a currency move
+  alone. `liquidity_floor.compute_illiquid_tickers()` is a second,
+  symmetric hard override for tradability. Deliberately its own package,
+  never a stage inside the autonomous daily pipeline. Exposed as a
+  read-only, on-demand `agx decide --date ... [--positions
+  positions.json]` CLI command.
+- **`agents.financial_performance.FinancialPerformanceAgent`** is real:
+  revenue-growth-trend and leverage-trend findings from a new
+  `DatasetSnapshot.financial_statements` field (populated via a new
+  optional `financials_provider` parameter on `build_snapshot()`/
+  `MarketMemory`). All 8 of 8 Scientist Framework agents are now real.
+- **`meta.readiness.assess_decision_readiness`** extended with a
+  liquidity-floor blocker (all horizons) and a country-risk-currency-
+  data-presence blocker (INVESTMENT, checking specifically for `EGP_USD`
+  coverage) -- reusing the same `decision_service` mechanisms, not a
+  second parallel gate.
+- **Registry cleanup**: removed 11 sources with zero mapping in
+  `acquisition_intelligence.capability.CAPABILITY_STRATEGIES`
+  (`wikipedia_pageviews`/`google_trends`/`github_releases`/
+  `company_social_official`/`public_telegram`/`patents`/`hiring_signals`/
+  `google_scholar`/`researchgate`/`investing_com`/`tradingview`), which
+  also emptied and removed `SourceCategory.ALTERNATIVE`. Merged
+  `Capability.ECONOMIC_RELEASES` into `MACROECONOMIC`. Added
+  `moodys_ratings`/`sp_global_ratings`/`fitch_ratings` (Sovereign & Credit
+  Context) and `amwal_alghad` (Egypt-specific news) as new `PLANNED`
+  sources and `TargetOrganization` candidates.
+- 41 new tests (`test_country_risk.py`, `test_decision_service.py`,
+  `test_capability_catalog.py`, plus new cases in existing files); 734
+  backend tests pass; `ruff check` clean.
+- See `docs/PHASE_STATUS.md`'s "Decision-Centric Redesign implementation"
+  section for what deliberately deviated from the prior documents under
+  further scrutiny, and `docs/MISSION_COMPLETION_REVIEW.md` for the final
+  full-system review.
+
 ## 0.39.0 — GDELT evidence-tier gate: discovery-only, never independent evidence
 
 Project owner direction after inspecting the real backfilled content

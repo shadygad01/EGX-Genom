@@ -37,6 +37,23 @@ def test_seed_sources_ids_are_unique():
     assert len(ids) == len(set(ids))
 
 
+def test_decision_centric_audit_removed_tier_4_sources():
+    ids = {s.id for s in seed_sources()}
+    removed = {
+        "wikipedia_pageviews", "google_trends", "github_releases",
+        "company_social_official", "public_telegram", "patents",
+        "hiring_signals", "google_scholar", "researchgate",
+        "investing_com", "tradingview",
+    }
+    assert ids.isdisjoint(removed)
+
+
+def test_decision_centric_audit_added_sovereign_and_amwal_sources():
+    ids = {s.id for s in seed_sources()}
+    added = {"moodys_ratings", "sp_global_ratings", "fitch_ratings", "amwal_alghad"}
+    assert added <= ids
+
+
 def test_seed_registry_status_breakdown_matches_seed_sources():
     registry = seed_registry()
     specs = seed_sources()

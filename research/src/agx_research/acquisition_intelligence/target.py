@@ -356,42 +356,11 @@ def seed_target_organizations() -> list[TargetOrganization]:
             existing_source_id="suez_canal_stats",
             priority=PRIORITY_ADDITIONAL_DISCOVERED,
         ),
-        TargetOrganization(
-            id="investing_com",
-            name="Investing.com",
-            category=SourceCategory.MARKET_DATA,
-            country="US",
-            domain_hints=["investing.com", "www.investing.com"],
-            existing_source_id="investing_com",
-            priority=PRIORITY_ADDITIONAL_DISCOVERED,
-        ),
-        TargetOrganization(
-            id="tradingview",
-            name="TradingView",
-            category=SourceCategory.MARKET_DATA,
-            country="US",
-            domain_hints=["tradingview.com", "www.tradingview.com"],
-            existing_source_id="tradingview",
-            priority=PRIORITY_ADDITIONAL_DISCOVERED,
-        ),
-        TargetOrganization(
-            id="google_trends",
-            name="Google Trends",
-            category=SourceCategory.ALTERNATIVE,
-            country="US",
-            domain_hints=["trends.google.com"],
-            existing_source_id="google_trends",
-            priority=PRIORITY_ADDITIONAL_DISCOVERED,
-        ),
-        TargetOrganization(
-            id="wikipedia_pageviews",
-            name="Wikimedia Foundation",
-            category=SourceCategory.ALTERNATIVE,
-            country="US",
-            domain_hints=["wikimedia.org", "www.wikimedia.org"],
-            existing_source_id="wikipedia_pageviews",
-            priority=PRIORITY_ADDITIONAL_DISCOVERED,
-        ),
+        # investing_com/tradingview/google_trends/wikipedia_pageviews
+        # targets removed alongside their SourceSpec entries (Decision-
+        # Centric Gap Audit / Architecture Adversarial Review): zero
+        # capability mapping, zero agent consumer, no credible decision
+        # path -- see sources/catalog.py's removal note.
         TargetOrganization(
             id="arxiv",
             name="arXiv",
@@ -419,22 +388,48 @@ def seed_target_organizations() -> list[TargetOrganization]:
             existing_source_id="nber",
             priority=PRIORITY_ADDITIONAL_DISCOVERED,
         ),
+        # google_scholar/researchgate targets removed alongside their
+        # SourceSpec entries -- redundant with arxiv/ssrn/nber above.
+        #
+        # ---- Architecture Adversarial Review (2026-07-30): new Sovereign
+        # & Credit Context targets feeding the merged Country & Macro Risk
+        # severity classification's crisis rung (R3/R8). Public brand
+        # domains only, independently re-verified for reachability like
+        # every target above -- nothing here is asserted as a working feed.
         TargetOrganization(
-            id="google_scholar",
-            name="Google Scholar",
-            category=SourceCategory.RESEARCH,
+            id="moodys_ratings",
+            name="Moody's Ratings",
+            category=SourceCategory.MACROECONOMIC,
             country="US",
-            domain_hints=["scholar.google.com"],
-            existing_source_id="google_scholar",
+            domain_hints=["moodys.com", "www.moodys.com"],
+            existing_source_id="moodys_ratings",
             priority=PRIORITY_ADDITIONAL_DISCOVERED,
         ),
         TargetOrganization(
-            id="researchgate",
-            name="ResearchGate",
-            category=SourceCategory.RESEARCH,
-            country="DE",
-            domain_hints=["researchgate.net", "www.researchgate.net"],
-            existing_source_id="researchgate",
+            id="sp_global_ratings",
+            name="S&P Global Ratings",
+            category=SourceCategory.MACROECONOMIC,
+            country="US",
+            domain_hints=["spglobal.com", "www.spglobal.com"],
+            existing_source_id="sp_global_ratings",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="fitch_ratings",
+            name="Fitch Ratings",
+            category=SourceCategory.MACROECONOMIC,
+            country="US",
+            domain_hints=["fitchratings.com", "www.fitchratings.com"],
+            existing_source_id="fitch_ratings",
+            priority=PRIORITY_ADDITIONAL_DISCOVERED,
+        ),
+        TargetOrganization(
+            id="amwal_alghad",
+            name="Amwal Al Ghad",
+            category=SourceCategory.ARABIC_NEWS,
+            country="EG",
+            domain_hints=["amwalalghad.com", "www.amwalalghad.com"],
+            existing_source_id="amwal_alghad",
             priority=PRIORITY_ADDITIONAL_DISCOVERED,
         ),
     ]

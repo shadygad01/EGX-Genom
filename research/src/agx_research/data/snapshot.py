@@ -21,6 +21,8 @@ from pydantic import BaseModel, Field
 from agx_research.data.point_in_time import is_knowable
 from agx_research.data.provider import DataProvider
 from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem, PriceBar
+from agx_research.financials.provider import FinancialStatementProvider
+from agx_research.financials.schema import FinancialStatementLineItem
 
 
 class DatasetSnapshot(BaseModel):
@@ -45,6 +47,7 @@ class DatasetSnapshot(BaseModel):
     long_corporate_events: dict[str, list[CorporateEvent]] = Field(default_factory=dict)
     macro_series: dict[str, list[MacroObservation]] = Field(default_factory=dict)
     news: list[NewsItem] = Field(default_factory=list)
+    financial_statements: dict[str, list[FinancialStatementLineItem]] = Field(default_factory=dict)
 
 
 def build_snapshot(
@@ -57,6 +60,8 @@ def build_snapshot(
     macro_lookback_days: int | None = None,
     macro_series_sources: dict[str, str] | None = None,
     pattern_lookback_days: int = 0,
+    financials_provider: FinancialStatementProvider | None = None,
+    financials_lookback_days: int = 730,
 ) -> DatasetSnapshot:
     """Materialize a content-hashed snapshot of everything available as of `as_of`.
 
@@ -89,6 +94,19 @@ def build_snapshot(
     a split/dividend from years ago would otherwise fall outside the
     standard `corporate_events` window and silently corrupt adjusted
     long-history returns with a fake jump.
+
+    `financials_provider` (default: None, meaning `financial_statements`
+    stays empty) mirrors `UniverseProvider`'s "separate, small, dedicated
+    interface" pattern rather than growing `DataProvider`'s method set --
+    see `financials.provider.FinancialStatementProvider`'s own docstring.
+    Threading it through here (rather than reading it directly inside an
+    agent) is what keeps `FinancialPerformanceAgent` compliant with the
+    same "agents never touch a live provider directly" rule every other
+    agent already follows: financial statements become part of the
+    content-hashed, point-in-time snapshot like every other record type,
+    not a side-channel query. `financials_lookback_days` (default 730,
+    matching `meta.readiness.assess_decision_readiness`'s own window)
+    windows only this field.
     """
     start = as_of - timedelta(days=lookback_days)
     macro_lookback_days = lookback_days if macro_lookback_days is None else macro_lookback_days
@@ -117,6 +135,15 @@ def build_snapshot(
         for s in macro_series_ids
     }
     news = provider.get_news(None, start, as_of)
+    financials_start = as_of - timedelta(days=financials_lookback_days)
+    financial_statements = (
+        {
+            t: financials_provider.get_line_items(t, financials_start, as_of)
+            for t in tickers
+        }
+        if financials_provider is not None
+        else {}
+    )
 
     canonical = json.dumps(
         {
@@ -145,6 +172,10 @@ def build_snapshot(
                 s: [o.model_dump(mode="json") for o in obs] for s, obs in macro_series.items()
             },
             "news": [n.model_dump(mode="json") for n in news],
+            "financial_statements": {
+                t: [i.model_dump(mode="json") for i in items]
+                for t, items in financial_statements.items()
+            },
         },
         sort_keys=True,
     )
@@ -164,4 +195,5 @@ def build_snapshot(
         long_corporate_events=long_corporate_events,
         macro_series=macro_series,
         news=news,
+        financial_statements=financial_statements,
     )

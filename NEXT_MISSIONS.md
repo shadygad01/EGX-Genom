@@ -1,45 +1,41 @@
 # Next Missions
 
-## Genuinely next, per the Decision-Centric Gap Audit (2026-07-30)
+## Genuinely next, after the Decision-Centric Redesign implementation (2026-07-30)
 
-See `docs/DECISION_CENTRIC_AUDIT_2026-07-30.md` for the full audit,
-architecture, and reasoning behind this priority order (highest
-decision-quality impact per unit of engineering effort first):
+The six research/architecture documents' roadmap
+(`docs/DECISION_CENTRIC_AUDIT_2026-07-30.md` →
+`docs/FREE_DECISION_DATA_BLUEPRINT.md` → `docs/DECISION_EVIDENCE_MATRIX.md`
+→ `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) is now implemented — see
+`docs/PHASE_STATUS.md`'s "Decision-Centric Redesign implementation"
+section and `docs/MISSION_COMPLETION_REVIEW.md`. What's genuinely next:
 
-1. **Six-way, position-aware decision taxonomy** (audit §3.1) — add a
-   `PositionState` input and extend `MetaDecisionEngine`/
-   `PortfolioConstructor` to emit Buy/Hold/Increase/Reduce/Exit/No Action
-   instead of the current 4-way, position-unaware `BUY_CANDIDATE`/
-   `WATCH`/`AVOID`/`ABSTAIN`. Additive only — every existing caller keeps
-   working unchanged when no position is supplied.
-2. **Un-stub `FinancialPerformanceAgent`** (audit §3.2) — the collected,
-   readiness-gated `FinancialStatementLineItem` data still produces zero
-   `ResearchFinding`s; closes the largest data-to-decision gap for a
-   long-term-investor mission specifically.
-3. **Merge the `Economic Releases` capability into `Macroeconomic`**
-   (audit §3.3) — same source pool, no independent consumer, pure clarity.
-4. **Wire measured source reputation into recommendation confidence**
-   (audit §3.4) — the platform already computes this signal and discards
-   it at the recommendation boundary; implement as an explicit, logged,
-   overridable discount given TD-33's uncalibrated formula.
-5. **Remove the 11 Tier-4 sources with zero capability mapping**
-   (audit §3.5): `wikipedia_pageviews`, `google_trends`,
-   `github_releases`, `company_social_official`, `public_telegram`,
-   `patents`, `hiring_signals`, `google_scholar`, `researchgate`,
-   `investing_com`, `tradingview`.
-6. **Market Breadth artifact** (audit §3.6) — derivable from already-
-   collected Price Data; additive dashboard/analytics work, lower
-   priority than 1–5.
-7. **Amwal Al Ghad + IDSC as new `TargetOrganization` candidates**
-   (audit §3.7) — identity-only, resolved by the existing, unmodified
-   Acquisition Intelligence Engine on its next real-egress run; the one
-   item here touching acquisition, done through the already-frozen
-   mechanism rather than reopening acquisition architecture.
+1. ~~Wire `decision_service.DecisionService` into a queryable command~~
+   **Closed** (TD-47): `agx decide --date ... [--positions positions.json]`.
+2. **Connect a real `SovereignRatingAction` collector** once
+   `moodys_ratings`/`sp_global_ratings`/`fitch_ratings` verify a real
+   feed and go `IMPLEMENTED` (TD-48) — until then,
+   `CountryRiskSeverity.CRISIS` is honestly unreachable by design, not a
+   bug; do not lower that bar to make the override "do something" before
+   real evidence exists.
+3. **Calibration pass** once real history exists (TD-44/45/46, new this
+   phase): `FinancialPerformanceAgent`'s growth/leverage shift thresholds,
+   `assess_country_risk`'s currency-deterioration threshold, and the
+   liquidity floor are all declared, not measured — same posture as
+   TD-6/17/20/33, and the same repayment trigger (real decision-ledger
+   history, ≥30 evaluated decisions per horizon).
+4. **Market Breadth artifact** — derivable from already-collected Price
+   Data; additive dashboard/analytics work, still not built.
+5. **Amwal Al Ghad + IDSC/rating-agency `TargetOrganization` candidates'
+   next real `agx discover-sources` run** — the identity-only entries are
+   seeded; only a real network-egress run can confirm reachability, the
+   same evidenced blocker every prior acquisition mission has hit.
 
-Explicitly not next: a new source-discovery sprint (the audit found the
-existing catalog already covers the credible free/legal universe) or any
-rewrite of `MetaDecisionEngine`/`PortfolioConstructor`/the publication
-gate (item 1 is additive, not a replacement).
+Explicitly not next: a new source-discovery sprint (still true — the
+original audit found the existing catalog already covers the credible
+free/legal universe), any rewrite of `MetaDecisionEngine`/
+`PortfolioConstructor`/the publication gate (the Decision Service is
+additive, composed on top, not a replacement), or reopening the 31-row
+evidence-weight table the Adversarial Review explicitly rejected coding.
 
 ---
 

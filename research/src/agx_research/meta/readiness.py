@@ -8,9 +8,27 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
+from agx_research.decision_service.country_risk import (
+    DEFAULT_CURRENCY_SERIES_ID as _COUNTRY_RISK_CURRENCY_SERIES_ID,
+)
+from agx_research.decision_service.country_risk import (
+    MIN_OBSERVATIONS_FOR_CHANGE as _COUNTRY_RISK_MIN_OBSERVATIONS,
+)
+from agx_research.decision_service.liquidity_floor import (
+    DEFAULT_MIN_AVERAGE_TRADED_VALUE as _LIQUIDITY_FLOOR_MIN_AVG_TRADED_VALUE,
+)
+from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
 from agx_research.financials.provider import FinancialStatementProvider
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
+
+# Added per docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md R2 (extend this
+# existing gate rather than build a second, parallel one) and R4 (a
+# liquidity floor deserves the same hard-gate treatment as every other
+# mandatory-evidence check here, not a separate mechanism). The
+# thresholds themselves are declared, uncalibrated, and owned by
+# `decision_service` (TD-45/TD-46) -- imported above, not redeclared, so
+# this gate and `DecisionService` can never silently drift apart.
 
 
 class ReadinessStatus(str, Enum):
@@ -131,6 +149,13 @@ def assess_decision_readiness(
 ) -> list[DecisionReadiness]:
     snapshot = market_state.dataset_snapshot
     macro_series = sum(1 for values in snapshot.macro_series.values() if values)
+    illiquid_tickers = compute_illiquid_tickers(
+        snapshot, min_average_traded_value=_LIQUIDITY_FLOOR_MIN_AVG_TRADED_VALUE
+    )
+    country_risk_data_present = (
+        len(snapshot.macro_series.get(_COUNTRY_RISK_CURRENCY_SERIES_ID, []))
+        >= _COUNTRY_RISK_MIN_OBSERVATIONS
+    )
     rows: list[DecisionReadiness] = []
     for ticker in sorted(snapshot.tickers):
         prices = snapshot.price_history.get(ticker, [])
@@ -157,12 +182,18 @@ def assess_decision_readiness(
             Horizon.SWING: [],
             Horizon.INVESTMENT: [],
         }
+        is_illiquid = ticker in illiquid_tickers
+
         if len(prices) < 60:
             horizon_blockers[Horizon.MICRO].append("أقل من 60 مشاهدة سعرية.")
         if not price_is_fresh:
             horizon_blockers[Horizon.MICRO].append("بيانات السعر قديمة.")
         if not knowledge_by_horizon[Horizon.MICRO]:
             horizon_blockers[Horizon.MICRO].append("لا توجد معرفة نشطة للأفق القصير.")
+        if is_illiquid:
+            horizon_blockers[Horizon.MICRO].append(
+                "السيولة أقل من الحد الأدنى القابل للتنفيذ."
+            )
 
         if len(prices) < 120:
             horizon_blockers[Horizon.SWING].append("أقل من 120 مشاهدة سعرية.")
@@ -172,6 +203,10 @@ def assess_decision_readiness(
             horizon_blockers[Horizon.SWING].append("لا يوجد خبر أو حدث حديث للشركة.")
         if not knowledge_by_horizon[Horizon.SWING]:
             horizon_blockers[Horizon.SWING].append("لا توجد معرفة نشطة للأفق المتوسط.")
+        if is_illiquid:
+            horizon_blockers[Horizon.SWING].append(
+                "السيولة أقل من الحد الأدنى القابل للتنفيذ."
+            )
 
         if len(prices) < 252:
             horizon_blockers[Horizon.INVESTMENT].append("أقل من 252 مشاهدة سعرية.")
@@ -183,9 +218,17 @@ def assess_decision_readiness(
             )
         if macro_series < 3:
             horizon_blockers[Horizon.INVESTMENT].append("أقل من ثلاث سلاسل اقتصاد كلي.")
+        if not country_risk_data_present:
+            horizon_blockers[Horizon.INVESTMENT].append(
+                "لا تتوفر بيانات كافية عن سعر الصرف لتقييم مخاطر الدولة."
+            )
         if not knowledge_by_horizon[Horizon.INVESTMENT]:
             horizon_blockers[Horizon.INVESTMENT].append(
                 "لا توجد معرفة نشطة للأفق الطويل."
+            )
+        if is_illiquid:
+            horizon_blockers[Horizon.INVESTMENT].append(
+                "السيولة أقل من الحد الأدنى القابل للتنفيذ."
             )
 
         ready_horizons = [
@@ -209,6 +252,12 @@ def assess_decision_readiness(
         if macro_series < 3:
             blockers.append("سياق الاقتصاد الكلي يحتوي أقل من ثلاث سلاسل مكتملة.")
             next_actions.append("استعد ثلاث سلاسل اقتصاد كلي حديثة على الأقل.")
+        if not country_risk_data_present:
+            blockers.append("لا تتوفر بيانات كافية عن سعر الصرف لتقييم مخاطر الدولة.")
+            next_actions.append("اربط سلسلة سعر الصرف (مثل EGP_USD) بتغطية كافية للتقييم.")
+        if is_illiquid:
+            blockers.append("السيولة أقل من الحد الأدنى القابل للتنفيذ لأي قرار.")
+            next_actions.append("لا تُجبر على قرار في سهم غير سائل؛ انتظر تحسّن السيولة أو استبعده.")
         if not active_knowledge:
             blockers.append("لا يغطي السهم أي كائن معرفة نشط ومتحقق منه.")
             next_actions.append("مرّر الفرضيات عبر التحقق قبل إصدار أي قرار.")

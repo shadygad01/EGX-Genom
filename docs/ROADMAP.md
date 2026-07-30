@@ -222,12 +222,14 @@ built and tested. What's next:
   detail and full financial-statement line items a headline/structured-
   export path never can (TD-32) — never a generic PDF-numeric-extraction
   heuristic attempted ahead of a real layout.
-- **Wire financial statements into research**: `FinancialStatementProvider`
-  isn't yet composed into `MarketMemory`/`DatasetSnapshot` — deliberately
-  deferred until `agents.financial_performance.FinancialPerformanceAgent`'s
-  actual fundamental-factor logic is scoped (Scientist Framework work,
-  System 08), rather than extending Market Memory for a consumer that
-  doesn't exist yet.
+- ~~**Wire financial statements into research**~~ **Closed** (Decision-Centric
+  Redesign, 2026-07-30): `data.snapshot.DatasetSnapshot` gained
+  `financial_statements`, populated via a new optional `financials_provider`
+  parameter on `build_snapshot()`/`MarketMemory`, and
+  `agents.financial_performance.FinancialPerformanceAgent` now produces
+  real revenue-growth-trend and leverage-trend findings from it — see
+  `docs/PHASE_STATUS.md`'s "Decision-Centric Redesign implementation"
+  section and `AD-48`.
 - Calibration pass (TD-29, TD-30, TD-31, new this phase) once real
   headlines and real exports exist to calibrate against.
 
@@ -279,11 +281,20 @@ production entrypoint. What's next, in priority order:
   `HorizonModel` contract and model versioning are ready.
 - Covariance-based portfolio optimization replacing capped proportional
   scoring; cost-aware portfolio-level backtesting harness.
-- Remaining scientist agent: FinancialPerformance (fundamentals) — still
-  genuinely data-blocked on real per-company financial statements, unlike
-  NewsIntelligence and HistoricalPatterns which are both now real — plus
-  the HistoricalReviewer and the three remaining adversarial attacks
-  (overfitting harness, regime labels, live-degradation comparison).
+- ~~Remaining scientist agent: FinancialPerformance~~ **Closed** — see
+  above; all 8 of 8 Scientist Framework agents are now real. Remaining in
+  this category: the HistoricalReviewer and the three remaining
+  adversarial attacks (overfitting harness, regime labels,
+  live-degradation comparison).
+- ~~Wire `decision_service.DecisionService` into a queryable command~~
+  **Closed** (TD-47): `agx decide --date ... [--positions positions.json]`
+  reads a JSON portfolio file and prints position-aware six-way decisions,
+  read-only and on-demand — never wired into `ProductionPipeline`'s
+  autonomous stage list, per `AD-45`.
+- Connect a real `SovereignRatingAction` collector once `moodys_ratings`/
+  `sp_global_ratings`/`fitch_ratings` verify a real feed and go
+  `IMPLEMENTED` (TD-48) — until then, `CountryRiskSeverity.CRISIS` is
+  honestly unreachable by design, not a bug.
 - Monte Carlo experiment once a market simulator design is chosen.
 - Database-backed `Repository[T]` implementation when JSON stores hit
   scale limits; dedicated graph store behind the same interface.

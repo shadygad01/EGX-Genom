@@ -358,6 +358,13 @@ Layer 7 — Data-Quality / Provenance Meta-Layer
     layer's conclusions.
 ```
 
+**Superseded**: `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md` (§1.8, R7)
+found this framing inconsistent with `docs/DECISION_EVIDENCE_MATRIX.md`'s
+Q10 (a multiplier threaded *through* every question, not a discrete
+stage) and resolved the conflict in the review's favor: data quality is a
+cross-cutting gate/multiplier, not a pipeline layer. Treat Layer 7 above
+as historical reasoning, not the final design.
+
 ### 5.2 Synthesis: from layers to thesis components to decision
 
 ```

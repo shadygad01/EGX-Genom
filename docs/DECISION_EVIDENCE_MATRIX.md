@@ -355,6 +355,23 @@ prioritized below the items reordered above.
 
 ---
 
+## Superseded by the adversarial review
+
+`docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md` re-opened this matrix under
+deliberately hostile scrutiny and changed several load-bearing pieces of
+it: the 31-row weight table above should not be coded as-is (R1); Part
+3.1's mandatory gate should extend `meta.readiness`, not exist as a
+second parallel mechanism (R2); Q5/Q9 should merge into one graduated
+axis with the override as its top rung, not a separate short-circuit
+(R3); a symmetric liquidity floor is missing (R4); the six-way action in
+Part 3.4 should be a label derived from a continuous target weight, not
+the computed primitive itself (R5); and Q7's promotion to a near-term
+roadmap item in Part 4 below was reversed — it is gated behind Sector
+Membership data that doesn't yet exist (R6). Part 5's sequence below is
+superseded by that review's Part 4 roadmap; the per-question evidence
+tables in Parts 1–2 above remain the source of record for *what evidence
+exists*, just not for *how it is weighted/combined*.
+
 ## Part 5 — Proposed production implementation sequence
 
 This is the first point across all three documents where an actual build

@@ -1,5 +1,48 @@
 # Next Missions
 
+## Genuinely next, per the Decision-Centric Gap Audit (2026-07-30)
+
+See `docs/DECISION_CENTRIC_AUDIT_2026-07-30.md` for the full audit,
+architecture, and reasoning behind this priority order (highest
+decision-quality impact per unit of engineering effort first):
+
+1. **Six-way, position-aware decision taxonomy** (audit §3.1) — add a
+   `PositionState` input and extend `MetaDecisionEngine`/
+   `PortfolioConstructor` to emit Buy/Hold/Increase/Reduce/Exit/No Action
+   instead of the current 4-way, position-unaware `BUY_CANDIDATE`/
+   `WATCH`/`AVOID`/`ABSTAIN`. Additive only — every existing caller keeps
+   working unchanged when no position is supplied.
+2. **Un-stub `FinancialPerformanceAgent`** (audit §3.2) — the collected,
+   readiness-gated `FinancialStatementLineItem` data still produces zero
+   `ResearchFinding`s; closes the largest data-to-decision gap for a
+   long-term-investor mission specifically.
+3. **Merge the `Economic Releases` capability into `Macroeconomic`**
+   (audit §3.3) — same source pool, no independent consumer, pure clarity.
+4. **Wire measured source reputation into recommendation confidence**
+   (audit §3.4) — the platform already computes this signal and discards
+   it at the recommendation boundary; implement as an explicit, logged,
+   overridable discount given TD-33's uncalibrated formula.
+5. **Remove the 11 Tier-4 sources with zero capability mapping**
+   (audit §3.5): `wikipedia_pageviews`, `google_trends`,
+   `github_releases`, `company_social_official`, `public_telegram`,
+   `patents`, `hiring_signals`, `google_scholar`, `researchgate`,
+   `investing_com`, `tradingview`.
+6. **Market Breadth artifact** (audit §3.6) — derivable from already-
+   collected Price Data; additive dashboard/analytics work, lower
+   priority than 1–5.
+7. **Amwal Al Ghad + IDSC as new `TargetOrganization` candidates**
+   (audit §3.7) — identity-only, resolved by the existing, unmodified
+   Acquisition Intelligence Engine on its next real-egress run; the one
+   item here touching acquisition, done through the already-frozen
+   mechanism rather than reopening acquisition architecture.
+
+Explicitly not next: a new source-discovery sprint (the audit found the
+existing catalog already covers the credible free/legal universe) or any
+rewrite of `MetaDecisionEngine`/`PortfolioConstructor`/the publication
+gate (item 1 is additive, not a replacement).
+
+---
+
 ## Closed this phase: TD-39 EGX30+EGX70 Financial Source Registry
 
 See `CURRENT_MISSION.md`'s "TD-39" entry and `docs/TECHNICAL_DEBT.md`'s

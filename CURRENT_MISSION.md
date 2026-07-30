@@ -1,6 +1,54 @@
 # Current Mission
 
-## Current mission: TD-39 — EGX30+EGX70 Financial Source Registry
+## Current mission: Decision-Centric Gap Audit (2026-07-30)
+
+The project owner redefined the "redesign from first principles" ask
+after a review found most of the original 7-phase mission (free data
+census, qualification, ranking, decision mapping) already built under
+different names in this codebase, and flagged that the most recent prior
+mission had explicitly frozen acquisition architecture. Redefined mission:
+a **Decision-Centric Gap Audit** — reorganize existing inputs around
+investment-decision value (Buy/Hold/Increase/Reduce/Exit/No Action) rather
+than source category, preserve the existing architecture unless a
+measurable decision-quality gap justifies change, and document capability
+gaps rather than invent substitutes. Explicitly phased: Phase 1 (audit,
+no code changes), Phase 2 (Tier 1–4 architecture design), Phase 3
+(implementation roadmap, still no code changes this pass).
+
+**Delivered this phase**: `docs/DECISION_CENTRIC_AUDIT_2026-07-30.md` —
+full audit + architecture + roadmap. Headline findings:
+
+- The mission's 6-way decision taxonomy doesn't exist yet:
+  `meta.decision_engine.DecisionAction` is a 4-way, **position-unaware**
+  taxonomy (`BUY_CANDIDATE`/`WATCH`/`AVOID`/`ABSTAIN`) that structurally
+  cannot distinguish Hold from No Action, Increase from Buy, or Reduce
+  from Exit, because nothing in the platform tracks whether a position is
+  already held. This is the audit's central finding — an architecture
+  gap, not a data gap (roadmap item 3.1).
+- `FinancialPerformanceAgent` remains the largest data-to-decision gap for
+  a long-term-investor mission specifically: real financial-statement data
+  is collected and readiness-gates decisions but never produces a finding
+  (roadmap item 3.2).
+- Re-derived Tier 1–4 not from scratch but from the existing
+  `acquisition_intelligence.capability.Capability`/`CAPABILITY_STRATEGIES`
+  map (already a decision-value axis, not a source-category one) — found
+  11 catalogued sources with zero capability mapping at all
+  (`wikipedia_pageviews`, `google_trends`, `github_releases`,
+  `company_social_official`, `public_telegram`, `patents`,
+  `hiring_signals`, `google_scholar`, `researchgate`, `investing_com`,
+  `tradingview`), recommended for removal (roadmap item 3.5) — zero loss
+  of decision-relevant capability, pure cleanup.
+- Named two new `TargetOrganization` candidates for the existing,
+  unmodified Acquisition Intelligence Engine to independently resolve
+  (Amwal Al Ghad, IDSC) — the one roadmap item touching acquisition at
+  all, done through the existing frozen mechanism, not by reopening
+  acquisition architecture.
+
+No production code changed this phase (audit-only, per explicit
+instruction). See the audit doc for the full per-capability/per-source/
+per-field tables and the complete prioritized roadmap.
+
+## Prior mission: TD-39 — EGX30+EGX70 Financial Source Registry
 
 Immediate follow-up: the project owner asked to stop company-domain
 discovery (TD-38, closed) and continue until every EGX30/EGX70 company has

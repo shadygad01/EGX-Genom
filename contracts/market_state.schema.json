@@ -53,6 +53,16 @@
           "title": "Corporate Events",
           "type": "object"
         },
+        "financial_statements": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/FinancialStatementLineItem"
+            },
+            "type": "array"
+          },
+          "title": "Financial Statements",
+          "type": "object"
+        },
         "id": {
           "title": "Id",
           "type": "string"
@@ -363,6 +373,50 @@
       ],
       "title": "EventType",
       "type": "string"
+    },
+    "FinancialStatementLineItem": {
+      "properties": {
+        "currency": {
+          "default": "EGP",
+          "title": "Currency",
+          "type": "string"
+        },
+        "line_item": {
+          "title": "Line Item",
+          "type": "string"
+        },
+        "period_end_date": {
+          "format": "date",
+          "title": "Period End Date",
+          "type": "string"
+        },
+        "period_type": {
+          "title": "Period Type",
+          "type": "string"
+        },
+        "statement_type": {
+          "title": "Statement Type",
+          "type": "string"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "ticker",
+        "period_end_date",
+        "period_type",
+        "statement_type",
+        "line_item",
+        "value"
+      ],
+      "title": "FinancialStatementLineItem",
+      "type": "object"
     },
     "Horizon": {
       "description": "The three independent time horizons the platform optimizes simultaneously.",

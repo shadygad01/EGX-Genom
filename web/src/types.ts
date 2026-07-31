@@ -354,6 +354,7 @@ export interface DatasetSnapshot {
   long_price_history: Record<string, PriceBar[]>;
   corporate_events: Record<string, CorporateEvent[]>;
   long_corporate_events: Record<string, CorporateEvent[]>;
+  financial_statements: Record<string, FinancialStatementLineItem[]>;
   macro_series: Record<string, MacroObservation[]>;
   news: NewsItem[];
 }

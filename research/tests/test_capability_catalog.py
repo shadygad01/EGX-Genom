@@ -57,3 +57,14 @@ def test_every_target_organization_source_ref_exists_in_the_catalog():
 def test_new_sovereign_and_amwal_targets_are_seeded():
     ids = {t.id for t in seed_target_organizations()}
     assert {"moodys_ratings", "sp_global_ratings", "fitch_ratings", "amwal_alghad"} <= ids
+
+
+def test_fred_excluded_from_live_macroeconomic_pool():
+    # Regression test (2026-07-31, TD-50): 3 consecutive real live
+    # `deploy-pages.yml` runs all timed out fetching FRED, so it was never
+    # actually a working live dependency. `fred`'s `SourceSpec` stays
+    # IMPLEMENTED/catalogued (the collector and its own unit tests are
+    # real, legitimate code) -- only the live capability pool that decides
+    # what actually gets fetched stopped depending on it.
+    assert "fred" not in CAPABILITY_STRATEGIES[Capability.MACROECONOMIC]
+    assert "fred" in {s.id for s in seed_sources()}

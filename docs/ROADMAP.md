@@ -295,6 +295,16 @@ production entrypoint. What's next, in priority order:
   `sp_global_ratings`/`fitch_ratings` verify a real feed and go
   `IMPLEMENTED` (TD-48) — until then, `CountryRiskSeverity.CRISIS` is
   honestly unreachable by design, not a bug.
+- Re-add `fred` to `CAPABILITY_STRATEGIES[Capability.MACROECONOMIC]`
+  (TD-50/AD-50) once a real LIVE fetch against it succeeds again — it was
+  removed from live ranking after 3 consecutive real-run timeouts, not
+  deleted; `FredCsvCollector` stays real, tested code.
+- Real sector/peer-comparison data (`universe.sector.StaticSectorProvider`
+  currently a 10-ticker placeholder, `EGX30.csv` has no sector column at
+  all) and richer per-company financial-statement coverage beyond
+  `telecom_egypt_ir`/`orascom_ir` remain genuine, undisguised gaps —
+  closing either needs a real, verified source to appear, never a guess
+  or fabricated value.
 - Monte Carlo experiment once a market simulator design is chosen.
 - Database-backed `Repository[T]` implementation when JSON stores hit
   scale limits; dedicated graph store behind the same interface.

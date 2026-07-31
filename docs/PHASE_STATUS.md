@@ -1221,12 +1221,14 @@ under further scrutiny:
   `fitch_ratings` go `IMPLEMENTED`.
 - **`meta.readiness.assess_decision_readiness`** extended (not duplicated
   — R2 of the Adversarial Review) with two new checks reusing the exact
-  same `compute_illiquid_tickers`/`assess_country_risk` mechanisms the
-  Decision Service uses: a liquidity-floor blocker (all three horizons)
-  and a country-risk-currency-data-presence blocker (INVESTMENT only,
-  checking specifically for `EGP_USD` coverage — a real refinement over
-  the existing generic "fewer than 3 macro series" check, which doesn't
-  verify *which* series are present).
+  same `compute_illiquid_tickers`/`has_sufficient_currency_data` mechanisms
+  the Decision Service uses: a liquidity-floor blocker (all three
+  horizons) and a country-risk-currency-data-presence blocker (INVESTMENT
+  only, checking for EGP/USD coverage under *either* the mock (`EGP_USD`)
+  or real production (`egypt_official_fx_egp_per_usd`) series id — see
+  TD-50/AD-49 below for the bug this closed — a real refinement over the
+  existing generic "fewer than 3 macro series" check, which doesn't verify
+  *which* series are present).
 - One deliberate, named non-deviation: the Evidence Matrix's 31-row
   Critical/High/Medium/Low weight table was **not** implemented as a
   coded scoring formula (per the Adversarial Review's R1) — every score
@@ -1243,3 +1245,54 @@ under further scrutiny:
 
 See `docs/MISSION_COMPLETION_REVIEW.md` for the full final system review
 against the mission's eight completion criteria.
+
+## Post-mission investor walkthrough: two real bugs closed (2026-07-31, TD-50/AD-49/AD-50)
+
+An investor-perspective walkthrough of the live system (project owner
+request, Arabic: "put yourself in an investor's place opening the system
+to make a short/medium/long-term investment decision") found the system
+correctly abstains on every ticker today, but surfaced two genuine,
+previously-unnoticed implementation bugs behind part of that abstention
+— distinct from the already-known, honestly-disclosed data gaps (no
+licensed EGX vendor, no sector/peer data, no rating-agency collector):
+
+- `decision_service.country_risk`'s country-risk-data-presence check
+  hardcoded the mock fixture's currency-series id (`EGP_USD`), which never
+  matched real production's actual World Bank series id
+  (`egypt_official_fx_egp_per_usd`, from `production/collector_plan.py`'s
+  `LIVE_WORLDBANK_INDICATORS`) — every real LIVE run reported "no currency
+  data available" even though World Bank's FX series had been collected
+  successfully every single run. Fixed by resolving against a declared
+  alias list (`resolve_currency_series`/`has_sufficient_currency_data`,
+  reused by `meta.readiness` rather than redeclared). Verified directly
+  against real, already-persisted `production/state-latest` data (not
+  assumed): the check now correctly reports `True`, and
+  `assess_country_risk()` reports `DETERIORATING` (EGP moved +8.67% over
+  the real ~2.5-year lookback window) where it previously reported
+  nothing at all.
+- `fred` was actively wired into every LIVE run's `MACROECONOMIC`
+  capability pool despite timing out in 3 consecutive real
+  `deploy-pages.yml` runs, with zero FRED series ever appearing in real
+  persisted production data — a catalogued, `IMPLEMENTED` source that was
+  never actually a working live dependency. Removed from the live
+  ranking pool and from `production.collector_plan`'s live-wired source
+  set; `FredCsvCollector`, its `SourceSpec`, and its own unit tests are
+  untouched (a live-dependency change, not a legal/code deletion —
+  reversible the moment a real fetch succeeds again).
+- `agents.macro._SERIES_MECHANISMS` gained real production series ids
+  (`DCOILBRENTEU`, `egypt_official_fx_egp_per_usd`, etc.) alongside the
+  mock ids, so real findings get a real mechanism sentence instead of a
+  generic fallback — a quality gap, not a correctness one, but directly
+  relevant to explanation readability for a real investor.
+
+Confirmed explicitly out of scope, not silently skipped: paid-only
+sources (consensus estimates, forward EGP rate, CDS spreads, order-book
+depth, full rating reports, XBRL) and already-`DISABLED` free-but-blocked
+sources (`egx_official`, `cbe`, `imf`, `yahoo_finance`, `mubasher`,
+`investing_com`) needed no code change — they were already structurally
+un-depended-upon by `SourceStatus != IMPLEMENTED` refusing collector
+construction. Real sector/peer-comparison data and a working
+sovereign-rating collector remain genuine, disclosed gaps, not something
+this pass could close without fabrication.
+
+5 new regression tests; 741 backend tests pass; `ruff check` clean.

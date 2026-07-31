@@ -3,7 +3,9 @@ from pathlib import Path
 
 from agx_research.config import Horizon
 from agx_research.data.mock_provider import MockDataProvider
+from agx_research.data.schemas import MacroObservation
 from agx_research.data.snapshot import build_snapshot
+from agx_research.decision_service.country_risk import REAL_CURRENCY_SERIES_ID
 from agx_research.financials.collected import CollectedFinancialStatementProvider
 from agx_research.market_memory.state import MarketState, TradingSession
 from agx_research.meta.readiness import ReadinessStatus, assess_decision_readiness
@@ -59,6 +61,50 @@ def test_investment_horizon_blocked_without_currency_series(tmp_path):
     assert Horizon.INVESTMENT not in row.ready_horizons
     assert any("سعر الصرف" in blocker for blocker in row.horizon_blockers[Horizon.INVESTMENT])
     assert any("سعر الصرف" in blocker for blocker in row.blockers)
+
+
+def test_investment_horizon_recognizes_real_production_currency_series_id(tmp_path):
+    # Regression test (2026-07-31): a real LIVE run's snapshot carries
+    # EGP/USD under the real World Bank id (`egypt_official_fx_egp_per_usd`,
+    # production/collector_plan.py's LIVE_WORLDBANK_INDICATORS), never the
+    # mock fixture's `EGP_USD` -- this must satisfy the country-risk-data-
+    # presence check exactly like the mock id does, not report "missing"
+    # for real, successfully-collected data.
+    snapshot = build_snapshot(
+        MockDataProvider(MOCK_ROOT),
+        tickers=["COMI"],
+        macro_series_ids=["BRENT_USD"],
+        as_of=date(2026, 6, 14),
+        lookback_days=30,
+    )
+    snapshot = snapshot.model_copy(
+        update={
+            "macro_series": {
+                **snapshot.macro_series,
+                REAL_CURRENCY_SERIES_ID: [
+                    MacroObservation(
+                        series_id=REAL_CURRENCY_SERIES_ID,
+                        observation_date=date(2026, 1, 1),
+                        value=49.0,
+                    ),
+                    MacroObservation(
+                        series_id=REAL_CURRENCY_SERIES_ID,
+                        observation_date=date(2026, 6, 1),
+                        value=49.5,
+                    ),
+                ],
+            }
+        }
+    )
+    state = MarketState(
+        as_of=date(2026, 6, 14),
+        dataset_snapshot=snapshot,
+        constituents={"COMI": "Commercial International Bank"},
+        sectors={"COMI": "Banks"},
+        trading_session=TradingSession(session_date=date(2026, 6, 14), is_trading_day=True),
+    )
+    row = assess_decision_readiness(state, CollectedFinancialStatementProvider(tmp_path), [])[0]
+    assert not any("سعر الصرف" in blocker for blocker in row.horizon_blockers[Horizon.INVESTMENT])
 
 
 def test_illiquid_ticker_blocked_across_every_horizon(tmp_path):

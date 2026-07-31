@@ -2,9 +2,11 @@ from datetime import date
 
 from agx_research.data.schemas import MacroObservation
 from agx_research.decision_service.country_risk import (
+    REAL_CURRENCY_SERIES_ID,
     CountryRiskSeverity,
     SovereignRatingAction,
     assess_country_risk,
+    has_sufficient_currency_data,
 )
 
 
@@ -91,3 +93,44 @@ def test_empty_series_is_normal_not_fabricated():
     result = assess_country_risk({}, as_of=date(2026, 6, 14))
     assert result.severity == CountryRiskSeverity.NORMAL
     assert result.reasons == []
+
+
+def test_real_production_series_id_is_recognized_not_just_mock_id():
+    # Regression test (2026-07-31): real LIVE runs collect EGP/USD from
+    # World Bank under `egypt_official_fx_egp_per_usd`
+    # (production/collector_plan.py's LIVE_WORLDBANK_INDICATORS), never the
+    # mock fixture's `EGP_USD` -- this used to mean a real run's own,
+    # successfully-collected FX data was invisible to this assessment.
+    macro_series = {
+        REAL_CURRENCY_SERIES_ID: [
+            _obs(REAL_CURRENCY_SERIES_ID, date(2026, 1, 1), 49.0),
+            _obs(REAL_CURRENCY_SERIES_ID, date(2026, 6, 1), 55.0),  # ~12% depreciation
+        ]
+    }
+    result = assess_country_risk(macro_series, as_of=date(2026, 6, 14))
+    assert result.severity == CountryRiskSeverity.DETERIORATING
+    assert any(REAL_CURRENCY_SERIES_ID in reason for reason in result.reasons)
+    assert has_sufficient_currency_data(macro_series) is True
+
+
+def test_has_sufficient_currency_data_false_when_neither_alias_present():
+    assert has_sufficient_currency_data({"some_other_series": []}) is False
+    assert has_sufficient_currency_data({}) is False
+
+
+def test_explicit_currency_series_id_override_still_wins():
+    macro_series = {
+        "custom_fx_series": [
+            _obs("custom_fx_series", date(2026, 1, 1), 10.0),
+            _obs("custom_fx_series", date(2026, 6, 1), 20.0),
+        ],
+        "EGP_USD": [
+            _obs("EGP_USD", date(2026, 1, 1), 49.0),
+            _obs("EGP_USD", date(2026, 6, 1), 49.1),
+        ],
+    }
+    result = assess_country_risk(
+        macro_series, as_of=date(2026, 6, 14), currency_series_id="custom_fx_series"
+    )
+    assert result.severity == CountryRiskSeverity.DETERIORATING
+    assert any("custom_fx_series" in reason for reason in result.reasons)

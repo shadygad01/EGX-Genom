@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.40.2 — Close free-data gaps: currency-series-id fix, drop unreliable FRED live dependency
+
+Project owner direction (2026-07-31, following an investor-perspective
+walkthrough): delete dependency on sources that are legally free but
+operationally blocked, and fix genuine implementation gaps rather than
+paper over them. Two real bugs found and fixed (TD-50 has the full detail):
+
+- `decision_service.country_risk`'s country-risk-data-presence check
+  hardcoded the mock fixture's currency-series id (`EGP_USD`), which never
+  matched real production's actual World Bank series id
+  (`egypt_official_fx_egp_per_usd`) -- every real LIVE run reported "no
+  currency data" even though the FX series had been collected
+  successfully every time. New `resolve_currency_series()`/
+  `has_sufficient_currency_data()` recognize both ids; `meta.readiness`
+  reuses the same resolver instead of its own copy (AD-49). Verified
+  directly against real persisted `production/state-latest` data: now
+  correctly reports `DETERIORATING` (EGP moved +8.67% over the real
+  lookback window) where it previously reported nothing at all.
+- `fred` removed from the live `MACROECONOMIC` capability pool and from
+  `production.collector_plan`'s live-wired source set (AD-50): 3
+  consecutive real live runs timed out fetching it, and zero FRED series
+  ever appear in real persisted production data -- it was never actually
+  a working live dependency. `FredCsvCollector`, its `SourceSpec`
+  (`IMPLEMENTED`, legally cleared), and its own unit tests are untouched;
+  only the live capability ranking stopped depending on it.
+- `agents.macro._SERIES_MECHANISMS` gained real production series ids
+  (`DCOILBRENTEU`, `egypt_official_fx_egp_per_usd`, etc.) so real findings
+  get a real mechanism sentence instead of a generic fallback.
+- 5 new regression tests; 741 backend tests pass; `ruff check` clean.
+
+Explicitly out of scope (confirmed, not silently skipped): paid-only
+sources (consensus estimates, forward EGP rate, CDS spreads, full rating
+reports, XBRL) and already-`DISABLED` free-but-blocked sources
+(`egx_official`, `cbe`, `imf`, `yahoo_finance`, `mubasher`, `investing_com`)
+needed no code change -- they were already structurally un-depended-upon
+by `SourceStatus != IMPLEMENTED` refusing collector construction. Real
+sector/peer-comparison data and a working sovereign-rating collector
+remain genuine, undisguised gaps -- closing them needs either real network
+egress to verify a source, or a verified source appearing; fabricating
+either would violate this platform's anti-fabrication discipline.
+
 ## 0.40.1 — Fix a real live-deployment incident: three cascading production-pipeline crashes
 
 `deploy-pages.yml` run #92 (2026-07-31, commit `ce1a8a6`) failed on merge

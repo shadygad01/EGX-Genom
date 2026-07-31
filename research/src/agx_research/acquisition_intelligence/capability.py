@@ -117,7 +117,14 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     # classification's crisis rung (Architecture Adversarial Review R3/R8).
     Capability.MACROECONOMIC: [
         "worldbank",
-        "fred",
+        # "fred" deliberately excluded from live ranking (project owner
+        # direction, 2026-07-31): 3 consecutive real `deploy-pages.yml` LIVE
+        # runs all timed out fetching it, so it was never actually a working
+        # live dependency despite being catalogued `IMPLEMENTED` -- see
+        # docs/TECHNICAL_DEBT.md TD-50. `FredCsvCollector` and its own unit
+        # tests stay real/working code; only this live capability pool
+        # stopped depending on it. Re-add here once a real live fetch
+        # succeeds again (e.g. a mirror endpoint, or the original recovers).
         "imf",
         "oecd",
         "undata",

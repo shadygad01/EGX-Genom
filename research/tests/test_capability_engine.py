@@ -215,23 +215,25 @@ def test_decide_and_execute_skips_when_no_live_collector_wiring():
 def test_macroeconomic_capability_is_exhaustive_not_first_success_only():
     registry = SourceRegistry()
     registry.add(_spec("worldbank", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
-    registry.add(_spec("fred", status=SourceStatus.IMPLEMENTED, reliability=0.5, freshness=0.5))
+    registry.add(_spec("capmas", status=SourceStatus.IMPLEMENTED, reliability=0.5, freshness=0.5))
 
     def factory(source_id, spec):
         return _FakeCollector(source_id)
 
     service = _FakeCollectionService({
         "worldbank": _empty_result("worldbank", price_bars=2),
-        "fred": _empty_result("fred", price_bars=1),
+        "capmas": _empty_result("capmas", price_bars=1),
     })
     engine = CapabilityDecisionEngine(registry, factory)
     decision, results, _failures = engine.decide_and_execute(Capability.MACROECONOMIC, service)
 
     # Both complementary macro sources run -- this is not a "pick one"
-    # capability (World Bank's Egypt CPI and FRED's global series cover
+    # capability (World Bank's Egypt CPI and CAPMAS's domestic indices cover
     # disjoint data), so both must be selected, not just the top-ranked one.
-    assert set(decision.selected_source_ids) == {"worldbank", "fred"}
-    assert set(results) == {"worldbank", "fred"}
+    # (Not "fred": excluded from the live MACROECONOMIC pool, see TD-50 --
+    # picking a still-included pair keeps this test meaningful.)
+    assert set(decision.selected_source_ids) == {"worldbank", "capmas"}
+    assert set(results) == {"worldbank", "capmas"}
 
 
 def test_news_capability_collects_every_ready_outlet_for_corroboration():

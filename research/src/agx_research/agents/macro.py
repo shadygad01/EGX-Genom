@@ -51,9 +51,36 @@ def _forward_fill_onto(
             aligned[trading_date] = changes_by_date[observed_dates[idx]]
     return aligned
 
+# Mock fixtures (`research/data/mock/macro/`) and real LIVE production data
+# (`production/collector_plan.py`'s `LIVE_FRED_SERIES_IDS`/
+# `LIVE_WORLDBANK_INDICATORS`) name the same real-world series under
+# different ids -- both are declared here so a real run's findings get a
+# real mechanism sentence instead of silently falling back to the generic
+# "sensitivity to {series_id}" below for every series a real run actually
+# produces.
 _SERIES_MECHANISMS: dict[str, str] = {
     "BRENT_USD": "oil-price exposure of input costs and export revenues",
+    "DCOILBRENTEU": "oil-price exposure of input costs and export revenues",
+    "DCOILWTICO": "oil-price exposure of input costs and export revenues",
     "EGP_USD": "currency exposure of imported costs, foreign-currency debt, and repatriated earnings",
+    "egypt_official_fx_egp_per_usd": (
+        "currency exposure of imported costs, foreign-currency debt, and repatriated earnings"
+    ),
+    "DTWEXBGS": "broad-dollar exposure affecting import costs and dollar-denominated debt",
+    "VIXCLS": "global risk aversion affecting emerging-market capital flows and equity risk premia",
+    "DGS2": "short-term US rate exposure affecting the relative attractiveness of EGP carry",
+    "DGS10": "global discount-rate exposure affecting the present value of future earnings",
+    "BAMLH0A0HYM2": "global credit-risk-appetite exposure affecting emerging-market funding costs",
+    "egypt_cpi_inflation": "domestic inflation exposure affecting real margins and consumer demand",
+    "egypt_real_gdp_growth": "domestic demand exposure affecting revenue growth",
+    "egypt_current_account_pct_gdp": "external-balance exposure affecting FX availability and EGP stability",
+    "egypt_total_reserves_usd": "FX-reserve exposure affecting import cover and currency stability",
+    "egypt_lending_rate": "domestic interest-rate exposure affecting financing costs and discount rates",
+    "egypt_unemployment_rate": "labor-market exposure affecting consumer demand",
+    "egypt_exports_pct_gdp": "export-sector exposure to external demand and FX earnings",
+    "egypt_imports_pct_gdp": "import-dependence exposure to FX cost and input pricing",
+    "egypt_fdi_net_inflows_pct_gdp": "foreign-investment-flow exposure affecting FX supply and EGP stability",
+    "egypt_external_debt_usd": "external-debt exposure affecting FX-denominated debt-service burden",
 }
 
 

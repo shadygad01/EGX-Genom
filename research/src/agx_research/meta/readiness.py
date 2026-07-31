@@ -8,12 +8,7 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
-from agx_research.decision_service.country_risk import (
-    DEFAULT_CURRENCY_SERIES_ID as _COUNTRY_RISK_CURRENCY_SERIES_ID,
-)
-from agx_research.decision_service.country_risk import (
-    MIN_OBSERVATIONS_FOR_CHANGE as _COUNTRY_RISK_MIN_OBSERVATIONS,
-)
+from agx_research.decision_service.country_risk import has_sufficient_currency_data
 from agx_research.decision_service.liquidity_floor import (
     DEFAULT_MIN_AVERAGE_TRADED_VALUE as _LIQUIDITY_FLOOR_MIN_AVG_TRADED_VALUE,
 )
@@ -152,10 +147,7 @@ def assess_decision_readiness(
     illiquid_tickers = compute_illiquid_tickers(
         snapshot, min_average_traded_value=_LIQUIDITY_FLOOR_MIN_AVG_TRADED_VALUE
     )
-    country_risk_data_present = (
-        len(snapshot.macro_series.get(_COUNTRY_RISK_CURRENCY_SERIES_ID, []))
-        >= _COUNTRY_RISK_MIN_OBSERVATIONS
-    )
+    country_risk_data_present = has_sufficient_currency_data(snapshot.macro_series)
     rows: list[DecisionReadiness] = []
     for ticker in sorted(snapshot.tickers):
         prices = snapshot.price_history.get(ticker, [])

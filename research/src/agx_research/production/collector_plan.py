@@ -1,10 +1,15 @@
 """Collector Selection + Execution wiring for the production pipeline.
 
 `ExecutionMode.LIVE` builds the *real* `Collector` subclasses this platform
-already ships (`StooqPriceCollector`, `FredCsvCollector`, `WorldBankCollector`)
-against a real `HttpFetcher` -- an actual network fetch, real robots.txt
-enforcement, real rate limiting/retry/backoff. This is the production
-default: the mission is "AGX must stop behaving as a demonstration system."
+already ships (`StooqPriceCollector`, `WorldBankCollector`) against a real
+`HttpFetcher` -- an actual network fetch, real robots.txt enforcement, real
+rate limiting/retry/backoff. This is the production default: the mission is
+"AGX must stop behaving as a demonstration system." `FredCsvCollector` is
+real, tested code, but is no longer depended upon by any live capability
+ranking (`acquisition_intelligence.capability.CAPABILITY_STRATEGIES` --
+3 consecutive live runs timed out fetching it; see `docs/TECHNICAL_DEBT.md`
+TD-50) -- `build_live_collector` still knows how to build one, but nothing
+in the live path calls it with `source_id="fred"` anymore.
 `rss_generic` is deliberately left unwired in LIVE mode: it is `IMPLEMENTED`
 as a generic collector *class*, but no concrete news outlet in the catalog
 has a verified real feed URL yet (every named outlet stays `PLANNED`) --
@@ -73,6 +78,10 @@ class ExecutionMode(str, Enum):
 # (oil, dollar index, treasury yield) -- the same confidence tier this
 # codebase already grants FRED's/World Bank's endpoint *shape*.
 LIVE_STOOQ_TICKER_SUFFIX = ".eg"
+# Declared for `build_live_collector`'s (currently unreachable in the live
+# path -- see module docstring/TD-50) FRED wiring; deliberately excluded
+# from `LIVE_MACRO_SERIES_IDS`/`LIVE_MACRO_SERIES_SOURCES` below so this
+# platform doesn't query for series ids no live collector actually produces.
 LIVE_FRED_SERIES_IDS = [
     "DCOILBRENTEU",  # Brent: exporters, fertilizers, transport and inflation
     "DCOILWTICO",  # second oil benchmark for dislocation checks
@@ -110,7 +119,10 @@ LIVE_CAPMAS_INDICATORS = {
     },
     2268: {"Urban Egypt": "egypt_urban_cpi_mom"},
 }
-LIVE_MACRO_SERIES_IDS = list(LIVE_FRED_SERIES_IDS) + list(LIVE_WORLDBANK_INDICATORS.values())
+# FRED excluded (see LIVE_FRED_SERIES_IDS' comment / TD-50): no live
+# collector in the actual capability-driven path produces these ids, so
+# querying for them would only ever find nothing.
+LIVE_MACRO_SERIES_IDS = list(LIVE_WORLDBANK_INDICATORS.values())
 LIVE_MACRO_SERIES_IDS += [
     local_id for mappings in LIVE_UN_SDG_SERIES.values() for local_id in mappings.values()
 ]
@@ -122,7 +134,6 @@ LIVE_MACRO_SERIES_IDS += [
 # assumption (`data.snapshot.build_snapshot`'s `macro_series_sources` param)
 # -- built from the exact same groupings above, never a second declaration.
 LIVE_MACRO_SERIES_SOURCES: dict[str, str] = {
-    **{sid: "fred" for sid in LIVE_FRED_SERIES_IDS},
     **{sid: "worldbank" for sid in LIVE_WORLDBANK_INDICATORS.values()},
     **{
         local_id: "undata"
@@ -161,7 +172,6 @@ LIVE_PATTERN_LOOKBACK_DAYS = 1460
 EXPECTED_RECORDS_LIVE = {
     "egx_price_composite": 100,
     "stooq": 100,
-    "fred": 100,
     "worldbank": 10,
     "undata": 10,
     "capmas": 10,
@@ -452,7 +462,9 @@ def live_wired_source_ids(registry: SourceRegistry) -> set[str]:
     explicitly_wired = {
         "egx_price_composite",
         "stooq",
-        "fred",
+        # "fred" deliberately excluded -- see TD-50; it is no longer ranked
+        # by any live capability, so it would never actually be attempted
+        # and shouldn't be reported as a ready standby fallback.
         "worldbank",
         "undata",
         "capmas",

@@ -22,7 +22,6 @@ from agx_research.explainability import Explanation
 from agx_research.horizons.base import Prediction
 from agx_research.meta.decision_engine import MetaDecisionEngine
 from agx_research.production.collector_plan import (
-    LIVE_FRED_SERIES_IDS,
     LIVE_MACRO_LOOKBACK_DAYS,
     LIVE_STOOQ_TICKER_SUFFIX,
     LIVE_WORLDBANK_INDICATORS,
@@ -514,10 +513,9 @@ def _live_content_fixture() -> dict[str, str]:
         content[f"https://stooq.com/q/d/l/?s={stooq_symbol}&i=d"] = (
             "Date,Open,High,Low,Close,Volume\n2026-06-01,68.10,68.90,67.80,68.50,1250000\n"
         )
-    for series_id in LIVE_FRED_SERIES_IDS:
-        content[f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"] = (
-            f"DATE,{series_id}\n2026-06-01,85.30\n"
-        )
+    # FRED deliberately has no canned content here: it is no longer ranked
+    # by the live MACROECONOMIC capability pool (TD-50), so this fixture
+    # exercises exactly what a real live run now actually attempts.
     for indicator in LIVE_WORLDBANK_INDICATORS:
         content[
             f"https://api.worldbank.org/v2/country/EGY/indicator/{indicator}"
@@ -541,7 +539,7 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
 
     assert report.execution_mode == "live"
     assert report.overall_status != StageStatus.FAILED
-    assert set(pipeline.collection_results) == {"stooq", "fred", "worldbank"}
+    assert set(pipeline.collection_results) == {"stooq", "worldbank"}
 
     collector_status = json.loads(
         (tmp_path / "data" / "dashboard" / "collector_status.json").read_text()

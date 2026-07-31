@@ -38,8 +38,52 @@ from agx_research.data.schemas import MacroObservation
 # Named, shared constants -- `meta.readiness`'s country-risk-data-presence
 # pre-check reuses these exact values rather than declaring its own copy
 # that could silently drift from what `assess_country_risk` actually uses.
+#
+# Mock fixtures (`research/data/mock/macro/EGP_USD.csv`) and real production
+# data name the same real-world EGP/USD rate differently: real runs collect
+# it from World Bank indicator `PA.NUS.FCRF` under the id
+# `egypt_official_fx_egp_per_usd` (see `production/collector_plan.py`'s
+# `LIVE_WORLDBANK_INDICATORS`), never `EGP_USD`. Checking only `EGP_USD`
+# meant this assessment (and `meta.readiness`'s presence gate) reported "no
+# currency data" in every real run even though World Bank's FX series was
+# collected successfully every time -- a real bug, not a hypothetical one.
+# `CURRENCY_SERIES_ID_CANDIDATES` names both so a caller that doesn't pin an
+# explicit id finds whichever one the snapshot actually has.
 DEFAULT_CURRENCY_SERIES_ID = "EGP_USD"
+REAL_CURRENCY_SERIES_ID = "egypt_official_fx_egp_per_usd"
+CURRENCY_SERIES_ID_CANDIDATES = (DEFAULT_CURRENCY_SERIES_ID, REAL_CURRENCY_SERIES_ID)
 MIN_OBSERVATIONS_FOR_CHANGE = 2
+
+
+def resolve_currency_series(
+    macro_series: dict[str, list[MacroObservation]],
+    *,
+    currency_series_id: str | None = None,
+) -> tuple[str, list[MacroObservation]]:
+    """Find the EGP/USD observations under whichever id this snapshot uses.
+
+    An explicit `currency_series_id` always wins (never silently overridden).
+    Otherwise tries `CURRENCY_SERIES_ID_CANDIDATES` in order and returns the
+    first one with any observations; if none have data, returns the mock
+    convention's id with an empty list so callers still get a stable id to
+    report against.
+    """
+    if currency_series_id is not None:
+        return currency_series_id, macro_series.get(currency_series_id, [])
+    for candidate in CURRENCY_SERIES_ID_CANDIDATES:
+        observations = macro_series.get(candidate, [])
+        if observations:
+            return candidate, observations
+    return CURRENCY_SERIES_ID_CANDIDATES[0], []
+
+
+def has_sufficient_currency_data(macro_series: dict[str, list[MacroObservation]]) -> bool:
+    """Whether enough EGP/USD observations exist, under any known alias, for
+    `assess_country_risk` to compute a real change -- the single check
+    `meta.readiness`'s country-risk-data-presence gate reuses rather than
+    re-deriving its own alias list that could drift from this module's."""
+    _, observations = resolve_currency_series(macro_series)
+    return len(observations) >= MIN_OBSERVATIONS_FOR_CHANGE
 
 
 class CountryRiskSeverity(str, Enum):
@@ -72,7 +116,7 @@ def assess_country_risk(
     macro_series: dict[str, list[MacroObservation]],
     as_of: date,
     *,
-    currency_series_id: str = DEFAULT_CURRENCY_SERIES_ID,
+    currency_series_id: str | None = None,
     deterioration_threshold: float = 0.05,
     rating_actions: list[SovereignRatingAction] | None = None,
     rating_action_lookback_days: int = 180,
@@ -80,25 +124,27 @@ def assess_country_risk(
     """Classify country-risk severity as of `as_of`.
 
     `deterioration_threshold` (default 5%) applies to the cumulative
-    percentage change of `currency_series_id` (EGP/USD by default -- the
-    same series `agents.macro.MacroAgent` already names as a currency-
-    exposure mechanism) across whatever observations are given; it is a
-    declared, uncalibrated floor (new debt, same posture as
-    `docs/TECHNICAL_DEBT.md`'s TD-6/TD-17/TD-20/TD-33 -- no real multi-year
-    EGP crisis history exists in this platform yet to calibrate against).
+    percentage change of the resolved EGP/USD series (see
+    `resolve_currency_series` -- `currency_series_id=None`, the default,
+    means "whichever alias this snapshot actually has") across whatever
+    observations are given; it is a declared, uncalibrated floor (new debt,
+    same posture as `docs/TECHNICAL_DEBT.md`'s TD-6/TD-17/TD-20/TD-33 -- no
+    real multi-year EGP crisis history exists in this platform yet to
+    calibrate against).
     """
     reasons: list[str] = []
     severity = CountryRiskSeverity.NORMAL
 
-    observations = sorted(
-        macro_series.get(currency_series_id, []), key=lambda o: o.observation_date
+    resolved_series_id, raw_observations = resolve_currency_series(
+        macro_series, currency_series_id=currency_series_id
     )
+    observations = sorted(raw_observations, key=lambda o: o.observation_date)
     if len(observations) >= MIN_OBSERVATIONS_FOR_CHANGE and observations[0].value != 0:
         change = (observations[-1].value - observations[0].value) / abs(observations[0].value)
         if abs(change) >= deterioration_threshold:
             severity = CountryRiskSeverity.DETERIORATING
             reasons.append(
-                f"{currency_series_id} moved {change:+.2%} over the available window "
+                f"{resolved_series_id} moved {change:+.2%} over the available window "
                 f"(floor {deterioration_threshold:.0%})"
             )
 

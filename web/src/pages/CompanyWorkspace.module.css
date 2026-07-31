@@ -130,6 +130,16 @@
   color: var(--text-primary);
 }
 
+a.listItemTitle {
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+
+a.listItemTitle:hover {
+  color: var(--accent-strong);
+}
+
 .listItemMeta {
   font-size: var(--text-2xs);
   color: var(--text-tertiary);

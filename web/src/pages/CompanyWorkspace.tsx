@@ -361,7 +361,18 @@ export function CompanyWorkspace() {
               {news.map((n, i) => (
                 <div key={i} className={styles.listItem}>
                   <div className={styles.listItemHead}>
-                    <span className={styles.listItemTitle}>{n.headline}</span>
+                    {n.body?.startsWith("http") ? (
+                      <a
+                        className={styles.listItemTitle}
+                        href={n.body}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {n.headline}
+                      </a>
+                    ) : (
+                      <span className={styles.listItemTitle}>{n.headline}</span>
+                    )}
                     <span className={styles.listItemMeta}>{formatDateTime(n.published_at)}</span>
                   </div>
                   <span className={styles.listItemDetail}>{n.source}</span>

@@ -199,13 +199,22 @@ class HttpFetcher:
                             content = response.read()
                         self.request_latencies.append(time.monotonic() - request_started_at)
                         return content
-                    except (urllib.error.URLError, OSError, TimeoutError) as fallback_exc:
+                    except (urllib.error.URLError, OSError, TimeoutError, UnicodeError) as fallback_exc:
                         exc = fallback_exc
                 last_error = exc
                 if attempts < spec.retry_policy.max_attempts:
                     time.sleep(delay)
                     delay *= spec.retry_policy.backoff_multiplier
-            except (OSError, TimeoutError) as exc:
+            except (OSError, TimeoutError, UnicodeError) as exc:
+                # UnicodeError: a malformed candidate hostname (an empty or
+                # >63-char label) fails IDNA encoding inside
+                # socket.getaddrinfo -- a real production incident (a full
+                # ~101-company acquisition sweep crashing outright on one
+                # bad guessed domain, 2026-07-31) showed this propagating
+                # straight past every retry/backoff path here, since
+                # UnicodeError isn't an OSError subclass. One malformed
+                # hostname must report as an ordinary fetch failure for
+                # that one target, never crash the whole batch.
                 last_error = exc
                 if attempts < spec.retry_policy.max_attempts:
                     time.sleep(delay)

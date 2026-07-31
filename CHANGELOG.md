@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased — fix a malformed guessed hostname crashing the whole acquisition sweep
+
+While expanding free source coverage (this session triggered
+`discover-sources.yml`'s full ~101-company EGX30/EGX70 acquisition sweep
+via real GitHub Actions egress), the run failed outright 56 minutes in.
+Fetched the real job log directly (the raw-log blob-storage host isn't in
+this coding sandbox's egress allowlist, so used the GitHub MCP server's
+`get_job_logs` instead of a direct fetch) and found the real traceback: one
+company's name-derived guessed domain produced an empty/too-long IDNA
+label, and `socket.getaddrinfo` raised a bare `UnicodeError` that
+propagated straight past `collectors.fetcher.HttpFetcher.fetch_bytes()`'s
+retry loop (`UnicodeError` isn't an `OSError` subclass, so it wasn't
+caught by the existing `except (OSError, TimeoutError)` clauses) and
+crashed the entire sweep — losing all prior progress, since
+`discover-sources.yml` deliberately persists nothing mid-run.
+
+**Closed**: `fetch_bytes()` now also catches `UnicodeError` in both the
+primary attempt and the Windows-certificate-trust fallback path, so a
+malformed hostname reports as an ordinary per-target fetch failure
+(`FetchError`, already correctly handled by `acquisition_intelligence.live
+.build_live_prober`) instead of crashing the caller — the same class of
+defensive fix as the earlier `UnicodeEncodeError`-on-non-ASCII-URLs and
+unbounded-robots.txt-timeout bugs this module has already been hardened
+against. 1 new regression test (`test_http_fetcher.py`); 770 backend
+tests pass (up from 769); `ruff check` clean.
+
 ## Unreleased — fix source promotions silently not reaching an already-running deployment
 
 **Real bug found while verifying the Amwal Al Ghad promotion below**:

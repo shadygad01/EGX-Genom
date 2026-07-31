@@ -105,6 +105,28 @@ def test_exhausted_retries_raise_fetch_error(monkeypatch):
         )))
 
 
+def test_a_malformed_hostname_fails_the_fetch_instead_of_crashing_the_caller(monkeypatch):
+    """Regression test for a real production incident (2026-07-31): a full
+    ~101-company acquisition sweep crashed outright, losing all prior
+    progress, when one company's name-derived guessed domain produced an
+    empty/too-long IDNA label. `socket.getaddrinfo` raises `UnicodeError`
+    directly (not an `OSError` subclass), so it previously propagated
+    straight past every retry/backoff path here -- one bad hostname must
+    report as an ordinary fetch failure, never crash the whole caller.
+    """
+    fetcher = HttpFetcher(respect_robots=False)
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
+
+    def bad_hostname(request, timeout):
+        raise UnicodeError("label empty or too long")
+
+    monkeypatch.setattr(urllib.request, "urlopen", bad_hostname)
+    with pytest.raises(FetchError):
+        fetcher.fetch_text("https://.example.test/", make_spec(retry_policy=RetryPolicy(
+            max_attempts=2, backoff_seconds=0.01, backoff_multiplier=2.0
+        )))
+
+
 def test_successful_fetch_records_real_request_latency(monkeypatch):
     fetcher = HttpFetcher(respect_robots=False)
     monkeypatch.setattr("time.sleep", lambda seconds: None)

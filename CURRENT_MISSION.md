@@ -1,6 +1,46 @@
 # Current Mission
 
-## Current mission: Market Breadth artifact (2026-07-31)
+## Current mission: fix why no investment decision was ever reachable (2026-07-31)
+
+Project owner review of the live, merged-to-`main` dashboard: still no
+clear investment decision reachable, still sources that look unconnected,
+still sources that look like they add no value. Rather than guess,
+investigated against the real persisted production state
+(`production/state-latest`, restored/committed by every scheduled
+`deploy-pages.yml` run per TD-40) instead of mock data.
+
+**Found and fixed, both real engineering bugs, neither a data/business
+blocker**:
+
+1. `_stage_market_memory` passed a hardcoded `lookback_days=30` (calendar
+   days) for every mode — EGX trades 5 of 7 days, so that's only ~19-21
+   real trading days, strictly below the DATA_COLLECTION gate's
+   `min_observations=60`. Every one of 777 real hypotheses ever recorded
+   in production had failed there, despite COMI alone having 118 real
+   collected trading days sitting unused. New `LIVE_PRICE_LOOKBACK_DAYS =
+   180` (LIVE mode only, MOCK/REPLAY unchanged) fixes it — re-running the
+   real research pipeline against the same real data now produces 5
+   genuinely promoted `KnowledgeObject`s instead of zero. See AD-52/TD-53.
+2. `seed_registry()` only ever adds a new source id — it never removes
+   one deleted from `sources/catalog.py`. The Decision-Centric Redesign's
+   claimed removal of 11 zero-value sources never actually reached the
+   already-running production deployment: diffing the real registry
+   against the current catalog found all 11 still present, 9 still
+   `PLANNED`. New `SourceRegistry.retire_removed()` closes the gap
+   structurally (wired into every `seed_registry()` call), retiring all 9
+   this run while leaving every still-catalogued source (`fred`,
+   `global_benchmarks`, provider legs) untouched. See AD-53/TD-54.
+
+The remaining complaint (sources still unconnected) is the same,
+already-documented, evidence-backed state this project has reported for
+many prior missions — most `PLANNED` sources are blocked by a real
+network/ToS wall or a named, already-decided business call (AD-32), not a
+new code gap. See `docs/PHASE_STATUS.md`'s matching section and
+`CHANGELOG.md`'s entry for full detail, including the exact real-data
+verification numbers. 764 backend tests pass (up from 758); `ruff check`
+clean.
+
+## Prior mission: Market Breadth artifact (2026-07-31)
 
 Continuing `NEXT_MISSIONS.md`'s "genuinely next" list from the
 Decision-Centric Redesign: item 4, the Market Breadth artifact, was the

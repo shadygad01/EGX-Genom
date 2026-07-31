@@ -166,6 +166,28 @@ LIVE_MACRO_LOOKBACK_DAYS = 900
 # unbounded "all history" search.
 LIVE_PATTERN_LOOKBACK_DAYS = 1460
 
+# The 30-day window `_stage_market_memory` used for every mode's standard
+# `price_history`/`corporate_events`/`news` (the window every agent and the
+# hypothesis pipeline's DATA_COLLECTION gate actually see) is a real,
+# live-evidenced bug for LIVE mode specifically: EGX trades Sun-Thu (5 of 7
+# days), so 30 *calendar* days yields only ~19-21 *trading* days -- strictly
+# less than `orchestration.pipeline.PipelineConfig.min_observations = 60` no
+# matter how much real history a source has collected. Confirmed against
+# real persisted production data: COMI alone has 118 real collected trading
+# days spanning 2026-01-28 to 2026-07-30, yet all 777 hypotheses recorded so
+# far failed DATA_COLLECTION with only 19-21 aligned observations each --
+# every one of them was starved by the window, not by a genuine lack of
+# history. ~180 calendar days (~115-120 real trading days at EGX's cadence)
+# clears the 60-observation floor with real margin for holidays and for two
+# tickers' series not perfectly overlapping, while staying a bounded,
+# explainable "recent regime" window rather than reaching for years of
+# history the way the pattern-search window above deliberately does.
+# MOCK/REPLAY stays at the original 30 days -- fixture data and existing
+# test assertions are sized to that window, and this bug is LIVE-only:
+# nothing in either mode's price data ever exceeded 30 calendar days before
+# now, so widening it can only ever add data, never remove any.
+LIVE_PRICE_LOOKBACK_DAYS = 180
+
 # Conservative floors, not true full-history sizes (unknown until a real
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
 # lowballing here never unfairly penalizes a real result, it only avoids

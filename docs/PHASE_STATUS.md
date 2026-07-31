@@ -1435,3 +1435,122 @@ plus assertions added to 2 existing pipeline tests); 758 backend tests
 pass (up from 751); `ruff check` clean; `api` (19 tests, up from 18) and
 `web` (41 tests) build/test suites clean, including a fixture update for
 the new `getMarketBreadth` method in `App.test.tsx`'s fake provider.
+
+## The real DATA_COLLECTION-starvation bug and dead-source retirement (post-Market-Breadth)
+
+The project owner reviewed the merged, deployed dashboard and reported
+three things in one message: still no clear investment decision reachable,
+still sources that look unconnected, still sources that look like they add
+no value. Rather than answer from memory or from the mock-mode fixtures
+this codebase's tests usually run against, this phase pulled the real
+persisted production state (`production/state-latest`, restored/committed
+by every scheduled `deploy-pages.yml` run per debt #40) and investigated
+against it directly.
+
+**Finding 1, the real reason no decision was ever reachable.** Real
+persisted `hypotheses.json` showed **777 hypotheses, every single one
+stuck at `DATA_COLLECTION`**, none ever advancing further. The stage
+history recorded the exact reason: `"19 aligned observations (min 60)"` —
+`orchestration.pipeline.PipelineConfig.min_observations = 60`. That number
+looked odd next to real persisted `prices/COMI.csv`, which has **118 real
+collected trading days spanning 2026-01-28 to 2026-07-30** — clearly more
+than 60. The actual bug: `production.pipeline.ProductionPipeline
+._stage_market_memory` passed a hardcoded `lookback_days=30` (*calendar*
+days) for every mode's standard `price_history`/`corporate_events`/`news`
+window, with no LIVE-mode override — unlike `macro_lookback_days`/
+`pattern_lookback_days`, which already got their own LIVE-only wider
+windows (`LIVE_MACRO_LOOKBACK_DAYS`/`LIVE_PATTERN_LOOKBACK_DAYS`) for
+exactly this class of problem. EGX trades Sun-Thu (5 of 7 days), so 30
+calendar days yields only ~19-21 real trading days — a structural ceiling
+strictly below 60 that no amount of real accumulated history could ever
+cross, regardless of how many months a source had been collecting.
+
+**Verified directly against real data, not asserted.** Exported the real
+`production/state-latest` data tree and re-ran the actual research
+pipeline (`DailyResearchPipeline`, the real agents) against it, unmodified
+except for the lookback window:
+- At the original `lookback_days=30`: 337 findings, **0 progressed past
+  DATA_COLLECTION** — reproducing the exact real production failure.
+- At a new `lookback_days=180`: the identical real data produced 194
+  findings, of which 96 reached BACKTEST, 5 reached PEER_VALIDATION and
+  **were genuinely promoted to `KnowledgeObject`s** — proof the fix, not
+  just the diagnosis, is correct.
+
+**Closed**: `production.collector_plan.LIVE_PRICE_LOOKBACK_DAYS = 180`
+(new constant, same file as the other two LIVE-only windows), deferred
+through `ProductionPipeline.__init__`/`.run()` the identical way
+`macro_lookback_days` already is (`price_lookback_days` constructor
+override → mode-based default in `run()` → threaded into
+`_stage_market_memory`'s `MarketMemory(...)` call). MOCK/REPLAY keep the
+original 30-day default unchanged, so no existing test fixture or
+assertion was affected — confirmed by the full suite passing unmodified.
+180 days (not the bare 60-trading-day minimum) was chosen for real margin
+against holidays and two tickers' series not perfectly overlapping, while
+staying a bounded, explainable "recent regime" window rather than
+reaching for years of history the way the pattern-search window
+deliberately does. New debt: TD-53 (the window itself is a declared,
+uncalibrated margin choice, and one shared window across every horizon
+and agent is a simplification worth revisiting once real decision history
+exists).
+
+**Finding 2, sources that "add no value" were never actually removed.**
+The Decision-Centric Redesign's "registry cleanup" claimed to remove 11
+sources with zero `Capability` mapping (`docs/DECISION_CENTRIC_AUDIT_2026-07-30.md`
+section 3.5). Confirmed the code-level deletion genuinely happened — none
+of the 11 ids appear anywhere in the current `sources/catalog.py`. But
+diffing the real persisted `source_registry.json` against the current
+catalog found **all 11 still present**, 9 of them still `PLANNED`
+(`company_social_official`, `github_releases`, `google_scholar`,
+`google_trends`, `hiring_signals`, `patents`, `public_telegram`,
+`researchgate`, `wikipedia_pageviews` — the other 2, `investing_com`/
+`tradingview`, were already `DISABLED` from an earlier, unrelated
+ToS/403 finding). The mechanism: `sources.catalog.seed_registry()` only
+ever *adds* a source id it doesn't already have — nothing ever re-derives
+the registry's full membership from the current catalog, so a code-level
+deletion is invisible to any deployment that had already persisted that
+source before the deletion shipped. The redesign's own claim was accurate
+about the code; it was never true for the live, continuously-running
+deployment.
+
+**Closed**: `sources.registry.SourceRegistry.retire_removed(current_catalog_ids)`
+(new method) transitions any already-persisted source whose id is absent
+from `current_catalog_ids` to `SourceStatus.DISABLED` (which
+`default_lifecycle_for_status` already maps to `ActivationStatus.RETIRED`)
+via a new revision — never an edit or deletion, so the full prior history
+stays intact — and skips anything already `DISABLED`. Wired into
+`seed_registry()` (`current_ids` collected from `seed_sources()` during
+the existing add-loop, then `registry.retire_removed(current_ids)`
+called once at the end), so it runs on every pipeline execution from now
+on: any future catalog deletion reaches a live deployment on its very
+next run, closing this gap structurally rather than just for today's 9.
+Verified directly against the real registry: all 9 stale sources
+correctly retired with a clear `notes` reason, while every genuinely
+still-catalogued-but-unmapped source (`fred` — deliberately kept per
+debt #50, `global_benchmarks`, `rss_generic`, and the `stockanalysis`/
+`yahoo_finance`/`mubasher` provider legs) was left completely untouched —
+`fred`'s revision didn't even bump. New debt: TD-54 (this only catches an
+outright catalog deletion, not a still-catalogued source silently
+orphaned from every capability's candidate pool).
+
+**Finding 3, the third complaint (sources still unconnected) is not a new
+gap.** No new evidence contradicted the extensive, already-documented
+state (`docs/ACQUISITION_STRATEGY.md`, this file's own history above):
+most `PLANNED` sources remain blocked by a real network/ToS/anti-bot wall
+or a named, already-decided business call (a licensed vendor, explicitly
+declined per AD-32) — not a code gap this phase could close without
+fabricating a connection or bypassing a legal/ToS rule.
+
+**Verified**: 6 new backend tests (4 in `test_source_registry.py`
+covering `retire_removed`'s three behaviors plus `seed_registry`'s
+integration, 2 in `test_production_pipeline.py` covering LIVE vs.
+MOCK/REPLAY price-lookback behavior and the constructor override); 764
+backend tests pass (up from 758); `ruff check` clean. No `api`/`web`
+changes this phase (backend-only). See `CHANGELOG.md`'s matching entry
+and `docs/ARCHITECTURE_DECISIONS.md`'s AD-52/AD-53 for the full reasoning.
+
+**Not verified in this phase, named as the immediate next check**: this
+phase's evidence comes from re-running the real research pipeline against
+a locally re-exported copy of the real persisted data, not from watching
+an actual live `deploy-pages.yml` run produce a promoted `KnowledgeObject`
+end to end. That's the next scheduled (or manually triggered) run's job —
+see `NEXT_MISSIONS.md`.

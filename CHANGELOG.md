@@ -1,5 +1,66 @@
 # Changelog
 
+## Unreleased — fix the real reason no investment decision was ever reachable, and retire dead sources for real
+
+Project owner review of the live dashboard: no clear investment decision
+was reachable, some catalogued sources still looked unconnected, and some
+sources still looked like they add no value. Investigated against the
+real persisted production state (`production/state-latest`) rather than
+mock data — two real, previously-undetected engineering bugs found and
+fixed, not data/business blockers:
+
+- **The DATA_COLLECTION-starvation bug (AD-52).** `ProductionPipeline`
+  passed a hardcoded `lookback_days=30` (calendar days) for every mode's
+  standard `price_history`/`corporate_events`/`news` window — the window
+  every agent and the hypothesis pipeline's DATA_COLLECTION gate actually
+  sees. EGX trades Sun-Thu (5 of 7 days), so 30 calendar days yields only
+  ~19-21 real trading days, strictly below
+  `orchestration.pipeline.PipelineConfig.min_observations = 60` — a
+  structural ceiling no amount of real accumulated history could ever
+  cross. Confirmed directly against real data: COMI alone has 118 real
+  collected trading days (2026-01-28 to 2026-07-30), yet **every one of
+  777 real hypotheses recorded in production had failed DATA_COLLECTION**
+  with only 19-21 aligned observations each. Re-running the real research
+  pipeline against the real, already-collected data reproduced this
+  exactly (0 of 337 findings passed DATA_COLLECTION at the old window);
+  with a new LIVE-mode-only `LIVE_PRICE_LOOKBACK_DAYS = 180`
+  (`production/collector_plan.py`, deferred through `ProductionPipeline`
+  the same way `LIVE_MACRO_LOOKBACK_DAYS`/`LIVE_PATTERN_LOOKBACK_DAYS`
+  already are), the identical real data produced **5 genuinely promoted
+  `KnowledgeObject`s**, reaching PEER_VALIDATION. MOCK/REPLAY keep the
+  original 30-day window unchanged — no test fixture or assertion
+  affected. New debt: TD-53 (180 days is a declared, uncalibrated
+  margin-above-the-floor choice, not a measured optimum).
+- **The dead-source-that-never-actually-died bug (AD-53).** The Decision-
+  Centric Redesign's "registry cleanup" (removal of 11 sources with zero
+  capability mapping) deleted them from `sources/catalog.py`'s code, but
+  `seed_registry()` only ever *adds* an id it doesn't already know about —
+  it never removes one no longer in the catalog. Diffing the real
+  persisted `source_registry.json` against the current catalog found
+  exactly those same 11 ids still present, 9 of them still `PLANNED`
+  months later: the code shipped, but no already-running deployment ever
+  saw it take effect. New `sources.registry.SourceRegistry.retire_removed()`
+  transitions any such id to `DISABLED`/`RETIRED` via a new revision
+  (never an edit or deletion — full history intact), wired into
+  `seed_registry()` so it runs on every pipeline execution going forward.
+  Verified directly against the real registry: all 9 correctly retired
+  with a clear reason in `notes`, while still-catalogued sources
+  (`fred`, `global_benchmarks`, `rss_generic`, provider legs) were left
+  completely untouched. New debt: TD-54 (this only catches outright
+  catalog deletions, not a still-catalogued source silently orphaned from
+  every capability's candidate pool).
+- 6 new backend tests (4 in `test_source_registry.py`, 2 in
+  `test_production_pipeline.py`, plus assertions added to an existing
+  test); 764 backend tests pass (up from 758); `ruff check` clean.
+
+The remaining complaint (some sources are still unconnected) is not a new
+engineering gap: it's the same, already extensively evidenced state this
+project has documented across many prior missions (`docs/ACQUISITION_STRATEGY.md`,
+`docs/TECHNICAL_DEBT.md`) — most `PLANNED` sources are blocked by real
+network/ToS/anti-bot walls or a named business decision (a licensed
+vendor, explicitly declined per AD-32), not a code gap this session could
+close without fabricating a connection.
+
 ## Unreleased — Market Breadth artifact (advance/decline + volume breadth)
 
 Closes the last named item from `NEXT_MISSIONS.md`'s "genuinely next,

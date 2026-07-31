@@ -959,7 +959,14 @@ def seed_sources() -> list[SourceSpec]:
 
 def seed_registry(registry: SourceRegistry | None = None) -> SourceRegistry:
     registry = registry or SourceRegistry()
+    current_ids: set[str] = set()
     for spec in seed_sources():
+        current_ids.add(spec.id)
         if registry.latest(spec.id) is None:
             registry.add(spec)
+    # A source deleted from this catalog (e.g. one with zero capability
+    # mapping) must stop looking live in a deployment that already
+    # persisted it before the deletion shipped — see
+    # `SourceRegistry.retire_removed()`'s own docstring.
+    registry.retire_removed(current_ids)
     return registry

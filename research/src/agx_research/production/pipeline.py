@@ -105,6 +105,7 @@ from agx_research.production.collector_plan import (
     LIVE_MACRO_SERIES_IDS,
     LIVE_MACRO_SERIES_SOURCES,
     LIVE_PATTERN_LOOKBACK_DAYS,
+    LIVE_PRICE_LOOKBACK_DAYS,
     ExecutionMode,
     build_collector_plan,
     build_live_collector,
@@ -156,6 +157,7 @@ class ProductionPipeline:
         universe_provider: UniverseProvider | None = None,
         macro_series_ids: list[str] | None = None,
         macro_lookback_days: int | None = None,
+        price_lookback_days: int | None = None,
     ):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
@@ -170,6 +172,13 @@ class ProductionPipeline:
         # matched-to-lookback_days dates do.
         self._macro_lookback_days_override = macro_lookback_days
         self.macro_lookback_days = macro_lookback_days or 30
+        # Same deferral again: LIVE mode's real, accumulating price history
+        # needs a window wide enough to actually clear
+        # `orchestration.pipeline.PipelineConfig.min_observations` (see
+        # `LIVE_PRICE_LOOKBACK_DAYS`'s own comment for the real bug this
+        # closes); MOCK/REPLAY fixtures stay at the original 30 days.
+        self._price_lookback_days_override = price_lookback_days
+        self.price_lookback_days = price_lookback_days or 30
         # Same deferral again, this time for historical_patterns_agent's
         # search window (see data/snapshot.py's pattern_lookback_days):
         # mock/replay fixtures are far too short for meaningful analog
@@ -265,6 +274,12 @@ class ProductionPipeline:
             self.macro_lookback_days = LIVE_MACRO_LOOKBACK_DAYS
         else:
             self.macro_lookback_days = 30
+        if self._price_lookback_days_override is not None:
+            self.price_lookback_days = self._price_lookback_days_override
+        elif mode == ExecutionMode.LIVE:
+            self.price_lookback_days = LIVE_PRICE_LOOKBACK_DAYS
+        else:
+            self.price_lookback_days = 30
         self.macro_series_sources = (
             dict(LIVE_MACRO_SERIES_SOURCES) if mode == ExecutionMode.LIVE else {}
         )
@@ -766,7 +781,7 @@ class ProductionPipeline:
             self.universe_provider,
             StaticSectorProvider(),
             macro_series_ids=self.macro_series_ids,
-            lookback_days=30,
+            lookback_days=self.price_lookback_days,
             macro_lookback_days=self.macro_lookback_days,
             macro_series_sources=self.macro_series_sources,
             pattern_lookback_days=self.pattern_lookback_days,

@@ -23,6 +23,7 @@ from agx_research.horizons.base import Prediction
 from agx_research.meta.decision_engine import MetaDecisionEngine
 from agx_research.production.collector_plan import (
     LIVE_MACRO_LOOKBACK_DAYS,
+    LIVE_PRICE_LOOKBACK_DAYS,
     LIVE_STOOQ_TICKER_SUFFIX,
     LIVE_WORLDBANK_INDICATORS,
     ExecutionMode,
@@ -331,6 +332,26 @@ def test_failure_isolation_collector_failure_marks_partial_not_total(tmp_path, m
     assert report.overall_status in (StageStatus.PARTIAL, StageStatus.SUCCEEDED)
 
 
+def test_mock_mode_keeps_the_original_30_day_price_window(tmp_path):
+    # MOCK/REPLAY fixtures (and the test assertions built against them) are
+    # sized to the original 30-day window -- only LIVE mode needed the wider
+    # LIVE_PRICE_LOOKBACK_DAYS window (see the LIVE-mode test above).
+    pipeline = make_pipeline(tmp_path / "data")
+    pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
+    assert pipeline.price_lookback_days == 30
+    assert pipeline.market_memory.reconstruct(RUN_DATE).dataset_snapshot.lookback_days == 30
+
+
+def test_price_lookback_days_override_wins_regardless_of_mode(tmp_path):
+    pipeline = ProductionPipeline(
+        data_dir=tmp_path / "data",
+        universe_provider=MappingUniverseProvider({t: t for t in TICKERS}),
+        price_lookback_days=45,
+    )
+    pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK)
+    assert pipeline.price_lookback_days == 45
+
+
 def test_artifact_generation_writes_every_expected_file(tmp_path):
     dashboard_out = tmp_path / "dashboard"
     pipeline = make_pipeline(tmp_path / "data")
@@ -614,6 +635,15 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
     assert snapshot.macro_lookback_days == LIVE_MACRO_LOOKBACK_DAYS
     for indicator_local_id in LIVE_WORLDBANK_INDICATORS.values():
         assert len(snapshot.macro_series[indicator_local_id]) == 1
+
+    # Regression test for a real, live-evidenced bug: a 30-*calendar*-day
+    # window (EGX trades 5 of 7 days) yields only ~19-21 real trading
+    # days -- strictly below `min_observations = 60`, so DATA_COLLECTION
+    # rejected every one of 777 real hypotheses in production despite
+    # months of real collected price history existing. LIVE mode must use
+    # the wider window; MOCK/REPLAY (see below) stays at 30.
+    assert pipeline.price_lookback_days == LIVE_PRICE_LOOKBACK_DAYS
+    assert snapshot.lookback_days == LIVE_PRICE_LOOKBACK_DAYS
 
 
 def test_live_mode_fails_loudly_when_every_collector_fails(tmp_path, monkeypatch):

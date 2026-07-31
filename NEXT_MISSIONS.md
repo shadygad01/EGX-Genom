@@ -1,6 +1,35 @@
 # Next Missions
 
-## Closed this phase: Market Breadth artifact
+## Closed this phase: the real DATA_COLLECTION-starvation bug and dead-source retirement
+
+See `CURRENT_MISSION.md`'s "fix why no investment decision was ever
+reachable" entry and `docs/PHASE_STATUS.md`'s matching section for full
+detail. **Genuinely next now**, in priority order:
+
+1. **Watch the next scheduled `deploy-pages.yml` run** (or trigger one
+   manually) — the real, first-ever test of whether `LIVE_PRICE_LOOKBACK_DAYS`
+   produces a promoted `KnowledgeObject` end to end in an actual live run,
+   not just against a locally re-run copy of already-persisted data. This
+   is the single most important thing to verify next; everything else on
+   this list is secondary until that's confirmed.
+2. **TD-53's calibration trigger**: once real decision-ledger history
+   accumulates across enough trading days, review whether 180 days is the
+   right shared window, and whether per-horizon windows (a shorter one
+   for MICRO momentum, a longer one for INVESTMENT correlation) would
+   separate signal from noise better than one number for all of them.
+3. **TD-54's flagging extension**: if a future source review finds a
+   still-catalogued source silently orphaned from every capability's
+   candidate pool (unlike `fred`, which is deliberately kept), consider
+   whether `retire_removed` should flag it for a maintainer rather than
+   requiring a manual catalog deletion first.
+4. Everything already named as genuinely next before this phase (below)
+   is unchanged — this phase's fixes didn't touch acquisition
+   architecture, calibration of the pre-existing declared thresholds
+   (TD-44/45/46/51/52), or the sovereign-rating/Amwal-Al-Ghad items.
+
+---
+
+## Closed prior phase: Market Breadth artifact
 
 Item 4 from the list below is now closed — see `CURRENT_MISSION.md`'s
 "Market Breadth artifact" entry and `docs/PHASE_STATUS.md`'s matching

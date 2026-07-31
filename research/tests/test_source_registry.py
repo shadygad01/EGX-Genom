@@ -189,3 +189,64 @@ def test_amwal_alghad_is_implemented_with_a_real_verified_feed_url():
     assert spec.status == SourceStatus.IMPLEMENTED
     assert spec.collector == "RssNewsCollector"
     assert spec.base_url == "https://amwalalghad.com/feed/atom/"
+
+
+def test_sync_declared_fields_promotes_an_already_persisted_planned_source():
+    # Regression test for a real production incident (2026-07-31):
+    # promoting amwal_alghad from PLANNED to IMPLEMENTED in the catalog
+    # had no effect on a deployment that had already persisted its old
+    # PLANNED spec, because seed_registry()'s add-loop only adds a
+    # brand-new id -- it never revisits one that already exists.
+    registry = SourceRegistry()
+    registry.add(make_spec(id="amwal_alghad", status=SourceStatus.PLANNED))
+
+    seed_registry(registry)
+
+    spec = registry.latest("amwal_alghad")
+    assert spec.status == SourceStatus.IMPLEMENTED
+    assert spec.collector == "RssNewsCollector"
+    assert spec.base_url == "https://amwalalghad.com/feed/atom/"
+    assert spec.version == 2
+    from agx_research.sources.spec import ActivationStatus, LifecycleState
+
+    assert spec.lifecycle_state == LifecycleState.TRUSTED
+    assert spec.activation_status == ActivationStatus.ACTIVE
+
+
+def test_sync_declared_fields_preserves_measured_runtime_fields():
+    registry = SourceRegistry()
+    registry.add(make_spec(id="amwal_alghad", status=SourceStatus.PLANNED))
+    registry.record_measured_quality("amwal_alghad", 0.62)
+    from agx_research.sources.spec import HealthStatus
+
+    registry.update_health("amwal_alghad", HealthStatus.DEGRADED)
+
+    seed_registry(registry)
+
+    spec = registry.latest("amwal_alghad")
+    assert spec.status == SourceStatus.IMPLEMENTED
+    assert spec.data_quality_score == 0.62
+    assert spec.health_status == HealthStatus.DEGRADED
+
+
+def test_sync_declared_fields_is_a_no_op_when_nothing_changed():
+    registry = SourceRegistry()
+    seed_registry(registry)
+    before = registry.latest("amwal_alghad").version
+
+    seed_registry(registry)
+
+    assert registry.latest("amwal_alghad").version == before
+
+
+def test_sync_declared_fields_does_not_reset_an_earned_lifecycle_stage_when_status_is_unchanged():
+    registry = SourceRegistry()
+    registry.add(make_spec(id="a", status=SourceStatus.IMPLEMENTED))
+    from agx_research.sources.spec import LifecycleState
+
+    registry.transition_lifecycle("a", LifecycleState.CORE)
+
+    synced = registry.sync_declared_fields([make_spec(id="a", status=SourceStatus.IMPLEMENTED)])
+
+    assert synced == []
+    assert registry.latest("a").lifecycle_state == LifecycleState.CORE

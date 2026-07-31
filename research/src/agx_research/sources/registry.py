@@ -77,6 +77,54 @@ class SourceRegistry(JsonFileRepository[SourceSpec]):
             current.model_copy(update={"version": current.version + 1, "health_status": health})
         )
 
+    # A maintainer edits these directly in `sources.catalog`; everything
+    # else on `SourceSpec` (health_status, data_quality_score,
+    # reputation_score, and lifecycle_state/activation_status *except when
+    # status itself changes* -- see below) is runtime-measured and must
+    # never be clobbered by a catalog re-seed.
+    _DECLARED_FIELDS = (
+        "status", "access_method", "base_url", "collector",
+        "collector_version", "category", "notes",
+    )
+
+    def sync_declared_fields(self, current_specs: list[SourceSpec]) -> list[SourceSpec]:
+        """Push a new revision for any already-persisted source whose
+        catalog-declared fields (see `_DECLARED_FIELDS`) differ from what's
+        in `current_specs` -- e.g. a maintainer promoting a source from
+        PLANNED to IMPLEMENTED after verifying a real endpoint.
+
+        `seed_registry()`'s add-loop only adds a brand-new id; it never
+        revisits one that already exists, so a real production incident
+        (2026-07-31) showed a source promoted in `sources.catalog` stayed
+        PLANNED forever in an already-running deployment that had already
+        persisted its old PLANNED spec -- the exact same class of gap
+        `retire_removed()` already closed for outright deletions, this
+        time for updates. Runtime-measured fields
+        (health_status/data_quality_score/reputation_score) are always
+        carried forward unchanged. `lifecycle_state`/`activation_status`
+        are only re-derived from the new `status` when `status` itself
+        actually changed -- a source's own qualification-pipeline-earned
+        lifecycle stage must never be reset by an unrelated catalog edit.
+        """
+        synced = []
+        by_id = {spec.id: spec for spec in current_specs}
+        for current in self.all_latest():
+            spec = by_id.get(current.id)
+            if spec is None:
+                continue
+            if all(
+                getattr(current, field) == getattr(spec, field)
+                for field in self._DECLARED_FIELDS
+            ):
+                continue
+            updates = {field: getattr(spec, field) for field in self._DECLARED_FIELDS}
+            updates["version"] = current.version + 1
+            if current.status != spec.status:
+                updates["lifecycle_state"] = spec.lifecycle_state
+                updates["activation_status"] = spec.activation_status
+            synced.append(self.add(current.model_copy(update=updates)))
+        return synced
+
     def retire_removed(self, current_catalog_ids: set[str]) -> list[SourceSpec]:
         """Transition to DISABLED (which `default_lifecycle_for_status`
         already maps to `ActivationStatus.RETIRED`) any already-persisted

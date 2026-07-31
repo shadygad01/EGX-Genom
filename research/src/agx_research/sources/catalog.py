@@ -971,10 +971,16 @@ def seed_sources() -> list[SourceSpec]:
 def seed_registry(registry: SourceRegistry | None = None) -> SourceRegistry:
     registry = registry or SourceRegistry()
     current_ids: set[str] = set()
-    for spec in seed_sources():
+    specs = seed_sources()
+    for spec in specs:
         current_ids.add(spec.id)
         if registry.latest(spec.id) is None:
             registry.add(spec)
+    # A source whose declared fields changed (e.g. PLANNED -> IMPLEMENTED
+    # after a real endpoint is verified) must reach a deployment that
+    # already persisted its old spec — see
+    # `SourceRegistry.sync_declared_fields()`'s own docstring.
+    registry.sync_declared_fields(specs)
     # A source deleted from this catalog (e.g. one with zero capability
     # mapping) must stop looking live in a deployment that already
     # persisted it before the deletion shipped — see

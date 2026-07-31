@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased — fix source promotions silently not reaching an already-running deployment
+
+**Real bug found while verifying the Amwal Al Ghad promotion below**:
+after merging and deploying it, real persisted `source_registry.json`
+still showed `amwal_alghad` at version 1, `status: planned`,
+`base_url: null` — the promotion had zero effect on the live deployment.
+Root cause: `sources.catalog.seed_registry()`'s add-loop only adds a
+brand-new source id; it never revisits one that already exists, so a
+catalog-level field change (status, base_url, collector, ...) for an
+*already-persisted* source never reaches a deployment that had already
+seen that source before the edit — the exact sibling gap to AD-53's
+retire-on-deletion fix, this time for updates. Every prior source
+promotion in this codebase's history likely only worked because that
+source had never yet been persisted when first declared `IMPLEMENTED`;
+this is the first time an already-persisted `PLANNED` source was promoted,
+and it exposed the gap immediately.
+
+**Closed**: new `sources.registry.SourceRegistry.sync_declared_fields()`
+reconciles the catalog's declared fields (status/access_method/base_url/
+collector/collector_version/category/notes) into any already-persisted
+source whose values differ, via a new revision — never an edit or
+deletion. Runtime-measured fields (health_status/data_quality_score/
+reputation_score) are always preserved untouched; `lifecycle_state`/
+`activation_status` are only re-derived from the new status when status
+itself actually changed, so a source's own qualification-pipeline-earned
+lifecycle stage is never reset by an unrelated catalog edit. Wired into
+`seed_registry()` alongside `retire_removed()`. Verified directly against
+the real, already-broken persisted registry: `amwal_alghad` now correctly
+reconciles to `IMPLEMENTED`/`TRUSTED`/`ACTIVE` with its real base_url and
+collector. See AD-54.
+
+5 new tests (`test_source_registry.py`); 769 backend tests pass (up from
+765); `ruff check` clean.
+
 ## Unreleased — Amwal Al Ghad promoted to IMPLEMENTED via real verified discovery
 
 Project owner request: expand free source coverage for the universe.

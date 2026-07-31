@@ -1,5 +1,36 @@
 # Changelog
 
+## Unreleased — fix the FairValueEngine's shares-outstanding over-gating (with an honest caveat)
+
+Project owner request: "A reliable fair value cannot be computed from
+current inputs" shows for real tickers — find the bug and fix it so the
+correct number shows.
+
+**Real bug found and fixed**: `valuation.engine.FairValueEngine.value()`
+nested its `ddm` (dividend discount) and `pe` (P/E multiple) models inside
+`if shares and shares > 0:`, even though neither formula actually divides
+by `shares` — dividend-per-share and EPS are already per-share figures.
+Moved both out of that gate so a source reporting EPS or DPS directly
+(without ever stating total share count) no longer loses two computable
+models to an unrelated precondition.
+
+**Honest caveat, verified against real persisted production data, not
+assumed**: this fix has **zero observable effect today**. `value()`
+still requires ≥3 of 7 models to agree before returning a result, and only
+2 of the 7 (`ddm`, `pe`) can ever compute without `shares_outstanding` — no
+combination of currently-collectable fields reaches 3 without it. Worse,
+inspecting the real data found the deeper, dominant cause: only 2 of 101
+tickers (ETEL, ORAS) have *any* financial-statement line items collected
+at all, and both only carry 3-4 raw metrics from a quarterly highlights
+press release (revenue/ebitda/net_income/free_cash_flow) — never share
+count, EPS, dividend-per-share, equity, cash, debt, or operating income.
+Making a real number appear for any of these tickers needs real collected
+data this platform doesn't have yet, not a code fix — inventing one would
+violate the platform's core anti-fabrication principle. New debt: TD-55.
+
+4 existing `test_fair_value_engine.py` tests still pass unchanged (no
+regression); 764 backend tests pass; `ruff check` clean.
+
 ## Unreleased — fix the real reason no investment decision was ever reachable, and retire dead sources for real
 
 Project owner review of the live dashboard: no clear investment decision

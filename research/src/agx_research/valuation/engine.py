@@ -141,15 +141,27 @@ class FairValueEngine:
         ke = a.risk_free_rate + a.beta * a.equity_risk_premium
         pe, ev_ebitda, pb = _multiples(sector)
         results: dict[str, float | None] = {name: None for name in MODEL_WEIGHTS}
+        # DDM and P/E are already per-share models (dividend-per-share and
+        # EPS are per-share figures by definition) -- many real issuer
+        # disclosures (e.g. a quarterly highlights press release) report
+        # EPS or DPS directly without ever stating total shares
+        # outstanding. Gating these behind `shares` was a real bug: it
+        # discarded two computable models whenever a source reported a
+        # per-share figure but not the share count itself, exactly the
+        # kind of avoidable evidence loss the mission's "rank using the
+        # best available evidence" rule warns against.
+        dividend = forecasts[0]["dividend"]
+        if dividend and dividend > 0 and ke > a.terminal_growth:
+            results["ddm"] = dividend / (ke - a.terminal_growth)
+        eps = _latest(rows, "eps")
+        if eps and eps > 0:
+            results["pe"] = eps * pe
         if shares and shares > 0:
             fcf = [row["free_cash_flow"] for row in forecasts]
             if all(value is not None for value in fcf) and a.wacc > a.terminal_growth:
                 pv = sum(value / (1 + a.wacc) ** year for year, value in enumerate(fcf, 1))
                 terminal = fcf[-1] * (1 + a.terminal_growth) / (a.wacc - a.terminal_growth)
                 results["dcf"] = (pv + terminal / (1 + a.wacc) ** 5 + cash - (debt or 0)) / shares
-            dividend = forecasts[0]["dividend"]
-            if dividend and dividend > 0 and ke > a.terminal_growth:
-                results["ddm"] = dividend / (ke - a.terminal_growth)
             equity = _latest(rows, "equity")
             if equity and forecasts[0]["eps"] is not None and ke > a.terminal_growth:
                 bv = equity / shares
@@ -167,9 +179,6 @@ class FairValueEngine:
             ebitda = _latest(rows, "ebitda")
             if ebitda and ebitda > 0:
                 results["ev_ebitda"] = (ebitda * ev_ebitda + cash - (debt or 0)) / shares
-            eps = _latest(rows, "eps")
-            if eps and eps > 0:
-                results["pe"] = eps * pe
             if equity and equity > 0:
                 results["pb"] = equity / shares * pb
         candidates = {name: value for name, value in results.items() if value and value > 0}

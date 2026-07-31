@@ -65,6 +65,7 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "company_ir",
     ],
     Capability.CORPORATE_DISCLOSURES: [
+        "eac_egx_disclosures",
         "egx_official",
         "fra_egypt",
         "company_ir",
@@ -73,6 +74,7 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "zawya",
     ],
     Capability.CORPORATE_ACTIONS: [
+        "eac_egx_disclosures",
         "egx_official",
         "company_ir",
         "reuters",
@@ -93,6 +95,7 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "company_ir",
     ],
     Capability.NEWS: [
+        "eac_egx_disclosures",
         "reuters",
         "enterprise_press",
         "gdelt",

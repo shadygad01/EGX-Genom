@@ -87,6 +87,15 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
         "records": ["news_items", "corporate_events", "events"],
         "consumers": ["corporate_events_agent", "event_risk_overlay", "meta_decision_engine"],
     },
+    "eac_egx_disclosures": {
+        "records": ["news_items", "corporate_events", "events"],
+        "consumers": [
+            "corporate_events_agent",
+            "event_risk_overlay",
+            "company_workspace",
+            "meta_decision_engine",
+        ],
+    },
     "fra_egypt": {
         "records": ["news_items", "corporate_events", "events"],
         "consumers": ["corporate_events_agent", "event_risk_overlay", "meta_decision_engine"],

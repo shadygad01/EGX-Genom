@@ -3,8 +3,9 @@ from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.browser import BrowserAutomationCollector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
-from agx_research.collectors.excel import ExcelSeriesCollector
+from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
+from agx_research.collectors.excel import ExcelSeriesCollector
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
 from agx_research.collectors.filesystem import FilesystemCollector
 from agx_research.collectors.fred import FredCsvCollector
@@ -36,8 +37,9 @@ __all__ = [
     "CollectionRunResult",
     "CollectionService",
     "Collector",
-    "ExcelSeriesCollector",
     "EgxCompositePriceCollector",
+    "EgxDisclosureCollector",
+    "ExcelSeriesCollector",
     "FetchDisallowed",
     "FetchError",
     "FilesystemCollector",

@@ -43,6 +43,7 @@ from enum import Enum
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import Collector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
+from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
@@ -391,6 +392,8 @@ def build_live_collector(
     """
     if source_id == "egx_price_composite":
         return EgxCompositePriceCollector(spec, symbols=tickers, fetcher=fetcher)
+    if source_id == "eac_egx_disclosures":
+        return EgxDisclosureCollector(spec, tickers=tickers, fetcher=fetcher)
     if source_id == "stooq":
         symbols = {t: f"{t.lower()}{LIVE_STOOQ_TICKER_SUFFIX}" for t in tickers}
         return StooqPriceCollector(spec, symbols=symbols, fetcher=fetcher)
@@ -461,6 +464,7 @@ def live_wired_source_ids(registry: SourceRegistry) -> set[str]:
     """
     explicitly_wired = {
         "egx_price_composite",
+        "eac_egx_disclosures",
         "stooq",
         # "fred" deliberately excluded -- see TD-50; it is no longer ranked
         # by any live capability, so it would never actually be attempted

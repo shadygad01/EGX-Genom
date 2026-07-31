@@ -11,6 +11,7 @@ def test_classifies_stock_split_before_looser_terms():
 
 def test_classifies_earnings():
     assert classify_corporate_event_type("ETEL reports quarterly results") == "EARNINGS"
+    assert classify_corporate_event_type("أبو قير تعلن مؤشرات نتائج الأعمال") == "EARNINGS"
 
 
 def test_classifies_capital_increase():

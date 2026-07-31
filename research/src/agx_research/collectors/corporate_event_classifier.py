@@ -49,6 +49,16 @@ _KEYWORD_TO_EVENT_TYPE: tuple[tuple[str, str], ...] = (
     ("financial results", "EARNINGS"),
     ("net income", "EARNINGS"),
     ("earnings", "EARNINGS"),
+    ("نتائج الأعمال", "EARNINGS"),
+    ("نتائج اعمال", "EARNINGS"),
+    ("القوائم المالية", "EARNINGS"),
+    ("صافي الربح", "EARNINGS"),
+    ("توزيع نقدي", "DIVIDEND"),
+    ("توزيعات نقدية", "DIVIDEND"),
+    ("زيادة رأس المال", "CAPITAL_INCREASE"),
+    ("تجزئة السهم", "STOCK_SPLIT"),
+    ("استحواذ", "ACQUISITION"),
+    ("اندماج", "MERGER"),
 )
 
 

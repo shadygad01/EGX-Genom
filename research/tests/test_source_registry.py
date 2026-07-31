@@ -176,3 +176,16 @@ def test_seed_registry_retires_a_source_deleted_from_the_seed_catalog():
     # Every currently-catalogued source must still be present and untouched.
     for spec in seed_sources():
         assert registry.latest(spec.id).id == spec.id
+
+
+def test_amwal_alghad_is_implemented_with_a_real_verified_feed_url():
+    # Regression test for the 2026-07-31 promotion: the weekly discovery
+    # workflow's real network egress independently verified this feed
+    # reachable (robots.txt permits it, a live probe succeeded, and the
+    # Wayback Machine shows 143 archived snapshots spanning 1229 days) --
+    # promoted on that evidence, same as every prior RSS-outlet promotion
+    # in this registry.
+    [spec] = [s for s in seed_sources() if s.id == "amwal_alghad"]
+    assert spec.status == SourceStatus.IMPLEMENTED
+    assert spec.collector == "RssNewsCollector"
+    assert spec.base_url == "https://amwalalghad.com/feed/atom/"

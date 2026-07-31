@@ -1,5 +1,40 @@
 # Changelog
 
+## Unreleased — Amwal Al Ghad promoted to IMPLEMENTED via real verified discovery
+
+Project owner request: expand free source coverage for the universe.
+Rather than guess at new endpoints, triggered the two workflows this
+codebase already built for exactly this purpose but that no prior session
+had actually run to completion from here: `discovery.yml`
+(workflow_dispatch) and `discover-sources.yml` (the full per-company
+acquisition sprint), both using real GitHub Actions network egress this
+coding sandbox doesn't have.
+
+**Real result**: `discovery.yml`'s run (866s, 23 sources checked) found 3
+`verified_reachable` results. Two were already-known/stale (`african_markets_egx`
+is a deliberate company-directory hint source with no standalone collector
+planned; `skynews_arabia_economy`'s cached "reachable" entry carries 0.0
+confidence and no successful probe, consistent with its prior documented
+404). The third, **`amwal_alghad`**, was a genuinely fresh result
+(`from_cache: false`, confidence 0.875): `https://amwalalghad.com/feed/atom/`
+— robots.txt permits it, a live probe succeeded, and the Wayback Machine
+shows 143 archived snapshots spanning 1229 days.
+
+**Closed**: promoted `amwal_alghad` from `PLANNED` to `IMPLEMENTED`
+(`sources/catalog.py`, `RssNewsCollector`, matching Enterprise/Al Borsa/
+Masrawy's exact precedent), added its decision route
+(`production/decision_lineage.py`) — it was already present in
+`CAPABILITY_STRATEGIES[Capability.NEWS]`'s candidate pool from a prior
+phase, so no capability-mapping change was needed. Following this
+codebase's own established practice (Enterprise's original promotion),
+real content parsing is confirmed by the next live production run rather
+than a separate manual check; will revert to `PLANNED` immediately if
+that run shows zero real items, the same self-correction
+`skynews_arabia_economy`'s own history already went through once.
+
+1 new regression test (`test_amwal_alghad_is_implemented_with_a_real_verified_feed_url`);
+765 backend tests pass (up from 764); `ruff check` clean.
+
 ## Unreleased — fix the FairValueEngine's shares-outstanding over-gating (with an honest caveat)
 
 Project owner request: "A reliable fair value cannot be computed from

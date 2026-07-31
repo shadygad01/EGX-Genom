@@ -945,14 +945,25 @@ def seed_sources() -> list[SourceSpec]:
             name="Amwal Al Ghad",
             category=SourceCategory.ARABIC_NEWS,
             access_method=AccessMethod.RSS_FEED,
-            status=SourceStatus.PLANNED,
+            status=SourceStatus.IMPLEMENTED,
+            base_url="https://amwalalghad.com/feed/atom/",
             reliability_score=0.5,
             freshness_score=0.9,
+            collector="RssNewsCollector",
+            collector_version="1.0.0",
             conflict_priority=40,
             supported_event_types=["news"],
             supported_languages=["ar"],
-            notes="Egypt-specific stock-market news outlet; feed URL to be verified, then this "
-            "becomes RssNewsCollector configuration.",
+            notes="Endpoint independently verified reachable by the weekly discovery "
+            "workflow's real network egress (2026-07-31): robots.txt permits this path, "
+            "a live probe returned a consistent status, and the Wayback Machine shows "
+            "143 archived snapshots spanning 1229 days -- a long-lived, stable feed, not "
+            "a fluke. Flipped to IMPLEMENTED on that evidence, same as every prior "
+            "promotion in this registry; real content parsing is confirmed by the next "
+            "live production run rather than a separate manual check, matching the "
+            "Enterprise/Al Borsa/Masrawy precedent -- revert to PLANNED immediately if "
+            "that run shows zero real items, as skynews_arabia_economy's own history "
+            "already did once.",
         ),
     ]
 

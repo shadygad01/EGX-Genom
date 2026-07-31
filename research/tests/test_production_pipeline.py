@@ -161,6 +161,33 @@ def test_entire_range_on_non_trading_days_skips_investment_cases_instead_of_cras
     assert dashboard_stage.status != StageStatus.FAILED
 
 
+def test_non_trading_deploy_keeps_latest_successful_universe_and_market_state(tmp_path):
+    data_dir = tmp_path / "data"
+    dashboard_dir = tmp_path / "dashboard"
+    thursday = date(2026, 6, 11)
+    friday = date(2026, 6, 12)
+
+    make_pipeline(data_dir).run(
+        thursday,
+        mode=ExecutionMode.MOCK,
+        dashboard_out=dashboard_dir,
+    )
+    report = make_pipeline(data_dir).run(
+        friday,
+        mode=ExecutionMode.MOCK,
+        dashboard_out=dashboard_dir,
+    )
+
+    universe = json.loads((dashboard_dir / "universe.json").read_text())
+    market_state = json.loads((dashboard_dir / "market_state.json").read_text())
+    readiness = json.loads((dashboard_dir / "decision_readiness.json").read_text())
+
+    assert report.stage(StageName.DASHBOARD_ARTIFACT_GENERATOR).status == StageStatus.SUCCEEDED
+    assert universe["count"] > 0
+    assert market_state["as_of"] == thursday.isoformat()
+    assert len(readiness) == universe["count"]
+
+
 def test_end_to_end_execution_produces_a_real_hypothesis_from_collected_data(tmp_path):
     """Proves collector output actually reaches the research pipeline --
     the exact gap this pipeline was built to close (previously `agx collect`

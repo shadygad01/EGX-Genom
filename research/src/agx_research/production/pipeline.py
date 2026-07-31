@@ -222,6 +222,21 @@ class ProductionPipeline:
         possibly-drifting source of company names."""
         return dict(self.universe_provider.constituents(as_of))
 
+    def _latest_successful_as_of(self) -> date | None:
+        """Use the newest persisted trading run when today's execution is a weekend/holiday.
+
+        Pages can be rebuilt on any calendar day (for example after a UI push on Friday).
+        Publishing null universe/market artifacts on those days discards the last usable
+        trading snapshot even though it remains present in production state.
+        """
+        upper_bound = self._run_as_of
+        successful_dates = [
+            record.run_date
+            for record in RunRecordRepository(self.data_dir / "runs.json").all_latest()
+            if record.status == RunStatus.SUCCEEDED and record.run_date <= upper_bound
+        ]
+        return max(successful_dates, default=None)
+
     # ---- the public entrypoint ----------------------------------------
 
     def run(
@@ -851,10 +866,7 @@ class ProductionPipeline:
     def _stage_investment_case_generator(self):
         if self.knowledge_store is None or self.event_platform is None:
             return StageStatus.SKIPPED, "Knowledge base not ready.", []
-        succeeded_dates = sorted(
-            r.run_date for r in self.run_records_this_execution if r.status == RunStatus.SUCCEEDED
-        )
-        as_of = succeeded_dates[-1] if succeeded_dates else None
+        as_of = self._latest_successful_as_of()
         ready_horizons_by_ticker = None
         latest_prices = None
         if as_of is not None:
@@ -909,10 +921,7 @@ class ProductionPipeline:
             return StageStatus.SKIPPED, "Nothing to export yet.", []
         dashboard_out.mkdir(parents=True, exist_ok=True)
 
-        succeeded_dates = sorted(
-            r.run_date for r in self.run_records_this_execution if r.status == RunStatus.SUCCEEDED
-        )
-        as_of = succeeded_dates[-1] if succeeded_dates else None
+        as_of = self._latest_successful_as_of()
 
         counts = write_dashboard_artifacts(
             knowledge_store=self.knowledge_store,

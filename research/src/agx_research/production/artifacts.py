@@ -15,6 +15,7 @@ from typing import Any
 
 from agx_research.acquisition_intelligence.capability_engine import CapabilityDecision
 from agx_research.collectors.service import CollectionRunResult, collection_yield
+from agx_research.config import Horizon
 from agx_research.dashboard.schemas import SourceTruthRow
 from agx_research.events.service import EventPlatform
 from agx_research.financials.collected import CollectedFinancialStatementProvider
@@ -24,12 +25,12 @@ from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.meta.readiness import DecisionReadiness, build_ticker_data_gap_report
 from agx_research.meta.recommendation_service import RecommendationService
-from agx_research.config import Horizon
 from agx_research.papers.repository import PaperRepository
 from agx_research.portfolio.constructor import PortfolioConstructor
 from agx_research.runtime.engine import RunRecord
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository, compute_reputation
+from agx_research.valuation import FairValueEngine
 
 # Financial statements have no natural "start" date to filter by (a company's
 # full collected history should surface, not an arbitrary recent window) --
@@ -45,6 +46,7 @@ def export_investment_cases(
     as_of: date | None,
     ready_horizons_by_ticker: dict[str, set[Horizon]] | None = None,
     latest_prices: dict[str, float] | None = None,
+    fair_value_engine: FairValueEngine | None = None,
 ) -> dict[str, Any]:
     """The Investment Case Generator: per-ticker recommendations (already
     `meta.RecommendationService`) plus the cross-ticker portfolio built from
@@ -55,7 +57,7 @@ def export_investment_cases(
     if as_of is None:
         return {"as_of": None, "recommendations": [], "portfolio": None}
     recommendations = RecommendationService(
-        knowledge_store, event_platform=event_platform
+        knowledge_store, event_platform=event_platform, fair_value_engine=fair_value_engine
     ).recommend(
         tickers,
         as_of,

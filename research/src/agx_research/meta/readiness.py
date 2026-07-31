@@ -16,6 +16,7 @@ from agx_research.decision_service.liquidity_floor import compute_illiquid_ticke
 from agx_research.financials.provider import FinancialStatementProvider
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
+from agx_research.valuation import FairValueEngine
 
 # Added per docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md R2 (extend this
 # existing gate rather than build a second, parallel one) and R4 (a
@@ -44,6 +45,7 @@ class DecisionReadiness(BaseModel):
     news_items: int = 0
     corporate_events: int = 0
     financial_periods: int = 0
+    fair_value_available: bool = False
     macro_series: int = 0
     active_knowledge: int = 0
     blockers: list[str] = Field(default_factory=list)
@@ -51,7 +53,7 @@ class DecisionReadiness(BaseModel):
 
 
 _GAP_LAYER_THRESHOLDS: dict[str, int] = {
-    "financials": 2,
+    "valuation": 1,
     "disclosures": 1,
     "news": 1,
     "macro": 3,
@@ -87,7 +89,7 @@ def build_ticker_data_gap_report(
     readiness_rows: list[DecisionReadiness],
 ) -> list[TickerDataGapReport]:
     """Decompose each `DecisionReadiness` row into the five named data
-    layers (Financials/Disclosures/News/Macro/Knowledge) with an explicit
+    layers (Valuation/Disclosures/News/Macro/Knowledge) with an explicit
     completeness percentage per layer, so it's visible at a glance exactly
     which layer blocks a given ticker's Swing/Investment readiness.
 
@@ -98,7 +100,7 @@ def build_ticker_data_gap_report(
     reports: list[TickerDataGapReport] = []
     for row in readiness_rows:
         layer_counts = {
-            "financials": row.financial_periods,
+            "valuation": int(row.fair_value_available),
             "disclosures": row.corporate_events,
             "news": row.news_items,
             "macro": row.macro_series,
@@ -141,6 +143,7 @@ def assess_decision_readiness(
     market_state: MarketState,
     financials: FinancialStatementProvider,
     knowledge: list[KnowledgeObject],
+    fair_value_engine: FairValueEngine | None = None,
 ) -> list[DecisionReadiness]:
     snapshot = market_state.dataset_snapshot
     macro_series = sum(1 for values in snapshot.macro_series.values() if values)
@@ -159,6 +162,12 @@ def assess_decision_readiness(
             ticker, market_state.as_of - timedelta(days=730), market_state.as_of
         )
         financial_periods = len({item.period_end_date for item in items})
+        fair_value_available = bool(
+            fair_value_engine
+            and fair_value_engine.value(
+                ticker, market_state.as_of, sector=market_state.sectors.get(ticker)
+            )
+        )
         active_knowledge = [
             item
             for item in knowledge
@@ -204,9 +213,9 @@ def assess_decision_readiness(
             horizon_blockers[Horizon.INVESTMENT].append("أقل من 252 مشاهدة سعرية.")
         if not price_is_fresh:
             horizon_blockers[Horizon.INVESTMENT].append("بيانات السعر قديمة.")
-        if financial_periods < 4:
+        if not fair_value_available:
             horizon_blockers[Horizon.INVESTMENT].append(
-                "أقل من أربع فترات مالية قابلة للمقارنة."
+                "لا توجد قيمة عادلة موثوقة من ثلاثة نماذج صالحة على الأقل."
             )
         if macro_series < 3:
             horizon_blockers[Horizon.INVESTMENT].append("أقل من ثلاث سلاسل اقتصاد كلي.")
@@ -235,9 +244,9 @@ def assess_decision_readiness(
         elif not price_is_fresh:
             blockers.append("أحدث مشاهدة سعرية قديمة.")
             next_actions.append("حدّث جامع الأسعار وتحقق من تغطية أيام التداول.")
-        if financial_periods < 2:
-            blockers.append("يتوفر أقل من فترتين ماليتين.")
-            next_actions.append("اجمع فترتين ماليتين قابلتين للمقارنة.")
+        if not fair_value_available:
+            blockers.append("لا يمكن حساب قيمة عادلة موثوقة من المدخلات الحالية.")
+            next_actions.append("استكمل عدد الأسهم والحقول اللازمة لثلاثة نماذج تقييم على الأقل.")
         if not news and not events:
             blockers.append("لا يوجد خبر أو حدث مؤسسي مرتبط بالسهم داخل النافذة.")
             next_actions.append("حسّن ربط أسماء الشركات ورموز الأسهم بالأخبار.")
@@ -275,6 +284,7 @@ def assess_decision_readiness(
                 news_items=len(news),
                 corporate_events=len(events),
                 financial_periods=financial_periods,
+                fair_value_available=fair_value_available,
                 macro_series=macro_series,
                 active_knowledge=len(active_knowledge),
                 blockers=blockers,

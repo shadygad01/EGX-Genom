@@ -36,16 +36,16 @@ def test_gap_report_splits_readiness_into_five_named_layers(tmp_path):
     report = reports[0]
     assert report.ticker == "COMI"
     assert {layer.layer for layer in report.layers} == {
-        "financials",
+        "valuation",
         "disclosures",
         "news",
         "macro",
         "knowledge",
     }
-    financials = next(layer for layer in report.layers if layer.layer == "financials")
-    assert financials.count == 0
-    assert financials.complete is False
-    assert financials.completeness_pct == 0.0
+    valuation = next(layer for layer in report.layers if layer.layer == "valuation")
+    assert valuation.count == 0
+    assert valuation.complete is False
+    assert valuation.completeness_pct == 0.0
     assert report.swing_ready is False
     assert report.investment_ready is False
     assert Horizon.INVESTMENT not in report.ready_horizons

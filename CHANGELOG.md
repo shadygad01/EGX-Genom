@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — native fair-value evidence
+
+- Ported the Smartlist IVE V2 calculation method—not its results—into a native,
+  point-in-time seven-model AGX engine with TTM, robust blending and scenarios.
+- Investment readiness now depends on a calculable fair value rather than statement
+  count; available value carries a 20% research-only investment-horizon weight.
+
 ## 0.40.2 — Close free-data gaps: currency-series-id fix, drop unreliable FRED live dependency
 
 Project owner direction (2026-07-31, following an investor-perspective
@@ -120,7 +127,6 @@ adversarial scrutiny during implementation itself.
   section for what deliberately deviated from the prior documents under
   further scrutiny, and `docs/MISSION_COMPLETION_REVIEW.md` for the final
   full-system review.
-
 ## 0.39.0 — GDELT evidence-tier gate: discovery-only, never independent evidence
 
 Project owner direction after inspecting the real backfilled content

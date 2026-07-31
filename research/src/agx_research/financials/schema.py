@@ -47,6 +47,8 @@ STANDARD_LINE_ITEMS: tuple[str, ...] = (
     "ebitda_growth_yoy",
     "net_margin",
     "net_debt_to_ebitda",
+    "shares_outstanding",
+    "dividend_per_share",
 )
 
 

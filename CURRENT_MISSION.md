@@ -1,5 +1,12 @@
 # Current Mission
 
+## Owner-directed fair-value criterion (2026-07-30)
+
+The active implementation reproduces Smartlist's valuation methodology inside AGX
+without importing Smartlist outputs. It uses AGX's point-in-time financial provider.
+Operational coverage still requires shares outstanding and enough real line items for
+three models; absent inputs cause explicit abstention rather than fabricated values.
+
 ## Current mission: Decision-Centric Redesign implementation (2026-07-30)
 
 The project owner authorized full implementation of the roadmap the prior
@@ -70,6 +77,7 @@ instruction). See the audit doc for the full per-capability/per-source/
 per-field tables and the complete prioritized roadmap.
 
 ## Prior mission: TD-39 — EGX30+EGX70 Financial Source Registry
+## Current mission: TD-39 — EGX30+EGX70 Financial Source Registry
 
 Immediate follow-up: the project owner asked to stop company-domain
 discovery (TD-38, closed) and continue until every EGX30/EGX70 company has

@@ -2,6 +2,7 @@
 
 | # | Risk | Likelihood | Impact | Mitigation |
 |---|------|-----------|--------|------------|
+| R-33 | Fair-value assumptions or sector multiples drift, or sparse inputs make the value unreliable. | Medium | High | Version assumptions; use point-in-time inputs and TTM; require three models; reject median outliers; abstain on missing inputs; keep the 20% contribution research-only until validated. |
 | R-22 | A research-only horizon decision is mistaken for personalized or publication-ready investment advice. | Medium | Critical | Every `HorizonDecision` defaults to `research_only`; the Arabic UI carries a permanent warning and displays every failed Publication Gate check. Only `meta.publication_gate.apply_publication_gate` can promote it, after referenced live-data evidence, positive benchmark-matched history for all horizons, and a complete unexpired human legal approval. |
 | R-01 | Conclusions drawn from placeholder data being mistaken for real research output. | High (until a vendor is licensed) | Critical | Placeholder status stamped in code/docs at every placeholder (universe, sectors, holidays, mock CSVs); `PHASE_STATUS.md` states it as the gating item; no external publication of outputs before real data. |
 | R-02 | Statistical gates passing spurious relationships at current tiny sample sizes. | High | High | Small-sample adversarial attack + sample-size reviewer thresholds are strict by default (permissive settings exist only inside tests, clearly labeled); confidence capped at 0.9 and adversarially reduced. |

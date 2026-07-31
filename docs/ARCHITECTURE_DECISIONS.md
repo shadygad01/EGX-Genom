@@ -4,6 +4,15 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-33 — Calculate fair value inside AGX; never import Smartlist outputs
+
+AGX ports the Smartlist IVE V2 method as a pure, point-in-time engine over
+`FinancialStatementProvider`. It does not read Smartlist JSON, databases, or computed
+values. Seven models run; at least three must survive the 1/3x–3x median filter; model
+weights are then rebalanced. Four quarterly periods become TTM. Fair value replaces
+statement-count completeness as the investment fundamental gate and contributes 20%
+of that horizon's expected return. Missing inputs produce no value and no weight.
+
 | # | Decision | Rationale |
 |---|----------|-----------|
 | AD-35 | Final output carries an independent `HorizonDecision` for each prediction; cross-horizon aggregates remain compatibility summaries and may not drive the user action. Every decision defaults to `research_only`. | Returns and risks with different time units cannot be averaged into one executable instruction; public publication also requires external legal and live-data gates that code alone cannot claim. |

@@ -67,8 +67,8 @@ from agx_research.agents.macro import MacroAgent
 from agx_research.agents.market_structure import MarketStructureAgent
 from agx_research.agents.news_intelligence import NewsIntelligenceAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
-from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.discovery_reconciliation import reconcile_discovery_news
+from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.service import CollectionRunResult, CollectionService
@@ -128,6 +128,7 @@ from agx_research.sources.reputation import SourceMetricsRepository
 from agx_research.universe.collected import CollectedUniverseProvider
 from agx_research.universe.provider import UniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
+from agx_research.valuation import FairValueEngine
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
 
@@ -862,6 +863,7 @@ class ProductionPipeline:
                 state,
                 CollectedFinancialStatementProvider(self.data_dir),
                 self.knowledge_store.all_latest(),
+                FairValueEngine(CollectedFinancialStatementProvider(self.data_dir)),
             )
             ready_horizons_by_ticker = {
                 row.ticker: set(row.ready_horizons) for row in readiness_rows
@@ -893,6 +895,7 @@ class ProductionPipeline:
             as_of=as_of,
             ready_horizons_by_ticker=ready_horizons_by_ticker,
             latest_prices=latest_prices,
+            fair_value_engine=FairValueEngine(CollectedFinancialStatementProvider(self.data_dir)),
         )
         n = len(self.investment_cases["recommendations"])
         return (
@@ -1088,6 +1091,7 @@ class ProductionPipeline:
                 state,
                 CollectedFinancialStatementProvider(self.data_dir),
                 self.knowledge_store.all_latest(),
+                FairValueEngine(CollectedFinancialStatementProvider(self.data_dir)),
             )
         decision_readiness = [row.model_dump(mode="json") for row in decision_readiness_rows]
         (dashboard_out / "decision_readiness.json").write_text(

@@ -30,6 +30,10 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getAcquisitionDecisions: async () => [],
     getDecisionReadiness: async () => [],
     getTickerDataGapReport: async () => [],
+    getSourceTruth: async () => [],
+    getDecisionHistory: async () => [],
+    getDecisionPerformance: async () => [],
+    getPublicationGate: async () => null,
     getDiscoveryReport: async () => [],
     getDiscoveryMetrics: async () => null,
     getEndpointCandidates: async () => [],
@@ -150,6 +154,22 @@ describe("Universe propagation", () => {
 });
 
 describe("AI Briefing", () => {
+  it("shows the full 101-security universe with explicit abstention when no decision exists", async () => {
+    const tickers = Array.from({ length: 101 }, (_, index) => `S${String(index + 1).padStart(3, "0")}`);
+    mockProvider = fakeProvider({
+      getUniverse: async () => ({
+        as_of: "2026-07-31",
+        count: tickers.length,
+        tickers,
+        constituents: Object.fromEntries(tickers.map((ticker) => [ticker, `Company ${ticker}`])),
+      }),
+    });
+    await renderApp("/");
+    expect(await screen.findByText("S101")).toBeInTheDocument();
+    expect(screen.getByText("101 securities")).toBeInTheDocument();
+    expect(screen.getAllByText("Abstain").length).toBeGreaterThanOrEqual(303);
+  });
+
   it("shows empty states when no artifacts have been produced yet", async () => {
     mockProvider = fakeProvider();
     await renderApp("/");
@@ -182,7 +202,7 @@ describe("AI Briefing", () => {
       ],
     });
     await renderApp("/");
-    expect(await screen.findByText("COMI")).toBeInTheDocument();
+    expect((await screen.findAllByText("COMI")).length).toBeGreaterThan(0);
   });
 });
 

@@ -103,3 +103,70 @@
   display: block;
   margin-bottom: var(--space-1);
 }
+
+.decisionBanner {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) 2fr;
+  gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-inline-start-width: 4px;
+  background: var(--surface-raised);
+}
+
+.decisionBannerBlocked { border-inline-start-color: var(--warning); }
+.decisionBannerReady { border-inline-start-color: var(--positive); }
+
+.decisionBanner strong {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--text-xl);
+  color: var(--text-primary);
+}
+
+.decisionEyebrow {
+  color: var(--text-tertiary);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.decisionStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: var(--space-3);
+}
+
+.decisionToolbar {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin: var(--space-4) 0;
+}
+
+.searchInput, .filterSelect {
+  min-height: 40px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  padding: 0 var(--space-3);
+}
+
+.searchInput { flex: 1; min-width: 180px; }
+.filterSelect { min-width: 160px; }
+.rowCount { color: var(--text-tertiary); font-size: var(--text-xs); white-space: nowrap; }
+
+.horizonDecision { display: flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+.abstainCell { color: var(--text-tertiary); font-size: var(--text-xs); }
+.blockerText { display: block; max-width: 320px; color: var(--text-secondary); font-size: var(--text-xs); line-height: var(--leading-normal); }
+.compactList { margin: 0; padding-inline-start: var(--space-5); color: var(--text-secondary); font-size: var(--text-xs); }
+
+@media (max-width: 900px) {
+  .decisionBanner { grid-template-columns: 1fr; }
+  .decisionStats { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+  .decisionToolbar { align-items: stretch; flex-direction: column; }
+}

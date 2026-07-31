@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
@@ -12,7 +13,7 @@ import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { formatSignedPercent, formatPercent, titleCase } from "../lib/format";
-import type { CorporateEvent, Event, EventSeverity, KnowledgeStatus, NewsItem } from "../types";
+import type { CorporateEvent, DecisionReadiness, Event, EventSeverity, Horizon, KnowledgeStatus, NewsItem, Recommendation } from "../types";
 import styles from "./AIBriefing.module.css";
 
 const SEVERITY_VARIANT: Record<EventSeverity, BadgeVariant> = {
@@ -26,6 +27,15 @@ const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
   promoted: "positive",
   monitoring: "accent",
   retired: "neutral",
+};
+
+const HORIZONS: Horizon[] = ["micro", "swing", "investment"];
+
+type DecisionBoardRow = {
+  ticker: string;
+  company: string;
+  readiness: DecisionReadiness | null;
+  recommendation: Recommendation | null;
 };
 
 /** The landing page and signature experience: everything a portfolio
@@ -45,6 +55,45 @@ export function AIBriefing() {
   const papers = useArtifact((p) => p.getPapers());
   const investmentCases = useArtifact((p) => p.getInvestmentCases());
   const executionReport = useArtifact((p) => p.getExecutionReport());
+  const universe = useArtifact((p) => p.getUniverse());
+  const readiness = useArtifact((p) => p.getDecisionReadiness());
+  const publicationGate = useArtifact((p) => p.getPublicationGate());
+  const decisionPerformance = useArtifact((p) => p.getDecisionPerformance());
+  const [decisionSearch, setDecisionSearch] = useState("");
+  const [decisionFilter, setDecisionFilter] = useState<"all" | "actionable" | "watch" | "abstain">("all");
+
+  const decisionRows = useMemo<DecisionBoardRow[]>(() => {
+    const recommendationByTicker = new Map((recommendations.data ?? []).map((row) => [row.ticker, row]));
+    const readinessByTicker = new Map((readiness.data ?? []).map((row) => [row.ticker, row]));
+    const tickers = universe.data?.tickers ?? Array.from(new Set([
+      ...readinessByTicker.keys(),
+      ...recommendationByTicker.keys(),
+    ])).sort();
+    const query = decisionSearch.trim().toLocaleLowerCase();
+
+    return tickers.map((ticker) => ({
+      ticker,
+      company: universe.data?.constituents[ticker] ?? marketState.data?.constituents[ticker] ?? "",
+      readiness: readinessByTicker.get(ticker) ?? null,
+      recommendation: recommendationByTicker.get(ticker) ?? null,
+    })).filter((row) => {
+      const decisions = Object.values(row.recommendation?.horizon_decisions ?? {}).filter(Boolean);
+      const hasAction = decisions.some((decision) => decision!.action === "buy_candidate" && decision!.publication_status === "publication_ready");
+      const hasWatch = decisions.some((decision) => decision!.action === "watch") || row.readiness?.status === "degraded";
+      const matchesFilter = decisionFilter === "all"
+        || (decisionFilter === "actionable" && hasAction)
+        || (decisionFilter === "watch" && hasWatch)
+        || (decisionFilter === "abstain" && !hasAction && !hasWatch);
+      return matchesFilter && (!query || `${row.ticker} ${row.company}`.toLocaleLowerCase().includes(query));
+    }).sort((a, b) => {
+      const rank = (row: DecisionBoardRow) => row.readiness?.status === "ready" ? 0 : row.readiness?.status === "degraded" ? 1 : 2;
+      return rank(a) - rank(b) || a.ticker.localeCompare(b.ticker);
+    });
+  }, [decisionFilter, decisionSearch, marketState.data, readiness.data, recommendations.data, universe.data]);
+
+  const actionableCount = decisionRows.filter((row) => Object.values(row.recommendation?.horizon_decisions ?? {})
+    .some((decision) => decision?.action === "buy_candidate" && decision.publication_status === "publication_ready")).length;
+  const coveredCount = (readiness.data ?? []).filter((row) => row.status !== "blocked").length;
 
   const topOpportunities = [...(recommendations.data ?? [])]
     .sort((a, b) => b.combined_expected_return - a.combined_expected_return)
@@ -79,6 +128,89 @@ export function AIBriefing() {
   return (
     <>
       <Disclaimer />
+
+      <Section title={t("decisionBoard.title")} description={t("decisionBoard.description")}>
+        <div className={`${styles.decisionBanner} ${publicationGate.data?.publication_ready ? styles.decisionBannerReady : styles.decisionBannerBlocked}`}>
+          <div>
+            <span className={styles.decisionEyebrow}>{t("decisionBoard.portfolioStance")}</span>
+            <strong>{actionableCount > 0 && publicationGate.data?.publication_ready ? t("decisionBoard.selectiveRisk") : t("decisionBoard.cashAndWait")}</strong>
+          </div>
+          <div className={styles.decisionStats}>
+            <StatTile label={t("decisionBoard.universe")} value={universe.data?.count ?? decisionRows.length} />
+            <StatTile label={t("decisionBoard.actionable")} value={actionableCount} />
+            <StatTile label={t("decisionBoard.researchable")} value={coveredCount} />
+            <StatTile label={t("decisionBoard.marketAsOf")} value={formatDate(marketState.data?.as_of ?? null)} />
+          </div>
+        </div>
+
+        {publicationGate.data && !publicationGate.data.publication_ready && (
+          <Card title={t("decisionBoard.gateBlocked")} subtitle={t("decisionBoard.gateSubtitle", { date: formatDate(publicationGate.data.as_of) })} dense>
+            <ul className={styles.compactList}>
+              {publicationGate.data.checks.filter((check) => !check.passed).map((check) => (
+                <li key={check.id}>{check.label}{check.blocker ? ` — ${check.blocker}` : ""}</li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        <div className={styles.decisionToolbar}>
+          <input
+            className={styles.searchInput}
+            aria-label={t("decisionBoard.search")}
+            placeholder={t("decisionBoard.searchPlaceholder")}
+            value={decisionSearch}
+            onChange={(event) => setDecisionSearch(event.target.value)}
+          />
+          <select
+            className={styles.filterSelect}
+            aria-label={t("decisionBoard.filter")}
+            value={decisionFilter}
+            onChange={(event) => setDecisionFilter(event.target.value as typeof decisionFilter)}
+          >
+            <option value="all">{t("decisionBoard.filters.all")}</option>
+            <option value="actionable">{t("decisionBoard.filters.actionable")}</option>
+            <option value="watch">{t("decisionBoard.filters.watch")}</option>
+            <option value="abstain">{t("decisionBoard.filters.abstain")}</option>
+          </select>
+          <span className={styles.rowCount}>{t("decisionBoard.rows", { count: decisionRows.length })}</span>
+        </div>
+
+        {(universe.loading || readiness.loading || recommendations.loading) && <LoadingState rows={6} />}
+        {!universe.loading && !readiness.loading && !recommendations.loading && (
+          <DataTable
+            rows={decisionRows}
+            getRowKey={(row) => row.ticker}
+            onRowClick={(row) => navigate(`/company/${row.ticker}`)}
+            emptyTitle={t("decisionBoard.noRows")}
+            emptyDetail={t("decisionBoard.noRowsDetail")}
+            columns={[
+              { key: "ticker", header: tCommon("table.ticker"), render: (row) => <div className={styles.tickerCell}><span className={`${styles.tickerCode} num`}>{row.ticker}</span><span className={styles.tickerRationale}>{row.company}</span></div> },
+              { key: "status", header: tCommon("table.status"), render: (row) => <Badge variant={row.readiness?.status === "ready" ? "positive" : row.readiness?.status === "degraded" ? "warning" : "negative"}>{row.readiness?.status ? label("readinessStatus", row.readiness.status) : t("decisionBoard.notAssessed")}</Badge> },
+              ...HORIZONS.map((horizon) => ({
+                key: horizon,
+                header: label("horizon", horizon),
+                render: (row: DecisionBoardRow) => {
+                  const decision = row.recommendation?.horizon_decisions?.[horizon];
+                  if (!decision) return <span className={styles.abstainCell}>{t("decisionBoard.abstain")}</span>;
+                  return <div className={styles.horizonDecision}><Badge variant={decision.action === "buy_candidate" ? "positive" : decision.action === "watch" ? "warning" : "neutral"}>{label("decision", decision.action)}</Badge><span>{formatSignedPercent(decision.expected_return)}</span></div>;
+                },
+              })),
+              { key: "blocker", header: t("decisionBoard.primaryBlocker"), render: (row) => <span className={styles.blockerText}>{row.readiness?.blockers[0] ?? t("decisionBoard.noValidatedDecision")}</span> },
+            ]}
+          />
+        )}
+
+        <Card title={t("decisionBoard.performanceTitle")} subtitle={t("decisionBoard.performanceSubtitle")} dense>
+          {decisionPerformance.loading && <LoadingState />}
+          {!decisionPerformance.loading && (decisionPerformance.data ?? []).length === 0 && <EmptyState title={t("decisionBoard.noPerformance")} detail={t("decisionBoard.noPerformanceDetail")} />}
+          {(decisionPerformance.data ?? []).length > 0 && <DataTable rows={decisionPerformance.data ?? []} getRowKey={(row) => row.horizon} columns={[
+            { key: "horizon", header: t("decisionBoard.horizon"), render: (row) => label("horizon", row.horizon) },
+            { key: "evaluated", header: t("decisionBoard.evaluated"), align: "right", render: (row) => row.evaluated },
+            { key: "hit", header: t("decisionBoard.hitRate"), render: (row) => row.sample_status === "sufficient" && row.hit_rate != null ? formatPercent(row.hit_rate) : t("decisionBoard.insufficientSample") },
+            { key: "return", header: t("decisionBoard.realizedReturn"), render: (row) => row.mean_realized_return != null ? formatSignedPercent(row.mean_realized_return) : "—" },
+          ]} />}
+        </Card>
+      </Section>
 
       <Section title={t("marketSummary.title")} description={t("marketSummary.description")}>
         {marketState.loading && <LoadingState rows={1} />}

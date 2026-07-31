@@ -814,6 +814,22 @@ export interface FinancialCoverageReport {
   tickers: TickerFinancialCoverage[];
 }
 
+// --- market_breadth.json ---
+
+export interface MarketBreadthReport {
+  as_of: string;
+  universe_count: number;
+  tickers_with_price_data: number;
+  advancers: number;
+  decliners: number;
+  unchanged: number;
+  advance_decline_ratio: number | null;
+  average_daily_return_pct: number | null;
+  tickers_with_volume_data: number;
+  tickers_above_average_volume: number;
+  tickers_below_average_volume: number;
+}
+
 // --- source_metrics.json ---
 
 export interface ReputationScore {

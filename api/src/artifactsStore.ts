@@ -112,6 +112,10 @@ export class ArtifactsReader {
     return readJsonOrDefault<T[]>(this.path("source_metrics.json"), []);
   }
 
+  marketBreadth<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("market_breadth.json"), null);
+  }
+
   acquisitionDecisions<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("acquisition_decisions.json"), []);
   }

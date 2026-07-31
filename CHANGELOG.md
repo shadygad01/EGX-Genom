@@ -1,5 +1,43 @@
 # Changelog
 
+## Unreleased — Market Breadth artifact (advance/decline + volume breadth)
+
+Closes the last named item from `NEXT_MISSIONS.md`'s "genuinely next,
+engineering-closeable" list that wasn't gated on external evidence or a
+business decision: a market-wide breadth/liquidity rollup, derivable
+entirely from already-collected Price Data. Also closes the Market
+Intelligence page's own named honest gap ("Breadth and liquidity require a
+backend-computed artifact... this platform doesn't export yet").
+
+- New `market_memory.breadth.compute_market_breadth()` / `MarketBreadthReport`:
+  per-day advancers/decliners/unchanged, advance/decline ratio, average
+  daily return, and above-/below-trailing-average-volume counts, derived
+  from a reconstructed `MarketState` — return calculations go through
+  `data.adjustments.adjusted_dated_returns()`, never raw
+  `[bar.close for bar in bars]`, per `CLAUDE.md`'s standing rule.
+- Wired into `production.pipeline.ProductionPipeline._stage_dashboard_artifact_generator`
+  as a new, optional `market_breadth.json` artifact (`None` until a
+  `MarketState` has actually been reconstructed, the same honest-absence
+  convention `runtime_status.json` already uses); validated by
+  `dashboard.validate.validate_dashboard_artifacts`.
+- `api`: new `GET /market-breadth` route + `ArtifactsReader.marketBreadth()`.
+- `web`: `DashboardDataProvider.getMarketBreadth()` (both `ApiProvider` and
+  `StaticJsonProvider`); Market Intelligence's "Market Breadth & Liquidity"
+  card now renders real advancers/decliners/unchanged/ratio/average-return/
+  volume-breadth stat tiles instead of an empty-state placeholder,
+  bilingual EN/AR. Market Regime remains an honest gap (no classification
+  artifact exists upstream).
+- New declared, uncalibrated constant: `TRAILING_VOLUME_WINDOW_DAYS = 20`
+  (TD-52) — a conventional trading-month length, not derived from a real
+  EGX volume-distribution study, same posture as every other declared
+  threshold in this codebase.
+- 7 new backend tests (4 in `test_market_breadth.py`, 2 in
+  `test_production_artifacts.py`, 1 in `test_production_pipeline.py`, plus
+  assertions added to 2 existing pipeline tests), 1 new api test, and a
+  web fixture update (`App.test.tsx`'s fake provider); 758 backend tests
+  pass (up from 751), `ruff check` clean; `api` (19 tests, up from 18) and
+  `web` (41 tests) build and test suites green.
+
 ## Unreleased — expose price-vs-fair-value as an explicit decision-quality criterion
 
 Project owner request: make the fair-value engine's average distance from

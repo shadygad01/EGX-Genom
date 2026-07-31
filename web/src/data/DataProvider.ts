@@ -27,6 +27,7 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  MarketBreadthReport,
   MarketState,
   MissionStatus,
   Pattern,
@@ -72,6 +73,7 @@ export interface DashboardDataProvider {
   getFinancialStatements(): Promise<FinancialStatementLineItem[]>;
   getFinancialCoverage(): Promise<FinancialCoverageReport | null>;
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
+  getMarketBreadth(): Promise<MarketBreadthReport | null>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;
   getTickerDataGapReport(): Promise<TickerDataGapReport[]>;

@@ -85,3 +85,9 @@
   color: var(--text-secondary);
   line-height: var(--leading-normal);
 }
+
+.footnote {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+}

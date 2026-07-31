@@ -26,6 +26,7 @@ from agx_research.graph.edges import GraphEdge
 from agx_research.graph.nodes import GraphNode
 from agx_research.hypotheses.hypothesis import Hypothesis
 from agx_research.knowledge.schema import KnowledgeObject
+from agx_research.market_memory.breadth import MarketBreadthReport
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import (
     DecisionAction,
@@ -207,7 +208,21 @@ def validate_dashboard_artifacts(
                 "ticker_data_gap_report.json: membership differs from universe.json"
             )
 
+    _validate_optional_market_breadth(directory, counts)
+
     return counts
+
+
+def _validate_optional_market_breadth(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "market_breadth.json")
+    if not present:
+        return
+    if payload is not None:
+        try:
+            MarketBreadthReport.model_validate(payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"market_breadth.json: {exc}") from exc
+    counts["market_breadth.json"] = 0 if payload is None else 1
 
 
 def _validate_complete_financial_coverage(directory: Path, universe_payload) -> None:

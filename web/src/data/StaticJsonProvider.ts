@@ -25,6 +25,7 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  MarketBreadthReport,
   MarketState,
   MissionStatus,
   Pattern,
@@ -146,6 +147,10 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getSourceMetrics(): Promise<SourceMetricsRow[]> {
     return fetchList<SourceMetricsRow>("source_metrics.json");
+  }
+
+  getMarketBreadth(): Promise<MarketBreadthReport | null> {
+    return fetchObject<MarketBreadthReport>("market_breadth.json");
   }
 
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {

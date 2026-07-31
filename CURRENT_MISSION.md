@@ -1,6 +1,26 @@
 # Current Mission
 
-## Current mission: price-vs-fair-value as a decision-quality criterion (2026-07-31)
+## Current mission: Market Breadth artifact (2026-07-31)
+
+Continuing `NEXT_MISSIONS.md`'s "genuinely next" list from the
+Decision-Centric Redesign: item 4, the Market Breadth artifact, was the
+one entry not gated on external evidence or a business decision
+("derivable from already-collected Price Data; additive dashboard/
+analytics work, still not built"). Closed: new
+`market_memory.breadth.compute_market_breadth()` (advancers/decliners/
+unchanged, advance/decline ratio, average daily return, above-/below-
+trailing-average-volume counts — all through
+`data.adjustments.adjusted_dated_returns()`, never a raw close-to-close
+calculation), wired into the production pipeline as a new, optional
+`market_breadth.json` artifact, and surfaced end to end through `api`/
+`web` — Market Intelligence's "Market Breadth & Liquidity" card now
+renders real stat tiles instead of its prior honest empty-state
+placeholder. See `docs/PHASE_STATUS.md`'s "Market Breadth artifact"
+section and `CHANGELOG.md`'s matching entry for full detail. 758 backend
+tests pass; `ruff check` clean; `api` (19 tests) and `web` (41 tests)
+build/test suites clean.
+
+## Prior mission: price-vs-fair-value as a decision-quality criterion (2026-07-31)
 
 Project owner request: compute fair value per ticker, take the average
 across methods, measure how far the current price sits from it, and add

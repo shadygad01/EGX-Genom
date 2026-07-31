@@ -30,6 +30,7 @@ export async function dashboardRoutes(
   app.get("/financial-statements", async () => artifacts.financialStatements());
   app.get("/financial-coverage", async () => artifacts.financialCoverage());
   app.get("/source-metrics", async () => artifacts.sourceMetrics());
+  app.get("/market-breadth", async () => artifacts.marketBreadth());
   app.get("/acquisition-decisions", async () => artifacts.acquisitionDecisions());
   app.get("/decision-readiness", async () => artifacts.decisionReadiness());
   app.get("/ticker-data-gaps", async () => artifacts.tickerDataGapReport());

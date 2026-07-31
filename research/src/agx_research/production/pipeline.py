@@ -1094,10 +1094,11 @@ class ProductionPipeline:
         counts["financial_coverage.json"] = financial_coverage.universe_count
 
         decision_readiness_rows = []
+        market_state_for_breadth = None
         if as_of is not None:
-            state = self.market_memory.reconstruct(as_of)
+            market_state_for_breadth = self.market_memory.reconstruct(as_of)
             decision_readiness_rows = assess_decision_readiness(
-                state,
+                market_state_for_breadth,
                 CollectedFinancialStatementProvider(self.data_dir),
                 self.knowledge_store.all_latest(),
                 FairValueEngine(CollectedFinancialStatementProvider(self.data_dir)),
@@ -1115,6 +1116,12 @@ class ProductionPipeline:
             json.dumps(ticker_data_gap_report, indent=2, sort_keys=True) + "\n"
         )
         counts["ticker_data_gap_report.json"] = len(ticker_data_gap_report)
+
+        market_breadth = production_artifacts.export_market_breadth(market_state_for_breadth)
+        (dashboard_out / "market_breadth.json").write_text(
+            json.dumps(market_breadth, indent=2, sort_keys=True) + "\n"
+        )
+        counts["market_breadth.json"] = 0 if market_breadth is None else 1
 
         acquisition_decisions = production_artifacts.export_acquisition_decisions(
             self.capability_decisions

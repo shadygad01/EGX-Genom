@@ -27,6 +27,7 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getFinancialStatements: async () => [],
     getFinancialCoverage: async () => null,
     getSourceMetrics: async () => [],
+    getMarketBreadth: async () => null,
     getAcquisitionDecisions: async () => [],
     getDecisionReadiness: async () => [],
     getTickerDataGapReport: async () => [],

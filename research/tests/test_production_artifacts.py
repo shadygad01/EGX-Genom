@@ -30,6 +30,7 @@ from agx_research.production.artifacts import (
     export_genes,
     export_hypotheses,
     export_knowledge_graph,
+    export_market_breadth,
     export_papers,
     export_source_metrics,
     export_source_truth,
@@ -378,3 +379,30 @@ def test_source_truth_does_not_confuse_declared_route_with_actual_output():
     assert row["collector_status"] == "NOT_RUN"
     assert row["produced_records"] == 0
     assert row["reached_decision_path"] is False
+
+
+def test_export_market_breadth_is_none_without_a_reconstructed_state():
+    assert export_market_breadth(None) is None
+
+
+def test_export_market_breadth_serializes_a_real_reconstructed_state():
+    from agx_research.data.mock_provider import MockDataProvider
+    from agx_research.market_memory.memory import MarketMemory
+    from agx_research.universe.provider import MappingUniverseProvider
+    from agx_research.universe.sector import StaticSectorProvider
+
+    mock_root = Path(__file__).resolve().parents[1] / "data" / "mock"
+    memory = MarketMemory(
+        MockDataProvider(mock_root),
+        MappingUniverseProvider({"COMI": "COMI", "MFPC": "MFPC"}),
+        StaticSectorProvider(),
+        macro_series_ids=["BRENT_USD"],
+        lookback_days=30,
+    )
+    state = memory.reconstruct(date(2026, 6, 9))
+
+    payload = export_market_breadth(state)
+
+    assert payload["as_of"] == "2026-06-09"
+    assert payload["advancers"] == 1
+    assert payload["decliners"] == 1

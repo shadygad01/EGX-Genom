@@ -1387,3 +1387,51 @@ fields); verified live in a headless browser against a real mock-mode
 honestly for tickers with no computed fair value (this sandbox's local
 mock data has no financial-statement fixtures), never a fabricated
 percentage.
+
+## Market Breadth artifact (post-price-vs-fair-value)
+
+`NEXT_MISSIONS.md`'s own "genuinely next" list, after the Decision-Centric
+Redesign, named one item that wasn't gated on external evidence or a
+business decision: "Market Breadth artifact — derivable from already-
+collected Price Data; additive dashboard/analytics work, still not built."
+Market Intelligence's own "Market Breadth & Liquidity" card had carried an
+honest empty-state placeholder for the same reason since the frontend
+audit phase ("Breadth and liquidity require a backend-computed artifact...
+this platform doesn't export yet"). This phase closed it.
+
+**Closed**: new `market_memory.breadth.compute_market_breadth()` /
+`MarketBreadthReport` — advancers/decliners/unchanged, an advance/decline
+ratio (`None` when there are zero decliners, never a fabricated "infinite"
+ratio), average daily return, and a count of tickers trading above/below
+their own trailing-20-trading-day average volume (`TRAILING_VOLUME_WINDOW_DAYS`,
+TD-52 — a declared, uncalibrated window, same posture as every other
+declared threshold in this codebase). Computed entirely from a
+`MarketState`'s own `dataset_snapshot.price_history`, through
+`data.adjustments.adjusted_dated_returns()` — CLAUDE.md's return-adjustment
+rule ("never raw `[bar.close for bar in bars]`") applies here exactly as it
+does to every agent/experiment, so a stock split or dividend on the
+reconstruction date can't masquerade as an advance or decline. Wired into
+`production.pipeline.ProductionPipeline._stage_dashboard_artifact_generator`
+as a new, optional `market_breadth.json` artifact (`None` until a
+`MarketState` has actually been reconstructed — the same honest-absence
+convention `runtime_status.json` already established), validated by
+`dashboard.validate.validate_dashboard_artifacts`. `api`/`web`: a new
+`GET /market-breadth` route + `ArtifactsReader.marketBreadth()`, and both
+`ApiProvider`/`StaticJsonProvider` gained `getMarketBreadth()`. Market
+Intelligence's breadth card now renders real advancers/decliners/unchanged/
+ratio/average-return/volume-breadth stat tiles instead of the placeholder,
+bilingual EN/AR — Market Regime stays an honest gap (no classification
+artifact exists upstream).
+
+**Verified**: hand-computed against the real mock CSVs
+(`research/data/mock/prices/COMI.csv`/`MFPC.csv`) rather than asserted
+blind — on 2026-06-09, COMI's close rose (69.30→69.90) and its volume
+(1,720,000) exceeded its own trailing average while MFPC's close fell
+(222.10→220.80) on below-average volume (280,000), giving a predictable
+1 advancer / 1 decliner / 1 above-average / 1 below-average result the new
+tests assert directly. 7 new backend tests (4 in `test_market_breadth.py`,
+2 in `test_production_artifacts.py`, 1 in `test_production_pipeline.py`,
+plus assertions added to 2 existing pipeline tests); 758 backend tests
+pass (up from 751); `ruff check` clean; `api` (19 tests, up from 18) and
+`web` (41 tests) build/test suites clean, including a fixture update for
+the new `getMarketBreadth` method in `App.test.tsx`'s fake provider.

@@ -359,6 +359,7 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
         "financial_statements.json",
         "financial_coverage.json",
         "source_metrics.json",
+        "market_breadth.json",
     }
     for filename in expected:
         assert (dashboard_out / filename).exists(), filename
@@ -375,6 +376,20 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     assert counts["source_registry.json"] == len(seed_sources())
     assert "execution_report.json" in counts
     assert "mission_status.json" in counts
+    assert "market_breadth.json" in counts
+
+
+def test_market_breadth_reflects_real_universe_advancers_and_decliners(tmp_path):
+    dashboard_out = tmp_path / "dashboard"
+    pipeline = make_pipeline(tmp_path / "data")
+    pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+
+    breadth = json.loads((dashboard_out / "market_breadth.json").read_text())
+    assert breadth is not None
+    assert breadth["universe_count"] >= 1
+    assert breadth["advancers"] + breadth["decliners"] + breadth["unchanged"] == (
+        breadth["tickers_with_price_data"]
+    )
 
 
 def test_pipeline_reports_missing_publication_controls_and_stays_all_cash(tmp_path):

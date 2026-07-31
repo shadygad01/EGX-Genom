@@ -1,5 +1,30 @@
 # Next Missions
 
+## Closed this phase: Market Breadth artifact
+
+Item 4 from the list below is now closed — see `CURRENT_MISSION.md`'s
+"Market Breadth artifact" entry and `docs/PHASE_STATUS.md`'s matching
+section. **Genuinely next now**, from the same list, all still gated on
+external evidence or a business decision this codebase's own rules forbid
+guessing around:
+
+1. **Connect a real `SovereignRatingAction` collector** (TD-48) once
+   `moodys_ratings`/`sp_global_ratings`/`fitch_ratings` verify a real feed
+   and go `IMPLEMENTED` — until then, `CountryRiskSeverity.CRISIS` stays
+   honestly unreachable.
+2. **Calibration pass** (TD-44/45/46/51/52) once real decision-ledger
+   history exists (≥30 evaluated decisions per horizon) — every declared,
+   uncalibrated threshold in this codebase (including the new
+   `TRAILING_VOLUME_WINDOW_DAYS`) shares this same repayment trigger.
+3. **Amwal Al Ghad + IDSC/rating-agency `TargetOrganization` candidates'
+   next real `agx discover-sources` run** — needs real network egress, the
+   same evidenced blocker every prior acquisition mission has hit.
+
+Explicitly not next: a new source-discovery sprint, any rewrite of
+`MetaDecisionEngine`/`PortfolioConstructor`/the publication gate, or
+reopening the 31-row evidence-weight table the Adversarial Review
+explicitly rejected coding — none of that changed with this phase.
+
 ## Genuinely next, after the Decision-Centric Redesign implementation (2026-07-30)
 
 The six research/architecture documents' roadmap
@@ -23,8 +48,10 @@ section and `docs/MISSION_COMPLETION_REVIEW.md`. What's genuinely next:
    liquidity floor are all declared, not measured — same posture as
    TD-6/17/20/33, and the same repayment trigger (real decision-ledger
    history, ≥30 evaluated decisions per horizon).
-4. **Market Breadth artifact** — derivable from already-collected Price
-   Data; additive dashboard/analytics work, still not built.
+4. ~~Market Breadth artifact~~ **Closed**: `market_memory.breadth.compute_market_breadth()`
+   → `market_breadth.json`, wired through `api`/`web` into Market
+   Intelligence's breadth card. See `CURRENT_MISSION.md`'s "Market Breadth
+   artifact" entry.
 5. **Amwal Al Ghad + IDSC/rating-agency `TargetOrganization` candidates'
    next real `agx discover-sources` run** — the identity-only entries are
    seeded; only a real network-egress run can confirm reachability, the

@@ -35,8 +35,17 @@
   },
   "breadthLiquidity": {
     "title": "Market Breadth & Liquidity",
+    "subtitle": "Advance/decline and volume breadth across the covered universe, split-and-dividend-adjusted",
     "emptyTitle": "Not yet available",
-    "emptyDetail": "Breadth and liquidity require a backend-computed artifact (advancers/decliners, adjusted volume) this platform doesn't export yet -- the frontend never computes returns from raw price bars directly, per the platform's data.adjustments rule."
+    "emptyDetail": "Available once the first research cycle produces a reconstructed market state.",
+    "advancers": "Advancers",
+    "decliners": "Decliners",
+    "unchanged": "Unchanged",
+    "advanceDeclineRatio": "Advance/Decline Ratio",
+    "averageReturn": "Average Daily Return",
+    "aboveAverageVolume": "Above Avg. Volume",
+    "belowAverageVolume": "Below Avg. Volume",
+    "coverage": "{{withData}} of {{universe}} tickers have enough price history to compute breadth"
   },
   "marketRegime": {
     "title": "Market Regime & Historical Comparison",

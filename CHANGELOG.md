@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.40.1 — Fix a real live-deployment incident: three cascading production-pipeline crashes
+
+`deploy-pages.yml` run #92 (2026-07-31, commit `ce1a8a6`) failed on merge
+to `main`. Root-caused against the actual persisted production state, not
+assumed, and fixed same day (TD-49 has the full detail):
+
+- Restored `SourceCategory.ALTERNATIVE` in the enum. 0.40.0 removed it as
+  dead weight in the seed catalog, but real, already-persisted
+  `source_registry.json` state (the `production/state-latest` branch)
+  has real historical revisions carrying that category -- removing the
+  enum member broke deserializing them. Never remove an enum value real
+  persisted data depends on; only stop emitting new records with it.
+- Fixed `ProductionPipeline._stage_investment_case_generator` calling
+  `self._tickers(as_of)` before checking `as_of is None` -- any run whose
+  entire requested range fell on non-trading days (this incident: a
+  single day landing on an EGX Friday) crashed instead of skipping
+  cleanly. Pre-existing bug, unrelated to 0.40.0, that simply never
+  triggered until a scheduled run happened to land on a real non-trading
+  day with no other date in range.
+- Fixed `_stage_dashboard_artifact_generator`'s financial-coverage export
+  passing a possibly-`None` `as_of` into a report that requires a real
+  date -- same pre-existing bug class, fixed with the `as_of or end`
+  fallback the same stage already used elsewhere, just not consistently.
+- 2 new regression tests (`test_legacy_alternative_category_still_deserializes`,
+  `test_entire_range_on_non_trading_days_skips_investment_cases_instead_of_crashing`);
+  736 backend tests pass; `ruff check` clean. Verified by reproducing all
+  three failures directly against the real persisted production data tree
+  and confirming each fix resolves it, not just by reasoning about the
+  code.
+
 ## 0.40.0 — Decision-Centric Redesign: position-aware Decision Service + real FinancialPerformanceAgent
 
 Full implementation of the roadmap four research/architecture documents

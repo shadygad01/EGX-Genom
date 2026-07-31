@@ -871,6 +871,21 @@ class ProductionPipeline:
                 for ticker, bars in state.dataset_snapshot.price_history.items()
                 if bars
             }
+        if as_of is None:
+            # A real, live incident (2026-07-31): this stage previously
+            # called `self._tickers(None)` unconditionally before this
+            # check, and `UniverseProvider.constituents()` compares dates
+            # (`entry.as_of_date <= as_of`) -- `None` isn't orderable
+            # against a `date`, so any execution whose entire requested
+            # range fell on non-trading days (e.g. a single-day scheduled
+            # run landing on an EGX weekend) crashed here instead of
+            # skipping cleanly. Checked first now, never calling
+            # `_tickers`/`export_investment_cases` with no `as_of` at all.
+            return (
+                StageStatus.SKIPPED,
+                "No successfully-completed trading day this execution; no investment case generated.",
+                [],
+            )
         self.investment_cases = production_artifacts.export_investment_cases(
             self.knowledge_store,
             self.event_platform,
@@ -879,12 +894,6 @@ class ProductionPipeline:
             ready_horizons_by_ticker=ready_horizons_by_ticker,
             latest_prices=latest_prices,
         )
-        if as_of is None:
-            return (
-                StageStatus.SKIPPED,
-                "No successfully-completed trading day this execution; no investment case generated.",
-                [],
-            )
         n = len(self.investment_cases["recommendations"])
         return (
             StageStatus.SUCCEEDED,
@@ -1046,8 +1055,16 @@ class ProductionPipeline:
         )
         counts["knowledge_graph.json"] = len(knowledge_graph["nodes"])
 
+        # A real live incident (2026-07-31): when the whole requested range
+        # falls on non-trading days, `as_of` is `None` here -- `_tickers(None)`
+        # can silently return an empty/unfiltered universe depending on the
+        # provider, and `FinancialCoverageReport.as_of` requires a real
+        # `date` regardless. Fall back to `end` (the pipeline's own
+        # requested date), matching the exact pattern this stage already
+        # uses for `evaluate_publication_gate`/`PortfolioConstructor` above.
+        coverage_as_of = as_of or end
         financial_statements = production_artifacts.export_financial_statements(
-            self.data_dir, self._tickers(as_of), as_of
+            self.data_dir, self._tickers(coverage_as_of), coverage_as_of
         )
         (dashboard_out / "financial_statements.json").write_text(
             json.dumps(financial_statements, indent=2, sort_keys=True) + "\n"
@@ -1055,9 +1072,9 @@ class ProductionPipeline:
         counts["financial_statements.json"] = len(financial_statements)
 
         financial_coverage = build_financial_coverage_report(
-            tickers=self._tickers(as_of),
+            tickers=self._tickers(coverage_as_of),
             items=[FinancialStatementLineItem.model_validate(row) for row in financial_statements],
-            as_of=as_of,
+            as_of=coverage_as_of,
         )
         (dashboard_out / "financial_coverage.json").write_text(
             financial_coverage.model_dump_json(indent=2) + "\n"

@@ -25,10 +25,33 @@ def make_spec(**overrides) -> SourceSpec:
     return SourceSpec(**defaults)
 
 
-def test_seed_sources_covers_every_named_category():
+def test_seed_sources_covers_every_named_category_still_in_active_use():
+    # SourceCategory.ALTERNATIVE is intentionally excluded: the seed
+    # catalog no longer emits any source under it (Decision-Centric Gap
+    # Audit, 2026-07-30), but the enum member itself must stay so real,
+    # already-persisted production registry state with that category
+    # (from before the cleanup) keeps deserializing -- see sources/spec.py.
     specs = seed_sources()
     categories = {s.category for s in specs}
-    assert categories == set(SourceCategory)
+    assert categories == set(SourceCategory) - {SourceCategory.ALTERNATIVE}
+
+
+def test_legacy_alternative_category_still_deserializes():
+    # Regression test for a real production incident (2026-07-31): removing
+    # SourceCategory.ALTERNATIVE entirely broke loading real, already-
+    # persisted source_registry.json revisions carrying that category.
+    spec = SourceSpec.model_validate(
+        {
+            "id": "legacy_source",
+            "name": "Legacy Source",
+            "category": "alternative",
+            "access_method": "json_api",
+            "status": "planned",
+            "reliability_score": 0.5,
+            "freshness_score": 0.5,
+        }
+    )
+    assert spec.category == SourceCategory.ALTERNATIVE
 
 
 def test_seed_sources_ids_are_unique():

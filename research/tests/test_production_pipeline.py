@@ -140,6 +140,28 @@ def test_end_to_end_mock_execution_runs_every_stage_and_succeeds(tmp_path):
     assert all(s.status == StageStatus.SUCCEEDED for s in report.stages)
 
 
+def test_entire_range_on_non_trading_days_skips_investment_cases_instead_of_crashing(tmp_path):
+    """Regression test for a real live-deployment incident (2026-07-31): a
+    single-day scheduled run whose only requested date fell on an EGX
+    non-trading day (a Friday) left `succeeded_dates` empty, so `as_of`
+    was `None` -- `_stage_investment_case_generator` previously called
+    `self._tickers(None)` (-> `UniverseProvider.constituents(None)`,
+    which compares dates) before checking `as_of is None`, crashing with
+    `TypeError: '<=' not supported between instances of 'datetime.date'
+    and 'NoneType'` instead of skipping cleanly."""
+    friday = date(2026, 6, 12)  # EGX trades Sun-Thu; Friday is a weekend
+    pipeline = make_pipeline(tmp_path / "data")
+    report = pipeline.run(friday, mode=ExecutionMode.MOCK)
+
+    assert report.overall_status != StageStatus.FAILED
+    by_name = {s.name: s for s in report.stages}
+    investment_stage = by_name[StageName.INVESTMENT_CASE_GENERATOR]
+    assert investment_stage.status == StageStatus.SKIPPED
+    assert "no successfully-completed trading day" in investment_stage.detail.lower()
+    dashboard_stage = by_name[StageName.DASHBOARD_ARTIFACT_GENERATOR]
+    assert dashboard_stage.status != StageStatus.FAILED
+
+
 def test_end_to_end_execution_produces_a_real_hypothesis_from_collected_data(tmp_path):
     """Proves collector output actually reaches the research pipeline --
     the exact gap this pipeline was built to close (previously `agx collect`

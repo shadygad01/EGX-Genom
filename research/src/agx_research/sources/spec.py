@@ -30,14 +30,21 @@ class SourceCategory(str, Enum):
     ARABIC_NEWS = "arabic_news"
     MACROECONOMIC = "macroeconomic"
     GLOBAL_MARKETS = "global_markets"
-    # ALTERNATIVE removed (Architecture Adversarial Review, 2026-07-30):
-    # every source ever catalogued under it (social/search/patents/hiring/
-    # tech signals) was evaluated against the platform's ten first-
-    # principles investment questions and removed on the merits -- see
-    # docs/FREE_DECISION_DATA_BLUEPRINT.md Part 3. An empty category left
-    # in the enum is exactly the kind of unnecessary abstraction this
-    # review's mandate ("eliminate unnecessary abstractions") exists to
-    # catch; it is not reintroduced speculatively.
+    # ALTERNATIVE: no longer used by the seed catalog (every source once
+    # catalogued under it -- social/search/patents/hiring/tech signals --
+    # was evaluated against the platform's ten first-principles investment
+    # questions and removed on the merits, see
+    # docs/FREE_DECISION_DATA_BLUEPRINT.md Part 3) but the enum member
+    # itself MUST stay: real, live-collected `source_registry.json` state
+    # (the `production/state-latest` branch, restored on every
+    # `deploy-pages.yml` run) already has real persisted `SourceSpec`
+    # revisions with `category: "alternative"` from before this cleanup.
+    # Removing the member broke deserialization of that real historical
+    # state in production (a live incident, 2026-07-31) -- confirmed by
+    # reading the actual persisted registry, not assumed. Never delete an
+    # enum value real persisted data depends on; only stop emitting new
+    # records with it.
+    ALTERNATIVE = "alternative"
     RESEARCH = "research"
 
 

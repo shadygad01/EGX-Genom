@@ -35,7 +35,7 @@ def test_missing_fundamentals_and_knowledge_force_explicit_abstention(tmp_path):
     assert row.decision == "abstain"
     assert row.price_observations > 0
     assert row.financial_periods == 0
-    assert any("معرفة" in blocker for blocker in row.blockers)
+    assert any("knowledge" in blocker for blocker in row.blockers)
 
 
 def test_investment_horizon_blocked_without_currency_series(tmp_path):
@@ -59,8 +59,8 @@ def test_investment_horizon_blocked_without_currency_series(tmp_path):
     )
     row = assess_decision_readiness(state, CollectedFinancialStatementProvider(tmp_path), [])[0]
     assert Horizon.INVESTMENT not in row.ready_horizons
-    assert any("سعر الصرف" in blocker for blocker in row.horizon_blockers[Horizon.INVESTMENT])
-    assert any("سعر الصرف" in blocker for blocker in row.blockers)
+    assert any("exchange-rate" in blocker for blocker in row.horizon_blockers[Horizon.INVESTMENT])
+    assert any("exchange-rate" in blocker for blocker in row.blockers)
 
 
 def test_investment_horizon_recognizes_real_production_currency_series_id(tmp_path):
@@ -104,7 +104,7 @@ def test_investment_horizon_recognizes_real_production_currency_series_id(tmp_pa
         trading_session=TradingSession(session_date=date(2026, 6, 14), is_trading_day=True),
     )
     row = assess_decision_readiness(state, CollectedFinancialStatementProvider(tmp_path), [])[0]
-    assert not any("سعر الصرف" in blocker for blocker in row.horizon_blockers[Horizon.INVESTMENT])
+    assert not any("exchange-rate" in blocker for blocker in row.horizon_blockers[Horizon.INVESTMENT])
 
 
 def test_illiquid_ticker_blocked_across_every_horizon(tmp_path):
@@ -136,8 +136,8 @@ def test_illiquid_ticker_blocked_across_every_horizon(tmp_path):
 
     assert row.ready_horizons == []
     for horizon in Horizon:
-        assert any("السيولة" in blocker for blocker in row.horizon_blockers[horizon])
-    assert any("السيولة" in blocker for blocker in row.blockers)
+        assert any("Liquidity" in blocker for blocker in row.horizon_blockers[horizon])
+    assert any("Liquidity" in blocker for blocker in row.blockers)
 
 
 def test_no_prices_is_blocked_not_merely_degraded(tmp_path):

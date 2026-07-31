@@ -648,9 +648,11 @@ def main(argv: list[str] | None = None) -> int:
         try:
             payload.encode(sys.stdout.encoding or "utf-8")
         except UnicodeEncodeError:
-            # Windows terminals commonly expose cp1252 even though the report
-            # intentionally contains Arabic. Preserve readable JSON and the
-            # meaningful 0/2 exit code instead of crashing during output.
+            # Windows terminals commonly expose a narrow codepage (e.g.
+            # cp1252) that can't represent every character report content
+            # might carry (e.g. a non-ASCII legal reviewer name). Preserve
+            # readable JSON and the meaningful 0/2 exit code instead of
+            # crashing during output.
             sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
         else:
             print(payload)

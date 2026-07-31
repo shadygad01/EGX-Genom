@@ -1296,3 +1296,36 @@ sovereign-rating collector remain genuine, disclosed gaps, not something
 this pass could close without fabrication.
 
 5 new regression tests; 741 backend tests pass; `ruff check` clean.
+
+## Fix hardcoded Arabic backend prose (investor walkthrough, 2026-07-31)
+
+A second investor-perspective walkthrough of the live system (same request
+framing as TD-50/AD-49/AD-50 above), this time driven end to end in a real
+headless browser against a real mock-mode `agx run`'s dashboard artifacts
+(not just read from source), found a genuine, previously-unnoticed bug of
+its own: `meta.publication_gate`, `meta.readiness`, and
+`meta.decision_engine` had Arabic-language strings hardcoded directly into
+backend-generated content (`PublicationGateCheck.label`/`blocker`,
+`DecisionReadiness.blockers`/`horizon_blockers`, and every field of
+`Explanation`/`HorizonDecision` produced by the decision engine) — a direct
+violation of this repository's own documented rule (`CLAUDE.md`'s
+"Bilingual EN/AR dashboard" section) that free-form backend prose stays
+English so `i18next` is the only translation layer. In the live browser
+walkthrough this rendered as raw, untranslated Arabic mixed into an
+otherwise-English "Publication gate is blocking risk deployment" card —
+precisely the text a fund manager reads first to understand why no
+decision is being surfaced. Closed by translating every affected string to
+English (meaning, thresholds, and currency figures preserved exactly),
+updating the two test files that asserted on the old Arabic substrings
+(one test, `test_executable_decision_language_is_arabic`, had directly
+asserted the language *was* Arabic — renamed and rewritten, confirming this
+was a deliberate prior choice, not an accidental leak), and correcting a
+stale `cli.py` comment. `collectors/corporate_event_classifier.py`'s Arabic
+keyword list is untouched — it matches real Arabic-language news headlines
+from Enterprise/FRA/Al Borsa/Masrawy, which is a different concern
+entirely (pattern-matching input, not generating output prose). Verified
+live in a headless browser in both English and Arabic dashboard modes:
+Publication Gate, Opportunity Center, and Company Workspace all render
+correctly now, with backend prose staying English in both language modes
+exactly as designed. 748 backend tests pass; `ruff check` clean; `api`/
+`web` builds and test suites (18 + 41 tests) unaffected.

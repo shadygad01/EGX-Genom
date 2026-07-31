@@ -186,50 +186,50 @@ def assess_decision_readiness(
         is_illiquid = ticker in illiquid_tickers
 
         if len(prices) < 60:
-            horizon_blockers[Horizon.MICRO].append("أقل من 60 مشاهدة سعرية.")
+            horizon_blockers[Horizon.MICRO].append("Fewer than 60 price observations.")
         if not price_is_fresh:
-            horizon_blockers[Horizon.MICRO].append("بيانات السعر قديمة.")
+            horizon_blockers[Horizon.MICRO].append("Price data is stale.")
         if not knowledge_by_horizon[Horizon.MICRO]:
-            horizon_blockers[Horizon.MICRO].append("لا توجد معرفة نشطة للأفق القصير.")
+            horizon_blockers[Horizon.MICRO].append("No active knowledge for the Micro horizon.")
         if is_illiquid:
             horizon_blockers[Horizon.MICRO].append(
-                "السيولة أقل من الحد الأدنى القابل للتنفيذ."
+                "Liquidity is below the executable minimum."
             )
 
         if len(prices) < 120:
-            horizon_blockers[Horizon.SWING].append("أقل من 120 مشاهدة سعرية.")
+            horizon_blockers[Horizon.SWING].append("Fewer than 120 price observations.")
         if not price_is_fresh:
-            horizon_blockers[Horizon.SWING].append("بيانات السعر قديمة.")
+            horizon_blockers[Horizon.SWING].append("Price data is stale.")
         if not (news or events):
-            horizon_blockers[Horizon.SWING].append("لا يوجد خبر أو حدث حديث للشركة.")
+            horizon_blockers[Horizon.SWING].append("No recent news or corporate event for the company.")
         if not knowledge_by_horizon[Horizon.SWING]:
-            horizon_blockers[Horizon.SWING].append("لا توجد معرفة نشطة للأفق المتوسط.")
+            horizon_blockers[Horizon.SWING].append("No active knowledge for the Swing horizon.")
         if is_illiquid:
             horizon_blockers[Horizon.SWING].append(
-                "السيولة أقل من الحد الأدنى القابل للتنفيذ."
+                "Liquidity is below the executable minimum."
             )
 
         if len(prices) < 252:
-            horizon_blockers[Horizon.INVESTMENT].append("أقل من 252 مشاهدة سعرية.")
+            horizon_blockers[Horizon.INVESTMENT].append("Fewer than 252 price observations.")
         if not price_is_fresh:
-            horizon_blockers[Horizon.INVESTMENT].append("بيانات السعر قديمة.")
+            horizon_blockers[Horizon.INVESTMENT].append("Price data is stale.")
         if not fair_value_available:
             horizon_blockers[Horizon.INVESTMENT].append(
-                "لا توجد قيمة عادلة موثوقة من ثلاثة نماذج صالحة على الأقل."
+                "No reliable fair value from at least three valid models."
             )
         if macro_series < 3:
-            horizon_blockers[Horizon.INVESTMENT].append("أقل من ثلاث سلاسل اقتصاد كلي.")
+            horizon_blockers[Horizon.INVESTMENT].append("Fewer than three macro series.")
         if not country_risk_data_present:
             horizon_blockers[Horizon.INVESTMENT].append(
-                "لا تتوفر بيانات كافية عن سعر الصرف لتقييم مخاطر الدولة."
+                "Insufficient exchange-rate data to assess country risk."
             )
         if not knowledge_by_horizon[Horizon.INVESTMENT]:
             horizon_blockers[Horizon.INVESTMENT].append(
-                "لا توجد معرفة نشطة للأفق الطويل."
+                "No active knowledge for the Investment horizon."
             )
         if is_illiquid:
             horizon_blockers[Horizon.INVESTMENT].append(
-                "السيولة أقل من الحد الأدنى القابل للتنفيذ."
+                "Liquidity is below the executable minimum."
             )
 
         ready_horizons = [
@@ -239,29 +239,29 @@ def assess_decision_readiness(
         blockers: list[str] = []
         next_actions: list[str] = []
         if not prices:
-            blockers.append("لا يتوفر سجل أسعار موثوق.")
-            next_actions.append("اربط مصدر أسعار وحجم تداول عاملًا للبورصة المصرية.")
+            blockers.append("No reliable price history available.")
+            next_actions.append("Connect a working EGX price and trading-volume source.")
         elif not price_is_fresh:
-            blockers.append("أحدث مشاهدة سعرية قديمة.")
-            next_actions.append("حدّث جامع الأسعار وتحقق من تغطية أيام التداول.")
+            blockers.append("The latest price observation is stale.")
+            next_actions.append("Refresh the price collector and verify trading-day coverage.")
         if not fair_value_available:
-            blockers.append("لا يمكن حساب قيمة عادلة موثوقة من المدخلات الحالية.")
-            next_actions.append("استكمل عدد الأسهم والحقول اللازمة لثلاثة نماذج تقييم على الأقل.")
+            blockers.append("A reliable fair value cannot be computed from current inputs.")
+            next_actions.append("Supply shares outstanding and the fields needed for at least three valuation models.")
         if not news and not events:
-            blockers.append("لا يوجد خبر أو حدث مؤسسي مرتبط بالسهم داخل النافذة.")
-            next_actions.append("حسّن ربط أسماء الشركات ورموز الأسهم بالأخبار.")
+            blockers.append("No news or corporate event linked to the ticker within the window.")
+            next_actions.append("Improve company-name/ticker matching against news.")
         if macro_series < 3:
-            blockers.append("سياق الاقتصاد الكلي يحتوي أقل من ثلاث سلاسل مكتملة.")
-            next_actions.append("استعد ثلاث سلاسل اقتصاد كلي حديثة على الأقل.")
+            blockers.append("The macro context has fewer than three complete series.")
+            next_actions.append("Restore at least three recent macro series.")
         if not country_risk_data_present:
-            blockers.append("لا تتوفر بيانات كافية عن سعر الصرف لتقييم مخاطر الدولة.")
-            next_actions.append("اربط سلسلة سعر الصرف (مثل EGP_USD) بتغطية كافية للتقييم.")
+            blockers.append("Insufficient exchange-rate data to assess country risk.")
+            next_actions.append("Connect an exchange-rate series (e.g. EGP_USD) with sufficient coverage for assessment.")
         if is_illiquid:
-            blockers.append("السيولة أقل من الحد الأدنى القابل للتنفيذ لأي قرار.")
-            next_actions.append("لا تُجبر على قرار في سهم غير سائل؛ انتظر تحسّن السيولة أو استبعده.")
+            blockers.append("Liquidity is below the executable minimum for any decision.")
+            next_actions.append("Do not force a decision on an illiquid ticker; wait for liquidity to improve or exclude it.")
         if not active_knowledge:
-            blockers.append("لا يغطي السهم أي كائن معرفة نشط ومتحقق منه.")
-            next_actions.append("مرّر الفرضيات عبر التحقق قبل إصدار أي قرار.")
+            blockers.append("No active, validated knowledge object covers this ticker.")
+            next_actions.append("Run hypotheses through validation before issuing any decision.")
 
         decision_allowed = bool(ready_horizons and active_knowledge)
         status = (

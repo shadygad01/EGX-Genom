@@ -61,10 +61,10 @@ class PublicationGateReport(BaseModel):
 
 
 _EXTERNAL_CHECKS = {
-    "live_egx_market_data": "بيانات EGX حية ومسموح باستخدامها",
-    "official_disclosures_four_periods": "إفصاحات رسمية وأربع فترات مالية",
-    "current_cbe_capmas_macro": "بيانات CBE وCAPMAS حديثة",
-    "two_source_price_corroboration": "تأكيد السعر من مصدرين مستقلين",
+    "live_egx_market_data": "Live, legally usable EGX market data",
+    "official_disclosures_four_periods": "Official disclosures and four financial periods",
+    "current_cbe_capmas_macro": "Current CBE and CAPMAS data",
+    "two_source_price_corroboration": "Price corroboration from two independent sources",
 }
 
 _MAX_EVIDENCE_AGE_DAYS = {
@@ -115,7 +115,7 @@ def evaluate_publication_gate(
     if input_errors:
         checks.append(PublicationGateCheck(
             id="publication_input_validation",
-            label="سلامة ملفات أدلة النشر",
+            label="Publication evidence file integrity",
             passed=False,
             blocker="; ".join(input_errors),
         ))
@@ -142,7 +142,7 @@ def evaluate_publication_gate(
             label=label,
             passed=passed,
             evidence_refs=[ref.raw_document_id for ref in verified_refs],
-            blocker=None if passed else f"{label}: الشرط أو مرجع الدليل غير مكتمل.",
+            blocker=None if passed else f"{label}: condition or evidence reference is incomplete.",
         ))
 
     by_horizon = {row.horizon: row for row in performance}
@@ -164,9 +164,12 @@ def evaluate_publication_gate(
     )
     checks.append(PublicationGateCheck(
         id="benchmark_performance",
-        label="30 نتيجة متفوقة على EGX30 لكل أفق بعد التكلفة",
+        label="30+ results outperforming EGX30 per horizon, after costs",
         passed=performance_ok,
-        blocker=None if performance_ok else "الأداء لا يثبت تفوقًا موجبًا بثقة 95% وثباتًا ومخاطرة مقبولة لكل الآفاق.",
+        blocker=None if performance_ok else (
+            "Performance does not demonstrate positive outperformance at 95% confidence "
+            "with acceptable stability and risk across all horizons."
+        ),
     ))
 
     legal_ok = bool(
@@ -186,10 +189,10 @@ def evaluate_publication_gate(
     )
     checks.append(PublicationGateCheck(
         id="legal_approval",
-        label="مراجعة قانونية بشرية سارية",
+        label="Valid human legal review",
         passed=legal_ok,
         evidence_refs=[legal.evidence.raw_document_id] if legal else [],
-        blocker=None if legal_ok else "لا توجد موافقة قانونية بشرية كاملة وسارية.",
+        blocker=None if legal_ok else "No complete, valid human legal approval exists.",
     ))
     blockers = [check.blocker for check in checks if check.blocker]
     return PublicationGateReport(

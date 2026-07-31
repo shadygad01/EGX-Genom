@@ -73,20 +73,24 @@ def test_buy_signal_without_reference_price_abstains():
     decision = recommendation.horizon_decisions[Horizon.MICRO]
     assert decision.action == DecisionAction.ABSTAIN
     assert decision.entry_value is None
-    assert "سعر مرجعي" in " ".join(decision.abstention_reasons)
+    assert "reference price" in " ".join(decision.abstention_reasons)
 
 
-def test_executable_decision_language_is_arabic():
+def test_executable_decision_language_is_english():
+    # Backend-generated prose stays English (CLAUDE.md: "free-form
+    # backend-generated prose ... intentionally stays English"), so the
+    # bilingual EN/AR dashboard's i18next layer is the only place
+    # translation happens -- never baked into the explanation text itself.
     prediction = make_prediction(Horizon.MICRO, 0.02, 0.01, 0.8, "know-1")
     recommendation = MetaDecisionEngine().decide(
         "COMI", date(2026, 6, 14), {Horizon.MICRO: prediction}
     )
     assert recommendation is not None
     decision = recommendation.horizon_decisions[Horizon.MICRO]
-    assert "جنيه" in decision.entry_condition
-    assert "تُراجع" in decision.review_condition
-    assert "استنادًا" in recommendation.explanation.why_now
-    assert "العائد المتوقع" in recommendation.explanation.supporting_evidence[0]
+    assert "EGP" in decision.entry_condition
+    assert "Reviewed" in decision.review_condition
+    assert "Based on" in recommendation.explanation.why_now
+    assert "expected_return" in recommendation.explanation.supporting_evidence[0]
 
 
 def test_combines_multiple_horizons_weighted_by_confidence():

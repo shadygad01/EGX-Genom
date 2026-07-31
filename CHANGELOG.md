@@ -7,6 +7,50 @@
 - Investment readiness now depends on a calculable fair value rather than statement
   count; available value carries a 20% research-only investment-horizon weight.
 
+## Unreleased — fix hardcoded Arabic backend prose (investor walkthrough)
+
+Investor-perspective walkthrough (project owner request, Arabic: "put
+yourself in an investor's place opening the system"): a live headless-browser
+pass through the AI Briefing, Opportunity Center, and Company Workspace pages
+against a real mock-mode `agx run` (748 backend tests, `ruff check`, `npm run
+build`/`test` for `api`/`web` all verified green first) surfaced a genuine,
+previously-unnoticed bug distinct from any already-documented data gap:
+`meta.publication_gate`, `meta.readiness`, and `meta.decision_engine` had
+hardcoded Arabic-language strings baked directly into `PublicationGateCheck.label`/
+`blocker`, `DecisionReadiness.blockers`/`horizon_blockers`, and
+`Explanation.why_this_stock`/`why_now`/`why_not_others`/`entry_condition`/
+`review_condition`/`abstention_reasons` — a direct violation of this
+codebase's own documented rule (`CLAUDE.md`, "Bilingual EN/AR dashboard"
+section) that free-form backend-generated prose stays English so the
+i18next layer is the only place translation happens. In practice this meant
+an English-mode user saw raw untranslated Arabic mixed into the Publication
+Gate card and every ticker's readiness blockers/decision explanation — the
+exact "why can't I get a decision" text a fund manager opening the platform
+would read first. `test_meta_decision_engine.py` even had a test asserting
+the language *was* Arabic (`test_executable_decision_language_is_arabic`),
+confirming this was a deliberate but incorrect prior choice, not an
+accidental leak.
+
+Fixed: translated every hardcoded string in the three files to English,
+preserving exact meaning/thresholds/currency figures; renamed the test to
+`test_executable_decision_language_is_english` and updated its and
+`test_decision_readiness.py`'s assertions to the new English substrings;
+updated a misleading `cli.py` comment that claimed the publication-status
+report "intentionally contains Arabic" (it no longer does — the comment now
+describes the encode-fallback generically) and `test_infrastructure.py`'s
+matching cp1252-encoding regression test, which no longer has a non-ASCII
+character to exercise incidentally. Deliberately left untouched:
+`collectors/corporate_event_classifier.py`'s Arabic keyword list, which
+correctly matches *real Arabic-language news headlines* (Enterprise/FRA/Al
+Borsa/Masrawy) rather than generating prose — not the same rule at all.
+Verified live in a headless browser in both English and Arabic UI modes
+against real mock-run artifacts: the Publication Gate card, ticker
+readiness blockers, and Opportunity Center now render entirely in English
+regardless of dashboard language, matching the documented bilingual design
+(UI chrome translates via i18next; backend prose stays English in both
+modes). 748 backend tests pass (2 renamed/updated); `ruff check` clean;
+`api`/`web` unaffected (no dashboard-facing schema change).
+
 ## 0.40.2 — Close free-data gaps: currency-series-id fix, drop unreliable FRED live dependency
 
 Project owner direction (2026-07-31, following an investor-perspective

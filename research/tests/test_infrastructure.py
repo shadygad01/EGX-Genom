@@ -153,4 +153,11 @@ def test_cli_publication_status_writes_utf8_on_windows_code_page(tmp_path, monke
     windows_stdout.flush()
     report = json.loads(raw_output.getvalue().decode("utf-8"))
     assert report["publication_ready"] is False
-    assert any("بيانات" in check["label"] for check in report["checks"])
+    assert {check["id"] for check in report["checks"]} >= {
+        "live_egx_market_data",
+        "official_disclosures_four_periods",
+        "current_cbe_capmas_macro",
+        "two_source_price_corroboration",
+        "benchmark_performance",
+        "legal_approval",
+    }

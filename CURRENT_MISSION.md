@@ -1,5 +1,19 @@
 # Current Mission
 
+## Current mission: fix hardcoded Arabic backend prose (investor walkthrough, 2026-07-31)
+
+A live, browser-driven investor walkthrough (real mock-mode `agx run` served
+through `api`/`web`, both English and Arabic dashboard modes) found
+`meta.publication_gate`/`meta.readiness`/`meta.decision_engine` generating
+hardcoded Arabic prose for check labels, readiness blockers, and decision
+explanations — violating `CLAUDE.md`'s documented "backend prose stays
+English" rule and rendering as untranslated Arabic mixed into an
+English-mode dashboard. Fixed: all three files translated to English,
+matching tests updated, one stale comment corrected. See
+`docs/PHASE_STATUS.md`'s matching section and `CHANGELOG.md`'s entry for
+full detail. 748 backend tests pass; `ruff check` clean; `api`/`web`
+unaffected.
+
 ## Owner-directed fair-value criterion (2026-07-30)
 
 The active implementation reproduces Smartlist's valuation methodology inside AGX

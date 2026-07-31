@@ -145,17 +145,17 @@ class MetaDecisionEngine:
 
         explanation = Explanation(
             why_this_stock=(
-                f"وجدت نماذج {len(predictions)} أفق/آفاق "
-                f"({', '.join(_horizon_label(h) for h in predictions)}) أدلة مؤيدة للسهم {ticker}."
+                f"Models across {len(predictions)} horizon(s) "
+                f"({', '.join(_horizon_label(h) for h in predictions)}) found supporting evidence for {ticker}."
             ),
-            why_now=f"استنادًا إلى المعرفة وبيانات السوق المتاحة حتى {as_of.isoformat()}.",
+            why_now=f"Based on knowledge and market data available through {as_of.isoformat()}.",
             why_not_others=(
-                "يجمع هذا المحرك التنبؤات المتاحة فقط؛ أما المقارنة مع الأسهم الأخرى "
-                "فتُجرى في مرحلة الترتيب على مستوى السوق كله."
+                "This engine only combines available predictions; comparison against other "
+                "stocks happens at the market-wide ranking stage."
             ),
             supporting_evidence=[
-                f"{_horizon_label(h)}: العائد المتوقع={p.expected_return:.4f}، "
-                f"المخاطر المتوقعة={p.expected_risk:.4f}، الثقة={p.confidence:.2f}"
+                f"{_horizon_label(h)}: expected_return={p.expected_return:.4f}, "
+                f"expected_risk={p.expected_risk:.4f}, confidence={p.confidence:.2f}"
                 for h, p in predictions.items()
             ]
             + [
@@ -175,7 +175,7 @@ class MetaDecisionEngine:
             ],
             similar_historical_cases=[],
             invalidation_conditions=[
-                "تُسحب المعرفة الأساسية أو يتراجع سجل أدائها عن حد القبول."
+                "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
             ],
         )
 
@@ -224,7 +224,7 @@ class MetaDecisionEngine:
         abstention_reasons: list[str] = []
         if prediction.confidence < 0.60:
             action = DecisionAction.ABSTAIN
-            abstention_reasons.append("الثقة أقل من حد البحث البالغ 60٪.")
+            abstention_reasons.append("Confidence is below the research threshold of 60%.")
         elif prediction.expected_return <= 0:
             action = DecisionAction.AVOID
         elif score >= 1.0:
@@ -235,7 +235,7 @@ class MetaDecisionEngine:
         if action == DecisionAction.BUY_CANDIDATE and prediction.reference_price is None:
             action = DecisionAction.ABSTAIN
             abstention_reasons.append(
-                "لا يوجد سعر مرجعي حديث وموجب مرتبط بهذا التنبؤ."
+                "No recent, positive reference price is attached to this prediction."
             )
 
         reference_price = prediction.reference_price
@@ -248,16 +248,16 @@ class MetaDecisionEngine:
         )
         if action == DecisionAction.BUY_CANDIDATE:
             entry_condition = (
-                f"إغلاق معدل عند {entry_value:.2f} جنيه أو أقل، مع بقاء الأدلة "
-                "وبوابة النشر صالحتين."
+                f"Average close at or below EGP {entry_value:.2f}, while the evidence "
+                "and publication gate remain valid."
             )
             review_condition = (
-                f"تُراجع الحالة عند {reference_price * (1 + max(0.0, prediction.expected_return)):.2f} جنيه "
-                "أو عند انتهاء الصلاحية، أيهما أسبق."
+                f"Reviewed at EGP {reference_price * (1 + max(0.0, prediction.expected_return)):.2f} "
+                "or upon expiry, whichever comes first."
             )
         else:
-            entry_condition = "لا يوجد دخول قابل للتنفيذ ما دام القرار ليس مرشح شراء."
-            review_condition = "تُراجع الحالة عند ظهور دليل جديد أو انتهاء الصلاحية."
+            entry_condition = "No executable entry while the decision is not a buy candidate."
+            review_condition = "Reviewed when new evidence emerges or upon expiry."
 
         validity_days = {
             Horizon.MICRO: 3,
@@ -287,7 +287,7 @@ class MetaDecisionEngine:
             invalidation_value=invalidation_value,
             review_condition=review_condition,
             invalidation_conditions=list(prediction.explanation.invalidation_conditions)
-            + ([f"إغلاق معدل دون {invalidation_value:.2f} جنيه."] if invalidation_value else []),
+            + ([f"Average close below EGP {invalidation_value:.2f}."] if invalidation_value else []),
             max_position_pct=0.0,
             abstention_reasons=abstention_reasons,
             evidence_refs=list(prediction.explanation.evidence_refs),
@@ -296,7 +296,7 @@ class MetaDecisionEngine:
 
 def _horizon_label(horizon: Horizon) -> str:
     return {
-        Horizon.MICRO: "قصير",
-        Horizon.SWING: "متوسط",
-        Horizon.INVESTMENT: "طويل",
+        Horizon.MICRO: "Micro",
+        Horizon.SWING: "Swing",
+        Horizon.INVESTMENT: "Investment",
     }[horizon]

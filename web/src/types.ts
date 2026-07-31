@@ -25,6 +25,12 @@ export interface DecisionReadiness {
   news_items: number;
   corporate_events: number;
   financial_periods: number;
+  fair_value_available: boolean;
+  // (current_price - weighted_fair_value) / weighted_fair_value: positive
+  // means price sits above the calculated fair value (expensive), negative
+  // means below it (a margin of safety). null when no fair value could be
+  // computed (see fair_value_available).
+  price_vs_fair_value_pct: number | null;
   macro_series: number;
   active_knowledge: number;
   blockers: string[];

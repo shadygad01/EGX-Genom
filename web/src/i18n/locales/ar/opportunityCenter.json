@@ -9,8 +9,10 @@
     "prices": "الأسعار",
     "financialPeriods": "الفترات المالية",
     "knowledge": "المعرفة",
+    "fairValueGap": "السعر مقابل القيمة العادلة",
     "primaryBlocker": "المعوق الرئيسي",
-    "none": "لا يوجد"
+    "none": "لا يوجد",
+    "noFairValue": "غير متاح"
   },
   "badgeTitle": "{{horizon}}: عائد متوقع {{return}}، ثقة {{confidence}}",
   "evidenceTitle": "{{ticker}} — الأدلة",

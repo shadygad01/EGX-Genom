@@ -1,6 +1,26 @@
 # Current Mission
 
-## Current mission: fix hardcoded Arabic backend prose (investor walkthrough, 2026-07-31)
+## Current mission: price-vs-fair-value as a decision-quality criterion (2026-07-31)
+
+Project owner request: compute fair value per ticker, take the average
+across methods, measure how far the current price sits from it, and add
+that as one of the criteria determining the quality of the current price
+for the decision. The seven-model `FairValueEngine` (native fair-value
+evidence, below) already existed and already blended into INVESTMENT
+`expected_return` at a 20% weight (`meta.recommendation_service`), but the
+gap itself was never a visible, named criterion — only whether a fair
+value existed at all (`fair_value_available`) gated readiness. Closed:
+`meta.readiness.DecisionReadiness.price_vs_fair_value_pct` is now computed
+and exposed, and a new declared threshold
+(`MAX_PRICE_ABOVE_FAIR_VALUE_PCT = 0.20`, AD-51/TD-51) blocks INVESTMENT
+readiness with an explicit reason when the price sits too far above fair
+value. `recommendation_service`'s existing evidence text now also states
+the gap in plain terms. Rendered as a new "Price vs. Fair Value" column on
+Opportunity Center's Decision Readiness table, bilingual EN/AR. See
+`CHANGELOG.md`'s matching entry. 751 backend tests pass; `ruff check`
+clean; `api`/`web` unaffected beyond the new column/types.
+
+## Prior mission: fix hardcoded Arabic backend prose (investor walkthrough, 2026-07-31)
 
 A live, browser-driven investor walkthrough (real mock-mode `agx run` served
 through `api`/`web`, both English and Arabic dashboard modes) found

@@ -139,6 +139,8 @@ describe("Universe propagation", () => {
           news_items: 0,
           corporate_events: 0,
           financial_periods: 0,
+          fair_value_available: false,
+          price_vs_fair_value_pct: null,
           macro_series: 0,
           active_knowledge: 0,
           blockers: ["No data"],

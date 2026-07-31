@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased — expose price-vs-fair-value as an explicit decision-quality criterion
+
+Project owner request: make the fair-value engine's average distance from
+the current price into one of the criteria that determines the quality of
+a ticker's current price for the decision, not just a silently-blended
+research input.
+
+- `meta.readiness.DecisionReadiness` gained `price_vs_fair_value_pct`
+  ((current close − `FairValueEngine.value().weighted_fair_value`) /
+  weighted_fair_value, `None` when no fair value could be computed) —
+  reuses the existing seven-model, ≥3-method weighted-average fair value
+  engine (see the native fair-value evidence entry below) rather than
+  building a new calculation.
+- New declared threshold `MAX_PRICE_ABOVE_FAIR_VALUE_PCT = 0.20` (AD-51/
+  TD-51): when the current price sits more than 20% above the calculated
+  fair value, INVESTMENT-horizon readiness is now blocked with an explicit
+  reason ("Current price is +NN% vs. the calculated fair value (weak entry
+  quality).") in both the per-horizon and overall blocker lists — extending
+  the existing readiness gate, not adding a parallel one.
+- `meta.recommendation_service.RecommendationService`'s existing fair-value
+  blend (20% weight into INVESTMENT `expected_return`) now also states the
+  gap explicitly in its evidence text: "current price=X is +Y% vs. fair
+  value", alongside the fair value figure and the models it was averaged
+  from.
+- Web: `DecisionReadiness`'s new field is rendered as a "Price vs. Fair
+  Value" column on Opportunity Center's Decision Readiness table
+  (color-coded: red when the price is above fair value, green when below),
+  bilingual EN/AR.
+- 3 new backend tests (`test_decision_readiness.py` x2 covering the
+  blocked/not-blocked cases, `test_runtime_and_intelligence.py` x1
+  verifying the evidence text and expected-return blend); 751 backend
+  tests pass (up from 748); `ruff check` clean; `api`/`web` build and test
+  suites (18 + 41 tests) unaffected except the new column/types.
+
 ## Unreleased — native fair-value evidence
 
 - Ported the Smartlist IVE V2 calculation method—not its results—into a native,

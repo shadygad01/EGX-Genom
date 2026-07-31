@@ -1329,3 +1329,61 @@ Publication Gate, Opportunity Center, and Company Workspace all render
 correctly now, with backend prose staying English in both language modes
 exactly as designed. 748 backend tests pass; `ruff check` clean; `api`/
 `web` builds and test suites (18 + 41 tests) unaffected.
+
+## Price-vs-fair-value as an explicit decision-quality criterion (2026-07-31)
+
+Project owner request: compute fair value per ticker with multiple
+methods, take the average, measure how far the current price sits from
+it, and add that as one of the criteria determining the quality of the
+current price for the decision. The native fair-value engine
+(`valuation.engine.FairValueEngine`, seven models, weighted average of
+whichever ≥3 survive) already existed and already blended into
+INVESTMENT-horizon `expected_return` at a 20% weight
+(`meta.recommendation_service.RecommendationService`) — but the gap
+between price and fair value itself was never a visible, named criterion:
+`meta.readiness.DecisionReadiness` only ever exposed a boolean
+`fair_value_available` (could a fair value be computed at all), and the
+20% blend silently folded the gap into a single combined `expected_return`
+number with no separate signal for "is this specific price actually
+attractive."
+
+**Closed**: `DecisionReadiness` gained `price_vs_fair_value_pct`
+((current close − `weighted_fair_value`) / `weighted_fair_value`, `None`
+when no fair value could be computed) computed in
+`assess_decision_readiness` from the same `FairValueEngine.value()` call
+that already fed `fair_value_available` (no duplicate calculation). A new
+declared threshold, `MAX_PRICE_ABOVE_FAIR_VALUE_PCT = 0.20` (AD-51,
+TD-51 — same "declared, uncalibrated, named repayment trigger" posture as
+every other threshold in this codebase's Decision Service), blocks
+INVESTMENT-horizon readiness with an explicit reason ("Current price is
++NN% vs. the calculated fair value (weak entry quality).") both per-horizon
+and in the overall blocker/next-action lists, exactly mirroring how
+liquidity and country-risk-data-presence already gate this same horizon.
+`RecommendationService`'s existing fair-value evidence string now also
+states the gap explicitly ("current price=X.XX is +Y.Y% vs. fair value"),
+not just the fair value figure and included models. Web:
+`web/src/types.ts`'s `DecisionReadiness` interface gained both
+`fair_value_available` (previously missing entirely, a small pre-existing
+gap fixed alongside the new field) and `price_vs_fair_value_pct`, rendered
+as a new "Price vs. Fair Value" column on Opportunity Center's Decision
+Readiness table (red when the price is above fair value, green when
+below), bilingual EN/AR (`opportunityCenter.json` in both locales) — no
+`api`-side change needed since `artifactsStore.ts` already passes
+`decision_readiness.json` through generically.
+
+**Verified**: 3 new backend tests — two in `test_decision_readiness.py`
+(price far above fair value blocks INVESTMENT readiness with the new
+reason; price near fair value does not) using a hand-built financials
+fixture scaled to land on either side of COMI's real mock closing price,
+and one in `test_runtime_and_intelligence.py` proving the expected-return
+blend actually shifts and the evidence text carries the new gap language,
+via a hand-seeded INVESTMENT-horizon `KnowledgeObject` (bypassing the
+promotion gate the same way `test_dashboard.py` already does for export
+tests). 751 backend tests pass (up from 748); `ruff check` clean;
+`npm run build`/`test` clean for both `api` and `web` (41 web tests,
+including a fixture update for the two now-required `DecisionReadiness`
+fields); verified live in a headless browser against a real mock-mode
+`agx run`'s regenerated dashboard artifacts — the new column renders "N/A"
+honestly for tickers with no computed fair value (this sandbox's local
+mock data has no financial-statement fixtures), never a fabricated
+percentage.

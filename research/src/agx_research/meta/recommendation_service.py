@@ -70,11 +70,12 @@ class RecommendationService:
                         valuation = self.fair_value_engine.value(ticker, as_of)
                         if valuation is not None:
                             implied = max(-1.0, min(2.0, valuation.weighted_fair_value / reference_price - 1))
+                            price_vs_fair_value = reference_price / valuation.weighted_fair_value - 1
                             ref = ProvenanceRef(kind="calculated_fair_value", ref_id=f"{ticker}:{as_of}:{valuation.assumptions_version}")
                             prediction = prediction.model_copy(update={
                                 "expected_return": (1 - FAIR_VALUE_INVESTMENT_WEIGHT) * prediction.expected_return + FAIR_VALUE_INVESTMENT_WEIGHT * implied,
                                 "explanation": prediction.explanation.model_copy(update={
-                                    "supporting_evidence": [*prediction.explanation.supporting_evidence, f"Calculated fair value={valuation.weighted_fair_value:.2f}; models={','.join(valuation.included_models)}; weight={FAIR_VALUE_INVESTMENT_WEIGHT:.0%}"],
+                                    "supporting_evidence": [*prediction.explanation.supporting_evidence, f"Calculated fair value={valuation.weighted_fair_value:.2f} (avg. of {len(valuation.included_models)} models: {','.join(valuation.included_models)}); current price={reference_price:.2f} is {price_vs_fair_value:+.1%} vs. fair value; fair-value weight in expected return={FAIR_VALUE_INVESTMENT_WEIGHT:.0%}"],
                                     "evidence_refs": [*prediction.explanation.evidence_refs, ref],
                                 }),
                                 "provenance": prediction.provenance.model_copy(update={"inputs": [*prediction.provenance.inputs, ref]}),

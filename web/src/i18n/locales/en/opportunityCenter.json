@@ -9,8 +9,10 @@
     "prices": "Prices",
     "financialPeriods": "Financial Periods",
     "knowledge": "Knowledge",
+    "fairValueGap": "Price vs. Fair Value",
     "primaryBlocker": "Primary Blocker",
-    "none": "None"
+    "none": "None",
+    "noFairValue": "N/A"
   },
   "badgeTitle": "{{horizon}}: {{return}} exp. return, {{confidence}} confidence",
   "evidenceTitle": "{{ticker}} — Evidence",

@@ -14,6 +14,7 @@ from agx_research.events.entity import EntityKind, EntityRef
 from agx_research.events.event import EventSeverity, EventType
 from agx_research.events.service import EventPlatform, build_candidate_event
 from agx_research.events.taxonomy import EventSubtype
+from agx_research.financials.schema import FinancialStatementLineItem
 from agx_research.genome.gene import GeneStatus
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 from agx_research.knowledge.schema import KnowledgeObject
@@ -27,6 +28,7 @@ from agx_research.portfolio.constructor import PortfolioConstructor
 from agx_research.runtime.engine import RunStatus, RuntimeEngine
 from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
+from agx_research.valuation import FairValueEngine
 from agx_research.validation.statistical import StatisticalEvidence
 
 MOCK_ROOT = Path(__file__).resolve().parents[1] / "data" / "mock"
@@ -198,6 +200,72 @@ def test_recent_market_wide_event_reduces_every_egx_ticker_confidence():
 
     assert adjusted.confidence < baseline.confidence
     assert any("sources=alborsa" in item for item in adjusted.explanation.supporting_evidence)
+
+
+class _FairValueFinancialsProvider:
+    """Enough real annual line items for `FairValueEngine` to compute a
+    value; unscaled and without a sector hint (matching how
+    `RecommendationService` calls `.value()`), this yields a weighted fair
+    value of ~14.67 for any ticker, far below COMI's real mock close
+    (68.40 on 2026-06-14)."""
+
+    def __init__(self, ticker: str = "COMI"):
+        values = {
+            2023: {"revenue": 1000, "operating_income": 220, "net_income": 150, "free_cash_flow": 130, "ebitda": 260, "total_equity": 700, "cash_and_equivalents": 150, "total_debt": 100, "shares_outstanding": 100, "eps_diluted": 1.5, "dividend_per_share": .5},
+            2024: {"revenue": 1100, "operating_income": 240, "net_income": 165, "free_cash_flow": 140, "ebitda": 280, "total_equity": 780, "cash_and_equivalents": 170, "total_debt": 100, "shares_outstanding": 100, "eps_diluted": 1.65, "dividend_per_share": .55},
+            2025: {"revenue": 1200, "operating_income": 260, "net_income": 180, "free_cash_flow": 150, "ebitda": 300, "total_equity": 860, "cash_and_equivalents": 190, "total_debt": 100, "shares_outstanding": 100, "eps_diluted": 1.8, "dividend_per_share": .6},
+        }
+        self.items = [
+            FinancialStatementLineItem(
+                ticker=ticker, period_end_date=date(year, 12, 31),
+                period_type="ANNUAL", statement_type="TEST", line_item=name, value=value,
+            )
+            for year, row in values.items() for name, value in row.items()
+        ]
+
+    def get_line_items(self, ticker, start, end, *, statement_type=None):
+        return [item for item in self.items if start <= item.period_end_date <= end]
+
+
+def test_fair_value_blends_into_investment_prediction_and_surfaces_as_evidence():
+    # A hand-seeded promoted INVESTMENT-horizon knowledge object (bypassing
+    # the promotion gate via `._repo.add`, same pattern test_dashboard.py
+    # uses) isolates the fair-value blend from needing a full pipeline run
+    # to happen to promote an INVESTMENT-horizon finding.
+    store = KnowledgeStore()
+    store._repo.add(KnowledgeObject(
+        id="know-fv-test",
+        discovery_date=date(2026, 5, 1),
+        creator_agent="test",
+        supporting_evidence=[],
+        confidence=0.7,
+        statistical_evidence=StatisticalEvidence(
+            method="test", statistic=2.0, p_value=0.01, sample_size=40
+        ),
+        economic_explanation="test",
+        affected_assets=["COMI"],
+        horizon="investment",
+        expected_return=0.03,
+        expected_risk=0.05,
+        provenance=Provenance(produced_by="test", produced_at=datetime.now()),
+    ))
+    service = RecommendationService(
+        store, fair_value_engine=FairValueEngine(_FairValueFinancialsProvider())
+    )
+    recommendations = service.recommend(
+        ["COMI"], date(2026, 6, 14), latest_prices={"COMI": 68.40}
+    )
+
+    assert len(recommendations) == 1
+    decision = recommendations[0].horizon_decisions[Horizon.INVESTMENT]
+    # Fair value (~14.67) is far below the 68.40 mock price, so the 20%
+    # fair-value weight must pull expected_return down from the raw
+    # knowledge-only 0.03, not leave it untouched.
+    assert decision.expected_return < 0.03
+    evidence = " ".join(recommendations[0].explanation.supporting_evidence)
+    assert "Calculated fair value=14.67" in evidence
+    assert "vs. fair value" in evidence
+    assert any(ref.kind == "calculated_fair_value" for ref in recommendations[0].explanation.evidence_refs)
 
 
 def test_portfolio_construction_allocates_and_explains():

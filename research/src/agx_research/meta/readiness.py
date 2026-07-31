@@ -46,11 +46,24 @@ class DecisionReadiness(BaseModel):
     corporate_events: int = 0
     financial_periods: int = 0
     fair_value_available: bool = False
+    # (current_price - weighted_fair_value) / weighted_fair_value: positive
+    # means the current price sits above the calculated fair value
+    # (expensive), negative means below it (a margin of safety). `None`
+    # whenever no fair value could be computed (see `fair_value_available`).
+    price_vs_fair_value_pct: float | None = None
     macro_series: int = 0
     active_knowledge: int = 0
     blockers: list[str] = Field(default_factory=list)
     next_actions: list[str] = Field(default_factory=list)
 
+
+# Declared, uncalibrated threshold (same posture as the liquidity floor /
+# country-risk thresholds this module already imports from
+# `decision_service` -- see TD-6/17/20/33/44/45/46): how far above the
+# calculated fair value the current price can sit before the price-quality
+# criterion below flags it as a weak entry and blocks INVESTMENT
+# readiness. Not derived from real EGX outcome history -- see TD-51.
+MAX_PRICE_ABOVE_FAIR_VALUE_PCT = 0.20
 
 _GAP_LAYER_THRESHOLDS: dict[str, int] = {
     "valuation": 1,
@@ -154,7 +167,8 @@ def assess_decision_readiness(
     rows: list[DecisionReadiness] = []
     for ticker in sorted(snapshot.tickers):
         prices = snapshot.price_history.get(ticker, [])
-        latest_price = max((bar.trade_date for bar in prices), default=None)
+        latest_bar = max(prices, key=lambda bar: bar.trade_date, default=None)
+        latest_price = latest_bar.trade_date if latest_bar else None
         price_is_fresh = latest_price is not None and (market_state.as_of - latest_price).days <= 7
         news = [item for item in snapshot.news if ticker in item.tickers]
         events = snapshot.corporate_events.get(ticker, [])
@@ -162,11 +176,25 @@ def assess_decision_readiness(
             ticker, market_state.as_of - timedelta(days=730), market_state.as_of
         )
         financial_periods = len({item.period_end_date for item in items})
-        fair_value_available = bool(
-            fair_value_engine
-            and fair_value_engine.value(
+        fair_value_result = (
+            fair_value_engine.value(
                 ticker, market_state.as_of, sector=market_state.sectors.get(ticker)
             )
+            if fair_value_engine else None
+        )
+        fair_value_available = bool(fair_value_result)
+        price_vs_fair_value_pct = (
+            round(
+                (latest_bar.close - fair_value_result.weighted_fair_value)
+                / fair_value_result.weighted_fair_value,
+                4,
+            )
+            if fair_value_result and latest_bar
+            else None
+        )
+        price_overvalued = (
+            price_vs_fair_value_pct is not None
+            and price_vs_fair_value_pct > MAX_PRICE_ABOVE_FAIR_VALUE_PCT
         )
         active_knowledge = [
             item
@@ -217,6 +245,11 @@ def assess_decision_readiness(
             horizon_blockers[Horizon.INVESTMENT].append(
                 "No reliable fair value from at least three valid models."
             )
+        elif price_overvalued:
+            horizon_blockers[Horizon.INVESTMENT].append(
+                f"Current price is {price_vs_fair_value_pct:+.0%} vs. the calculated fair "
+                "value (weak entry quality)."
+            )
         if macro_series < 3:
             horizon_blockers[Horizon.INVESTMENT].append("Fewer than three macro series.")
         if not country_risk_data_present:
@@ -247,6 +280,13 @@ def assess_decision_readiness(
         if not fair_value_available:
             blockers.append("A reliable fair value cannot be computed from current inputs.")
             next_actions.append("Supply shares outstanding and the fields needed for at least three valuation models.")
+        elif price_overvalued:
+            blockers.append(
+                f"Current price is {price_vs_fair_value_pct:+.0%} above the calculated fair value."
+            )
+            next_actions.append(
+                "Wait for the price to retrace toward fair value, or for fair value to rise via reported earnings growth."
+            )
         if not news and not events:
             blockers.append("No news or corporate event linked to the ticker within the window.")
             next_actions.append("Improve company-name/ticker matching against news.")
@@ -285,6 +325,7 @@ def assess_decision_readiness(
                 corporate_events=len(events),
                 financial_periods=financial_periods,
                 fair_value_available=fair_value_available,
+                price_vs_fair_value_pct=price_vs_fair_value_pct,
                 macro_series=macro_series,
                 active_knowledge=len(active_knowledge),
                 blockers=blockers,

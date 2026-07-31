@@ -177,6 +177,22 @@ export function OpportunityCenter() {
                 { key: "prices", header: t("columns.prices"), align: "right", render: (row) => <span className="num">{row.price_observations}</span> },
                 { key: "financials", header: t("columns.financialPeriods"), align: "right", render: (row) => <span className="num">{row.financial_periods}</span> },
                 { key: "knowledge", header: t("columns.knowledge"), align: "right", render: (row) => <span className="num">{row.active_knowledge}</span> },
+                {
+                  key: "fairValueGap",
+                  header: t("columns.fairValueGap"),
+                  align: "right",
+                  render: (row) =>
+                    row.price_vs_fair_value_pct == null ? (
+                      <span className="num">{t("columns.noFairValue")}</span>
+                    ) : (
+                      <span
+                        className="num"
+                        style={{ color: row.price_vs_fair_value_pct > 0 ? "var(--negative)" : "var(--positive)" }}
+                      >
+                        {formatSignedPercent(row.price_vs_fair_value_pct)}
+                      </span>
+                    ),
+                },
                 { key: "blocker", header: t("columns.primaryBlocker"), render: (row) => row.blockers[0] ?? t("columns.none") },
               ]}
             />

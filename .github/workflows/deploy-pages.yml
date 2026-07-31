@@ -62,6 +62,9 @@ jobs:
           if git ls-remote --exit-code --heads origin production/state-latest > /dev/null 2>&1; then
             git fetch origin production/state-latest
             git archive origin/production/state-latest -- data/production | tar -x || true
+            if [ -f data/production/raw_documents.json.gz ]; then
+              gzip -d data/production/raw_documents.json.gz
+            fi
           fi
 
       # Persistence means today's date could already have a SUCCEEDED
@@ -167,6 +170,12 @@ jobs:
           git config user.name "agx-production-bot"
           git config user.email "actions@users.noreply.github.com"
           git checkout -B production/state-latest
+          # Raw-document provenance is highly compressible JSON but can exceed
+          # GitHub's 100 MiB per-blob limit uncompressed. Preserve it losslessly
+          # on the state branch and restore it before the next run above.
+          if [ -f research/data/production/raw_documents.json ]; then
+            gzip -9 research/data/production/raw_documents.json
+          fi
           git add research/data/production/
           if ! git diff --cached --quiet; then
             git commit -m "Production state: $(date -u +%F)"

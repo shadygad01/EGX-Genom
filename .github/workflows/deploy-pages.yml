@@ -65,6 +65,9 @@ jobs:
             if [ -f data/production/raw_documents.json.gz ]; then
               gzip -d data/production/raw_documents.json.gz
             fi
+            if [ -f data/production/provenance_index.json.gz ]; then
+              gzip -d data/production/provenance_index.json.gz
+            fi
           fi
 
       # Persistence means today's date could already have a SUCCEEDED
@@ -175,6 +178,17 @@ jobs:
           # on the state branch and restore it before the next run above.
           if [ -f research/data/production/raw_documents.json ]; then
             gzip -9 research/data/production/raw_documents.json
+          fi
+          # provenance_index.json (ProvenanceIndexRepository: one record per
+          # artifact_type/key/record_date, so it grows with every ticker's
+          # every collected day) crossed GitHub's *hard* 100 MiB blob limit
+          # for the first time on 2026-08-01, silently rejecting this push
+          # (pre-receive hook decline) and skipping every step after it,
+          # including the actual dashboard build/deploy -- same compressible-
+          # JSON profile as raw_documents.json above, same fix. See TD-63:
+          # gzip buys headroom, it does not cap the underlying growth.
+          if [ -f research/data/production/provenance_index.json ]; then
+            gzip -9 research/data/production/provenance_index.json
           fi
           git add research/data/production/
           if ! git diff --cached --quiet; then

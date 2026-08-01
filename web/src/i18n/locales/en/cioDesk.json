@@ -30,6 +30,7 @@
     "sourceUnavailable": "Capital allocation needs a live backend — showing the model portfolio's suggested starting positions instead.",
     "sourceModelPortfolio": "No holdings entered yet — showing the model portfolio's suggested starting positions (not personalized).",
     "needsHoldingsTitle": "Needs your real holdings",
+    "needsBackendTitle": "Needs a live backend",
     "queue": {
       "title": "Capital Deployment Queue",
       "description": "Every proposal requesting capital, ranked against every other proposal.",

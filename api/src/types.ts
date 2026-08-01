@@ -723,3 +723,40 @@ export interface SourceSpec {
   evidence_tier: EvidenceTier;
   notes: string;
 }
+
+// --- decision_service / PositionAwareDecision (POST /decisions, live-computed --
+// see routes/decisions.ts; not a static dashboard artifact) ---
+
+export type PositionAction =
+  | "buy"
+  | "increase_position"
+  | "hold"
+  | "reduce_position"
+  | "exit"
+  | "no_action";
+
+export interface PositionInput {
+  held: boolean;
+  current_weight?: number;
+  average_cost?: number | null;
+}
+
+export interface PositionAwareDecision {
+  ticker: string;
+  as_of: string;
+  action: PositionAction;
+  target_weight: number;
+  current_weight: number;
+  horizon: Horizon;
+  confidence: number;
+  investment_thesis: string;
+  key_risks: string[];
+  contradicting_evidence: string[];
+  active_catalysts: string[];
+  monitoring_events: string[];
+  expected_review_date: string | null;
+  abstained: boolean;
+  reasons: string[];
+  explanation: Explanation;
+  provenance: Provenance;
+}

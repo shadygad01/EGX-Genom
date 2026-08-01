@@ -38,6 +38,7 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getDiscoveryReport: async () => [],
     getDiscoveryMetrics: async () => null,
     getEndpointCandidates: async () => [],
+    postDecisions: async () => [],
     ...overrides,
   };
 }
@@ -65,11 +66,12 @@ async function renderApp(initialPath = "/") {
 }
 
 describe("App shell", () => {
-  it("renders the sidebar with all 9 sections", async () => {
+  it("renders the sidebar with all 10 sections", async () => {
     await renderApp();
     const nav = await screen.findByRole("navigation", { name: "Main navigation" });
     for (const label of [
       "AI Briefing",
+      "Decision Center",
       "Opportunity Center",
       "Market Intelligence",
       "Research Center",
@@ -80,6 +82,17 @@ describe("App shell", () => {
     ]) {
       expect(within(nav).getByText(label)).toBeInTheDocument();
     }
+  });
+
+  it("routes to Decision Center", async () => {
+    await renderApp("/decisions");
+    expect(await screen.findByText("Your current holdings")).toBeInTheDocument();
+  });
+
+  it("links from AI Briefing to Decision Center", async () => {
+    await renderApp("/");
+    const link = await screen.findByRole("link", { name: "Open Decision Center" });
+    expect(link).toHaveAttribute("href", "/decisions");
   });
 
   it("routes to the Opportunity Center", async () => {

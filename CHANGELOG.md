@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased — complete the decision object's 12 mandated fields; make it reachable from the web
+
+Audited `decision_service.PositionAwareDecision` against the mission's
+full institutional-decision field list (Decision, Target Weight, Horizon,
+Confidence, Thesis, Supporting/Contradicting Evidence, Key Risks, Active
+Catalysts, Monitoring Events, Invalidation Conditions, Expected Review
+Date) and found 6 of 12 missing, plus a separate, larger gap: the service
+was completely unreachable from `api/`/`web/` (CLI-only).
+
+**Closed**: added `horizon`, `investment_thesis`, `key_risks`,
+`contradicting_evidence`, `active_catalysts`, `monitoring_events`, and
+`expected_review_date` to `PositionAwareDecision`, each derived from data
+already computed or newly threaded through `decide_portfolio()`
+(`corporate_events`, `knowledge_store` — both optional, honest-empty when
+omitted), never fabricated. New `POST /decisions` route in `api/` shells
+out to the same `agx decide` CLI on each request (on-demand, never
+autonomous — `decision_service` still must never enter a scheduled run);
+new web page **Decision Center** (`/decisions`) lets an investor enter
+their own holdings and get the full six-way decision, linked prominently
+from the AI Briefing landing page. `StaticJsonProvider` honestly reports
+itself unavailable (no live backend on GitHub Pages) rather than
+fabricating a result. 778 backend tests pass (up from 764, 12 new); 23
+`api` tests pass (4 new); 46 `web` tests pass (7 new); all three
+workspaces' `build`/`lint` clean; verified live end to end in a real
+headless browser against a real mock-mode `agx run`. See
+`docs/PHASE_STATUS.md`'s matching section for full detail.
+
 ## Unreleased — fix a malformed guessed hostname crashing the whole acquisition sweep
 
 While expanding free source coverage (this session triggered

@@ -26,6 +26,7 @@ import json
 from pathlib import Path
 
 from agx_research.dashboard.schemas import DashboardSystemStatus
+from agx_research.decision_service.service import PositionAwareDecision
 from agx_research.events.event import Event
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
@@ -45,6 +46,7 @@ MODELS = {
     "run_record.schema.json": RunRecord,
     "source_spec.schema.json": SourceSpec,
     "dashboard_system_status.schema.json": DashboardSystemStatus,
+    "position_aware_decision.schema.json": PositionAwareDecision,
 }
 
 

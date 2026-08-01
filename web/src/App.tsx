@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
 import { AIBriefing } from "./pages/AIBriefing";
 import { CompanyWorkspace } from "./pages/CompanyWorkspace";
+import { DecisionCenter } from "./pages/DecisionCenter";
 import { KnowledgeGraphPage } from "./pages/KnowledgeGraphPage";
 import { MarketIntelligence } from "./pages/MarketIntelligence";
 import { MissionControlPage } from "./pages/MissionControlPage";
@@ -17,6 +18,7 @@ export function App() {
     <AppShell>
       <Routes>
         <Route path="/" element={<AIBriefing />} />
+        <Route path="/decisions" element={<DecisionCenter />} />
         <Route path="/opportunities" element={<OpportunityCenter />} />
         <Route path="/company/:ticker" element={<CompanyWorkspace />} />
         <Route path="/market" element={<MarketIntelligence />} />

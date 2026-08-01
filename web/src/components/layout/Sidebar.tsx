@@ -12,6 +12,7 @@ interface NavItem {
 // landing page (index route), everything else is a first-class nav entry.
 const NAV_ITEMS: NavItem[] = [
   { to: "/", labelKey: "nav.aiBriefing", icon: "◆" },
+  { to: "/decisions", labelKey: "nav.decisionCenter", icon: "⚖" },
   { to: "/opportunities", labelKey: "nav.opportunityCenter", icon: "◎" },
   { to: "/market", labelKey: "nav.marketIntelligence", icon: "▤" },
   { to: "/research", labelKey: "nav.researchCenter", icon: "⚗" },

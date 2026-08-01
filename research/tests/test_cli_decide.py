@@ -67,5 +67,12 @@ def test_decide_with_a_held_position_and_no_fresh_evidence_abstains_to_hold(tmp_
     assert decision["abstained"] is True
     assert decision["target_weight"] == 0.0
     assert decision["current_weight"] == 0.05
+    assert decision["horizon"] == "investment"
+    assert decision["investment_thesis"]
+    assert decision["expected_review_date"] is None  # no fresh decision to review
+    assert any("no current investment-horizon evidence" in r.lower() for r in decision["key_risks"])
+    assert decision["contradicting_evidence"] == []
+    assert decision["active_catalysts"] == []
+    assert decision["monitoring_events"] == []
     assert decision["explanation"]["why_this_stock"]
     assert decision["provenance"]["produced_by"] == "decision_service@1.0.0"

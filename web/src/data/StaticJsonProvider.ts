@@ -39,7 +39,8 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
-import type { DashboardDataProvider } from "./DataProvider";
+import type { PositionAwareDecision } from "../types";
+import { DecisionCenterUnavailableError, type DashboardDataProvider, type DecideRequest } from "./DataProvider";
 
 async function fetchList<T>(filename: string): Promise<T[]> {
   const response = await fetch(`${import.meta.env.BASE_URL}data/${filename}`);
@@ -191,5 +192,14 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getEndpointCandidates(): Promise<EndpointCandidate[]> {
     return fetchList<EndpointCandidate>("endpoint_candidates.json");
+  }
+
+  async postDecisions(_request: DecideRequest): Promise<PositionAwareDecision[]> {
+    throw new DecisionCenterUnavailableError(
+      "Decision Center needs a live backend. decision_service depends on your own portfolio " +
+        "holdings, which this platform never autonomously discovers or precomputes into the " +
+        "static dashboard -- run `npm run dev -w api` locally with DECISION_DATA_DIR set (see " +
+        "README's 'Personalized decisions' section), or use `agx decide` directly."
+    );
   }
 }

@@ -21,7 +21,17 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: acquisition freeze partially lifted — EGX30+EGX70
+- **Current mission: decision object completeness + live Decision Center
+  (2026-08-01).** `decision_service.PositionAwareDecision` now carries all
+  12 of the mission's mandated decision fields (was 4 of 12 plus 1
+  partial) and is reachable from the web for the first time via a new
+  on-demand `POST /decisions` route and Decision Center page
+  (`/decisions`), linked from the AI Briefing landing page — previously
+  CLI-only (`agx decide`). See `CURRENT_MISSION.md` and
+  `docs/PHASE_STATUS.md` for full detail. Market Regime classification is
+  the next named gap (mission brief's landing-page checklist item 1, no
+  artifact exists upstream yet).
+- **Prior mission: acquisition freeze partially lifted — EGX30+EGX70
   Financial Source Registry (TD-38, TD-39).** The project owner asked for
   large-scale EGX30/EGX70 company source discovery, exactly what the
   standing freeze (below) deferred pending a new named business input —

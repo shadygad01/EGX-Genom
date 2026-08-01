@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 
 import arCommon from "./locales/ar/common.json";
 import arAiBriefing from "./locales/ar/aiBriefing.json";
+import arDecisionCenter from "./locales/ar/decisionCenter.json";
 import arOpportunityCenter from "./locales/ar/opportunityCenter.json";
 import arCompanyWorkspace from "./locales/ar/companyWorkspace.json";
 import arMarketIntelligence from "./locales/ar/marketIntelligence.json";
@@ -14,6 +15,7 @@ import arSystemAdministration from "./locales/ar/systemAdministration.json";
 
 import enCommon from "./locales/en/common.json";
 import enAiBriefing from "./locales/en/aiBriefing.json";
+import enDecisionCenter from "./locales/en/decisionCenter.json";
 import enOpportunityCenter from "./locales/en/opportunityCenter.json";
 import enCompanyWorkspace from "./locales/en/companyWorkspace.json";
 import enMarketIntelligence from "./locales/en/marketIntelligence.json";
@@ -45,6 +47,7 @@ const resources = {
   en: {
     common: enCommon,
     aiBriefing: enAiBriefing,
+    decisionCenter: enDecisionCenter,
     opportunityCenter: enOpportunityCenter,
     companyWorkspace: enCompanyWorkspace,
     marketIntelligence: enMarketIntelligence,
@@ -57,6 +60,7 @@ const resources = {
   ar: {
     common: arCommon,
     aiBriefing: arAiBriefing,
+    decisionCenter: arDecisionCenter,
     opportunityCenter: arOpportunityCenter,
     companyWorkspace: arCompanyWorkspace,
     marketIntelligence: arMarketIntelligence,

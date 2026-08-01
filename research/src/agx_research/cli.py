@@ -697,6 +697,8 @@ def main(argv: list[str] | None = None) -> int:
             as_of,
             country_risk=country_risk,
             illiquid_tickers=illiquid_tickers,
+            corporate_events=snapshot.corporate_events,
+            knowledge_store=knowledge_store,
         )
         payload = json.dumps(
             [decision.model_dump(mode="json") for decision in decisions],

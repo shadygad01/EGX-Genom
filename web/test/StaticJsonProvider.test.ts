@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { DecisionCenterUnavailableError } from "../src/data/DataProvider";
 import { StaticJsonProvider } from "../src/data/StaticJsonProvider";
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -73,5 +74,12 @@ describe("StaticJsonProvider", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({}, 500)));
     const provider = new StaticJsonProvider();
     await expect(provider.getKnowledge()).rejects.toThrow(/500/);
+  });
+
+  it("postDecisions always reports itself unavailable, never fabricating a decision", async () => {
+    const provider = new StaticJsonProvider();
+    await expect(provider.postDecisions({ date: "2026-06-14" })).rejects.toThrow(
+      DecisionCenterUnavailableError,
+    );
   });
 });

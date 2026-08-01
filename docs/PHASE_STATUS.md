@@ -1554,3 +1554,104 @@ a locally re-exported copy of the real persisted data, not from watching
 an actual live `deploy-pages.yml` run produce a promoted `KnowledgeObject`
 end to end. That's the next scheduled (or manually triggered) run's job —
 see `NEXT_MISSIONS.md`.
+
+## Decision object completeness + live Decision Center (2026-08-01)
+
+The project owner's mission brief restated AGX's purpose as producing a
+complete institutional investment decision (Decision, Target Portfolio
+Weight, Investment Horizon, Confidence, Investment Thesis, Supporting
+Evidence, Contradicting Evidence, Key Risks, Active Catalysts, Monitoring
+Events, Invalidation Conditions, Expected Review Date) as its primary,
+reachable output. Auditing `decision_service.PositionAwareDecision`
+against that exact field list (not from memory -- a fresh read of
+`service.py`, `cli.py`, `api/`, and `web/`) found 4 of 12 fields present
+(action, target_weight, confidence, invalidation_conditions via
+`explanation`), 1 partial (thesis folded into `why_this_stock`/`why_now`
+prose with no dedicated field), and 6 missing outright (horizon,
+contradicting_evidence, key_risks, active_catalysts, monitoring_events,
+expected_review_date) -- and, separately, that `decision_service` was
+completely unreachable from `api/`/`web/`: no route, no TS type, no page,
+confirmed by grep returning zero matches for `PositionAwareDecision`
+anywhere outside `research/`.
+
+**Closed, both halves:**
+
+- **The missing fields, all derived from data this service already
+  computes or is handed -- never fabricated.** `horizon` (always
+  `Horizon.INVESTMENT`, now explicit). `investment_thesis`: one
+  deterministic sentence built only from the decision's own numbers.
+  `key_risks`: the horizon's own `risk_metric`/`expected_risk`, any
+  sibling (MICRO/SWING) horizon signaling AVOID, plus the existing
+  liquidity/country-risk override `reasons`. `contradicting_evidence`: a
+  sibling horizon disagreeing in direction with the INVESTMENT thesis,
+  plus `CountryRiskAssessment.reasons` whenever severity is not `NORMAL`
+  (not only `CRISIS`) -- deliberately distinct from
+  `invalidation_conditions` (hypothetical future conditions), which
+  `OpportunityCenter.tsx` had been mislabeling as "Contradicting
+  Evidence" for the *unrelated* 4-way `Recommendation` object; this fix is
+  scoped to the new 6-way `PositionAwareDecision` object only, not a
+  change to that existing page. `active_catalysts`: real, already-
+  collected upcoming `CorporateEvent`s per ticker (`decide_portfolio()`
+  gained an optional `corporate_events` param, wired from
+  `snapshot.corporate_events` in `cli.py`) -- same event source and same
+  `event_date >= as_of` filter `OpportunityCenter.tsx`'s catalysts panel
+  already uses, so it inherits the same honest limitation (the collection
+  window itself never extends past `as_of`, so this is realistically
+  same-day events only until a real forward-dated announcement source
+  exists). `monitoring_events`: which of a decision's own evidence
+  references are a `KnowledgeObject` currently in
+  `KnowledgeStatus.MONITORING` (`decide_portfolio()` gained an optional
+  `knowledge_store` param) -- real continuous-learning state, not a
+  generic reminder. `expected_review_date`: `HorizonDecision.valid_until`,
+  now copied onto the decision directly. 12 new tests in
+  `test_decision_service.py`, 778 backend tests pass (up from 764);
+  `ruff check` clean. `contracts/position_aware_decision.schema.json`
+  added to `research/scripts/export_schemas.py`'s served-model set; `api/`
+  and `web/` `types.ts` mirrors updated to match.
+
+- **The reachability gap.** `decision_service` is deliberately
+  stateless-per-call, queried on demand, and must never be wired into a
+  scheduled/autonomous run (existing rule, unchanged) -- and production is
+  a static GitHub Pages site with no live backend by design, so a
+  precomputed artifact was never an option without violating that rule.
+  The correct fix, matching how `agx decide` already reaches this
+  service: a new `POST /decisions` route (`api/src/routes/decisions.ts`)
+  that shells out to the *same* `agx decide` CLI invocation
+  (`uv run --project <researchDir> python -m agx_research.cli --data-dir
+  <DECISION_DATA_DIR> ... decide --date ... [--positions <tmpfile>]`) on
+  each HTTP request -- an HTTP request triggering a fresh on-demand
+  computation is the same "queried on demand" semantics as a CLI
+  invocation, not a second autonomous path. No business logic moved into
+  TypeScript: the route only shapes the request into the CLI call and
+  returns its stdout. `DECISION_DATA_DIR` has no default -- an
+  unconfigured route reports `501` honestly rather than guessing a
+  directory that might disagree with the rest of the dashboard. New web
+  page **Decision Center** (`/decisions`): a positions editor (ticker,
+  current weight, optional average cost -- never stored, entered only for
+  the query) plus a "flat-portfolio read" shortcut, rendering the full
+  decision (action, weights, thesis, key risks, contradicting evidence,
+  catalysts, monitoring events, invalidation conditions, supporting
+  evidence, review date) per ticker. `StaticJsonProvider.postDecisions()`
+  always throws a typed `DecisionCenterUnavailableError` with a specific,
+  actionable message (never a fabricated result) -- the GitHub Pages
+  build has no backend to compute this against by design. A prominent
+  card on the AI Briefing landing page ("Want a decision for your own
+  portfolio?") links to it, so the mission's "what should I do today"
+  question has a real, reachable answer path from the landing page for
+  the first time, not just a CLI command mentioned in a doc. Verified live
+  end to end: a real mock-mode `agx run` + `export-dashboard`, `api/`
+  started with `DECISION_DATA_DIR` pointed at it, and Decision Center
+  driven in a real headless browser (Playwright/Chromium) -- submitting a
+  held COMI position with no fresh evidence correctly returned an
+  abstained Hold with the right key-risk reason, zero console errors. 23
+  `api` tests pass (4 new, covering the 501/400 paths without requiring a
+  live subprocess), 46 `web` tests pass (7 new, covering `postDecisions`
+  on both providers and the new route/page/CTA-link); both workspaces'
+  `build`/`lint` clean.
+
+**Not done, named as genuinely next**: Market Regime classification
+remains a confirmed, real gap (`grep -rn "MarketRegime"` across
+`research/src/` returns nothing) -- named again here since the mission
+brief's landing-page checklist asks for it explicitly; no artifact or
+model exists upstream yet, and building one was out of scope for this
+session's two closed items above. See `NEXT_MISSIONS.md`.

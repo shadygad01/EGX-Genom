@@ -62,4 +62,34 @@ describe("ApiProvider", () => {
     const provider = new ApiProvider();
     await expect(provider.getKnowledge()).rejects.toThrow(/500/);
   });
+
+  it("postDecisions POSTs to /api/decisions with the request body", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse([{ ticker: "COMI" }]));
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new ApiProvider();
+
+    const result = await provider.postDecisions({
+      date: "2026-06-14",
+      positions: { COMI: { held: true, current_weight: 0.05 } },
+    });
+
+    expect(result).toEqual([{ ticker: "COMI" }]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/decisions",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: "2026-06-14",
+          positions: { COMI: { held: true, current_weight: 0.05 } },
+        }),
+      }),
+    );
+  });
+
+  it("postDecisions surfaces the server's error message on failure", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ error: "unconfigured" }, 501)));
+    const provider = new ApiProvider();
+    await expect(provider.postDecisions({ date: "2026-06-14" })).rejects.toThrow(/unconfigured/);
+  });
 });

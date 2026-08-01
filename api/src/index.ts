@@ -16,6 +16,12 @@ const app = buildApp({
   // directory is refreshed on a schedule (System 18 -- deployment/scheduling
   // is business-blocked, see docs/ROADMAP.md) alongside the static site build.
   artifactsDir: process.env.DASHBOARD_ARTIFACTS_DIR ?? path.join(researchData, "dashboard"),
+  // No default: must be the exact `--data-dir` a real `agx run`/`agx decide`
+  // was pointed at, or Decision Center honestly reports itself unconfigured
+  // rather than risk decisions that disagree with the rest of the dashboard.
+  decisionDataDir: process.env.DECISION_DATA_DIR ?? null,
+  universeSeedDir: process.env.UNIVERSE_SEED_DIR ?? path.join(researchData, "universe"),
+  researchDir: path.resolve(__dirname, "../../research"),
 });
 
 app

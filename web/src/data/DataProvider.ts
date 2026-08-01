@@ -31,6 +31,8 @@ import type {
   MarketState,
   MissionStatus,
   Pattern,
+  PositionAwareDecision,
+  PositionInput,
   PublicationGateReport,
   Recommendation,
   ResearchPaper,
@@ -41,6 +43,24 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
+
+export interface DecideRequest {
+  date: string;
+  positions?: Record<string, PositionInput>;
+}
+
+// Thrown by StaticJsonProvider.postDecisions() -- decision_service is a live,
+// on-demand computation (it depends on the investor's own position state,
+// which can never be autonomously discovered or precomputed into a static
+// artifact -- see CLAUDE.md's decision_service rules). Pages catch this
+// specifically to render an honest "needs a live backend" state rather than
+// a generic fetch-failure error.
+export class DecisionCenterUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DecisionCenterUnavailableError";
+  }
+}
 
 // Every method here mirrors exactly one dashboard artifact file (see
 // docs/ARCHITECTURE.md's "Dashboard data providers" section) -- no
@@ -84,4 +104,10 @@ export interface DashboardDataProvider {
   getDiscoveryReport(): Promise<DiscoveryOutcome[]>;
   getDiscoveryMetrics(): Promise<DiscoveryMetrics | null>;
   getEndpointCandidates(): Promise<EndpointCandidate[]>;
+
+  // The one write-shaped call on this interface: computes fresh, position-
+  // aware decisions on demand (see api/src/routes/decisions.ts). Never
+  // cached, never a static artifact -- StaticJsonProvider always rejects
+  // with DecisionCenterUnavailableError.
+  postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]>;
 }

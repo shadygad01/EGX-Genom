@@ -1,6 +1,44 @@
 # Current Mission
 
-## Current mission: fix why no investment decision was ever reachable (2026-07-31)
+## Current mission: complete the 12-field decision object; wire it to the web (2026-08-01)
+
+The project owner restated AGX's purpose as producing a complete
+institutional investment decision (Decision, Target Portfolio Weight,
+Investment Horizon, Confidence, Investment Thesis, Supporting Evidence,
+Contradicting Evidence, Key Risks, Active Catalysts, Monitoring Events,
+Invalidation Conditions, Expected Review Date) as its primary, reachable
+output — the landing page must answer "what should I do today."
+
+Audited `decision_service.PositionAwareDecision` field-by-field against
+that exact list (not from memory): 4 of 12 present, 1 partial, 6 missing.
+Separately, and more significantly, found `decision_service` completely
+unreachable from `api/`/`web/` — CLI-only (`agx decide`) since the
+Decision-Centric Redesign shipped it.
+
+**Closed, both halves** — see `docs/PHASE_STATUS.md`'s "Decision object
+completeness + live Decision Center (2026-08-01)" section for full detail:
+the 6 missing fields, each derived from real data (sibling-horizon
+disagreement, corporate events, `KnowledgeStatus.MONITORING` lookups,
+`HorizonDecision.valid_until`), never fabricated; and a new `POST
+/decisions` route in `api/` (shells out to the same `agx decide` CLI
+per request — on-demand, never autonomous, respecting the existing "never
+schedule decision_service" rule) plus a new Decision Center web page
+(`/decisions`, linked from the AI Briefing landing page) where an investor
+enters their own holdings and gets the full six-way decision. The static
+GitHub Pages build has no backend to compute this against by design, so it
+honestly reports itself unavailable there rather than fabricating a
+result — `agx decide` or a self-hosted `api/` (`DECISION_DATA_DIR`) is the
+real path. 778 backend tests pass (up from 764); 23 `api` tests pass; 46
+`web` tests pass; verified live end to end in a real headless browser.
+
+**Not done, named as genuinely next**: Market Regime classification — the
+mission brief's landing-page checklist names it explicitly, and it's a
+confirmed real gap (no `MarketRegime` model or artifact exists anywhere in
+`research/src/`), already named in `NEXT_MISSIONS.md`'s frontend-gaps list
+from the prior frontend mission. Out of scope for this session's two
+closed items above.
+
+## Prior mission: fix why no investment decision was ever reachable (2026-07-31)
 
 Project owner review of the live, merged-to-`main` dashboard: still no
 clear investment decision reachable, still sources that look unconnected,

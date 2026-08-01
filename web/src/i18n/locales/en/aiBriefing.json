@@ -1,4 +1,9 @@
 {
+  "decisionCenterCta": {
+    "title": "Want a decision for your own portfolio?",
+    "detail": "This board is the market-wide research view. For a personalized Buy / Increase Position / Hold / Reduce Position / Exit / No Action decision on your own holdings -- with target weight, thesis, risks, and a review date -- open Decision Center.",
+    "action": "Open Decision Center"
+  },
   "decisionBoard": {
     "title": "Investment Decision Board",
     "description": "The complete investable universe, with an explicit short-, medium-, and long-horizon action. Missing evidence results in abstention, never a fabricated recommendation.",

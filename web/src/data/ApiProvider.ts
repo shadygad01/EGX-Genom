@@ -29,6 +29,7 @@ import type {
   MarketState,
   MissionStatus,
   Pattern,
+  PositionAwareDecision,
   PublicationGateReport,
   Recommendation,
   ResearchPaper,
@@ -39,7 +40,7 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
-import type { DashboardDataProvider } from "./DataProvider";
+import type { DashboardDataProvider, DecideRequest } from "./DataProvider";
 
 async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(`/api${path}`);
@@ -180,5 +181,18 @@ export class ApiProvider implements DashboardDataProvider {
 
   getEndpointCandidates(): Promise<EndpointCandidate[]> {
     return fetchJson<EndpointCandidate[]>("/endpoint-candidates");
+  }
+
+  async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {
+    const response = await fetch("/api/decisions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    const body = await response.json();
+    if (!response.ok) {
+      throw new Error(body?.error ?? `Failed to compute decisions: ${response.status}`);
+    }
+    return body as PositionAwareDecision[];
   }
 }

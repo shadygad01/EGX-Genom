@@ -94,12 +94,24 @@ Layout:
   `docs/FREE_DECISION_DATA_BLUEPRINT.md`,
   `docs/DECISION_EVIDENCE_MATRIX.md`,
   `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) adds `decision_service/`).
-- `api/` — TypeScript (Fastify) service exposing the knowledge base over
-  HTTP. Currently reads a JSON knowledge store; has no business logic of
-  its own by design (logic lives in `research/`). Epoch II added no new
-  API surface — it was scoped exclusively to the Python research core.
-- `web/` — TypeScript (Vite + React) dashboard, currently a minimal viewer
-  for knowledge objects returned by `api/`. Untouched in Epoch II.
+- `api/` — TypeScript (Fastify) service exposing the knowledge base and
+  dashboard artifacts over HTTP; almost every route only reads a
+  pre-produced JSON artifact. The one exception is `POST /decisions`
+  (`routes/decisions.ts`), which shells out to the `agx decide` CLI on
+  each request for a live, position-aware decision — still no business
+  logic of its own (it only shapes the HTTP call, all computation stays in
+  `research/`), and still never autonomous (queried on demand, exactly
+  like the CLI it wraps).
+- `web/` — TypeScript (Vite + React) dashboard: 9 routed sections (AI
+  Briefing, Decision Center, Opportunity Center, Company Research
+  Workspace, Market Intelligence, Research Center, Knowledge Graph,
+  Mission Control, Source Intelligence, System Administration), each
+  reading real dashboard artifacts through `DashboardDataProvider` — see
+  `docs/ARCHITECTURE.md`'s "Dashboard data providers" section. Decision
+  Center is the one page that writes (`POST /decisions`); it only works
+  against a live `api/` (`StaticJsonProvider` honestly reports itself
+  unavailable on the static GitHub Pages build, never fabricating a
+  decision).
 - `contracts/` — JSON Schema generated from the pydantic models `api/`
   serves, regenerated via `research/scripts/export_schemas.py`. CI fails if
   this drifts from the schema; `api/src/types.ts` and `web/src/types.ts`

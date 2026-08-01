@@ -1,0 +1,43 @@
+{
+  "title": "Decision Center",
+  "description": "Your personalized, position-aware investment decision -- Buy, Increase Position, Hold, Reduce Position, Exit, or No Action -- with target weight, thesis, risks, evidence, catalysts, monitoring status, and review date, computed on demand for your own holdings.",
+  "positions": {
+    "title": "Your current holdings",
+    "subtitle": "Never stored or autonomously discovered -- entered here only for this query.",
+    "ticker": "Ticker",
+    "currentWeight": "Current weight",
+    "averageCost": "Average cost (EGP)",
+    "tickerPlaceholder": "e.g. COMI",
+    "optional": "Optional",
+    "remove": "Remove row",
+    "addRow": "Add another holding",
+    "getMyDecisions": "Get my decisions",
+    "getFlatRead": "Get a flat-portfolio read (no positions held)"
+  },
+  "unavailable": {
+    "title": "Decision Center needs a live backend"
+  },
+  "results": {
+    "title": "Decisions",
+    "ticker": "Ticker",
+    "action": "Decision",
+    "targetWeight": "Target weight",
+    "currentWeight": "Current weight",
+    "confidence": "Confidence",
+    "reviewDate": "Review by",
+    "emptyTitle": "No decisions returned",
+    "emptyDetail": "No ticker had either fresh evidence or an existing position for this date."
+  },
+  "detail": {
+    "title": "{{ticker}}",
+    "select": "Select a row to see the full decision",
+    "abstained": "Abstained",
+    "keyRisks": "Key risks",
+    "contradictingEvidence": "Contradicting evidence",
+    "activeCatalysts": "Active catalysts",
+    "monitoringEvents": "Monitoring events",
+    "invalidationConditions": "Invalidation conditions",
+    "supportingEvidence": "Supporting evidence",
+    "none": "None recorded."
+  }
+}

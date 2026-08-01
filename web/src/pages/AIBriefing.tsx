@@ -129,6 +129,13 @@ export function AIBriefing() {
     <>
       <Disclaimer />
 
+      <Card title={t("decisionCenterCta.title")} className={styles.decisionCenterCta}>
+        <p className={styles.decisionCenterCtaDetail}>{t("decisionCenterCta.detail")}</p>
+        <Link to="/decisions" className={styles.decisionCenterCtaLink}>
+          {t("decisionCenterCta.action")}
+        </Link>
+      </Card>
+
       <Section title={t("decisionBoard.title")} description={t("decisionBoard.description")}>
         <div className={`${styles.decisionBanner} ${publicationGate.data?.publication_ready ? styles.decisionBannerReady : styles.decisionBannerBlocked}`}>
           <div>

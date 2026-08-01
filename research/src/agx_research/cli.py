@@ -52,6 +52,7 @@ from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
 from agx_research.financials.collected import CollectedFinancialStatementProvider
 from agx_research.infrastructure.backup import create_backup, restore_backup, verify_backup
+from agx_research.institutional_validation.runner import run_institutional_validation
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_ledger import DecisionLedger
@@ -292,6 +293,21 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help='JSON file: {"TICKER": {"held": true, "current_weight": 0.05, '
         '"average_cost": 12.3}}. A ticker absent from this file is treated as not held.',
+    )
+
+    validate_investment_parser = sub.add_parser(
+        "validate-investment",
+        help="Institutional Investment Validation: stress-test the decision engine against "
+        "10 repeatable scenarios (full-universe ranking, rejection, cash, portfolio "
+        "construction, benchmark comparison, thesis-failure detection, change attribution, "
+        "evidence traceability). Self-contained -- ignores --data-dir except to report real "
+        "mock price coverage honestly; exits 2 only if a scenario finds a genuine defect.",
+    )
+    validate_investment_parser.add_argument(
+        "--out", type=Path, default=None, help="Write the JSON report to this path (in addition to stdout)."
+    )
+    validate_investment_parser.add_argument(
+        "--markdown-out", type=Path, default=None, help="Also write a human-readable Markdown report."
     )
 
     args = parser.parse_args(argv)
@@ -657,6 +673,25 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(payload)
         return 0 if report.publication_ready else 2
+
+    if args.command == "validate-investment":
+        from agx_research.institutional_validation.report import CheckVerdict
+
+        report = run_institutional_validation()
+        payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
+        if args.out is not None:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(payload, encoding="utf-8")
+        if args.markdown_out is not None:
+            args.markdown_out.parent.mkdir(parents=True, exist_ok=True)
+            args.markdown_out.write_text(report.to_markdown(), encoding="utf-8")
+        try:
+            payload.encode(sys.stdout.encoding or "utf-8")
+        except UnicodeEncodeError:
+            sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
+        else:
+            print(payload)
+        return 0 if report.overall_verdict != CheckVerdict.FAIL else 2
 
     if args.command == "decide":
         as_of = date.fromisoformat(args.date)

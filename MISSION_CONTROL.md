@@ -21,7 +21,19 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: Market Regime classification (2026-08-01).**
+- **Current mission: Institutional Investment Validation (2026-08-01).**
+  The mission shifted from engineering implementation to proving, with
+  real evidence, that the decision engine is internally consistent,
+  explainable, and economically meaningful. New `institutional_validation/`
+  package answers 10 named questions via repeatable, falsification-
+  attempting scenarios against real platform code. Result: 4 PASS, 4
+  PARTIAL, 1 BLOCKED, 0 FAIL — two new named gaps (TD-57, TD-58), one
+  genuinely new capability added because validation revealed it was
+  missing (Q9's knowledge-revision diffing), and one real scenario-
+  construction bug the framework's own falsification attempt caught and
+  fixed during development. New `agx validate-investment` CLI command. See
+  `CURRENT_MISSION.md` and `docs/PHASE_STATUS.md` for full detail.
+- **Prior mission: Market Regime classification (2026-08-01).**
   `market_memory.regime.compute_market_regime()` closes the mission
   brief's landing-page checklist item 1 ("current market regime") — a
   trend/volatility classification wired end to end (`market_regime.json`

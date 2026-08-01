@@ -1709,3 +1709,86 @@ real trading history not yet collected, per the existing, unchanged System
 12 status. The Market Intelligence card's title was narrowed from "Market
 Regime & Historical Comparison" to "Market Regime" specifically so the now
 real content doesn't imply the still-missing half is also available.
+
+## Institutional Investment Validation (2026-08-01)
+
+The project owner redefined the mission: engineering implementation is no
+longer primary. The objective became proving -- with real evidence, not
+more features -- that the platform's decision engine is internally
+consistent, explainable, and economically meaningful, answering 10 named
+questions (rank the full EGX30/EGX70 universe, explain every ranking,
+reject every stock if appropriate, recommend holding cash, build a
+complete portfolio, compare against a benchmark, detect thesis failure,
+identify why a recommendation changed, trace every decision to evidence),
+via repeatable scenarios that actively attempt to falsify the platform's
+own conclusions -- explicitly not a request for more passing software
+tests.
+
+**Delivered**: a new `institutional_validation/` package (deliberately
+separate from `validation/`, MASTER_PROMPT.md System 11's *statistical*
+hypothesis validator -- this package validates the *decision engine's*
+aggregate behavior once hypotheses are already knowledge, and imports
+System 11's siblings rather than duplicating any of their logic):
+
+- `scenarios.py` -- repeatable, deterministic scenario builders exercising
+  real platform classes (`KnowledgeStore`, `RecommendationService`,
+  `PortfolioConstructor`, `DecisionService`, `ContinuousLearningMonitor`,
+  `DecisionLedger`) against both the real, checked-in 101-ticker
+  EGX30+EGX70 universe (`real_universe_tickers()`) and clearly-labeled
+  synthetic data built to stress mechanisms mock data can't otherwise
+  reach at scale (a full 101-ticker synthetic universe spanning every
+  decision outcome; a zero-evidence universe; an all-reject universe; a
+  maximal-conviction-vs-country-crisis override attempt; a declining-vs-
+  confirming thesis-lifecycle pair; a hand-verifiable benchmark scenario;
+  a hypothesis-to-decision evidence chain).
+- `diffing.py` -- a genuinely new capability Q9 revealed was missing:
+  `diff_knowledge_history()`/`diff_knowledge_revisions()`, built entirely
+  on `KnowledgeStore.revisions_for()` (already-existing versioning, no new
+  storage path), reconstructing a human-readable "what changed and why"
+  timeline for a knowledge object. Scoped honestly: only `KnowledgeObject`
+  is diffable, because it's the only decision-chain entity actually
+  persisted with a version history -- `Recommendation`/
+  `PortfolioRecommendation` are recomputed fresh every run and never
+  stored with one, named as a real limitation rather than silently built
+  around.
+- `checks.py`/`report.py`/`runner.py` -- one check function per question,
+  each graded PASS/PARTIAL/BLOCKED/FAIL (never a bare boolean -- BLOCKED
+  means the mechanism is real and correct but data coverage can't yet
+  demonstrate it, distinct from FAIL, a genuine defect) with concrete
+  evidence and named findings, assembled into a `ValidationReport`
+  (JSON + Markdown) by `run_institutional_validation()`.
+- New `agx validate-investment` CLI command (self-contained -- no
+  `--data-dir` setup needed, every scenario builds in memory), exit code 2
+  only on a genuine FAIL.
+
+**A real defect was found and fixed during development, by the
+framework's own falsification attempt**, not left in place: the first
+version of the full-universe synthetic scenario hand-set
+`publication_status=PUBLICATION_READY` directly, which left every
+`HorizonDecision.max_position_pct` at its default `0.0` (that field is set
+*only* by `meta.publication_gate.apply_publication_gate()`, never by
+`MetaDecisionEngine`) -- silently making every synthetic BUY_CANDIDATE
+portfolio-ineligible despite scoring positive. `check_complete_portfolio`
+caught it (26 positions, weight sum `0.0000`) by refusing to accept that
+contradiction. Fixed by calling the real `apply_publication_gate()`
+instead of hand-setting one of its two outputs -- the platform code itself
+had no bug; the validation scenario did, and the framework's own
+discipline caught it before it could produce a false PASS.
+
+**Report as of this session** (`agx validate-investment`, run against the
+real EGX30/EGX70 lists plus the scenarios above): 3 PASS (Q3 explain,
+Q4 reject, Q5 hold cash, Q6 complete portfolio -- 4 actually PASS), 4
+PARTIAL (Q1/Q2 universe ranking -- mechanism proven at full 101-ticker
+scale, real mock coverage is 1/31 EGX30 and 1/70 EGX70 tickers today,
+data-blocked not code-blocked; Q8 thesis-failure detection -- mechanism
+proven correct in both directions, not autonomously wired, new TD-57; Q9
+change attribution -- new capability proven for knowledge, not for
+recommendations, named limitation), 1 BLOCKED (Q7 benchmark comparison --
+math proven correct with synthetic data, no real EGX30-index-level price
+series exists to evaluate against today, new TD-58), 0 FAIL. Overall
+verdict: PARTIAL (no genuine defect remains). 807 backend tests pass (up
+from 788, 21 new); `ruff check` clean.
+
+**Not done, named as next**: the two BLOCKED/named-gap findings (TD-57,
+TD-58) are real, scoped follow-up items, not silently left implicit in a
+prose report only.

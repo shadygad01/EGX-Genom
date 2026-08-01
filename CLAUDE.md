@@ -93,7 +93,15 @@ Layout:
   `docs/DECISION_CENTRIC_AUDIT_2026-07-30.md`,
   `docs/FREE_DECISION_DATA_BLUEPRINT.md`,
   `docs/DECISION_EVIDENCE_MATRIX.md`,
-  `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) adds `decision_service/`).
+  `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) adds `decision_service/`; the
+  Institutional Investment Validation mission adds
+  `institutional_validation/` — deliberately separate from `validation/`
+  (System 11, which statistically validates one *hypothesis* before
+  promotion): `institutional_validation/` validates the *decision
+  engine's* aggregate behavior via repeatable, falsification-attempting
+  scenarios (`agx validate-investment`), and imports `validation/`'s
+  siblings rather than duplicating any of their logic. Never confuse the
+  two when extending either).
 - `api/` — TypeScript (Fastify) service exposing the knowledge base and
   dashboard artifacts over HTTP; almost every route only reads a
   pre-produced JSON artifact. The one exception is `POST /decisions`

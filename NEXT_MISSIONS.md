@@ -1,6 +1,30 @@
 # Next Missions
 
-## Closed this phase: Market Regime classification
+## Closed this phase: Institutional Investment Validation framework
+
+See `CURRENT_MISSION.md`'s "Institutional Investment Validation" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **TD-57**: design and wire `ContinuousLearningMonitor`'s cadence into
+   `production.pipeline.ProductionPipeline` — proven correct by the
+   validation framework, but never autonomously invoked today.
+2. **TD-58**: once a real EGX30 index-level price series is legally
+   obtainable (same root cause as the broader Price Data wall,
+   `docs/ACQUISITION_STRATEGY.md`), benchmark-evaluated decisions become
+   possible with zero code change — the math is already proven correct.
+3. **Q9's named limitation**: day-over-day `Recommendation` diffing needs
+   a real architectural decision (a new versioned store for an entity
+   that's deliberately ephemeral today) this validation mission
+   deliberately did not make unilaterally.
+4. Re-run `agx validate-investment` after any future change to
+   `meta.decision_engine`/`decision_service`/`portfolio.constructor` — it
+   is the fastest way to catch a regression in the properties this mission
+   proved, not just a one-time report.
+5. Everything already named as genuinely next before this phase (below) is
+   unchanged.
+
+## Closed prior phase: Market Regime classification
 
 See `CURRENT_MISSION.md`'s "Market Regime classification" entry and
 `docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in

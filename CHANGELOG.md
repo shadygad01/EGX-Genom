@@ -1,5 +1,40 @@
 # Changelog
 
+## Unreleased — Institutional Investment Validation framework
+
+The project owner redefined the mission from engineering implementation to
+proving, with real evidence, that the decision engine is internally
+consistent, explainable, and economically meaningful — 10 named
+questions, answered by repeatable scenarios that attempt to falsify the
+platform's own conclusions, not more passing software tests.
+
+**Delivered**: new `institutional_validation/` package (deliberately
+separate from System 11's statistical hypothesis validator) —
+`scenarios.py` (deterministic builders exercising real
+`RecommendationService`/`PortfolioConstructor`/`DecisionService`/
+`ContinuousLearningMonitor`/`DecisionLedger` against both the real
+101-ticker EGX30+EGX70 universe and clearly-labeled synthetic stress
+data), `diffing.py` (a genuinely new capability Q9 revealed was missing —
+`diff_knowledge_history()`, built on existing versioning, scoped honestly
+to knowledge only), `checks.py`/`report.py`/`runner.py` (PASS/PARTIAL/
+BLOCKED/FAIL per question with concrete evidence, never a bare boolean),
+and a new `agx validate-investment` CLI command.
+
+A real scenario-construction bug was found and fixed by the framework's
+own falsification attempt during development (hand-setting
+`publication_status` without going through the real
+`apply_publication_gate()` silently zeroed `max_position_pct`, making
+every synthetic buy portfolio-ineligible) — caught because
+`check_complete_portfolio` refused to accept 26 positions summing to a
+0.0 weight. The platform code itself had no defect; the test scenario did.
+
+Current report: 4 PASS, 4 PARTIAL, 1 BLOCKED, 0 FAIL, overall PARTIAL —
+two new named, scoped gaps (TD-57: `ContinuousLearningMonitor` not
+autonomously wired; TD-58: no real EGX30 index-level price series to
+benchmark against). 807 backend tests pass (up from 788, 21 new); `ruff
+check` clean. See `docs/PHASE_STATUS.md`'s matching section for the full
+report.
+
 ## Unreleased — Market Regime classification (trend/volatility), wired end to end
 
 Immediate follow-up to the decision-object work below: the mission brief's

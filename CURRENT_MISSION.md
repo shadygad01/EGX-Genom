@@ -1,6 +1,34 @@
 # Current Mission
 
-## Current mission: Market Regime classification (2026-08-01, immediate follow-up)
+## Current mission: Institutional Investment Validation (2026-08-01)
+
+The project owner redefined the mission: engineering implementation is no
+longer primary. New objective: prove, with real evidence rather than more
+features, that the platform produces investment decisions that are
+internally consistent, explainable, and economically meaningful — 10
+named questions, answered by a complete, repeatable validation framework
+that stress-tests the decision engine and actively attempts to falsify
+its own conclusions. Explicit instructions: no new data sources, no new
+features unless validation reveals they're necessary.
+
+**Delivered**: new `research/src/agx_research/institutional_validation/`
+package — see `docs/PHASE_STATUS.md`'s "Institutional Investment
+Validation" section for the full report. One check per question
+(PASS/PARTIAL/BLOCKED/FAIL, always with concrete evidence), driven by
+deterministic scenarios against real platform code (not mocks of it). One
+genuinely new capability was added because validation revealed it was
+missing and nothing else (Q9's `diff_knowledge_history()`, built entirely
+on existing versioning). A real scenario-construction bug was found and
+fixed by the framework's own falsification attempt during development —
+the platform code itself had no defect. New `agx validate-investment` CLI
+command.
+
+**Result**: 4 PASS, 4 PARTIAL, 1 BLOCKED, 0 FAIL, overall PARTIAL. Two new
+named, scoped technical-debt items (TD-57, TD-58) rather than either
+forcing a fix or leaving the gap implicit. 807 backend tests pass (up
+from 788); `ruff check` clean.
+
+## Prior mission: Market Regime classification (2026-08-01, immediate follow-up)
 
 Immediate follow-up to the decision-object mission below: its own "not
 done, named as next" item, and the mission brief's landing-page checklist

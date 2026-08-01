@@ -1,5 +1,66 @@
 # Changelog
 
+## Unreleased — Zero-Cost Production Deployment + Shadow Fund
+
+The project owner redefined the production deployment architecture:
+permanently free, GitHub Actions + GitHub Pages only, no VPS/paid hosting/
+always-on backend/live decision generation ever for the public site — and,
+within that architecture, required a persistent, continuously-managed
+virtual institutional portfolio ("Shadow Fund") as one of nine required
+daily artifacts, explicitly distinct from `meta.decision_ledger`
+(decision history) and `investment_cases`/`investment_proof` (reasoning/
+validation): "the Shadow Fund is the owner of portfolio state."
+
+**Delivered**: see `docs/PHASE_STATUS.md`'s "Shadow Fund" section and
+AD-56/AD-57 for full detail. New `research/src/agx_research/shadow_fund/`
+package (`models.py`, `engine.py`, `repository.py`, `export.py`) — a
+persistent virtual portfolio driven by feeding the fund's own prior-day
+state back into the existing, unmodified `DecisionService.decide_portfolio()`
+(never a new decision engine, never a real investor's holdings; see AD-56
+for why this is the one deliberate exception to "never wire
+decision_service into a scheduled run"). Wired into
+`production.pipeline.ProductionPipeline` as a new stage, reusing
+`gated_recommendations`/`country_risk`/`illiquid_tickers` already computed
+there and `capital_allocation.CapitalAllocationEngine.build()` for the
+fund's own capital-deployment/recycling view. Tracks current holdings/cash/
+NAV, daily NAV history, every buy/increase/reduce/exit transaction,
+position sizing, capital deployment/recycling, benchmark comparison,
+performance attribution, and risk metrics (volatility/max drawdown/
+Sharpe-like ratio/concentration), all honestly gated by sample size. Two
+new dashboard artifacts (`shadow_fund.json`, `shadow_fund_history.json`),
+new API routes (`GET /shadow-fund`, `GET /shadow-fund-history`), new
+`agx shadow-fund` CLI command, full `DashboardDataProvider` wiring (both
+`StaticJsonProvider`/`ApiProvider`), new Monitoring page section
+(NAV/return/risk stat tiles, open positions, recent transactions), new
+JSON Schema contracts, bilingual EN/AR i18n.
+
+Confirmed, and formally closed as System 18's permanent decision for the
+*public* deployment (AD-57): the static GitHub Pages build already issues
+zero network POST requests (`StaticJsonProvider.postDecisions()`/
+`postCapitalAllocation()` throw synchronously, before any `fetch()` call)
+— a same-session exploration of a Render-hosted live `api/` backend (to
+make `Portfolio.tsx`'s personalized-decision feature work on the public
+site) was abandoned mid-design once this mission superseded it; no code
+from that exploration was committed. Personalized decisions remain a
+deliberate, permanent, local-only/self-hosted capability.
+
+**Result**: 867 backend tests pass (up from 855, 12 new); ruff clean; 33
+`api` tests pass (up from 31); 53 `web` tests pass (up from 51);
+`tsc`/production builds clean for both `api` and `web`. Live-verified in a
+real headless browser (English and Arabic/RTL) against real mock-mode
+pipeline output — zero console errors, correct empty-state rendering with
+no Shadow Fund history yet. A real unit-convention bug (percent fields
+pre-multiplied by 100 instead of stored as fractions, inconsistent with
+every other `_pct` field in this codebase and the shared
+`formatPercent()`/`formatSignedPercent()` frontend formatters) and a real
+correctness bug (an abstained held ticker's `target_weight=0.0` initially
+treated as a genuine exit signal, contradicting `capital_allocation`'s own
+documented exclusion rule) were both found and fixed by the mission's own
+tests before shipping. See TD-64 for what's honestly still open
+(benchmark tracking stays flat pending a real EGX30 index feed, same root
+cause as TD-58; declared-not-calibrated rebalance-threshold/risk-sample
+constants; no NAV-history line chart yet, data contract already exists).
+
 ## Unreleased — EGX Investment Methodology (permanent investment doctrine)
 
 The project owner declared the platform architecture complete and asked

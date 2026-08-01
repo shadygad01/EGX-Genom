@@ -22,6 +22,40 @@
     "emptyTitle": "No knowledge changes",
     "emptyDetail": "No knowledge object has been created or updated recently."
   },
+  "shadowFund": {
+    "title": "Shadow Fund",
+    "description": "The virtual institutional portfolio that has followed this platform's own recommendations, day over day, since inception.",
+    "emptyTitle": "Shadow Fund not started yet",
+    "emptyDetail": "The Shadow Fund begins tracking on the next scheduled research run.",
+    "nav": "NAV",
+    "cumulativeReturn": "Cumulative Return",
+    "benchmarkReturn": "EGX30 Benchmark Return",
+    "excessReturn": "Excess Return",
+    "cashAllocation": "Cash Allocation",
+    "volatility": "Volatility (annualized)",
+    "maxDrawdown": "Max Drawdown",
+    "sharpeLike": "Sharpe-like Ratio",
+    "insufficientSample_one": "Insufficient sample ({{count}} day)",
+    "insufficientSample_other": "Insufficient sample ({{count}} days)",
+    "openPositions": {
+      "title": "Open Positions",
+      "emptyTitle": "No open positions",
+      "emptyDetail": "The Shadow Fund is fully in cash.",
+      "entryDate": "Entry Date",
+      "avgCost": "Avg. Cost",
+      "marketPrice": "Market Price",
+      "unrealizedPnl": "Unrealized P/L"
+    },
+    "transactions": {
+      "title": "Recent Transactions",
+      "emptyTitle": "No transactions yet",
+      "emptyDetail": "No buy/increase/reduce/exit has been executed yet.",
+      "date": "Date",
+      "weightBefore": "Weight Before",
+      "weightAfter": "Weight After",
+      "price": "Price"
+    }
+  },
   "decisionChanges": {
     "title": "Decision Changes",
     "description": "Recently recorded decisions across the whole universe, newest first",

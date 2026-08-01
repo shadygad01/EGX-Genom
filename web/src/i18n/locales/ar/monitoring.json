@@ -22,6 +22,44 @@
     "emptyTitle": "لا توجد تغييرات معرفية",
     "emptyDetail": "لم يتم إنشاء أو تحديث أي كائن معرفة مؤخرًا."
   },
+  "shadowFund": {
+    "title": "الصندوق الظِلّي",
+    "description": "المحفظة الاستثمارية الافتراضية التي تتبع توصيات هذه المنصة، يومًا بعد يوم، منذ التأسيس.",
+    "emptyTitle": "لم يبدأ الصندوق الظِلّي بعد",
+    "emptyDetail": "يبدأ الصندوق الظِلّي التتبع في دورة البحث المجدولة التالية.",
+    "nav": "صافي قيمة الأصول",
+    "cumulativeReturn": "العائد التراكمي",
+    "benchmarkReturn": "عائد مؤشر EGX30",
+    "excessReturn": "العائد الزائد",
+    "cashAllocation": "تخصيص النقد",
+    "volatility": "التقلب (سنوي)",
+    "maxDrawdown": "أقصى تراجع",
+    "sharpeLike": "مؤشر شبيه بشارب",
+    "insufficientSample_zero": "عيّنة غير كافية (0 يوم)",
+    "insufficientSample_one": "عيّنة غير كافية (يوم واحد)",
+    "insufficientSample_two": "عيّنة غير كافية (يومان)",
+    "insufficientSample_few": "عيّنة غير كافية ({{count}} أيام)",
+    "insufficientSample_many": "عيّنة غير كافية ({{count}} يومًا)",
+    "insufficientSample_other": "عيّنة غير كافية ({{count}} يوم)",
+    "openPositions": {
+      "title": "المراكز المفتوحة",
+      "emptyTitle": "لا توجد مراكز مفتوحة",
+      "emptyDetail": "الصندوق الظِلّي بالكامل في النقد حاليًا.",
+      "entryDate": "تاريخ الدخول",
+      "avgCost": "متوسط التكلفة",
+      "marketPrice": "سعر السوق",
+      "unrealizedPnl": "الربح/الخسارة غير المحققة"
+    },
+    "transactions": {
+      "title": "أحدث المعاملات",
+      "emptyTitle": "لا توجد معاملات بعد",
+      "emptyDetail": "لم يتم تنفيذ أي عملية شراء/زيادة/تخفيض/خروج بعد.",
+      "date": "التاريخ",
+      "weightBefore": "الوزن قبل",
+      "weightAfter": "الوزن بعد",
+      "price": "السعر"
+    }
+  },
   "decisionChanges": {
     "title": "تغييرات القرارات",
     "description": "القرارات المسجّلة مؤخرًا عبر الكون الاستثماري بالكامل، الأحدث أولاً",

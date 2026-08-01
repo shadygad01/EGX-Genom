@@ -42,6 +42,8 @@ import type {
   Recommendation,
   ResearchPaper,
   RunRecord,
+  ShadowFundHistory,
+  ShadowFundPublicState,
   SourceMetricsRow,
   SourceSpec,
   SourceTruthRow,
@@ -116,6 +118,15 @@ export interface DashboardDataProvider {
   getPortfolioSummary(): Promise<PortfolioSummaryReport | null>;
   getWarnings(): Promise<MonitoringWarningsReport | null>;
   getCommitteeSummary(): Promise<CommitteeSummaryReport | null>;
+
+  // Shadow Fund: the persistent virtual-portfolio state produced
+  // autonomously as a stage inside `agx run` (shadow_fund/engine.py) --
+  // unlike postDecisions/postCapitalAllocation below, this is a real
+  // static dashboard artifact (both providers read it the same way),
+  // never a live on-demand call, because the fund's own state (not a
+  // real investor's) is safe to precompute.
+  getShadowFund(): Promise<ShadowFundPublicState | null>;
+  getShadowFundHistory(): Promise<ShadowFundHistory>;
 
   // The one write-shaped call on this interface: computes fresh, position-
   // aware decisions on demand (see api/src/routes/decisions.ts). Never

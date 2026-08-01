@@ -43,6 +43,7 @@
   },
   "table": {
     "ticker": "Ticker",
+    "weight": "Weight",
     "status": "Status",
     "decision": "Decision",
     "confidence": "Confidence",

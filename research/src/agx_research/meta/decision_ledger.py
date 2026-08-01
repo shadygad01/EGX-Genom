@@ -16,6 +16,11 @@ from agx_research.meta.decision_engine import DecisionAction, Recommendation
 from agx_research.storage.repository import JsonFileRepository
 
 
+#: Reused by `shadow_fund.engine` for the identical assumption -- one
+#: declared transaction-cost figure, not two that could silently drift.
+DEFAULT_TRANSACTION_COST_BPS = 20.0
+
+
 class OutcomeStatus(str, Enum):
     PENDING = "pending"
     EVALUATED = "evaluated"
@@ -107,7 +112,7 @@ class DecisionLedger(JsonFileRepository[DecisionRecord]):
         snapshot: DatasetSnapshot,
         *,
         benchmark_ticker: str = "EGX30",
-        transaction_cost_bps: float = 20.0,
+        transaction_cost_bps: float = DEFAULT_TRANSACTION_COST_BPS,
     ) -> None:
         changed = False
         for record in list(self.all_latest()):

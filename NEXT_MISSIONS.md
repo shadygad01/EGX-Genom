@@ -1,6 +1,33 @@
 # Next Missions
 
-## Closed this phase: EGX Investment Methodology (permanent investment doctrine)
+## Closed this phase: Zero-Cost Production Deployment + Shadow Fund
+
+See `CURRENT_MISSION.md`'s "Zero-Cost Production Deployment + Shadow Fund"
+entry, `docs/PHASE_STATUS.md`'s matching section, and AD-56/AD-57/TD-64.
+**Genuinely next now**, in priority order:
+
+1. **`InvestmentProofDashboard`** — unchanged from every prior mission's
+   note (originally named after the Investment Proof Framework mission):
+   `agx investment-proof`'s Capital Trust Report is still CLI-only, never
+   wired into `agx_research.dashboard.export`/a matching API route/a web
+   surface. This mission's redirection toward the Shadow Fund didn't
+   reach it — still the top item on this list.
+2. **NAV-history line chart on Monitoring** (TD-64) — `shadow_fund_history.json`'s
+   full daily NAV series is already exported and already fetched
+   (`getShadowFundHistory()`); only a chart component over already-wired
+   data is missing, not a new backend capability.
+3. **Real EGX30 (or other index-level) benchmark comparison** stays
+   honestly flat for the Shadow Fund (TD-64) — same root cause and same
+   trigger as TD-58's `DecisionLedger` benchmark gap, not a new blocker.
+4. **Rebalance-threshold/risk-sample-size calibration** (TD-64:
+   `REBALANCE_THRESHOLD_PCT = 0.01`/`MIN_RISK_SAMPLE_DAYS = 20`) — once
+   real Shadow Fund NAV history accumulates across enough trading days,
+   same calibration-trigger posture as every other declared threshold in
+   `docs/TECHNICAL_DEBT.md`.
+5. Everything already named as genuinely next before this phase (below)
+   is unchanged.
+
+## Closed prior phase: EGX Investment Methodology (permanent investment doctrine)
 
 See `CURRENT_MISSION.md`'s "EGX Investment Methodology" entry and
 `docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in

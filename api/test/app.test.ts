@@ -209,6 +209,20 @@ describe("dashboard artifact routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toBeNull();
   });
+
+  it("GET /shadow-fund returns null when the fund hasn't started yet", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/shadow-fund" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
+  it("GET /shadow-fund-history returns an honest empty series when absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/shadow-fund-history" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ nav_series: [], transactions: [] });
+  });
 });
 
 describe("POST /decisions", () => {

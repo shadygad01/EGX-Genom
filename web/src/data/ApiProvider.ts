@@ -39,6 +39,8 @@ import type {
   Recommendation,
   ResearchPaper,
   RunRecord,
+  ShadowFundHistory,
+  ShadowFundPublicState,
   SourceMetricsRow,
   SourceSpec,
   SourceTruthRow,
@@ -202,6 +204,14 @@ export class ApiProvider implements DashboardDataProvider {
 
   getCommitteeSummary(): Promise<CommitteeSummaryReport | null> {
     return fetchJson<CommitteeSummaryReport | null>("/committee-summary");
+  }
+
+  getShadowFund(): Promise<ShadowFundPublicState | null> {
+    return fetchJson<ShadowFundPublicState | null>("/shadow-fund");
+  }
+
+  getShadowFundHistory(): Promise<ShadowFundHistory> {
+    return fetchJson<ShadowFundHistory>("/shadow-fund-history");
   }
 
   async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {

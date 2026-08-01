@@ -43,7 +43,7 @@ phase evidence below.
 | 15 | Portfolio Intelligence | **DONE** (v1) | `PortfolioConstructor`: risk-adjusted confidence-discounted scoring, capped proportional weights, cash fallback, full explanation. Deferred: covariance-based optimization (needs real data depth). |
 | 16 | Explainability Engine | **DONE** | Six-question `Explanation` with structured `evidence_refs` everywhere; `similar_historical_cases` populated from real recorded events via the Event Platform. |
 | 17 | Continuous Learning | **DONE** (v1) | `ContinuousLearningMonitor`: realized performance recorded on knowledge+genes from real later-window data; mechanical sign-disagreement retirement policy with audited reasons. |
-| 18 | Production Infrastructure | **PARTIAL** | Engineering-closeable parts done: integrity-checked backup/verify/restore, CLI (`run`/`status`/`backup`/`restore`/`discover-sources`/`collect`), the first production execution pipeline (`agx run` — see "Production Execution Pipeline" below), Dockerfile, CI. Business-blocked: cloud provider + payment, secrets management service, managed scheduling, API authentication context, monitoring/alerting stack. Named in `docs/ROADMAP.md`. |
+| 18 | Production Infrastructure | **PARTIAL** | The public-deployment cloud-provider question is now **permanently decided, not blocked** (AD-57, 2026-08-01): zero-cost, GitHub Actions + GitHub Pages only, no VPS/paid hosting/always-on backend ever for the public site — `deploy-pages.yml` + `ProductionPipeline` already fully implement this. Engineering-closeable parts done: integrity-checked backup/verify/restore, CLI (`run`/`status`/`shadow-fund`/`backup`/`restore`/`discover-sources`/`collect`), the first production execution pipeline (`agx run` — see "Production Execution Pipeline" below), Dockerfile (local/self-hosted use only, not part of the zero-cost public pipeline), CI. Still business-blocked, unchanged by AD-57: secrets management service, managed scheduling (e.g. for `discover-sources`), API authentication context, monitoring/alerting stack — none of these are about the public site's hosting target, which is now closed. Named in `docs/ROADMAP.md`. |
 
 ## What Production 1.0 still needs (all business-blocked, except #1 which is decided)
 
@@ -2424,3 +2424,163 @@ are real future engineering work, each already carrying its own honest
 "doctrine, not yet a dedicated detector" label in
 `INVESTMENT_PLAYBOOK.md` rather than a silent absence -- see
 `NEXT_MISSIONS.md`.
+
+## Zero-Cost Production Deployment + Shadow Fund (2026-08-01)
+
+The project owner redefined the production deployment architecture mid-
+session, superseding an in-progress exploration of a Render-hosted live
+`api/` backend (to make `Portfolio.tsx`'s personalized-decision feature
+work on the public GitHub Pages site): permanently free, GitHub Actions +
+GitHub Pages only, explicitly no VPS/Render/Railway/Fly.io/always-on
+backend/live decision generation/POST endpoints on the public deployment,
+ever. Within that architecture, required a persistent, continuously-
+managed virtual institutional portfolio -- the "Shadow Fund" -- as one of
+nine required daily artifacts, explicitly defined as distinct from
+`meta.decision_ledger.DecisionLedger` (why decisions were made) and
+`investment_cases`/`investment_proof` (reasoning/validation): "DecisionLedger
+becomes only one input to the Shadow Fund... the Shadow Fund is the owner
+of portfolio state." An initial ambiguity (rename `DecisionLedger` vs.
+build only a NAV curve vs. the full portfolio-state architecture
+ultimately specified) was resolved via `AskUserQuestion`, then further
+clarified by the project owner directly rather than guessed.
+
+**Audited first, before building anything**: most of the mission's nine
+required outputs (data collection, complete methodology, autonomous
+investment decisions, CIO Desk/Investment Cases/Monitoring artifacts,
+static-JSON-via-GitHub-Pages publishing) were already fully satisfied by
+the existing `deploy-pages.yml` + `ProductionPipeline` architecture --
+confirmed by reading the actual workflow and pipeline code, not assumed.
+The static GitHub Pages build already issued zero network POST requests
+before this mission (`StaticJsonProvider.postDecisions()`/
+`postCapitalAllocation()` throw `LiveDecisionsUnavailableError`
+synchronously, before any `fetch()` call reaches the network) -- the one
+real gap was Investment Proof (`agx investment-proof`, CLI-only, already
+named as "genuinely next" in `NEXT_MISSIONS.md` before this mission, not
+newly discovered), left out of this pass's scope by the project owner's
+own redirection toward the Shadow Fund specifically. The only genuinely
+new capability required was the Shadow Fund itself.
+
+**Delivered**: new `research/src/agx_research/shadow_fund/` package --
+`models.py` (`ShadowFundPosition`/`ShadowFundClosedPosition`/
+`ShadowFundTransaction`/`ShadowFundRiskMetrics`/
+`ShadowFundAttributionEntry`/`ShadowFundNavPoint`/`ShadowFundSnapshot`/
+`ShadowFundPublicState`/`ShadowFundHistory`), `engine.py`
+(`advance()` -- the one state transition), `repository.py`
+(`ShadowFundLedger`, a single continuously-versioned entity whose
+`history()` doubles as the daily NAV time series, no separate unbounded
+per-day store), `export.py` (`export_shadow_fund`/
+`export_shadow_fund_history`, deriving the two dashboard artifacts from
+the ledger). See AD-56 for the full architectural rationale, in
+particular why autonomously driving `DecisionService.decide_portfolio()`
+here is safe and correct (the fund's own, fully platform-controlled,
+reproducible-from-inception state -- never a real investor's holdings)
+despite `decision_service/__init__.py`'s standing "never wire
+decision_service into a scheduled run" rule. Reuses rather than
+duplicates: `DecisionService.decide_portfolio()` for every target weight
+(no new decision engine), `capital_allocation.CapitalAllocationEngine.build()`
+for the fund's own capital-deployment/recycling view,
+`data.adjustments.compute_adjusted_closes()` for mark-to-market (never a
+raw close), `meta.decision_ledger.DEFAULT_TRANSACTION_COST_BPS` for the
+identical transaction-cost assumption (extracted to a shared constant
+rather than duplicated). Wired into
+`production.pipeline.ProductionPipeline._stage_dashboard_artifact_generator`
+as a new step, reusing the same `gated_recommendations`/`country_risk`/
+`illiquid_tickers`/`knowledge_store` inputs `decision_ledger` already
+computes there; skips cleanly (matching every other stage's convention)
+on a non-trading day.
+
+Tracks, per the mission's exact field list: current holdings, cash,
+target vs. realized weights, entry dates/prices, market value, unrealized/
+realized P/L, closed and open positions, portfolio NAV, daily NAV history,
+daily allocation/capital-deployment/capital-recycling/rebalancing history
+(every buy/increase/reduce/exit is a `ShadowFundTransaction`; `hold`/
+`no_action` never are, since nothing changed), benchmark history,
+portfolio attribution (a real contribution-to-return decomposition --
+daily weight x daily ticker return, compounded in NAV-currency terms and
+carried forward as small, universe-bounded rolling state, not
+recomputed by replaying the full NAV history each day), and risk metrics
+(annualized volatility, max drawdown, a "Sharpe-like" ratio explicitly
+not called Sharpe since no risk-free rate is fabricated, Herfindahl
+concentration, largest position) -- all honestly gated by sample size
+(`sample_status`), same posture as `DecisionPerformanceSummary`. An
+abstained held ticker's `target_weight=0.0` is never treated as a real
+exit signal (mirrors `capital_allocation`'s existing exclusion rule
+exactly) -- caught and fixed by the mission's own tests before shipping
+(see below). A declared `REBALANCE_THRESHOLD_PCT = 0.01` avoids
+manufacturing daily transaction noise out of `decide_portfolio`'s
+continuous score wobble; `INCEPTION_NAV = 100.0` is an explicit notional
+NAV-per-unit index convention, not a fabricated real capital figure.
+
+**End-to-end wiring**: two new dashboard artifacts (`shadow_fund.json` --
+current state, `shadow_fund_history.json` -- NAV series + all-time
+transaction log, growth bounded by real trading activity rather than
+elapsed-time x universe-size, the specific axis that made
+`provenance_index.json` unbounded per TD-63); new
+`dashboard.validate._validate_optional_shadow_fund`/
+`_validate_optional_shadow_fund_history` (the same CI gate every other
+optional artifact gets); new JSON Schema contracts
+(`contracts/shadow_fund.schema.json`/`shadow_fund_history.schema.json`,
+generated the same way as every other resource); new `agx shadow-fund`
+read-only CLI command; new `GET /shadow-fund`/`GET /shadow-fund-history`
+API routes (`api/src/artifactsStore.ts`/`routes/dashboard.ts`); full
+`DashboardDataProvider` wiring (`getShadowFund()`/`getShadowFundHistory()`
+on both `StaticJsonProvider` and `ApiProvider`, hand-maintained TS mirrors
+in both `api/src/types.ts` and `web/src/types.ts`); a new Shadow Fund
+section on the Monitoring page (NAV/cumulative-return/benchmark-return/
+excess-return/cash-allocation stat tiles, volatility/max-drawdown/
+Sharpe-like risk tiles with an honest "insufficient sample" state, an
+open-positions table, a recent-transactions table), bilingual EN/AR i18n
+including a new shared `table.weight` key.
+
+**Two real bugs found and fixed by the mission's own tests before
+shipping, neither assumed**: (1) a unit-convention bug -- every `_pct`
+field was initially pre-multiplied by 100 (percent-scale), inconsistent
+with every other `_pct`-suffixed field in this codebase (e.g.
+`MAX_PRICE_ABOVE_FAIR_VALUE_PCT = 0.20`, a fraction) and with the shared
+`formatPercent()`/`formatSignedPercent()` frontend formatters, which
+multiply by 100 themselves for display -- caught before any web wiring
+consumed the values, fixed by removing every `* 100.0`/`/ 100.0` in
+`engine.py`. (2) a real correctness bug -- an abstained held ticker (no
+current INVESTMENT-horizon evidence) was initially liquidated by the
+rebalance loop because its `target_weight=0.0` looked like a genuine
+target, contradicting `capital_allocation`'s own documented rule that an
+abstained ticker's zero target is an evidence gap, never a real sell
+signal; a new `test_abstained_held_ticker_is_preserved_not_liquidated`
+test caught it, fixed with an explicit `abstained_held` guard that
+carries the position forward unchanged instead.
+
+**Verified live, not just unit-tested**: ran the real CLI end to end
+(`agx run --mode mock` then `agx shadow-fund`) and confirmed a real,
+correctly-shaped `shadow_fund.json` (100% cash, NAV 100.0, honest
+`insufficient_sample` risk state -- correct given zero promotions in a
+single-day mock run). Built the production web bundle, served it, and
+drove it with a real headless Chromium session (not assumed): the
+Monitoring page's Shadow Fund section renders correctly in both English
+and Arabic/RTL (`الصندوق الظِلّي`), zero console errors, zero unexpected
+404s, correct empty-state rendering for open positions/transactions with
+no trading history yet. All verification scripts/artifacts used for this
+check were removed afterward, not committed.
+
+**Result**: 867 backend tests pass (up from 855, 12 new -- 9 in
+`test_shadow_fund.py`, 3 in `test_shadow_fund_repository_export.py`);
+`ruff check` clean; 33 `api` tests pass (up from 31, 2 new); 53 `web`
+tests pass (up from 51, 2 new); `tsc -b`/production builds clean for both
+`api` and `web`. See AD-56 (Shadow Fund architecture)/AD-57 (permanent
+zero-cost deployment decision, closing System 18's cloud-provider
+business-blocker for the *public* deployment specifically -- secrets
+management, managed scheduling for `discover-sources`, and monitoring/
+alerting remain open exactly as before) and TD-64 (benchmark tracking
+stays flat pending a real EGX30 index feed, same root cause as TD-58;
+declared-not-calibrated rebalance-threshold/risk-sample-size constants;
+no NAV-history line chart yet on Monitoring, though the data contract
+already exists and is already fetched).
+
+**Not done, named as next**: `InvestmentProofDashboard` (CLI-only Capital
+Trust Report, unchanged from every prior mission's note) remains the one
+item from `NEXT_MISSIONS.md`'s prioritized list this mission's redirection
+did not reach. A NAV-history line chart on Monitoring (TD-64) is a scoped,
+low-risk follow-up. Extending `Portfolio.tsx` with the same Shadow-Fund-
+style state view is not planned -- `Portfolio.tsx` remains the real
+investor's own personalized, position-aware page (local/self-hosted `api/`
+only, by design, per AD-57), structurally distinct from the Shadow Fund's
+autonomous, platform-owned state.

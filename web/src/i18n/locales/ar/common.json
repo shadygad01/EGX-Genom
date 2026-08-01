@@ -43,6 +43,7 @@
   },
   "table": {
     "ticker": "الرمز",
+    "weight": "الوزن",
     "status": "الحالة",
     "decision": "القرار",
     "confidence": "الثقة",

@@ -382,6 +382,8 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
         "source_metrics.json",
         "market_breadth.json",
         "market_regime.json",
+        "shadow_fund.json",
+        "shadow_fund_history.json",
     }
     for filename in expected:
         assert (dashboard_out / filename).exists(), filename
@@ -400,6 +402,22 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     assert "mission_status.json" in counts
     assert "market_breadth.json" in counts
     assert "market_regime.json" in counts
+    assert "shadow_fund.json" in counts
+    assert "shadow_fund_history.json" in counts
+
+
+def test_shadow_fund_never_double_records_a_retry_of_the_same_date(tmp_path):
+    from agx_research.shadow_fund.repository import ShadowFundLedger
+
+    data_dir = tmp_path / "data"
+    dashboard_out = tmp_path / "dashboard"
+
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+
+    history = ShadowFundLedger(data_dir / "shadow_fund.json").daily_history()
+    assert len(history) == 1
+    assert history[0].date == RUN_DATE
 
 
 def test_market_breadth_reflects_real_universe_advancers_and_decliners(tmp_path):

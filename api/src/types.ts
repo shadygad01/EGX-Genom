@@ -937,3 +937,102 @@ export interface CapitalAllocationPlan {
   explanation: Explanation;
   provenance: Provenance;
 }
+
+// --- shadow_fund (GET /shadow-fund, GET /shadow-fund-history) -- the
+// persistent virtual-portfolio state produced by shadow_fund/engine.py as
+// a stage inside `agx run`, never computed on demand. See
+// contracts/shadow_fund.schema.json / shadow_fund_history.schema.json. ---
+
+export interface ShadowFundPosition {
+  ticker: string;
+  entry_date: string;
+  average_cost: number;
+  weight: number;
+  target_weight: number;
+  market_price: number;
+  market_value: number;
+  unrealized_pnl_pct: number | null;
+  horizon: string;
+  confidence: number;
+  investment_thesis: string;
+}
+
+export interface ShadowFundClosedPosition {
+  ticker: string;
+  entry_date: string;
+  exit_date: string;
+  average_cost: number;
+  exit_price: number;
+  realized_pnl_pct: number;
+}
+
+export interface ShadowFundTransaction {
+  id: string;
+  date: string;
+  ticker: string;
+  action: PositionAction;
+  weight_before: number;
+  weight_after: number;
+  weight_delta: number;
+  price: number;
+  cash_delta: number;
+  transaction_cost: number;
+  investment_thesis: string;
+  confidence: number;
+  provenance: Provenance;
+}
+
+export interface ShadowFundRiskMetrics {
+  volatility_annualized_pct: number | null;
+  max_drawdown_pct: number | null;
+  sharpe_like_ratio: number | null;
+  herfindahl_index: number | null;
+  largest_position_pct: number | null;
+  sample_days: number;
+  sample_status: string;
+}
+
+export interface ShadowFundAttributionEntry {
+  ticker: string;
+  contribution_pct_of_total_gain: number | null;
+  status: string;
+}
+
+export interface ShadowFundNavPoint {
+  date: string;
+  nav: number;
+  cash: number;
+  cash_pct: number;
+  invested_pct: number;
+  daily_return_pct: number | null;
+  cumulative_return_pct: number;
+  benchmark_nav: number;
+  benchmark_cumulative_return_pct: number;
+}
+
+export interface ShadowFundPublicState {
+  date: string;
+  inception_date: string;
+  nav: number;
+  cash: number;
+  cash_pct: number;
+  invested_pct: number;
+  daily_return_pct: number | null;
+  cumulative_return_pct: number;
+  benchmark_ticker: string;
+  benchmark_nav: number;
+  benchmark_cumulative_return_pct: number;
+  excess_return_pct: number;
+  open_positions: ShadowFundPosition[];
+  closed_positions: ShadowFundClosedPosition[];
+  transactions: ShadowFundTransaction[];
+  capital_allocation_plan: CapitalAllocationPlan | null;
+  risk: ShadowFundRiskMetrics;
+  attribution: ShadowFundAttributionEntry[];
+  provenance: Provenance;
+}
+
+export interface ShadowFundHistory {
+  nav_series: ShadowFundNavPoint[];
+  transactions: ShadowFundTransaction[];
+}

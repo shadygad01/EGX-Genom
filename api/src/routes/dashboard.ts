@@ -50,4 +50,10 @@ export async function dashboardRoutes(
   app.get("/portfolio-summary", async () => artifacts.portfolioSummary());
   app.get("/warnings", async () => artifacts.warnings());
   app.get("/committee-summary", async () => artifacts.committeeSummary());
+
+  // Shadow Fund: the persistent virtual-portfolio state produced by
+  // shadow_fund/engine.py as a stage inside `agx run` -- read-only here,
+  // same as every other artifact above (never computed on demand).
+  app.get("/shadow-fund", async () => artifacts.shadowFund());
+  app.get("/shadow-fund-history", async () => artifacts.shadowFundHistory());
 }

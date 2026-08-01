@@ -1792,3 +1792,145 @@ from 788, 21 new); `ruff check` clean.
 **Not done, named as next**: the two BLOCKED/named-gap findings (TD-57,
 TD-58) are real, scoped follow-up items, not silently left implicit in a
 prose report only.
+
+## Investment Proof Framework (2026-08-01)
+
+The project owner's final mission for this phase: acting simultaneously as
+CIO/CRO/Head of Research/Principal Architect, build the complete
+architecture to answer "would a rational institutional investment
+committee trust this system with capital?" -- 10 phases, 10 non-negotiable
+rules (free data only, never fabricate missing information or historical
+performance, every decision explainable and evidence-traceable, every
+module justified, complexity removed where unjustified, determinism
+preserved, all validation reproducible), and an explicit instruction that
+missing *data* (not missing *engineering*) should be reported as `READY
+FOR DATA` and never block the work.
+
+**Delivered**: new `research/src/agx_research/investment_proof/` package,
+composing `institutional_validation/` (Mission 3's framework) rather than
+duplicating it --
+
+- `categories.py` -- the Macro/Sector/Quality/Value/Catalyst/Risk/
+  Liquidity/Portfolio/Execution/Technical taxonomy and the real
+  `creator_agent -> Category` map (`AGENT_CATEGORY_MAP`) every engine
+  below shares, plus `RETURN_CONTRIBUTING_CATEGORIES`/`MODIFIER_CATEGORIES`
+  distinguishing additive return contributors from gate/multiplier
+  modifiers.
+- `attribution.py` (`DecisionAttributionEngine`) -- Phase 3. Decomposes a
+  real `KnowledgeWeightedHorizonModel` + `FairValueEngine` expected return
+  into named category contributions, computed with the exact same code the
+  platform uses for a real decision (not an approximation). `attribution_
+  residual` (`final_expected_return - sum(contributions)`) is a real
+  consistency check, verified ~1e-18 (exact) against real knowledge-weighted
+  predictions.
+- `counterfactual.py` (`CounterfactualEngine`) -- Phase 4. Real ablation:
+  removes every knowledge object in one category and recomputes the
+  prediction and decision with the same real `KnowledgeWeightedHorizonModel`
+  + `MetaDecisionEngine` calls, reporting which categories are actually
+  `decisive` (their removal flips the action) rather than assumed
+  important. A real bug was found and fixed during development: the first
+  version never applied `reference_price` to the counterfactual prediction,
+  structurally forcing every would-be BUY_CANDIDATE to ABSTAIN.
+- `committee_validation.py` (`CommitteeValidationEngine`) -- Phase 8.
+  Aggregates attribution + counterfactual results across a ticker batch
+  into per-category agreement/disagreement/decisiveness rates.
+  `historical_usefulness_status` is honestly `ready_for_data` for every
+  committee (new TD-60) -- correlating a committee's opinion with later
+  realized outcomes needs `DecisionRecord` to know which categories
+  contributed to each recorded decision, which it does not yet.
+- `portfolio_validation.py` (`PortfolioValidationEngine`) -- Phase 7.
+  Herfindahl concentration index, top-3 weight, sector exposure (when a
+  sector map is supplied), weight reconciliation (invested + cash == 1.0),
+  an explicitly-named `expected_downside_proxy` (a weighted-average
+  `expected_risk`, never presented as a true VaR -- a real covariance
+  matrix this platform doesn't have), and decision-conflict detection
+  between the position-unaware (`PortfolioConstructor`) and position-aware
+  (`DecisionService`) construction paths.
+- `stability.py` (`DecisionStabilityEngine`) -- Phase 9. Calls
+  `RecommendationService.recommend()`/`DecisionService.decide_portfolio()`
+  multiple times against identical `KnowledgeStore` state and diffs the
+  results (stripping only `produced_at` timestamps, the one field expected
+  to differ) -- determinism measured directly, not assumed from code
+  reading.
+- `calibration.py` (`ConfidenceCalibrationFramework`) -- Phase 5. Brier
+  score, a 10-bin reliability curve, and expected calibration error (ECE)
+  over real `DecisionLedger` records. Honestly returns
+  `sample_status="insufficient"` with every statistic `None` below the
+  same 30-record floor `DecisionLedger.performance_summary()` already
+  uses -- never a fabricated number standing in for a real sample.
+- `walk_forward.py` (`WalkForwardInfrastructure`) -- Phase 2. The genuinely
+  missing driver connecting `RecommendationService.recommend()` +
+  `DecisionLedger.record_recommendations()` across a real trading-day
+  range (`StaticEGXCalendar`), with per-day exception isolation matching
+  `RuntimeEngine.run_range()`'s own discipline. Proven against 8 real mock
+  trading days, 80 recommendations recorded, 0 errors. `required_datasets()`
+  names exactly what real EGX history is still needed (multi-year real
+  price history, a real EGX30-index-level series, daily promoted-knowledge
+  snapshots at scale), each honestly `ready_for_data` today -- never
+  claimed available before it is.
+- `thesis_survival.py` (`ThesisSurvivalEngine`) -- Phase 6. Compares an
+  original `PositionAwareDecision` against a later re-evaluation of the
+  same ticker: `broken_assumptions` (cited knowledge later `RETIRED`,
+  looked up via `KnowledgeStore.latest()`), new contradicting evidence,
+  lapsed/remaining catalysts, and review-date discipline -- a mechanical
+  `ThesisStatus` (ALIVE/WEAKENING/BROKEN/EXPIRED), never a sentiment guess.
+- `capital_trust.py` (`InvestmentProofEngine`/`CapitalTrustReport`) --
+  Phase 10, and the top-level orchestrator for Phases 1-9. Runs
+  `institutional_validation.run_institutional_validation()` plus every
+  engine above against one shared, real-code-driven scenario (a capped
+  subset of the real EGX30 universe, `synthetic_full_universe()`, plus a
+  dedicated INVESTMENT-horizon thesis-lifecycle scenario --
+  `institutional_validation.scenarios.thesis_lifecycle_scenario()` uses
+  SWING, which `DecisionService` never acts on per AD-35, so this phase
+  builds its own INVESTMENT-horizon analogue with the same real classes).
+  `overall_verdict` (YES/NO/PARTIALLY) is computed mechanically from the
+  per-dimension `CheckVerdict`s -- any FAIL anywhere forces NO; no FAIL but
+  at least one BLOCKED forces PARTIALLY; only if every dimension clears
+  does it reach YES. Never asserted independently of the dimensions
+  driving it.
+
+New `agx investment-proof` CLI command (JSON + optional Markdown Capital
+Trust Report, same `--out`/`--markdown-out`/exit-code-2-on-genuine-FAIL
+shape `validate-investment` already established).
+
+**Two real, pre-existing production bugs found and fixed** while directly
+exercising the CLI decision path the mission required (not introduced by
+this mission, and not found by the framework's own checks -- found by
+using `agx decide` and `DecisionService` the way an investor actually
+would): (1) `DecisionService.decide_portfolio()` never referenced
+`HorizonDecision.max_position_pct` in its `target_weight` formula, so
+identical evidence sized a position ~6x larger through the position-aware
+path than through `PortfolioConstructor` (which already applied it
+correctly); (2) `agx decide`/`cli.py` never called
+`meta.publication_gate.apply_publication_gate()` at all, so every real
+`agx decide`/Decision Center call always silently reported
+`no_action`/zero weight with no reason naming the cause -- a Rule 5
+("every decision must be explainable") defect on the CLI/web decision path
+built in an earlier mission, not merely a sizing bug. Both fixed; the
+zero-weight *outcome* itself remains correct today (no real EGX vendor is
+licensed yet, per `docs/DECISION_SYSTEM_ACCEPTANCE.md`) -- what was
+missing was the cap and the explanation. See TD-59/AD-55.
+
+**Capital Trust Report, current run** (`agx investment-proof`, 15-ticker
+real-EGX30-derived scenario): `decision_stability` PASS, `decision_
+attribution` PASS (residual ~1e-18), `counterfactual_analysis` PASS,
+`committee_validation` PASS (historical_usefulness honestly ready_for_data,
+TD-60), `portfolio_validation` PASS, `thesis_survival` PASS,
+`confidence_calibration` BLOCKED (0 real benchmark-evaluated
+`DecisionLedger` records, 30 required), `walk_forward_backtest` BLOCKED (0
+real trading days of the 252 a meaningful replay needs). Overall verdict:
+**PARTIALLY** -- every mechanism the platform can run today is
+architecturally complete and passes; the two BLOCKED dimensions are
+honestly gated on real, licensed EGX history that does not exist yet, not
+on any remaining engineering work. 833 backend tests pass (up from 809, 24
+new: `test_investment_proof.py`, `test_cli_investment_proof.py`); `ruff
+check` clean.
+
+**Not done, named as next**: `InvestmentProofDashboard` (the mission's
+10th named deliverable, alongside `CapitalTrustReport`) exists today as
+the JSON/Markdown `agx investment-proof` CLI output only -- no dedicated
+`api`/`web` route or dashboard page was built this session, matching this
+codebase's "dashboard data goes through `agx_research.dashboard.export`
+plus a matching route" convention, which a `CapitalTrustReport` web
+surface would need to follow but does not yet. TD-59/TD-60 (both new) are
+real, scoped follow-up items, not silently left implicit.

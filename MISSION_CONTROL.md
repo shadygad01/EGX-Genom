@@ -21,7 +21,24 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: Institutional Investment Validation (2026-08-01).**
+- **Current mission: Investment Proof Framework — Capital Trust Report
+  (2026-08-01).** New `investment_proof/` package (composes, never
+  duplicates, `institutional_validation/`) adds `DecisionAttributionEngine`,
+  `CounterfactualEngine`, `CommitteeValidationEngine`,
+  `PortfolioValidationEngine`, `DecisionStabilityEngine`,
+  `ConfidenceCalibrationFramework`, `WalkForwardInfrastructure`,
+  `ThesisSurvivalEngine`, and the top-level `InvestmentProofEngine`
+  producing a `CapitalTrustReport` — "would a rational institutional
+  investment committee trust this system with capital?" New `agx
+  investment-proof` CLI command. Overall verdict: **PARTIALLY** —
+  everything exercisable today passes; confidence calibration and
+  walk-forward backtesting stay honestly `READY FOR DATA` pending real,
+  licensed EGX history. Two real production bugs found and fixed
+  (`DecisionService` ignoring `max_position_pct`; `agx decide` never
+  applying the publication gate, so every decision silently zeroed with no
+  explanation) — TD-59/AD-55. See `CURRENT_MISSION.md` and
+  `docs/PHASE_STATUS.md` for full detail.
+- **Prior mission: Institutional Investment Validation (2026-08-01).**
   The mission shifted from engineering implementation to proving, with
   real evidence, that the decision engine is internally consistent,
   explainable, and economically meaningful. New `institutional_validation/`

@@ -16,6 +16,7 @@ from agx_research.knowledge.lifecycle import KnowledgeStatus
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.meta.decision_engine import DecisionAction, MetaDecisionEngine, PublicationStatus
+from agx_research.meta.publication_gate import PublicationGateReport, apply_publication_gate
 from agx_research.validation.statistical import StatisticalEvidence
 
 NO_RISK = CountryRiskAssessment(as_of=date(2026, 6, 14), severity=CountryRiskSeverity.NORMAL)
@@ -51,19 +52,30 @@ def make_publication_ready_recommendation(
     ticker: str, expected_return: float = 0.10, expected_risk: float = 0.05, confidence: float = 0.8
 ):
     """A real Recommendation, built the same way `MetaDecisionEngine` always
-    builds one (not a hand-constructed fake), with its INVESTMENT decision
-    manually promoted to publication-ready -- the exact pattern
-    `test_runtime_and_intelligence.py`'s own portfolio-construction test
-    already uses for `PortfolioConstructor`, since a real end-to-end
-    publication gate needs 30 evaluated decisions and legal approval that
-    no unit test can honestly provide."""
+    builds one (not a hand-constructed fake), pushed through the real
+    `apply_publication_gate()` with a synthetic all-pass report -- a real
+    end-to-end gate needs 30 evaluated decisions and legal approval no
+    unit test can honestly provide, but hand-setting only
+    `publication_status` (not `max_position_pct`, which the same gate
+    function sets) previously left `max_position_pct=0.0`, silently
+    zeroing every target weight regardless of a real decision's action.
+    Using the real gate function is both the fix and the more honest
+    test -- the same lesson `institutional_validation/scenarios.py`
+    already learned from its own version of this bug."""
     prediction = make_prediction(ticker, expected_return, expected_risk, confidence)
     recommendation = MetaDecisionEngine().decide(ticker, date(2026, 6, 14), {Horizon.INVESTMENT: prediction})
     assert recommendation is not None
     decision = recommendation.horizon_decisions[Horizon.INVESTMENT]
     assert decision.action == DecisionAction.BUY_CANDIDATE  # sanity: score >= 1.0 threshold cleared
-    decision.publication_status = PublicationStatus.PUBLICATION_READY
-    return recommendation
+    report = PublicationGateReport(as_of=date(2026, 6, 14), publication_ready=True, checks=[], blockers=[])
+    return apply_publication_gate([recommendation], report)[0]
+
+
+def _apply_publication_ready(recommendation):
+    """Same real-gate fix as `make_publication_ready_recommendation`, for
+    tests that hand-build a multi-horizon `Recommendation` directly."""
+    report = PublicationGateReport(as_of=date(2026, 6, 14), publication_ready=True, checks=[], blockers=[])
+    return apply_publication_gate([recommendation], report)[0]
 
 
 def make_research_only_recommendation(ticker: str):
@@ -260,7 +272,7 @@ def test_key_risks_include_expected_risk_and_a_disagreeing_sibling_horizon():
     )
     assert rec is not None
     assert rec.horizon_decisions[Horizon.MICRO].action == DecisionAction.AVOID
-    rec.horizon_decisions[Horizon.INVESTMENT].publication_status = PublicationStatus.PUBLICATION_READY
+    rec = _apply_publication_ready(rec)
 
     decisions = DecisionService().decide_portfolio(
         [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
@@ -277,7 +289,7 @@ def test_contradicting_evidence_includes_disagreeing_sibling_horizon_and_country
         "COMI", date(2026, 6, 14), {Horizon.INVESTMENT: investment_pred, Horizon.SWING: swing_pred}
     )
     assert rec is not None
-    rec.horizon_decisions[Horizon.INVESTMENT].publication_status = PublicationStatus.PUBLICATION_READY
+    rec = _apply_publication_ready(rec)
 
     deteriorating = CountryRiskAssessment(
         as_of=date(2026, 6, 14),
@@ -329,7 +341,7 @@ def test_monitoring_events_lists_knowledge_currently_in_monitoring_status(tmp_pa
     investment_pred = make_prediction("COMI", 0.10, 0.05, 0.8, explanation=explanation)
     rec = MetaDecisionEngine().decide("COMI", date(2026, 6, 14), {Horizon.INVESTMENT: investment_pred})
     assert rec is not None
-    rec.horizon_decisions[Horizon.INVESTMENT].publication_status = PublicationStatus.PUBLICATION_READY
+    rec = _apply_publication_ready(rec)
 
     store = KnowledgeStore(tmp_path / "knowledge.json")
     store._repo.add(

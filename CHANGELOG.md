@@ -1,5 +1,86 @@
 # Changelog
 
+## Unreleased — Investment Proof Framework (Capital Trust Report)
+
+The project owner's final mission for this phase: build the complete
+architecture to prove — not just claim — that the platform's decisions are
+trustworthy enough for capital, with the explicit instruction that missing
+*data* (not missing *engineering*) should be reported as `READY FOR DATA`
+rather than block the work.
+
+**Delivered**: new `investment_proof/` package, composing rather than
+duplicating `institutional_validation/` —
+
+- `categories.py`: the Macro/Sector/Quality/Value/Catalyst/Risk/Liquidity/
+  Portfolio/Execution/Technical taxonomy and the real `creator_agent ->
+  Category` map every other engine below shares.
+- `attribution.py` (`DecisionAttributionEngine`): decomposes a real
+  `KnowledgeWeightedHorizonModel`+`FairValueEngine` expected return into
+  named category contributions, with `attribution_residual` as a real
+  reconciliation check (verified ~1e-18, i.e. exact).
+- `counterfactual.py` (`CounterfactualEngine`): real ablation — removes
+  each evidence category and recomputes the decision with the same real
+  `MetaDecisionEngine`, reporting which categories are actually decisive
+  rather than assumed important.
+- `committee_validation.py` (`CommitteeValidationEngine`): aggregates
+  attribution + counterfactual results across a ticker batch into
+  per-category agreement/decisiveness rates; `historical_usefulness`
+  honestly stays `ready_for_data` (see TD-59).
+- `portfolio_validation.py` (`PortfolioValidationEngine`): Herfindahl
+  concentration, sector exposure, weight reconciliation, an explicitly-
+  named `expected_downside_proxy` (never presented as a true VaR), and
+  position-aware vs. position-unaware decision-conflict detection.
+- `stability.py` (`DecisionStabilityEngine`): calls
+  `RecommendationService`/`DecisionService` multiple times against
+  identical evidence and diffs the results — determinism measured, not
+  claimed.
+- `calibration.py` (`ConfidenceCalibrationFramework`): Brier score, a
+  10-bin reliability curve, and expected calibration error over
+  `DecisionLedger` records — honestly `sample_status="insufficient"`
+  below a 30-record floor, never a fabricated statistic.
+- `walk_forward.py` (`WalkForwardInfrastructure`): a real day-by-day
+  driver connecting `RecommendationService` + `DecisionLedger` over the
+  real EGX trading calendar (proven against 8 real mock trading days, 0
+  errors); `required_datasets()` names exactly what real EGX history is
+  still needed, each honestly `ready_for_data`.
+- `thesis_survival.py` (`ThesisSurvivalEngine`): compares a
+  `PositionAwareDecision` against a later re-evaluation of the same
+  ticker, detecting broken assumptions (cited knowledge later retired),
+  new contradicting evidence, and lapsed catalysts — mechanically, never
+  a sentiment guess.
+- `capital_trust.py` (`InvestmentProofEngine`/`CapitalTrustReport`): the
+  top-level orchestrator. Runs `institutional_validation` plus every
+  engine above against one shared scenario and answers "would a rational
+  institutional investment committee trust this system with capital?" as
+  YES/NO/PARTIALLY, computed mechanically from the dimension verdicts
+  (any FAIL -> NO; any BLOCKED with no FAIL -> PARTIALLY; otherwise YES).
+
+New `agx investment-proof` CLI command (JSON + optional Markdown Capital
+Trust Report, same `--out`/`--markdown-out` shape as `validate-investment`).
+
+**Current verdict: PARTIALLY.** Every dimension that can be exercised
+today (decision determinism, attribution, counterfactual ablation,
+committee agreement, portfolio consistency, thesis-break detection) is
+architecturally complete and passes; `confidence_calibration` and
+`walk_forward_backtest` remain `BLOCKED` only for lack of real historical
+EGX data (a licensed vendor is still a pending business decision — see
+`CLAUDE.md`). No fabricated data or invented statistic stands in for
+either gap.
+
+**Two real, pre-existing production bugs found and fixed** while building
+this framework's own attribution/decide checks (not by the framework
+itself, but by directly exercising `DecisionService`/`agx decide` the way
+this mission required): (1) `DecisionService.decide_portfolio()` never
+capped `target_weight` at `decision.max_position_pct`, so identical
+evidence could size a position ~6x larger through the position-aware path
+than through `PortfolioConstructor`; (2) `agx decide` never called
+`apply_publication_gate()` at all, so every CLI/Decision-Center decision
+silently reported `no_action`/zero weight with no reason naming the real
+cause. Both fixed; see `docs/ARCHITECTURE_DECISIONS.md` (AD entry) and
+`docs/TECHNICAL_DEBT.md`.
+
+833 backend tests pass (up from 809, 24 new); `ruff check` clean.
+
 ## Unreleased — Institutional Investment Validation framework
 
 The project owner redefined the mission from engineering implementation to

@@ -59,6 +59,8 @@ from agx_research.meta.decision_ledger import DecisionLedger
 from agx_research.meta.publication_gate import (
     ExternalPublicationEvidence,
     LegalPublicationApproval,
+    PublicationGateReport,
+    apply_publication_gate,
     evaluate_publication_gate,
 )
 from agx_research.meta.recommendation_service import RecommendationService
@@ -93,6 +95,57 @@ def build_market_memory(data_dir: Path, mock_data: Path) -> MarketMemory:
         macro_series_ids=MACRO_SERIES_IDS,
         lookback_days=30,
         event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
+    )
+
+
+def build_publication_gate_report(data_dir: Path, as_of: date) -> PublicationGateReport:
+    """The one real assembly of a `PublicationGateReport` -- shared by
+    `publication-status` (reports it) and `decide` (applies it via
+    `apply_publication_gate()` before scoring a portfolio). Before this was
+    shared, `decide` never called `apply_publication_gate()` at all, so
+    every `HorizonDecision.publication_status` silently stayed at its
+    `MetaDecisionEngine` default (`RESEARCH_ONLY`) and `max_position_pct`
+    stayed `0.0` regardless of real evidence strength -- `agx decide`
+    always produced `no_action`/zero target weight, with no reason in the
+    decision's own `explanation` naming the real cause (the fail-closed
+    publication gate, not "no positive expectancy"). Read-only: uses the
+    persisted registry/ledger/evidence files when they exist, never writes
+    to the inspected `--data-dir`.
+    """
+    input_errors: list[str] = []
+    external = None
+    legal = None
+    external_path = data_dir / "publication_evidence.json"
+    legal_path = data_dir / "legal_publication_approval.json"
+    if external_path.exists():
+        try:
+            external = ExternalPublicationEvidence.model_validate_json(
+                external_path.read_text(encoding="utf-8")
+            )
+        except (ValueError, OSError) as exc:
+            input_errors.append(f"publication_evidence.json invalid: {exc}")
+    else:
+        input_errors.append("publication_evidence.json missing")
+    if legal_path.exists():
+        try:
+            legal = LegalPublicationApproval.model_validate_json(legal_path.read_text(encoding="utf-8"))
+        except (ValueError, OSError) as exc:
+            input_errors.append(f"legal_publication_approval.json invalid: {exc}")
+    else:
+        input_errors.append("legal_publication_approval.json missing")
+
+    registry_path = data_dir / "source_registry.json"
+    registry = seed_registry(SourceRegistry(registry_path) if registry_path.exists() else SourceRegistry())
+    return evaluate_publication_gate(
+        DecisionLedger(data_dir / "decision_ledger.json").performance_summary(),
+        as_of=as_of,
+        external=external,
+        legal=legal,
+        raw_documents=RawDocumentRepository(data_dir / "raw_documents.json").all_latest(),
+        legally_cleared_source_ids={
+            source.id for source in registry.all_latest() if source.legal_use_status.value == "cleared"
+        },
+        input_errors=input_errors,
     )
 
 
@@ -308,6 +361,32 @@ def main(argv: list[str] | None = None) -> int:
     )
     validate_investment_parser.add_argument(
         "--markdown-out", type=Path, default=None, help="Also write a human-readable Markdown report."
+    )
+
+    investment_proof_parser = sub.add_parser(
+        "investment-proof",
+        help="Investment Proof Framework: runs Institutional Investment Validation plus decision "
+        "attribution, counterfactual analysis, committee validation, portfolio validation, "
+        "decision stability, thesis-survival, confidence-calibration and walk-forward readiness "
+        "checks, and assembles the final Capital Trust Report (would a rational institutional "
+        "investment committee trust this system with capital?). Self-contained, synthetic-data "
+        "based -- exits 2 only if a dimension finds a genuine (FAIL) defect, never for an honest "
+        "READY FOR DATA gap.",
+    )
+    investment_proof_parser.add_argument(
+        "--date", default=None, help="As-of date (ISO). Defaults to the same date validate-investment uses."
+    )
+    investment_proof_parser.add_argument(
+        "--ticker-limit",
+        type=int,
+        default=15,
+        help="How many real EGX30 tickers to build the shared synthetic scenario from.",
+    )
+    investment_proof_parser.add_argument(
+        "--out", type=Path, default=None, help="Write the JSON report to this path (in addition to stdout)."
+    )
+    investment_proof_parser.add_argument(
+        "--markdown-out", type=Path, default=None, help="Also write a human-readable Markdown Capital Trust Report."
     )
 
     args = parser.parse_args(argv)
@@ -616,50 +695,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "publication-status":
         as_of = date.fromisoformat(args.date)
-        input_errors: list[str] = []
-        external = None
-        legal = None
-        external_path = args.data_dir / "publication_evidence.json"
-        legal_path = args.data_dir / "legal_publication_approval.json"
-        if external_path.exists():
-            try:
-                external = ExternalPublicationEvidence.model_validate_json(
-                    external_path.read_text(encoding="utf-8")
-                )
-            except (ValueError, OSError) as exc:
-                input_errors.append(f"publication_evidence.json invalid: {exc}")
-        else:
-            input_errors.append("publication_evidence.json missing")
-        if legal_path.exists():
-            try:
-                legal = LegalPublicationApproval.model_validate_json(
-                    legal_path.read_text(encoding="utf-8")
-                )
-            except (ValueError, OSError) as exc:
-                input_errors.append(f"legal_publication_approval.json invalid: {exc}")
-        else:
-            input_errors.append("legal_publication_approval.json missing")
-
-        registry_path = args.data_dir / "source_registry.json"
-        # Status inspection must be read-only. Use the persisted registry when
-        # it exists; otherwise evaluate against an in-memory seeded registry
-        # without creating files in the inspected production directory.
-        registry = seed_registry(
-            SourceRegistry(registry_path) if registry_path.exists() else SourceRegistry()
-        )
-        report = evaluate_publication_gate(
-            DecisionLedger(args.data_dir / "decision_ledger.json").performance_summary(),
-            as_of=as_of,
-            external=external,
-            legal=legal,
-            raw_documents=RawDocumentRepository(args.data_dir / "raw_documents.json").all_latest(),
-            legally_cleared_source_ids={
-                source.id
-                for source in registry.all_latest()
-                if source.legal_use_status.value == "cleared"
-            },
-            input_errors=input_errors,
-        )
+        report = build_publication_gate_report(args.data_dir, as_of)
         payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
         try:
             payload.encode(sys.stdout.encoding or "utf-8")
@@ -693,6 +729,29 @@ def main(argv: list[str] | None = None) -> int:
             print(payload)
         return 0 if report.overall_verdict != CheckVerdict.FAIL else 2
 
+    if args.command == "investment-proof":
+        from agx_research.institutional_validation.report import CheckVerdict
+        from agx_research.institutional_validation.runner import DEFAULT_AS_OF
+        from agx_research.investment_proof.capital_trust import InvestmentProofEngine
+
+        as_of = date.fromisoformat(args.date) if args.date else DEFAULT_AS_OF
+        report = InvestmentProofEngine().run(as_of, ticker_limit=args.ticker_limit)
+        payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
+        if args.out is not None:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(payload, encoding="utf-8")
+        if args.markdown_out is not None:
+            args.markdown_out.parent.mkdir(parents=True, exist_ok=True)
+            args.markdown_out.write_text(report.to_markdown(), encoding="utf-8")
+        try:
+            payload.encode(sys.stdout.encoding or "utf-8")
+        except UnicodeEncodeError:
+            sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
+        else:
+            print(payload)
+        has_fail = any(d.verdict == CheckVerdict.FAIL for d in report.dimensions)
+        return 0 if not has_fail else 2
+
     if args.command == "decide":
         as_of = date.fromisoformat(args.date)
         materialize_universe_seed(args.universe_seed_dir, args.data_dir)
@@ -722,6 +781,15 @@ def main(argv: list[str] | None = None) -> int:
         )
         tickers = sorted(set(snapshot.tickers) | set(positions))
         recommendations = recommendation_service.recommend(tickers, as_of)
+        # Apply the same real publication gate `agx publication-status`
+        # reports on -- without this, `HorizonDecision.publication_status`/
+        # `max_position_pct` silently kept MetaDecisionEngine's defaults
+        # (RESEARCH_ONLY / 0.0), which forced every decision to no_action
+        # with a zero target weight regardless of evidence strength, and
+        # gave no reason in the decision's own explanation naming the real
+        # cause. See docs/TECHNICAL_DEBT.md.
+        gate_report = build_publication_gate_report(args.data_dir, as_of)
+        recommendations = apply_publication_gate(recommendations, gate_report)
 
         country_risk = assess_country_risk(snapshot.macro_series, as_of)
         illiquid_tickers = compute_illiquid_tickers(snapshot)

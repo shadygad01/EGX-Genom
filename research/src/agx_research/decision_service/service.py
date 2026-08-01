@@ -147,7 +147,11 @@ class DecisionService:
             reasons: list[str] = []
 
             target_weight = (
-                min(max(score, 0.0) / total_positive_score, self.max_position_weight)
+                min(
+                    max(score, 0.0) / total_positive_score,
+                    self.max_position_weight,
+                    decision.max_position_pct if decision is not None else self.max_position_weight,
+                )
                 if total_positive_score > 0 and score > 0
                 else 0.0
             )
@@ -173,6 +177,17 @@ class DecisionService:
             elif decision.action == DecisionAction.ABSTAIN:
                 abstained = True
                 reasons.extend(decision.abstention_reasons)
+            elif decision.publication_status != PublicationStatus.PUBLICATION_READY:
+                # The model itself reached a real action (e.g. BUY_CANDIDATE),
+                # but `meta.publication_gate` hasn't cleared it -- target_weight
+                # is already zero from the eligibility check above; without this
+                # branch the decision would silently report no_action/hold with
+                # no reason naming the real cause (Principle 3/Rule 5).
+                abstained = True
+                reasons.extend(
+                    decision.abstention_reasons
+                    or ["Not publication-ready; see meta.publication_gate's blockers for the exact reason."]
+                )
 
             action = self._resolve_action(
                 position=position, target_weight=target_weight, abstained=abstained

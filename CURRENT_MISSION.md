@@ -1,6 +1,48 @@
 # Current Mission
 
-## Current mission: Institutional Investment Validation (2026-08-01)
+## Current mission: Investment Proof Framework — Capital Trust Report (2026-08-01)
+
+The project owner's final mission for this phase: acting as CIO/CRO/Head
+of Research/Principal Architect simultaneously, build the complete
+architecture to prove the platform's investment decisions are trustworthy
+enough for capital — 10 phases (Investment Proof Architecture,
+Walk-Forward Infrastructure, Decision Attribution, Counterfactual
+Analysis, Confidence Calibration, Investment Thesis Survival, Portfolio
+Validation, Investment Committee Validation, Decision Stability, Capital
+Trust Report), 10 non-negotiable rules (free data only, never fabricate,
+every decision explainable/traceable, determinism preserved, everything
+reproducible), and an explicit instruction to mark missing *data* as
+`READY FOR DATA` rather than stop — only missing *engineering* should
+block progress.
+
+**Delivered**: new `research/src/agx_research/investment_proof/` package
+(composes, never duplicates, `institutional_validation/`) —
+`categories.py`, `attribution.py` (`DecisionAttributionEngine`),
+`counterfactual.py` (`CounterfactualEngine`), `committee_validation.py`
+(`CommitteeValidationEngine`), `portfolio_validation.py`
+(`PortfolioValidationEngine`), `stability.py`
+(`DecisionStabilityEngine`), `calibration.py`
+(`ConfidenceCalibrationFramework`), `walk_forward.py`
+(`WalkForwardInfrastructure`), `thesis_survival.py`
+(`ThesisSurvivalEngine`), and the top-level orchestrator
+`capital_trust.py` (`InvestmentProofEngine`/`CapitalTrustReport`). New
+`agx investment-proof` CLI command. See `docs/PHASE_STATUS.md`'s
+"Investment Proof Framework" section for the full per-phase report.
+
+**Result**: overall Capital Trust verdict **PARTIALLY** — every mechanism
+exercisable today (determinism, attribution, counterfactual ablation,
+committee agreement, portfolio consistency, thesis-break detection)
+passes; confidence calibration and walk-forward backtesting stay honestly
+`BLOCKED`/`READY FOR DATA` pending real, licensed EGX history (still a
+pending business decision, unchanged from every prior mission's caveat).
+Two real, pre-existing production bugs found and fixed while exercising
+the CLI decision path directly (`DecisionService.decide_portfolio()`
+never capped `target_weight` at `max_position_pct`; `agx decide` never
+called the real publication gate at all, so every decision silently
+reported `no_action` with no reason) — see TD-59/AD-55. 833 backend tests
+pass (up from 809, 24 new); `ruff check` clean.
+
+## Prior mission: Institutional Investment Validation (2026-08-01)
 
 The project owner redefined the mission: engineering implementation is no
 longer primary. New objective: prove, with real evidence rather than more

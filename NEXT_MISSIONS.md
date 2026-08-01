@@ -1,6 +1,41 @@
 # Next Missions
 
-## Closed this phase: Institutional Investment Validation framework
+## Closed this phase: Investment Proof Framework (Capital Trust Report)
+
+See `CURRENT_MISSION.md`'s "Investment Proof Framework" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **`InvestmentProofDashboard`** — the mission's 10th named deliverable
+   exists today only as `agx investment-proof`'s JSON/Markdown CLI output.
+   A real `api`/`web` surface needs a `CapitalTrustReport` export through
+   `agx_research.dashboard.export` plus a matching `api` route, following
+   the same convention every other dashboard artifact already uses (see
+   `docs/ARCHITECTURE.md`'s "Dashboard data providers" section) — not a
+   one-off fetch wired into a component.
+2. **TD-59** (fixed, but its wider implication is not): the same
+   `max_position_pct`/publication-gate defect pattern that hit
+   `DecisionService.decide_portfolio()` is worth a targeted audit of every
+   other caller of `MetaDecisionEngine.decide()`'s output to confirm none
+   of them silently skip `apply_publication_gate()` either.
+3. **TD-60**: once `DecisionRecord` (or a linked artifact) carries
+   per-category attribution at record time, `CommitteeValidationEngine`
+   can compute real `historical_usefulness` correlations instead of
+   `ready_for_data` — a real schema change, deliberately not made
+   unilaterally mid-framework.
+4. **Confidence calibration and walk-forward backtesting** stay `BLOCKED`
+   until real, licensed EGX history exists — both `ConfidenceCalibrationFramework`
+   and `WalkForwardInfrastructure` are architecturally complete and will
+   produce real numbers with zero code change the moment that data exists.
+5. Re-run `agx investment-proof` after any future change to
+   `meta.decision_engine`/`decision_service`/`portfolio.constructor`/
+   `horizons.knowledge_weighted` — like `validate-investment`, it's the
+   fastest way to catch a regression in the properties this mission
+   proved, not just a one-time report.
+6. Everything already named as genuinely next before this phase (below) is
+   unchanged.
+
+## Closed prior phase: Institutional Investment Validation framework
 
 See `CURRENT_MISSION.md`'s "Institutional Investment Validation" entry and
 `docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in

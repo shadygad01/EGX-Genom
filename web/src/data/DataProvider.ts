@@ -28,6 +28,7 @@ import type {
   KnowledgeGraphData,
   KnowledgeObject,
   MarketBreadthReport,
+  MarketRegimeReport,
   MarketState,
   MissionStatus,
   Pattern,
@@ -94,6 +95,7 @@ export interface DashboardDataProvider {
   getFinancialCoverage(): Promise<FinancialCoverageReport | null>;
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
   getMarketBreadth(): Promise<MarketBreadthReport | null>;
+  getMarketRegime(): Promise<MarketRegimeReport | null>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;
   getTickerDataGapReport(): Promise<TickerDataGapReport[]>;

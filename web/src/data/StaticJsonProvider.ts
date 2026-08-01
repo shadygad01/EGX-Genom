@@ -26,6 +26,7 @@ import type {
   KnowledgeGraphData,
   KnowledgeObject,
   MarketBreadthReport,
+  MarketRegimeReport,
   MarketState,
   MissionStatus,
   Pattern,
@@ -152,6 +153,10 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getMarketBreadth(): Promise<MarketBreadthReport | null> {
     return fetchObject<MarketBreadthReport>("market_breadth.json");
+  }
+
+  getMarketRegime(): Promise<MarketRegimeReport | null> {
+    return fetchObject<MarketRegimeReport>("market_regime.json");
   }
 
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {

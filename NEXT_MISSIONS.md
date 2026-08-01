@@ -1,26 +1,31 @@
 # Next Missions
 
-## Closed this phase: decision object completeness + live Decision Center
+## Closed this phase: Market Regime classification
 
-See `CURRENT_MISSION.md`'s "complete the 12-field decision object; wire it
-to the web" entry and `docs/PHASE_STATUS.md`'s matching section.
-**Genuinely next now**, in priority order:
+See `CURRENT_MISSION.md`'s "Market Regime classification" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
 
-1. **Market Regime classification** — the mission brief's landing-page
-   checklist names it explicitly ("current market regime" as item 1); a
-   confirmed real gap (no `MarketRegime` model/artifact anywhere in
-   `research/src/`), previously named in this file's own "Known frontend
-   gaps" list below. Needs a real design decision (which inputs classify a
-   regime — realized volatility, breadth, trend vs. a benchmark — all
-   derivable from already-collected Price Data, same posture as the Market
-   Breadth artifact that closed the same way) before implementation.
+1. **Historical-analog comparison** — Market Intelligence's card was
+   "Market Regime & Historical Comparison"; only the regime half is closed.
+   Genuinely blocked on years of real trading history (System 12's
+   `HistoricalReviewer`, unchanged status) — not a code gap to force.
 2. **Decision Center's `DECISION_DATA_DIR` wiring is real but manual** —
    works today only against a local/self-hosted `api/` with the env var
    set to a directory a real `agx run` produced; no automation points a
    deployed `api/` instance at production data yet (System 18's
    deployment/scheduling business-blocker, unchanged).
-3. Everything already named as genuinely next before this phase (below) is
+3. **TD-56's calibration trigger**: once real decision-ledger/regime
+   history accumulates, review whether ±3% cumulative return and 1.5%/2.5%
+   daily volatility are the thresholds that actually separate a genuine
+   trend/volatility shift from routine noise.
+4. Everything already named as genuinely next before this phase (below) is
    unchanged.
+
+## Closed prior phase: decision object completeness + live Decision Center
+
+See `CURRENT_MISSION.md`'s "complete the 12-field decision object; wire it
+to the web" entry and `docs/PHASE_STATUS.md`'s matching section.
 
 ## Closed prior phase: the real DATA_COLLECTION-starvation bug and dead-source retirement
 
@@ -469,11 +474,16 @@ fabricated content (per `CLAUDE.md`'s anti-fabrication principle) — worth
 closing once the artifact they depend on exists, but none of them require
 new data collection:
 
-- **Market Regime classification** (Market Intelligence, Company Research
-  Workspace) — no artifact exists upstream yet.
-- **Market Breadth & Liquidity** (Market Intelligence) — needs a
-  backend-computed artifact (advancers/decliners, adjusted volume); the
-  frontend must not compute returns from raw price bars itself.
+- ~~**Market Regime classification** (Market Intelligence)~~ **Closed**:
+  `market_memory.regime.compute_market_regime()` → `market_regime.json`,
+  wired through `api`/`web` into a landing-page banner and Market
+  Intelligence's card. See `CURRENT_MISSION.md`'s "Market Regime
+  classification" entry. Company Research Workspace's own per-ticker
+  regime/macro-exposure view is still open (a different, per-ticker
+  question this market-wide artifact doesn't answer).
+- ~~**Market Breadth & Liquidity** (Market Intelligence)~~ **Closed**
+  (prior phase): `market_memory.breadth.compute_market_breadth()` →
+  `market_breadth.json`, wired through `api`/`web`.
 - **Review Board decision history** (Research Center) — no repository
   persists past `BoardDecision`s yet.
 - ~~**Discovery Engine detail** (Mission Control) — `acquisition_intelligence`

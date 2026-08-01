@@ -656,6 +656,23 @@ export interface MarketBreadthReport {
   tickers_below_average_volume: number;
 }
 
+// --- market_regime.json / MarketRegimeReport ---
+
+export type MarketTrend = "bullish" | "bearish" | "neutral";
+export type VolatilityLevel = "low" | "elevated" | "high";
+
+export interface MarketRegimeReport {
+  as_of: string;
+  lookback_days: number;
+  tickers_with_sufficient_data: number;
+  trading_days_observed: number;
+  cumulative_return_pct: number | null;
+  daily_volatility_pct: number | null;
+  trend: MarketTrend;
+  volatility: VolatilityLevel;
+  reasons: string[];
+}
+
 // --- source_metrics.json ---
 
 export interface ReputationScore {

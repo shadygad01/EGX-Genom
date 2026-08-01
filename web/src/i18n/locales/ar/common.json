@@ -233,6 +233,8 @@
       "income_statement": "قائمة الدخل",
       "balance_sheet": "الميزانية العمومية",
       "cash_flow": "قائمة التدفقات النقدية"
-    }
+    },
+    "marketTrend": { "bullish": "صاعد", "bearish": "هابط", "neutral": "محايد" },
+    "volatilityLevel": { "low": "منخفض", "elevated": "مرتفع نسبيًا", "high": "مرتفع" }
   }
 }

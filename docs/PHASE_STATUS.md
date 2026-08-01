@@ -1655,3 +1655,57 @@ remains a confirmed, real gap (`grep -rn "MarketRegime"` across
 brief's landing-page checklist asks for it explicitly; no artifact or
 model exists upstream yet, and building one was out of scope for this
 session's two closed items above. See `NEXT_MISSIONS.md`.
+
+## Market Regime classification (2026-08-01, immediate follow-up)
+
+`NEXT_MISSIONS.md`'s top-priority item after the decision-object work above:
+Market Regime was a confirmed, real gap (`grep -rn "MarketRegime"` across
+`research/src/` returned nothing) and the mission brief's landing-page
+checklist names "current market regime" explicitly as item 1.
+
+**Closed**: new `market_memory.regime.compute_market_regime()`, built the
+same way `market_memory.breadth.compute_market_breadth()` already is --
+adjusted, equal-weighted returns across the universe
+(`data.adjustments.adjusted_dated_returns()`, never a raw close-to-close
+calculation), no live lookups (derives everything from an already-
+reconstructed `MarketState`). Reports **two independent axes** rather than
+one fused combinatorial label (`R5`'s "a label over a continuous number,
+never a lookup table" discipline, the same reasoning
+`decision_service.service` and `assess_country_risk` already follow):
+`trend` (bullish/bearish/neutral, from the cumulative equal-weighted
+return over a trailing window) and `volatility` (low/elevated/high, from
+that same window's realized daily standard deviation). Declared,
+uncalibrated thresholds (new debt TD-56, same posture as TD-6/17/20/33/
+44/45/46/51/52/53 -- no real multi-year EGX regime history exists yet to
+calibrate against).
+
+Wired end to end exactly like Market Breadth: `production.artifacts.
+export_market_regime()` → `market_regime.json` (every `agx run`, mock or
+live) → `dashboard.validate`'s optional-artifact validator → new
+`GET /market-regime` route (`api/`) → `DashboardDataProvider.
+getMarketRegime()` (both providers) → rendered on **both** the AI Briefing
+landing page (a new banner card, first thing under the disclaimer, with a
+link into Market Intelligence for detail) and Market Intelligence's
+existing "Market Regime" card, which previously rendered a permanent
+empty state. Verified live end to end: a real mock-mode `agx run` +
+`export-dashboard`, `api/` served from it, and both pages driven in a real
+headless browser (Playwright/Chromium) -- zero console errors, consistent
+with the sibling Market Breadth card's own honest-empty-state behavior
+under the same run.
+
+10 new backend tests (`test_market_regime.py`, covering bullish/bearish/
+neutral trend classification, high volatility independent of trend,
+insufficient-data honesty, and the lookback window boundary, plus 2 in
+`test_production_artifacts.py` and 1 in `test_production_pipeline.py`);
+788 backend tests pass (up from 778); `ruff check` clean. 24 `api` tests
+pass (1 new); 46 `web` tests pass, build/lint clean for all three
+workspaces.
+
+**Not done, named as next**: the sibling gap this section's title also
+used to name -- Market Regime & **Historical Comparison** -- remains open;
+historical-analog comparison needs a historical-regime database
+(`HistoricalReviewer`, System 12) that's genuinely blocked on years of
+real trading history not yet collected, per the existing, unchanged System
+12 status. The Market Intelligence card's title was narrowed from "Market
+Regime & Historical Comparison" to "Market Regime" specifically so the now
+real content doesn't imply the still-missing half is also available.

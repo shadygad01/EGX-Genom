@@ -181,6 +181,13 @@ describe("dashboard artifact routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toBeNull();
   });
+
+  it("GET /market-regime returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/market-regime" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
 });
 
 describe("POST /decisions", () => {

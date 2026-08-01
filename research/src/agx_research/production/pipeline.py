@@ -1138,6 +1138,12 @@ class ProductionPipeline:
         )
         counts["market_breadth.json"] = 0 if market_breadth is None else 1
 
+        market_regime = production_artifacts.export_market_regime(market_state_for_breadth)
+        (dashboard_out / "market_regime.json").write_text(
+            json.dumps(market_regime, indent=2, sort_keys=True) + "\n"
+        )
+        counts["market_regime.json"] = 0 if market_regime is None else 1
+
         acquisition_decisions = production_artifacts.export_acquisition_decisions(
             self.capability_decisions
         )

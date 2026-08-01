@@ -29,6 +29,18 @@ const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
   retired: "neutral",
 };
 
+const TREND_VARIANT: Record<string, BadgeVariant> = {
+  bullish: "positive",
+  bearish: "negative",
+  neutral: "neutral",
+};
+
+const VOLATILITY_VARIANT: Record<string, BadgeVariant> = {
+  low: "neutral",
+  elevated: "warning",
+  high: "negative",
+};
+
 const HORIZONS: Horizon[] = ["micro", "swing", "investment"];
 
 type DecisionBoardRow = {
@@ -49,6 +61,7 @@ export function AIBriefing() {
   const navigate = useNavigate();
   const systemStatus = useArtifact((p) => p.getSystemStatus());
   const marketState = useArtifact((p) => p.getMarketState());
+  const regime = useArtifact((p) => p.getMarketRegime());
   const recommendations = useArtifact((p) => p.getRecommendations());
   const events = useArtifact((p) => p.getEvents());
   const knowledge = useArtifact((p) => p.getKnowledge());
@@ -128,6 +141,28 @@ export function AIBriefing() {
   return (
     <>
       <Disclaimer />
+
+      <Card title={t("marketRegime.title")} subtitle={t("marketRegime.subtitle")}>
+        {regime.loading && <LoadingState rows={1} />}
+        {regime.error && <ErrorState detail={regime.error.message} onRetry={regime.reload} />}
+        {!regime.loading && !regime.error && !regime.data && (
+          <EmptyState title={t("marketRegime.emptyTitle")} detail={t("marketRegime.emptyDetail")} />
+        )}
+        {regime.data && (
+          <div className={styles.regimeBanner}>
+            <Badge variant={TREND_VARIANT[regime.data.trend] ?? "neutral"}>{label("marketTrend", regime.data.trend)}</Badge>
+            <Badge variant={VOLATILITY_VARIANT[regime.data.volatility] ?? "neutral"}>
+              {t("marketRegime.volatilityBadge", { level: label("volatilityLevel", regime.data.volatility) })}
+            </Badge>
+            {regime.data.cumulative_return_pct != null && (
+              <span className={styles.regimeReturn}>
+                {formatSignedPercent(regime.data.cumulative_return_pct / 100)} ({regime.data.trading_days_observed}d)
+              </span>
+            )}
+            <Link to="/market" className={styles.regimeLink}>{t("marketRegime.viewDetail")}</Link>
+          </div>
+        )}
+      </Card>
 
       <Card title={t("decisionCenterCta.title")} className={styles.decisionCenterCta}>
         <p className={styles.decisionCenterCtaDetail}>{t("decisionCenterCta.detail")}</p>

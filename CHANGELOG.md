@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased — Market Regime classification (trend/volatility), wired end to end
+
+Immediate follow-up to the decision-object work below: the mission brief's
+landing-page checklist names "current market regime" explicitly, and it
+was a confirmed real gap (no `MarketRegime` model/artifact anywhere in
+`research/src/`).
+
+**Closed**: new `market_memory.regime.compute_market_regime()`, built the
+same way `market_memory.breadth.compute_market_breadth()` already is
+(adjusted, equal-weighted returns, no live lookups). Reports `trend`
+(bullish/bearish/neutral) and `volatility` (low/elevated/high) as two
+independent axes rather than one fused label, per this codebase's existing
+"a label over a continuous number, never a lookup table" discipline.
+Declared, uncalibrated thresholds (new debt TD-56). Wired end to end like
+Market Breadth: `market_regime.json` (every `agx run`) → dashboard
+validator → `GET /market-regime` → both `DashboardDataProvider`s → a new
+banner on the AI Briefing landing page and a real card on Market
+Intelligence (previously a permanent empty state). 788 backend tests pass
+(up from 778, 10 new); 24 `api` tests pass; 46 `web` tests pass; all three
+workspaces' `build`/`lint` clean; verified live end to end in a real
+headless browser. See `docs/PHASE_STATUS.md`'s matching section.
+
 ## Unreleased — complete the decision object's 12 mandated fields; make it reachable from the web
 
 Audited `decision_service.PositionAwareDecision` against the mission's

@@ -48,8 +48,14 @@
     "coverage": "{{withData}} of {{universe}} tickers have enough price history to compute breadth"
   },
   "marketRegime": {
-    "title": "Market Regime & Historical Comparison",
+    "title": "Market Regime",
+    "subtitle": "Trend and volatility over a trailing window, split-and-dividend-adjusted, equal-weighted across the covered universe",
     "emptyTitle": "Not yet available",
-    "emptyDetail": "No market regime classification or historical-comparison artifact exists upstream yet. This section will populate once the research engine produces one."
+    "emptyDetail": "Available once the first research cycle produces a reconstructed market state.",
+    "trend": "Trend",
+    "volatility": "Volatility",
+    "cumulativeReturn": "Cumulative Return",
+    "volatilityPct": "Daily Return Volatility",
+    "coverage": "{{days}} trailing trading day(s) observed across {{tickers}} ticker(s) with enough price history"
   }
 }

@@ -1,6 +1,31 @@
 # Current Mission
 
-## Current mission: complete the 12-field decision object; wire it to the web (2026-08-01)
+## Current mission: Market Regime classification (2026-08-01, immediate follow-up)
+
+Immediate follow-up to the decision-object mission below: its own "not
+done, named as next" item, and the mission brief's landing-page checklist
+item 1 ("current market regime"). Confirmed real gap (no `MarketRegime`
+model/artifact anywhere in `research/src/` before this).
+
+**Closed**: `market_memory.regime.compute_market_regime()` (trend +
+volatility, two independent axes, declared thresholds — new debt TD-56),
+wired end to end exactly like the existing Market Breadth artifact:
+`market_regime.json` → dashboard validator → `GET /market-regime` → both
+`DashboardDataProvider`s → a new banner on the AI Briefing landing page
+(first thing under the disclaimer) and a real card on Market Intelligence
+(replacing a permanent empty state). See `docs/PHASE_STATUS.md`'s "Market
+Regime classification" section for full detail. 788 backend tests pass (up
+from 778); 24 `api`/46 `web` tests pass; verified live end to end in a
+real headless browser.
+
+**Not done, named as next**: historical-analog comparison (the other half
+of Market Intelligence's original "Market Regime & Historical Comparison"
+card title) remains genuinely blocked on years of real trading history
+(`HistoricalReviewer`, System 12's unchanged status) — the card title was
+narrowed to "Market Regime" so the now-real trend/volatility content
+doesn't imply that still-missing half is also available.
+
+## Prior mission: complete the 12-field decision object; wire it to the web (2026-08-01)
 
 The project owner restated AGX's purpose as producing a complete
 institutional investment decision (Decision, Target Portfolio Weight,

@@ -1,4 +1,12 @@
 {
+  "marketRegime": {
+    "title": "Market Regime",
+    "subtitle": "Trend and volatility over a trailing window, equal-weighted across the covered universe",
+    "emptyTitle": "Not yet available",
+    "emptyDetail": "Available once the first research cycle produces a reconstructed market state.",
+    "volatilityBadge": "{{level}} volatility",
+    "viewDetail": "View in Market Intelligence"
+  },
   "decisionCenterCta": {
     "title": "Want a decision for your own portfolio?",
     "detail": "This board is the market-wide research view. For a personalized Buy / Increase Position / Hold / Reduce Position / Exit / No Action decision on your own holdings -- with target weight, thesis, risks, and a review date -- open Decision Center.",

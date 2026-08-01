@@ -206,3 +206,28 @@ a.listItemTitle:hover {
 .decisionCenterCtaLink:hover {
   opacity: 0.9;
 }
+
+.regimeBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.regimeReturn {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.regimeLink {
+  margin-inline-start: auto;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.regimeLink:hover {
+  text-decoration: underline;
+}

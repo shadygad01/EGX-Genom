@@ -3,16 +3,29 @@
 This file orients any Claude session working in this repository. It is not
 the vision document itself — that lives in `docs/VISION.md` verbatim — nor
 the operating charter, which is `MASTER_PROMPT.md` (role, non-negotiable
-principles, and the strict 18-system build order). This file is the
-practical guide to how the codebase is organized and what invariants to
-protect when touching it. `docs/ARCHITECTURE.md` describes the current
-design in more detail; `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
-`docs/EPOCH_II_DESIGN.md`/`docs/EPOCH_II_REPORT.md` (Epoch II) explain *why*
-it's shaped this way. `docs/PHASE_STATUS.md` is the living, must-be-updated
-audit of where every one of `MASTER_PROMPT.md`'s 18 systems actually
-stands — check it before starting new work: per the charter, a later
-system's work should not start while an earlier one still has closeable
-gaps.
+principles, and the strict 18-system build order). Nor is it the
+investment doctrine: `docs/INVESTMENT_CONSTITUTION.md` (permanent
+principles — why invest/reject, when to hold cash/increase/reduce/exit,
+how capital is allocated, how confidence and evidence are interpreted,
+how conflicts and mistakes are handled), `docs/INVESTMENT_PLAYBOOK.md`
+(situational doctrine for 12 market regimes), `docs/DECISION_STANDARDS.md`
+(the exact minimum bar for each of the six-way action labels), and
+`docs/PORTFOLIO_STANDARDS.md` (concentration/liquidity/cash/sizing/
+recycling rules) are the permanent governing law for *how AGX decides*,
+produced by the EGX Investment Methodology mission (2026-08-01) — every
+one of them is grounded in real, already-implemented mechanisms and cited
+by exact module/threshold, never free-floating policy; `docs/
+INVESTMENT_HANDBOOK.md` is the complete operational walkthrough tying
+them together, detailed enough to rebuild the investment process without
+reading source. This file is the practical guide to how the *codebase* is
+organized and what invariants to protect when touching it. `docs/
+ARCHITECTURE.md` describes the current design in more detail; `docs/
+ARCHITECTURE_AUDIT.md` (Epoch I) and `docs/EPOCH_II_DESIGN.md`/`docs/
+EPOCH_II_REPORT.md` (Epoch II) explain *why* it's shaped this way. `docs/
+PHASE_STATUS.md` is the living, must-be-updated audit of where every one
+of `MASTER_PROMPT.md`'s 18 systems actually stands — check it before
+starting new work: per the charter, a later system's work should not
+start while an earlier one still has closeable gaps.
 
 ## What this repository is
 
@@ -77,10 +90,19 @@ Layout:
   principles, strict 18-system build order).
 - `docs/` — vision, architecture, the Epoch I/II audit and design docs,
   `PHASE_STATUS.md` (current status of all 18 systems against the
-  charter), plus the management set the charter mandates: `ROADMAP.md`,
-  `TECHNICAL_DEBT.md`, `ARCHITECTURE_DECISIONS.md`, `RISK_REGISTER.md`
-  (and `CHANGELOG.md` at the repo root). Keep all of them current when
-  making changes.
+  charter), the investment doctrine set (`INVESTMENT_CONSTITUTION.md`,
+  `INVESTMENT_PLAYBOOK.md`, `DECISION_STANDARDS.md`,
+  `PORTFOLIO_STANDARDS.md`, `INVESTMENT_HANDBOOK.md`), plus the
+  management set the charter mandates: `ROADMAP.md`, `TECHNICAL_DEBT.md`,
+  `ARCHITECTURE_DECISIONS.md`, `RISK_REGISTER.md` (and `CHANGELOG.md` at
+  the repo root). Keep all of them current when making changes — in
+  particular, a change to any decision-affecting threshold or gate
+  (`meta.decision_engine`, `meta.publication_gate`, `meta.readiness`,
+  `decision_service/`, `capital_allocation/`, `investment_proof/`) must be
+  reflected in the doctrine set in the same change, per the doctrine's own
+  amendment rule (`docs/INVESTMENT_CONSTITUTION.md`'s closing article):
+  numbered decision, stated reason, permanent record — never a silent
+  drift between what the code does and what the doctrine says it does.
 - `research/` — Python package (`agx_research`) containing the research
   engine. See `docs/ARCHITECTURE.md`'s component map for the full
   subpackage breakdown (Epoch I: `domain/`, `storage/`, `universe/`,

@@ -21,7 +21,26 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: Capital Allocation Intelligence (2026-08-01).**
+- **Current mission: EGX Investment Methodology (2026-08-01).** The
+  project owner declared the platform architecture complete and asked for
+  the investment methodology itself — a permanent constitution, not
+  descriptive documentation. Five new permanent doctrine documents under
+  `docs/`: `INVESTMENT_CONSTITUTION.md` (11 articles — why invest/reject,
+  cash/increase/reduce/exit triggers, capital allocation, confidence,
+  evidence evaluation, conflict handling, mistake review),
+  `INVESTMENT_PLAYBOOK.md` (12 market situations, each separating real
+  detected signals from honestly-named future-detector doctrine),
+  `DECISION_STANDARDS.md` (exact minimum bar per action label),
+  `PORTFOLIO_STANDARDS.md` (concentration/liquidity/cash/sizing/
+  recycling), `INVESTMENT_HANDBOOK.md` (13-chapter rebuild-without-
+  source-code walkthrough + constant glossary). Every claim grounded in
+  real, cited code. No source code changed — one gap in the mission's own
+  first-draft understanding (confidence aggregation is a plain mean, plus
+  a real, previously undocumented event-risk mechanism) was corrected in
+  the doctrine before delivery. 855 backend / 31 `api` / 51 `web` tests
+  remain green. See `CURRENT_MISSION.md` and `docs/PHASE_STATUS.md` for
+  full detail.
+- **Prior mission: Capital Allocation Intelligence (2026-08-01).**
   Redefined the platform again: no longer only a research/decision
   system, a capital allocation system — every recommendation competes
   for the same finite capital rather than being scored in isolation. New

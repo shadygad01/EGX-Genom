@@ -1,6 +1,37 @@
 # Next Missions
 
-## Closed this phase: Capital Allocation Intelligence
+## Closed this phase: EGX Investment Methodology (permanent investment doctrine)
+
+See `CURRENT_MISSION.md`'s "EGX Investment Methodology" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **The three named detector gaps in `docs/INVESTMENT_PLAYBOOK.md`** —
+   interest-rate cycles, inflation shocks, and sector rotation each
+   currently read only indirectly (via `agents.macro`'s generic
+   sensitivity mechanism or `MarketStructureAgent`'s co-movement proxy).
+   Real engineering work: a CBE policy-rate collector and a dedicated
+   rate-sensitivity mechanism; a real CPI/inflation series and a
+   dedicated inflation-sensitivity mechanism; a dedicated sector-rotation
+   detector distinct from the existing sector-exposure/co-movement
+   proxies. Each should close by extending the doctrine's own "doctrine,
+   not yet a dedicated detector" label to "real, mechanically detected"
+   in the same change that ships the detector — the playbook itself
+   should never silently fall out of date with what the platform can
+   actually see.
+2. **Amendment discipline going forward**: every future mission touching
+   `meta.decision_engine`/`meta.publication_gate`/`meta.readiness`/
+   `decision_service/`/`capital_allocation/`/`investment_proof/` must
+   update the doctrine set in the same change (`CLAUDE.md`'s new
+   standing rule) — treat a decision-affecting threshold or gate change
+   that doesn't touch `docs/INVESTMENT_CONSTITUTION.md`/`DECISION_
+   STANDARDS.md`/`PORTFOLIO_STANDARDS.md` as incomplete, the same way a
+   schema change without a matching `contracts/` regeneration already is.
+3. Everything already named as genuinely next before this phase (below)
+   is unchanged — this mission was documentation-only by explicit
+   instruction and touched no source.
+
+## Closed prior phase: Capital Allocation Intelligence
 
 See `CURRENT_MISSION.md`'s "Capital Allocation Intelligence" entry and
 `docs/PHASE_STATUS.md`'s matching section (including the mission's own

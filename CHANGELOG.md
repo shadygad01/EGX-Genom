@@ -1,5 +1,36 @@
 # Changelog
 
+## Unreleased — EGX Investment Methodology (permanent investment doctrine)
+
+The project owner declared the platform architecture complete and asked
+for the investment methodology itself: a permanent constitution, a
+market-situation playbook, exact decision/portfolio standards, and a
+complete operational handbook — documentation-only by explicit
+instruction, becoming the permanent governing doctrine for every future
+decision. See `docs/PHASE_STATUS.md`'s "EGX Investment Methodology"
+section for the full report.
+
+**Delivered**: `docs/INVESTMENT_CONSTITUTION.md` (11 articles: why
+invest/reject, when to hold cash/increase/reduce/exit, how capital is
+allocated, how confidence and evidence are interpreted, how conflicts and
+mistakes are handled — each grounded in a real, cited mechanism, never
+free-floating policy); `docs/INVESTMENT_PLAYBOOK.md` (12 market
+situations, each explicitly separating real mechanically-detected signals
+from honestly-named doctrine awaiting a future detector);
+`docs/DECISION_STANDARDS.md` (exact minimum bar for every one of the
+six-way action labels plus Abstain); `docs/PORTFOLIO_STANDARDS.md`
+(concentration/diversification/liquidity/cash/sizing/recycling rules);
+`docs/INVESTMENT_HANDBOOK.md` (13-chapter rebuild-without-source-code
+walkthrough with a full constant glossary).
+
+**No code changed.** One real gap in the mission's own working
+understanding — not in the platform — was caught while writing and
+corrected before delivery: the prediction model's confidence aggregation
+is a plain arithmetic mean, not a genuine confidence-weighted one (the
+weight term mathematically cancels), and a separate, real, previously
+undocumented event-driven risk-inflation/confidence-deflation mechanism
+exists alongside it. Both documents state the real formula.
+
 ## Unreleased — Capital Allocation Intelligence
 
 The project owner redefined the platform again: no longer a research or

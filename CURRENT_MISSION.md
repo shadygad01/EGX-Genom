@@ -1,6 +1,55 @@
 # Current Mission
 
-## Current mission: Capital Allocation Intelligence (2026-08-01)
+## Current mission: EGX Investment Methodology (2026-08-01)
+
+The project owner declared software implementation no longer the primary
+mission and the platform architecture complete. The next objective:
+define the investment methodology itself — not documentation in the
+descriptive sense, but the permanent constitution governing every future
+decision. Required: an Investment Constitution (permanent principles —
+why invest/reject, when to hold cash/increase/reduce/exit, how capital is
+allocated, how confidence and evidence are interpreted, how conflicts and
+mistakes are handled), an Investment Playbook (operating procedures for
+12 market situations), Decision Standards (exact minimum bar for every
+action label), Portfolio Standards (concentration/diversification/
+liquidity/cash/sizing/recycling), and a complete Investment Handbook
+detailed enough for another engineering team to rebuild the process
+without reading the source. Explicit instruction: no code unless the
+writing process reveals a real architectural inconsistency requiring
+correction.
+
+**Delivered**: see `docs/PHASE_STATUS.md`'s "EGX Investment Methodology"
+section for the full report. Five new permanent documents under `docs/`:
+`INVESTMENT_CONSTITUTION.md`, `INVESTMENT_PLAYBOOK.md`,
+`DECISION_STANDARDS.md`, `PORTFOLIO_STANDARDS.md`,
+`INVESTMENT_HANDBOOK.md` — every claim grounded in a real,
+already-implemented mechanism read directly from source (`decision_service/`,
+`meta/`, `capital_allocation/`, `investment_proof/`, `learning/`,
+`valuation/`, `market_memory/`, `causal/`, `review/`, `adversarial/`,
+`horizons/`), cited by exact module and threshold, never free-floating
+policy. The playbook explicitly separates real, mechanically-detected
+signals (Market Regime, Country & Macro Risk, the liquidity floor, Market
+Breadth) from honestly-named doctrine awaiting a detector that does not
+exist yet (interest-rate cycles, inflation shocks, sector rotation).
+
+**No code changed.** One real gap surfaced and was corrected during
+writing — not in the platform, in the mission's own first-draft
+understanding of it: the prediction model's confidence aggregation is a
+plain arithmetic mean, not a genuine confidence-weighted one (the weight
+term mathematically cancels), and a separate, real, previously
+undocumented event-driven risk-inflation/confidence-deflation mechanism
+exists alongside it (severity-weighted, capped at a combined 50%). Both
+documents state the real formula rather than the first-assumed one; the
+underlying code was already correct and untouched.
+
+**Result**: 855 backend / 31 `api` / 51 `web` tests remain green (no
+source touched); `ruff check` unaffected. Amendment discipline is
+explicit in the Constitution's closing article: any future change to a
+decision-affecting threshold or gate must update the doctrine in the same
+change, via a numbered `docs/ARCHITECTURE_DECISIONS.md` entry — never a
+silent drift between what the code does and what the doctrine says.
+
+## Prior mission: Capital Allocation Intelligence (2026-08-01)
 
 The project owner's next redefinition: the platform is no longer only a
 research or decision system — it must become a capital allocation

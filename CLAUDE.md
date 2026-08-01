@@ -112,30 +112,39 @@ Layout:
   like the CLI it wraps).
 - `web/` — TypeScript (Vite + React) Investment Operating System (the IOS
   mission, 2026-08-01: research is an internal capability, investment
-  decisions are the product). 7 top-level routed sections in the
-  mission-mandated hierarchy — CIO Desk (`/`, the landing page; exactly 5
-  sections: Market Regime, Today's Actions, Portfolio Summary, Warnings,
-  Investment Committee Summary — never more, per the Product Law that
-  every screen answers exactly one primary investment question),
-  Portfolio (`/portfolio`, holdings entry + the live six-way decision
-  table), Investment Cases (`/cases`, `/cases/:ticker` — the 19-section
-  thesis-first case page), Monitoring (`/monitoring`), Market (`/market`),
-  Research (`/research` — the internal-capability hub, absorbing the
-  former Opportunity Center's Decision Readiness/Data Coverage tables and
-  linking out to Knowledge Graph/Source Intelligence, which stay
-  reachable but off the primary nav), Settings (`/settings`, merging the
-  former Mission Control + System Administration). Each page reads real
-  dashboard artifacts through `DashboardDataProvider` — see
+  decisions are the product; extended by the Capital Allocation
+  Intelligence mission, 2026-08-01: every recommendation competes for the
+  same finite capital rather than being scored in isolation). 7 top-level
+  routed sections in the mission-mandated hierarchy — CIO Desk (`/`, the
+  landing page; exactly 5 sections: Market Regime, Capital Allocation,
+  Portfolio Summary, Warnings, Investment Committee Summary — never more,
+  per the Product Law that every screen answers exactly one primary
+  investment question), Portfolio (`/portfolio`, holdings entry + the live
+  six-way decision table), Investment Cases (`/cases`, `/cases/:ticker` —
+  the 19-section thesis-first case page), Monitoring (`/monitoring`),
+  Market (`/market`), Research (`/research` — the internal-capability hub,
+  absorbing the former Opportunity Center's Decision Readiness/Data
+  Coverage tables and linking out to Knowledge Graph/Source Intelligence,
+  which stay reachable but off the primary nav), Settings (`/settings`,
+  merging the former Mission Control + System Administration). Each page
+  reads real dashboard artifacts through `DashboardDataProvider` — see
   `docs/ARCHITECTURE.md`'s "Dashboard data providers" and "Frontend:
-  Institutional Investment Operating System" sections. Portfolio is the
-  one page that writes (`POST /decisions`); it only works against a live
+  Institutional Investment Operating System" sections. Portfolio is one of
+  two pages that write (`POST /decisions`); it only works against a live
   `api/` (`StaticJsonProvider` honestly reports itself unavailable on the
   static GitHub Pages build, never fabricating a decision). CIO Desk's
-  Today's Actions calls the same live endpoint when the investor has
-  entered holdings via `usePortfolioPositions` (localStorage-only — the
-  backend never stores real portfolio data) and otherwise falls back to
-  the position-unaware model portfolio, always labeled which one is
-  showing. The prior 9-section IA (AI Briefing, Decision Center,
+  Capital Allocation section (Capital Deployment Queue, Capital Recycling,
+  Capital Released Today, Best New Opportunities, Highest Opportunity
+  Cost, Allocation Changes, Capital Waiting For Better Opportunities — the
+  mission's 7 named sub-sections) calls both `POST /decisions` and the
+  second live-write endpoint, `POST /capital-allocation`, when the
+  investor has entered holdings via `usePortfolioPositions`
+  (localStorage-only — the backend never stores real portfolio data), and
+  otherwise falls back to the existing position-unaware decisions table
+  plus a ranked "Best New Opportunities" preview from the model portfolio
+  — the other 6 sub-sections honestly state they need real holdings rather
+  than fabricating a capital competition that doesn't exist without real
+  capital. The prior 9-section IA (AI Briefing, Decision Center,
   Opportunity Center, Company Research Workspace, Mission Control, System
   Administration) was retired outright, not kept as parallel dead code —
   see `docs/PHASE_STATUS.md`'s IOS section for the full page-by-page
@@ -254,6 +263,35 @@ Layout:
   risk. Only the INVESTMENT horizon drives an action here (`AD-35`'s
   existing "never blend horizons into one action" rule), since this
   layer exists for the long-term-investor mission specifically.
+  `PositionAwareDecision.opportunity_score`/`expected_return`/
+  `expected_risk` (Capital Allocation Intelligence mission) expose the
+  same score/return/risk `decide_portfolio()` already computes internally
+  as first-class fields — any future consumer needing to rank tickers
+  against each other reads these, never re-derives the eligibility/
+  scoring rule a second time.
+- `capital_allocation/` (`CapitalAllocationEngine`) is the read-only
+  ranking/opportunity-cost/recycling layer *on top of*
+  `decision_service.DecisionService.decide_portfolio()`'s output — it
+  never rescoring or reweighs anything `decide_portfolio()` already
+  computed, only attributes each unit of requested capital to a source
+  (idle cash, or a specific lower-ranked holding whose reduction/exit
+  released it) and each unit of released capital to a destination (a
+  specific higher-ranked demander, or back to cash). Idle cash is always
+  drawn before any holding is displaced, so a holding is only ever named
+  as a capital source when idle cash genuinely wasn't enough — never
+  fabricate a "should this replace another investment" conflict where
+  idle cash alone would have covered it. A ticker whose `PositionAwareDecision.abstained`
+  is `True` never participates in capital-flow matching even if its raw
+  `target_weight` differs from `current_weight` — `decide_portfolio()`
+  deliberately reports `target_weight=0.0` for an abstained held ticker to
+  keep its own scoring simple, but labels the *action* `hold` specifically
+  so an evidence gap is never read as a sell signal; treating that raw
+  number as a real capital release would fabricate a movement nothing
+  recommends. Same architectural posture as `decision_service/` itself:
+  stateless-per-call, queried on demand only (`agx allocate-capital`,
+  `POST /capital-allocation`), never wired into
+  `production.pipeline.ProductionPipeline` — there is nothing to rank or
+  recycle without the investor's own real `PositionState`.
 - `decision_service.country_risk.assess_country_risk()` classifies
   Country & Macro Risk severity (NORMAL/DETERIORATING/CRISIS) from macro
   series data. `CRISIS` must never be inferred from a currency/macro move

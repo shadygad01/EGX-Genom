@@ -1,6 +1,56 @@
 # Current Mission
 
-## Current mission: EGX-Genom Final Product Mission — Institutional Investment Operating System (2026-08-01)
+## Current mission: Capital Allocation Intelligence (2026-08-01)
+
+The project owner's next redefinition: the platform is no longer only a
+research or decision system — it must become a capital allocation
+system. Controlling reframe: every investment decision competes for the
+same limited capital, so the question is never "is this stock good?" but
+"is this the best use of capital available today?" Explicit requirements:
+capital as the primary input (every recommendation is a proposal
+requesting capital), a Global Opportunity Ranking evaluating the entire
+universe simultaneously (never score in isolation), a new Opportunity
+Cost Engine, a Capital Deployment Queue, Capital Recycling (every
+released pound gets an explicit destination), relative decision-making
+(BUY must answer "better than what?", SELL must answer "replace with
+what?"), 7 new CIO Desk sections, a hard prohibition on local (per-stock)
+optimization, explicit instruction to reuse `DecisionService`/
+`PortfolioConstructor`/`investment_proof` rather than duplicate logic,
+and a Mandatory Final Review before declaring completion.
+
+**Delivered**: see `docs/PHASE_STATUS.md`'s "Capital Allocation
+Intelligence" section for the complete report, including the Mandatory
+Final Review's own findings. `PositionAwareDecision` gained 3 fields
+(`opportunity_score`/`expected_return`/`expected_risk`) exposing numbers
+`DecisionService.decide_portfolio()` already computed. New
+`capital_allocation/` package (`CapitalAllocationEngine`) — a read-only
+ranking/opportunity-cost/recycling layer strictly on top of
+`decide_portfolio()`'s already-joint, already-normalized output: a
+global rank for every ticker it evaluated (not only the funded ones), a
+deterministic capital-flow matcher (idle cash drawn first, the
+weakest-ranked holding displaced before a stronger one), and a
+`CapitalAllocationPlan` covering all 7 mission-named views. A real bug
+(an abstained held ticker's placeholder `target_weight=0.0` initially
+misread as a genuine capital release) was found and fixed by the
+mission's own tests before shipping. New `agx allocate-capital` CLI
+command and `POST /capital-allocation` API route, both sharing setup/
+shell-out helpers with the existing `decide`/`POST /decisions` rather
+than duplicating them. CIO Desk's "Today's Actions" is now "Capital
+Allocation," rendering the mission's 7 named sub-sections live when
+holdings are entered, with an honest (never fabricated) fallback
+otherwise.
+
+**Result**: 855 backend tests pass (up from 840, 15 new); 31 `api` tests
+pass (up from 27, 4 new); 51 `web` tests pass (up from 47, 4 new); `ruff
+check`/`tsc --noEmit`/production builds all clean. Live-verified in
+English and Arabic/RTL via headless Chromium against real demo data.
+**Named, not silently left out**: the position-unaware CIO Desk fallback
+(no holdings) deliberately gets no ranking/recycling treatment — nothing
+real to displace without real capital, the same boundary
+`decision_service/` already lives by; `Portfolio.tsx` was not extended
+with the same view in this pass (new TD-62).
+
+## Prior mission: EGX-Genom Final Product Mission — Institutional Investment Operating System (2026-08-01)
 
 The project owner's final-product mission: redefine EGX-Genom from a
 research platform into an institutional-grade Investment Operating

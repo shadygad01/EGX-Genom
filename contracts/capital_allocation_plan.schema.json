@@ -1,0 +1,529 @@
+{
+  "$defs": {
+    "AllocationChange": {
+      "description": "Any ticker whose target weight differs from its current weight\ntoday -- the union of the queue and the releases, one flat list for\nan at-a-glance \"what moved\" view.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/PositionAction"
+        },
+        "capital_delta": {
+          "title": "Capital Delta",
+          "type": "number"
+        },
+        "current_weight": {
+          "title": "Current Weight",
+          "type": "number"
+        },
+        "target_weight": {
+          "title": "Target Weight",
+          "type": "number"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "action",
+        "current_weight",
+        "target_weight",
+        "capital_delta"
+      ],
+      "title": "AllocationChange",
+      "type": "object"
+    },
+    "CapitalFlow": {
+      "description": "One matched movement of capital from a supplier to a demander.\n`from_ticker=None` means the capital came from idle cash;\n`to_ticker=None` means released capital returned to cash rather than\nfunding anything today.",
+      "properties": {
+        "amount": {
+          "title": "Amount",
+          "type": "number"
+        },
+        "from_ticker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From Ticker"
+        },
+        "to_ticker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "To Ticker"
+        }
+      },
+      "required": [
+        "amount"
+      ],
+      "title": "CapitalFlow",
+      "type": "object"
+    },
+    "CapitalQueueEntry": {
+      "description": "One proposal requesting capital, ranked against every other\nproposal -- the Capital Deployment Queue. `capital_sources` and\n`opportunity_cost_note` are what make the underlying action answer\n\"better than what?\" and \"funded by what?\" instead of a bare BUY/\nINCREASE label.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/PositionAction"
+        },
+        "capital_delta": {
+          "title": "Capital Delta",
+          "type": "number"
+        },
+        "capital_sources": {
+          "items": {
+            "$ref": "#/$defs/CapitalSource"
+          },
+          "title": "Capital Sources",
+          "type": "array"
+        },
+        "current_weight": {
+          "title": "Current Weight",
+          "type": "number"
+        },
+        "expected_contribution": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Contribution"
+        },
+        "marginal_benefit": {
+          "title": "Marginal Benefit",
+          "type": "number"
+        },
+        "marginal_risk": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Marginal Risk"
+        },
+        "opportunity_cost_note": {
+          "title": "Opportunity Cost Note",
+          "type": "string"
+        },
+        "priority": {
+          "title": "Priority",
+          "type": "integer"
+        },
+        "required_action": {
+          "title": "Required Action",
+          "type": "string"
+        },
+        "target_weight": {
+          "title": "Target Weight",
+          "type": "number"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "priority",
+        "action",
+        "target_weight",
+        "current_weight",
+        "capital_delta",
+        "marginal_benefit",
+        "required_action",
+        "opportunity_cost_note"
+      ],
+      "title": "CapitalQueueEntry",
+      "type": "object"
+    },
+    "CapitalRelease": {
+      "description": "One ticker whose allocation shrank today -- Capital Released Today.\n`destinations` names exactly which demander(s) (or cash) absorbed it,\nanswering \"replace with what?\" for every REDUCE/EXIT.",
+      "properties": {
+        "amount": {
+          "title": "Amount",
+          "type": "number"
+        },
+        "destinations": {
+          "items": {
+            "$ref": "#/$defs/CapitalSource"
+          },
+          "title": "Destinations",
+          "type": "array"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "amount"
+      ],
+      "title": "CapitalRelease",
+      "type": "object"
+    },
+    "CapitalSource": {
+      "description": "One unit of capital funding a queue entry. `ticker=None` means\nunallocated cash rather than a displaced holding.",
+      "properties": {
+        "amount": {
+          "title": "Amount",
+          "type": "number"
+        },
+        "ticker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ticker"
+        }
+      },
+      "required": [
+        "amount"
+      ],
+      "title": "CapitalSource",
+      "type": "object"
+    },
+    "CashWaiting": {
+      "description": "Capital deliberately left unallocated rather than forced into a\nweaker idea -- Capital Waiting For Better Opportunities.",
+      "properties": {
+        "idle_cash_after": {
+          "title": "Idle Cash After",
+          "type": "number"
+        },
+        "idle_cash_before": {
+          "title": "Idle Cash Before",
+          "type": "number"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "idle_cash_before",
+        "idle_cash_after",
+        "reason"
+      ],
+      "title": "CashWaiting",
+      "type": "object"
+    },
+    "Explanation": {
+      "description": "Answers to the questions every recommendation must be able to answer.\n\n`evidence_refs` is what keeps `supporting_evidence` from being just\nprose: each entry points at an actual, looked-up-able entity (a\nknowledge object, a dataset snapshot, a feature) rather than only a\nsentence describing one.",
+      "properties": {
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "invalidation_conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidation Conditions",
+          "type": "array"
+        },
+        "similar_historical_cases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Similar Historical Cases",
+          "type": "array"
+        },
+        "supporting_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Evidence",
+          "type": "array"
+        },
+        "why_not_others": {
+          "title": "Why Not Others",
+          "type": "string"
+        },
+        "why_now": {
+          "title": "Why Now",
+          "type": "string"
+        },
+        "why_this_stock": {
+          "title": "Why This Stock",
+          "type": "string"
+        }
+      },
+      "required": [
+        "why_this_stock",
+        "why_now",
+        "why_not_others"
+      ],
+      "title": "Explanation",
+      "type": "object"
+    },
+    "OpportunityCostHighlight": {
+      "description": "A real, evidence-backed opportunity that received zero capital\ntoday because a higher-ranked idea claimed the budget first --\nHighest Opportunity Cost.",
+      "properties": {
+        "opportunity_score": {
+          "title": "Opportunity Score",
+          "type": "number"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "opportunity_score",
+        "reason"
+      ],
+      "title": "OpportunityCostHighlight",
+      "type": "object"
+    },
+    "PositionAction": {
+      "enum": [
+        "buy",
+        "increase_position",
+        "hold",
+        "reduce_position",
+        "exit",
+        "no_action"
+      ],
+      "title": "PositionAction",
+      "type": "string"
+    },
+    "Provenance": {
+      "properties": {
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "produced_at": {
+          "format": "date-time",
+          "title": "Produced At",
+          "type": "string"
+        },
+        "produced_by": {
+          "title": "Produced By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "produced_by",
+        "produced_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "description": "A pointer to one input entity: what kind it is, its id, and (if versioned) which version.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "ref_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Version"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    },
+    "RankedOpportunity": {
+      "description": "Where one ticker stands against every other ticker competing for the\nsame capital -- the Global Opportunity Ranking. Includes every ticker\n`DecisionService` evaluated, not only the funded ones, so a real\nrejected opportunity is visible, not silently dropped.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/PositionAction"
+        },
+        "confidence": {
+          "title": "Confidence",
+          "type": "number"
+        },
+        "current_weight": {
+          "title": "Current Weight",
+          "type": "number"
+        },
+        "expected_return": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Return"
+        },
+        "expected_risk": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Risk"
+        },
+        "is_new_position": {
+          "title": "Is New Position",
+          "type": "boolean"
+        },
+        "opportunity_score": {
+          "title": "Opportunity Score",
+          "type": "number"
+        },
+        "rank": {
+          "title": "Rank",
+          "type": "integer"
+        },
+        "target_weight": {
+          "title": "Target Weight",
+          "type": "number"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rank",
+        "ticker",
+        "opportunity_score",
+        "action",
+        "target_weight",
+        "current_weight",
+        "confidence",
+        "is_new_position"
+      ],
+      "title": "RankedOpportunity",
+      "type": "object"
+    }
+  },
+  "description": "The full institutional capital-allocation view for one `as_of`\ndate: every opportunity ranked together, the deployment queue, the\nrecycling ledger, and the honest leftover-cash accounting. Never\nconstructed without an `Explanation` (Principle 3, same rule every\nother recommendation-like object in this codebase follows).",
+  "properties": {
+    "allocation_changes": {
+      "items": {
+        "$ref": "#/$defs/AllocationChange"
+      },
+      "title": "Allocation Changes",
+      "type": "array"
+    },
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "best_new_opportunities": {
+      "items": {
+        "$ref": "#/$defs/RankedOpportunity"
+      },
+      "title": "Best New Opportunities",
+      "type": "array"
+    },
+    "capital_recycled": {
+      "items": {
+        "$ref": "#/$defs/CapitalFlow"
+      },
+      "title": "Capital Recycled",
+      "type": "array"
+    },
+    "capital_released_today": {
+      "items": {
+        "$ref": "#/$defs/CapitalRelease"
+      },
+      "title": "Capital Released Today",
+      "type": "array"
+    },
+    "cash_waiting": {
+      "$ref": "#/$defs/CashWaiting"
+    },
+    "explanation": {
+      "$ref": "#/$defs/Explanation"
+    },
+    "highest_opportunity_cost": {
+      "items": {
+        "$ref": "#/$defs/OpportunityCostHighlight"
+      },
+      "title": "Highest Opportunity Cost",
+      "type": "array"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "queue": {
+      "items": {
+        "$ref": "#/$defs/CapitalQueueEntry"
+      },
+      "title": "Queue",
+      "type": "array"
+    },
+    "ranking": {
+      "items": {
+        "$ref": "#/$defs/RankedOpportunity"
+      },
+      "title": "Ranking",
+      "type": "array"
+    }
+  },
+  "required": [
+    "as_of",
+    "cash_waiting",
+    "explanation",
+    "provenance"
+  ],
+  "title": "CapitalAllocationPlan",
+  "type": "object"
+}

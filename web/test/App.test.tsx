@@ -43,6 +43,19 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getWarnings: async () => null,
     getCommitteeSummary: async () => null,
     postDecisions: async () => [],
+    postCapitalAllocation: async () => ({
+      as_of: "2026-07-22",
+      ranking: [],
+      queue: [],
+      capital_released_today: [],
+      capital_recycled: [],
+      best_new_opportunities: [],
+      highest_opportunity_cost: [],
+      allocation_changes: [],
+      cash_waiting: { idle_cash_before: 1, idle_cash_after: 1, reason: "test" },
+      explanation: { why_this_stock: "", why_now: "", why_not_others: "" },
+      provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
+    }),
     ...overrides,
   };
 }
@@ -138,10 +151,86 @@ describe("CIO Desk", () => {
   it("answers 'what should I do today' with only the 5 mandated sections", async () => {
     await renderApp("/");
     expect(await screen.findByText("Market Regime")).toBeInTheDocument();
-    expect(screen.getByText("Today's Actions")).toBeInTheDocument();
+    expect(screen.getByText("Capital Allocation")).toBeInTheDocument();
     expect(screen.getByText("Portfolio Summary")).toBeInTheDocument();
     expect(screen.getByText("Warnings")).toBeInTheDocument();
     expect(screen.getByText("Investment Committee Summary")).toBeInTheDocument();
+  });
+
+  it("renders the Capital Allocation deployment queue live when holdings are saved", async () => {
+    window.localStorage.setItem(
+      "agx.portfolio.positions.v1",
+      JSON.stringify([{ ticker: "COMI", currentWeight: 0.05, averageCost: 60 }])
+    );
+    mockProvider = fakeProvider({
+      postDecisions: async () => [],
+      postCapitalAllocation: async () => ({
+        as_of: "2026-07-22",
+        ranking: [
+          {
+            rank: 1,
+            ticker: "ETEL",
+            opportunity_score: 1.5,
+            action: "buy",
+            target_weight: 0.2,
+            current_weight: 0,
+            confidence: 0.8,
+            expected_return: 0.1,
+            expected_risk: 0.04,
+            is_new_position: true,
+          },
+        ],
+        queue: [
+          {
+            ticker: "ETEL",
+            priority: 1,
+            action: "buy",
+            target_weight: 0.2,
+            current_weight: 0,
+            capital_delta: 0.2,
+            expected_contribution: 0.02,
+            marginal_benefit: 1.5,
+            marginal_risk: 0.04,
+            capital_sources: [{ ticker: null, amount: 0.2 }],
+            required_action: "Buy ETEL to 20.00%, funded by idle cash: 20.00%.",
+            opportunity_cost_note: "Every ticker with a positive opportunity score is already funded; no rejected alternative exists today.",
+          },
+        ],
+        capital_released_today: [],
+        capital_recycled: [],
+        best_new_opportunities: [
+          {
+            rank: 1,
+            ticker: "ETEL",
+            opportunity_score: 1.5,
+            action: "buy",
+            target_weight: 0.2,
+            current_weight: 0,
+            confidence: 0.8,
+            expected_return: 0.1,
+            expected_risk: 0.04,
+            is_new_position: true,
+          },
+        ],
+        highest_opportunity_cost: [],
+        allocation_changes: [
+          { ticker: "ETEL", action: "buy", current_weight: 0, target_weight: 0.2, capital_delta: 0.2 },
+        ],
+        cash_waiting: { idle_cash_before: 0.95, idle_cash_after: 0.75, reason: "test reason" },
+        explanation: { why_this_stock: "", why_now: "", why_not_others: "" },
+        provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
+      }),
+    });
+    await renderApp("/");
+    expect(await screen.findByText("Capital Deployment Queue")).toBeInTheDocument();
+    expect(await screen.findByText(/Buy ETEL to 20\.00%/)).toBeInTheDocument();
+    expect(screen.getByText("Capital Recycling")).toBeInTheDocument();
+    expect(screen.getByText("Capital Released Today")).toBeInTheDocument();
+    expect(screen.getByText("Best New Opportunities")).toBeInTheDocument();
+    expect(screen.getByText("Highest Opportunity Cost")).toBeInTheDocument();
+    expect(screen.getByText("Allocation Changes")).toBeInTheDocument();
+    expect(screen.getByText("Capital Waiting For Better Opportunities")).toBeInTheDocument();
+    expect(screen.getByText("test reason")).toBeInTheDocument();
   });
 
   it("prompts to add holdings when none are saved, linking to Portfolio", async () => {

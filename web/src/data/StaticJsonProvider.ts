@@ -43,7 +43,7 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
-import type { PositionAwareDecision } from "../types";
+import type { CapitalAllocationPlan, PositionAwareDecision } from "../types";
 import { LiveDecisionsUnavailableError, type DashboardDataProvider, type DecideRequest } from "./DataProvider";
 
 async function fetchList<T>(filename: string): Promise<T[]> {
@@ -220,6 +220,14 @@ export class StaticJsonProvider implements DashboardDataProvider {
         "holdings, which this platform never autonomously discovers or precomputes into the " +
         "static dashboard -- run `npm run dev -w api` locally with DECISION_DATA_DIR set (see " +
         "README's 'Personalized decisions' section), or use `agx decide` directly."
+    );
+  }
+
+  async postCapitalAllocation(_request: DecideRequest): Promise<CapitalAllocationPlan> {
+    throw new LiveDecisionsUnavailableError(
+      "Capital allocation needs a live backend, for the same reason personalized decisions do -- " +
+        "there is nothing to rank or recycle without your own real portfolio holdings. Run " +
+        "`npm run dev -w api` locally with DECISION_DATA_DIR set, or use `agx allocate-capital` directly."
     );
   }
 }

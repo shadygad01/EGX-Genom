@@ -83,6 +83,13 @@ describe("StaticJsonProvider", () => {
     );
   });
 
+  it("postCapitalAllocation always reports itself unavailable, never fabricating a plan", async () => {
+    const provider = new StaticJsonProvider();
+    await expect(provider.postCapitalAllocation({ date: "2026-06-14" })).rejects.toThrow(
+      LiveDecisionsUnavailableError,
+    );
+  });
+
   it("fetches the CIO Desk artifacts (portfolio summary, warnings, committee summary)", async () => {
     const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(null)));
     vi.stubGlobal("fetch", fetchMock);

@@ -1,5 +1,62 @@
 # Changelog
 
+## Unreleased — Capital Allocation Intelligence
+
+The project owner redefined the platform again: no longer a research or
+decision system, a capital allocation system — every recommendation
+competes for the same finite capital rather than being scored in
+isolation ("is this the best use of capital available today?", not "is
+this stock good?"). See `docs/PHASE_STATUS.md`'s "Capital Allocation
+Intelligence" section for the full report, including the Mandatory Final
+Review the mission required before declaring completion.
+
+**Backend**: `PositionAwareDecision` gained 3 additive fields
+(`opportunity_score`, `expected_return`, `expected_risk`) exposing
+numbers `DecisionService.decide_portfolio()` already computed internally.
+New `capital_allocation/` package (`CapitalAllocationEngine`) — a
+read-only ranking/opportunity-cost/recycling layer strictly on top of
+`decide_portfolio()`'s output: a global rank for every ticker it
+evaluated, a deterministic capital-flow matcher (idle cash drawn before
+any holding is displaced; the weakest-ranked holding displaced before a
+stronger one), and a `CapitalAllocationPlan` (ranking, deployment queue,
+capital released/recycled, best new opportunities, highest opportunity
+cost, allocation changes, cash waiting). Caught and fixed a real bug via
+its own tests before shipping: an abstained held ticker's `target_weight
+=0.0` (no fresh evidence, not a decisive sell) was initially read as a
+real capital release — fixed with `_effective_target()`. New `agx
+allocate-capital` CLI command, sharing `decide`'s own setup via a new
+`build_position_aware_decisions()` helper rather than duplicating it. 15
+new tests; 855 backend tests pass; `ruff check` clean.
+
+**API**: `POST /capital-allocation`, the same live-bridge shape as
+`POST /decisions` (shells out to the CLI, no business logic in
+TypeScript), sharing a new `runCli()` helper with `/decisions` rather
+than duplicating the shell-out logic. 4 new tests; 31 `api` tests pass;
+clean build.
+
+**Frontend**: CIO Desk's "Today's Actions" section is now "Capital
+Allocation," rendering the mission's 7 named sub-sections (Capital
+Deployment Queue, Capital Recycling, Capital Released Today, Best New
+Opportunities, Highest Opportunity Cost, Allocation Changes, Capital
+Waiting For Better Opportunities) from a live `CapitalAllocationPlan`
+when the investor has entered holdings, with an honest fallback (the
+existing decisions table + a ranked model-portfolio preview) otherwise —
+never fabricating a capital competition that doesn't exist without real
+capital. New `postCapitalAllocation()` on `DashboardDataProvider`
+(`ApiProvider` live; `StaticJsonProvider` always reports itself
+unavailable, same posture as `postDecisions`). 4 new tests; 51 `web`
+tests pass; clean `tsc`/build. Live-verified in English and Arabic/RTL
+via headless Chromium against real demo data — all 7 sub-sections render
+the platform's honest current state (an empty plan, since no real EGX
+vendor is licensed yet), no overflow in either direction.
+
+**Named, not silently left out**: the position-unaware CIO Desk fallback
+(no holdings entered) deliberately does not get ranking/opportunity-cost/
+recycling treatment — there is nothing real to displace or recycle
+without real capital and real holdings, the same architectural boundary
+`decision_service/` already lives by. `Portfolio.tsx` was not extended
+with the same view in this pass (new TD-62).
+
 ## Unreleased — EGX-Genom Final Product Mission: Institutional Investment Operating System (IOS)
 
 The project owner redefined AGX from a research platform into an

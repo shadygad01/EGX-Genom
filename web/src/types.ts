@@ -941,6 +941,9 @@ export interface PositionAwareDecision {
   current_weight: number;
   horizon: Horizon;
   confidence: number;
+  opportunity_score: number;
+  expected_return: number | null;
+  expected_risk: number | null;
   investment_thesis: string;
   key_risks: string[];
   contradicting_evidence: string[];
@@ -1026,4 +1029,87 @@ export interface CommitteeSummaryReport {
   as_of: string;
   tickers_evaluated: number;
   opinions: CommitteeOpinion[];
+}
+
+// --- capital_allocation / CapitalAllocationEngine (POST /capital-allocation, live-computed --
+// see data/DataProvider.ts's postCapitalAllocation; not a static dashboard artifact, same
+// reason as PositionAwareDecision -- there is nothing to rank/recycle without a real portfolio) ---
+
+export interface RankedOpportunity {
+  rank: number;
+  ticker: string;
+  opportunity_score: number;
+  action: PositionAction;
+  target_weight: number;
+  current_weight: number;
+  confidence: number;
+  expected_return: number | null;
+  expected_risk: number | null;
+  is_new_position: boolean;
+}
+
+export interface CapitalSource {
+  ticker: string | null;
+  amount: number;
+}
+
+export interface CapitalFlow {
+  from_ticker: string | null;
+  to_ticker: string | null;
+  amount: number;
+}
+
+export interface CapitalQueueEntry {
+  ticker: string;
+  priority: number;
+  action: PositionAction;
+  target_weight: number;
+  current_weight: number;
+  capital_delta: number;
+  expected_contribution: number | null;
+  marginal_benefit: number;
+  marginal_risk: number | null;
+  capital_sources: CapitalSource[];
+  required_action: string;
+  opportunity_cost_note: string;
+}
+
+export interface CapitalRelease {
+  ticker: string;
+  amount: number;
+  destinations: CapitalSource[];
+}
+
+export interface OpportunityCostHighlight {
+  ticker: string;
+  opportunity_score: number;
+  reason: string;
+}
+
+export interface AllocationChange {
+  ticker: string;
+  action: PositionAction;
+  current_weight: number;
+  target_weight: number;
+  capital_delta: number;
+}
+
+export interface CashWaiting {
+  idle_cash_before: number;
+  idle_cash_after: number;
+  reason: string;
+}
+
+export interface CapitalAllocationPlan {
+  as_of: string;
+  ranking: RankedOpportunity[];
+  queue: CapitalQueueEntry[];
+  capital_released_today: CapitalRelease[];
+  capital_recycled: CapitalFlow[];
+  best_new_opportunities: RankedOpportunity[];
+  highest_opportunity_cost: OpportunityCostHighlight[];
+  allocation_changes: AllocationChange[];
+  cash_waiting: CashWaiting;
+  explanation: Explanation;
+  provenance: Provenance;
 }

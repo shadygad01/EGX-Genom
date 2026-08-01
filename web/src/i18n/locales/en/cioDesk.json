@@ -13,11 +13,6 @@
     "action": "Go to Portfolio →"
   },
   "todaysActions": {
-    "title": "Today's Actions",
-    "description": "What should I do today?",
-    "sourceLive": "Personalized to your holdings (live decision_service call).",
-    "sourceUnavailable": "Personalized decisions need a live backend — showing the model portfolio's suggested starting positions instead.",
-    "sourceModelPortfolio": "No holdings entered yet — showing the model portfolio's suggested starting positions (not personalized).",
     "emptyTitle": "No action required today",
     "emptyDetail": "Nothing currently clears the evidence bar for a real position.",
     "suggestedBuy": "Suggested",
@@ -27,6 +22,69 @@
     "topReasons": "Top Reasons",
     "largestRisk": "Largest Risk",
     "notAssessed": "Not assessed"
+  },
+  "capitalAllocation": {
+    "title": "Capital Allocation",
+    "description": "Is this the best use of my capital available today?",
+    "sourceLive": "Personalized to your holdings (live capital allocation engine call).",
+    "sourceUnavailable": "Capital allocation needs a live backend — showing the model portfolio's suggested starting positions instead.",
+    "sourceModelPortfolio": "No holdings entered yet — showing the model portfolio's suggested starting positions (not personalized).",
+    "needsHoldingsTitle": "Needs your real holdings",
+    "needsHoldingsDetail": "There is nothing to rank, displace, or recycle without your own portfolio — add your holdings above to see this section live.",
+    "queue": {
+      "title": "Capital Deployment Queue",
+      "description": "Every proposal requesting capital, ranked against every other proposal.",
+      "priority": "Priority",
+      "targetAllocation": "Target Allocation (Δ)",
+      "requiredAction": "Required Action",
+      "expectedContribution": "Expected Contribution",
+      "marginalBenefit": "Marginal Benefit",
+      "marginalRisk": "Marginal Risk",
+      "capitalSources": "Capital Source",
+      "opportunityCost": "Opportunity Cost",
+      "fallbackNote": "Full queue economics (priority, capital source, opportunity cost) need your real holdings — showing today's actions only."
+    },
+    "recycling": {
+      "title": "Capital Recycling",
+      "description": "Which released holding funded which new one.",
+      "emptyTitle": "No capital recycled today",
+      "emptyDetail": "Every funded proposal was covered by idle cash alone — no holding needed to be displaced."
+    },
+    "released": {
+      "title": "Capital Released Today",
+      "description": "Every holding whose allocation shrank today, and where that capital went.",
+      "emptyTitle": "No capital released today",
+      "emptyDetail": "No holding is being reduced or exited today."
+    },
+    "bestNew": {
+      "title": "Best New Opportunities",
+      "description": "The highest-ranked ideas not already in the portfolio.",
+      "emptyTitle": "No new opportunities today",
+      "emptyDetail": "Nothing outside the current portfolio currently clears the evidence bar.",
+      "score": "opportunity_score={{score}}",
+      "modelPortfolioBadge": "suggested (model portfolio)"
+    },
+    "highestCost": {
+      "title": "Highest Opportunity Cost",
+      "description": "Real, evidence-backed ideas that received zero capital today, outranked by a stronger one.",
+      "emptyTitle": "No rejected opportunities today",
+      "emptyDetail": "Every ticker with a positive opportunity score is already funded."
+    },
+    "allocationChanges": {
+      "title": "Allocation Changes",
+      "description": "Every ticker whose target weight differs from its current weight today.",
+      "from": "From",
+      "to": "To",
+      "delta": "Change",
+      "emptyTitle": "No allocation changes today",
+      "emptyDetail": "Every current position matches its target weight."
+    },
+    "cashWaiting": {
+      "title": "Capital Waiting For Better Opportunities",
+      "description": "Capital deliberately left unallocated rather than forced into a weaker idea.",
+      "before": "Idle Cash Before",
+      "after": "Idle Cash After"
+    }
   },
   "portfolioSummary": {
     "title": "Portfolio Summary",

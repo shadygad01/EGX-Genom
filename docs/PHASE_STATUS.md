@@ -2113,3 +2113,211 @@ composed, none reimplemented); existing tests remain green (840 backend /
 unchanged from the mission above); TD-61 (three unused provider methods,
 named rather than force-fit into a screen); TD-59/TD-60's own
 next-steps (unchanged).
+
+## Capital Allocation Intelligence (2026-08-01)
+
+The project owner redefined the platform again: no longer a research
+system, no longer only a decision system -- a capital allocation system.
+The controlling instruction reframed the primary question from "is this
+stock good?" to "is this the best use of capital available today?" and
+mandated: capital as the primary input (every recommendation is a
+proposal *requesting* capital), a global opportunity ranking (never score
+a ticker in isolation -- every opportunity competes against every other
+opportunity, existing holdings, and cash), a new Opportunity Cost Engine,
+a Capital Deployment Queue replacing isolated recommendations, Capital
+Recycling (every released pound gets an explicit destination), relative
+decision-making (never output BUY without "better than what?", never
+SELL without "replace with what?"), 7 new CIO Desk sections, and an
+explicit prohibition on local (per-stock) optimization in favor of global
+portfolio optimization. Explicit instruction to reuse `DecisionService`/
+`PortfolioConstructor`/`investment_proof`, never duplicate logic or build
+a parallel architecture, and to perform a mandatory final review before
+declaring completion.
+
+**Grounding, not guessing**: `DecisionService.decide_portfolio()`
+(Decision-Centric Redesign mission) already evaluated the *entire*
+INVESTMENT-horizon universe jointly -- every ticker with a `Recommendation`
+unioned with every currently-held ticker, normalized against one shared
+`total_positive_score` budget, hard-capped by `max_position_weight`/
+`max_position_pct`. `MetaDecisionEngine`'s own `Recommendation.explanation
+.why_not_others` already stated "comparison against other stocks happens
+at the market-wide ranking stage" -- naming exactly where this mission's
+work belongs. The gap was never the underlying competition (it already
+existed); it was that the competition was implicit, invisible, and had no
+opportunity-cost or recycling narrative attached to it.
+
+**Delivered**:
+
+- `PositionAwareDecision` (`decision_service/service.py`) gained 3
+  additive fields -- `opportunity_score`, `expected_return`,
+  `expected_risk` -- exposing the exact score/return/risk
+  `decide_portfolio()` already computed internally as first-class,
+  machine-readable numbers instead of only prose. No new scoring logic;
+  every downstream consumer (including the new engine below) reads these
+  rather than re-deriving the eligibility/scoring rule.
+- New `capital_allocation/` package (`CapitalAllocationEngine`,
+  `models.py`) -- a read-only ranking/opportunity-cost/recycling layer
+  strictly *on top of* `decide_portfolio()`'s output:
+  - `_rank()`: every decision (funded, rejected, held, abstained) gets a
+    `RankedOpportunity` with a global rank 1..N by `opportunity_score` --
+    the Global Opportunity Ranking, covering the *entire* universe
+    `decide_portfolio()` evaluated, not only the winners.
+  - `_match_capital_flows()`: a deterministic bipartite matching --
+    demanders (BUY/INCREASE, ranked best-first) draw from idle cash
+    first, then from suppliers (REDUCE/EXIT, ranked *weakest*-first --
+    the least attractive holding is displaced before a stronger one ever
+    would be). Idle cash is always drawn before any holding is touched,
+    so a holding is only ever named as a capital source when idle cash
+    genuinely wasn't enough -- the engine never fabricates a "should this
+    replace another investment" conflict where none exists. Every unit of
+    capital is a `CapitalFlow` (from/to ticker or cash, amount) -- one
+    ledger backing the Capital Deployment Queue's `capital_sources`,
+    Capital Released Today's `destinations`, and the Capital Recycling
+    list, so there is no second, divergent bookkeeping.
+  - Real bug caught by this mission's own tests, fixed before shipping:
+    `decide_portfolio()` deliberately labels an abstained held ticker
+    `hold` (never `exit`, so an evidence *gap* is never read as a sell
+    signal) but still reports `target_weight=0.0` for it (no fresh
+    evidence to score). The engine's first draft read that raw 0.0 as a
+    real capital release, fabricating a "sell to fund something else"
+    movement nothing actually recommends. Fixed with `_effective_target()`
+    (`current_weight` for an abstained decision, the real `target_weight`
+    otherwise) -- caught by `test_cli_allocate_capital.py`'s own
+    end-to-end run against real mock pipeline output, not just a unit
+    fake.
+  - `CapitalAllocationPlan`: `ranking`, `queue` (`CapitalQueueEntry` --
+    priority, target allocation, capital delta, expected contribution,
+    marginal benefit, marginal risk, capital sources, a human
+    `required_action` sentence, and an `opportunity_cost_note` naming the
+    best-ranked idea currently without capital -- the mission's "better
+    than what?" answer, structurally, not just in prose),
+    `capital_released_today`/`capital_recycled` (the "replace with what?"
+    answer for every REDUCE/EXIT), `best_new_opportunities`,
+    `highest_opportunity_cost` (real, evidence-backed ideas that received
+    zero capital today because a higher-ranked idea claimed the budget),
+    `allocation_changes` (every mover, one flat list), `cash_waiting`
+    (idle cash before/after with an honest reason -- "no additional
+    ticker currently clears a positive score" vs. "fully deployed").
+  - 13 new tests (`test_capital_allocation.py`) covering ranking order,
+    full-universe inclusion (not only funded tickers), cash-drawn-first
+    behavior, weakest-holding-displaced-first behavior, the abstention
+    fix specifically, opportunity-cost attribution, best-new-opportunities
+    exclusion of top-ups, allocation-change sorting, cash-waiting
+    accounting, and the empty-universe case.
+- CLI: `agx allocate-capital --date ... [--positions positions.json]`
+  (`cli.py`), composing `decide`'s own real evidence via a new shared
+  helper (`build_position_aware_decisions()`, factored out of `decide`'s
+  own command body so neither command re-derives the market-state/
+  positions/publication-gate setup a second time) rather than
+  reconstructing it. 2 new tests (`test_cli_allocate_capital.py`),
+  including one that reproduces the abstention bug end-to-end against a
+  real mock pipeline run.
+- API: `POST /capital-allocation` (`routes/decisions.ts`), the exact same
+  live-bridge shape as `POST /decisions` (shells out to the CLI, no
+  business logic in TypeScript) -- factored `runCli()` helper shared by
+  both routes rather than duplicating the shell-out/temp-positions-file/
+  error-handling logic a second time. 4 new tests (`app.test.ts`).
+- `contracts/capital_allocation_plan.schema.json` (+ `position_aware_
+  decision.schema.json` regenerated for the 3 new fields), `api/src/
+  types.ts`/`web/src/types.ts` mirrors kept in sync per the established
+  convention.
+- Frontend: `DashboardDataProvider.postCapitalAllocation()`
+  (`ApiProvider` calls the live route; `StaticJsonProvider` always
+  rejects with `LiveDecisionsUnavailableError`, same honest-unavailable
+  posture as `postDecisions` -- there is nothing to rank or recycle
+  without a real portfolio, so this can never be a static artifact).
+  CIO Desk's former "Today's Actions" section is now "Capital
+  Allocation," rendering the mission's 7 named sub-sections from a live
+  `CapitalAllocationPlan` when holdings are entered (fetched in parallel
+  with `postDecisions` via one `Promise.all`, sharing the same request);
+  when no live plan exists, the deployment queue falls back to the
+  existing decisions table (now explicitly labeled as a degraded view)
+  and Best New Opportunities falls back to the model portfolio's own
+  already-ranked positions, while the other 5 sub-sections honestly state
+  they need real holdings rather than fabricating a competition. 6 tests
+  added/updated (`App.test.tsx`'s "5 mandated sections" assertion text,
+  a new live-rendering test exercising all 7 sub-sections with a
+  realistic populated plan including the `required_action` sentence;
+  `ApiProvider.test.ts`/`StaticJsonProvider.test.ts` mirror
+  `postDecisions`'s existing coverage for the new method: 4 new `web`
+  tests total (1 `App.test.tsx` live-rendering test, 2 `ApiProvider`, 1
+  `StaticJsonProvider`), plus 1 existing `App.test.tsx` assertion updated
+  for the renamed section.
+
+**Live-verified** against real demo data (a seeded `KnowledgeStore` +
+real mock-mode collected prices, the same environment prior missions used)
+via headless Chromium, both English and Arabic/RTL: all 7 Capital
+Allocation sub-sections render correctly with the platform's real,
+honest current state -- an empty plan, since no real EGX vendor is
+licensed and the publication gate correctly blocks every decision
+(`docs/DECISION_SYSTEM_ACCEPTANCE.md`'s "research-only decisions display
+zero position" requirement, unchanged). No page-level horizontal overflow
+in either direction; no new console errors beyond the pre-existing benign
+favicon 404. The *populated* rendering path (a real deployment queue with
+sourced capital and an opportunity-cost note) is covered by
+`test_capital_allocation.py`'s engine-level tests (proven-correct
+matching algorithm against hand-built scenarios) and `App.test.tsx`'s new
+live-rendering test (a realistic `CapitalAllocationPlan` fixture rendered
+through the real component tree) -- fabricating a populated live screenshot
+would have required bypassing the real publication gate with invented
+"live EGX data" evidence, which this platform's own anti-fabrication
+principle forbids even for a demo.
+
+**Mandatory Final Review** (per the mission's explicit instruction):
+
+- *Does every recommendation compete against every other opportunity?*
+  Yes, structurally, not just in prose: `_rank()` assigns a global rank to
+  every ticker `decide_portfolio()` evaluated (funded, rejected, held, or
+  abstained) from the one shared `opportunity_score` field every ticker
+  now carries. Nothing is scored or displayed in isolation --
+  `RankedOpportunity.rank` is visible on every list (queue, best-new,
+  highest-opportunity-cost).
+- *Does every allocation have an explicit opportunity cost?* Yes: every
+  `CapitalQueueEntry.opportunity_cost_note` names the specific best-ranked
+  alternative currently without capital, or explicitly states none exists
+  ("every ticker with a positive opportunity score is already funded").
+  `highest_opportunity_cost` surfaces this system-wide, not just per-entry.
+- *Is every capital movement justified?* Yes: `capital_sources`/
+  `destinations` name the exact ticker (or "cash") behind every unit of
+  capital, `required_action` states it as a sentence, and the abstention
+  fix means no movement is ever attributed to an evidence gap that wasn't
+  a real decision to sell.
+- *Never output BUY without "better than what?", never SELL without
+  "replace with what?"* Satisfied structurally by `opportunity_cost_note`
+  (BUY/INCREASE) and `capital_released_today[].destinations`
+  (REDUCE/EXIT) -- both are typed fields on the response, not just prose
+  a UI could drop.
+- *Capital as the primary input, never local optimization.* No new
+  per-stock scoring was added anywhere in this mission -- `opportunity_
+  score` is exactly `decide_portfolio()`'s own already-global,
+  already-jointly-normalized score, read, never recomputed. CIO Desk's
+  primary section is now named "Capital Allocation," not a stock list.
+- *Reuse, not duplication.* `capital_allocation/` imports
+  `decision_service.service.PositionAwareDecision`/`PositionAction`
+  only -- zero re-implementation of `MetaDecisionEngine`'s scoring,
+  `DecisionService`'s eligibility rules, or `PortfolioConstructor`'s
+  weighting. The CLI shares one setup helper across `decide`/
+  `allocate-capital`; the API shares one shell-out helper across
+  `/decisions`/`/capital-allocation`.
+- *Named, not silently left out*: the position-*unaware* path (CIO Desk
+  with no holdings entered) deliberately does **not** get ranking/
+  opportunity-cost/recycling treatment. This is an architectural
+  consequence of the same rule `decision_service/` already lives by
+  (CLAUDE.md: never wire a real-portfolio-dependent computation into an
+  autonomous run) -- there is nothing to displace, release, or recycle
+  without real capital and real holdings; a model portfolio has neither.
+  The fallback view is honest (existing decisions table + a ranked
+  preview from the model portfolio) rather than a fabricated competition.
+  `Portfolio.tsx` (the dedicated holdings page) was not extended with
+  capital-allocation UI in this pass -- CIO Desk was the mission's
+  explicit target ("what should I do today"); see `NEXT_MISSIONS.md`.
+
+855 backend tests pass (up from 840, 15 new); 31 `api` tests pass (up
+from 27, 4 new); 51 `web` tests pass (up from 47, 4 new); `ruff check`/
+`tsc --noEmit`/production builds all clean.
+
+**Not done, named as next**: capital-allocation UI on `Portfolio.tsx`
+itself (new TD-62); the position-unaware/model-portfolio path staying
+deliberately un-ranked (architectural, not a gap -- named above); every
+other already-open item (TD-59/TD-60/TD-61, confidence calibration,
+walk-forward backtesting) is unchanged by this mission.

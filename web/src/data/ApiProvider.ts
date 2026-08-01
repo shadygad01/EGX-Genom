@@ -7,6 +7,7 @@
 
 import type {
   AcquisitionDecision,
+  CapitalAllocationPlan,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -214,5 +215,18 @@ export class ApiProvider implements DashboardDataProvider {
       throw new Error(body?.error ?? `Failed to compute decisions: ${response.status}`);
     }
     return body as PositionAwareDecision[];
+  }
+
+  async postCapitalAllocation(request: DecideRequest): Promise<CapitalAllocationPlan> {
+    const response = await fetch("/api/capital-allocation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    const body = await response.json();
+    if (!response.ok) {
+      throw new Error(body?.error ?? `Failed to compute capital allocation: ${response.status}`);
+    }
+    return body as CapitalAllocationPlan;
   }
 }

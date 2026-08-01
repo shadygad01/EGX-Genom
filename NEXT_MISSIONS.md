@@ -1,6 +1,42 @@
 # Next Missions
 
-## Closed this phase: EGX-Genom Final Product Mission (Institutional Investment Operating System)
+## Closed this phase: Capital Allocation Intelligence
+
+See `CURRENT_MISSION.md`'s "Capital Allocation Intelligence" entry and
+`docs/PHASE_STATUS.md`'s matching section (including the mission's own
+Mandatory Final Review). **Genuinely next now**, in priority order:
+
+1. **TD-62**: extend `Portfolio.tsx` with the same `CapitalAllocationPlan`
+   view CIO Desk now renders (or a shared component) — it already calls
+   `postDecisions()` with the exact request `postCapitalAllocation()`
+   needs; deliberately not done in this pass since CIO Desk was the
+   mission's explicit target and a rushed second layout risked being
+   inconsistent with the considered one just built.
+2. **Real, populated capital-allocation numbers stay honestly zero** until
+   a real, licensed EGX vendor exists and the publication gate actually
+   clears — same root-cause caveat as every other mission's output
+   (`docs/ROADMAP.md`). Once real data flows, re-verify the live queue/
+   recycling/opportunity-cost views against a genuinely non-empty plan
+   (this mission could only prove that path via engine-level tests and a
+   component-level rendering test with a realistic fixture, not a live
+   screenshot, since fabricating one would require inventing "live EGX
+   data" evidence the gate correctly withholds).
+3. Consider whether the position-unaware CIO Desk fallback (no holdings
+   entered) should ever get its own, more limited ranking view (e.g.
+   showing the model portfolio's own already-ranked positions with
+   explicit rank numbers) rather than the current plain list — a real UX
+   question, not started here since the mission's ranking/opportunity-
+   cost/recycling concepts fundamentally require real capital to mean
+   anything.
+4. Re-run `agx allocate-capital`/`agx validate-investment`/`agx
+   investment-proof` after any future change to `meta.decision_engine`/
+   `decision_service`/`portfolio.constructor` — the fastest way to catch
+   a regression in the properties each framework already proved, not
+   just a one-time report.
+5. Everything already named as genuinely next before this phase (below)
+   is unchanged.
+
+## Closed prior phase: EGX-Genom Final Product Mission (Institutional Investment Operating System)
 
 See `CURRENT_MISSION.md`'s "EGX-Genom Final Product Mission" entry and
 `docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in

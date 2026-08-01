@@ -9,6 +9,7 @@
 
 import type {
   AcquisitionDecision,
+  CapitalAllocationPlan,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -121,4 +122,10 @@ export interface DashboardDataProvider {
   // cached, never a static artifact -- StaticJsonProvider always rejects
   // with LiveDecisionsUnavailableError.
   postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]>;
+
+  // Capital Allocation Intelligence: same on-demand, position-aware-only
+  // shape as postDecisions -- there is nothing to rank/recycle without a
+  // real portfolio, so this is never a static artifact either (see
+  // capital_allocation/__init__.py).
+  postCapitalAllocation(request: DecideRequest): Promise<CapitalAllocationPlan>;
 }

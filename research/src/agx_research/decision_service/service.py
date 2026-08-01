@@ -67,6 +67,17 @@ class PositionAwareDecision(BaseModel):
     invalidation conditions -- on `explanation` -- and expected review
     date), each derived from data this service already computes or is
     handed, never fabricated.
+
+    `opportunity_score`/`expected_return`/`expected_risk` (Capital
+    Allocation Intelligence mission) expose the same
+    `HorizonDecision.risk_adjusted_score`/`expected_return`/`expected_risk`
+    this method already computes internally as first-class fields, not
+    just prose -- `capital_allocation.CapitalAllocationEngine` (and any
+    future consumer needing to rank tickers against each other) reads
+    these directly instead of re-deriving the eligibility/scoring rule a
+    second time. `opportunity_score` is the pre-cap, pre-normalization
+    score (0.0 when ineligible/abstained/not publication-ready), exactly
+    the `score` this method already used to compute `target_weight`.
     """
 
     ticker: str
@@ -76,6 +87,9 @@ class PositionAwareDecision(BaseModel):
     current_weight: float
     horizon: Horizon
     confidence: float
+    opportunity_score: float = 0.0
+    expected_return: float | None = None
+    expected_risk: float | None = None
     investment_thesis: str
     key_risks: list[str] = Field(default_factory=list)
     contradicting_evidence: list[str] = Field(default_factory=list)
@@ -207,6 +221,9 @@ class DecisionService:
                     current_weight=position.current_weight,
                     horizon=Horizon.INVESTMENT,
                     confidence=confidence,
+                    opportunity_score=max(score, 0.0),
+                    expected_return=decision.expected_return if decision is not None else None,
+                    expected_risk=decision.expected_risk if decision is not None else None,
                     investment_thesis=self._investment_thesis(
                         ticker, action, target_weight, position, decision
                     ),

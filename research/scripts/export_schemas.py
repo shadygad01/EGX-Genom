@@ -25,6 +25,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from agx_research.capital_allocation import CapitalAllocationPlan
 from agx_research.dashboard.committee_summary import CommitteeSummaryReport
 from agx_research.dashboard.monitoring import MonitoringWarningsReport
 from agx_research.dashboard.portfolio_summary import PortfolioSummaryReport
@@ -53,6 +54,7 @@ MODELS = {
     "portfolio_summary.schema.json": PortfolioSummaryReport,
     "monitoring_warnings.schema.json": MonitoringWarningsReport,
     "committee_summary.schema.json": CommitteeSummaryReport,
+    "capital_allocation_plan.schema.json": CapitalAllocationPlan,
 }
 
 

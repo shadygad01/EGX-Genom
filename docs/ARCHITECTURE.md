@@ -174,6 +174,34 @@ research/        Python package `agx_research` — the research engine
                   docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md Part 3 for the
                   full design and reasoning.
 
+  # Capital Allocation Intelligence: every proposal competes for one budget
+  capital_allocation/
+                  CapitalAllocationEngine: a read-only ranking/opportunity-
+                  cost/recycling layer *on top of* decide_portfolio()'s
+                  output, never a second scoring engine. RankedOpportunity
+                  makes DecisionService's already-joint, already-normalized
+                  competition explicit (every ticker with a Recommendation
+                  or an existing position, ranked 1..N by
+                  PositionAwareDecision.opportunity_score); the matching
+                  algorithm (engine.py's _match_capital_flows) attributes
+                  each unit of requested capital to a source (idle cash
+                  first, then the weakest-ranked holding being displaced)
+                  and each unit of released capital to a destination (the
+                  strongest-ranked unmet demander, or back to cash) --
+                  bookkeeping over already-computed weights, never a fresh
+                  optimization. An abstained decision (no fresh evidence,
+                  not a decisive call to exit) never participates in
+                  capital-flow matching even though decide_portfolio()
+                  reports its target_weight as 0.0 -- see
+                  _effective_target()'s docstring. Same on-demand-only
+                  posture as decision_service/ (stateless, never wired into
+                  production/pipeline.py -- there is nothing to rank or
+                  recycle without the investor's own real PositionState).
+                  Exposed as `agx allocate-capital --date ... [--positions
+                  positions.json]` (cli.py, composing decide's own real
+                  evidence via the shared build_position_aware_decisions()
+                  helper, not reconstructing it).
+
 api/              TypeScript (Fastify) — HTTP surface over the knowledge base
 web/              TypeScript (Vite + React) — dashboard for knowledge/recs
 contracts/        Generated JSON Schema for API-facing pydantic models
@@ -296,14 +324,22 @@ never the default destination.
   the primary nav without deleting the capability.
 - **The pages** (`web/src/pages/`):
   - `CIODesk` (landing page, `/`) — answers "what should I do today?"
-    with exactly the 5 mission-mandated sections (Market Regime, Today's
-    Actions, Portfolio Summary, Warnings, Investment Committee Summary),
-    nothing else. Today's Actions calls the live, position-aware
-    `POST /decisions` when the investor has entered holdings
-    (`usePortfolioPositions`, `web/src/hooks/usePortfolioPositions.ts` —
-    a localStorage-only "my holdings" record; the backend never stores
-    real portfolio data) and falls back to the position-unaware model
-    portfolio otherwise, always labeled which one is showing.
+    with exactly the 5 mission-mandated sections (Market Regime, Capital
+    Allocation, Portfolio Summary, Warnings, Investment Committee
+    Summary), nothing else. Capital Allocation (the Capital Allocation
+    Intelligence mission's own 7 named sub-sections — Capital Deployment
+    Queue, Capital Recycling, Capital Released Today, Best New
+    Opportunities, Highest Opportunity Cost, Allocation Changes, Capital
+    Waiting For Better Opportunities) calls both the live, position-aware
+    `POST /decisions` and `POST /capital-allocation` when the investor has
+    entered holdings (`usePortfolioPositions`,
+    `web/src/hooks/usePortfolioPositions.ts` — a localStorage-only "my
+    holdings" record; the backend never stores real portfolio data) and
+    falls back to the existing decisions table plus a ranked "Best New
+    Opportunities" preview from the position-unaware model portfolio
+    otherwise — the other 6 sub-sections honestly report they need real
+    holdings rather than fabricating a capital competition that doesn't
+    exist without real capital, always labeled which source is showing.
   - `Portfolio` (`/portfolio`) — answers "is my capital allocated
     correctly?": holdings editor + the full live six-way decision table,
     reusing `DecisionService.decide_portfolio()` through `POST /decisions`

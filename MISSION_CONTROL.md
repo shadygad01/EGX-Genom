@@ -21,7 +21,30 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: EGX-Genom Final Product Mission — Institutional
+- **Current mission: Capital Allocation Intelligence (2026-08-01).**
+  Redefined the platform again: no longer only a research/decision
+  system, a capital allocation system — every recommendation competes
+  for the same finite capital rather than being scored in isolation. New
+  `capital_allocation/` package (`CapitalAllocationEngine`) — a read-only
+  ranking/opportunity-cost/recycling layer strictly on top of
+  `DecisionService.decide_portfolio()`'s already-joint output: a global
+  rank for every ticker it evaluated, a deterministic capital-flow
+  matcher (idle cash drawn first, weakest-ranked holding displaced
+  before a stronger one), and a `CapitalAllocationPlan` covering the
+  mission's 7 named views (Capital Deployment Queue, Capital Recycling,
+  Capital Released Today, Best New Opportunities, Highest Opportunity
+  Cost, Allocation Changes, Capital Waiting For Better Opportunities). A
+  real bug (an abstained held ticker's placeholder target weight
+  misread as a genuine capital release) was found and fixed by the
+  mission's own tests before shipping. New `agx allocate-capital` CLI
+  command and `POST /capital-allocation` API route, both reusing setup
+  shared with `decide`/`POST /decisions`. CIO Desk's "Today's Actions" is
+  now "Capital Allocation," rendering all 7 sections live when holdings
+  are entered, honest fallback otherwise. 855 backend / 31 `api` / 51
+  `web` tests pass; live-verified in English and Arabic/RTL. See
+  `CURRENT_MISSION.md` and `docs/PHASE_STATUS.md` for full detail,
+  including the mission's own Mandatory Final Review.
+- **Prior mission: EGX-Genom Final Product Mission — Institutional
   Investment Operating System (2026-08-01).** Redefined AGX from a
   research platform into an institutional-grade Investment Operating
   System: research is now an internal capability, investment decisions

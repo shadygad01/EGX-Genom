@@ -135,7 +135,7 @@
       "type": "object"
     }
   },
-  "description": "One ticker's position-aware decision. Never constructed without an\n`Explanation` (Principle 3, same rule every other recommendation-like\nobject in this codebase follows).\n\nFields cover the full institutional decision memo the mission requires\n(decision, target weight, horizon, confidence, thesis, supporting and\ncontradicting evidence, key risks, active catalysts, monitoring events,\ninvalidation conditions -- on `explanation` -- and expected review\ndate), each derived from data this service already computes or is\nhanded, never fabricated.",
+  "description": "One ticker's position-aware decision. Never constructed without an\n`Explanation` (Principle 3, same rule every other recommendation-like\nobject in this codebase follows).\n\nFields cover the full institutional decision memo the mission requires\n(decision, target weight, horizon, confidence, thesis, supporting and\ncontradicting evidence, key risks, active catalysts, monitoring events,\ninvalidation conditions -- on `explanation` -- and expected review\ndate), each derived from data this service already computes or is\nhanded, never fabricated.\n\n`opportunity_score`/`expected_return`/`expected_risk` (Capital\nAllocation Intelligence mission) expose the same\n`HorizonDecision.risk_adjusted_score`/`expected_return`/`expected_risk`\nthis method already computes internally as first-class fields, not\njust prose -- `capital_allocation.CapitalAllocationEngine` (and any\nfuture consumer needing to rank tickers against each other) reads\nthese directly instead of re-deriving the eligibility/scoring rule a\nsecond time. `opportunity_score` is the pre-cap, pre-normalization\nscore (0.0 when ineligible/abstained/not publication-ready), exactly\nthe `score` this method already used to compute `target_weight`.",
   "properties": {
     "abstained": {
       "title": "Abstained",
@@ -171,6 +171,18 @@
       "title": "Current Weight",
       "type": "number"
     },
+    "expected_return": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Return"
+    },
     "expected_review_date": {
       "anyOf": [
         {
@@ -183,6 +195,18 @@
       ],
       "default": null,
       "title": "Expected Review Date"
+    },
+    "expected_risk": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Risk"
     },
     "explanation": {
       "$ref": "#/$defs/Explanation"
@@ -207,6 +231,11 @@
       },
       "title": "Monitoring Events",
       "type": "array"
+    },
+    "opportunity_score": {
+      "default": 0.0,
+      "title": "Opportunity Score",
+      "type": "number"
     },
     "provenance": {
       "$ref": "#/$defs/Provenance"

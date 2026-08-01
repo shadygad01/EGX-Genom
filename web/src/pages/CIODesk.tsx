@@ -16,8 +16,19 @@ import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { usePortfolioPositions } from "../hooks/usePortfolioPositions";
 import { formatPercent, formatSignedPercent, titleCase } from "../lib/format";
-import type { PortfolioPosition, PositionAwareDecision, Recommendation } from "../types";
+import type {
+  CapitalAllocationPlan,
+  CapitalSource,
+  PortfolioPosition,
+  PositionAwareDecision,
+  Recommendation,
+} from "../types";
 import styles from "./CIODesk.module.css";
+
+function formatCapitalSources(sources: CapitalSource[]): string {
+  if (sources.length === 0) return "—";
+  return sources.map((s) => `${s.ticker ?? "cash"}: ${formatPercent(s.amount)}`).join(", ");
+}
 
 const TREND_VARIANT: Record<string, BadgeVariant> = {
   bullish: "positive",
@@ -84,6 +95,7 @@ export function CIODesk() {
   const committeeSummary = useArtifact((p) => p.getCommitteeSummary());
 
   const [liveDecisions, setLiveDecisions] = useState<PositionAwareDecision[] | null>(null);
+  const [liveCapitalPlan, setLiveCapitalPlan] = useState<CapitalAllocationPlan | null>(null);
   const [liveLoading, setLiveLoading] = useState(false);
   const [liveUnavailable, setLiveUnavailable] = useState(false);
 
@@ -93,20 +105,25 @@ export function CIODesk() {
   useEffect(() => {
     if (!hasPositions) {
       setLiveDecisions(null);
+      setLiveCapitalPlan(null);
       return;
     }
     let cancelled = false;
     setLiveLoading(true);
     setLiveUnavailable(false);
-    dataProvider
-      .postDecisions({ date: asOf, positions: toPositionInputs() })
-      .then((result) => {
-        if (!cancelled) setLiveDecisions(result);
+    const request = { date: asOf, positions: toPositionInputs() };
+    Promise.all([dataProvider.postDecisions(request), dataProvider.postCapitalAllocation(request)])
+      .then(([decisions, plan]) => {
+        if (!cancelled) {
+          setLiveDecisions(decisions);
+          setLiveCapitalPlan(plan);
+        }
       })
       .catch((err: unknown) => {
         if (cancelled) return;
         if (err instanceof LiveDecisionsUnavailableError) setLiveUnavailable(true);
         setLiveDecisions(null);
+        setLiveCapitalPlan(null);
       })
       .finally(() => {
         if (!cancelled) setLiveLoading(false);
@@ -170,113 +187,333 @@ export function CIODesk() {
         </Card>
       )}
 
-      <Section title={t("todaysActions.title")} description={t("todaysActions.description")}>
+      <Section title={t("capitalAllocation.title")} description={t("capitalAllocation.description")}>
         <p className={styles.actionsSourceNote}>
-          {liveDecisions
-            ? t("todaysActions.sourceLive")
+          {liveCapitalPlan
+            ? t("capitalAllocation.sourceLive")
             : liveUnavailable
-              ? t("todaysActions.sourceUnavailable")
-              : t("todaysActions.sourceModelPortfolio")}
+              ? t("capitalAllocation.sourceUnavailable")
+              : t("capitalAllocation.sourceModelPortfolio")}
         </p>
 
-        {(liveLoading || investmentCases.loading) && <LoadingState rows={4} />}
-        {!liveLoading && !investmentCases.loading && (
-          <DataTable
-            rows={actionRows}
-            getRowKey={(row) => (row.kind === "decision" ? row.decision.ticker : row.position.ticker)}
-            onRowClick={(row) => navigate(`/cases/${row.kind === "decision" ? row.decision.ticker : row.position.ticker}`)}
-            emptyTitle={t("todaysActions.emptyTitle")}
-            emptyDetail={t("todaysActions.emptyDetail")}
-            columns={[
-              {
-                key: "ticker",
-                header: tCommon("table.ticker"),
-                render: (row) => {
-                  const ticker = row.kind === "decision" ? row.decision.ticker : row.position.ticker;
-                  return (
+        <Card title={t("capitalAllocation.queue.title")} subtitle={t("capitalAllocation.queue.description")}>
+          {(liveLoading || investmentCases.loading) && <LoadingState rows={4} />}
+          {!liveLoading && !investmentCases.loading && liveCapitalPlan && (
+            <DataTable
+              rows={liveCapitalPlan.queue}
+              getRowKey={(row) => row.ticker}
+              onRowClick={(row) => navigate(`/cases/${row.ticker}`)}
+              emptyTitle={t("todaysActions.emptyTitle")}
+              emptyDetail={t("todaysActions.emptyDetail")}
+              columns={[
+                {
+                  key: "priority",
+                  header: t("capitalAllocation.queue.priority"),
+                  render: (row) => <span className="num">#{row.priority}</span>,
+                },
+                {
+                  key: "ticker",
+                  header: tCommon("table.ticker"),
+                  render: (row) => (
                     <div className={styles.tickerCell}>
-                      <span className={`${styles.tickerCode} num`}>{ticker}</span>
-                      <span className={styles.tickerCompany}>{row.companyName}</span>
+                      <span className={`${styles.tickerCode} num`}>{row.ticker}</span>
+                      <span className={styles.tickerCompany}>{companyNames[row.ticker] ?? ""}</span>
                     </div>
-                  );
-                },
-              },
-              {
-                key: "decision",
-                header: tCommon("table.decision"),
-                render: (row) =>
-                  row.kind === "decision" ? (
-                    <Badge variant={ACTION_VARIANT[row.decision.action] ?? "default"}>{titleCase(row.decision.action)}</Badge>
-                  ) : (
-                    <Badge variant="accent">{t("todaysActions.suggestedBuy")}</Badge>
                   ),
-              },
-              {
-                key: "weight",
-                header: t("todaysActions.targetWeight"),
-                align: "right",
-                render: (row) => (
-                  <span className="num">{formatPercent(row.kind === "decision" ? row.decision.target_weight : row.position.weight)}</span>
-                ),
-              },
-              {
-                key: "confidence",
-                header: tCommon("table.confidence"),
-                render: (row) => (
-                  <Meter
-                    value={row.kind === "decision" ? row.decision.confidence : row.position.confidence}
-                    label={formatPercent(row.kind === "decision" ? row.decision.confidence : row.position.confidence)}
-                  />
-                ),
-              },
-              {
-                key: "horizon",
-                header: t("todaysActions.holdingPeriod"),
-                render: () => label("horizon", "investment"),
-              },
-              {
-                key: "thesis",
-                header: t("todaysActions.thesis"),
-                render: (row) => (
-                  <span className={styles.thesisCell}>
-                    {row.kind === "decision"
-                      ? row.decision.investment_thesis
-                      : row.recommendation?.explanation.why_this_stock ?? ""}
-                  </span>
-                ),
-              },
-              {
-                key: "reasons",
-                header: t("todaysActions.topReasons"),
-                render: (row) => {
-                  const reasons =
-                    row.kind === "decision"
-                      ? row.decision.explanation.supporting_evidence
-                      : row.recommendation?.explanation.supporting_evidence ?? [];
-                  if (reasons.length === 0) return <span className={styles.riskCell}>—</span>;
-                  return (
-                    <ul className={styles.reasonsList}>
-                      {reasons.slice(0, 3).map((r, i) => (
-                        <li key={i}>{r}</li>
-                      ))}
-                    </ul>
-                  );
                 },
-              },
-              {
-                key: "risk",
-                header: t("todaysActions.largestRisk"),
-                render: (row) => (
-                  <span className={styles.riskCell}>
-                    {row.kind === "decision"
-                      ? row.decision.key_risks[0] ?? "—"
-                      : row.recommendation?.explanation.why_not_others ?? t("todaysActions.notAssessed")}
-                  </span>
-                ),
-              },
-            ]}
-          />
-        )}
+                {
+                  key: "decision",
+                  header: tCommon("table.decision"),
+                  render: (row) => <Badge variant={ACTION_VARIANT[row.action] ?? "default"}>{titleCase(row.action)}</Badge>,
+                },
+                {
+                  key: "weight",
+                  header: t("capitalAllocation.queue.targetAllocation"),
+                  align: "right",
+                  render: (row) => (
+                    <span className="num">
+                      {formatPercent(row.target_weight)} ({formatSignedPercent(row.capital_delta)})
+                    </span>
+                  ),
+                },
+                {
+                  key: "requiredAction",
+                  header: t("capitalAllocation.queue.requiredAction"),
+                  render: (row) => <span className={styles.thesisCell}>{row.required_action}</span>,
+                },
+                {
+                  key: "contribution",
+                  header: t("capitalAllocation.queue.expectedContribution"),
+                  align: "right",
+                  render: (row) => (
+                    <span className="num">{row.expected_contribution != null ? formatSignedPercent(row.expected_contribution) : "—"}</span>
+                  ),
+                },
+                {
+                  key: "benefit",
+                  header: t("capitalAllocation.queue.marginalBenefit"),
+                  align: "right",
+                  render: (row) => <span className="num">{row.marginal_benefit.toFixed(3)}</span>,
+                },
+                {
+                  key: "risk",
+                  header: t("capitalAllocation.queue.marginalRisk"),
+                  align: "right",
+                  render: (row) => <span className="num">{row.marginal_risk != null ? formatPercent(row.marginal_risk) : "—"}</span>,
+                },
+                {
+                  key: "sources",
+                  header: t("capitalAllocation.queue.capitalSources"),
+                  render: (row) => <span className={styles.thesisCell}>{formatCapitalSources(row.capital_sources)}</span>,
+                },
+                {
+                  key: "opportunityCost",
+                  header: t("capitalAllocation.queue.opportunityCost"),
+                  render: (row) => <span className={styles.riskCell}>{row.opportunity_cost_note}</span>,
+                },
+              ]}
+            />
+          )}
+          {!liveLoading && !investmentCases.loading && !liveCapitalPlan && (
+            <>
+              <p className={styles.actionsSourceNote}>{t("capitalAllocation.queue.fallbackNote")}</p>
+              <DataTable
+                rows={actionRows}
+                getRowKey={(row) => (row.kind === "decision" ? row.decision.ticker : row.position.ticker)}
+                onRowClick={(row) => navigate(`/cases/${row.kind === "decision" ? row.decision.ticker : row.position.ticker}`)}
+                emptyTitle={t("todaysActions.emptyTitle")}
+                emptyDetail={t("todaysActions.emptyDetail")}
+                columns={[
+                  {
+                    key: "ticker",
+                    header: tCommon("table.ticker"),
+                    render: (row) => {
+                      const ticker = row.kind === "decision" ? row.decision.ticker : row.position.ticker;
+                      return (
+                        <div className={styles.tickerCell}>
+                          <span className={`${styles.tickerCode} num`}>{ticker}</span>
+                          <span className={styles.tickerCompany}>{row.companyName}</span>
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    key: "decision",
+                    header: tCommon("table.decision"),
+                    render: (row) =>
+                      row.kind === "decision" ? (
+                        <Badge variant={ACTION_VARIANT[row.decision.action] ?? "default"}>{titleCase(row.decision.action)}</Badge>
+                      ) : (
+                        <Badge variant="accent">{t("todaysActions.suggestedBuy")}</Badge>
+                      ),
+                  },
+                  {
+                    key: "weight",
+                    header: t("todaysActions.targetWeight"),
+                    align: "right",
+                    render: (row) => (
+                      <span className="num">{formatPercent(row.kind === "decision" ? row.decision.target_weight : row.position.weight)}</span>
+                    ),
+                  },
+                  {
+                    key: "confidence",
+                    header: tCommon("table.confidence"),
+                    render: (row) => (
+                      <Meter
+                        value={row.kind === "decision" ? row.decision.confidence : row.position.confidence}
+                        label={formatPercent(row.kind === "decision" ? row.decision.confidence : row.position.confidence)}
+                      />
+                    ),
+                  },
+                  {
+                    key: "horizon",
+                    header: t("todaysActions.holdingPeriod"),
+                    render: () => label("horizon", "investment"),
+                  },
+                  {
+                    key: "thesis",
+                    header: t("todaysActions.thesis"),
+                    render: (row) => (
+                      <span className={styles.thesisCell}>
+                        {row.kind === "decision"
+                          ? row.decision.investment_thesis
+                          : row.recommendation?.explanation.why_this_stock ?? ""}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "reasons",
+                    header: t("todaysActions.topReasons"),
+                    render: (row) => {
+                      const reasons =
+                        row.kind === "decision"
+                          ? row.decision.explanation.supporting_evidence
+                          : row.recommendation?.explanation.supporting_evidence ?? [];
+                      if (reasons.length === 0) return <span className={styles.riskCell}>—</span>;
+                      return (
+                        <ul className={styles.reasonsList}>
+                          {reasons.slice(0, 3).map((r, i) => (
+                            <li key={i}>{r}</li>
+                          ))}
+                        </ul>
+                      );
+                    },
+                  },
+                  {
+                    key: "risk",
+                    header: t("todaysActions.largestRisk"),
+                    render: (row) => (
+                      <span className={styles.riskCell}>
+                        {row.kind === "decision"
+                          ? row.decision.key_risks[0] ?? "—"
+                          : row.recommendation?.explanation.why_not_others ?? t("todaysActions.notAssessed")}
+                      </span>
+                    ),
+                  },
+                ]}
+              />
+            </>
+          )}
+        </Card>
+
+        <Card title={t("capitalAllocation.recycling.title")} subtitle={t("capitalAllocation.recycling.description")}>
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {liveCapitalPlan && liveCapitalPlan.capital_recycled.length === 0 && (
+            <EmptyState title={t("capitalAllocation.recycling.emptyTitle")} detail={t("capitalAllocation.recycling.emptyDetail")} />
+          )}
+          {liveCapitalPlan && liveCapitalPlan.capital_recycled.length > 0 && (
+            <ul className={styles.flowList}>
+              {liveCapitalPlan.capital_recycled.map((f, i) => (
+                <li key={i}>
+                  <span className="num">{f.from_ticker}</span> → <span className="num">{f.to_ticker}</span>:{" "}
+                  <span className="num">{formatPercent(f.amount)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <Card title={t("capitalAllocation.released.title")} subtitle={t("capitalAllocation.released.description")}>
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {liveCapitalPlan && liveCapitalPlan.capital_released_today.length === 0 && (
+            <EmptyState title={t("capitalAllocation.released.emptyTitle")} detail={t("capitalAllocation.released.emptyDetail")} />
+          )}
+          {liveCapitalPlan && liveCapitalPlan.capital_released_today.length > 0 && (
+            <ul className={styles.flowList}>
+              {liveCapitalPlan.capital_released_today.map((r) => (
+                <li key={r.ticker}>
+                  <span className="num">{r.ticker}</span>: <span className="num">{formatPercent(r.amount)}</span> →{" "}
+                  {formatCapitalSources(r.destinations)}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <Card title={t("capitalAllocation.bestNew.title")} subtitle={t("capitalAllocation.bestNew.description")}>
+          {liveCapitalPlan ? (
+            liveCapitalPlan.best_new_opportunities.length === 0 ? (
+              <EmptyState title={t("capitalAllocation.bestNew.emptyTitle")} detail={t("capitalAllocation.bestNew.emptyDetail")} />
+            ) : (
+              <ul className={styles.rankList}>
+                {liveCapitalPlan.best_new_opportunities.map((r) => (
+                  <li key={r.ticker}>
+                    <span className="num">#{r.rank}</span> <span className={`${styles.tickerCode} num`}>{r.ticker}</span> —{" "}
+                    {t("capitalAllocation.bestNew.score", { score: r.opportunity_score.toFixed(3) })}
+                  </li>
+                ))}
+              </ul>
+            )
+          ) : (investmentCases.data?.portfolio?.positions ?? []).filter((p) => p.weight > 0).length === 0 ? (
+            <EmptyState title={t("capitalAllocation.bestNew.emptyTitle")} detail={t("capitalAllocation.bestNew.emptyDetail")} />
+          ) : (
+            <ul className={styles.rankList}>
+              {(investmentCases.data?.portfolio?.positions ?? [])
+                .filter((p) => p.weight > 0)
+                .slice(0, 5)
+                .map((p, i) => (
+                  <li key={p.ticker}>
+                    <span className="num">#{i + 1}</span> <span className={`${styles.tickerCode} num`}>{p.ticker}</span> —{" "}
+                    {t("capitalAllocation.bestNew.modelPortfolioBadge")}
+                  </li>
+                ))}
+            </ul>
+          )}
+        </Card>
+
+        <Card title={t("capitalAllocation.highestCost.title")} subtitle={t("capitalAllocation.highestCost.description")}>
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {liveCapitalPlan && liveCapitalPlan.highest_opportunity_cost.length === 0 && (
+            <EmptyState title={t("capitalAllocation.highestCost.emptyTitle")} detail={t("capitalAllocation.highestCost.emptyDetail")} />
+          )}
+          {liveCapitalPlan && liveCapitalPlan.highest_opportunity_cost.length > 0 && (
+            <ul className={styles.rankList}>
+              {liveCapitalPlan.highest_opportunity_cost.map((h) => (
+                <li key={h.ticker}>
+                  <span className={`${styles.tickerCode} num`}>{h.ticker}</span>{" "}
+                  {t("capitalAllocation.bestNew.score", { score: h.opportunity_score.toFixed(3) })} — {h.reason}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <Card title={t("capitalAllocation.allocationChanges.title")} subtitle={t("capitalAllocation.allocationChanges.description")}>
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {liveCapitalPlan && liveCapitalPlan.allocation_changes.length === 0 && (
+            <EmptyState title={t("capitalAllocation.allocationChanges.emptyTitle")} detail={t("capitalAllocation.allocationChanges.emptyDetail")} />
+          )}
+          {liveCapitalPlan && liveCapitalPlan.allocation_changes.length > 0 && (
+            <DataTable
+              rows={liveCapitalPlan.allocation_changes}
+              getRowKey={(c) => c.ticker}
+              onRowClick={(c) => navigate(`/cases/${c.ticker}`)}
+              columns={[
+                {
+                  key: "ticker",
+                  header: tCommon("table.ticker"),
+                  render: (c) => <span className={`${styles.tickerCode} num`}>{c.ticker}</span>,
+                },
+                {
+                  key: "decision",
+                  header: tCommon("table.decision"),
+                  render: (c) => <Badge variant={ACTION_VARIANT[c.action] ?? "default"}>{titleCase(c.action)}</Badge>,
+                },
+                {
+                  key: "from",
+                  header: t("capitalAllocation.allocationChanges.from"),
+                  align: "right",
+                  render: (c) => <span className="num">{formatPercent(c.current_weight)}</span>,
+                },
+                {
+                  key: "to",
+                  header: t("capitalAllocation.allocationChanges.to"),
+                  align: "right",
+                  render: (c) => <span className="num">{formatPercent(c.target_weight)}</span>,
+                },
+                {
+                  key: "delta",
+                  header: t("capitalAllocation.allocationChanges.delta"),
+                  align: "right",
+                  render: (c) => <span className="num">{formatSignedPercent(c.capital_delta)}</span>,
+                },
+              ]}
+            />
+          )}
+        </Card>
+
+        <Card title={t("capitalAllocation.cashWaiting.title")} subtitle={t("capitalAllocation.cashWaiting.description")}>
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {liveCapitalPlan && (
+            <>
+              <div className={styles.statGrid}>
+                <StatTile label={t("capitalAllocation.cashWaiting.before")} value={formatPercent(liveCapitalPlan.cash_waiting.idle_cash_before)} />
+                <StatTile label={t("capitalAllocation.cashWaiting.after")} value={formatPercent(liveCapitalPlan.cash_waiting.idle_cash_after)} />
+              </div>
+              <p className={styles.actionsSourceNote}>{liveCapitalPlan.cash_waiting.reason}</p>
+            </>
+          )}
+        </Card>
       </Section>
 
       <Section title={t("portfolioSummary.title")} description={t("portfolioSummary.description")}>

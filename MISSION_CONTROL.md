@@ -21,7 +21,26 @@ commit whenever the fact they state changes.
   still scoped to mock data pending the promotion pipeline's first real
   trading-day run, and no output is claimed as real research until a
   licensed EGX price vendor exists (`docs/ROADMAP.md`).
-- **Current mission: Investment Proof Framework — Capital Trust Report
+- **Current mission: EGX-Genom Final Product Mission — Institutional
+  Investment Operating System (2026-08-01).** Redefined AGX from a
+  research platform into an institutional-grade Investment Operating
+  System: research is now an internal capability, investment decisions
+  are the product. New Product Law (every screen answers exactly one
+  primary investment question) drove a full navigation/page redesign — a
+  new 5-section CIO Desk landing page (`/`), Portfolio, Investment Cases
+  (19-section detail page), Monitoring, and a merged Settings page; nav
+  collapsed from 9 to 7 top-level items. 3 new dashboard artifacts
+  (`portfolio_summary.json`/`warnings.json`/`committee_summary.json`)
+  compose the existing `investment_proof` engines from the mission below
+  rather than adding new judgment logic. Six obsolete pages + a dead
+  placeholder deleted outright. A mandatory product audit found and
+  merged two data-only pages, removed one dead API route, and named one
+  real unused-artifact gap (TD-61) rather than silently dropping it. 840
+  backend / 27 `api` / 47 `web` tests pass; live-verified in English and
+  Arabic/RTL via headless Chromium (one real RTL CSS overflow bug found
+  and fixed). See `CURRENT_MISSION.md` and `docs/PHASE_STATUS.md` for
+  full detail.
+- **Prior mission: Investment Proof Framework — Capital Trust Report
   (2026-08-01).** New `investment_proof/` package (composes, never
   duplicates, `institutional_validation/`) adds `DecisionAttributionEngine`,
   `CounterfactualEngine`, `CommitteeValidationEngine`,

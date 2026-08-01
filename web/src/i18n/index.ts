@@ -2,28 +2,26 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import arCommon from "./locales/ar/common.json";
-import arAiBriefing from "./locales/ar/aiBriefing.json";
-import arDecisionCenter from "./locales/ar/decisionCenter.json";
-import arOpportunityCenter from "./locales/ar/opportunityCenter.json";
-import arCompanyWorkspace from "./locales/ar/companyWorkspace.json";
+import arCioDesk from "./locales/ar/cioDesk.json";
+import arPortfolio from "./locales/ar/portfolio.json";
+import arInvestmentCases from "./locales/ar/investmentCases.json";
+import arMonitoring from "./locales/ar/monitoring.json";
+import arSettings from "./locales/ar/settings.json";
 import arMarketIntelligence from "./locales/ar/marketIntelligence.json";
 import arResearchCenter from "./locales/ar/researchCenter.json";
 import arKnowledgeGraph from "./locales/ar/knowledgeGraph.json";
-import arMissionControl from "./locales/ar/missionControl.json";
 import arSourceIntelligence from "./locales/ar/sourceIntelligence.json";
-import arSystemAdministration from "./locales/ar/systemAdministration.json";
 
 import enCommon from "./locales/en/common.json";
-import enAiBriefing from "./locales/en/aiBriefing.json";
-import enDecisionCenter from "./locales/en/decisionCenter.json";
-import enOpportunityCenter from "./locales/en/opportunityCenter.json";
-import enCompanyWorkspace from "./locales/en/companyWorkspace.json";
+import enCioDesk from "./locales/en/cioDesk.json";
+import enPortfolio from "./locales/en/portfolio.json";
+import enInvestmentCases from "./locales/en/investmentCases.json";
+import enMonitoring from "./locales/en/monitoring.json";
+import enSettings from "./locales/en/settings.json";
 import enMarketIntelligence from "./locales/en/marketIntelligence.json";
 import enResearchCenter from "./locales/en/researchCenter.json";
 import enKnowledgeGraph from "./locales/en/knowledgeGraph.json";
-import enMissionControl from "./locales/en/missionControl.json";
 import enSourceIntelligence from "./locales/en/sourceIntelligence.json";
-import enSystemAdministration from "./locales/en/systemAdministration.json";
 
 export const SUPPORTED_LANGUAGES = ["en", "ar"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
@@ -46,29 +44,27 @@ function detectInitialLanguage(): SupportedLanguage {
 const resources = {
   en: {
     common: enCommon,
-    aiBriefing: enAiBriefing,
-    decisionCenter: enDecisionCenter,
-    opportunityCenter: enOpportunityCenter,
-    companyWorkspace: enCompanyWorkspace,
+    cioDesk: enCioDesk,
+    portfolio: enPortfolio,
+    investmentCases: enInvestmentCases,
+    monitoring: enMonitoring,
+    settings: enSettings,
     marketIntelligence: enMarketIntelligence,
     researchCenter: enResearchCenter,
     knowledgeGraph: enKnowledgeGraph,
-    missionControl: enMissionControl,
     sourceIntelligence: enSourceIntelligence,
-    systemAdministration: enSystemAdministration,
   },
   ar: {
     common: arCommon,
-    aiBriefing: arAiBriefing,
-    decisionCenter: arDecisionCenter,
-    opportunityCenter: arOpportunityCenter,
-    companyWorkspace: arCompanyWorkspace,
+    cioDesk: arCioDesk,
+    portfolio: arPortfolio,
+    investmentCases: arInvestmentCases,
+    monitoring: arMonitoring,
+    settings: arSettings,
     marketIntelligence: arMarketIntelligence,
     researchCenter: arResearchCenter,
     knowledgeGraph: arKnowledgeGraph,
-    missionControl: arMissionControl,
     sourceIntelligence: arSourceIntelligence,
-    systemAdministration: arSystemAdministration,
   },
 };
 

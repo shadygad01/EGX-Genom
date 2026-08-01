@@ -158,3 +158,53 @@ a.listItemTitle:hover {
   gap: var(--space-2);
   flex-wrap: wrap;
 }
+
+.decisionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-inline-start-width: 4px;
+  background: var(--surface-raised);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.decisionHeaderAction {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.decisionHeaderStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.executionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.executionItem {
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.executionLabel {
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-1);
+}
+
+.executionValue {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}

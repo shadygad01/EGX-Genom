@@ -25,6 +25,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from agx_research.dashboard.committee_summary import CommitteeSummaryReport
+from agx_research.dashboard.monitoring import MonitoringWarningsReport
+from agx_research.dashboard.portfolio_summary import PortfolioSummaryReport
 from agx_research.dashboard.schemas import DashboardSystemStatus
 from agx_research.decision_service.service import PositionAwareDecision
 from agx_research.events.event import Event
@@ -47,6 +50,9 @@ MODELS = {
     "source_spec.schema.json": SourceSpec,
     "dashboard_system_status.schema.json": DashboardSystemStatus,
     "position_aware_decision.schema.json": PositionAwareDecision,
+    "portfolio_summary.schema.json": PortfolioSummaryReport,
+    "monitoring_warnings.schema.json": MonitoringWarningsReport,
+    "committee_summary.schema.json": CommitteeSummaryReport,
 }
 
 

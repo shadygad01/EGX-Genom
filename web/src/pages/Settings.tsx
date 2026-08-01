@@ -11,7 +11,7 @@ import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { formatNumber, formatPercent } from "../lib/format";
 import type { CollectorStatusRow, DiscoveryOutcome, GeneStatus, HealthStatus, RunStatus, StageStatus } from "../types";
-import styles from "./MissionControlPage.module.css";
+import styles from "./Settings.module.css";
 
 const DISCOVERY_RESULT_VARIANT: Record<string, BadgeVariant> = {
   verified_reachable: "positive",
@@ -58,13 +58,7 @@ const GENE_VARIANT: Record<GeneStatus, BadgeVariant> = {
   retired: "neutral",
 };
 
-/** `collector_status.json` carries per-record-type counts (price bars,
- * macro observations, news, corporate events, index constituents,
- * financial statement line items) that a single summed "Yield" number
- * otherwise hides -- e.g. a source producing prices but zero news, or
- * vice versa. Only non-zero categories are shown, so a single-purpose
- * source's row stays short. */
-function describeYieldBreakdown(row: CollectorStatusRow, t: TFunction<"missionControl">): string {
+function describeYieldBreakdown(row: CollectorStatusRow, t: TFunction<"settings">): string {
   const parts: string[] = [
     row.price_bars_written && t("collectors.yieldParts.price", { count: formatNumber(row.price_bars_written) }),
     row.macro_observations_written && t("collectors.yieldParts.macro", { count: formatNumber(row.macro_observations_written) }),
@@ -77,13 +71,16 @@ function describeYieldBreakdown(row: CollectorStatusRow, t: TFunction<"missionCo
   return parts.length ? parts.join(" · ") : "—";
 }
 
-/** Everything an operator needs to know about the platform itself:
- * current mission status, pipeline health stage-by-stage, collector
- * output, knowledge/genome status, source health, execution history,
- * current blockers, and the weekly Discovery workflow's own verification
- * report -- all composed from existing artifacts. */
-export function MissionControlPage() {
-  const { t } = useTranslation("missionControl");
+/** Settings -- system configuration and operational health, deliberately
+ * separate from every investment-decision screen. Merges the former
+ * Mission Control (business-facing: mission status, financial coverage,
+ * collectors, source health, acquisition decisions, weekly discovery) and
+ * System Administration (operational: runtime config, artifact inventory,
+ * per-stage performance, execution log) into one page with two grouped
+ * sections -- not two separate nav items competing for the same "how is
+ * the platform doing" question. Never the CIO Desk's landing content. */
+export function Settings() {
+  const { t } = useTranslation("settings");
   const label = useEnumLabel();
   const { formatDate, formatDateTime } = useFormatters();
   const missionStatus = useArtifact((p) => p.getMissionStatus());
@@ -97,6 +94,7 @@ export function MissionControlPage() {
   const discoveryReport = useArtifact((p) => p.getDiscoveryReport());
   const discoveryMetrics = useArtifact((p) => p.getDiscoveryMetrics());
   const financialCoverage = useArtifact((p) => p.getFinancialCoverage());
+  const dashboardMetrics = useArtifact((p) => p.getDashboardMetrics());
 
   const geneCounts = {
     promoted: (genes.data ?? []).filter((g) => g.status === "promoted").length,
@@ -115,9 +113,13 @@ export function MissionControlPage() {
   const unavailableCount = (collectorStatus.data ?? []).filter((s) => s.status === "UNAVAILABLE").length;
 
   const runHistory = [...(runtimeMetrics.data ?? [])].sort((a, b) => (a.run_date < b.run_date ? 1 : -1));
+  const artifactRows = Object.entries(dashboardMetrics.data?.artifacts ?? {}).sort(([a], [b]) => a.localeCompare(b));
+  const stagesByDuration = [...(executionReport.data?.stages ?? [])].sort((a, b) => b.duration_seconds - a.duration_seconds);
 
   return (
     <>
+      <h2 className={styles.groupHeading}>{t("groups.mission")}</h2>
+
       <Section title={t("missionStatus.title")} description={t("missionStatus.description")}>
         {missionStatus.loading && <LoadingState rows={2} />}
         {missionStatus.error && <ErrorState detail={missionStatus.error.message} onRetry={missionStatus.reload} />}
@@ -150,28 +152,6 @@ export function MissionControlPage() {
             <StatTile label={t("financialCoverage.status")} value={<Badge variant={financialCoverage.data.complete ? "positive" : "negative"}>{financialCoverage.data.complete ? t("financialCoverage.complete") : t("financialCoverage.incomplete")}</Badge>} />
             <StatTile label={t("financialCoverage.asOf")} value={formatDate(financialCoverage.data.as_of)} />
           </div>
-        )}
-      </Section>
-
-      <Section title={t("pipelineHealth.title")} description={t("pipelineHealth.description")}>
-        {executionReport.loading && <LoadingState rows={3} />}
-        {executionReport.error && <ErrorState detail={executionReport.error.message} onRetry={executionReport.reload} />}
-        {!executionReport.loading && !executionReport.error && !executionReport.data && (
-          <EmptyState title={t("pipelineHealth.emptyTitle")} />
-        )}
-        {executionReport.data && (
-          <DataTable
-            rows={executionReport.data.stages}
-            getRowKey={(s) => s.name}
-            emptyTitle={t("pipelineHealth.emptyTitleStages")}
-            columns={[
-              { key: "name", header: t("pipelineHealth.stage"), render: (s) => label("stageName", s.name) },
-              { key: "status", header: t("pipelineHealth.status"), render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{label("stageStatus", s.status)}</Badge> },
-              { key: "duration", header: t("pipelineHealth.duration"), align: "right", render: (s) => <span className="num">{formatNumber(s.duration_seconds, 2)}s</span> },
-              { key: "detail", header: t("pipelineHealth.detail"), render: (s) => s.detail },
-              { key: "warnings", header: t("pipelineHealth.warnings"), align: "right", render: (s) => s.warnings.length },
-            ]}
-          />
         )}
       </Section>
 
@@ -300,21 +280,6 @@ export function MissionControlPage() {
         </Card>
       </div>
 
-      <Section title={t("executionHistory.title")} description={t("executionHistory.description")}>
-        <DataTable
-          rows={runHistory}
-          getRowKey={(r) => r.id}
-          emptyTitle={t("executionHistory.emptyTitle")}
-          columns={[
-            { key: "date", header: t("executionHistory.runDate"), render: (r) => formatDate(r.run_date) },
-            { key: "status", header: t("executionHistory.status"), render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{label("runStatus", r.status)}</Badge> },
-            { key: "hypotheses", header: t("executionHistory.hypotheses"), align: "right", render: (r) => r.hypotheses },
-            { key: "promoted", header: t("executionHistory.promoted"), align: "right", render: (r) => r.promoted },
-            { key: "completed", header: t("executionHistory.completed"), align: "right", render: (r) => formatDateTime(r.completed_at) },
-          ]}
-        />
-      </Section>
-
       <Section title={t("acquisitionDecisions.title")} description={t("acquisitionDecisions.description")}>
         {acquisitionDecisions.loading && <LoadingState rows={3} />}
         {acquisitionDecisions.error && (
@@ -399,6 +364,110 @@ export function MissionControlPage() {
           />
         )}
       </Section>
+
+      <h2 className={styles.groupHeading}>{t("groups.system")}</h2>
+
+      <Section title={t("runtime.title")} description={t("runtime.description")}>
+        {executionReport.loading && <LoadingState rows={2} />}
+        {executionReport.error && <ErrorState detail={executionReport.error.message} onRetry={executionReport.reload} />}
+        {!executionReport.loading && !executionReport.error && !executionReport.data && (
+          <EmptyState title={t("runtime.emptyTitle")} />
+        )}
+        {executionReport.data && (
+          <div className={styles.grid}>
+            <StatTile label={t("runtime.pipelineVersion")} value={<span className="num">{executionReport.data.pipeline_version}</span>} />
+            <StatTile label={t("runtime.executionMode")} value={label("executionMode", executionReport.data.execution_mode)} />
+            <StatTile label={t("runtime.overallStatus")} value={<Badge variant={STAGE_VARIANT[executionReport.data.overall_status]}>{label("stageStatus", executionReport.data.overall_status)}</Badge>} />
+            <StatTile label={t("runtime.runDates")} value={executionReport.data.run_dates.length} />
+            <StatTile label={t("runtime.started")} value={formatDateTime(executionReport.data.started_at)} />
+            <StatTile label={t("runtime.completed")} value={formatDateTime(executionReport.data.completed_at)} />
+            <StatTile label={t("runtime.duration")} value={<span className="num">{`${formatNumber(executionReport.data.duration_seconds, 2)}s`}</span>} />
+          </div>
+        )}
+      </Section>
+
+      <div className={styles.twoCol}>
+        <Card title={t("configuration.title")} subtitle={t("configuration.subtitle")}>
+          {!executionReport.data && !dashboardMetrics.data ? (
+            <EmptyState title={t("configuration.emptyTitle")} />
+          ) : (
+            <div>
+              {dashboardMetrics.data && (
+                <div className={styles.listItem}>
+                  <strong>{t("configuration.dashboardDirectory")}</strong> <span className={styles.path}>{dashboardMetrics.data.dashboard_dir}</span>
+                </div>
+              )}
+              {executionReport.data && executionReport.data.skipped_stages.length > 0 && (
+                <div className={styles.listItem}>
+                  <strong>{t("configuration.skippedStages")}</strong> {executionReport.data.skipped_stages.map((s) => label("stageName", s)).join(", ")}
+                </div>
+              )}
+              {executionReport.data && executionReport.data.skipped_stages.length === 0 && (
+                <div className={styles.listItem}>{t("configuration.noSkippedStages")}</div>
+              )}
+            </div>
+          )}
+        </Card>
+
+        <Card title={t("replay.title")}>
+          <EmptyState
+            title={executionReport.data ? t("replay.currentMode", { mode: label("executionMode", executionReport.data.execution_mode) }) : t("replay.notYetRun")}
+            detail={t("replay.detail")}
+          />
+        </Card>
+      </div>
+
+      <Section title={t("artifacts.title")} description={t("artifacts.description")}>
+        {dashboardMetrics.error && <ErrorState detail={dashboardMetrics.error.message} onRetry={dashboardMetrics.reload} />}
+        {!dashboardMetrics.error && dashboardMetrics.data && (
+          <StatTile label={t("artifacts.totalArtifacts")} value={dashboardMetrics.data.total_artifacts} caption={formatDateTime(dashboardMetrics.data.generated_at)} />
+        )}
+        <div style={{ marginTop: "var(--space-4)" }}>
+          <DataTable
+            rows={artifactRows}
+            getRowKey={([name]) => name}
+            emptyTitle={t("artifacts.emptyTitle")}
+            columns={[
+              { key: "name", header: t("artifacts.artifact"), render: ([name]) => name },
+              { key: "count", header: t("artifacts.records"), align: "right", render: ([, count]) => <span className="num">{formatNumber(count)}</span> },
+            ]}
+          />
+        </div>
+      </Section>
+
+      <Section title={t("performance.title")} description={t("performance.description")}>
+        <DataTable
+          rows={stagesByDuration}
+          getRowKey={(s) => s.name}
+          emptyTitle={t("performance.emptyTitle")}
+          columns={[
+            { key: "name", header: t("performance.stage"), render: (s) => label("stageName", s.name) },
+            { key: "status", header: t("performance.status"), render: (s) => <Badge variant={STAGE_VARIANT[s.status]}>{label("stageStatus", s.status)}</Badge> },
+            { key: "duration", header: t("performance.duration"), align: "right", render: (s) => <span className="num">{`${formatNumber(s.duration_seconds, 3)}s`}</span> },
+          ]}
+        />
+      </Section>
+
+      <Section title={t("executionHistory.title")} description={t("executionHistory.description")}>
+        <DataTable
+          rows={runHistory}
+          getRowKey={(r) => r.id}
+          emptyTitle={t("executionHistory.emptyTitle")}
+          columns={[
+            { key: "date", header: t("executionHistory.runDate"), render: (r) => formatDate(r.run_date) },
+            { key: "status", header: t("executionHistory.status"), render: (r) => <Badge variant={RUN_VARIANT[r.status]}>{label("runStatus", r.status)}</Badge> },
+            { key: "hypotheses", header: t("executionHistory.hypotheses"), align: "right", render: (r) => r.hypotheses },
+            { key: "promoted", header: t("executionHistory.promoted"), align: "right", render: (r) => r.promoted },
+            { key: "session", header: t("executionHistory.session"), render: (r) => r.session_id ?? "—" },
+            { key: "error", header: t("executionHistory.error"), render: (r) => r.error ?? "—" },
+            { key: "completed", header: t("executionHistory.completed"), align: "right", render: (r) => formatDateTime(r.completed_at) },
+          ]}
+        />
+      </Section>
+
+      <Card title={t("logs.title")}>
+        <EmptyState title={t("logs.notYetAvailable")} detail={t("logs.detail")} />
+      </Card>
     </>
   );
 }

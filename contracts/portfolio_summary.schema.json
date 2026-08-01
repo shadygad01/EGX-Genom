@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "ConcentrationCheck": {
+      "properties": {
+        "herfindahl_index": {
+          "title": "Herfindahl Index",
+          "type": "number"
+        },
+        "max_position_ticker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Position Ticker"
+        },
+        "max_position_weight": {
+          "title": "Max Position Weight",
+          "type": "number"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "top_3_weight": {
+          "title": "Top 3 Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "herfindahl_index",
+        "status",
+        "max_position_weight",
+        "top_3_weight"
+      ],
+      "title": "ConcentrationCheck",
+      "type": "object"
+    },
+    "SectorExposure": {
+      "properties": {
+        "sector": {
+          "title": "Sector",
+          "type": "string"
+        },
+        "tickers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tickers",
+          "type": "array"
+        },
+        "weight": {
+          "title": "Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "sector",
+        "weight"
+      ],
+      "title": "SectorExposure",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "cash_weight": {
+      "title": "Cash Weight",
+      "type": "number"
+    },
+    "concentration": {
+      "$ref": "#/$defs/ConcentrationCheck"
+    },
+    "decision_conflicts": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Decision Conflicts",
+      "type": "array"
+    },
+    "expected_return": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Return"
+    },
+    "expected_risk": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Risk"
+    },
+    "invested_weight": {
+      "title": "Invested Weight",
+      "type": "number"
+    },
+    "is_live_portfolio": {
+      "title": "Is Live Portfolio",
+      "type": "boolean"
+    },
+    "liquidity_violations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Liquidity Violations",
+      "type": "array"
+    },
+    "max_sector_weight": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Sector Weight"
+    },
+    "position_count": {
+      "title": "Position Count",
+      "type": "integer"
+    },
+    "sector_concentration_status": {
+      "default": "not_evaluated",
+      "title": "Sector Concentration Status",
+      "type": "string"
+    },
+    "sector_exposures": {
+      "items": {
+        "$ref": "#/$defs/SectorExposure"
+      },
+      "title": "Sector Exposures",
+      "type": "array"
+    },
+    "weights_reconcile": {
+      "title": "Weights Reconcile",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "as_of",
+    "is_live_portfolio",
+    "position_count",
+    "cash_weight",
+    "invested_weight",
+    "weights_reconcile",
+    "concentration"
+  ],
+  "title": "PortfolioSummaryReport",
+  "type": "object"
+}

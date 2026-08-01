@@ -25,11 +25,14 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  CommitteeSummaryReport,
   MarketBreadthReport,
   MarketRegimeReport,
   MarketState,
   MissionStatus,
+  MonitoringWarningsReport,
   Pattern,
+  PortfolioSummaryReport,
   PublicationGateReport,
   Recommendation,
   ResearchPaper,
@@ -41,7 +44,7 @@ import type {
   UniverseArtifact,
 } from "../types";
 import type { PositionAwareDecision } from "../types";
-import { DecisionCenterUnavailableError, type DashboardDataProvider, type DecideRequest } from "./DataProvider";
+import { LiveDecisionsUnavailableError, type DashboardDataProvider, type DecideRequest } from "./DataProvider";
 
 async function fetchList<T>(filename: string): Promise<T[]> {
   const response = await fetch(`${import.meta.env.BASE_URL}data/${filename}`);
@@ -199,9 +202,21 @@ export class StaticJsonProvider implements DashboardDataProvider {
     return fetchList<EndpointCandidate>("endpoint_candidates.json");
   }
 
+  getPortfolioSummary(): Promise<PortfolioSummaryReport | null> {
+    return fetchObject<PortfolioSummaryReport>("portfolio_summary.json");
+  }
+
+  getWarnings(): Promise<MonitoringWarningsReport | null> {
+    return fetchObject<MonitoringWarningsReport>("warnings.json");
+  }
+
+  getCommitteeSummary(): Promise<CommitteeSummaryReport | null> {
+    return fetchObject<CommitteeSummaryReport>("committee_summary.json");
+  }
+
   async postDecisions(_request: DecideRequest): Promise<PositionAwareDecision[]> {
-    throw new DecisionCenterUnavailableError(
-      "Decision Center needs a live backend. decision_service depends on your own portfolio " +
+    throw new LiveDecisionsUnavailableError(
+      "Personalized decisions need a live backend. decision_service depends on your own portfolio " +
         "holdings, which this platform never autonomously discovers or precomputes into the " +
         "static dashboard -- run `npm run dev -w api` locally with DECISION_DATA_DIR set (see " +
         "README's 'Personalized decisions' section), or use `agx decide` directly."

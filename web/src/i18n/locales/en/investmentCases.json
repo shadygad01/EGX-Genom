@@ -1,0 +1,143 @@
+{
+  "title": "Investment Cases",
+  "description": "Why should I own this company? Every ticker AGX currently sees, ranked by expected return.",
+  "emptyTitle": "No investment cases yet",
+  "emptyDetail": "Needs at least one promoted piece of knowledge for a real recommendation to exist.",
+  "evidence": "Evidence",
+  "evidenceTitle": "{{ticker}} evidence",
+  "noOpportunitySelected": "No case selected",
+  "selectRowDetail": "Select a row to preview its evidence.",
+  "badgeTitle": "{{horizon}}: {{return}} at {{confidence}} confidence",
+  "columns": {
+    "opportunity": "Company",
+    "horizons": "Horizon signals"
+  },
+  "detail": {
+    "horizonBreakdown": "Horizon breakdown",
+    "expReturnShort": "Exp. return",
+    "noModelPrediction": "No model prediction for this horizon.",
+    "researchSummary": "Research summary",
+    "supportingEvidence": "Supporting evidence",
+    "upcomingCatalysts": "Upcoming catalysts",
+    "noScheduledCatalysts": "No scheduled catalysts.",
+    "catalystLine": "{{date}}: {{eventType}} — {{description}}",
+    "openCase": "Open full Investment Case"
+  },
+  "caseDetail": {
+    "noCaseTitle": "No investment case for this ticker",
+    "noCaseDetail": "No current recommendation exists -- either no promoted knowledge covers it, or evidence hasn't cleared the bar yet.",
+    "decision": "Decision",
+    "targetAllocation": "Target Allocation",
+    "notInModelPortfolio": "Not in model portfolio",
+    "horizon": "Investment Horizon",
+    "reviewBy": "Review By"
+  },
+  "thesis": {
+    "title": "Investment Thesis",
+    "emptyTitle": "No thesis yet",
+    "emptyDetail": "No current recommendation exists for this ticker.",
+    "investmentThesis": "Investment thesis",
+    "risks": "Risks",
+    "supportingEvidence": "Supporting evidence",
+    "contradictingEvidence": "Contradicting evidence",
+    "historicalSimilarCases": "Historical similar cases"
+  },
+  "upcomingCatalysts": {
+    "title": "Catalysts",
+    "subtitle": "Real, already-collected corporate events",
+    "emptyTitle": "No catalysts scheduled",
+    "emptyDetail": "No upcoming corporate events for this ticker."
+  },
+  "macroContext": {
+    "title": "Macro Context",
+    "subtitle": "Macro-agent evidence behind this thesis",
+    "emptyTitle": "No macro-agent evidence for this ticker."
+  },
+  "qualityAssessment": {
+    "title": "Quality Assessment",
+    "subtitle": "Growth, margin, and leverage checks",
+    "emptyTitle": "No financial statements collected",
+    "emptyDetail": "No fundamentals data exists for this ticker yet.",
+    "assessment": {
+      "positive": "Strong fundamentals",
+      "mixed": "Mixed fundamentals",
+      "weak": "Weak fundamentals",
+      "insufficient": "Insufficient data for a fundamentals read"
+    }
+  },
+  "valuation": {
+    "title": "Valuation",
+    "description": "Price versus calculated fair value",
+    "emptyTitle": "No fair value calculated",
+    "emptyDetail": "Needs enough collected financial-statement fields (see docs/TECHNICAL_DEBT.md) -- not fabricated in its absence.",
+    "priceVsFairValue": "Price vs. Fair Value"
+  },
+  "executionPlan": {
+    "title": "Technical Execution Plan",
+    "description": "Real entry, invalidation, and review conditions from the INVESTMENT-horizon decision",
+    "emptyTitle": "No executable decision for this ticker",
+    "entryCondition": "Entry Condition",
+    "invalidationCondition": "Invalidation Condition",
+    "reviewCondition": "Review Condition",
+    "notApplicable": "Not applicable",
+    "namedInvalidationConditions": "Named invalidation conditions"
+  },
+  "monitoringPlan": {
+    "title": "Monitoring Plan",
+    "description": "Supporting knowledge currently under active continuous-learning review",
+    "emptyTitle": "Nothing under active monitoring",
+    "emptyDetail": "No supporting knowledge for this ticker is currently in MONITORING status."
+  },
+  "decisionHistory": {
+    "title": "Decision History",
+    "description": "Every recorded decision for this ticker, oldest last",
+    "emptyTitle": "No decision history yet",
+    "emptyDetail": "No decision has been recorded for this ticker in the decision ledger.",
+    "asOf": "As of",
+    "horizon": "Horizon",
+    "outcome": "Outcome",
+    "realizedReturn": "Realized Return"
+  },
+  "evidenceTimeline": {
+    "title": "Evidence Timeline",
+    "description": "Every piece of knowledge behind this ticker's thesis, newest first",
+    "emptyTitle": "No evidence yet",
+    "emptyDetail": "No knowledge object currently covers this ticker.",
+    "confidencePct": "{{value}} confidence"
+  },
+  "learningHistory": {
+    "title": "Learning History",
+    "description": "Gene lineage -- every generation this thesis has mutated through",
+    "emptyTitle": "No learning history yet",
+    "emptyDetail": "No gene lineage exists for this ticker's knowledge.",
+    "generationLabel": "{{id}} (generation {{generation}})"
+  },
+  "research": {
+    "title": "Research",
+    "description": "Deepest layer -- published papers, raw financials, corporate actions and news behind this case",
+    "papers": {
+      "title": "Research Papers",
+      "subtitle": "Published findings behind this thesis",
+      "emptyTitle": "No papers published for this ticker."
+    },
+    "news": {
+      "title": "News Timeline",
+      "subtitle": "Real, collected news mentioning this ticker",
+      "emptyTitle": "No news collected for this ticker."
+    },
+    "financials": {
+      "title": "Financial Statements",
+      "subtitle": "Every collected line item",
+      "emptyTitle": "No financial statements collected",
+      "emptyDetail": "No collector has captured financial-statement data for this ticker yet.",
+      "periodEnd": "Period End",
+      "lineItem": "Line Item",
+      "value": "Value"
+    },
+    "corporateActions": {
+      "title": "Corporate Actions",
+      "subtitle": "Past corporate events",
+      "emptyTitle": "No past corporate actions recorded."
+    }
+  }
+}

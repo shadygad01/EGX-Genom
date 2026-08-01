@@ -1,0 +1,80 @@
+{
+  "$defs": {
+    "CommitteeOpinion": {
+      "properties": {
+        "agreement_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agreement Rate"
+        },
+        "committee": {
+          "title": "Committee",
+          "type": "string"
+        },
+        "decisive_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decisive Rate"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        },
+        "stance": {
+          "title": "Stance",
+          "type": "string"
+        },
+        "tickers_present": {
+          "default": 0,
+          "title": "Tickers Present",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "committee",
+        "stance",
+        "note"
+      ],
+      "title": "CommitteeOpinion",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "opinions": {
+      "items": {
+        "$ref": "#/$defs/CommitteeOpinion"
+      },
+      "title": "Opinions",
+      "type": "array"
+    },
+    "tickers_evaluated": {
+      "title": "Tickers Evaluated",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "as_of",
+    "tickers_evaluated"
+  ],
+  "title": "CommitteeSummaryReport",
+  "type": "object"
+}

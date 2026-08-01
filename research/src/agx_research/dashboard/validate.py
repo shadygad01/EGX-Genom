@@ -14,6 +14,9 @@ from datetime import date
 from pathlib import Path
 
 from agx_research.acquisition_intelligence.capability_engine import CapabilityDecision
+from agx_research.dashboard.committee_summary import CommitteeSummaryReport
+from agx_research.dashboard.monitoring import MonitoringWarningsReport
+from agx_research.dashboard.portfolio_summary import PortfolioSummaryReport
 from agx_research.dashboard.schemas import DashboardSystemStatus
 from agx_research.events.event import Event
 from agx_research.financials.coverage import (
@@ -211,6 +214,9 @@ def validate_dashboard_artifacts(
 
     _validate_optional_market_breadth(directory, counts)
     _validate_optional_market_regime(directory, counts)
+    _validate_optional_portfolio_summary(directory, counts)
+    _validate_optional_warnings(directory, counts)
+    _validate_optional_committee_summary(directory, counts)
 
     return counts
 
@@ -237,6 +243,42 @@ def _validate_optional_market_regime(directory: Path, counts: dict[str, int]) ->
         except Exception as exc:
             raise DashboardArtifactError(f"market_regime.json: {exc}") from exc
     counts["market_regime.json"] = 0 if payload is None else 1
+
+
+def _validate_optional_portfolio_summary(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "portfolio_summary.json")
+    if not present:
+        return
+    if payload is not None:
+        try:
+            PortfolioSummaryReport.model_validate(payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"portfolio_summary.json: {exc}") from exc
+    counts["portfolio_summary.json"] = 0 if payload is None else 1
+
+
+def _validate_optional_warnings(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "warnings.json")
+    if not present:
+        return
+    if payload is not None:
+        try:
+            MonitoringWarningsReport.model_validate(payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"warnings.json: {exc}") from exc
+    counts["warnings.json"] = 0 if payload is None else len(payload.get("warnings", []))
+
+
+def _validate_optional_committee_summary(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "committee_summary.json")
+    if not present:
+        return
+    if payload is not None:
+        try:
+            CommitteeSummaryReport.model_validate(payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"committee_summary.json: {exc}") from exc
+    counts["committee_summary.json"] = 0 if payload is None else 1
 
 
 def _validate_complete_financial_coverage(directory: Path, universe_payload) -> None:

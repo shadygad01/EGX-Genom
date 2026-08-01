@@ -1,0 +1,57 @@
+{
+  "marketRegime": {
+    "title": "Market Regime",
+    "subtitle": "The current investment environment, in one read",
+    "emptyTitle": "No regime classification yet",
+    "emptyDetail": "Needs at least one reconstructed trading day of price history.",
+    "volatilityBadge": "{{level}} volatility",
+    "viewDetail": "View market detail →"
+  },
+  "holdingsCta": {
+    "title": "Add your holdings",
+    "detail": "Enter your current positions to see personalized Buy / Increase / Hold / Reduce / Exit actions, sized to your own portfolio. Until then, Today's Actions shows the model portfolio's suggested starting positions.",
+    "action": "Go to Portfolio →"
+  },
+  "todaysActions": {
+    "title": "Today's Actions",
+    "description": "What should I do today?",
+    "sourceLive": "Personalized to your holdings (live decision_service call).",
+    "sourceUnavailable": "Personalized decisions need a live backend — showing the model portfolio's suggested starting positions instead.",
+    "sourceModelPortfolio": "No holdings entered yet — showing the model portfolio's suggested starting positions (not personalized).",
+    "emptyTitle": "No action required today",
+    "emptyDetail": "Nothing currently clears the evidence bar for a real position.",
+    "suggestedBuy": "Suggested",
+    "targetWeight": "Target Weight",
+    "holdingPeriod": "Expected Holding Period",
+    "thesis": "Investment Thesis",
+    "topReasons": "Top Reasons",
+    "largestRisk": "Largest Risk",
+    "notAssessed": "Not assessed"
+  },
+  "portfolioSummary": {
+    "title": "Portfolio Summary",
+    "description": "Is my capital allocated correctly?",
+    "sourceLive": "Your portfolio, live.",
+    "sourceModelPortfolio": "Model portfolio (no holdings entered) — see Portfolio for your own allocation.",
+    "emptyTitle": "No portfolio summary yet",
+    "emptyDetail": "Needs at least one reconstructed trading day and a non-empty model portfolio.",
+    "cash": "Cash Allocation",
+    "invested": "Invested Capital",
+    "expectedReturn": "Expected Portfolio Return",
+    "expectedDownside": "Expected Downside",
+    "diversification": "Diversification",
+    "positions": "Positions"
+  },
+  "warnings": {
+    "title": "Warnings",
+    "description": "What requires immediate attention?",
+    "emptyTitle": "No warnings today",
+    "emptyDetail": "Nothing in the model portfolio currently needs attention."
+  },
+  "committeeSummary": {
+    "title": "Investment Committee Summary",
+    "description": "Who agrees, who disagrees, and how much does it matter?",
+    "emptyTitle": "No committee summary yet",
+    "emptyDetail": "Needs a non-empty model portfolio with real evidence behind it."
+  }
+}

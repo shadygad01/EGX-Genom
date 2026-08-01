@@ -25,11 +25,14 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  CommitteeSummaryReport,
   MarketBreadthReport,
   MarketRegimeReport,
   MarketState,
   MissionStatus,
+  MonitoringWarningsReport,
   Pattern,
+  PortfolioSummaryReport,
   PositionAwareDecision,
   PublicationGateReport,
   Recommendation,
@@ -186,6 +189,18 @@ export class ApiProvider implements DashboardDataProvider {
 
   getEndpointCandidates(): Promise<EndpointCandidate[]> {
     return fetchJson<EndpointCandidate[]>("/endpoint-candidates");
+  }
+
+  getPortfolioSummary(): Promise<PortfolioSummaryReport | null> {
+    return fetchJson<PortfolioSummaryReport | null>("/portfolio-summary");
+  }
+
+  getWarnings(): Promise<MonitoringWarningsReport | null> {
+    return fetchJson<MonitoringWarningsReport | null>("/warnings");
+  }
+
+  getCommitteeSummary(): Promise<CommitteeSummaryReport | null> {
+    return fetchJson<CommitteeSummaryReport | null>("/committee-summary");
   }
 
   async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {

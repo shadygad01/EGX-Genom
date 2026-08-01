@@ -1,6 +1,61 @@
 # Current Mission
 
-## Current mission: Investment Proof Framework — Capital Trust Report (2026-08-01)
+## Current mission: EGX-Genom Final Product Mission — Institutional Investment Operating System (2026-08-01)
+
+The project owner's final-product mission: redefine EGX-Genom from a
+research platform into an institutional-grade Investment Operating
+System (IOS) — research becomes an internal capability, investment
+decisions are the product. Ten non-negotiable constraints carried over
+unchanged (free/legal data only, never fabricate, every recommendation
+explainable and traceable, determinism preserved). New requirements: a
+strict Product Law ("every screen answers exactly one primary investment
+question"), an Information Hierarchy (Decision → Investment Case →
+Evidence → Research), a mandated 5-section CIO Desk landing page, a
+19-section Investment Case page, portfolio-aware thinking everywhere, a
+7-item navigation hierarchy with Research never the default destination,
+and an explicit mandatory product audit before completion. Full
+authorization to redesign page hierarchy/navigation, merge/remove pages,
+refactor frontend/APIs, and reuse the existing decision engine — "do not
+preserve existing UI if it conflicts with the new mission."
+
+**Delivered**: see `docs/PHASE_STATUS.md`'s "EGX-Genom Final Product
+Mission" section for the complete report. Backend: 3 new dashboard
+artifacts (`portfolio_summary.json`, `warnings.json`,
+`committee_summary.json`), each composing an already-existing engine
+(`investment_proof.portfolio_validation`/`committee_validation` from the
+Investment Proof Framework mission below) rather than adding new
+judgment logic. API: 3 new routes, 1 confirmed-dead duplicate route
+removed. Frontend: a complete navigation and page-hierarchy redesign —
+new `CIODesk` (landing page), `Portfolio`, `InvestmentCases`/
+`InvestmentCaseDetail` (19 sections), `Monitoring`, and a merged
+`Settings` page; `ResearchCenter` extended to absorb Decision
+Readiness/Data Coverage; nav collapsed from 9 to 7 top-level items
+(Knowledge Graph/Source Intelligence stay reachable via Research, not the
+primary nav). Six obsolete pages plus the already-dead `ComingSoon.tsx`
+deleted outright, not kept as parallel dead code. New
+`usePortfolioPositions` localStorage hook backs "my holdings" on both CIO
+Desk and Portfolio — the backend never stores real portfolio data.
+
+**Mandatory Product Audit performed** (every screen/widget/nav item/API
+endpoint/report, asked "does this improve investment decisions?"): found
+and merged two data-only pages (Mission Control + System Administration)
+into one Settings page; removed one dead API route; removed the old AI
+Briefing's giant per-ticker/per-horizon abstain table (never drove a
+decision); named one real, not-silently-dropped gap —
+`getRuntimeStatus()`/`getSourceTruth()`/`getEndpointCandidates()` remain
+unused by any page after the redesign (new TD-61, not force-built into a
+screen that would itself fail the Product Law).
+
+**Result**: 840 backend tests pass (up from 833, 7 new); 27 `api` tests
+pass (3 new); 47 `web` tests pass (fully rewritten `App.test.tsx`); `ruff
+check`/`tsc --noEmit`/production builds all clean. Live-verified in a
+real running `api`+`web` dev server pair, English and Arabic/RTL, via
+headless Chromium — including one real RTL CSS overflow bug found and
+fixed during verification (`CIODesk.module.css`'s inline-`<span>`
+`max-width` had no effect on `display: inline` elements; fixed with
+`display: block` + explicit width + ellipsis truncation).
+
+## Prior mission: Investment Proof Framework — Capital Trust Report (2026-08-01)
 
 The project owner's final mission for this phase: acting as CIO/CRO/Head
 of Research/Principal Architect simultaneously, build the complete

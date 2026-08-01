@@ -917,7 +917,7 @@ export interface SourceSpec {
 
 // --- decision_service / PositionAwareDecision (POST /decisions, live-computed --
 // see api/src/routes/decisions.ts; not a static dashboard artifact, so only
-// ApiProvider can serve it -- see DecisionCenter.tsx for the static-mode gap state) ---
+// ApiProvider can serve it -- see Portfolio.tsx/CIODesk.tsx for the static-mode gap state) ---
 
 export type PositionAction =
   | "buy"
@@ -951,4 +951,79 @@ export interface PositionAwareDecision {
   reasons: string[];
   explanation: Explanation;
   provenance: Provenance;
+}
+
+// --- portfolio_summary.json / dashboard.portfolio_summary.PortfolioSummaryReport ---
+
+export interface ConcentrationCheck {
+  herfindahl_index: number;
+  status: "diversified" | "concentrated";
+  max_position_weight: number;
+  max_position_ticker: string | null;
+  top_3_weight: number;
+}
+
+export interface SectorExposure {
+  sector: string;
+  weight: number;
+  tickers: string[];
+}
+
+export interface PortfolioSummaryReport {
+  as_of: string;
+  is_live_portfolio: boolean;
+  position_count: number;
+  cash_weight: number;
+  invested_weight: number;
+  weights_reconcile: boolean;
+  expected_return: number | null;
+  expected_risk: number | null;
+  concentration: ConcentrationCheck;
+  sector_exposures: SectorExposure[];
+  max_sector_weight: number | null;
+  sector_concentration_status: "diversified" | "concentrated" | "not_evaluated";
+  liquidity_violations: string[];
+  decision_conflicts: string[];
+}
+
+// --- warnings.json / dashboard.monitoring.MonitoringWarningsReport ---
+
+export type WarningCategory =
+  | "broken_thesis"
+  | "macro_risk_increased"
+  | "catalyst_expired"
+  | "liquidity_deterioration"
+  | "portfolio_concentration"
+  | "review_required";
+
+export type WarningSeverity = "info" | "warning" | "critical";
+
+export interface MonitoringWarning {
+  category: WarningCategory;
+  severity: WarningSeverity;
+  ticker: string | null;
+  title: string;
+  detail: string;
+}
+
+export interface MonitoringWarningsReport {
+  as_of: string;
+  warnings: MonitoringWarning[];
+}
+
+// --- committee_summary.json / dashboard.committee_summary.CommitteeSummaryReport ---
+
+export interface CommitteeOpinion {
+  committee: string;
+  stance: string;
+  agreement_rate: number | null;
+  decisive_rate: number | null;
+  tickers_present: number;
+  note: string;
+}
+
+export interface CommitteeSummaryReport {
+  as_of: string;
+  tickers_evaluated: number;
+  opinions: CommitteeOpinion[];
 }

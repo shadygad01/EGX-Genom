@@ -44,5 +44,41 @@
     "title": "Review Board",
     "emptyTitle": "Not yet available",
     "emptyDetail": "No repository persists past ScientificReviewBoard decisions yet -- this section will populate once one exists (see docs/TECHNICAL_DEBT.md), never a fabricated review history."
+  },
+  "dataReadiness": {
+    "title": "Data Readiness",
+    "description": "Why AGX can research or must abstain for every ticker, and exactly which data layer blocks it",
+    "decisionReadiness": "Decision Readiness",
+    "ticker": "Ticker",
+    "status": "Status",
+    "fairValueGap": "Price vs. Fair Value",
+    "noFairValue": "N/A",
+    "primaryBlocker": "Primary Blocker",
+    "none": "None",
+    "emptyTitle": "No readiness assessment yet",
+    "emptyDetail": "The production pipeline must run before evidence readiness can be assessed.",
+    "gapTitle": "Data Coverage",
+    "gapTitleForTicker": "{{ticker}} — Data Coverage",
+    "noTickerSelected": "No ticker selected",
+    "selectRowDetail": "Select a row in Decision Readiness to see its per-layer data-completeness breakdown.",
+    "overallCompleteness": "Overall Completeness",
+    "swingReady": "Swing Ready",
+    "investmentReady": "Investment Ready",
+    "yes": "Yes",
+    "no": "No",
+    "ofRequired": "of {{threshold}} required",
+    "layers": {
+      "financials": "Financials",
+      "disclosures": "Disclosures",
+      "news": "News",
+      "macro": "Macro",
+      "knowledge": "Knowledge"
+    }
+  },
+  "moreTools": {
+    "title": "More Research Tools",
+    "subtitle": "Deeper, internal-capability views -- reachable, never the default destination",
+    "knowledgeGraph": "Knowledge Graph",
+    "sourceIntelligence": "Source Intelligence"
   }
 }

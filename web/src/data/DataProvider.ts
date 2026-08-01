@@ -27,11 +27,14 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  CommitteeSummaryReport,
   MarketBreadthReport,
   MarketRegimeReport,
   MarketState,
   MissionStatus,
+  MonitoringWarningsReport,
   Pattern,
+  PortfolioSummaryReport,
   PositionAwareDecision,
   PositionInput,
   PublicationGateReport,
@@ -56,10 +59,10 @@ export interface DecideRequest {
 // artifact -- see CLAUDE.md's decision_service rules). Pages catch this
 // specifically to render an honest "needs a live backend" state rather than
 // a generic fetch-failure error.
-export class DecisionCenterUnavailableError extends Error {
+export class LiveDecisionsUnavailableError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "DecisionCenterUnavailableError";
+    this.name = "LiveDecisionsUnavailableError";
   }
 }
 
@@ -107,9 +110,15 @@ export interface DashboardDataProvider {
   getDiscoveryMetrics(): Promise<DiscoveryMetrics | null>;
   getEndpointCandidates(): Promise<EndpointCandidate[]>;
 
+  // CIO Desk artifacts: the autonomous, position-unaware model portfolio's
+  // summary, monitoring warnings, and investment committee agreement.
+  getPortfolioSummary(): Promise<PortfolioSummaryReport | null>;
+  getWarnings(): Promise<MonitoringWarningsReport | null>;
+  getCommitteeSummary(): Promise<CommitteeSummaryReport | null>;
+
   // The one write-shaped call on this interface: computes fresh, position-
   // aware decisions on demand (see api/src/routes/decisions.ts). Never
   // cached, never a static artifact -- StaticJsonProvider always rejects
-  // with DecisionCenterUnavailableError.
+  // with LiveDecisionsUnavailableError.
   postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]>;
 }

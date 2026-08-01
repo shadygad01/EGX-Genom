@@ -127,3 +127,20 @@
 .tickerLink:hover {
   text-decoration: underline;
 }
+
+.toolLinks {
+  display: flex;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.toolLink {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.toolLink:hover {
+  text-decoration: underline;
+}

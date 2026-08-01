@@ -1,9 +1,9 @@
 {
-  "title": "Decision Center",
-  "description": "Your personalized, position-aware investment decision -- Buy, Increase Position, Hold, Reduce Position, Exit, or No Action -- with target weight, thesis, risks, evidence, catalysts, monitoring status, and review date, computed on demand for your own holdings.",
+  "title": "Portfolio",
+  "description": "Is my capital allocated correctly?",
   "positions": {
     "title": "Your current holdings",
-    "subtitle": "Never stored or autonomously discovered -- entered here only for this query.",
+    "subtitle": "Saved only in this browser -- never sent anywhere except as part of your own decision request.",
     "ticker": "Ticker",
     "currentWeight": "Current weight",
     "averageCost": "Average cost (EGP)",
@@ -15,7 +15,18 @@
     "getFlatRead": "Get a flat-portfolio read (no positions held)"
   },
   "unavailable": {
-    "title": "Decision Center needs a live backend"
+    "title": "Portfolio needs a live backend"
+  },
+  "summary": {
+    "title": "Portfolio Summary",
+    "description": "Cash, sector exposure, and concentration -- computed from your live decisions.",
+    "cash": "Cash Allocation",
+    "invested": "Invested Capital",
+    "positions": "Positions",
+    "concentration": "Concentration",
+    "concentrated": "Concentrated",
+    "diversified": "Diversified",
+    "topPosition": "Largest Position"
   },
   "results": {
     "title": "Decisions",
@@ -38,6 +49,7 @@
     "monitoringEvents": "Monitoring events",
     "invalidationConditions": "Invalidation conditions",
     "supportingEvidence": "Supporting evidence",
-    "none": "None recorded."
+    "none": "None recorded.",
+    "viewCase": "View full Investment Case"
   }
 }

@@ -187,7 +187,7 @@ export function KnowledgeGraphPage() {
                 </div>
 
                 {selected.node_type === "company" && (
-                  <Link to={`/company/${selected.id}`} style={{ color: "var(--accent-strong)", fontWeight: 600, fontSize: "var(--text-xs)" }}>
+                  <Link to={`/cases/${selected.id}`} style={{ color: "var(--accent-strong)", fontWeight: 600, fontSize: "var(--text-xs)" }}>
                     {t("nodeDetail.openWorkspace")} <span className="icon-forward" aria-hidden="true">→</span>
                   </Link>
                 )}

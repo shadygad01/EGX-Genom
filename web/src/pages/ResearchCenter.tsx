@@ -11,9 +11,12 @@ import { EmptyState, ErrorState, LoadingState } from "../components/primitives/S
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
-import { formatPercent } from "../lib/format";
-import type { Hypothesis, KnowledgeStatus } from "../types";
+import { formatPercent, formatSignedPercent } from "../lib/format";
+import type { DecisionReadiness, Hypothesis, KnowledgeStatus, ReadinessStatus, TickerDataGapReport } from "../types";
+import { Meter } from "../components/primitives/Meter";
 import styles from "./ResearchCenter.module.css";
+
+const READINESS_RANK: Record<ReadinessStatus, number> = { ready: 0, degraded: 1, blocked: 2 };
 
 const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
   promoted: "positive",
@@ -49,7 +52,10 @@ export function ResearchCenter() {
   const hypotheses = useArtifact((p) => p.getHypotheses());
   const knowledge = useArtifact((p) => p.getKnowledge());
   const papers = useArtifact((p) => p.getPapers());
+  const readiness = useArtifact((p) => p.getDecisionReadiness());
+  const gapReport = useArtifact((p) => p.getTickerDataGapReport());
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedGapTicker, setSelectedGapTicker] = useState<string | null>(null);
 
   const allHypotheses = [...(hypotheses.data ?? [])].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   const activeCount = allHypotheses.filter((h) => {
@@ -65,6 +71,13 @@ export function ResearchCenter() {
   };
   const sortedKnowledge = [...(knowledge.data ?? [])].sort((a, b) => (a.discovery_date < b.discovery_date ? 1 : -1));
   const sortedPapers = [...(papers.data ?? [])].sort((a, b) => (a.published_at < b.published_at ? 1 : -1));
+
+  const rankedReadiness = [...(readiness.data ?? [])].sort((a, b) => {
+    const rank = READINESS_RANK[a.status] - READINESS_RANK[b.status];
+    return rank !== 0 ? rank : a.ticker.localeCompare(b.ticker);
+  });
+  const gapReports = gapReport.data ?? [];
+  const selectedGap = gapReports.find((g) => g.ticker === selectedGapTicker) ?? null;
 
   return (
     <>
@@ -151,7 +164,7 @@ export function ResearchCenter() {
                 render: (k) => (
                   <div className={styles.tickerLinks}>
                     {k.affected_assets.map((ticker) => (
-                      <Link key={ticker} className={`${styles.tickerLink} num`} to={`/company/${ticker}`}>
+                      <Link key={ticker} className={`${styles.tickerLink} num`} to={`/cases/${ticker}`}>
                         {ticker}
                       </Link>
                     ))}
@@ -190,6 +203,98 @@ export function ResearchCenter() {
           <EmptyState title={t("reviewBoard.emptyTitle")} detail={t("reviewBoard.emptyDetail")} />
         </Card>
       </div>
+
+      <Section title={t("dataReadiness.title")} description={t("dataReadiness.description")}>
+        <div className={styles.layout}>
+          <Card title={t("dataReadiness.decisionReadiness")} dense>
+            {readiness.loading && <LoadingState rows={4} />}
+            {readiness.error && <ErrorState detail={readiness.error.message} onRetry={readiness.reload} />}
+            {!readiness.loading && !readiness.error && (
+              <DataTable<DecisionReadiness>
+                rows={rankedReadiness}
+                getRowKey={(row) => row.ticker}
+                onRowClick={(row) => setSelectedGapTicker(row.ticker)}
+                emptyTitle={t("dataReadiness.emptyTitle")}
+                emptyDetail={t("dataReadiness.emptyDetail")}
+                columns={[
+                  { key: "ticker", header: t("dataReadiness.ticker"), render: (row) => <span className="num">{row.ticker}</span> },
+                  {
+                    key: "status",
+                    header: t("dataReadiness.status"),
+                    render: (row) => (
+                      <Badge variant={row.status === "ready" ? "positive" : row.status === "degraded" ? "warning" : "negative"}>
+                        {label("readinessStatus", row.status)}
+                      </Badge>
+                    ),
+                  },
+                  {
+                    key: "fairValueGap",
+                    header: t("dataReadiness.fairValueGap"),
+                    align: "right",
+                    render: (row) =>
+                      row.price_vs_fair_value_pct == null ? (
+                        <span className="num">{t("dataReadiness.noFairValue")}</span>
+                      ) : (
+                        <span className="num" style={{ color: row.price_vs_fair_value_pct > 0 ? "var(--negative)" : "var(--positive)" }}>
+                          {formatSignedPercent(row.price_vs_fair_value_pct)}
+                        </span>
+                      ),
+                  },
+                  { key: "blocker", header: t("dataReadiness.primaryBlocker"), render: (row) => row.blockers[0] ?? t("dataReadiness.none") },
+                ]}
+              />
+            )}
+          </Card>
+
+          <Card title={selectedGap ? t("dataReadiness.gapTitleForTicker", { ticker: selectedGap.ticker }) : t("dataReadiness.gapTitle")} dense>
+            {gapReport.loading && <LoadingState rows={4} />}
+            {gapReport.error && <ErrorState detail={gapReport.error.message} onRetry={gapReport.reload} />}
+            {!gapReport.loading && !gapReport.error && !selectedGap && (
+              <EmptyState title={t("dataReadiness.noTickerSelected")} detail={t("dataReadiness.selectRowDetail")} />
+            )}
+            {!gapReport.loading && !gapReport.error && selectedGap && <TickerGapDetail gap={selectedGap} />}
+          </Card>
+        </div>
+      </Section>
+
+      <Card title={t("moreTools.title")} subtitle={t("moreTools.subtitle")}>
+        <div className={styles.toolLinks}>
+          <Link className={styles.toolLink} to="/knowledge-graph">{t("moreTools.knowledgeGraph")} →</Link>
+          <Link className={styles.toolLink} to="/sources">{t("moreTools.sourceIntelligence")} →</Link>
+        </div>
+      </Card>
     </>
+  );
+}
+
+function TickerGapDetail({ gap }: { gap: TickerDataGapReport }) {
+  const { t } = useTranslation("researchCenter");
+  const tCommon = useTranslation("common").t;
+  return (
+    <div>
+      <div className={styles.grid} style={{ marginBottom: "var(--space-4)" }}>
+        <StatTile label={t("dataReadiness.overallCompleteness")} value={formatPercent(gap.overall_completeness_pct / 100)} />
+        <StatTile label={t("dataReadiness.swingReady")} value={gap.swing_ready ? t("dataReadiness.yes") : t("dataReadiness.no")} />
+        <StatTile label={t("dataReadiness.investmentReady")} value={gap.investment_ready ? t("dataReadiness.yes") : t("dataReadiness.no")} />
+      </div>
+
+      <div className={styles.stageList}>
+        {gap.layers.map((layer) => (
+          <div key={layer.layer} className={styles.stageRow}>
+            <div>
+              <div className={styles.stageName}>{t(`dataReadiness.layers.${layer.layer}`, { defaultValue: layer.layer })}</div>
+              <div className={styles.stageNotes}>
+                <span className="num">{layer.count}</span> {t("dataReadiness.ofRequired", { threshold: layer.threshold })}
+              </div>
+            </div>
+            <Meter value={layer.completeness_pct / 100} label={`${layer.completeness_pct}%`} />
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.detailMeta} style={{ marginTop: "var(--space-4)" }}>
+        {tCommon("table.blockers")}: {gap.blockers.length === 0 ? tCommon("states.noneRecorded") : gap.blockers.join("; ")}
+      </div>
+    </div>
   );
 }

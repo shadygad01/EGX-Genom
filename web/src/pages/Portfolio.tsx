@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Badge, type BadgeVariant } from "../components/primitives/Badge";
 import { Card } from "../components/primitives/Card";
 import { DataTable } from "../components/primitives/DataTable";
 import { Disclaimer } from "../components/primitives/Disclaimer";
 import { Section } from "../components/primitives/Section";
+import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { dataProvider } from "../data/factory";
-import { DecisionCenterUnavailableError } from "../data/DataProvider";
+import { LiveDecisionsUnavailableError } from "../data/DataProvider";
 import { useArtifact } from "../hooks/useArtifact";
 import { useFormatters } from "../hooks/useFormatters";
+import { usePortfolioPositions, type HeldPosition } from "../hooks/usePortfolioPositions";
 import { formatPercent, titleCase } from "../lib/format";
-import type { PositionAwareDecision, PositionInput } from "../types";
-import styles from "./DecisionCenter.module.css";
+import type { PositionAwareDecision } from "../types";
+import styles from "./Portfolio.module.css";
 
 const ACTION_VARIANT: Record<string, BadgeVariant> = {
   buy: "positive",
@@ -23,47 +26,25 @@ const ACTION_VARIANT: Record<string, BadgeVariant> = {
   no_action: "default",
 };
 
-interface PositionRow {
-  key: string;
-  ticker: string;
-  currentWeight: string;
-  averageCost: string;
+function emptyRow(): HeldPosition {
+  return { ticker: "", currentWeight: 0, averageCost: null };
 }
 
-function emptyRow(): PositionRow {
-  return { key: crypto.randomUUID(), ticker: "", currentWeight: "", averageCost: "" };
-}
-
-function toPositions(rows: PositionRow[]): Record<string, PositionInput> {
-  const positions: Record<string, PositionInput> = {};
-  for (const row of rows) {
-    const ticker = row.ticker.trim().toUpperCase();
-    if (!ticker) continue;
-    const weight = Number(row.currentWeight);
-    const cost = Number(row.averageCost);
-    positions[ticker] = {
-      held: true,
-      current_weight: Number.isFinite(weight) && row.currentWeight !== "" ? weight : 0,
-      average_cost: Number.isFinite(cost) && row.averageCost !== "" ? cost : null,
-    };
-  }
-  return positions;
-}
-
-/** The mission's primary output, made queryable: a real, on-demand call to
- * `decision_service.DecisionService` (via POST /decisions) for a six-way
- * Buy/Increase Position/Hold/Reduce Position/Exit/No Action decision per
- * ticker, complete with target weight, thesis, risks, contradicting
- * evidence, catalysts, monitoring status and review date. Deliberately not
- * a static dashboard artifact -- it depends on the investor's own holdings,
- * which this platform never autonomously discovers (see CLAUDE.md's
- * decision_service rules) -- so it only works against a live api/ instance;
- * StaticJsonProvider honestly reports that rather than fabricating a result. */
-export function DecisionCenter() {
-  const { t } = useTranslation("decisionCenter");
+/** Portfolio -- "is my capital allocated correctly?" Owns two things no
+ * other screen does: editing the investor's own holdings, and the full,
+ * position-aware six-way decision table those holdings produce (real,
+ * on-demand `decision_service.DecisionService` calls -- see CLAUDE.md).
+ * The summary numbers here are computed client-side from that same real
+ * response (plus already-loaded market_state.sectors), never a second,
+ * parallel autonomous computation. */
+export function Portfolio() {
+  const { t } = useTranslation("portfolio");
+  const { t: tCommon } = useTranslation("common");
   const { formatDate } = useFormatters();
   const marketState = useArtifact((p) => p.getMarketState());
-  const [rows, setRows] = useState<PositionRow[]>([emptyRow()]);
+  const { positions: savedPositions, setPositions: savePositions, toPositionInputs } = usePortfolioPositions();
+
+  const [rows, setRows] = useState<HeldPosition[]>(savedPositions.length > 0 ? savedPositions : [emptyRow()]);
   const [decisions, setDecisions] = useState<PositionAwareDecision[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -71,10 +52,12 @@ export function DecisionCenter() {
 
   const defaultDate = marketState.data?.as_of ?? new Date().toISOString().slice(0, 10);
 
-  async function runDecide(positions: Record<string, PositionInput>) {
+  async function runDecide(nextRows: HeldPosition[]) {
+    savePositions(nextRows);
     setLoading(true);
     setError(null);
     try {
+      const positions = toPositionInputsFor(nextRows);
       const result = await dataProvider.postDecisions({ date: defaultDate, positions });
       setDecisions(result);
       setSelectedTicker(result[0]?.ticker ?? null);
@@ -85,8 +68,50 @@ export function DecisionCenter() {
     }
   }
 
+  function toPositionInputsFor(nextRows: HeldPosition[]) {
+    const result: Record<string, { held: boolean; current_weight: number; average_cost: number | null }> = {};
+    for (const row of nextRows) {
+      const ticker = row.ticker.trim().toUpperCase();
+      if (!ticker) continue;
+      result[ticker] = { held: true, current_weight: row.currentWeight, average_cost: row.averageCost };
+    }
+    return result;
+  }
+
+  // Auto-fetch on first load if holdings were already saved from a prior visit.
+  useEffect(() => {
+    if (savedPositions.length > 0) {
+      runDecide(savedPositions);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const selected = decisions?.find((d) => d.ticker === selectedTicker) ?? decisions?.[0] ?? null;
-  const unavailable = error instanceof DecisionCenterUnavailableError;
+  const unavailable = error instanceof LiveDecisionsUnavailableError;
+
+  const summary = useMemo(() => {
+    if (!decisions || decisions.length === 0) return null;
+    const held = decisions.filter((d) => d.target_weight > 0);
+    const invested = held.reduce((sum, d) => sum + d.target_weight, 0);
+    const cash = Math.max(0, 1 - invested);
+    const herfindahl = held.reduce((sum, d) => sum + d.target_weight ** 2, 0);
+    const sorted = [...held].sort((a, b) => b.target_weight - a.target_weight);
+    const sectors = marketState.data?.sectors ?? {};
+    const bySector = new Map<string, number>();
+    for (const d of held) {
+      const sector = sectors[d.ticker] ?? tCommon("table.noSector", { defaultValue: "Unclassified" });
+      bySector.set(sector, (bySector.get(sector) ?? 0) + d.target_weight);
+    }
+    return {
+      invested,
+      cash,
+      herfindahl,
+      concentrated: herfindahl > 0.25,
+      topPosition: sorted[0] ?? null,
+      positionCount: held.length,
+      sectors: [...bySector.entries()].sort((a, b) => b[1] - a[1]),
+    };
+  }, [decisions, marketState.data, tCommon]);
 
   return (
     <Section title={t("title")} description={t("description")}>
@@ -101,7 +126,7 @@ export function DecisionCenter() {
             <span />
           </div>
           {rows.map((row, index) => (
-            <div className={styles.positionsRow} key={row.key}>
+            <div className={styles.positionsRow} key={index}>
               <input
                 className={styles.input}
                 value={row.ticker}
@@ -114,30 +139,31 @@ export function DecisionCenter() {
               />
               <input
                 className={styles.input}
-                value={row.currentWeight}
+                value={row.currentWeight || ""}
                 placeholder="0.05"
                 inputMode="decimal"
                 onChange={(e) => {
                   const next = [...rows];
-                  next[index] = { ...row, currentWeight: e.target.value };
+                  next[index] = { ...row, currentWeight: Number(e.target.value) || 0 };
                   setRows(next);
                 }}
               />
               <input
                 className={styles.input}
-                value={row.averageCost}
+                value={row.averageCost ?? ""}
                 placeholder={t("positions.optional")}
                 inputMode="decimal"
                 onChange={(e) => {
                   const next = [...rows];
-                  next[index] = { ...row, averageCost: e.target.value };
+                  const value = e.target.value;
+                  next[index] = { ...row, averageCost: value === "" ? null : Number(value) };
                   setRows(next);
                 }}
               />
               <button
                 type="button"
                 className={styles.removeButton}
-                onClick={() => setRows(rows.filter((r) => r.key !== row.key))}
+                onClick={() => setRows(rows.filter((_, i) => i !== index))}
                 aria-label={t("positions.remove")}
               >
                 ×
@@ -149,15 +175,10 @@ export function DecisionCenter() {
           <button type="button" className={styles.secondaryButton} onClick={() => setRows([...rows, emptyRow()])}>
             {t("positions.addRow")}
           </button>
-          <button
-            type="button"
-            className={styles.primaryButton}
-            disabled={loading}
-            onClick={() => runDecide(toPositions(rows))}
-          >
+          <button type="button" className={styles.primaryButton} disabled={loading} onClick={() => runDecide(rows)}>
             {t("positions.getMyDecisions")}
           </button>
-          <button type="button" className={styles.secondaryButton} disabled={loading} onClick={() => runDecide({})}>
+          <button type="button" className={styles.secondaryButton} disabled={loading} onClick={() => runDecide([])}>
             {t("positions.getFlatRead")}
           </button>
         </div>
@@ -165,12 +186,38 @@ export function DecisionCenter() {
 
       {loading && <LoadingState rows={4} />}
 
-      {!loading && unavailable && (
-        <EmptyState title={t("unavailable.title")} detail={error?.message} icon="⛔" />
-      )}
+      {!loading && unavailable && <EmptyState title={t("unavailable.title")} detail={error?.message} icon="⛔" />}
 
       {!loading && error && !unavailable && (
-        <ErrorState detail={error.message} onRetry={() => runDecide(toPositions(rows))} />
+        <ErrorState detail={error.message} onRetry={() => runDecide(rows)} />
+      )}
+
+      {!loading && !error && summary && (
+        <Section title={t("summary.title")} description={t("summary.description")}>
+          <div className={styles.statGrid}>
+            <StatTile label={t("summary.cash")} value={formatPercent(summary.cash)} />
+            <StatTile label={t("summary.invested")} value={formatPercent(summary.invested)} />
+            <StatTile label={t("summary.positions")} value={summary.positionCount} />
+            <StatTile
+              label={t("summary.concentration")}
+              value={summary.concentrated ? t("summary.concentrated") : t("summary.diversified")}
+            />
+            <StatTile
+              label={t("summary.topPosition")}
+              value={summary.topPosition ? `${summary.topPosition.ticker} (${formatPercent(summary.topPosition.target_weight)})` : "—"}
+            />
+          </div>
+          {summary.sectors.length > 0 && (
+            <div className={styles.sectorList}>
+              {summary.sectors.map(([sector, weight]) => (
+                <div key={sector} className={styles.sectorRow}>
+                  <span className={styles.sectorName}>{sector}</span>
+                  <span className="num">{formatPercent(weight)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
       )}
 
       {!loading && !error && decisions !== null && (
@@ -306,6 +353,10 @@ export function DecisionCenter() {
                     </ul>
                   )}
                 </div>
+
+                <Link className={styles.caseLink} to={`/cases/${selected.ticker}`}>
+                  {t("detail.viewCase")} →
+                </Link>
               </>
             )}
           </Card>

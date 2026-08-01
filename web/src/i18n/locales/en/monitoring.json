@@ -1,0 +1,34 @@
+{
+  "warnings": {
+    "title": "Warnings",
+    "description": "What requires immediate attention?",
+    "filterAll": "All",
+    "emptyTitle": "No warnings",
+    "emptyDetail": "Nothing in the model portfolio currently needs attention."
+  },
+  "sinceLastRun": {
+    "title": "Since the Last Run",
+    "description": "What the research pipeline itself reports changed",
+    "knowledgeObjects": "Knowledge Objects",
+    "genes": "Genes",
+    "events": "Events",
+    "pipelineStatus": "Pipeline Status",
+    "delta": "{{delta}} since last run",
+    "error": "Error"
+  },
+  "knowledgeChanges": {
+    "title": "Knowledge Changes",
+    "description": "Recently discovered or updated knowledge, newest first",
+    "emptyTitle": "No knowledge changes",
+    "emptyDetail": "No knowledge object has been created or updated recently."
+  },
+  "decisionChanges": {
+    "title": "Decision Changes",
+    "description": "Recently recorded decisions across the whole universe, newest first",
+    "emptyTitle": "No decision changes",
+    "emptyDetail": "No decision has been recorded recently.",
+    "asOf": "As of",
+    "horizon": "Horizon",
+    "realizedReturn": "Realized Return"
+  }
+}

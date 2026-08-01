@@ -188,6 +188,27 @@ describe("dashboard artifact routes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toBeNull();
   });
+
+  it("GET /portfolio-summary returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/portfolio-summary" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
+  it("GET /warnings returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/warnings" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
+  it("GET /committee-summary returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/committee-summary" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
 });
 
 describe("POST /decisions", () => {

@@ -110,16 +110,36 @@ Layout:
   logic of its own (it only shapes the HTTP call, all computation stays in
   `research/`), and still never autonomous (queried on demand, exactly
   like the CLI it wraps).
-- `web/` — TypeScript (Vite + React) dashboard: 9 routed sections (AI
-  Briefing, Decision Center, Opportunity Center, Company Research
-  Workspace, Market Intelligence, Research Center, Knowledge Graph,
-  Mission Control, Source Intelligence, System Administration), each
-  reading real dashboard artifacts through `DashboardDataProvider` — see
-  `docs/ARCHITECTURE.md`'s "Dashboard data providers" section. Decision
-  Center is the one page that writes (`POST /decisions`); it only works
-  against a live `api/` (`StaticJsonProvider` honestly reports itself
-  unavailable on the static GitHub Pages build, never fabricating a
-  decision).
+- `web/` — TypeScript (Vite + React) Investment Operating System (the IOS
+  mission, 2026-08-01: research is an internal capability, investment
+  decisions are the product). 7 top-level routed sections in the
+  mission-mandated hierarchy — CIO Desk (`/`, the landing page; exactly 5
+  sections: Market Regime, Today's Actions, Portfolio Summary, Warnings,
+  Investment Committee Summary — never more, per the Product Law that
+  every screen answers exactly one primary investment question),
+  Portfolio (`/portfolio`, holdings entry + the live six-way decision
+  table), Investment Cases (`/cases`, `/cases/:ticker` — the 19-section
+  thesis-first case page), Monitoring (`/monitoring`), Market (`/market`),
+  Research (`/research` — the internal-capability hub, absorbing the
+  former Opportunity Center's Decision Readiness/Data Coverage tables and
+  linking out to Knowledge Graph/Source Intelligence, which stay
+  reachable but off the primary nav), Settings (`/settings`, merging the
+  former Mission Control + System Administration). Each page reads real
+  dashboard artifacts through `DashboardDataProvider` — see
+  `docs/ARCHITECTURE.md`'s "Dashboard data providers" and "Frontend:
+  Institutional Investment Operating System" sections. Portfolio is the
+  one page that writes (`POST /decisions`); it only works against a live
+  `api/` (`StaticJsonProvider` honestly reports itself unavailable on the
+  static GitHub Pages build, never fabricating a decision). CIO Desk's
+  Today's Actions calls the same live endpoint when the investor has
+  entered holdings via `usePortfolioPositions` (localStorage-only — the
+  backend never stores real portfolio data) and otherwise falls back to
+  the position-unaware model portfolio, always labeled which one is
+  showing. The prior 9-section IA (AI Briefing, Decision Center,
+  Opportunity Center, Company Research Workspace, Mission Control, System
+  Administration) was retired outright, not kept as parallel dead code —
+  see `docs/PHASE_STATUS.md`'s IOS section for the full page-by-page
+  mapping.
 - `contracts/` — JSON Schema generated from the pydantic models `api/`
   serves, regenerated via `research/scripts/export_schemas.py`. CI fails if
   this drifts from the schema; `api/src/types.ts` and `web/src/types.ts`

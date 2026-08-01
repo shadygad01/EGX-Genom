@@ -1,6 +1,41 @@
 # Next Missions
 
-## Closed this phase: Investment Proof Framework (Capital Trust Report)
+## Closed this phase: EGX-Genom Final Product Mission (Institutional Investment Operating System)
+
+See `CURRENT_MISSION.md`'s "EGX-Genom Final Product Mission" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **`InvestmentProofDashboard`** — unchanged from the Investment Proof
+   Framework mission below: still CLI-only. Now more clearly in scope
+   given the IOS mission's page conventions — likely a Research-hub
+   sub-view or a Settings sub-view rather than a new top-level nav item,
+   since a Capital Trust Report is an internal-capability artifact, not a
+   daily-decision one (same Product Law reasoning that kept it off CIO
+   Desk).
+2. **TD-61**: `getRuntimeStatus()`/`getSourceTruth()`/
+   `getEndpointCandidates()` remain unused by any page. Named, not
+   force-built — wire in only if a real maintainer need (e.g. a
+   data-quality incident review flow) justifies a System & Operations
+   sub-view on Settings.
+3. **Decision Center's `DECISION_DATA_DIR` wiring is still real but
+   manual** (unchanged from the Market Regime mission's own note, now
+   applying to Portfolio instead) — works today only against a local/
+   self-hosted `api/` with the env var set; no automation points a
+   deployed `api/` instance at production data yet (System 18's
+   deployment/scheduling business-blocker, unchanged).
+4. Everything already named as genuinely next before this phase (below,
+   TD-59/TD-60/confidence-calibration/walk-forward-backtesting/etc.) is
+   unchanged — this mission was a product/UX redesign layered on top of
+   the existing decision engine, not a change to any of those
+   still-open items.
+5. Re-verify the live browser walkthrough (Playwright, both EN and AR)
+   after any future CIO Desk/Portfolio/Investment Case CSS or layout
+   change — this mission's own RTL table-overflow bug (inline `<span>`
+   `max-width` silently doing nothing) is the concrete class of defect
+   that only a real rendered check catches, not `tsc`/vitest alone.
+
+## Closed prior phase: Investment Proof Framework (Capital Trust Report)
 
 See `CURRENT_MISSION.md`'s "Investment Proof Framework" entry and
 `docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in

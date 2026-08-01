@@ -1934,3 +1934,182 @@ codebase's "dashboard data goes through `agx_research.dashboard.export`
 plus a matching route" convention, which a `CapitalTrustReport` web
 surface would need to follow but does not yet. TD-59/TD-60 (both new) are
 real, scoped follow-up items, not silently left implicit.
+
+## EGX-Genom Final Product Mission — Institutional Investment Operating System (2026-08-01)
+
+The project owner redefined AGX from a research platform into an
+institutional-grade Investment Operating System: research becomes an
+internal capability, investment decisions are the product. Ten
+non-negotiable constraints carried over unchanged from every prior
+mission (free/legal data only, never fabricate, every recommendation
+explainable and traceable, determinism preserved). New, mission-specific
+requirements: a strict Product Law ("every screen answers exactly one
+primary investment question"), an Information Hierarchy (Decision →
+Investment Case → Evidence → Research), a 5-section CIO Desk landing
+page, a 19-section Investment Case page, portfolio-aware thinking
+everywhere, a 7-item navigation hierarchy with Research never the default
+destination, and an explicit, mandatory product audit before completion.
+Full implementation authorization: redesign page hierarchy/navigation,
+merge/remove pages, refactor frontend/APIs, reuse the existing decision
+engine — "do not preserve existing UI if it conflicts with the new
+mission."
+
+**Backend — 3 new dashboard artifacts, reusing existing engines rather
+than computing anything new**:
+
+- `dashboard.portfolio_summary.build_portfolio_summary()` (new
+  `PortfolioSummaryReport`) wraps `investment_proof.portfolio_validation
+  .PortfolioValidationEngine` (Mission 4) and adds a weighted-average
+  `expected_return`. Answers "is my capital allocated correctly?" with
+  cash/invested weight, sector exposure, concentration, liquidity
+  violations, decision conflicts.
+- `dashboard.monitoring.build_warnings()` (new `MonitoringWarningsReport`,
+  `WarningCategory` — broken_thesis/macro_risk_increased/
+  catalyst_expired/liquidity_deterioration/portfolio_concentration/
+  review_required) scans the *whole* `KnowledgeStore`, not just current
+  positions, since a broken thesis is exactly what makes a ticker drop
+  out of the model portfolio in the first place
+  (`KnowledgeWeightedHorizonModel.predict()` excludes `RETIRED`
+  knowledge) — an initial version that only checked held tickers would
+  have silently missed every retirement-driven warning.
+- `dashboard.committee_summary.build_committee_summary()` (new
+  `CommitteeSummaryReport`, `CommitteeOpinion`) wraps
+  `investment_proof.committee_validation.CommitteeValidationEngine`
+  (Mission 4) for the 6 return-contributing committees, adds Risk/
+  Portfolio committees derived from `PortfolioValidationResult`, and a
+  mechanical `chief_investment_officer` tally row — no new judgment logic,
+  just aggregation of committees that already exist.
+
+All three are wired into `production.pipeline.ProductionPipeline`'s
+existing dashboard-artifact stage, `None`-safe on non-trading days
+(matching `market_breadth.json`'s honest-absence convention), covered by
+`dashboard.validate.validate_dashboard_artifacts()`, and exported to
+`contracts/*.schema.json`. 7 new tests
+(`test_cio_desk_artifacts.py`). 840 backend tests pass (up from 833);
+`ruff check` clean.
+
+**API layer**: `GET /portfolio-summary`, `GET /warnings`,
+`GET /committee-summary` (same `readJsonOrDefault(path, null)` passthrough
+pattern as every existing route — no new business logic in `api/`).
+Removed one confirmed-dead duplicate route
+(`GET /ticker-data-gap-report`, superseded by the already-wired
+`/ticker-data-gaps`, never called by any page, never tested) rather than
+carry it forward unaudited. 27 `api` tests pass (3 new); clean build.
+
+**Frontend — full navigation and page-hierarchy redesign**, exercising
+the mission's explicit authorization to remove/merge/redesign rather than
+preserve the prior IA:
+
+| New page | Route | Primary question | Built from |
+|---|---|---|---|
+| `CIODesk` | `/` | What should I do today? | Reused Market Regime banner (from the old AI Briefing) + live `POST /decisions` (position-aware) or model-portfolio fallback (position-unaware) + the 3 new artifacts above |
+| `Portfolio` | `/portfolio` | Is my capital allocated correctly? | Holdings editor (new `usePortfolioPositions` localStorage hook) + the full decision table/detail panel reused from the old Decision Center |
+| `InvestmentCases` | `/cases` | Which companies are candidates? | Reused from the old Opportunity Center's ranked list, minus the tables now living on Research |
+| `InvestmentCaseDetail` | `/cases/:ticker` | Why should I own this company? | The mission's 19 named sections; reused from the old Company Research Workspace, extended with 2 previously-dead artifact calls (`getDecisionHistory` — implemented since an earlier mission, never called by any page until now) |
+| `Monitoring` | `/monitoring` | What changed since my last decision? | New filterable warnings feed + reused "Since the Last Run"/knowledge-change feed from the old AI Briefing + `getDecisionHistory` again (universe-wide) |
+| `MarketIntelligence` | `/market` | What is the investment environment? | Unchanged |
+| `ResearchCenter` | `/research` | (internal capability, not a decision screen) | Extended in place with Decision Readiness/Data Coverage (absorbed from Opportunity Center) + links to Knowledge Graph/Source Intelligence |
+| `Settings` | `/settings` | (operational status, not a decision screen) | Merges the old Mission Control + System Administration into one two-group page, including a single unified Execution History table replacing two redundant ones |
+
+`KnowledgeGraphPage`/`SourceIntelligence` are unchanged but demoted off
+the top-level nav (reachable only via a "More Research Tools" card on
+Research) — real capabilities, but neither answers a daily-decision
+question on its own.
+
+**Deleted outright** (not kept as parallel dead code):
+`AIBriefing.tsx`, `DecisionCenter.tsx`, `OpportunityCenter.tsx`,
+`CompanyWorkspace.tsx`, `MissionControlPage.tsx`,
+`SystemAdministration.tsx` (all + their `.module.css`), and the
+already-dead `ComingSoon.tsx` (confirmed unreferenced both before and
+after this mission). i18n: 6 old namespaces deleted, 5 new ones added
+(`cioDesk`, `portfolio`, `investmentCases`, `monitoring`, `settings`,
+bilingual EN/AR), `common.json`'s `nav`/`enums`/`table` blocks extended.
+`App.tsx`/`Sidebar.tsx`/`TopBar.tsx` fully rewired to the new routes.
+
+**Mandatory Product Audit** (per the mission's explicit instruction —
+every screen/widget/nav item/API endpoint/report, asking "does this
+improve investment decisions?"):
+
+- *Screens*: every one of the 9 reachable pages maps to exactly one
+  primary question (table above) — none answers more than one, none was
+  found to answer zero. The audit's main finding was negative-space: the
+  old 9-section IA had **two pages that existed only to display data
+  without driving a decision** (Mission Control, System Administration) —
+  both merged into one Settings page rather than kept as two nav slots,
+  since neither individually justified top-level placement once measured
+  against the Product Law.
+- *Widgets*: CIO Desk's 5 sections were built to the mission's exact spec
+  (no 6th section was added; a "recent knowledge" feed that existed on
+  the old AI Briefing was deliberately dropped from CIO Desk and now
+  lives only on Monitoring/Research, since "what changed" and "what
+  should I do" are different questions the Product Law says shouldn't
+  share a screen). The old AI Briefing's giant per-ticker/per-horizon
+  abstain table (101 rows × 3 horizons, mostly "abstain") was removed
+  entirely rather than migrated anywhere — it never drove a decision, it
+  only demonstrated the platform's honesty about not having enough real
+  data yet, which the CIO Desk's "Today's Actions" empty/fallback states
+  already communicate more directly.
+- *Nav items*: 7 top-level (down from 9); Knowledge Graph and Source
+  Intelligence demoted to reachable-not-top-level (see table above) —
+  the only two demotions, since every other former top-level page maps
+  cleanly onto one of the 7.
+- *API endpoints*: 3 added (all decision-relevant: portfolio state,
+  warnings, committee agreement), 1 confirmed-dead duplicate removed
+  (`GET /ticker-data-gap-report`). Every other existing route was
+  reviewed and still backs a real page.
+- *Reports/artifacts*: the 3 new artifacts each back a CIO Desk/Monitoring
+  section directly. The audit surfaced one gap worth naming rather than
+  silently accepting: `getRuntimeStatus()`/`getSourceTruth()`/
+  `getEndpointCandidates()` (three real, already-implemented provider
+  methods) are called by zero pages even after the redesign — recorded as
+  **TD-61** rather than force-built into a screen that would fail the
+  "does this improve a decision" test on its own, or silently dropped.
+
+**Verified live** (real running `api`+`web` dev servers against a
+hand-assembled, real-service-computed demo dataset — headless Chromium via
+Playwright, both English and Arabic/RTL): Market Regime, Today's Actions
+in both the model-portfolio and live personalized-decision paths,
+Portfolio Summary, Warnings, Investment Committee Summary, the full
+Portfolio holdings-entry -> live-decision -> detail-panel flow, the full
+19-section Investment Case detail page, Monitoring's filterable feed, the
+merged Research and Settings hubs, Market, Knowledge Graph, Source
+Intelligence. One real RTL CSS bug found and fixed during this
+verification: `.thesisCell`/`.riskCell` in `CIODesk.module.css` were
+`<span>` (inline) elements with `max-width`/no width constraint at all —
+CSS `max-width` has no effect on `display: inline` elements, so their
+unwrapped English sentences forced the Arabic-mode table's auto-layout to
+size those columns to full content width, overflowing the page. Fixed by
+making both `display: block` with an explicit `width` +
+`overflow: hidden` + `text-overflow: ellipsis`; re-verified via a real
+`boundingBox()`/`scrollWidth` check that the page-level horizontal
+overflow is gone in both directions.
+
+47 `web` tests pass (`App.test.tsx` fully rewritten: new 7-label sidebar
+check, new CIO Desk describe block, routes updated to the new paths, the
+old giant abstain-table test block removed since that content is
+intentionally gone). `npx tsc --noEmit` clean; `npm run build -w web`
+clean.
+
+**Acceptance criteria** (verified against the mission's own 10-item
+list): a user can determine today's actions within 30 seconds (CIO
+Desk's Today's Actions is the first content section after the regime
+banner); every recommendation includes decision/allocation/confidence/
+thesis/evidence/risks/monitoring (both `PositionAwareDecision` and the
+`InvestmentCaseDetail` 19-section page carry all 12 fields, unchanged
+from the earlier decision-object-completeness mission); every
+recommendation links to a complete Investment Case (`/cases/:ticker`);
+research is never the first destination (`/` is CIO Desk, Research sits
+6th in the nav); every screen has exactly one primary purpose (audit
+above); no page exists solely to display data without contributing to a
+decision (Mission Control/System Administration merged, the abstain table
+removed); existing decision engine capabilities reused, not duplicated
+(`DecisionService`, `PortfolioConstructor`,
+`investment_proof.portfolio_validation`/`committee_validation` all
+composed, none reimplemented); existing tests remain green (840 backend /
+27 `api` / 47 `web`); documentation updated to match (this section,
+`docs/ARCHITECTURE.md`, `CLAUDE.md`, `CHANGELOG.md`, `NEXT_MISSIONS.md`).
+
+**Not done, named as next**: `InvestmentProofDashboard` (still CLI-only,
+unchanged from the mission above); TD-61 (three unused provider methods,
+named rather than force-fit into a screen); TD-59/TD-60's own
+next-steps (unchanged).

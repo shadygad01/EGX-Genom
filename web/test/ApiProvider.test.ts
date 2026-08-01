@@ -92,4 +92,17 @@ describe("ApiProvider", () => {
     const provider = new ApiProvider();
     await expect(provider.postDecisions({ date: "2026-06-14" })).rejects.toThrow(/unconfigured/);
   });
+
+  it("fetches the CIO Desk artifacts from their matching API endpoints", async () => {
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(null)));
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new ApiProvider();
+
+    await provider.getPortfolioSummary();
+    await provider.getWarnings();
+    await provider.getCommitteeSummary();
+
+    const urls = fetchMock.mock.calls.map((call) => call[0] as string);
+    expect(urls).toEqual(["/api/portfolio-summary", "/api/warnings", "/api/committee-summary"]);
+  });
 });

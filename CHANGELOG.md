@@ -1,5 +1,70 @@
 # Changelog
 
+## Unreleased — EGX-Genom Final Product Mission: Institutional Investment Operating System (IOS)
+
+The project owner redefined AGX from a research platform into an
+institutional-grade Investment Operating System: research becomes an
+internal capability, investment decisions are the product. Explicit
+Product Law (every screen answers exactly one primary investment
+question), a mandated 5-section CIO Desk landing page and 19-section
+Investment Case page, portfolio-aware thinking everywhere, a 7-item
+navigation hierarchy with Research never the default destination, and a
+mandatory product audit before completion — see
+`docs/PHASE_STATUS.md`'s "EGX-Genom Final Product Mission" section for
+the full report.
+
+**Backend**: 3 new dashboard artifacts, each composing an existing
+engine rather than adding new judgment logic — `dashboard.
+portfolio_summary.build_portfolio_summary()` (wraps `investment_proof.
+portfolio_validation.PortfolioValidationEngine`), `dashboard.monitoring.
+build_warnings()` (new `WarningCategory` taxonomy: broken_thesis,
+macro_risk_increased, catalyst_expired, liquidity_deterioration,
+portfolio_concentration, review_required — scans the whole
+`KnowledgeStore`, not just current positions, so a knowledge retirement
+that drops a ticker out of the model portfolio is correctly surfaced),
+`dashboard.committee_summary.build_committee_summary()` (wraps
+`investment_proof.committee_validation.CommitteeValidationEngine`, adds
+Risk/Portfolio committees + a mechanical CIO tally row). Wired into
+`production.pipeline.ProductionPipeline`'s existing dashboard-artifact
+stage, `None`-safe on non-trading days, schema-exported, 7 new tests. 840
+backend tests pass (up from 833); `ruff check` clean.
+
+**API**: `GET /portfolio-summary`, `GET /warnings`,
+`GET /committee-summary` (thin passthrough, same pattern as every
+existing route). Removed one confirmed-dead duplicate route
+(`GET /ticker-data-gap-report`). 27 `api` tests pass; clean build.
+
+**Frontend**: full navigation/page-hierarchy redesign. New pages —
+`CIODesk` (landing page, `/`), `Portfolio` (`/portfolio`),
+`InvestmentCases`/`InvestmentCaseDetail` (`/cases`, `/cases/:ticker`),
+`Monitoring` (`/monitoring`), `Settings` (`/settings`, merging Mission
+Control + System Administration). `ResearchCenter` extended in place to
+absorb Decision Readiness/Data Coverage. Nav collapsed from 9 to 7
+top-level items; Knowledge Graph/Source Intelligence stay reachable via a
+"More Research Tools" link on Research rather than the primary nav.
+Deleted outright (not kept as dead code): `AIBriefing`, `DecisionCenter`,
+`OpportunityCenter`, `CompanyWorkspace`, `MissionControlPage`,
+`SystemAdministration` (+ their CSS), and the already-dead
+`ComingSoon.tsx`. New `usePortfolioPositions` localStorage hook backs
+both CIO Desk's and Portfolio's "my holdings" state — the backend never
+stores real portfolio data. i18n fully restructured (6 old namespaces
+removed, 5 new ones added, bilingual EN/AR). 47 `web` tests pass; clean
+`tsc`/build.
+
+**Mandatory product audit** (per the mission's explicit requirement):
+every screen, widget, nav item, API endpoint, and report reviewed against
+"does this improve investment decisions?" One real gap named rather than
+silently dropped or force-built: `getRuntimeStatus()`/`getSourceTruth()`/
+`getEndpointCandidates()` remain unused by any page (TD-61).
+
+**Live-verified** in a real running `api`+`web` dev server pair, English
+and Arabic/RTL, via headless Chromium — including one real RTL CSS bug
+found and fixed (`CIODesk.module.css`'s `.thesisCell`/`.riskCell` were
+inline `<span>`s with a non-functional `max-width`, which has no effect
+on `display: inline` elements; fixed with `display: block` + an explicit
+`width` + ellipsis truncation, re-verified via `boundingBox()`/
+`scrollWidth` that the page no longer overflows in either direction).
+
 ## Unreleased — Investment Proof Framework (Capital Trust Report)
 
 The project owner's final mission for this phase: build the complete

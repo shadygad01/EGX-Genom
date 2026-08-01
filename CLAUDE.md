@@ -123,7 +123,12 @@ Layout:
   engine's* aggregate behavior via repeatable, falsification-attempting
   scenarios (`agx validate-investment`), and imports `validation/`'s
   siblings rather than duplicating any of their logic. Never confuse the
-  two when extending either).
+  two when extending either; the Zero-Cost Production Deployment mission
+  (2026-08-01) adds `shadow_fund/` — the persistent, autonomous virtual-
+  portfolio state, deliberately distinct from `meta.decision_ledger`
+  (why decisions were made) and `investment_cases`/`investment_proof`
+  (reasoning/validation): the Shadow Fund owns portfolio state, nothing
+  else does. See the `shadow_fund/` working-conventions bullet below).
 - `api/` — TypeScript (Fastify) service exposing the knowledge base and
   dashboard artifacts over HTTP; almost every route only reads a
   pre-produced JSON artifact. The one exception is `POST /decisions`
@@ -314,6 +319,32 @@ Layout:
   `POST /capital-allocation`), never wired into
   `production.pipeline.ProductionPipeline` — there is nothing to rank or
   recycle without the investor's own real `PositionState`.
+- `shadow_fund/` (`shadow_fund.engine.advance()`, `ShadowFundLedger`) is
+  the **one deliberate exception** to "never wire `decision_service` into
+  a scheduled run": it drives `DecisionService.decide_portfolio()`
+  autonomously, inside `production.pipeline.ProductionPipeline`, every
+  day. This is safe and correct — unlike `capital_allocation/`/`decision_service`'s
+  real-investor case above — because the `PositionState` fed in is always
+  the Shadow Fund's *own* prior-day state, never a real investor's
+  holdings: fully platform-controlled and reproducible from an all-cash
+  inception plus every day's own autonomous decisions. Do not generalize
+  this exception to any path that could ever receive a real investor's
+  positions. Never a new decision engine: every target weight comes from
+  the same `decide_portfolio()` call every other position-aware consumer
+  uses; `capital_allocation.CapitalAllocationEngine.build()` is reused
+  as-is for the fund's own capital-deployment/recycling view, never
+  reimplemented. `ShadowFundLedger` is a single continuously-versioned
+  entity (not one entity per date) so `history()` doubles as the daily NAV
+  time series with no separate, unboundedly-growing per-day store — the
+  TD-63 mistake this package deliberately avoids. An abstained held
+  ticker's `target_weight=0.0` is never treated as a real exit — same
+  exclusion rule `capital_allocation/` already follows above; the fund
+  holds it unchanged instead of fabricating a liquidation nothing
+  recommended. Every `_pct`-suffixed field here is a fraction (e.g.
+  `0.0432` = 4.32%), matching every other `_pct` field in this codebase
+  (`MAX_PRICE_ABOVE_FAIR_VALUE_PCT = 0.20`) and the shared
+  `formatPercent()`/`formatSignedPercent()` frontend formatters — never
+  pre-multiply by 100 in Python.
 - `decision_service.country_risk.assess_country_risk()` classifies
   Country & Macro Risk severity (NORMAL/DETERIORATING/CRISIS) from macro
   series data. `CRISIS` must never be inferred from a currency/macro move

@@ -1,6 +1,73 @@
 # Current Mission
 
-## Current mission: EGX Investment Methodology (2026-08-01)
+## Current mission: Zero-Cost Production Deployment + Shadow Fund (2026-08-01)
+
+The project owner redefined the production deployment architecture:
+permanently free, GitHub Actions + GitHub Pages only, explicitly no VPS/
+Render/Railway/Fly.io/always-on backend/live decision generation/POST
+endpoints on the public deployment — superseding an in-progress
+exploration of a Render-hosted live `api/` backend (abandoned mid-design,
+no code committed). Within that architecture, required a persistent,
+continuously-managed virtual institutional portfolio (the "Shadow Fund")
+as one of nine required daily artifacts, explicitly distinct from
+`meta.decision_ledger.DecisionLedger` (decision history) and
+`investment_cases`/`investment_proof` (reasoning/validation): "the Shadow
+Fund is the owner of portfolio state," not a rename of the existing
+ledger and not a NAV-only bolt-on. An initial ambiguity over what "Shadow
+Fund" meant was resolved via `AskUserQuestion`, then the project owner's
+own follow-up gave the exact field list.
+
+**Delivered**: see `docs/PHASE_STATUS.md`'s "Zero-Cost Production
+Deployment + Shadow Fund" section for the complete report. New
+`research/src/agx_research/shadow_fund/` package — a persistent virtual
+portfolio driven by feeding the fund's own prior-day state back into the
+existing, unmodified `DecisionService.decide_portfolio()` (never a new
+decision engine, never a real investor's holdings; see AD-56 for why this
+is the one deliberate, documented exception to "never wire
+decision_service into a scheduled run"). Wired into
+`production.pipeline.ProductionPipeline` as a new stage; reuses
+`capital_allocation.CapitalAllocationEngine` for capital-deployment/
+recycling and `meta.decision_ledger.DEFAULT_TRANSACTION_COST_BPS` rather
+than duplicating either. Tracks holdings/cash/NAV/daily NAV history/every
+transaction/position sizing/capital deployment/recycling/rebalancing/
+benchmark comparison/attribution/risk metrics, all honestly gated by
+sample size. Full stack wired end to end: two dashboard artifacts, JSON
+Schema contracts, CI validator, `agx shadow-fund` CLI command, 2 new API
+routes, both web `DashboardDataProvider`s, a new Monitoring page section,
+bilingual EN/AR i18n.
+
+Also formally closed, not left implicit: System 18's cloud-provider
+question for the *public* deployment specifically (AD-57) — the static
+GitHub Pages build already issued zero network POST requests before this
+mission even started (`StaticJsonProvider` throws synchronously, before
+any `fetch()`), confirming the architecture the project owner mandated was
+already substantially in place; this mission made the decision explicit
+and permanent rather than "business-blocked."
+
+**Two real bugs found and fixed by the mission's own tests before
+shipping**: a unit-convention bug (every `_pct` field initially
+pre-multiplied by 100, inconsistent with every other `_pct` field in this
+codebase and the shared frontend percent formatters); a real correctness
+bug (an abstained held ticker's `target_weight=0.0` initially treated as
+a genuine exit signal, contradicting `capital_allocation`'s own documented
+exclusion rule — fixed with an explicit guard once a new test caught it).
+
+**Result**: 867 backend tests pass (up from 855, 12 new); `ruff check`
+clean; 33 `api` tests pass (up from 31); 53 `web` tests pass (up from 51);
+production builds clean for both. Live-verified in a real headless
+browser, English and Arabic/RTL, against real mock-mode pipeline output —
+zero console errors. See TD-64 for what's honestly still open (benchmark
+tracking stays flat pending a real EGX30 index feed, same root cause as
+TD-58; declared-not-calibrated thresholds; no NAV-history chart yet, data
+contract already exists).
+
+**Not done, named as next**: `InvestmentProofDashboard` (CLI-only,
+unchanged from every prior mission's note) remains the one item from
+`NEXT_MISSIONS.md`'s prioritized list this mission's redirection didn't
+reach. A NAV-history line chart on Monitoring (TD-64) is a scoped,
+low-risk follow-up.
+
+## Prior mission: EGX Investment Methodology (2026-08-01)
 
 The project owner declared software implementation no longer the primary
 mission and the platform architecture complete. The next objective:

@@ -104,4 +104,19 @@ describe("StaticJsonProvider", () => {
     expect(urls.some((u) => u.includes("warnings.json"))).toBe(true);
     expect(urls.some((u) => u.includes("committee_summary.json"))).toBe(true);
   });
+
+  it("fetches shadow_fund.json and falls back honestly when shadow_fund_history.json is absent", async () => {
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve({ status: 404, ok: false }));
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new StaticJsonProvider();
+
+    const state = await provider.getShadowFund();
+    const history = await provider.getShadowFundHistory();
+
+    expect(state).toBeNull();
+    expect(history).toEqual({ nav_series: [], transactions: [] });
+    const urls = fetchMock.mock.calls.map((call) => call[0] as string);
+    expect(urls.some((u) => u.includes("shadow_fund.json"))).toBe(true);
+    expect(urls.some((u) => u.includes("shadow_fund_history.json"))).toBe(true);
+  });
 });

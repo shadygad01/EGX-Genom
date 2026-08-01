@@ -382,6 +382,8 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
         "source_metrics.json",
         "market_breadth.json",
         "market_regime.json",
+        "shadow_fund.json",
+        "shadow_fund_history.json",
     }
     for filename in expected:
         assert (dashboard_out / filename).exists(), filename
@@ -400,6 +402,8 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     assert "mission_status.json" in counts
     assert "market_breadth.json" in counts
     assert "market_regime.json" in counts
+    assert "shadow_fund.json" in counts
+    assert "shadow_fund_history.json" in counts
 
 
 def test_market_breadth_reflects_real_universe_advancers_and_decliners(tmp_path):

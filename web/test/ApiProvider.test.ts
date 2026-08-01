@@ -135,4 +135,16 @@ describe("ApiProvider", () => {
     const urls = fetchMock.mock.calls.map((call) => call[0] as string);
     expect(urls).toEqual(["/api/portfolio-summary", "/api/warnings", "/api/committee-summary"]);
   });
+
+  it("fetches the Shadow Fund artifacts from their matching API endpoints", async () => {
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(null)));
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new ApiProvider();
+
+    await provider.getShadowFund();
+    await provider.getShadowFundHistory();
+
+    const urls = fetchMock.mock.calls.map((call) => call[0] as string);
+    expect(urls).toEqual(["/api/shadow-fund", "/api/shadow-fund-history"]);
+  });
 });

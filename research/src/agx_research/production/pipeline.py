@@ -128,6 +128,9 @@ from agx_research.production.report import (
 )
 from agx_research.production.stages import StageName, StageResult, StageStatus
 from agx_research.runtime.engine import RunRecord, RunRecordRepository, RunStatus, RuntimeEngine
+from agx_research.shadow_fund.engine import advance as advance_shadow_fund
+from agx_research.shadow_fund.export import export_shadow_fund, export_shadow_fund_history
+from agx_research.shadow_fund.repository import ShadowFundLedger
 from agx_research.sources.catalog import seed_registry
 from agx_research.sources.health import HealthAlertRepository, HealthMonitor
 from agx_research.sources.registry import SourceRegistry
@@ -1038,6 +1041,45 @@ class ProductionPipeline:
             json.dumps(decision_history, indent=2, sort_keys=True) + "\n"
         )
         counts["decision_history.json"] = len(decision_history)
+
+        # Shadow Fund: the persistent state of a virtual portfolio that
+        # follows this platform's own INVESTMENT-horizon recommendations,
+        # autonomously, day over day. Safe to drive `decide_portfolio()`
+        # here (unlike a real investor's decisions) because the fund's own
+        # prior state -- never a real investor's holdings -- is the only
+        # position state fed in; see `shadow_fund.engine`'s module
+        # docstring for why this is the one deliberate exception to
+        # "never wire decision_service into a scheduled run".
+        shadow_fund_ledger = ShadowFundLedger(self.data_dir / "shadow_fund.json")
+        if as_of is not None:
+            fund_snapshot = self.market_memory.reconstruct(as_of).dataset_snapshot
+            previous_fund_state = shadow_fund_ledger.latest_snapshot()
+            prior_history = shadow_fund_ledger.daily_history()
+            new_fund_state = advance_shadow_fund(
+                previous_fund_state,
+                gated_recommendations,
+                as_of,
+                fund_snapshot,
+                country_risk=assess_country_risk(fund_snapshot.macro_series, as_of),
+                illiquid_tickers=compute_illiquid_tickers(fund_snapshot),
+                knowledge_store=self.knowledge_store,
+                prior_daily_returns=[
+                    s.daily_return_pct for s in prior_history if s.daily_return_pct is not None
+                ],
+                prior_nav_series=[s.nav for s in prior_history],
+            )
+            shadow_fund_ledger.record(new_fund_state)
+        shadow_fund_state = export_shadow_fund(shadow_fund_ledger)
+        if shadow_fund_state is not None:
+            (dashboard_out / "shadow_fund.json").write_text(
+                json.dumps(shadow_fund_state.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
+            )
+            counts["shadow_fund.json"] = 1
+        shadow_fund_history = export_shadow_fund_history(shadow_fund_ledger)
+        (dashboard_out / "shadow_fund_history.json").write_text(
+            json.dumps(shadow_fund_history.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
+        )
+        counts["shadow_fund_history.json"] = len(shadow_fund_history.nav_series)
 
         collector_status = production_artifacts.export_collector_status(
             self.registry,

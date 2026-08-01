@@ -42,6 +42,8 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getPortfolioSummary: async () => null,
     getWarnings: async () => null,
     getCommitteeSummary: async () => null,
+    getShadowFund: async () => null,
+    getShadowFundHistory: async () => ({ nav_series: [], transactions: [] }),
     postDecisions: async () => [],
     postCapitalAllocation: async () => ({
       as_of: "2026-07-22",

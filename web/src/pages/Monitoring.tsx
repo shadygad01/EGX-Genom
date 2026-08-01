@@ -9,7 +9,7 @@ import { EmptyState, ErrorState, LoadingState } from "../components/primitives/S
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
-import { formatSignedPercent } from "../lib/format";
+import { formatPercent, formatSignedPercent, titleCase } from "../lib/format";
 import type { WarningCategory } from "../types";
 import styles from "./Monitoring.module.css";
 
@@ -43,6 +43,8 @@ export function Monitoring() {
   const executionReport = useArtifact((p) => p.getExecutionReport());
   const knowledge = useArtifact((p) => p.getKnowledge());
   const decisionHistory = useArtifact((p) => p.getDecisionHistory());
+  const shadowFund = useArtifact((p) => p.getShadowFund());
+  const shadowFundHistory = useArtifact((p) => p.getShadowFundHistory());
 
   const [categoryFilter, setCategoryFilter] = useState<WarningCategory | "all">("all");
 
@@ -57,6 +59,10 @@ export function Monitoring() {
 
   const recentDecisions = [...(decisionHistory.data ?? [])]
     .sort((a, b) => (a.as_of < b.as_of ? 1 : -1))
+    .slice(0, 20);
+
+  const recentTransactions = [...(shadowFundHistory.data?.transactions ?? [])]
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 20);
 
   return (
@@ -101,6 +107,117 @@ export function Monitoring() {
               </div>
             ))}
           </div>
+        )}
+      </Section>
+
+      <Section title={t("shadowFund.title")} description={t("shadowFund.description")}>
+        {shadowFund.loading && <LoadingState rows={3} />}
+        {shadowFund.error && <ErrorState detail={shadowFund.error.message} onRetry={shadowFund.reload} />}
+        {!shadowFund.loading && !shadowFund.error && !shadowFund.data && (
+          <EmptyState title={t("shadowFund.emptyTitle")} detail={t("shadowFund.emptyDetail")} />
+        )}
+        {shadowFund.data && (
+          <>
+            <div className={styles.statGrid}>
+              <StatTile label={t("shadowFund.nav")} value={shadowFund.data.nav.toFixed(2)} />
+              <StatTile
+                label={t("shadowFund.cumulativeReturn")}
+                value={formatSignedPercent(shadowFund.data.cumulative_return_pct)}
+              />
+              <StatTile
+                label={t("shadowFund.benchmarkReturn")}
+                value={formatSignedPercent(shadowFund.data.benchmark_cumulative_return_pct)}
+              />
+              <StatTile
+                label={t("shadowFund.excessReturn")}
+                value={formatSignedPercent(shadowFund.data.excess_return_pct)}
+              />
+              <StatTile label={t("shadowFund.cashAllocation")} value={formatPercent(shadowFund.data.cash_pct)} />
+            </div>
+            <div className={styles.statGrid} style={{ marginTop: "var(--space-3)" }}>
+              <StatTile
+                label={t("shadowFund.volatility")}
+                value={
+                  shadowFund.data.risk.sample_status === "sufficient"
+                    ? formatPercent(shadowFund.data.risk.volatility_annualized_pct)
+                    : t("shadowFund.insufficientSample", { days: shadowFund.data.risk.sample_days })
+                }
+              />
+              <StatTile
+                label={t("shadowFund.maxDrawdown")}
+                value={
+                  shadowFund.data.risk.max_drawdown_pct != null
+                    ? formatSignedPercent(shadowFund.data.risk.max_drawdown_pct)
+                    : "—"
+                }
+              />
+              <StatTile
+                label={t("shadowFund.sharpeLike")}
+                value={shadowFund.data.risk.sharpe_like_ratio != null ? shadowFund.data.risk.sharpe_like_ratio.toFixed(2) : "—"}
+              />
+            </div>
+
+            <Card title={t("shadowFund.openPositions.title")} dense>
+              {shadowFund.data.open_positions.length === 0 && (
+                <EmptyState
+                  title={t("shadowFund.openPositions.emptyTitle")}
+                  detail={t("shadowFund.openPositions.emptyDetail")}
+                />
+              )}
+              {shadowFund.data.open_positions.length > 0 && (
+                <DataTable
+                  rows={shadowFund.data.open_positions}
+                  getRowKey={(p) => p.ticker}
+                  columns={[
+                    { key: "ticker", header: tCommon("table.ticker"), render: (p) => <span className="num">{p.ticker}</span> },
+                    { key: "weight", header: tCommon("table.weight"), align: "right", render: (p) => formatPercent(p.weight) },
+                    { key: "entryDate", header: t("shadowFund.openPositions.entryDate"), render: (p) => formatDate(p.entry_date) },
+                    { key: "avgCost", header: t("shadowFund.openPositions.avgCost"), align: "right", render: (p) => p.average_cost.toFixed(2) },
+                    { key: "marketPrice", header: t("shadowFund.openPositions.marketPrice"), align: "right", render: (p) => p.market_price.toFixed(2) },
+                    {
+                      key: "unrealizedPnl",
+                      header: t("shadowFund.openPositions.unrealizedPnl"),
+                      align: "right",
+                      render: (p) => (p.unrealized_pnl_pct != null ? formatSignedPercent(p.unrealized_pnl_pct) : "—"),
+                    },
+                  ]}
+                />
+              )}
+            </Card>
+
+            <Card title={t("shadowFund.transactions.title")} dense>
+              {recentTransactions.length === 0 && (
+                <EmptyState
+                  title={t("shadowFund.transactions.emptyTitle")}
+                  detail={t("shadowFund.transactions.emptyDetail")}
+                />
+              )}
+              {recentTransactions.length > 0 && (
+                <DataTable
+                  rows={recentTransactions}
+                  getRowKey={(txn) => txn.id}
+                  columns={[
+                    { key: "date", header: t("shadowFund.transactions.date"), render: (txn) => formatDate(txn.date) },
+                    { key: "ticker", header: tCommon("table.ticker"), render: (txn) => <span className="num">{txn.ticker}</span> },
+                    { key: "action", header: tCommon("table.decision"), render: (txn) => titleCase(txn.action) },
+                    {
+                      key: "weightBefore",
+                      header: t("shadowFund.transactions.weightBefore"),
+                      align: "right",
+                      render: (txn) => formatPercent(txn.weight_before),
+                    },
+                    {
+                      key: "weightAfter",
+                      header: t("shadowFund.transactions.weightAfter"),
+                      align: "right",
+                      render: (txn) => formatPercent(txn.weight_after),
+                    },
+                    { key: "price", header: t("shadowFund.transactions.price"), align: "right", render: (txn) => txn.price.toFixed(2) },
+                  ]}
+                />
+              )}
+            </Card>
+          </>
         )}
       </Section>
 

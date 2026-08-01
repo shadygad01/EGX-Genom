@@ -160,6 +160,17 @@ export class ArtifactsReader {
     return readJsonOrDefault<T | null>(this.path("committee_summary.json"), null);
   }
 
+  shadowFund<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("shadow_fund.json"), null);
+  }
+
+  shadowFundHistory<T = unknown>(): Promise<T> {
+    return readJsonOrDefault<T>(
+      this.path("shadow_fund_history.json"),
+      { nav_series: [], transactions: [] } as T
+    );
+  }
+
   // Written by the weekly Discovery workflow (.github/workflows/discovery.yml),
   // not by agx run/export-dashboard -- absent until the first scheduled run's
   // PR merges. See docs/DATA_ACQUISITION.md's "Discovery workflow" section.

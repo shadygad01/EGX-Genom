@@ -252,13 +252,20 @@ Both implementations return exactly the same shapes, defined once in
   `portfolio_summary.json`, `warnings.json`, `committee_summary.json` —
   each composes existing `investment_proof.portfolio_validation`/
   `investment_proof.committee_validation` engines rather than
-  recomputing anything.
+  recomputing anything. The same stage also writes `shadow_fund.json`
+  (current state) and `shadow_fund_history.json` (NAV series + all-time
+  transaction log), derived by `shadow_fund.export.export_shadow_fund()`/
+  `export_shadow_fund_history()` from `shadow_fund.ShadowFundLedger`'s
+  append-only history — see CLAUDE.md's `shadow_fund/` working-conventions
+  bullet for why autonomously advancing this one (unlike everything
+  position-aware above) inside the scheduled pipeline is correct.
 - **API side**: `api/src/routes/dashboard.ts` serves `/events` and
   `/runtime-metrics` by flattening the same raw versioned-repository files
   (`events.json`/`runs.json`) `KnowledgeStoreReader` already flattens for
   `/knowledge`. `/patterns`, `/recommendations`, `/universe`, `/market-state`,
   `/system-status`, `/source-registry`, `/portfolio-summary`, `/warnings`,
-  and `/committee-summary` have no live TypeScript-side recomputation
+  `/committee-summary`, `/shadow-fund`, and `/shadow-fund-history` have no
+  live TypeScript-side recomputation
   (most are computed on demand by the research engine, one is a static
   Python catalog, one is reserved for an unimplemented agent) —
   `api/src/artifactsStore.ts` reads the same generated snapshot files

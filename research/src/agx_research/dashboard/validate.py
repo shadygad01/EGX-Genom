@@ -44,6 +44,7 @@ from agx_research.portfolio.constructor import PortfolioRecommendation
 from agx_research.production.mission_control import MissionControlStatus
 from agx_research.production.report import ExecutionReport
 from agx_research.runtime.engine import RunRecord
+from agx_research.shadow_fund.models import ShadowFundHistory, ShadowFundPublicState
 from agx_research.sources.spec import SourceSpec
 from agx_research.universe.provider import UniverseArtifact
 
@@ -217,6 +218,8 @@ def validate_dashboard_artifacts(
     _validate_optional_portfolio_summary(directory, counts)
     _validate_optional_warnings(directory, counts)
     _validate_optional_committee_summary(directory, counts)
+    _validate_optional_shadow_fund(directory, counts)
+    _validate_optional_shadow_fund_history(directory, counts)
 
     return counts
 
@@ -279,6 +282,29 @@ def _validate_optional_committee_summary(directory: Path, counts: dict[str, int]
         except Exception as exc:
             raise DashboardArtifactError(f"committee_summary.json: {exc}") from exc
     counts["committee_summary.json"] = 0 if payload is None else 1
+
+
+def _validate_optional_shadow_fund(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "shadow_fund.json")
+    if not present:
+        return
+    if payload is not None:
+        try:
+            ShadowFundPublicState.model_validate(payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"shadow_fund.json: {exc}") from exc
+    counts["shadow_fund.json"] = 0 if payload is None else 1
+
+
+def _validate_optional_shadow_fund_history(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "shadow_fund_history.json")
+    if not present:
+        return
+    try:
+        history = ShadowFundHistory.model_validate(payload)
+    except Exception as exc:
+        raise DashboardArtifactError(f"shadow_fund_history.json: {exc}") from exc
+    counts["shadow_fund_history.json"] = len(history.nav_series)
 
 
 def _validate_complete_financial_coverage(directory: Path, universe_payload) -> None:

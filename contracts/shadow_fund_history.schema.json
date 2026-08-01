@@ -1,0 +1,230 @@
+{
+  "$defs": {
+    "PositionAction": {
+      "enum": [
+        "buy",
+        "increase_position",
+        "hold",
+        "reduce_position",
+        "exit",
+        "no_action"
+      ],
+      "title": "PositionAction",
+      "type": "string"
+    },
+    "Provenance": {
+      "properties": {
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "produced_at": {
+          "format": "date-time",
+          "title": "Produced At",
+          "type": "string"
+        },
+        "produced_by": {
+          "title": "Produced By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "produced_by",
+        "produced_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "description": "A pointer to one input entity: what kind it is, its id, and (if versioned) which version.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "ref_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Version"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    },
+    "ShadowFundNavPoint": {
+      "description": "One day's NAV/cash/benchmark point -- the daily NAV history.",
+      "properties": {
+        "benchmark_cumulative_return_pct": {
+          "title": "Benchmark Cumulative Return Pct",
+          "type": "number"
+        },
+        "benchmark_nav": {
+          "title": "Benchmark Nav",
+          "type": "number"
+        },
+        "cash": {
+          "title": "Cash",
+          "type": "number"
+        },
+        "cash_pct": {
+          "title": "Cash Pct",
+          "type": "number"
+        },
+        "cumulative_return_pct": {
+          "title": "Cumulative Return Pct",
+          "type": "number"
+        },
+        "daily_return_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Daily Return Pct"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "invested_pct": {
+          "title": "Invested Pct",
+          "type": "number"
+        },
+        "nav": {
+          "title": "Nav",
+          "type": "number"
+        }
+      },
+      "required": [
+        "date",
+        "nav",
+        "cash",
+        "cash_pct",
+        "invested_pct",
+        "daily_return_pct",
+        "cumulative_return_pct",
+        "benchmark_nav",
+        "benchmark_cumulative_return_pct"
+      ],
+      "title": "ShadowFundNavPoint",
+      "type": "object"
+    },
+    "ShadowFundTransaction": {
+      "description": "One executed change to the Shadow Fund's holdings on one date --\nthe position-sizing/rebalancing/capital-deployment history. Only\n`buy`/`increase_position`/`reduce_position`/`exit` ever appear here;\n`hold`/`no_action` are not transactions (nothing changed).",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/PositionAction"
+        },
+        "cash_delta": {
+          "title": "Cash Delta",
+          "type": "number"
+        },
+        "confidence": {
+          "title": "Confidence",
+          "type": "number"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "investment_thesis": {
+          "title": "Investment Thesis",
+          "type": "string"
+        },
+        "price": {
+          "title": "Price",
+          "type": "number"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "ticker": {
+          "title": "Ticker",
+          "type": "string"
+        },
+        "transaction_cost": {
+          "title": "Transaction Cost",
+          "type": "number"
+        },
+        "weight_after": {
+          "title": "Weight After",
+          "type": "number"
+        },
+        "weight_before": {
+          "title": "Weight Before",
+          "type": "number"
+        },
+        "weight_delta": {
+          "title": "Weight Delta",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "ticker",
+        "action",
+        "weight_before",
+        "weight_after",
+        "weight_delta",
+        "price",
+        "cash_delta",
+        "transaction_cost",
+        "investment_thesis",
+        "confidence",
+        "provenance"
+      ],
+      "title": "ShadowFundTransaction",
+      "type": "object"
+    }
+  },
+  "description": "The dashboard/API-facing NAV time series + all-time transaction\nlog -- `shadow_fund_history.json` / `GET /shadow-fund-history`.",
+  "properties": {
+    "nav_series": {
+      "items": {
+        "$ref": "#/$defs/ShadowFundNavPoint"
+      },
+      "title": "Nav Series",
+      "type": "array"
+    },
+    "transactions": {
+      "items": {
+        "$ref": "#/$defs/ShadowFundTransaction"
+      },
+      "title": "Transactions",
+      "type": "array"
+    }
+  },
+  "title": "ShadowFundHistory",
+  "type": "object"
+}

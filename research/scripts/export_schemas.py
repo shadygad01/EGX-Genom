@@ -36,6 +36,7 @@ from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import Recommendation
 from agx_research.runtime.engine import RunRecord
+from agx_research.shadow_fund.models import ShadowFundHistory, ShadowFundPublicState
 from agx_research.sources.spec import SourceSpec
 from agx_research.universe.provider import UniverseArtifact
 
@@ -55,6 +56,8 @@ MODELS = {
     "monitoring_warnings.schema.json": MonitoringWarningsReport,
     "committee_summary.schema.json": CommitteeSummaryReport,
     "capital_allocation_plan.schema.json": CapitalAllocationPlan,
+    "shadow_fund.schema.json": ShadowFundPublicState,
+    "shadow_fund_history.schema.json": ShadowFundHistory,
 }
 
 

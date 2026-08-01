@@ -257,6 +257,14 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("status", help="Show run ledger and knowledge summary")
 
+    sub.add_parser(
+        "shadow-fund",
+        help="Show the Shadow Fund's current state (holdings, cash, NAV, risk, attribution) -- "
+        "read-only; the fund itself only advances as a stage inside `agx run`, never on demand "
+        "(see shadow_fund/engine.py's module docstring for why an autonomous virtual portfolio "
+        "is safe to advance inside the scheduled pipeline, unlike a real investor's decisions).",
+    )
+
     backup_parser = sub.add_parser("backup", help="Create an integrity-checked backup")
     backup_parser.add_argument("--output", type=Path, required=True)
 
@@ -516,6 +524,20 @@ def main(argv: list[str] | None = None) -> int:
                 indent=2,
             )
         )
+        return 0
+
+    if args.command == "shadow-fund":
+        from agx_research.shadow_fund.export import export_shadow_fund
+        from agx_research.shadow_fund.repository import ShadowFundLedger
+
+        ledger = ShadowFundLedger(args.data_dir / "shadow_fund.json")
+        state = export_shadow_fund(ledger)
+        if state is None:
+            print(
+                json.dumps({"error": "Shadow Fund has not started yet -- run `agx run` first."}, indent=2)
+            )
+            return 0
+        _print_json(state.model_dump(mode="json"))
         return 0
 
     if args.command == "backup":

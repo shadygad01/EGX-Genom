@@ -106,7 +106,8 @@ def test_price_appreciation_grows_nav_and_marks_daily_return():
     day2_state = advance(day1_state, [rec2], day2, snap2, country_risk=NO_RISK)
 
     expected_drift_value = invested_value_day1 * 1.10
-    assert day2_state.open_positions[0].market_value >= expected_drift_value - 1e-6 or True
+    assert day2_state.transactions == []  # too small a weight move to cross the rebalance threshold
+    assert day2_state.open_positions[0].market_value == pytest.approx(expected_drift_value, rel=1e-2)
     assert day2_state.daily_return_pct is not None
     assert day2_state.daily_return_pct > 0  # the held position genuinely gained value
     assert day2_state.nav > day1_state.nav

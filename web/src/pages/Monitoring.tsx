@@ -140,7 +140,7 @@ export function Monitoring() {
                 value={
                   shadowFund.data.risk.sample_status === "sufficient"
                     ? formatPercent(shadowFund.data.risk.volatility_annualized_pct)
-                    : t("shadowFund.insufficientSample", { days: shadowFund.data.risk.sample_days })
+                    : t("shadowFund.insufficientSample", { count: shadowFund.data.risk.sample_days })
                 }
               />
               <StatTile
@@ -186,13 +186,17 @@ export function Monitoring() {
             </Card>
 
             <Card title={t("shadowFund.transactions.title")} dense>
-              {recentTransactions.length === 0 && (
+              {shadowFundHistory.loading && <LoadingState rows={3} />}
+              {shadowFundHistory.error && (
+                <ErrorState detail={shadowFundHistory.error.message} onRetry={shadowFundHistory.reload} />
+              )}
+              {!shadowFundHistory.loading && !shadowFundHistory.error && recentTransactions.length === 0 && (
                 <EmptyState
                   title={t("shadowFund.transactions.emptyTitle")}
                   detail={t("shadowFund.transactions.emptyDetail")}
                 />
               )}
-              {recentTransactions.length > 0 && (
+              {!shadowFundHistory.loading && !shadowFundHistory.error && recentTransactions.length > 0 && (
                 <DataTable
                   rows={recentTransactions}
                   getRowKey={(txn) => txn.id}

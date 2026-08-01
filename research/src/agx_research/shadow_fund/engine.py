@@ -122,12 +122,21 @@ def advance(
     )
     decisions_by_ticker = {d.ticker: d for d in decisions}
 
+    # Kept per-ticker (not just the latest price) so a previously-held
+    # position's drift below is derived from prior.date and as_of on the
+    # *same* freshly-computed series -- compute_adjusted_closes re-applies
+    # every known corporate event on every call, so mixing today's series
+    # with yesterday's stored ShadowFundPosition.market_price would silently
+    # inject a fake NAV jump the moment a new split/dividend is discovered
+    # for a ticker between two runs (the series gets rebased, the stored
+    # price doesn't).
+    adjusted_by_ticker: dict[str, dict[date, float]] = {}
     prices: dict[str, float] = {}
     for ticker in set(positions) | set(decisions_by_ticker):
-        adjusted = compute_adjusted_closes(
+        adjusted_by_ticker[ticker] = compute_adjusted_closes(
             snapshot.price_history.get(ticker, []), snapshot.corporate_events.get(ticker, [])
         )
-        price = _latest_price_on_or_before(adjusted, as_of)
+        price = _latest_price_on_or_before(adjusted_by_ticker[ticker], as_of)
         if price is not None and price > 0:
             prices[ticker] = price
 
@@ -149,8 +158,12 @@ def advance(
         pre_rebalance_cash = previous.cash
         drifted_value = {}
         for pos in previous.open_positions:
-            price_today = prices.get(pos.ticker)
-            growth = (price_today / pos.market_price) if (price_today and pos.market_price > 0) else 1.0
+            adjusted_series = adjusted_by_ticker.get(pos.ticker, {})
+            price_today = _latest_price_on_or_before(adjusted_series, as_of)
+            price_prior = _latest_price_on_or_before(adjusted_series, previous.date)
+            growth = (
+                (price_today / price_prior) if (price_today and price_prior and price_prior > 0) else 1.0
+            )
             new_value = pos.market_value * growth
             drifted_value[pos.ticker] = new_value
             attribution_state[pos.ticker] = attribution_state.get(pos.ticker, 0.0) + (new_value - pos.market_value)

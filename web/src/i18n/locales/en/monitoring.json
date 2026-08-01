@@ -35,7 +35,8 @@
     "volatility": "Volatility (annualized)",
     "maxDrawdown": "Max Drawdown",
     "sharpeLike": "Sharpe-like Ratio",
-    "insufficientSample": "Insufficient sample ({{days}} day(s))",
+    "insufficientSample_one": "Insufficient sample ({{count}} day)",
+    "insufficientSample_other": "Insufficient sample ({{count}} days)",
     "openPositions": {
       "title": "Open Positions",
       "emptyTitle": "No open positions",

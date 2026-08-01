@@ -406,6 +406,20 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     assert "shadow_fund_history.json" in counts
 
 
+def test_shadow_fund_never_double_records_a_retry_of_the_same_date(tmp_path):
+    from agx_research.shadow_fund.repository import ShadowFundLedger
+
+    data_dir = tmp_path / "data"
+    dashboard_out = tmp_path / "dashboard"
+
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+
+    history = ShadowFundLedger(data_dir / "shadow_fund.json").daily_history()
+    assert len(history) == 1
+    assert history[0].date == RUN_DATE
+
+
 def test_market_breadth_reflects_real_universe_advancers_and_decliners(tmp_path):
     dashboard_out = tmp_path / "dashboard"
     pipeline = make_pipeline(tmp_path / "data")

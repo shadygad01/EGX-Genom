@@ -31,5 +31,16 @@ class ShadowFundLedger(JsonFileRepository[ShadowFundSnapshot]):
 
     def record(self, snapshot: ShadowFundSnapshot) -> ShadowFundSnapshot:
         previous = self.latest_snapshot()
+        if previous is not None and snapshot.date <= previous.date:
+            # A retry, manual rerun, or dashboard rebuild re-calling this
+            # for a date already recorded must never insert a duplicate
+            # NAV point -- `daily_history()` is the NAV time series, and a
+            # duplicate would double-count that day's return everywhere it
+            # feeds forward (risk metrics, attribution, the next day's
+            # `prior_daily_returns`/`prior_nav_series`).
+            raise ValueError(
+                f"Shadow Fund snapshots must have strictly increasing dates "
+                f"(latest is {previous.date}, got {snapshot.date})"
+            )
         snapshot.version = (previous.version + 1) if previous is not None else 1
         return self.add(snapshot)

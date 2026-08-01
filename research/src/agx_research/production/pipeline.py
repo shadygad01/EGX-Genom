@@ -1051,9 +1051,9 @@ class ProductionPipeline:
         # docstring for why this is the one deliberate exception to
         # "never wire decision_service into a scheduled run".
         shadow_fund_ledger = ShadowFundLedger(self.data_dir / "shadow_fund.json")
-        if as_of is not None:
+        previous_fund_state = shadow_fund_ledger.latest_snapshot()
+        if as_of is not None and (previous_fund_state is None or previous_fund_state.date < as_of):
             fund_snapshot = self.market_memory.reconstruct(as_of).dataset_snapshot
-            previous_fund_state = shadow_fund_ledger.latest_snapshot()
             prior_history = shadow_fund_ledger.daily_history()
             new_fund_state = advance_shadow_fund(
                 previous_fund_state,

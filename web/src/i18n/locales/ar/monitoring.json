@@ -35,7 +35,12 @@
     "volatility": "التقلب (سنوي)",
     "maxDrawdown": "أقصى تراجع",
     "sharpeLike": "مؤشر شبيه بشارب",
-    "insufficientSample": "عيّنة غير كافية ({{days}} يوم)",
+    "insufficientSample_zero": "عيّنة غير كافية (0 يوم)",
+    "insufficientSample_one": "عيّنة غير كافية (يوم واحد)",
+    "insufficientSample_two": "عيّنة غير كافية (يومان)",
+    "insufficientSample_few": "عيّنة غير كافية ({{count}} أيام)",
+    "insufficientSample_many": "عيّنة غير كافية ({{count}} يومًا)",
+    "insufficientSample_other": "عيّنة غير كافية ({{count}} يوم)",
     "openPositions": {
       "title": "المراكز المفتوحة",
       "emptyTitle": "لا توجد مراكز مفتوحة",

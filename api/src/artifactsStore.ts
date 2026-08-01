@@ -116,6 +116,10 @@ export class ArtifactsReader {
     return readJsonOrDefault<T | null>(this.path("market_breadth.json"), null);
   }
 
+  marketRegime<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("market_regime.json"), null);
+  }
+
   acquisitionDecisions<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("acquisition_decisions.json"), []);
   }
@@ -142,6 +146,18 @@ export class ArtifactsReader {
 
   publicationGate<T = unknown>(): Promise<T | null> {
     return readJsonOrDefault<T | null>(this.path("publication_gate.json"), null);
+  }
+
+  portfolioSummary<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("portfolio_summary.json"), null);
+  }
+
+  warnings<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("warnings.json"), null);
+  }
+
+  committeeSummary<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("committee_summary.json"), null);
   }
 
   // Written by the weekly Discovery workflow (.github/workflows/discovery.yml),

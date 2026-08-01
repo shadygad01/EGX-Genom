@@ -1,6 +1,194 @@
 # Next Missions
 
-## Closed this phase: the real DATA_COLLECTION-starvation bug and dead-source retirement
+## Closed this phase: EGX Investment Methodology (permanent investment doctrine)
+
+See `CURRENT_MISSION.md`'s "EGX Investment Methodology" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **The three named detector gaps in `docs/INVESTMENT_PLAYBOOK.md`** —
+   interest-rate cycles, inflation shocks, and sector rotation each
+   currently read only indirectly (via `agents.macro`'s generic
+   sensitivity mechanism or `MarketStructureAgent`'s co-movement proxy).
+   Real engineering work: a CBE policy-rate collector and a dedicated
+   rate-sensitivity mechanism; a real CPI/inflation series and a
+   dedicated inflation-sensitivity mechanism; a dedicated sector-rotation
+   detector distinct from the existing sector-exposure/co-movement
+   proxies. Each should close by extending the doctrine's own "doctrine,
+   not yet a dedicated detector" label to "real, mechanically detected"
+   in the same change that ships the detector — the playbook itself
+   should never silently fall out of date with what the platform can
+   actually see.
+2. **Amendment discipline going forward**: every future mission touching
+   `meta.decision_engine`/`meta.publication_gate`/`meta.readiness`/
+   `decision_service/`/`capital_allocation/`/`investment_proof/` must
+   update the doctrine set in the same change (`CLAUDE.md`'s new
+   standing rule) — treat a decision-affecting threshold or gate change
+   that doesn't touch `docs/INVESTMENT_CONSTITUTION.md`/`DECISION_
+   STANDARDS.md`/`PORTFOLIO_STANDARDS.md` as incomplete, the same way a
+   schema change without a matching `contracts/` regeneration already is.
+3. Everything already named as genuinely next before this phase (below)
+   is unchanged — this mission was documentation-only by explicit
+   instruction and touched no source.
+
+## Closed prior phase: Capital Allocation Intelligence
+
+See `CURRENT_MISSION.md`'s "Capital Allocation Intelligence" entry and
+`docs/PHASE_STATUS.md`'s matching section (including the mission's own
+Mandatory Final Review). **Genuinely next now**, in priority order:
+
+1. **TD-62**: extend `Portfolio.tsx` with the same `CapitalAllocationPlan`
+   view CIO Desk now renders (or a shared component) — it already calls
+   `postDecisions()` with the exact request `postCapitalAllocation()`
+   needs; deliberately not done in this pass since CIO Desk was the
+   mission's explicit target and a rushed second layout risked being
+   inconsistent with the considered one just built.
+2. **Real, populated capital-allocation numbers stay honestly zero** until
+   a real, licensed EGX vendor exists and the publication gate actually
+   clears — same root-cause caveat as every other mission's output
+   (`docs/ROADMAP.md`). Once real data flows, re-verify the live queue/
+   recycling/opportunity-cost views against a genuinely non-empty plan
+   (this mission could only prove that path via engine-level tests and a
+   component-level rendering test with a realistic fixture, not a live
+   screenshot, since fabricating one would require inventing "live EGX
+   data" evidence the gate correctly withholds).
+3. Consider whether the position-unaware CIO Desk fallback (no holdings
+   entered) should ever get its own, more limited ranking view (e.g.
+   showing the model portfolio's own already-ranked positions with
+   explicit rank numbers) rather than the current plain list — a real UX
+   question, not started here since the mission's ranking/opportunity-
+   cost/recycling concepts fundamentally require real capital to mean
+   anything.
+4. Re-run `agx allocate-capital`/`agx validate-investment`/`agx
+   investment-proof` after any future change to `meta.decision_engine`/
+   `decision_service`/`portfolio.constructor` — the fastest way to catch
+   a regression in the properties each framework already proved, not
+   just a one-time report.
+5. Everything already named as genuinely next before this phase (below)
+   is unchanged.
+
+## Closed prior phase: EGX-Genom Final Product Mission (Institutional Investment Operating System)
+
+See `CURRENT_MISSION.md`'s "EGX-Genom Final Product Mission" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **`InvestmentProofDashboard`** — unchanged from the Investment Proof
+   Framework mission below: still CLI-only. Now more clearly in scope
+   given the IOS mission's page conventions — likely a Research-hub
+   sub-view or a Settings sub-view rather than a new top-level nav item,
+   since a Capital Trust Report is an internal-capability artifact, not a
+   daily-decision one (same Product Law reasoning that kept it off CIO
+   Desk).
+2. **TD-61**: `getRuntimeStatus()`/`getSourceTruth()`/
+   `getEndpointCandidates()` remain unused by any page. Named, not
+   force-built — wire in only if a real maintainer need (e.g. a
+   data-quality incident review flow) justifies a System & Operations
+   sub-view on Settings.
+3. **Decision Center's `DECISION_DATA_DIR` wiring is still real but
+   manual** (unchanged from the Market Regime mission's own note, now
+   applying to Portfolio instead) — works today only against a local/
+   self-hosted `api/` with the env var set; no automation points a
+   deployed `api/` instance at production data yet (System 18's
+   deployment/scheduling business-blocker, unchanged).
+4. Everything already named as genuinely next before this phase (below,
+   TD-59/TD-60/confidence-calibration/walk-forward-backtesting/etc.) is
+   unchanged — this mission was a product/UX redesign layered on top of
+   the existing decision engine, not a change to any of those
+   still-open items.
+5. Re-verify the live browser walkthrough (Playwright, both EN and AR)
+   after any future CIO Desk/Portfolio/Investment Case CSS or layout
+   change — this mission's own RTL table-overflow bug (inline `<span>`
+   `max-width` silently doing nothing) is the concrete class of defect
+   that only a real rendered check catches, not `tsc`/vitest alone.
+
+## Closed prior phase: Investment Proof Framework (Capital Trust Report)
+
+See `CURRENT_MISSION.md`'s "Investment Proof Framework" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **`InvestmentProofDashboard`** — the mission's 10th named deliverable
+   exists today only as `agx investment-proof`'s JSON/Markdown CLI output.
+   A real `api`/`web` surface needs a `CapitalTrustReport` export through
+   `agx_research.dashboard.export` plus a matching `api` route, following
+   the same convention every other dashboard artifact already uses (see
+   `docs/ARCHITECTURE.md`'s "Dashboard data providers" section) — not a
+   one-off fetch wired into a component.
+2. **TD-59** (fixed, but its wider implication is not): the same
+   `max_position_pct`/publication-gate defect pattern that hit
+   `DecisionService.decide_portfolio()` is worth a targeted audit of every
+   other caller of `MetaDecisionEngine.decide()`'s output to confirm none
+   of them silently skip `apply_publication_gate()` either.
+3. **TD-60**: once `DecisionRecord` (or a linked artifact) carries
+   per-category attribution at record time, `CommitteeValidationEngine`
+   can compute real `historical_usefulness` correlations instead of
+   `ready_for_data` — a real schema change, deliberately not made
+   unilaterally mid-framework.
+4. **Confidence calibration and walk-forward backtesting** stay `BLOCKED`
+   until real, licensed EGX history exists — both `ConfidenceCalibrationFramework`
+   and `WalkForwardInfrastructure` are architecturally complete and will
+   produce real numbers with zero code change the moment that data exists.
+5. Re-run `agx investment-proof` after any future change to
+   `meta.decision_engine`/`decision_service`/`portfolio.constructor`/
+   `horizons.knowledge_weighted` — like `validate-investment`, it's the
+   fastest way to catch a regression in the properties this mission
+   proved, not just a one-time report.
+6. Everything already named as genuinely next before this phase (below) is
+   unchanged.
+
+## Closed prior phase: Institutional Investment Validation framework
+
+See `CURRENT_MISSION.md`'s "Institutional Investment Validation" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **TD-57**: design and wire `ContinuousLearningMonitor`'s cadence into
+   `production.pipeline.ProductionPipeline` — proven correct by the
+   validation framework, but never autonomously invoked today.
+2. **TD-58**: once a real EGX30 index-level price series is legally
+   obtainable (same root cause as the broader Price Data wall,
+   `docs/ACQUISITION_STRATEGY.md`), benchmark-evaluated decisions become
+   possible with zero code change — the math is already proven correct.
+3. **Q9's named limitation**: day-over-day `Recommendation` diffing needs
+   a real architectural decision (a new versioned store for an entity
+   that's deliberately ephemeral today) this validation mission
+   deliberately did not make unilaterally.
+4. Re-run `agx validate-investment` after any future change to
+   `meta.decision_engine`/`decision_service`/`portfolio.constructor` — it
+   is the fastest way to catch a regression in the properties this mission
+   proved, not just a one-time report.
+5. Everything already named as genuinely next before this phase (below) is
+   unchanged.
+
+## Closed prior phase: Market Regime classification
+
+See `CURRENT_MISSION.md`'s "Market Regime classification" entry and
+`docs/PHASE_STATUS.md`'s matching section. **Genuinely next now**, in
+priority order:
+
+1. **Historical-analog comparison** — Market Intelligence's card was
+   "Market Regime & Historical Comparison"; only the regime half is closed.
+   Genuinely blocked on years of real trading history (System 12's
+   `HistoricalReviewer`, unchanged status) — not a code gap to force.
+2. **Decision Center's `DECISION_DATA_DIR` wiring is real but manual** —
+   works today only against a local/self-hosted `api/` with the env var
+   set to a directory a real `agx run` produced; no automation points a
+   deployed `api/` instance at production data yet (System 18's
+   deployment/scheduling business-blocker, unchanged).
+3. **TD-56's calibration trigger**: once real decision-ledger/regime
+   history accumulates, review whether ±3% cumulative return and 1.5%/2.5%
+   daily volatility are the thresholds that actually separate a genuine
+   trend/volatility shift from routine noise.
+4. Everything already named as genuinely next before this phase (below) is
+   unchanged.
+
+## Closed prior phase: decision object completeness + live Decision Center
+
+See `CURRENT_MISSION.md`'s "complete the 12-field decision object; wire it
+to the web" entry and `docs/PHASE_STATUS.md`'s matching section.
+
+## Closed prior phase: the real DATA_COLLECTION-starvation bug and dead-source retirement
 
 See `CURRENT_MISSION.md`'s "fix why no investment decision was ever
 reachable" entry and `docs/PHASE_STATUS.md`'s matching section for full
@@ -447,11 +635,16 @@ fabricated content (per `CLAUDE.md`'s anti-fabrication principle) — worth
 closing once the artifact they depend on exists, but none of them require
 new data collection:
 
-- **Market Regime classification** (Market Intelligence, Company Research
-  Workspace) — no artifact exists upstream yet.
-- **Market Breadth & Liquidity** (Market Intelligence) — needs a
-  backend-computed artifact (advancers/decliners, adjusted volume); the
-  frontend must not compute returns from raw price bars itself.
+- ~~**Market Regime classification** (Market Intelligence)~~ **Closed**:
+  `market_memory.regime.compute_market_regime()` → `market_regime.json`,
+  wired through `api`/`web` into a landing-page banner and Market
+  Intelligence's card. See `CURRENT_MISSION.md`'s "Market Regime
+  classification" entry. Company Research Workspace's own per-ticker
+  regime/macro-exposure view is still open (a different, per-ticker
+  question this market-wide artifact doesn't answer).
+- ~~**Market Breadth & Liquidity** (Market Intelligence)~~ **Closed**
+  (prior phase): `market_memory.breadth.compute_market_breadth()` →
+  `market_breadth.json`, wired through `api`/`web`.
 - **Review Board decision history** (Research Center) — no repository
   persists past `BoardDecision`s yet.
 - ~~**Discovery Engine detail** (Mission Control) — `acquisition_intelligence`

@@ -3,16 +3,29 @@
 This file orients any Claude session working in this repository. It is not
 the vision document itself — that lives in `docs/VISION.md` verbatim — nor
 the operating charter, which is `MASTER_PROMPT.md` (role, non-negotiable
-principles, and the strict 18-system build order). This file is the
-practical guide to how the codebase is organized and what invariants to
-protect when touching it. `docs/ARCHITECTURE.md` describes the current
-design in more detail; `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
-`docs/EPOCH_II_DESIGN.md`/`docs/EPOCH_II_REPORT.md` (Epoch II) explain *why*
-it's shaped this way. `docs/PHASE_STATUS.md` is the living, must-be-updated
-audit of where every one of `MASTER_PROMPT.md`'s 18 systems actually
-stands — check it before starting new work: per the charter, a later
-system's work should not start while an earlier one still has closeable
-gaps.
+principles, and the strict 18-system build order). Nor is it the
+investment doctrine: `docs/INVESTMENT_CONSTITUTION.md` (permanent
+principles — why invest/reject, when to hold cash/increase/reduce/exit,
+how capital is allocated, how confidence and evidence are interpreted,
+how conflicts and mistakes are handled), `docs/INVESTMENT_PLAYBOOK.md`
+(situational doctrine for 12 market regimes), `docs/DECISION_STANDARDS.md`
+(the exact minimum bar for each of the six-way action labels), and
+`docs/PORTFOLIO_STANDARDS.md` (concentration/liquidity/cash/sizing/
+recycling rules) are the permanent governing law for *how AGX decides*,
+produced by the EGX Investment Methodology mission (2026-08-01) — every
+one of them is grounded in real, already-implemented mechanisms and cited
+by exact module/threshold, never free-floating policy; `docs/
+INVESTMENT_HANDBOOK.md` is the complete operational walkthrough tying
+them together, detailed enough to rebuild the investment process without
+reading source. This file is the practical guide to how the *codebase* is
+organized and what invariants to protect when touching it. `docs/
+ARCHITECTURE.md` describes the current design in more detail; `docs/
+ARCHITECTURE_AUDIT.md` (Epoch I) and `docs/EPOCH_II_DESIGN.md`/`docs/
+EPOCH_II_REPORT.md` (Epoch II) explain *why* it's shaped this way. `docs/
+PHASE_STATUS.md` is the living, must-be-updated audit of where every one
+of `MASTER_PROMPT.md`'s 18 systems actually stands — check it before
+starting new work: per the charter, a later system's work should not
+start while an earlier one still has closeable gaps.
 
 ## What this repository is
 
@@ -77,10 +90,19 @@ Layout:
   principles, strict 18-system build order).
 - `docs/` — vision, architecture, the Epoch I/II audit and design docs,
   `PHASE_STATUS.md` (current status of all 18 systems against the
-  charter), plus the management set the charter mandates: `ROADMAP.md`,
-  `TECHNICAL_DEBT.md`, `ARCHITECTURE_DECISIONS.md`, `RISK_REGISTER.md`
-  (and `CHANGELOG.md` at the repo root). Keep all of them current when
-  making changes.
+  charter), the investment doctrine set (`INVESTMENT_CONSTITUTION.md`,
+  `INVESTMENT_PLAYBOOK.md`, `DECISION_STANDARDS.md`,
+  `PORTFOLIO_STANDARDS.md`, `INVESTMENT_HANDBOOK.md`), plus the
+  management set the charter mandates: `ROADMAP.md`, `TECHNICAL_DEBT.md`,
+  `ARCHITECTURE_DECISIONS.md`, `RISK_REGISTER.md` (and `CHANGELOG.md` at
+  the repo root). Keep all of them current when making changes — in
+  particular, a change to any decision-affecting threshold or gate
+  (`meta.decision_engine`, `meta.publication_gate`, `meta.readiness`,
+  `decision_service/`, `capital_allocation/`, `investment_proof/`) must be
+  reflected in the doctrine set in the same change, per the doctrine's own
+  amendment rule (`docs/INVESTMENT_CONSTITUTION.md`'s closing article):
+  numbered decision, stated reason, permanent record — never a silent
+  drift between what the code does and what the doctrine says it does.
 - `research/` — Python package (`agx_research`) containing the research
   engine. See `docs/ARCHITECTURE.md`'s component map for the full
   subpackage breakdown (Epoch I: `domain/`, `storage/`, `universe/`,
@@ -93,13 +115,62 @@ Layout:
   `docs/DECISION_CENTRIC_AUDIT_2026-07-30.md`,
   `docs/FREE_DECISION_DATA_BLUEPRINT.md`,
   `docs/DECISION_EVIDENCE_MATRIX.md`,
-  `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) adds `decision_service/`).
-- `api/` — TypeScript (Fastify) service exposing the knowledge base over
-  HTTP. Currently reads a JSON knowledge store; has no business logic of
-  its own by design (logic lives in `research/`). Epoch II added no new
-  API surface — it was scoped exclusively to the Python research core.
-- `web/` — TypeScript (Vite + React) dashboard, currently a minimal viewer
-  for knowledge objects returned by `api/`. Untouched in Epoch II.
+  `docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md`) adds `decision_service/`; the
+  Institutional Investment Validation mission adds
+  `institutional_validation/` — deliberately separate from `validation/`
+  (System 11, which statistically validates one *hypothesis* before
+  promotion): `institutional_validation/` validates the *decision
+  engine's* aggregate behavior via repeatable, falsification-attempting
+  scenarios (`agx validate-investment`), and imports `validation/`'s
+  siblings rather than duplicating any of their logic. Never confuse the
+  two when extending either).
+- `api/` — TypeScript (Fastify) service exposing the knowledge base and
+  dashboard artifacts over HTTP; almost every route only reads a
+  pre-produced JSON artifact. The one exception is `POST /decisions`
+  (`routes/decisions.ts`), which shells out to the `agx decide` CLI on
+  each request for a live, position-aware decision — still no business
+  logic of its own (it only shapes the HTTP call, all computation stays in
+  `research/`), and still never autonomous (queried on demand, exactly
+  like the CLI it wraps).
+- `web/` — TypeScript (Vite + React) Investment Operating System (the IOS
+  mission, 2026-08-01: research is an internal capability, investment
+  decisions are the product; extended by the Capital Allocation
+  Intelligence mission, 2026-08-01: every recommendation competes for the
+  same finite capital rather than being scored in isolation). 7 top-level
+  routed sections in the mission-mandated hierarchy — CIO Desk (`/`, the
+  landing page; exactly 5 sections: Market Regime, Capital Allocation,
+  Portfolio Summary, Warnings, Investment Committee Summary — never more,
+  per the Product Law that every screen answers exactly one primary
+  investment question), Portfolio (`/portfolio`, holdings entry + the live
+  six-way decision table), Investment Cases (`/cases`, `/cases/:ticker` —
+  the 19-section thesis-first case page), Monitoring (`/monitoring`),
+  Market (`/market`), Research (`/research` — the internal-capability hub,
+  absorbing the former Opportunity Center's Decision Readiness/Data
+  Coverage tables and linking out to Knowledge Graph/Source Intelligence,
+  which stay reachable but off the primary nav), Settings (`/settings`,
+  merging the former Mission Control + System Administration). Each page
+  reads real dashboard artifacts through `DashboardDataProvider` — see
+  `docs/ARCHITECTURE.md`'s "Dashboard data providers" and "Frontend:
+  Institutional Investment Operating System" sections. Portfolio is one of
+  two pages that write (`POST /decisions`); it only works against a live
+  `api/` (`StaticJsonProvider` honestly reports itself unavailable on the
+  static GitHub Pages build, never fabricating a decision). CIO Desk's
+  Capital Allocation section (Capital Deployment Queue, Capital Recycling,
+  Capital Released Today, Best New Opportunities, Highest Opportunity
+  Cost, Allocation Changes, Capital Waiting For Better Opportunities — the
+  mission's 7 named sub-sections) calls both `POST /decisions` and the
+  second live-write endpoint, `POST /capital-allocation`, when the
+  investor has entered holdings via `usePortfolioPositions`
+  (localStorage-only — the backend never stores real portfolio data), and
+  otherwise falls back to the existing position-unaware decisions table
+  plus a ranked "Best New Opportunities" preview from the model portfolio
+  — the other 6 sub-sections honestly state they need real holdings rather
+  than fabricating a capital competition that doesn't exist without real
+  capital. The prior 9-section IA (AI Briefing, Decision Center,
+  Opportunity Center, Company Research Workspace, Mission Control, System
+  Administration) was retired outright, not kept as parallel dead code —
+  see `docs/PHASE_STATUS.md`'s IOS section for the full page-by-page
+  mapping.
 - `contracts/` — JSON Schema generated from the pydantic models `api/`
   serves, regenerated via `research/scripts/export_schemas.py`. CI fails if
   this drifts from the schema; `api/src/types.ts` and `web/src/types.ts`
@@ -214,6 +285,35 @@ Layout:
   risk. Only the INVESTMENT horizon drives an action here (`AD-35`'s
   existing "never blend horizons into one action" rule), since this
   layer exists for the long-term-investor mission specifically.
+  `PositionAwareDecision.opportunity_score`/`expected_return`/
+  `expected_risk` (Capital Allocation Intelligence mission) expose the
+  same score/return/risk `decide_portfolio()` already computes internally
+  as first-class fields — any future consumer needing to rank tickers
+  against each other reads these, never re-derives the eligibility/
+  scoring rule a second time.
+- `capital_allocation/` (`CapitalAllocationEngine`) is the read-only
+  ranking/opportunity-cost/recycling layer *on top of*
+  `decision_service.DecisionService.decide_portfolio()`'s output — it
+  never rescoring or reweighs anything `decide_portfolio()` already
+  computed, only attributes each unit of requested capital to a source
+  (idle cash, or a specific lower-ranked holding whose reduction/exit
+  released it) and each unit of released capital to a destination (a
+  specific higher-ranked demander, or back to cash). Idle cash is always
+  drawn before any holding is displaced, so a holding is only ever named
+  as a capital source when idle cash genuinely wasn't enough — never
+  fabricate a "should this replace another investment" conflict where
+  idle cash alone would have covered it. A ticker whose `PositionAwareDecision.abstained`
+  is `True` never participates in capital-flow matching even if its raw
+  `target_weight` differs from `current_weight` — `decide_portfolio()`
+  deliberately reports `target_weight=0.0` for an abstained held ticker to
+  keep its own scoring simple, but labels the *action* `hold` specifically
+  so an evidence gap is never read as a sell signal; treating that raw
+  number as a real capital release would fabricate a movement nothing
+  recommends. Same architectural posture as `decision_service/` itself:
+  stateless-per-call, queried on demand only (`agx allocate-capital`,
+  `POST /capital-allocation`), never wired into
+  `production.pipeline.ProductionPipeline` — there is nothing to rank or
+  recycle without the investor's own real `PositionState`.
 - `decision_service.country_risk.assess_country_risk()` classifies
   Country & Macro Risk severity (NORMAL/DETERIORATING/CRISIS) from macro
   series data. `CRISIS` must never be inferred from a currency/macro move

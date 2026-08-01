@@ -1,0 +1,82 @@
+{
+  "$defs": {
+    "MonitoringWarning": {
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/WarningCategory"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/WarningSeverity"
+        },
+        "ticker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ticker"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "category",
+        "severity",
+        "title",
+        "detail"
+      ],
+      "title": "MonitoringWarning",
+      "type": "object"
+    },
+    "WarningCategory": {
+      "enum": [
+        "broken_thesis",
+        "macro_risk_increased",
+        "catalyst_expired",
+        "liquidity_deterioration",
+        "portfolio_concentration",
+        "review_required"
+      ],
+      "title": "WarningCategory",
+      "type": "string"
+    },
+    "WarningSeverity": {
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ],
+      "title": "WarningSeverity",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/MonitoringWarning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "as_of"
+  ],
+  "title": "MonitoringWarningsReport",
+  "type": "object"
+}

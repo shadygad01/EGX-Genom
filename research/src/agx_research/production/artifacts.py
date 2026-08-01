@@ -24,6 +24,7 @@ from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.breadth import MarketBreadthReport, compute_market_breadth
+from agx_research.market_memory.regime import MarketRegimeReport, compute_market_regime
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.readiness import DecisionReadiness, build_ticker_data_gap_report
 from agx_research.meta.recommendation_service import RecommendationService
@@ -244,6 +245,18 @@ def export_market_breadth(state: MarketState | None) -> dict[str, Any] | None:
     if state is None:
         return None
     report: MarketBreadthReport = compute_market_breadth(state)
+    return report.model_dump(mode="json")
+
+
+def export_market_regime(state: MarketState | None) -> dict[str, Any] | None:
+    """Market Intelligence's (and the AI Briefing landing page's) trend/
+    volatility classification -- `None` until a `MarketState` has actually
+    been reconstructed for the day, the same honest-absence convention
+    `export_market_breadth` uses.
+    """
+    if state is None:
+        return None
+    report: MarketRegimeReport = compute_market_regime(state)
     return report.model_dump(mode="json")
 
 

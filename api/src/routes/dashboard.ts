@@ -31,10 +31,10 @@ export async function dashboardRoutes(
   app.get("/financial-coverage", async () => artifacts.financialCoverage());
   app.get("/source-metrics", async () => artifacts.sourceMetrics());
   app.get("/market-breadth", async () => artifacts.marketBreadth());
+  app.get("/market-regime", async () => artifacts.marketRegime());
   app.get("/acquisition-decisions", async () => artifacts.acquisitionDecisions());
   app.get("/decision-readiness", async () => artifacts.decisionReadiness());
   app.get("/ticker-data-gaps", async () => artifacts.tickerDataGapReport());
-  app.get("/ticker-data-gap-report", async () => artifacts.tickerDataGapReport());
   app.get("/source-truth", async () => artifacts.sourceTruth());
   app.get("/decision-history", async () => artifacts.decisionHistory());
   app.get("/decision-performance", async () => artifacts.decisionPerformance());
@@ -42,4 +42,12 @@ export async function dashboardRoutes(
   app.get("/discovery-report", async () => artifacts.discoveryReport());
   app.get("/discovery-metrics", async () => artifacts.discoveryMetrics());
   app.get("/endpoint-candidates", async () => artifacts.endpointCandidates());
+
+  // CIO Desk artifacts (Institutional Investment Operating System mission):
+  // the autonomous, position-unaware model portfolio's summary, warnings,
+  // and investment committee agreement -- same read-only pattern as every
+  // other route above.
+  app.get("/portfolio-summary", async () => artifacts.portfolioSummary());
+  app.get("/warnings", async () => artifacts.warnings());
+  app.get("/committee-summary", async () => artifacts.committeeSummary());
 }

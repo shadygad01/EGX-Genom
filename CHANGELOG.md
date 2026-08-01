@@ -1,5 +1,323 @@
 # Changelog
 
+## Unreleased — EGX Investment Methodology (permanent investment doctrine)
+
+The project owner declared the platform architecture complete and asked
+for the investment methodology itself: a permanent constitution, a
+market-situation playbook, exact decision/portfolio standards, and a
+complete operational handbook — documentation-only by explicit
+instruction, becoming the permanent governing doctrine for every future
+decision. See `docs/PHASE_STATUS.md`'s "EGX Investment Methodology"
+section for the full report.
+
+**Delivered**: `docs/INVESTMENT_CONSTITUTION.md` (11 articles: why
+invest/reject, when to hold cash/increase/reduce/exit, how capital is
+allocated, how confidence and evidence are interpreted, how conflicts and
+mistakes are handled — each grounded in a real, cited mechanism, never
+free-floating policy); `docs/INVESTMENT_PLAYBOOK.md` (12 market
+situations, each explicitly separating real mechanically-detected signals
+from honestly-named doctrine awaiting a future detector);
+`docs/DECISION_STANDARDS.md` (exact minimum bar for every one of the
+six-way action labels plus Abstain); `docs/PORTFOLIO_STANDARDS.md`
+(concentration/diversification/liquidity/cash/sizing/recycling rules);
+`docs/INVESTMENT_HANDBOOK.md` (13-chapter rebuild-without-source-code
+walkthrough with a full constant glossary).
+
+**No code changed.** One real gap in the mission's own working
+understanding — not in the platform — was caught while writing and
+corrected before delivery: the prediction model's confidence aggregation
+is a plain arithmetic mean, not a genuine confidence-weighted one (the
+weight term mathematically cancels), and a separate, real, previously
+undocumented event-driven risk-inflation/confidence-deflation mechanism
+exists alongside it. Both documents state the real formula.
+
+## Unreleased — Capital Allocation Intelligence
+
+The project owner redefined the platform again: no longer a research or
+decision system, a capital allocation system — every recommendation
+competes for the same finite capital rather than being scored in
+isolation ("is this the best use of capital available today?", not "is
+this stock good?"). See `docs/PHASE_STATUS.md`'s "Capital Allocation
+Intelligence" section for the full report, including the Mandatory Final
+Review the mission required before declaring completion.
+
+**Backend**: `PositionAwareDecision` gained 3 additive fields
+(`opportunity_score`, `expected_return`, `expected_risk`) exposing
+numbers `DecisionService.decide_portfolio()` already computed internally.
+New `capital_allocation/` package (`CapitalAllocationEngine`) — a
+read-only ranking/opportunity-cost/recycling layer strictly on top of
+`decide_portfolio()`'s output: a global rank for every ticker it
+evaluated, a deterministic capital-flow matcher (idle cash drawn before
+any holding is displaced; the weakest-ranked holding displaced before a
+stronger one), and a `CapitalAllocationPlan` (ranking, deployment queue,
+capital released/recycled, best new opportunities, highest opportunity
+cost, allocation changes, cash waiting). Caught and fixed a real bug via
+its own tests before shipping: an abstained held ticker's `target_weight
+=0.0` (no fresh evidence, not a decisive sell) was initially read as a
+real capital release — fixed with `_effective_target()`. New `agx
+allocate-capital` CLI command, sharing `decide`'s own setup via a new
+`build_position_aware_decisions()` helper rather than duplicating it. 15
+new tests; 855 backend tests pass; `ruff check` clean.
+
+**API**: `POST /capital-allocation`, the same live-bridge shape as
+`POST /decisions` (shells out to the CLI, no business logic in
+TypeScript), sharing a new `runCli()` helper with `/decisions` rather
+than duplicating the shell-out logic. 4 new tests; 31 `api` tests pass;
+clean build.
+
+**Frontend**: CIO Desk's "Today's Actions" section is now "Capital
+Allocation," rendering the mission's 7 named sub-sections (Capital
+Deployment Queue, Capital Recycling, Capital Released Today, Best New
+Opportunities, Highest Opportunity Cost, Allocation Changes, Capital
+Waiting For Better Opportunities) from a live `CapitalAllocationPlan`
+when the investor has entered holdings, with an honest fallback (the
+existing decisions table + a ranked model-portfolio preview) otherwise —
+never fabricating a capital competition that doesn't exist without real
+capital. New `postCapitalAllocation()` on `DashboardDataProvider`
+(`ApiProvider` live; `StaticJsonProvider` always reports itself
+unavailable, same posture as `postDecisions`). 4 new tests; 51 `web`
+tests pass; clean `tsc`/build. Live-verified in English and Arabic/RTL
+via headless Chromium against real demo data — all 7 sub-sections render
+the platform's honest current state (an empty plan, since no real EGX
+vendor is licensed yet), no overflow in either direction.
+
+**Named, not silently left out**: the position-unaware CIO Desk fallback
+(no holdings entered) deliberately does not get ranking/opportunity-cost/
+recycling treatment — there is nothing real to displace or recycle
+without real capital and real holdings, the same architectural boundary
+`decision_service/` already lives by. `Portfolio.tsx` was not extended
+with the same view in this pass (new TD-62).
+
+## Unreleased — EGX-Genom Final Product Mission: Institutional Investment Operating System (IOS)
+
+The project owner redefined AGX from a research platform into an
+institutional-grade Investment Operating System: research becomes an
+internal capability, investment decisions are the product. Explicit
+Product Law (every screen answers exactly one primary investment
+question), a mandated 5-section CIO Desk landing page and 19-section
+Investment Case page, portfolio-aware thinking everywhere, a 7-item
+navigation hierarchy with Research never the default destination, and a
+mandatory product audit before completion — see
+`docs/PHASE_STATUS.md`'s "EGX-Genom Final Product Mission" section for
+the full report.
+
+**Backend**: 3 new dashboard artifacts, each composing an existing
+engine rather than adding new judgment logic — `dashboard.
+portfolio_summary.build_portfolio_summary()` (wraps `investment_proof.
+portfolio_validation.PortfolioValidationEngine`), `dashboard.monitoring.
+build_warnings()` (new `WarningCategory` taxonomy: broken_thesis,
+macro_risk_increased, catalyst_expired, liquidity_deterioration,
+portfolio_concentration, review_required — scans the whole
+`KnowledgeStore`, not just current positions, so a knowledge retirement
+that drops a ticker out of the model portfolio is correctly surfaced),
+`dashboard.committee_summary.build_committee_summary()` (wraps
+`investment_proof.committee_validation.CommitteeValidationEngine`, adds
+Risk/Portfolio committees + a mechanical CIO tally row). Wired into
+`production.pipeline.ProductionPipeline`'s existing dashboard-artifact
+stage, `None`-safe on non-trading days, schema-exported, 7 new tests. 840
+backend tests pass (up from 833); `ruff check` clean.
+
+**API**: `GET /portfolio-summary`, `GET /warnings`,
+`GET /committee-summary` (thin passthrough, same pattern as every
+existing route). Removed one confirmed-dead duplicate route
+(`GET /ticker-data-gap-report`). 27 `api` tests pass; clean build.
+
+**Frontend**: full navigation/page-hierarchy redesign. New pages —
+`CIODesk` (landing page, `/`), `Portfolio` (`/portfolio`),
+`InvestmentCases`/`InvestmentCaseDetail` (`/cases`, `/cases/:ticker`),
+`Monitoring` (`/monitoring`), `Settings` (`/settings`, merging Mission
+Control + System Administration). `ResearchCenter` extended in place to
+absorb Decision Readiness/Data Coverage. Nav collapsed from 9 to 7
+top-level items; Knowledge Graph/Source Intelligence stay reachable via a
+"More Research Tools" link on Research rather than the primary nav.
+Deleted outright (not kept as dead code): `AIBriefing`, `DecisionCenter`,
+`OpportunityCenter`, `CompanyWorkspace`, `MissionControlPage`,
+`SystemAdministration` (+ their CSS), and the already-dead
+`ComingSoon.tsx`. New `usePortfolioPositions` localStorage hook backs
+both CIO Desk's and Portfolio's "my holdings" state — the backend never
+stores real portfolio data. i18n fully restructured (6 old namespaces
+removed, 5 new ones added, bilingual EN/AR). 47 `web` tests pass; clean
+`tsc`/build.
+
+**Mandatory product audit** (per the mission's explicit requirement):
+every screen, widget, nav item, API endpoint, and report reviewed against
+"does this improve investment decisions?" One real gap named rather than
+silently dropped or force-built: `getRuntimeStatus()`/`getSourceTruth()`/
+`getEndpointCandidates()` remain unused by any page (TD-61).
+
+**Live-verified** in a real running `api`+`web` dev server pair, English
+and Arabic/RTL, via headless Chromium — including one real RTL CSS bug
+found and fixed (`CIODesk.module.css`'s `.thesisCell`/`.riskCell` were
+inline `<span>`s with a non-functional `max-width`, which has no effect
+on `display: inline` elements; fixed with `display: block` + an explicit
+`width` + ellipsis truncation, re-verified via `boundingBox()`/
+`scrollWidth` that the page no longer overflows in either direction).
+
+## Unreleased — Investment Proof Framework (Capital Trust Report)
+
+The project owner's final mission for this phase: build the complete
+architecture to prove — not just claim — that the platform's decisions are
+trustworthy enough for capital, with the explicit instruction that missing
+*data* (not missing *engineering*) should be reported as `READY FOR DATA`
+rather than block the work.
+
+**Delivered**: new `investment_proof/` package, composing rather than
+duplicating `institutional_validation/` —
+
+- `categories.py`: the Macro/Sector/Quality/Value/Catalyst/Risk/Liquidity/
+  Portfolio/Execution/Technical taxonomy and the real `creator_agent ->
+  Category` map every other engine below shares.
+- `attribution.py` (`DecisionAttributionEngine`): decomposes a real
+  `KnowledgeWeightedHorizonModel`+`FairValueEngine` expected return into
+  named category contributions, with `attribution_residual` as a real
+  reconciliation check (verified ~1e-18, i.e. exact).
+- `counterfactual.py` (`CounterfactualEngine`): real ablation — removes
+  each evidence category and recomputes the decision with the same real
+  `MetaDecisionEngine`, reporting which categories are actually decisive
+  rather than assumed important.
+- `committee_validation.py` (`CommitteeValidationEngine`): aggregates
+  attribution + counterfactual results across a ticker batch into
+  per-category agreement/decisiveness rates; `historical_usefulness`
+  honestly stays `ready_for_data` (see TD-59).
+- `portfolio_validation.py` (`PortfolioValidationEngine`): Herfindahl
+  concentration, sector exposure, weight reconciliation, an explicitly-
+  named `expected_downside_proxy` (never presented as a true VaR), and
+  position-aware vs. position-unaware decision-conflict detection.
+- `stability.py` (`DecisionStabilityEngine`): calls
+  `RecommendationService`/`DecisionService` multiple times against
+  identical evidence and diffs the results — determinism measured, not
+  claimed.
+- `calibration.py` (`ConfidenceCalibrationFramework`): Brier score, a
+  10-bin reliability curve, and expected calibration error over
+  `DecisionLedger` records — honestly `sample_status="insufficient"`
+  below a 30-record floor, never a fabricated statistic.
+- `walk_forward.py` (`WalkForwardInfrastructure`): a real day-by-day
+  driver connecting `RecommendationService` + `DecisionLedger` over the
+  real EGX trading calendar (proven against 8 real mock trading days, 0
+  errors); `required_datasets()` names exactly what real EGX history is
+  still needed, each honestly `ready_for_data`.
+- `thesis_survival.py` (`ThesisSurvivalEngine`): compares a
+  `PositionAwareDecision` against a later re-evaluation of the same
+  ticker, detecting broken assumptions (cited knowledge later retired),
+  new contradicting evidence, and lapsed catalysts — mechanically, never
+  a sentiment guess.
+- `capital_trust.py` (`InvestmentProofEngine`/`CapitalTrustReport`): the
+  top-level orchestrator. Runs `institutional_validation` plus every
+  engine above against one shared scenario and answers "would a rational
+  institutional investment committee trust this system with capital?" as
+  YES/NO/PARTIALLY, computed mechanically from the dimension verdicts
+  (any FAIL -> NO; any BLOCKED with no FAIL -> PARTIALLY; otherwise YES).
+
+New `agx investment-proof` CLI command (JSON + optional Markdown Capital
+Trust Report, same `--out`/`--markdown-out` shape as `validate-investment`).
+
+**Current verdict: PARTIALLY.** Every dimension that can be exercised
+today (decision determinism, attribution, counterfactual ablation,
+committee agreement, portfolio consistency, thesis-break detection) is
+architecturally complete and passes; `confidence_calibration` and
+`walk_forward_backtest` remain `BLOCKED` only for lack of real historical
+EGX data (a licensed vendor is still a pending business decision — see
+`CLAUDE.md`). No fabricated data or invented statistic stands in for
+either gap.
+
+**Two real, pre-existing production bugs found and fixed** while building
+this framework's own attribution/decide checks (not by the framework
+itself, but by directly exercising `DecisionService`/`agx decide` the way
+this mission required): (1) `DecisionService.decide_portfolio()` never
+capped `target_weight` at `decision.max_position_pct`, so identical
+evidence could size a position ~6x larger through the position-aware path
+than through `PortfolioConstructor`; (2) `agx decide` never called
+`apply_publication_gate()` at all, so every CLI/Decision-Center decision
+silently reported `no_action`/zero weight with no reason naming the real
+cause. Both fixed; see `docs/ARCHITECTURE_DECISIONS.md` (AD entry) and
+`docs/TECHNICAL_DEBT.md`.
+
+833 backend tests pass (up from 809, 24 new); `ruff check` clean.
+
+## Unreleased — Institutional Investment Validation framework
+
+The project owner redefined the mission from engineering implementation to
+proving, with real evidence, that the decision engine is internally
+consistent, explainable, and economically meaningful — 10 named
+questions, answered by repeatable scenarios that attempt to falsify the
+platform's own conclusions, not more passing software tests.
+
+**Delivered**: new `institutional_validation/` package (deliberately
+separate from System 11's statistical hypothesis validator) —
+`scenarios.py` (deterministic builders exercising real
+`RecommendationService`/`PortfolioConstructor`/`DecisionService`/
+`ContinuousLearningMonitor`/`DecisionLedger` against both the real
+101-ticker EGX30+EGX70 universe and clearly-labeled synthetic stress
+data), `diffing.py` (a genuinely new capability Q9 revealed was missing —
+`diff_knowledge_history()`, built on existing versioning, scoped honestly
+to knowledge only), `checks.py`/`report.py`/`runner.py` (PASS/PARTIAL/
+BLOCKED/FAIL per question with concrete evidence, never a bare boolean),
+and a new `agx validate-investment` CLI command.
+
+A real scenario-construction bug was found and fixed by the framework's
+own falsification attempt during development (hand-setting
+`publication_status` without going through the real
+`apply_publication_gate()` silently zeroed `max_position_pct`, making
+every synthetic buy portfolio-ineligible) — caught because
+`check_complete_portfolio` refused to accept 26 positions summing to a
+0.0 weight. The platform code itself had no defect; the test scenario did.
+
+Current report: 4 PASS, 4 PARTIAL, 1 BLOCKED, 0 FAIL, overall PARTIAL —
+two new named, scoped gaps (TD-57: `ContinuousLearningMonitor` not
+autonomously wired; TD-58: no real EGX30 index-level price series to
+benchmark against). 807 backend tests pass (up from 788, 21 new); `ruff
+check` clean. See `docs/PHASE_STATUS.md`'s matching section for the full
+report.
+
+## Unreleased — Market Regime classification (trend/volatility), wired end to end
+
+Immediate follow-up to the decision-object work below: the mission brief's
+landing-page checklist names "current market regime" explicitly, and it
+was a confirmed real gap (no `MarketRegime` model/artifact anywhere in
+`research/src/`).
+
+**Closed**: new `market_memory.regime.compute_market_regime()`, built the
+same way `market_memory.breadth.compute_market_breadth()` already is
+(adjusted, equal-weighted returns, no live lookups). Reports `trend`
+(bullish/bearish/neutral) and `volatility` (low/elevated/high) as two
+independent axes rather than one fused label, per this codebase's existing
+"a label over a continuous number, never a lookup table" discipline.
+Declared, uncalibrated thresholds (new debt TD-56). Wired end to end like
+Market Breadth: `market_regime.json` (every `agx run`) → dashboard
+validator → `GET /market-regime` → both `DashboardDataProvider`s → a new
+banner on the AI Briefing landing page and a real card on Market
+Intelligence (previously a permanent empty state). 788 backend tests pass
+(up from 778, 10 new); 24 `api` tests pass; 46 `web` tests pass; all three
+workspaces' `build`/`lint` clean; verified live end to end in a real
+headless browser. See `docs/PHASE_STATUS.md`'s matching section.
+
+## Unreleased — complete the decision object's 12 mandated fields; make it reachable from the web
+
+Audited `decision_service.PositionAwareDecision` against the mission's
+full institutional-decision field list (Decision, Target Weight, Horizon,
+Confidence, Thesis, Supporting/Contradicting Evidence, Key Risks, Active
+Catalysts, Monitoring Events, Invalidation Conditions, Expected Review
+Date) and found 6 of 12 missing, plus a separate, larger gap: the service
+was completely unreachable from `api/`/`web/` (CLI-only).
+
+**Closed**: added `horizon`, `investment_thesis`, `key_risks`,
+`contradicting_evidence`, `active_catalysts`, `monitoring_events`, and
+`expected_review_date` to `PositionAwareDecision`, each derived from data
+already computed or newly threaded through `decide_portfolio()`
+(`corporate_events`, `knowledge_store` — both optional, honest-empty when
+omitted), never fabricated. New `POST /decisions` route in `api/` shells
+out to the same `agx decide` CLI on each request (on-demand, never
+autonomous — `decision_service` still must never enter a scheduled run);
+new web page **Decision Center** (`/decisions`) lets an investor enter
+their own holdings and get the full six-way decision, linked prominently
+from the AI Briefing landing page. `StaticJsonProvider` honestly reports
+itself unavailable (no live backend on GitHub Pages) rather than
+fabricating a result. 778 backend tests pass (up from 764, 12 new); 23
+`api` tests pass (4 new); 46 `web` tests pass (7 new); all three
+workspaces' `build`/`lint` clean; verified live end to end in a real
+headless browser against a real mock-mode `agx run`. See
+`docs/PHASE_STATUS.md`'s matching section for full detail.
+
 ## Unreleased — fix a malformed guessed hostname crashing the whole acquisition sweep
 
 While expanding free source coverage (this session triggered

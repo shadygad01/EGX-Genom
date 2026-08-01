@@ -830,6 +830,23 @@ export interface MarketBreadthReport {
   tickers_below_average_volume: number;
 }
 
+// --- market_regime.json / MarketRegimeReport ---
+
+export type MarketTrend = "bullish" | "bearish" | "neutral";
+export type VolatilityLevel = "low" | "elevated" | "high";
+
+export interface MarketRegimeReport {
+  as_of: string;
+  lookback_days: number;
+  tickers_with_sufficient_data: number;
+  trading_days_observed: number;
+  cumulative_return_pct: number | null;
+  daily_volatility_pct: number | null;
+  trend: MarketTrend;
+  volatility: VolatilityLevel;
+  reasons: string[];
+}
+
 // --- source_metrics.json ---
 
 export interface ReputationScore {
@@ -896,4 +913,203 @@ export interface SourceSpec {
   reputation_score: number | null;
   evidence_tier: EvidenceTier;
   notes: string;
+}
+
+// --- decision_service / PositionAwareDecision (POST /decisions, live-computed --
+// see api/src/routes/decisions.ts; not a static dashboard artifact, so only
+// ApiProvider can serve it -- see Portfolio.tsx/CIODesk.tsx for the static-mode gap state) ---
+
+export type PositionAction =
+  | "buy"
+  | "increase_position"
+  | "hold"
+  | "reduce_position"
+  | "exit"
+  | "no_action";
+
+export interface PositionInput {
+  held: boolean;
+  current_weight?: number;
+  average_cost?: number | null;
+}
+
+export interface PositionAwareDecision {
+  ticker: string;
+  as_of: string;
+  action: PositionAction;
+  target_weight: number;
+  current_weight: number;
+  horizon: Horizon;
+  confidence: number;
+  opportunity_score: number;
+  expected_return: number | null;
+  expected_risk: number | null;
+  investment_thesis: string;
+  key_risks: string[];
+  contradicting_evidence: string[];
+  active_catalysts: string[];
+  monitoring_events: string[];
+  expected_review_date: string | null;
+  abstained: boolean;
+  reasons: string[];
+  explanation: Explanation;
+  provenance: Provenance;
+}
+
+// --- portfolio_summary.json / dashboard.portfolio_summary.PortfolioSummaryReport ---
+
+export interface ConcentrationCheck {
+  herfindahl_index: number;
+  status: "diversified" | "concentrated";
+  max_position_weight: number;
+  max_position_ticker: string | null;
+  top_3_weight: number;
+}
+
+export interface SectorExposure {
+  sector: string;
+  weight: number;
+  tickers: string[];
+}
+
+export interface PortfolioSummaryReport {
+  as_of: string;
+  is_live_portfolio: boolean;
+  position_count: number;
+  cash_weight: number;
+  invested_weight: number;
+  weights_reconcile: boolean;
+  expected_return: number | null;
+  expected_risk: number | null;
+  concentration: ConcentrationCheck;
+  sector_exposures: SectorExposure[];
+  max_sector_weight: number | null;
+  sector_concentration_status: "diversified" | "concentrated" | "not_evaluated";
+  liquidity_violations: string[];
+  decision_conflicts: string[];
+}
+
+// --- warnings.json / dashboard.monitoring.MonitoringWarningsReport ---
+
+export type WarningCategory =
+  | "broken_thesis"
+  | "macro_risk_increased"
+  | "catalyst_expired"
+  | "liquidity_deterioration"
+  | "portfolio_concentration"
+  | "review_required";
+
+export type WarningSeverity = "info" | "warning" | "critical";
+
+export interface MonitoringWarning {
+  category: WarningCategory;
+  severity: WarningSeverity;
+  ticker: string | null;
+  title: string;
+  detail: string;
+}
+
+export interface MonitoringWarningsReport {
+  as_of: string;
+  warnings: MonitoringWarning[];
+}
+
+// --- committee_summary.json / dashboard.committee_summary.CommitteeSummaryReport ---
+
+export interface CommitteeOpinion {
+  committee: string;
+  stance: string;
+  agreement_rate: number | null;
+  decisive_rate: number | null;
+  tickers_present: number;
+  note: string;
+}
+
+export interface CommitteeSummaryReport {
+  as_of: string;
+  tickers_evaluated: number;
+  opinions: CommitteeOpinion[];
+}
+
+// --- capital_allocation / CapitalAllocationEngine (POST /capital-allocation, live-computed --
+// see data/DataProvider.ts's postCapitalAllocation; not a static dashboard artifact, same
+// reason as PositionAwareDecision -- there is nothing to rank/recycle without a real portfolio) ---
+
+export interface RankedOpportunity {
+  rank: number;
+  ticker: string;
+  opportunity_score: number;
+  action: PositionAction;
+  target_weight: number;
+  current_weight: number;
+  confidence: number;
+  expected_return: number | null;
+  expected_risk: number | null;
+  is_new_position: boolean;
+}
+
+export interface CapitalSource {
+  ticker: string | null;
+  amount: number;
+}
+
+export interface CapitalFlow {
+  from_ticker: string | null;
+  to_ticker: string | null;
+  amount: number;
+}
+
+export interface CapitalQueueEntry {
+  ticker: string;
+  priority: number;
+  action: PositionAction;
+  target_weight: number;
+  current_weight: number;
+  capital_delta: number;
+  expected_contribution: number | null;
+  marginal_benefit: number;
+  marginal_risk: number | null;
+  capital_sources: CapitalSource[];
+  required_action: string;
+  opportunity_cost_note: string;
+}
+
+export interface CapitalRelease {
+  ticker: string;
+  amount: number;
+  destinations: CapitalSource[];
+}
+
+export interface OpportunityCostHighlight {
+  ticker: string;
+  opportunity_score: number;
+  reason: string;
+}
+
+export interface AllocationChange {
+  ticker: string;
+  action: PositionAction;
+  current_weight: number;
+  target_weight: number;
+  capital_delta: number;
+}
+
+export interface CashWaiting {
+  idle_cash_before: number;
+  idle_cash_after: number;
+  reason: string;
+}
+
+export interface CapitalAllocationPlan {
+  as_of: string;
+  ranking: RankedOpportunity[];
+  queue: CapitalQueueEntry[];
+  capital_released_today: CapitalRelease[];
+  capital_recycled: CapitalFlow[];
+  best_new_opportunities: RankedOpportunity[];
+  highest_opportunity_cost: OpportunityCostHighlight[];
+  allocation_changes: AllocationChange[];
+  cash_waiting: CashWaiting;
+  explanation: Explanation;
+  provenance: Provenance;
 }

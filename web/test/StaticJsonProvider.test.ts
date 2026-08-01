@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { LiveDecisionsUnavailableError } from "../src/data/DataProvider";
 import { StaticJsonProvider } from "../src/data/StaticJsonProvider";
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -73,5 +74,34 @@ describe("StaticJsonProvider", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({}, 500)));
     const provider = new StaticJsonProvider();
     await expect(provider.getKnowledge()).rejects.toThrow(/500/);
+  });
+
+  it("postDecisions always reports itself unavailable, never fabricating a decision", async () => {
+    const provider = new StaticJsonProvider();
+    await expect(provider.postDecisions({ date: "2026-06-14" })).rejects.toThrow(
+      LiveDecisionsUnavailableError,
+    );
+  });
+
+  it("postCapitalAllocation always reports itself unavailable, never fabricating a plan", async () => {
+    const provider = new StaticJsonProvider();
+    await expect(provider.postCapitalAllocation({ date: "2026-06-14" })).rejects.toThrow(
+      LiveDecisionsUnavailableError,
+    );
+  });
+
+  it("fetches the CIO Desk artifacts (portfolio summary, warnings, committee summary)", async () => {
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(null)));
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new StaticJsonProvider();
+
+    await provider.getPortfolioSummary();
+    await provider.getWarnings();
+    await provider.getCommitteeSummary();
+
+    const urls = fetchMock.mock.calls.map((call) => call[0] as string);
+    expect(urls.some((u) => u.includes("portfolio_summary.json"))).toBe(true);
+    expect(urls.some((u) => u.includes("warnings.json"))).toBe(true);
+    expect(urls.some((u) => u.includes("committee_summary.json"))).toBe(true);
   });
 });

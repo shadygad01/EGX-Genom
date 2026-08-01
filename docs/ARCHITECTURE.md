@@ -174,6 +174,34 @@ research/        Python package `agx_research` — the research engine
                   docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md Part 3 for the
                   full design and reasoning.
 
+  # Capital Allocation Intelligence: every proposal competes for one budget
+  capital_allocation/
+                  CapitalAllocationEngine: a read-only ranking/opportunity-
+                  cost/recycling layer *on top of* decide_portfolio()'s
+                  output, never a second scoring engine. RankedOpportunity
+                  makes DecisionService's already-joint, already-normalized
+                  competition explicit (every ticker with a Recommendation
+                  or an existing position, ranked 1..N by
+                  PositionAwareDecision.opportunity_score); the matching
+                  algorithm (engine.py's _match_capital_flows) attributes
+                  each unit of requested capital to a source (idle cash
+                  first, then the weakest-ranked holding being displaced)
+                  and each unit of released capital to a destination (the
+                  strongest-ranked unmet demander, or back to cash) --
+                  bookkeeping over already-computed weights, never a fresh
+                  optimization. An abstained decision (no fresh evidence,
+                  not a decisive call to exit) never participates in
+                  capital-flow matching even though decide_portfolio()
+                  reports its target_weight as 0.0 -- see
+                  _effective_target()'s docstring. Same on-demand-only
+                  posture as decision_service/ (stateless, never wired into
+                  production/pipeline.py -- there is nothing to rank or
+                  recycle without the investor's own real PositionState).
+                  Exposed as `agx allocate-capital --date ... [--positions
+                  positions.json]` (cli.py, composing decide's own real
+                  evidence via the shared build_position_aware_decisions()
+                  helper, not reconstructing it).
+
 api/              TypeScript (Fastify) — HTTP surface over the knowledge base
 web/              TypeScript (Vite + React) — dashboard for knowledge/recs
 contracts/        Generated JSON Schema for API-facing pydantic models
@@ -215,19 +243,29 @@ Both implementations return exactly the same shapes, defined once in
   re-parses every file back through its owning model before anything is
   published — a schema drift or truncated write fails the build, not the
   live site. Both are exposed as CLI subcommands (`agx export-dashboard`,
-  `agx validate-dashboard`).
+  `agx validate-dashboard`). `production.pipeline.ProductionPipeline`'s
+  dashboard-artifact stage additionally writes three CIO-Desk-specific,
+  `None`-safe (honest-absence on non-trading days) artifacts wrapping
+  `dashboard.portfolio_summary.build_portfolio_summary()`,
+  `dashboard.monitoring.build_warnings()`, and
+  `dashboard.committee_summary.build_committee_summary()`:
+  `portfolio_summary.json`, `warnings.json`, `committee_summary.json` —
+  each composes existing `investment_proof.portfolio_validation`/
+  `investment_proof.committee_validation` engines rather than
+  recomputing anything.
 - **API side**: `api/src/routes/dashboard.ts` serves `/events` and
   `/runtime-metrics` by flattening the same raw versioned-repository files
   (`events.json`/`runs.json`) `KnowledgeStoreReader` already flattens for
   `/knowledge`. `/patterns`, `/recommendations`, `/universe`, `/market-state`,
-  `/system-status`, and `/source-registry` have no live TypeScript-side
-  recomputation (three are computed on demand by the research engine, one
-  is a static Python catalog, one is reserved for an unimplemented agent)
-  — `api/src/artifactsStore.ts` reads the same generated snapshot files
-  `write_dashboard_artifacts()` produces, refreshed on a schedule in a real
-  deployment (System 18 scheduling is business-blocked — see
-  `docs/ROADMAP.md`). In production, `ApiProvider` and `StaticJsonProvider`
-  can even point at the same underlying files.
+  `/system-status`, `/source-registry`, `/portfolio-summary`, `/warnings`,
+  and `/committee-summary` have no live TypeScript-side recomputation
+  (most are computed on demand by the research engine, one is a static
+  Python catalog, one is reserved for an unimplemented agent) —
+  `api/src/artifactsStore.ts` reads the same generated snapshot files
+  `write_dashboard_artifacts()`/`ProductionPipeline` produce, refreshed on
+  a schedule in a real deployment (System 18 scheduling is
+  business-blocked — see `docs/ROADMAP.md`). In production, `ApiProvider`
+  and `StaticJsonProvider` can even point at the same underlying files.
 - `patterns.json` is always `[]`: `agents.historical_patterns.HistoricalPatternsAgent`
   raises `NotImplementedError`, so there is no real output to export.
   `validate_dashboard_artifacts()` enforces this — it fails the build if
@@ -249,12 +287,15 @@ generated `knowledge.json`/`recommendations.json` are honestly often empty
 2-ticker mock history) — that's the platform's real behavior faithfully
 surfaced, not a demo bug.
 
-## Frontend: Production User Experience
+## Frontend: Institutional Investment Operating System (IOS)
 
-`web/` is a routed, 9-section institutional research platform (the
-Production User Experience mission), not the single hardcoded knowledge
-table it started as. Every page still goes through exactly one
-`DashboardDataProvider` (above) — nothing here changes that contract.
+`web/` is a decision-first Investment Operating System (the IOS mission,
+2026-08-01), not a research portal with a decision page bolted on. Every
+page still goes through exactly one `DashboardDataProvider` (above) —
+nothing here changes that contract — but the page set and navigation were
+redesigned around the mission's Product Law: **every screen answers
+exactly one primary investment question**, and research is reachable but
+never the default destination.
 
 - **Design tokens** (`web/src/styles/tokens.css`): dark-theme-first CSS
   custom properties (surfaces, borders, text, accent, semantic
@@ -272,18 +313,68 @@ table it started as. Every page still goes through exactly one
 - **`useArtifact` hook** (`web/src/hooks/useArtifact.ts`): the one seam
   every page uses to call a `DashboardDataProvider` method with consistent
   loading/error state — no page calls the provider directly.
-- **The 9 pages** (`web/src/pages/`): `AIBriefing` (landing page),
-  `OpportunityCenter`, `CompanyWorkspace` (`/company/:ticker`),
-  `MarketIntelligence`, `ResearchCenter`, `KnowledgeGraphPage`,
-  `MissionControlPage`, `SourceIntelligence`, `SystemAdministration`.
-  Each composes only from artifacts already described above — **no page
-  computes a value the backend didn't already produce**. Where the
-  9-section spec calls for something no artifact backs yet (market
-  regime classification, market breadth/liquidity, Review Board decision
-  history, Discovery Engine detail, raw log lines), the page renders an
+- **Navigation** (`web/src/components/layout/Sidebar.tsx`): 7 top-level
+  items, in the mission-mandated hierarchy — CIO Desk (`/`), Portfolio
+  (`/portfolio`), Investment Cases (`/cases`), Monitoring (`/monitoring`),
+  Market (`/market`), Research (`/research`), Settings (`/settings`).
+  Knowledge Graph (`/knowledge-graph`) and Source Intelligence
+  (`/sources`) are deliberately reachable-but-not-top-level (linked from
+  Research's "More Research Tools" card) — they answer a research
+  question, not a daily-decision one, so the Product Law keeps them off
+  the primary nav without deleting the capability.
+- **The pages** (`web/src/pages/`):
+  - `CIODesk` (landing page, `/`) — answers "what should I do today?"
+    with exactly the 5 mission-mandated sections (Market Regime, Capital
+    Allocation, Portfolio Summary, Warnings, Investment Committee
+    Summary), nothing else. Capital Allocation (the Capital Allocation
+    Intelligence mission's own 7 named sub-sections — Capital Deployment
+    Queue, Capital Recycling, Capital Released Today, Best New
+    Opportunities, Highest Opportunity Cost, Allocation Changes, Capital
+    Waiting For Better Opportunities) calls both the live, position-aware
+    `POST /decisions` and `POST /capital-allocation` when the investor has
+    entered holdings (`usePortfolioPositions`,
+    `web/src/hooks/usePortfolioPositions.ts` — a localStorage-only "my
+    holdings" record; the backend never stores real portfolio data) and
+    falls back to the existing decisions table plus a ranked "Best New
+    Opportunities" preview from the position-unaware model portfolio
+    otherwise — the other 6 sub-sections honestly report they need real
+    holdings rather than fabricating a capital competition that doesn't
+    exist without real capital, always labeled which source is showing.
+  - `Portfolio` (`/portfolio`) — answers "is my capital allocated
+    correctly?": holdings editor + the full live six-way decision table,
+    reusing `DecisionService.decide_portfolio()` through `POST /decisions`
+    exactly as the former Decision Center did.
+  - `InvestmentCases` (`/cases`, list) and `InvestmentCaseDetail`
+    (`/cases/:ticker`, the mission's 19-section page) — answer "why
+    should I own this company?" Investment Thesis first, charts and raw
+    research last.
+  - `Monitoring` (`/monitoring`) — answers "what changed since my last
+    decision?": the full filterable warnings feed plus knowledge/decision
+    change history.
+  - `MarketIntelligence` (`/market`) — answers "what is the current
+    investment environment?" (unchanged from the prior IA).
+  - `ResearchCenter` (`/research`) — the internal-capability research hub:
+    knowledge objects, hypotheses, papers, financials, corporate actions,
+    Data Readiness (absorbed from the former Opportunity Center), plus
+    links out to Knowledge Graph/Source Intelligence.
+  - `Settings` (`/settings`) — merges the former Mission Control +
+    System Administration into one "Mission & Business Status" /
+    "System & Operations" page; nothing here informs a daily decision, so
+    it collapses to the bottom of the nav rather than living at two
+    separate top-level slots.
+  - `KnowledgeGraphPage` (`/knowledge-graph`), `SourceIntelligence`
+    (`/sources`) — unchanged, reachable only from Research.
+
+  Each page composes only from artifacts already described above — **no
+  page computes a value the backend didn't already produce**. Where a
+  section calls for something no artifact backs yet, the page renders an
   honest "not yet available" `EmptyState` naming the gap, never a
   fabricated number — see `CURRENT_MISSION.md`/`NEXT_MISSIONS.md` for the
-  current list.
+  current list. The prior IA's `AIBriefing`, `DecisionCenter`,
+  `OpportunityCenter`, `CompanyWorkspace`, `MissionControlPage`,
+  `SystemAdministration`, and the always-dead `ComingSoon` placeholder
+  were deleted outright rather than kept as unreachable dead code — their
+  capabilities were absorbed into the pages above, not lost.
 - **Knowledge Graph rendering** (`web/src/lib/forceLayout.ts`): a small,
   dependency-free Fruchterman-Reingold-style force simulation, computed
   once per graph load and rendered as plain SVG with hand-rolled pan/zoom.

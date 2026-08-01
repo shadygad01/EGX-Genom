@@ -1,0 +1,274 @@
+{
+  "$defs": {
+    "Explanation": {
+      "description": "Answers to the questions every recommendation must be able to answer.\n\n`evidence_refs` is what keeps `supporting_evidence` from being just\nprose: each entry points at an actual, looked-up-able entity (a\nknowledge object, a dataset snapshot, a feature) rather than only a\nsentence describing one.",
+      "properties": {
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "invalidation_conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidation Conditions",
+          "type": "array"
+        },
+        "similar_historical_cases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Similar Historical Cases",
+          "type": "array"
+        },
+        "supporting_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Evidence",
+          "type": "array"
+        },
+        "why_not_others": {
+          "title": "Why Not Others",
+          "type": "string"
+        },
+        "why_now": {
+          "title": "Why Now",
+          "type": "string"
+        },
+        "why_this_stock": {
+          "title": "Why This Stock",
+          "type": "string"
+        }
+      },
+      "required": [
+        "why_this_stock",
+        "why_now",
+        "why_not_others"
+      ],
+      "title": "Explanation",
+      "type": "object"
+    },
+    "Horizon": {
+      "description": "The three independent time horizons the platform optimizes simultaneously.",
+      "enum": [
+        "micro",
+        "swing",
+        "investment"
+      ],
+      "title": "Horizon",
+      "type": "string"
+    },
+    "PositionAction": {
+      "enum": [
+        "buy",
+        "increase_position",
+        "hold",
+        "reduce_position",
+        "exit",
+        "no_action"
+      ],
+      "title": "PositionAction",
+      "type": "string"
+    },
+    "Provenance": {
+      "properties": {
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "produced_at": {
+          "format": "date-time",
+          "title": "Produced At",
+          "type": "string"
+        },
+        "produced_by": {
+          "title": "Produced By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "produced_by",
+        "produced_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "description": "A pointer to one input entity: what kind it is, its id, and (if versioned) which version.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "ref_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Version"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    }
+  },
+  "description": "One ticker's position-aware decision. Never constructed without an\n`Explanation` (Principle 3, same rule every other recommendation-like\nobject in this codebase follows).\n\nFields cover the full institutional decision memo the mission requires\n(decision, target weight, horizon, confidence, thesis, supporting and\ncontradicting evidence, key risks, active catalysts, monitoring events,\ninvalidation conditions -- on `explanation` -- and expected review\ndate), each derived from data this service already computes or is\nhanded, never fabricated.\n\n`opportunity_score`/`expected_return`/`expected_risk` (Capital\nAllocation Intelligence mission) expose the same\n`HorizonDecision.risk_adjusted_score`/`expected_return`/`expected_risk`\nthis method already computes internally as first-class fields, not\njust prose -- `capital_allocation.CapitalAllocationEngine` (and any\nfuture consumer needing to rank tickers against each other) reads\nthese directly instead of re-deriving the eligibility/scoring rule a\nsecond time. `opportunity_score` is the pre-cap, pre-normalization\nscore (0.0 when ineligible/abstained/not publication-ready), exactly\nthe `score` this method already used to compute `target_weight`.",
+  "properties": {
+    "abstained": {
+      "title": "Abstained",
+      "type": "boolean"
+    },
+    "action": {
+      "$ref": "#/$defs/PositionAction"
+    },
+    "active_catalysts": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Active Catalysts",
+      "type": "array"
+    },
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "confidence": {
+      "title": "Confidence",
+      "type": "number"
+    },
+    "contradicting_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Contradicting Evidence",
+      "type": "array"
+    },
+    "current_weight": {
+      "title": "Current Weight",
+      "type": "number"
+    },
+    "expected_return": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Return"
+    },
+    "expected_review_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Review Date"
+    },
+    "expected_risk": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Risk"
+    },
+    "explanation": {
+      "$ref": "#/$defs/Explanation"
+    },
+    "horizon": {
+      "$ref": "#/$defs/Horizon"
+    },
+    "investment_thesis": {
+      "title": "Investment Thesis",
+      "type": "string"
+    },
+    "key_risks": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Key Risks",
+      "type": "array"
+    },
+    "monitoring_events": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Monitoring Events",
+      "type": "array"
+    },
+    "opportunity_score": {
+      "default": 0.0,
+      "title": "Opportunity Score",
+      "type": "number"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "target_weight": {
+      "title": "Target Weight",
+      "type": "number"
+    },
+    "ticker": {
+      "title": "Ticker",
+      "type": "string"
+    }
+  },
+  "required": [
+    "ticker",
+    "as_of",
+    "action",
+    "target_weight",
+    "current_weight",
+    "horizon",
+    "confidence",
+    "investment_thesis",
+    "abstained",
+    "explanation",
+    "provenance"
+  ],
+  "title": "PositionAwareDecision",
+  "type": "object"
+}

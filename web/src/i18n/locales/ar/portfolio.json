@@ -1,0 +1,55 @@
+{
+  "title": "المحفظة",
+  "description": "هل رأس مالي موزّع بشكل صحيح؟",
+  "positions": {
+    "title": "ممتلكاتك الحالية",
+    "subtitle": "تُحفظ في هذا المتصفح فقط -- لا تُرسل إلى أي مكان إلا كجزء من طلب قرارك الخاص.",
+    "ticker": "الرمز",
+    "currentWeight": "الوزن الحالي",
+    "averageCost": "متوسط التكلفة (جنيه مصري)",
+    "tickerPlaceholder": "مثال: COMI",
+    "optional": "اختياري",
+    "remove": "حذف الصف",
+    "addRow": "إضافة ممتلكات أخرى",
+    "getMyDecisions": "احصل على قراراتي",
+    "getFlatRead": "احصل على قراءة بدون مراكز حالية"
+  },
+  "unavailable": {
+    "title": "المحفظة تتطلب خادمًا حيًا"
+  },
+  "summary": {
+    "title": "ملخص المحفظة",
+    "description": "النقد، والتوزيع القطاعي، والتركّز -- محسوبة من قراراتك المباشرة.",
+    "cash": "التخصيص النقدي",
+    "invested": "رأس المال المستثمر",
+    "positions": "المراكز",
+    "concentration": "التركّز",
+    "concentrated": "متركّزة",
+    "diversified": "متنوّعة",
+    "topPosition": "أكبر مركز"
+  },
+  "results": {
+    "title": "القرارات",
+    "ticker": "الرمز",
+    "action": "القرار",
+    "targetWeight": "الوزن المستهدف",
+    "currentWeight": "الوزن الحالي",
+    "confidence": "درجة الثقة",
+    "reviewDate": "المراجعة بحلول",
+    "emptyTitle": "لا توجد قرارات",
+    "emptyDetail": "لم يكن لدى أي رمز أدلة حديثة أو مركز قائم لهذا التاريخ."
+  },
+  "detail": {
+    "title": "{{ticker}}",
+    "select": "اختر صفًا لعرض القرار الكامل",
+    "abstained": "امتناع",
+    "keyRisks": "المخاطر الرئيسية",
+    "contradictingEvidence": "أدلة معارضة",
+    "activeCatalysts": "المحفزات النشطة",
+    "monitoringEvents": "أحداث المتابعة",
+    "invalidationConditions": "شروط الإبطال",
+    "supportingEvidence": "الأدلة الداعمة",
+    "none": "لا يوجد.",
+    "viewCase": "عرض الحالة الاستثمارية الكاملة"
+  }
+}

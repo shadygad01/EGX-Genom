@@ -7,14 +7,15 @@ import { LanguageToggle } from "./LanguageToggle";
 import styles from "./TopBar.module.css";
 
 const PAGE_TITLE_KEYS: Record<string, string> = {
-  "/": "nav.aiBriefing",
-  "/opportunities": "nav.opportunityCenter",
-  "/market": "nav.marketIntelligence",
-  "/research": "nav.researchCenter",
+  "/": "nav.cioDesk",
+  "/portfolio": "nav.portfolio",
+  "/cases": "nav.investmentCases",
+  "/monitoring": "nav.monitoring",
+  "/market": "nav.market",
+  "/research": "nav.research",
   "/knowledge-graph": "nav.knowledgeGraph",
-  "/mission-control": "nav.missionControl",
   "/sources": "nav.sourceIntelligence",
-  "/admin": "nav.systemAdministration",
+  "/settings": "nav.settings",
 };
 
 /** Global status strip -- pipeline health, always visible, so a portfolio
@@ -29,8 +30,8 @@ export function TopBar() {
   const titleKey = PAGE_TITLE_KEYS[location.pathname];
   const title = titleKey
     ? t(titleKey)
-    : location.pathname.startsWith("/company/")
-      ? t("nav.companyWorkspace")
+    : location.pathname.startsWith("/cases/")
+      ? t("nav.investmentCaseDetail")
       : t("app.fallbackTitle");
 
   return (

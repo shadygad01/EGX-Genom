@@ -25,10 +25,14 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  CommitteeSummaryReport,
   MarketBreadthReport,
+  MarketRegimeReport,
   MarketState,
   MissionStatus,
+  MonitoringWarningsReport,
   Pattern,
+  PortfolioSummaryReport,
   PublicationGateReport,
   Recommendation,
   ResearchPaper,
@@ -39,7 +43,8 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
-import type { DashboardDataProvider } from "./DataProvider";
+import type { CapitalAllocationPlan, PositionAwareDecision } from "../types";
+import { LiveDecisionsUnavailableError, type DashboardDataProvider, type DecideRequest } from "./DataProvider";
 
 async function fetchList<T>(filename: string): Promise<T[]> {
   const response = await fetch(`${import.meta.env.BASE_URL}data/${filename}`);
@@ -153,6 +158,10 @@ export class StaticJsonProvider implements DashboardDataProvider {
     return fetchObject<MarketBreadthReport>("market_breadth.json");
   }
 
+  getMarketRegime(): Promise<MarketRegimeReport | null> {
+    return fetchObject<MarketRegimeReport>("market_regime.json");
+  }
+
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {
     return fetchList<AcquisitionDecision>("acquisition_decisions.json");
   }
@@ -191,5 +200,34 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getEndpointCandidates(): Promise<EndpointCandidate[]> {
     return fetchList<EndpointCandidate>("endpoint_candidates.json");
+  }
+
+  getPortfolioSummary(): Promise<PortfolioSummaryReport | null> {
+    return fetchObject<PortfolioSummaryReport>("portfolio_summary.json");
+  }
+
+  getWarnings(): Promise<MonitoringWarningsReport | null> {
+    return fetchObject<MonitoringWarningsReport>("warnings.json");
+  }
+
+  getCommitteeSummary(): Promise<CommitteeSummaryReport | null> {
+    return fetchObject<CommitteeSummaryReport>("committee_summary.json");
+  }
+
+  async postDecisions(_request: DecideRequest): Promise<PositionAwareDecision[]> {
+    throw new LiveDecisionsUnavailableError(
+      "Personalized decisions need a live backend. decision_service depends on your own portfolio " +
+        "holdings, which this platform never autonomously discovers or precomputes into the " +
+        "static dashboard -- run `npm run dev -w api` locally with DECISION_DATA_DIR set (see " +
+        "README's 'Personalized decisions' section), or use `agx decide` directly."
+    );
+  }
+
+  async postCapitalAllocation(_request: DecideRequest): Promise<CapitalAllocationPlan> {
+    throw new LiveDecisionsUnavailableError(
+      "Capital allocation needs a live backend, for the same reason personalized decisions do -- " +
+        "there is nothing to rank or recycle without your own real portfolio holdings. Run " +
+        "`npm run dev -w api` locally with DECISION_DATA_DIR set, or use `agx allocate-capital` directly."
+    );
   }
 }

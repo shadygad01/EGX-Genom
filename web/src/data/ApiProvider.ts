@@ -7,6 +7,7 @@
 
 import type {
   AcquisitionDecision,
+  CapitalAllocationPlan,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -25,10 +26,15 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  CommitteeSummaryReport,
   MarketBreadthReport,
+  MarketRegimeReport,
   MarketState,
   MissionStatus,
+  MonitoringWarningsReport,
   Pattern,
+  PortfolioSummaryReport,
+  PositionAwareDecision,
   PublicationGateReport,
   Recommendation,
   ResearchPaper,
@@ -39,7 +45,7 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
-import type { DashboardDataProvider } from "./DataProvider";
+import type { DashboardDataProvider, DecideRequest } from "./DataProvider";
 
 async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(`/api${path}`);
@@ -142,6 +148,10 @@ export class ApiProvider implements DashboardDataProvider {
     return fetchJson<MarketBreadthReport | null>("/market-breadth");
   }
 
+  getMarketRegime(): Promise<MarketRegimeReport | null> {
+    return fetchJson<MarketRegimeReport | null>("/market-regime");
+  }
+
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]> {
     return fetchJson<AcquisitionDecision[]>("/acquisition-decisions");
   }
@@ -180,5 +190,43 @@ export class ApiProvider implements DashboardDataProvider {
 
   getEndpointCandidates(): Promise<EndpointCandidate[]> {
     return fetchJson<EndpointCandidate[]>("/endpoint-candidates");
+  }
+
+  getPortfolioSummary(): Promise<PortfolioSummaryReport | null> {
+    return fetchJson<PortfolioSummaryReport | null>("/portfolio-summary");
+  }
+
+  getWarnings(): Promise<MonitoringWarningsReport | null> {
+    return fetchJson<MonitoringWarningsReport | null>("/warnings");
+  }
+
+  getCommitteeSummary(): Promise<CommitteeSummaryReport | null> {
+    return fetchJson<CommitteeSummaryReport | null>("/committee-summary");
+  }
+
+  async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {
+    const response = await fetch("/api/decisions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    const body = await response.json();
+    if (!response.ok) {
+      throw new Error(body?.error ?? `Failed to compute decisions: ${response.status}`);
+    }
+    return body as PositionAwareDecision[];
+  }
+
+  async postCapitalAllocation(request: DecideRequest): Promise<CapitalAllocationPlan> {
+    const response = await fetch("/api/capital-allocation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    const body = await response.json();
+    if (!response.ok) {
+      throw new Error(body?.error ?? `Failed to compute capital allocation: ${response.status}`);
+    }
+    return body as CapitalAllocationPlan;
   }
 }

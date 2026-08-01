@@ -72,8 +72,13 @@ from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.service import CollectionRunResult, CollectionService
+from agx_research.dashboard.committee_summary import build_committee_summary
 from agx_research.dashboard.export import ARTIFACT_FILENAMES, write_dashboard_artifacts
+from agx_research.dashboard.monitoring import build_warnings
+from agx_research.dashboard.portfolio_summary import build_portfolio_summary
 from agx_research.data.mock_provider import LocalCsvDataProvider
+from agx_research.decision_service.country_risk import assess_country_risk
+from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
 from agx_research.domain.identifiers import new_id
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
@@ -83,6 +88,7 @@ from agx_research.financials.schema import FinancialStatementLineItem
 from agx_research.genome.service import AlphaGenome
 from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
+from agx_research.investment_proof.portfolio_validation import PortfolioValidationEngine
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_engine import Recommendation
@@ -96,7 +102,7 @@ from agx_research.meta.publication_gate import (
 from agx_research.meta.readiness import assess_decision_readiness
 from agx_research.orchestration.pipeline import DailyResearchPipeline
 from agx_research.papers.repository import PaperRepository
-from agx_research.portfolio.constructor import PortfolioConstructor
+from agx_research.portfolio.constructor import PortfolioConstructor, PortfolioRecommendation
 from agx_research.production import artifacts as production_artifacts
 from agx_research.production.collector_plan import (
     EXPECTED_RECORDS,
@@ -1137,6 +1143,89 @@ class ProductionPipeline:
             json.dumps(market_breadth, indent=2, sort_keys=True) + "\n"
         )
         counts["market_breadth.json"] = 0 if market_breadth is None else 1
+
+        market_regime = production_artifacts.export_market_regime(market_state_for_breadth)
+        (dashboard_out / "market_regime.json").write_text(
+            json.dumps(market_regime, indent=2, sort_keys=True) + "\n"
+        )
+        counts["market_regime.json"] = 0 if market_regime is None else 1
+
+        # CIO Desk artifacts (Portfolio Summary / Warnings / Investment
+        # Committee Summary) -- all built from the autonomous, position-
+        # unaware model portfolio `investment_cases["portfolio"]` already
+        # constructed above (same "decision_service needs real investor
+        # positions, so it stays on-demand only" boundary every other
+        # position-aware artifact in this codebase respects). `None` on any
+        # non-trading-day/no-portfolio run, the same honest-absence
+        # convention `market_breadth.json`/`market_regime.json` already use.
+        portfolio_summary = None
+        warnings_payload = None
+        committee_summary = None
+        portfolio_obj = (
+            PortfolioRecommendation.model_validate(investment_cases["portfolio"])
+            if investment_cases.get("portfolio")
+            else None
+        )
+        if as_of is not None and market_state_for_breadth is not None and portfolio_obj is not None:
+            snapshot = market_state_for_breadth.dataset_snapshot
+            country_risk_for_desk = assess_country_risk(snapshot.macro_series, as_of)
+            illiquid_tickers = compute_illiquid_tickers(snapshot)
+            sectors = market_state_for_breadth.sectors
+
+            portfolio_summary = build_portfolio_summary(
+                portfolio_obj,
+                as_of,
+                is_live_portfolio=False,
+                sectors=sectors,
+                illiquid_tickers=illiquid_tickers,
+            ).model_dump(mode="json")
+
+            portfolio_validation = PortfolioValidationEngine().validate(
+                portfolio_obj.positions,
+                portfolio_obj.cash_weight,
+                as_of,
+                sectors=sectors,
+                illiquid_tickers=illiquid_tickers,
+            )
+            warnings_payload = build_warnings(
+                as_of=as_of,
+                portfolio=portfolio_obj,
+                recommendations=gated_recommendations,
+                knowledge_store=self.knowledge_store,
+                corporate_events=snapshot.corporate_events,
+                country_risk=country_risk_for_desk,
+                illiquid_tickers=illiquid_tickers,
+                portfolio_validation=portfolio_validation,
+            ).model_dump(mode="json")
+
+            portfolio_tickers = [p.ticker for p in portfolio_obj.positions]
+            knowledge_by_ticker = {
+                ticker: [k for k in self.knowledge_store.all_latest() if ticker in k.affected_assets]
+                for ticker in portfolio_tickers
+            }
+            latest_prices = {ticker: bars[-1].close for ticker, bars in snapshot.price_history.items() if bars}
+            committee_summary = build_committee_summary(
+                as_of,
+                portfolio_tickers,
+                knowledge_by_ticker,
+                latest_prices=latest_prices,
+                portfolio_validation=portfolio_validation,
+            ).model_dump(mode="json")
+
+        (dashboard_out / "portfolio_summary.json").write_text(
+            json.dumps(portfolio_summary, indent=2, sort_keys=True) + "\n"
+        )
+        counts["portfolio_summary.json"] = 0 if portfolio_summary is None else 1
+
+        (dashboard_out / "warnings.json").write_text(
+            json.dumps(warnings_payload, indent=2, sort_keys=True) + "\n"
+        )
+        counts["warnings.json"] = 0 if warnings_payload is None else len(warnings_payload.get("warnings", []))
+
+        (dashboard_out / "committee_summary.json").write_text(
+            json.dumps(committee_summary, indent=2, sort_keys=True) + "\n"
+        )
+        counts["committee_summary.json"] = 0 if committee_summary is None else 1
 
         acquisition_decisions = production_artifacts.export_acquisition_decisions(
             self.capability_decisions

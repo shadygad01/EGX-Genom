@@ -9,6 +9,7 @@
 
 import type {
   AcquisitionDecision,
+  CapitalAllocationPlan,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -27,10 +28,16 @@ import type {
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
+  CommitteeSummaryReport,
   MarketBreadthReport,
+  MarketRegimeReport,
   MarketState,
   MissionStatus,
+  MonitoringWarningsReport,
   Pattern,
+  PortfolioSummaryReport,
+  PositionAwareDecision,
+  PositionInput,
   PublicationGateReport,
   Recommendation,
   ResearchPaper,
@@ -41,6 +48,24 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
+
+export interface DecideRequest {
+  date: string;
+  positions?: Record<string, PositionInput>;
+}
+
+// Thrown by StaticJsonProvider.postDecisions() -- decision_service is a live,
+// on-demand computation (it depends on the investor's own position state,
+// which can never be autonomously discovered or precomputed into a static
+// artifact -- see CLAUDE.md's decision_service rules). Pages catch this
+// specifically to render an honest "needs a live backend" state rather than
+// a generic fetch-failure error.
+export class LiveDecisionsUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "LiveDecisionsUnavailableError";
+  }
+}
 
 // Every method here mirrors exactly one dashboard artifact file (see
 // docs/ARCHITECTURE.md's "Dashboard data providers" section) -- no
@@ -74,6 +99,7 @@ export interface DashboardDataProvider {
   getFinancialCoverage(): Promise<FinancialCoverageReport | null>;
   getSourceMetrics(): Promise<SourceMetricsRow[]>;
   getMarketBreadth(): Promise<MarketBreadthReport | null>;
+  getMarketRegime(): Promise<MarketRegimeReport | null>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;
   getTickerDataGapReport(): Promise<TickerDataGapReport[]>;
@@ -84,4 +110,22 @@ export interface DashboardDataProvider {
   getDiscoveryReport(): Promise<DiscoveryOutcome[]>;
   getDiscoveryMetrics(): Promise<DiscoveryMetrics | null>;
   getEndpointCandidates(): Promise<EndpointCandidate[]>;
+
+  // CIO Desk artifacts: the autonomous, position-unaware model portfolio's
+  // summary, monitoring warnings, and investment committee agreement.
+  getPortfolioSummary(): Promise<PortfolioSummaryReport | null>;
+  getWarnings(): Promise<MonitoringWarningsReport | null>;
+  getCommitteeSummary(): Promise<CommitteeSummaryReport | null>;
+
+  // The one write-shaped call on this interface: computes fresh, position-
+  // aware decisions on demand (see api/src/routes/decisions.ts). Never
+  // cached, never a static artifact -- StaticJsonProvider always rejects
+  // with LiveDecisionsUnavailableError.
+  postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]>;
+
+  // Capital Allocation Intelligence: same on-demand, position-aware-only
+  // shape as postDecisions -- there is nothing to rank/recycle without a
+  // real portfolio, so this is never a static artifact either (see
+  // capital_allocation/__init__.py).
+  postCapitalAllocation(request: DecideRequest): Promise<CapitalAllocationPlan>;
 }

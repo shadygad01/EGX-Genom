@@ -35,10 +35,13 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
+from agx_research.data.schemas import CorporateEvent
 from agx_research.decision_service.country_risk import CountryRiskAssessment, CountryRiskSeverity
 from agx_research.decision_service.position import PositionState
 from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.explainability import Explanation
+from agx_research.knowledge.lifecycle import KnowledgeStatus
+from agx_research.knowledge.store import KnowledgeStore
 from agx_research.meta.decision_engine import DecisionAction, HorizonDecision, PublicationStatus, Recommendation
 
 _EPS = 1e-9
@@ -56,14 +59,43 @@ class PositionAction(str, Enum):
 class PositionAwareDecision(BaseModel):
     """One ticker's position-aware decision. Never constructed without an
     `Explanation` (Principle 3, same rule every other recommendation-like
-    object in this codebase follows)."""
+    object in this codebase follows).
+
+    Fields cover the full institutional decision memo the mission requires
+    (decision, target weight, horizon, confidence, thesis, supporting and
+    contradicting evidence, key risks, active catalysts, monitoring events,
+    invalidation conditions -- on `explanation` -- and expected review
+    date), each derived from data this service already computes or is
+    handed, never fabricated.
+
+    `opportunity_score`/`expected_return`/`expected_risk` (Capital
+    Allocation Intelligence mission) expose the same
+    `HorizonDecision.risk_adjusted_score`/`expected_return`/`expected_risk`
+    this method already computes internally as first-class fields, not
+    just prose -- `capital_allocation.CapitalAllocationEngine` (and any
+    future consumer needing to rank tickers against each other) reads
+    these directly instead of re-deriving the eligibility/scoring rule a
+    second time. `opportunity_score` is the pre-cap, pre-normalization
+    score (0.0 when ineligible/abstained/not publication-ready), exactly
+    the `score` this method already used to compute `target_weight`.
+    """
 
     ticker: str
     as_of: date
     action: PositionAction
     target_weight: float
     current_weight: float
+    horizon: Horizon
     confidence: float
+    opportunity_score: float = 0.0
+    expected_return: float | None = None
+    expected_risk: float | None = None
+    investment_thesis: str
+    key_risks: list[str] = Field(default_factory=list)
+    contradicting_evidence: list[str] = Field(default_factory=list)
+    active_catalysts: list[str] = Field(default_factory=list)
+    monitoring_events: list[str] = Field(default_factory=list)
+    expected_review_date: date | None = None
     abstained: bool
     reasons: list[str] = Field(default_factory=list)
     explanation: Explanation
@@ -87,14 +119,25 @@ class DecisionService:
         *,
         country_risk: CountryRiskAssessment,
         illiquid_tickers: set[str] | None = None,
+        corporate_events: dict[str, list[CorporateEvent]] | None = None,
+        knowledge_store: KnowledgeStore | None = None,
     ) -> list[PositionAwareDecision]:
         """Evaluate every ticker with either a fresh recommendation or an
         existing position, together, since portfolio weights must be
         normalized jointly -- exactly the same reason
         `PortfolioConstructor.construct` takes the full recommendation
         list rather than one ticker at a time.
+
+        `corporate_events` (real, already-collected `CorporateEvent`s per
+        ticker) drives `active_catalysts`; `knowledge_store` (optional --
+        this service stays queryable without one) drives
+        `monitoring_events` by looking up which of a decision's own
+        evidence references are currently `KnowledgeStatus.MONITORING`.
+        Neither is fabricated if omitted -- the corresponding field is
+        simply empty, an honest gap rather than an invented one.
         """
         illiquid_tickers = illiquid_tickers or set()
+        corporate_events = corporate_events or {}
 
         scored: dict[str, tuple[float, HorizonDecision | None, Recommendation | None]] = {}
         for rec in recommendations:
@@ -118,7 +161,11 @@ class DecisionService:
             reasons: list[str] = []
 
             target_weight = (
-                min(max(score, 0.0) / total_positive_score, self.max_position_weight)
+                min(
+                    max(score, 0.0) / total_positive_score,
+                    self.max_position_weight,
+                    decision.max_position_pct if decision is not None else self.max_position_weight,
+                )
                 if total_positive_score > 0 and score > 0
                 else 0.0
             )
@@ -144,11 +191,26 @@ class DecisionService:
             elif decision.action == DecisionAction.ABSTAIN:
                 abstained = True
                 reasons.extend(decision.abstention_reasons)
+            elif decision.publication_status != PublicationStatus.PUBLICATION_READY:
+                # The model itself reached a real action (e.g. BUY_CANDIDATE),
+                # but `meta.publication_gate` hasn't cleared it -- target_weight
+                # is already zero from the eligibility check above; without this
+                # branch the decision would silently report no_action/hold with
+                # no reason naming the real cause (Principle 3/Rule 5).
+                abstained = True
+                reasons.extend(
+                    decision.abstention_reasons
+                    or ["Not publication-ready; see meta.publication_gate's blockers for the exact reason."]
+                )
 
             action = self._resolve_action(
                 position=position, target_weight=target_weight, abstained=abstained
             )
             confidence = decision.confidence if decision is not None else 0.0
+            key_risks = self._key_risks(decision, rec, reasons)
+            contradicting_evidence = self._contradicting_evidence(decision, rec, country_risk)
+            active_catalysts = self._active_catalysts(ticker, as_of, corporate_events)
+            monitoring_events = self._monitoring_events(decision, knowledge_store)
 
             decisions.append(
                 PositionAwareDecision(
@@ -157,7 +219,19 @@ class DecisionService:
                     action=action,
                     target_weight=target_weight,
                     current_weight=position.current_weight,
+                    horizon=Horizon.INVESTMENT,
                     confidence=confidence,
+                    opportunity_score=max(score, 0.0),
+                    expected_return=decision.expected_return if decision is not None else None,
+                    expected_risk=decision.expected_risk if decision is not None else None,
+                    investment_thesis=self._investment_thesis(
+                        ticker, action, target_weight, position, decision
+                    ),
+                    key_risks=key_risks,
+                    contradicting_evidence=contradicting_evidence,
+                    active_catalysts=active_catalysts,
+                    monitoring_events=monitoring_events,
+                    expected_review_date=decision.valid_until if decision is not None else None,
                     abstained=abstained,
                     reasons=reasons,
                     explanation=self._explanation(
@@ -230,3 +304,120 @@ class DecisionService:
                 list(decision.invalidation_conditions) if decision is not None else []
             ),
         )
+
+    @staticmethod
+    def _investment_thesis(
+        ticker: str,
+        action: PositionAction,
+        target_weight: float,
+        position: PositionState,
+        decision: HorizonDecision | None,
+    ) -> str:
+        """One deterministic sentence built only from this decision's own
+        already-computed numbers -- never a separately-fabricated summary."""
+        if decision is None:
+            return (
+                f"{ticker}: {action.value.replace('_', ' ')} -- no current INVESTMENT-horizon "
+                "evidence exists for this ticker."
+            )
+        return (
+            f"{ticker}: {action.value.replace('_', ' ')} to target weight {target_weight:.2%} "
+            f"(from {position.current_weight:.2%}). INVESTMENT-horizon model expects "
+            f"{decision.expected_return:+.2%} return at {decision.expected_risk:.2%} risk over "
+            f"{decision.horizon_window}, confidence {decision.confidence:.2f}, backed by "
+            f"{len(decision.evidence_refs)} evidence reference(s)."
+        )
+
+    @staticmethod
+    def _key_risks(
+        decision: HorizonDecision | None,
+        rec: Recommendation | None,
+        reasons: list[str],
+    ) -> list[str]:
+        """Structural threats to this decision -- the risk this thesis is
+        already known to carry, distinct from `contradicting_evidence`
+        (evidence actively arguing against the thesis right now)."""
+        risks: list[str] = []
+        if decision is not None:
+            risks.append(
+                f"Model-estimated risk ({decision.risk_metric}) for this horizon: "
+                f"{decision.expected_risk:.2%}."
+            )
+        if rec is not None:
+            for horizon, sibling in rec.horizon_decisions.items():
+                if horizon == Horizon.INVESTMENT:
+                    continue
+                if sibling.action == DecisionAction.AVOID:
+                    risks.append(
+                        f"{horizon.value.title()}-horizon model signals AVOID "
+                        f"(expected_return={sibling.expected_return:+.2%})."
+                    )
+        for reason in reasons:
+            if reason not in risks:
+                risks.append(reason)
+        return risks
+
+    @staticmethod
+    def _contradicting_evidence(
+        decision: HorizonDecision | None,
+        rec: Recommendation | None,
+        country_risk: CountryRiskAssessment,
+    ) -> list[str]:
+        """Real evidence that disagrees with this thesis right now -- a
+        disagreeing sibling horizon or an active country-risk finding --
+        never a restatement of `invalidation_conditions` (hypothetical
+        future conditions), which is a distinct field."""
+        contradicting: list[str] = []
+        if rec is not None:
+            for horizon, sibling in rec.horizon_decisions.items():
+                if horizon == Horizon.INVESTMENT:
+                    continue
+                if sibling.expected_return < 0 or sibling.action == DecisionAction.AVOID:
+                    contradicting.append(
+                        f"{horizon.value.title()}-horizon model expects "
+                        f"{sibling.expected_return:+.2%} return (confidence "
+                        f"{sibling.confidence:.2f}), disagreeing with the INVESTMENT-horizon "
+                        "thesis."
+                    )
+        if country_risk.severity != CountryRiskSeverity.NORMAL:
+            contradicting.extend(country_risk.reasons)
+        return contradicting
+
+    @staticmethod
+    def _active_catalysts(
+        ticker: str,
+        as_of: date,
+        corporate_events: dict[str, list[CorporateEvent]],
+    ) -> list[str]:
+        """Real, already-collected upcoming `CorporateEvent`s for this
+        ticker -- the same event source `OpportunityCenter`'s "Upcoming
+        Catalysts" panel already reads, never a separately-derived guess."""
+        upcoming = sorted(
+            (event for event in corporate_events.get(ticker, []) if event.event_date >= as_of),
+            key=lambda event: event.event_date,
+        )[:5]
+        return [f"{event.event_date.isoformat()}: {event.event_type} -- {event.description}" for event in upcoming]
+
+    @staticmethod
+    def _monitoring_events(
+        decision: HorizonDecision | None,
+        knowledge_store: KnowledgeStore | None,
+    ) -> list[str]:
+        """Which of this decision's own supporting knowledge objects are
+        currently in `KnowledgeStatus.MONITORING` -- real continuous-
+        learning state, not a generic reminder to "keep watching"."""
+        if decision is None or knowledge_store is None:
+            return []
+        monitoring: list[str] = []
+        seen: set[str] = set()
+        for ref in decision.evidence_refs:
+            if ref.kind != "knowledge" or ref.ref_id in seen:
+                continue
+            seen.add(ref.ref_id)
+            knowledge = knowledge_store.latest(ref.ref_id)
+            if knowledge is not None and knowledge.status == KnowledgeStatus.MONITORING:
+                monitoring.append(
+                    f"{knowledge.id}: {knowledge.economic_explanation} "
+                    f"(confidence={knowledge.confidence:.2f}, status=monitoring)."
+                )
+        return monitoring

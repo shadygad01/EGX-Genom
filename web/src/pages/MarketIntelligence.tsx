@@ -12,17 +12,17 @@ import styles from "./MarketIntelligence.module.css";
 
 /** Market-wide context: universe composition, sector breakdown, the latest
  * macro observations AGX tracks, corporate actions across every covered
- * ticker, and market breadth/liquidity (advance/decline, volume breadth --
- * `market_breadth.json`, computed entirely in `market_memory.breadth`
- * through the platform's own return-adjustment rule, never here). Market
- * Regime is still an honest gap -- no classification artifact exists
- * upstream yet. */
+ * ticker, market breadth/liquidity (advance/decline, volume breadth --
+ * `market_breadth.json`), and market regime (trend/volatility --
+ * `market_regime.json`) -- both computed entirely in `market_memory`
+ * through the platform's own return-adjustment rule, never here. */
 export function MarketIntelligence() {
   const { t } = useTranslation("marketIntelligence");
   const label = useEnumLabel();
   const { formatDate } = useFormatters();
   const marketState = useArtifact((p) => p.getMarketState());
   const breadth = useArtifact((p) => p.getMarketBreadth());
+  const regime = useArtifact((p) => p.getMarketRegime());
 
   const sectors = marketState.data?.sectors ?? {};
   const constituents = marketState.data?.constituents ?? {};
@@ -180,8 +180,45 @@ export function MarketIntelligence() {
           )}
         </Card>
 
-        <Card title={t("marketRegime.title")}>
-          <EmptyState title={t("marketRegime.emptyTitle")} detail={t("marketRegime.emptyDetail")} />
+        <Card title={t("marketRegime.title")} subtitle={t("marketRegime.subtitle")}>
+          {regime.loading && <LoadingState rows={2} />}
+          {regime.error && <ErrorState detail={regime.error.message} onRetry={regime.reload} />}
+          {!regime.loading && !regime.error && !regime.data && (
+            <EmptyState title={t("marketRegime.emptyTitle")} detail={t("marketRegime.emptyDetail")} />
+          )}
+          {regime.data && (
+            <>
+              <div className={styles.grid}>
+                <StatTile label={t("marketRegime.trend")} value={label("marketTrend", regime.data.trend)} />
+                <StatTile label={t("marketRegime.volatility")} value={label("volatilityLevel", regime.data.volatility)} />
+                <StatTile
+                  label={t("marketRegime.cumulativeReturn")}
+                  value={
+                    regime.data.cumulative_return_pct == null
+                      ? "—"
+                      : formatSignedPercent(regime.data.cumulative_return_pct / 100)
+                  }
+                />
+                <StatTile
+                  label={t("marketRegime.volatilityPct")}
+                  value={regime.data.daily_volatility_pct == null ? "—" : formatSignedPercent(regime.data.daily_volatility_pct / 100)}
+                />
+              </div>
+              <p className={styles.footnote}>
+                {t("marketRegime.coverage", {
+                  days: regime.data.trading_days_observed,
+                  tickers: regime.data.tickers_with_sufficient_data,
+                })}
+              </p>
+              {regime.data.reasons.length > 0 && (
+                <ul className={styles.compactList}>
+                  {regime.data.reasons.map((r, i) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
         </Card>
       </div>
     </>

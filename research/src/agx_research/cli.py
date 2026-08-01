@@ -42,22 +42,26 @@ from agx_research.collectors.service import CollectionService
 from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.dashboard import validate_dashboard_artifacts, write_dashboard_artifacts
 from agx_research.dashboard.validate import DashboardArtifactError
+from agx_research.capital_allocation import CapitalAllocationEngine
 from agx_research.decision_service.country_risk import assess_country_risk
 from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
 from agx_research.decision_service.position import PositionState
-from agx_research.decision_service.service import DecisionService
+from agx_research.decision_service.service import DecisionService, PositionAwareDecision
 from agx_research.discovery.web_search_hints import load_web_search_domain_hints
 from agx_research.data.mock_provider import LocalCsvDataProvider, MockDataProvider
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
 from agx_research.financials.collected import CollectedFinancialStatementProvider
 from agx_research.infrastructure.backup import create_backup, restore_backup, verify_backup
+from agx_research.institutional_validation.runner import run_institutional_validation
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_ledger import DecisionLedger
 from agx_research.meta.publication_gate import (
     ExternalPublicationEvidence,
     LegalPublicationApproval,
+    PublicationGateReport,
+    apply_publication_gate,
     evaluate_publication_gate,
 )
 from agx_research.meta.recommendation_service import RecommendationService
@@ -93,6 +97,121 @@ def build_market_memory(data_dir: Path, mock_data: Path) -> MarketMemory:
         lookback_days=30,
         event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
     )
+
+
+def build_publication_gate_report(data_dir: Path, as_of: date) -> PublicationGateReport:
+    """The one real assembly of a `PublicationGateReport` -- shared by
+    `publication-status` (reports it) and `decide` (applies it via
+    `apply_publication_gate()` before scoring a portfolio). Before this was
+    shared, `decide` never called `apply_publication_gate()` at all, so
+    every `HorizonDecision.publication_status` silently stayed at its
+    `MetaDecisionEngine` default (`RESEARCH_ONLY`) and `max_position_pct`
+    stayed `0.0` regardless of real evidence strength -- `agx decide`
+    always produced `no_action`/zero target weight, with no reason in the
+    decision's own `explanation` naming the real cause (the fail-closed
+    publication gate, not "no positive expectancy"). Read-only: uses the
+    persisted registry/ledger/evidence files when they exist, never writes
+    to the inspected `--data-dir`.
+    """
+    input_errors: list[str] = []
+    external = None
+    legal = None
+    external_path = data_dir / "publication_evidence.json"
+    legal_path = data_dir / "legal_publication_approval.json"
+    if external_path.exists():
+        try:
+            external = ExternalPublicationEvidence.model_validate_json(
+                external_path.read_text(encoding="utf-8")
+            )
+        except (ValueError, OSError) as exc:
+            input_errors.append(f"publication_evidence.json invalid: {exc}")
+    else:
+        input_errors.append("publication_evidence.json missing")
+    if legal_path.exists():
+        try:
+            legal = LegalPublicationApproval.model_validate_json(legal_path.read_text(encoding="utf-8"))
+        except (ValueError, OSError) as exc:
+            input_errors.append(f"legal_publication_approval.json invalid: {exc}")
+    else:
+        input_errors.append("legal_publication_approval.json missing")
+
+    registry_path = data_dir / "source_registry.json"
+    registry = seed_registry(SourceRegistry(registry_path) if registry_path.exists() else SourceRegistry())
+    return evaluate_publication_gate(
+        DecisionLedger(data_dir / "decision_ledger.json").performance_summary(),
+        as_of=as_of,
+        external=external,
+        legal=legal,
+        raw_documents=RawDocumentRepository(data_dir / "raw_documents.json").all_latest(),
+        legally_cleared_source_ids={
+            source.id for source in registry.all_latest() if source.legal_use_status.value == "cleared"
+        },
+        input_errors=input_errors,
+    )
+
+
+def build_position_aware_decisions(
+    data_dir: Path, universe_seed_dir: Path, as_of: date, positions_path: Path | None
+) -> list[PositionAwareDecision]:
+    """Shared setup for `decide` and `allocate-capital` -- both need the
+    exact same real `MarketState`/positions/publication-gated
+    recommendations, computed once and fed to
+    `DecisionService.decide_portfolio()`. Factored out so
+    `allocate-capital` composes `decide`'s own real evidence rather than
+    reconstructing it a second time.
+    """
+    materialize_universe_seed(universe_seed_dir, data_dir)
+    market_memory = MarketMemory(
+        LocalCsvDataProvider(data_dir),
+        CollectedUniverseProvider(data_dir),
+        StaticSectorProvider(),
+        macro_series_ids=MACRO_SERIES_IDS,
+        lookback_days=30,
+        event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
+        financials_provider=CollectedFinancialStatementProvider(data_dir),
+    )
+    market_state = market_memory.reconstruct(as_of)
+    snapshot = market_state.dataset_snapshot
+
+    positions: dict[str, PositionState] = {}
+    if positions_path is not None:
+        raw_positions = json.loads(positions_path.read_text(encoding="utf-8"))
+        positions = {
+            ticker: PositionState(ticker=ticker, **fields) for ticker, fields in raw_positions.items()
+        }
+
+    knowledge_store = KnowledgeStore(data_dir / "knowledge.json")
+    recommendation_service = RecommendationService(knowledge_store, event_platform=market_memory.event_platform)
+    tickers = sorted(set(snapshot.tickers) | set(positions))
+    recommendations = recommendation_service.recommend(tickers, as_of)
+    # Same real publication gate `agx publication-status` reports on -- see
+    # `build_publication_gate_report`'s own docstring for why this must
+    # run before scoring.
+    gate_report = build_publication_gate_report(data_dir, as_of)
+    recommendations = apply_publication_gate(recommendations, gate_report)
+
+    country_risk = assess_country_risk(snapshot.macro_series, as_of)
+    illiquid_tickers = compute_illiquid_tickers(snapshot)
+
+    return DecisionService().decide_portfolio(
+        recommendations,
+        positions,
+        as_of,
+        country_risk=country_risk,
+        illiquid_tickers=illiquid_tickers,
+        corporate_events=snapshot.corporate_events,
+        knowledge_store=knowledge_store,
+    )
+
+
+def _print_json(payload_obj: object) -> None:
+    payload = json.dumps(payload_obj, ensure_ascii=False, indent=2)
+    try:
+        payload.encode(sys.stdout.encoding or "utf-8")
+    except UnicodeEncodeError:
+        sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
+    else:
+        print(payload)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -292,6 +411,65 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help='JSON file: {"TICKER": {"held": true, "current_weight": 0.05, '
         '"average_cost": 12.3}}. A ticker absent from this file is treated as not held.',
+    )
+
+    allocate_capital_parser = sub.add_parser(
+        "allocate-capital",
+        help="Capital Allocation Intelligence: rank every ticker `decide` would evaluate "
+        "against every other one for the same capital budget, and produce a deployment "
+        "queue, an opportunity-cost note per proposal, and a capital-recycling ledger "
+        "(which released holding funded which new one, or cash). Composes `decide`'s own "
+        "real evidence -- read-only, queried on demand, never run on a schedule (same "
+        "constraint as `decide`; see capital_allocation/__init__.py).",
+    )
+    allocate_capital_parser.add_argument("--date", required=True, help="Decision date (ISO)")
+    allocate_capital_parser.add_argument(
+        "--positions",
+        type=Path,
+        default=None,
+        help='JSON file: {"TICKER": {"held": true, "current_weight": 0.05, '
+        '"average_cost": 12.3}}. A ticker absent from this file is treated as not held.',
+    )
+
+    validate_investment_parser = sub.add_parser(
+        "validate-investment",
+        help="Institutional Investment Validation: stress-test the decision engine against "
+        "10 repeatable scenarios (full-universe ranking, rejection, cash, portfolio "
+        "construction, benchmark comparison, thesis-failure detection, change attribution, "
+        "evidence traceability). Self-contained -- ignores --data-dir except to report real "
+        "mock price coverage honestly; exits 2 only if a scenario finds a genuine defect.",
+    )
+    validate_investment_parser.add_argument(
+        "--out", type=Path, default=None, help="Write the JSON report to this path (in addition to stdout)."
+    )
+    validate_investment_parser.add_argument(
+        "--markdown-out", type=Path, default=None, help="Also write a human-readable Markdown report."
+    )
+
+    investment_proof_parser = sub.add_parser(
+        "investment-proof",
+        help="Investment Proof Framework: runs Institutional Investment Validation plus decision "
+        "attribution, counterfactual analysis, committee validation, portfolio validation, "
+        "decision stability, thesis-survival, confidence-calibration and walk-forward readiness "
+        "checks, and assembles the final Capital Trust Report (would a rational institutional "
+        "investment committee trust this system with capital?). Self-contained, synthetic-data "
+        "based -- exits 2 only if a dimension finds a genuine (FAIL) defect, never for an honest "
+        "READY FOR DATA gap.",
+    )
+    investment_proof_parser.add_argument(
+        "--date", default=None, help="As-of date (ISO). Defaults to the same date validate-investment uses."
+    )
+    investment_proof_parser.add_argument(
+        "--ticker-limit",
+        type=int,
+        default=15,
+        help="How many real EGX30 tickers to build the shared synthetic scenario from.",
+    )
+    investment_proof_parser.add_argument(
+        "--out", type=Path, default=None, help="Write the JSON report to this path (in addition to stdout)."
+    )
+    investment_proof_parser.add_argument(
+        "--markdown-out", type=Path, default=None, help="Also write a human-readable Markdown Capital Trust Report."
     )
 
     args = parser.parse_args(argv)
@@ -600,50 +778,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "publication-status":
         as_of = date.fromisoformat(args.date)
-        input_errors: list[str] = []
-        external = None
-        legal = None
-        external_path = args.data_dir / "publication_evidence.json"
-        legal_path = args.data_dir / "legal_publication_approval.json"
-        if external_path.exists():
-            try:
-                external = ExternalPublicationEvidence.model_validate_json(
-                    external_path.read_text(encoding="utf-8")
-                )
-            except (ValueError, OSError) as exc:
-                input_errors.append(f"publication_evidence.json invalid: {exc}")
-        else:
-            input_errors.append("publication_evidence.json missing")
-        if legal_path.exists():
-            try:
-                legal = LegalPublicationApproval.model_validate_json(
-                    legal_path.read_text(encoding="utf-8")
-                )
-            except (ValueError, OSError) as exc:
-                input_errors.append(f"legal_publication_approval.json invalid: {exc}")
-        else:
-            input_errors.append("legal_publication_approval.json missing")
-
-        registry_path = args.data_dir / "source_registry.json"
-        # Status inspection must be read-only. Use the persisted registry when
-        # it exists; otherwise evaluate against an in-memory seeded registry
-        # without creating files in the inspected production directory.
-        registry = seed_registry(
-            SourceRegistry(registry_path) if registry_path.exists() else SourceRegistry()
-        )
-        report = evaluate_publication_gate(
-            DecisionLedger(args.data_dir / "decision_ledger.json").performance_summary(),
-            as_of=as_of,
-            external=external,
-            legal=legal,
-            raw_documents=RawDocumentRepository(args.data_dir / "raw_documents.json").all_latest(),
-            legally_cleared_source_ids={
-                source.id
-                for source in registry.all_latest()
-                if source.legal_use_status.value == "cleared"
-            },
-            input_errors=input_errors,
-        )
+        report = build_publication_gate_report(args.data_dir, as_of)
         payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
         try:
             payload.encode(sys.stdout.encoding or "utf-8")
@@ -658,57 +793,59 @@ def main(argv: list[str] | None = None) -> int:
             print(payload)
         return 0 if report.publication_ready else 2
 
-    if args.command == "decide":
-        as_of = date.fromisoformat(args.date)
-        materialize_universe_seed(args.universe_seed_dir, args.data_dir)
-        market_memory = MarketMemory(
-            LocalCsvDataProvider(args.data_dir),
-            CollectedUniverseProvider(args.data_dir),
-            StaticSectorProvider(),
-            macro_series_ids=MACRO_SERIES_IDS,
-            lookback_days=30,
-            event_platform=EventPlatform(repository=EventRepository(args.data_dir / "events.json")),
-            financials_provider=CollectedFinancialStatementProvider(args.data_dir),
-        )
-        market_state = market_memory.reconstruct(as_of)
-        snapshot = market_state.dataset_snapshot
+    if args.command == "validate-investment":
+        from agx_research.institutional_validation.report import CheckVerdict
 
-        positions: dict[str, PositionState] = {}
-        if args.positions is not None:
-            raw_positions = json.loads(args.positions.read_text(encoding="utf-8"))
-            positions = {
-                ticker: PositionState(ticker=ticker, **fields)
-                for ticker, fields in raw_positions.items()
-            }
-
-        knowledge_store = KnowledgeStore(args.data_dir / "knowledge.json")
-        recommendation_service = RecommendationService(
-            knowledge_store, event_platform=market_memory.event_platform
-        )
-        tickers = sorted(set(snapshot.tickers) | set(positions))
-        recommendations = recommendation_service.recommend(tickers, as_of)
-
-        country_risk = assess_country_risk(snapshot.macro_series, as_of)
-        illiquid_tickers = compute_illiquid_tickers(snapshot)
-
-        decisions = DecisionService().decide_portfolio(
-            recommendations,
-            positions,
-            as_of,
-            country_risk=country_risk,
-            illiquid_tickers=illiquid_tickers,
-        )
-        payload = json.dumps(
-            [decision.model_dump(mode="json") for decision in decisions],
-            ensure_ascii=False,
-            indent=2,
-        )
+        report = run_institutional_validation()
+        payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
+        if args.out is not None:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(payload, encoding="utf-8")
+        if args.markdown_out is not None:
+            args.markdown_out.parent.mkdir(parents=True, exist_ok=True)
+            args.markdown_out.write_text(report.to_markdown(), encoding="utf-8")
         try:
             payload.encode(sys.stdout.encoding or "utf-8")
         except UnicodeEncodeError:
             sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
         else:
             print(payload)
+        return 0 if report.overall_verdict != CheckVerdict.FAIL else 2
+
+    if args.command == "investment-proof":
+        from agx_research.institutional_validation.report import CheckVerdict
+        from agx_research.institutional_validation.runner import DEFAULT_AS_OF
+        from agx_research.investment_proof.capital_trust import InvestmentProofEngine
+
+        as_of = date.fromisoformat(args.date) if args.date else DEFAULT_AS_OF
+        report = InvestmentProofEngine().run(as_of, ticker_limit=args.ticker_limit)
+        payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
+        if args.out is not None:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(payload, encoding="utf-8")
+        if args.markdown_out is not None:
+            args.markdown_out.parent.mkdir(parents=True, exist_ok=True)
+            args.markdown_out.write_text(report.to_markdown(), encoding="utf-8")
+        try:
+            payload.encode(sys.stdout.encoding or "utf-8")
+        except UnicodeEncodeError:
+            sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
+        else:
+            print(payload)
+        has_fail = any(d.verdict == CheckVerdict.FAIL for d in report.dimensions)
+        return 0 if not has_fail else 2
+
+    if args.command == "decide":
+        as_of = date.fromisoformat(args.date)
+        decisions = build_position_aware_decisions(args.data_dir, args.universe_seed_dir, as_of, args.positions)
+        _print_json([decision.model_dump(mode="json") for decision in decisions])
+        return 0
+
+    if args.command == "allocate-capital":
+        as_of = date.fromisoformat(args.date)
+        decisions = build_position_aware_decisions(args.data_dir, args.universe_seed_dir, as_of, args.positions)
+        plan = CapitalAllocationEngine().build(decisions, as_of)
+        _print_json(plan.model_dump(mode="json"))
         return 0
 
     return 1

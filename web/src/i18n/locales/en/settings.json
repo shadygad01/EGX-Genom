@@ -1,0 +1,199 @@
+{
+  "groups": {
+    "mission": "Mission & Business Status",
+    "system": "System & Operations"
+  },
+  "missionStatus": {
+    "title": "Mission Status",
+    "description": "The current production pipeline's status, per the most recent Mission Control update.",
+    "emptyTitle": "No mission status yet",
+    "emptyDetail": "Available once the full production pipeline (agx run) executes.",
+    "pipelineStatus": "Pipeline Status",
+    "pipelineVersion": "Pipeline Version",
+    "executionMode": "Execution Mode",
+    "duration": "Duration",
+    "totalExecutions": "Total Executions",
+    "lastSuccessfulRun": "Last Successful Run",
+    "lastFailedRun": "Last Failed Run"
+  },
+  "financialCoverage": {
+    "title": "Financial Data Coverage",
+    "description": "Coverage requires at least one real reported financial item for every universe ticker; missing depth remains visible.",
+    "emptyTitle": "No financial coverage report yet",
+    "covered": "Covered Tickers",
+    "percent": "Coverage",
+    "status": "Completion Status",
+    "complete": "Complete",
+    "incomplete": "Incomplete",
+    "asOf": "As Of"
+  },
+  "knowledgeStatus": {
+    "title": "Knowledge Status",
+    "subtitle": "Knowledge objects by lifecycle status",
+    "emptyTitle": "No knowledge status yet",
+    "total": "Total"
+  },
+  "genomeStatus": {
+    "title": "Genome Status",
+    "subtitle": "Genes by lifecycle status",
+    "emptyTitle": "No genes yet",
+    "total": "Total",
+    "promoted": "Promoted",
+    "monitoring": "Monitoring",
+    "replaced": "Replaced",
+    "retired": "Retired"
+  },
+  "collectors": {
+    "title": "Collectors",
+    "description": "Output of each source's most recent collection run.",
+    "catalogued": "Catalogued",
+    "collected": "Collected",
+    "degraded": "Degraded",
+    "wiredStandby": "Wired Standby",
+    "failed": "Failed",
+    "notYetWired": "Not Yet Wired",
+    "emptyTitle": "No collector runs yet",
+    "source": "Source",
+    "status": "Status",
+    "health": "Health",
+    "notMeasured": "Not Measured",
+    "connected": "Connected",
+    "notRun": "Not Run",
+    "yes": "Yes",
+    "no": "No",
+    "parsed": "Parsed",
+    "yield": "Yield",
+    "breakdown": "Breakdown",
+    "events": "Events",
+    "documents": "Documents",
+    "withheld": "Withheld",
+    "reputation": "Reputation",
+    "quality": "Quality",
+    "reason": "Reason",
+    "yieldParts": {
+      "price": "{{count}} price",
+      "macro": "{{count}} macro",
+      "news": "{{count}} news",
+      "corporateActions": "{{count}} corp. actions",
+      "index": "{{count}} index",
+      "financials": "{{count}} financials"
+    }
+  },
+  "sourceHealth": {
+    "title": "Source Health",
+    "subtitle": "Rollup across the full source registry -- see Research → Source Intelligence for per-source detail",
+    "emptyTitle": "No source registry yet",
+    "implemented": "Implemented",
+    "healthy": "Healthy",
+    "degraded": "Degraded",
+    "down": "Down"
+  },
+  "currentBlockers": {
+    "title": "Current Blockers",
+    "emptyTitle": "No blockers",
+    "emptyDetail": "The most recent execution reported no errors or warnings.",
+    "error": "Error",
+    "warning": "Warning"
+  },
+  "acquisitionDecisions": {
+    "title": "Acquisition Decisions",
+    "description": "Every capability's ranked acquisition strategies this run -- which source was selected, and why every other candidate was skipped, failed, or produced nothing usable. A capability is never tied to one website: this is the runtime Acquisition Decision Engine's own record of the fallback chain it evaluated.",
+    "emptyTitle": "No acquisition decisions yet",
+    "capability": "Capability",
+    "status": "Status",
+    "satisfied": "Satisfied",
+    "unsatisfied": "Unsatisfied",
+    "selectedStrategy": "Selected Strategy",
+    "strategiesConsidered": "Strategies Considered",
+    "topRankedStrategy": "Top-Ranked Strategy"
+  },
+  "weeklyDiscovery": {
+    "title": "Weekly Discovery",
+    "description": "The Acquisition Intelligence Engine's own scheduled, evidenced attempt to verify a real endpoint for every catalogued PLANNED/CANDIDATE source (see .github/workflows/discovery.yml) -- never an automatic promotion, always a human-reviewed pull request.",
+    "sourcesInReport": "Sources In Report",
+    "verifiedReachable": "Verified Reachable",
+    "checkedFresh": "Checked Fresh",
+    "servedFromCache": "Served From Cache",
+    "lastRun": "Last Run",
+    "emptyTitle": "No discovery report yet",
+    "emptyDetail": "Published once the weekly workflow's pull request merges -- see docs/DATA_ACQUISITION.md's Discovery workflow section.",
+    "source": "Source",
+    "result": "Result",
+    "endpoint": "Endpoint",
+    "confidence": "Confidence",
+    "cache": "Cache",
+    "cached": "Cached",
+    "fresh": "Fresh",
+    "recommendation": "Recommendation"
+  },
+  "runtime": {
+    "title": "Runtime & Versions",
+    "description": "The pipeline version and mode behind the most recent execution.",
+    "emptyTitle": "No execution report yet",
+    "pipelineVersion": "Pipeline Version",
+    "executionMode": "Execution Mode",
+    "overallStatus": "Overall Status",
+    "runDates": "Run Dates",
+    "started": "Started",
+    "completed": "Completed",
+    "duration": "Duration"
+  },
+  "configuration": {
+    "title": "Configuration",
+    "subtitle": "Where this run's artifacts were written, and which stages were skipped",
+    "emptyTitle": "No configuration data yet",
+    "dashboardDirectory": "Dashboard directory:",
+    "skippedStages": "Skipped stages:",
+    "noSkippedStages": "No stages were skipped in the most recent run."
+  },
+  "replay": {
+    "title": "Replay",
+    "currentMode": "Current mode: {{mode}}",
+    "notYetRun": "Not yet run",
+    "detail": "Replay mode re-executes the identical pipeline against already-archived RawDocuments from a prior run, proving the pipeline cannot distinguish live data from replayed data. No dedicated replay-history artifact exists separately from Execution History below."
+  },
+  "artifacts": {
+    "title": "Artifacts",
+    "description": "Every dashboard artifact file written by the most recent run, and how many records it holds.",
+    "totalArtifacts": "Total Artifacts",
+    "emptyTitle": "No artifacts recorded yet",
+    "artifact": "Artifact",
+    "records": "Records"
+  },
+  "performance": {
+    "title": "Performance",
+    "description": "Every stage of the most recent execution, slowest first.",
+    "emptyTitle": "No stage timing recorded yet",
+    "stage": "Stage",
+    "status": "Status",
+    "duration": "Duration"
+  },
+  "pipelineHealth": {
+    "title": "Pipeline Health",
+    "description": "Every stage of the most recent execution, in order.",
+    "emptyTitle": "No execution report yet",
+    "emptyTitleStages": "No stages recorded",
+    "stage": "Stage",
+    "status": "Status",
+    "duration": "Duration",
+    "detail": "Detail",
+    "warnings": "Warnings"
+  },
+  "executionHistory": {
+    "title": "Execution History",
+    "description": "Every research-cycle run recorded, including research outcomes, error, and session detail.",
+    "emptyTitle": "No runs recorded yet",
+    "runDate": "Run Date",
+    "status": "Status",
+    "hypotheses": "Hypotheses",
+    "promoted": "Promoted",
+    "session": "Session",
+    "error": "Error",
+    "completed": "Completed"
+  },
+  "logs": {
+    "title": "Logs",
+    "notYetAvailable": "Not yet available",
+    "detail": "No artifact carries raw log lines yet -- this section will populate once one exists, rather than fabricating a log stream."
+  }
+}

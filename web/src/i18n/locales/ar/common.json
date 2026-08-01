@@ -8,15 +8,16 @@
     "text": "AGX منصة بحث آلية مستقلة، وليست جهة استشارية استثمارية مرخصة. لا يمثل أي محتوى هنا نصيحة استثمارية أو توصية بشراء أو بيع أي ورقة مالية — تحقق بشكل مستقل واستشر متخصصًا مرخصًا قبل اتخاذ أي إجراء."
   },
   "nav": {
-    "aiBriefing": "موجز الذكاء الاصطناعي",
-    "opportunityCenter": "مركز الفرص",
-    "marketIntelligence": "استخبارات السوق",
-    "researchCenter": "مركز الأبحاث",
+    "cioDesk": "مكتب المدير الاستثماري",
+    "portfolio": "المحفظة",
+    "investmentCases": "الحالات الاستثمارية",
+    "monitoring": "المتابعة",
+    "market": "السوق",
+    "research": "الأبحاث",
+    "settings": "الإعدادات",
     "knowledgeGraph": "مخطط المعرفة",
-    "missionControl": "مركز التحكم",
     "sourceIntelligence": "استخبارات المصادر",
-    "systemAdministration": "إدارة النظام",
-    "companyWorkspace": "مساحة أبحاث الشركة"
+    "investmentCaseDetail": "الحالة الاستثمارية"
   },
   "topbar": {
     "nominal": "طبيعي",
@@ -49,7 +50,8 @@
     "expRisk": "المخاطرة المتوقعة",
     "blockers": "المعوقات",
     "nextActions": "الإجراءات التالية",
-    "noSignal": "لا توجد إشارة"
+    "noSignal": "لا توجد إشارة",
+    "noSector": "غير مصنّف"
   },
   "a11y": {
     "mainNavigation": "التنقل الرئيسي"
@@ -232,6 +234,43 @@
       "income_statement": "قائمة الدخل",
       "balance_sheet": "الميزانية العمومية",
       "cash_flow": "قائمة التدفقات النقدية"
+    },
+    "marketTrend": { "bullish": "صاعد", "bearish": "هابط", "neutral": "محايد" },
+    "volatilityLevel": { "low": "منخفض", "elevated": "مرتفع نسبيًا", "high": "مرتفع" },
+    "warningCategory": {
+      "broken_thesis": "فرضية منهارة",
+      "macro_risk_increased": "ارتفاع المخاطر الكلية",
+      "catalyst_expired": "انتهاء المحفز",
+      "liquidity_deterioration": "تراجع السيولة",
+      "portfolio_concentration": "تركّز المحفظة",
+      "review_required": "مطلوب مراجعة"
+    },
+    "committee": {
+      "macro": "لجنة الاقتصاد الكلي",
+      "sector": "لجنة القطاع",
+      "quality": "لجنة الجودة",
+      "value": "لجنة القيمة",
+      "catalyst": "لجنة المحفزات",
+      "technical": "لجنة التحليل الفني",
+      "liquidity": "لجنة السيولة",
+      "risk": "لجنة المخاطر",
+      "portfolio": "لجنة المحفظة",
+      "chief_investment_officer": "المدير الاستثماري"
+    },
+    "committeeStance": {
+      "aligned": "متوافقة",
+      "diverging": "متباينة",
+      "mixed": "مختلطة",
+      "no_data": "لا تتوفر بيانات",
+      "normal": "طبيعية",
+      "elevated": "مرتفعة",
+      "consistent": "متسقة",
+      "conflicted": "متعارضة"
+    },
+    "concentrationStatus": {
+      "diversified": "متنوّعة",
+      "concentrated": "متركّزة",
+      "not_evaluated": "لم يتم التقييم"
     }
   }
 }

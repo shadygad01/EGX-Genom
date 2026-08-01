@@ -8,17 +8,23 @@ interface NavItem {
   icon: string;
 }
 
-// The 9 sections, in the mission's canonical order -- AI Briefing is the
-// landing page (index route), everything else is a first-class nav entry.
+// The 7-item Institutional Investment Operating System hierarchy, in
+// investment-workflow order: decision first (CIO Desk), then portfolio
+// state, then the evidence behind any one company, then what changed,
+// then the wider environment, then internal research capability (never
+// the default destination), then system configuration. Knowledge Graph
+// and Source Intelligence remain real routes but are deliberately not
+// top-level nav items -- they're reachable from Research (see
+// ResearchCenter's "More Research Tools" links) since they're deeper
+// internal-capability views, not investment-workflow destinations.
 const NAV_ITEMS: NavItem[] = [
-  { to: "/", labelKey: "nav.aiBriefing", icon: "◆" },
-  { to: "/opportunities", labelKey: "nav.opportunityCenter", icon: "◎" },
-  { to: "/market", labelKey: "nav.marketIntelligence", icon: "▤" },
-  { to: "/research", labelKey: "nav.researchCenter", icon: "⚗" },
-  { to: "/knowledge-graph", labelKey: "nav.knowledgeGraph", icon: "◈" },
-  { to: "/mission-control", labelKey: "nav.missionControl", icon: "⌘" },
-  { to: "/sources", labelKey: "nav.sourceIntelligence", icon: "⛁" },
-  { to: "/admin", labelKey: "nav.systemAdministration", icon: "⚙" },
+  { to: "/", labelKey: "nav.cioDesk", icon: "◆" },
+  { to: "/portfolio", labelKey: "nav.portfolio", icon: "▣" },
+  { to: "/cases", labelKey: "nav.investmentCases", icon: "◎" },
+  { to: "/monitoring", labelKey: "nav.monitoring", icon: "◉" },
+  { to: "/market", labelKey: "nav.market", icon: "▤" },
+  { to: "/research", labelKey: "nav.research", icon: "⚗" },
+  { to: "/settings", labelKey: "nav.settings", icon: "⚙" },
 ];
 
 export function Sidebar() {

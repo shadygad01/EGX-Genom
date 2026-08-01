@@ -381,6 +381,7 @@ def test_artifact_generation_writes_every_expected_file(tmp_path):
         "financial_coverage.json",
         "source_metrics.json",
         "market_breadth.json",
+        "market_regime.json",
     }
     for filename in expected:
         assert (dashboard_out / filename).exists(), filename
@@ -398,6 +399,7 @@ def test_artifacts_validate_against_dashboard_validator(tmp_path):
     assert "execution_report.json" in counts
     assert "mission_status.json" in counts
     assert "market_breadth.json" in counts
+    assert "market_regime.json" in counts
 
 
 def test_market_breadth_reflects_real_universe_advancers_and_decliners(tmp_path):
@@ -411,6 +413,18 @@ def test_market_breadth_reflects_real_universe_advancers_and_decliners(tmp_path)
     assert breadth["advancers"] + breadth["decliners"] + breadth["unchanged"] == (
         breadth["tickers_with_price_data"]
     )
+
+
+def test_market_regime_reflects_real_universe_price_history(tmp_path):
+    dashboard_out = tmp_path / "dashboard"
+    pipeline = make_pipeline(tmp_path / "data")
+    pipeline.run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+
+    regime = json.loads((dashboard_out / "market_regime.json").read_text())
+    assert regime is not None
+    assert regime["trend"] in {"bullish", "bearish", "neutral"}
+    assert regime["volatility"] in {"low", "elevated", "high"}
+    assert len(regime["reasons"]) >= 2
 
 
 def test_pipeline_reports_missing_publication_controls_and_stays_all_cash(tmp_path):

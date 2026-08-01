@@ -7,7 +7,7 @@ export interface AppShellProps {
   children: ReactNode;
 }
 
-/** The persistent frame -- left nav across all 9 sections plus the status
+/** The persistent frame -- left nav across all 7 sections plus the status
  * top bar -- every routed page renders inside this, never its own layout. */
 export function AppShell({ children }: AppShellProps) {
   return (

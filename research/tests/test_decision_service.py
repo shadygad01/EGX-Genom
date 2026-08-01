@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
 from agx_research.config import Horizon
+from agx_research.data.schemas import CorporateEvent
 from agx_research.decision_service.country_risk import CountryRiskAssessment, CountryRiskSeverity
 from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
 from agx_research.decision_service.position import PositionState
@@ -8,10 +9,15 @@ from agx_research.decision_service.service import (
     DecisionService,
     PositionAction,
 )
-from agx_research.domain.provenance import Provenance
+from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.explainability import Explanation
 from agx_research.horizons.base import Prediction
+from agx_research.knowledge.lifecycle import KnowledgeStatus
+from agx_research.knowledge.schema import KnowledgeObject
+from agx_research.knowledge.store import KnowledgeStore
 from agx_research.meta.decision_engine import DecisionAction, MetaDecisionEngine, PublicationStatus
+from agx_research.meta.publication_gate import PublicationGateReport, apply_publication_gate
+from agx_research.validation.statistical import StatisticalEvidence
 
 NO_RISK = CountryRiskAssessment(as_of=date(2026, 6, 14), severity=CountryRiskSeverity.NORMAL)
 
@@ -22,10 +28,12 @@ def make_prediction(
     expected_risk: float,
     confidence: float,
     reference_price: float | None = 100.0,
+    horizon: Horizon = Horizon.INVESTMENT,
+    explanation: Explanation | None = None,
 ) -> Prediction:
     return Prediction(
         ticker=ticker,
-        horizon=Horizon.INVESTMENT,
+        horizon=horizon,
         as_of=date(2026, 6, 14),
         model_id="investment_alpha",
         model_version="0.1.0",
@@ -33,7 +41,8 @@ def make_prediction(
         expected_risk=expected_risk,
         confidence=confidence,
         reference_price=reference_price,
-        explanation=Explanation(why_this_stock="test", why_now="test", why_not_others="test"),
+        explanation=explanation
+        or Explanation(why_this_stock="test", why_now="test", why_not_others="test"),
         supporting_knowledge_ids=["know-1"],
         provenance=Provenance(produced_by="investment_alpha@0.1.0", produced_at=datetime.now()),
     )
@@ -43,19 +52,30 @@ def make_publication_ready_recommendation(
     ticker: str, expected_return: float = 0.10, expected_risk: float = 0.05, confidence: float = 0.8
 ):
     """A real Recommendation, built the same way `MetaDecisionEngine` always
-    builds one (not a hand-constructed fake), with its INVESTMENT decision
-    manually promoted to publication-ready -- the exact pattern
-    `test_runtime_and_intelligence.py`'s own portfolio-construction test
-    already uses for `PortfolioConstructor`, since a real end-to-end
-    publication gate needs 30 evaluated decisions and legal approval that
-    no unit test can honestly provide."""
+    builds one (not a hand-constructed fake), pushed through the real
+    `apply_publication_gate()` with a synthetic all-pass report -- a real
+    end-to-end gate needs 30 evaluated decisions and legal approval no
+    unit test can honestly provide, but hand-setting only
+    `publication_status` (not `max_position_pct`, which the same gate
+    function sets) previously left `max_position_pct=0.0`, silently
+    zeroing every target weight regardless of a real decision's action.
+    Using the real gate function is both the fix and the more honest
+    test -- the same lesson `institutional_validation/scenarios.py`
+    already learned from its own version of this bug."""
     prediction = make_prediction(ticker, expected_return, expected_risk, confidence)
     recommendation = MetaDecisionEngine().decide(ticker, date(2026, 6, 14), {Horizon.INVESTMENT: prediction})
     assert recommendation is not None
     decision = recommendation.horizon_decisions[Horizon.INVESTMENT]
     assert decision.action == DecisionAction.BUY_CANDIDATE  # sanity: score >= 1.0 threshold cleared
-    decision.publication_status = PublicationStatus.PUBLICATION_READY
-    return recommendation
+    report = PublicationGateReport(as_of=date(2026, 6, 14), publication_ready=True, checks=[], blockers=[])
+    return apply_publication_gate([recommendation], report)[0]
+
+
+def _apply_publication_ready(recommendation):
+    """Same real-gate fix as `make_publication_ready_recommendation`, for
+    tests that hand-build a multi-horizon `Recommendation` directly."""
+    report = PublicationGateReport(as_of=date(2026, 6, 14), publication_ready=True, checks=[], blockers=[])
+    return apply_publication_gate([recommendation], report)[0]
 
 
 def make_research_only_recommendation(ticker: str):
@@ -220,3 +240,140 @@ def test_liquidity_floor_helper_flags_thin_and_no_history_tickers():
     permissive = compute_illiquid_tickers(snapshot, min_average_traded_value=0.0)
     assert "NOSUCHTICKER" in permissive  # still illiquid: no history, regardless of floor
     assert "COMI" not in permissive
+
+
+def test_decision_carries_horizon_thesis_and_review_date():
+    rec = make_publication_ready_recommendation("COMI")
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )
+    decision = decisions[0]
+    assert decision.horizon == Horizon.INVESTMENT
+    assert "COMI" in decision.investment_thesis
+    assert "buy" in decision.investment_thesis.lower()
+    assert decision.expected_review_date == rec.horizon_decisions[Horizon.INVESTMENT].valid_until
+
+
+def test_no_evidence_decision_has_no_thesis_numbers_and_no_review_date():
+    position = PositionState(ticker="COMI", held=True, current_weight=0.05)
+    decisions = DecisionService().decide_portfolio(
+        [], positions={"COMI": position}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )
+    decision = decisions[0]
+    assert decision.expected_review_date is None
+    assert "no current investment-horizon evidence" in decision.investment_thesis.lower()
+
+
+def test_key_risks_include_expected_risk_and_a_disagreeing_sibling_horizon():
+    investment_pred = make_prediction("COMI", 0.10, 0.05, 0.8, horizon=Horizon.INVESTMENT)
+    micro_pred = make_prediction("COMI", -0.05, 0.03, 0.7, horizon=Horizon.MICRO)
+    rec = MetaDecisionEngine().decide(
+        "COMI", date(2026, 6, 14), {Horizon.INVESTMENT: investment_pred, Horizon.MICRO: micro_pred}
+    )
+    assert rec is not None
+    assert rec.horizon_decisions[Horizon.MICRO].action == DecisionAction.AVOID
+    rec = _apply_publication_ready(rec)
+
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )
+    decision = decisions[0]
+    assert any("model-estimated risk" in r.lower() for r in decision.key_risks)
+    assert any("micro" in r.lower() and "avoid" in r.lower() for r in decision.key_risks)
+
+
+def test_contradicting_evidence_includes_disagreeing_sibling_horizon_and_country_risk():
+    investment_pred = make_prediction("COMI", 0.10, 0.05, 0.8, horizon=Horizon.INVESTMENT)
+    swing_pred = make_prediction("COMI", -0.02, 0.03, 0.65, horizon=Horizon.SWING)
+    rec = MetaDecisionEngine().decide(
+        "COMI", date(2026, 6, 14), {Horizon.INVESTMENT: investment_pred, Horizon.SWING: swing_pred}
+    )
+    assert rec is not None
+    rec = _apply_publication_ready(rec)
+
+    deteriorating = CountryRiskAssessment(
+        as_of=date(2026, 6, 14),
+        severity=CountryRiskSeverity.DETERIORATING,
+        reasons=["EGP_USD moved -6.00% over the available window (floor 5%)"],
+    )
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=deteriorating
+    )
+    decision = decisions[0]
+    assert any("swing" in e.lower() for e in decision.contradicting_evidence)
+    assert any("egp_usd" in e.lower() for e in decision.contradicting_evidence)
+    # Deteriorating (not crisis) country risk must not force target weight to zero.
+    assert decision.target_weight > 0
+
+
+def test_active_catalysts_reflects_a_same_day_corporate_event():
+    rec = make_publication_ready_recommendation("COMI")
+    as_of = date(2026, 6, 14)
+    events = {
+        "COMI": [
+            CorporateEvent(
+                ticker="COMI", event_date=as_of, event_type="dividend", description="Cash dividend declared"
+            )
+        ]
+    }
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=as_of, country_risk=NO_RISK, corporate_events=events
+    )
+    decision = decisions[0]
+    assert any("dividend" in c.lower() for c in decision.active_catalysts)
+
+
+def test_active_catalysts_empty_without_corporate_events():
+    rec = make_publication_ready_recommendation("COMI")
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )
+    assert decisions[0].active_catalysts == []
+
+
+def test_monitoring_events_lists_knowledge_currently_in_monitoring_status(tmp_path):
+    explanation = Explanation(
+        why_this_stock="test",
+        why_now="test",
+        why_not_others="test",
+        evidence_refs=[ProvenanceRef(kind="knowledge", ref_id="know-1")],
+    )
+    investment_pred = make_prediction("COMI", 0.10, 0.05, 0.8, explanation=explanation)
+    rec = MetaDecisionEngine().decide("COMI", date(2026, 6, 14), {Horizon.INVESTMENT: investment_pred})
+    assert rec is not None
+    rec = _apply_publication_ready(rec)
+
+    store = KnowledgeStore(tmp_path / "knowledge.json")
+    store._repo.add(
+        KnowledgeObject(
+            id="know-1",
+            discovery_date=date(2026, 5, 1),
+            creator_agent="test_agent",
+            supporting_evidence=["test"],
+            confidence=0.8,
+            statistical_evidence=StatisticalEvidence(
+                method="t-test", statistic=2.5, p_value=0.01, sample_size=100
+            ),
+            economic_explanation="Momentum persists post-earnings.",
+            affected_assets=["COMI"],
+            horizon=Horizon.INVESTMENT,
+            expected_return=0.10,
+            expected_risk=0.05,
+            status=KnowledgeStatus.MONITORING,
+            provenance=Provenance(produced_by="test", produced_at=datetime.now()),
+        )
+    )
+
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK, knowledge_store=store
+    )
+    decision = decisions[0]
+    assert any("know-1" in m and "momentum" in m.lower() for m in decision.monitoring_events)
+
+
+def test_monitoring_events_empty_without_a_knowledge_store():
+    rec = make_publication_ready_recommendation("COMI")
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )
+    assert decisions[0].monitoring_events == []

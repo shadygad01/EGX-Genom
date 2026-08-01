@@ -59,3 +59,22 @@ npm run dev -w api
 npm install
 npm run dev -w web
 ```
+
+### Personalized decisions (Decision Center)
+
+`decision_service.DecisionService` turns promoted knowledge plus your own
+portfolio holdings into a six-way Buy / Increase Position / Hold / Reduce
+Position / Exit / No Action decision per ticker — target weight, thesis,
+key risks, contradicting evidence, active catalysts, monitoring status, and
+an expected review date. It's deliberately stateless-per-call and never
+autonomous (a real portfolio's holdings can't be discovered, only supplied
+by you), so it's reachable two ways:
+
+- **CLI, always available**: `agx decide --date <ISO date> [--positions positions.json]`
+  against any `--data-dir` a real `agx run` was pointed at.
+- **Web (Decision Center, `/decisions`), only with a live `api/`**: set
+  `DECISION_DATA_DIR` to that same `--data-dir` before starting `api/`
+  (`DECISION_DATA_DIR=research/data/your-run-dir npm run dev -w api`). The
+  static GitHub Pages build has no backend to compute this against, so
+  Decision Center honestly reports itself unavailable there rather than
+  fabricating a result — use the CLI, or self-host `api/`, instead.

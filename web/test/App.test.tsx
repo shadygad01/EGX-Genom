@@ -28,6 +28,7 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getFinancialCoverage: async () => null,
     getSourceMetrics: async () => [],
     getMarketBreadth: async () => null,
+    getMarketRegime: async () => null,
     getAcquisitionDecisions: async () => [],
     getDecisionReadiness: async () => [],
     getTickerDataGapReport: async () => [],
@@ -38,6 +39,23 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getDiscoveryReport: async () => [],
     getDiscoveryMetrics: async () => null,
     getEndpointCandidates: async () => [],
+    getPortfolioSummary: async () => null,
+    getWarnings: async () => null,
+    getCommitteeSummary: async () => null,
+    postDecisions: async () => [],
+    postCapitalAllocation: async () => ({
+      as_of: "2026-07-22",
+      ranking: [],
+      queue: [],
+      capital_released_today: [],
+      capital_recycled: [],
+      best_new_opportunities: [],
+      highest_opportunity_cost: [],
+      allocation_changes: [],
+      cash_waiting: { idle_cash_before: 1, idle_cash_after: 1, reason: "test" },
+      explanation: { why_this_stock: "", why_now: "", why_not_others: "" },
+      provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
+    }),
     ...overrides,
   };
 }
@@ -53,6 +71,7 @@ vi.mock("../src/data/factory", () => ({
 afterEach(() => {
   vi.restoreAllMocks();
   mockProvider = fakeProvider();
+  window.localStorage.clear();
 });
 
 async function renderApp(initialPath = "/") {
@@ -65,69 +84,225 @@ async function renderApp(initialPath = "/") {
 }
 
 describe("App shell", () => {
-  it("renders the sidebar with all 9 sections", async () => {
+  it("renders the sidebar with all 7 sections", async () => {
     await renderApp();
     const nav = await screen.findByRole("navigation", { name: "Main navigation" });
     for (const label of [
-      "AI Briefing",
-      "Opportunity Center",
-      "Market Intelligence",
-      "Research Center",
-      "Knowledge Graph",
-      "Mission Control",
-      "Source Intelligence",
-      "System Administration",
+      "CIO Desk",
+      "Portfolio",
+      "Investment Cases",
+      "Monitoring",
+      "Market",
+      "Research",
+      "Settings",
     ]) {
       expect(within(nav).getByText(label)).toBeInTheDocument();
     }
   });
 
-  it("routes to the Opportunity Center", async () => {
-    await renderApp("/opportunities");
-    expect(await screen.findByText("No opportunities yet")).toBeInTheDocument();
+  it("routes to Portfolio", async () => {
+    await renderApp("/portfolio");
+    expect(await screen.findByText("Your current holdings")).toBeInTheDocument();
   });
 
-  it("routes to Market Intelligence", async () => {
+  it("routes to Investment Cases", async () => {
+    await renderApp("/cases");
+    expect(await screen.findByText("No investment cases yet")).toBeInTheDocument();
+  });
+
+  it("routes to an Investment Case detail page", async () => {
+    await renderApp("/cases/COMI");
+    expect(await screen.findByText("No investment case for this ticker")).toBeInTheDocument();
+  });
+
+  it("routes to Monitoring", async () => {
+    await renderApp("/monitoring");
+    expect(await screen.findByText("No warnings")).toBeInTheDocument();
+  });
+
+  it("routes to Market", async () => {
     await renderApp("/market");
     expect(await screen.findByText("No market state yet")).toBeInTheDocument();
   });
 
-  it("routes to the Research Center", async () => {
+  it("routes to Research", async () => {
     await renderApp("/research");
     expect(await screen.findByText("No hypotheses yet")).toBeInTheDocument();
   });
 
-  it("routes to the Knowledge Graph", async () => {
+  it("routes to the Knowledge Graph (reachable, not a top-level nav item)", async () => {
     await renderApp("/knowledge-graph");
     expect(await screen.findByText("No graph data yet")).toBeInTheDocument();
   });
 
-  it("routes to Mission Control", async () => {
-    await renderApp("/mission-control");
-    expect(await screen.findByText("No mission status yet")).toBeInTheDocument();
-  });
-
-  it("routes to Source Intelligence", async () => {
+  it("routes to Source Intelligence (reachable, not a top-level nav item)", async () => {
     await renderApp("/sources");
     expect(await screen.findByText("No sources registered yet")).toBeInTheDocument();
   });
 
-  it("routes to System Administration", async () => {
-    await renderApp("/admin");
+  it("routes to Settings", async () => {
+    await renderApp("/settings");
+    expect(await screen.findByText("No mission status yet")).toBeInTheDocument();
     expect(await screen.findByText("No execution report yet")).toBeInTheDocument();
   });
 });
 
-describe("Universe propagation", () => {
+describe("CIO Desk", () => {
+  it("answers 'what should I do today' with only the 5 mandated sections", async () => {
+    await renderApp("/");
+    expect(await screen.findByText("Market Regime")).toBeInTheDocument();
+    expect(screen.getByText("Capital Allocation")).toBeInTheDocument();
+    expect(screen.getByText("Portfolio Summary")).toBeInTheDocument();
+    expect(screen.getByText("Warnings")).toBeInTheDocument();
+    expect(screen.getByText("Investment Committee Summary")).toBeInTheDocument();
+  });
+
+  it("renders the Capital Allocation deployment queue live when holdings are saved", async () => {
+    window.localStorage.setItem(
+      "agx.portfolio.positions.v1",
+      JSON.stringify([{ ticker: "COMI", currentWeight: 0.05, averageCost: 60 }])
+    );
+    mockProvider = fakeProvider({
+      postDecisions: async () => [],
+      postCapitalAllocation: async () => ({
+        as_of: "2026-07-22",
+        ranking: [
+          {
+            rank: 1,
+            ticker: "ETEL",
+            opportunity_score: 1.5,
+            action: "buy",
+            target_weight: 0.2,
+            current_weight: 0,
+            confidence: 0.8,
+            expected_return: 0.1,
+            expected_risk: 0.04,
+            is_new_position: true,
+          },
+        ],
+        queue: [
+          {
+            ticker: "ETEL",
+            priority: 1,
+            action: "buy",
+            target_weight: 0.2,
+            current_weight: 0,
+            capital_delta: 0.2,
+            expected_contribution: 0.02,
+            marginal_benefit: 1.5,
+            marginal_risk: 0.04,
+            capital_sources: [{ ticker: null, amount: 0.2 }],
+            required_action: "Buy ETEL to 20.00%, funded by idle cash: 20.00%.",
+            opportunity_cost_note: "Every ticker with a positive opportunity score is already funded; no rejected alternative exists today.",
+          },
+        ],
+        capital_released_today: [],
+        capital_recycled: [],
+        best_new_opportunities: [
+          {
+            rank: 1,
+            ticker: "ETEL",
+            opportunity_score: 1.5,
+            action: "buy",
+            target_weight: 0.2,
+            current_weight: 0,
+            confidence: 0.8,
+            expected_return: 0.1,
+            expected_risk: 0.04,
+            is_new_position: true,
+          },
+        ],
+        highest_opportunity_cost: [],
+        allocation_changes: [
+          { ticker: "ETEL", action: "buy", current_weight: 0, target_weight: 0.2, capital_delta: 0.2 },
+        ],
+        cash_waiting: { idle_cash_before: 0.95, idle_cash_after: 0.75, reason: "test reason" },
+        explanation: { why_this_stock: "", why_now: "", why_not_others: "" },
+        provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
+      }),
+    });
+    await renderApp("/");
+    expect(await screen.findByText("Capital Deployment Queue")).toBeInTheDocument();
+    expect(await screen.findByText(/Buy ETEL to 20\.00%/)).toBeInTheDocument();
+    expect(screen.getByText("Capital Recycling")).toBeInTheDocument();
+    expect(screen.getByText("Capital Released Today")).toBeInTheDocument();
+    expect(screen.getByText("Best New Opportunities")).toBeInTheDocument();
+    expect(screen.getByText("Highest Opportunity Cost")).toBeInTheDocument();
+    expect(screen.getByText("Allocation Changes")).toBeInTheDocument();
+    expect(screen.getByText("Capital Waiting For Better Opportunities")).toBeInTheDocument();
+    expect(screen.getByText("test reason")).toBeInTheDocument();
+  });
+
+  it("prompts to add holdings when none are saved, linking to Portfolio", async () => {
+    await renderApp("/");
+    const link = await screen.findByRole("link", { name: /Go to Portfolio/ });
+    expect(link).toHaveAttribute("href", "/portfolio");
+  });
+
+  it("shows model-portfolio opportunities (not personalized) when no holdings are saved", async () => {
+    mockProvider = fakeProvider({
+      getInvestmentCases: async () => ({
+        as_of: "2026-07-22",
+        recommendations: [
+          {
+            ticker: "COMI",
+            as_of: "2026-07-22",
+            combined_expected_return: 0.05,
+            combined_expected_risk: 0.03,
+            confidence: 0.82,
+            horizon_predictions: {},
+            supporting_knowledge_ids: [],
+            explanation: {
+              why_this_stock: "Strong fundamentals",
+              why_now: "",
+              why_not_others: "",
+              supporting_evidence: [],
+              evidence_refs: [],
+              similar_historical_cases: [],
+              invalidation_conditions: [],
+            },
+            provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
+          },
+        ],
+        portfolio: {
+          id: "p1",
+          version: 1,
+          as_of: "2026-07-22",
+          positions: [
+            {
+              ticker: "COMI",
+              weight: 0.1,
+              score: 1.2,
+              expected_return: 0.05,
+              expected_risk: 0.03,
+              confidence: 0.82,
+              supporting_knowledge_ids: [],
+            },
+          ],
+          cash_weight: 0.9,
+          explanation: {
+            why_this_stock: "",
+            why_now: "",
+            why_not_others: "",
+            supporting_evidence: [],
+            evidence_refs: [],
+            similar_historical_cases: [],
+            invalidation_conditions: [],
+          },
+          provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
+        },
+      }),
+    });
+    await renderApp("/");
+    expect((await screen.findAllByText("COMI")).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Suggested").length).toBeGreaterThan(0);
+  });
+});
+
+describe("Universe propagation (Research → Data Readiness)", () => {
   it("renders every Decision Readiness row when the universe grows beyond ten", async () => {
     const tickers = Array.from({ length: 12 }, (_, index) => `T${String(index + 1).padStart(2, "0")}`);
     mockProvider = fakeProvider({
-      getUniverse: async () => ({
-        as_of: "2026-07-26",
-        count: tickers.length,
-        tickers,
-        constituents: Object.fromEntries(tickers.map((ticker) => [ticker, ticker])),
-      }),
       getDecisionReadiness: async () =>
         tickers.map((ticker) => ({
           ticker,
@@ -149,70 +324,8 @@ describe("Universe propagation", () => {
         })),
     });
 
-    await renderApp("/opportunities");
+    await renderApp("/research");
 
     expect(await screen.findByText("T12")).toBeInTheDocument();
-    expect(screen.getAllByRole("row")).toHaveLength(13);
-  });
-});
-
-describe("AI Briefing", () => {
-  it("shows the full 101-security universe with explicit abstention when no decision exists", async () => {
-    const tickers = Array.from({ length: 101 }, (_, index) => `S${String(index + 1).padStart(3, "0")}`);
-    mockProvider = fakeProvider({
-      getUniverse: async () => ({
-        as_of: "2026-07-31",
-        count: tickers.length,
-        tickers,
-        constituents: Object.fromEntries(tickers.map((ticker) => [ticker, `Company ${ticker}`])),
-      }),
-    });
-    await renderApp("/");
-    expect(await screen.findByText("S101")).toBeInTheDocument();
-    expect(screen.getByText("101 securities")).toBeInTheDocument();
-    expect(screen.getAllByText("Abstain").length).toBeGreaterThanOrEqual(303);
-  });
-
-  it("shows empty states when no artifacts have been produced yet", async () => {
-    mockProvider = fakeProvider();
-    await renderApp("/");
-    expect(await screen.findByText(/No opportunities yet/)).toBeInTheDocument();
-    expect(await screen.findByText(/No elevated-severity events/)).toBeInTheDocument();
-  });
-
-  it("renders a top opportunity from the recommendations artifact", async () => {
-    mockProvider = fakeProvider({
-      getRecommendations: async () => [
-        {
-          ticker: "COMI",
-          as_of: "2026-07-22",
-          combined_expected_return: 0.05,
-          combined_expected_risk: 0.03,
-          confidence: 0.82,
-          horizon_predictions: {},
-          supporting_knowledge_ids: [],
-          explanation: {
-            why_this_stock: "",
-            why_now: "",
-            why_not_others: "",
-            supporting_evidence: [],
-            evidence_refs: [],
-            similar_historical_cases: [],
-            invalidation_conditions: [],
-          },
-          provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
-        },
-      ],
-    });
-    await renderApp("/");
-    expect((await screen.findAllByText("COMI")).length).toBeGreaterThan(0);
-  });
-});
-
-describe("Company Research Workspace", () => {
-  it("shows an honest empty state when the ticker has no recommendation or knowledge", async () => {
-    await renderApp("/company/COMI");
-    expect(await screen.findByText("No active recommendation")).toBeInTheDocument();
-    expect(await screen.findByText("No knowledge objects yet")).toBeInTheDocument();
   });
 });

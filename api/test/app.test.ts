@@ -17,6 +17,9 @@ function testApp(overrides: Partial<Parameters<typeof buildApp>[0]> = {}) {
     eventsStorePath: emptyStorePath,
     runsStorePath: emptyStorePath,
     artifactsDir: emptyArtifactsDir,
+    decisionDataDir: null,
+    universeSeedDir: path.resolve(__dirname, "fixtures"),
+    researchDir: path.resolve(__dirname, "../.."),
     ...overrides,
   });
 }
@@ -177,5 +180,119 @@ describe("dashboard artifact routes", () => {
     const response = await app.inject({ method: "GET", url: "/market-breadth" });
     expect(response.statusCode).toBe(200);
     expect(response.json()).toBeNull();
+  });
+
+  it("GET /market-regime returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/market-regime" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
+  it("GET /portfolio-summary returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/portfolio-summary" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
+  it("GET /warnings returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/warnings" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+
+  it("GET /committee-summary returns null when the report is absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/committee-summary" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toBeNull();
+  });
+});
+
+describe("POST /decisions", () => {
+  it("reports 501 when DECISION_DATA_DIR is unconfigured, never guessing a directory", async () => {
+    const app = testApp();
+    const response = await app.inject({
+      method: "POST",
+      url: "/decisions",
+      payload: { date: "2026-06-14" },
+    });
+    expect(response.statusCode).toBe(501);
+    expect(response.json().error).toMatch(/DECISION_DATA_DIR/);
+  });
+
+  it("rejects a missing/malformed date before ever configuring a run", async () => {
+    const app = testApp({ decisionDataDir: "/tmp/does-not-matter" });
+    const response = await app.inject({
+      method: "POST",
+      url: "/decisions",
+      payload: { date: "not-a-date" },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("rejects a malformed position entry", async () => {
+    const app = testApp({ decisionDataDir: "/tmp/does-not-matter" });
+    const response = await app.inject({
+      method: "POST",
+      url: "/decisions",
+      payload: { date: "2026-06-14", positions: { COMI: { held: "yes" } } },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("rejects a ticker key that isn't a plain identifier", async () => {
+    const app = testApp({ decisionDataDir: "/tmp/does-not-matter" });
+    const response = await app.inject({
+      method: "POST",
+      url: "/decisions",
+      payload: { date: "2026-06-14", positions: { "../etc/passwd": { held: true } } },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+});
+
+describe("POST /capital-allocation", () => {
+  it("reports 501 when DECISION_DATA_DIR is unconfigured, never guessing a directory", async () => {
+    const app = testApp();
+    const response = await app.inject({
+      method: "POST",
+      url: "/capital-allocation",
+      payload: { date: "2026-06-14" },
+    });
+    expect(response.statusCode).toBe(501);
+    expect(response.json().error).toMatch(/DECISION_DATA_DIR/);
+  });
+
+  it("rejects a missing/malformed date before ever configuring a run", async () => {
+    const app = testApp({ decisionDataDir: "/tmp/does-not-matter" });
+    const response = await app.inject({
+      method: "POST",
+      url: "/capital-allocation",
+      payload: { date: "not-a-date" },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("rejects a malformed position entry", async () => {
+    const app = testApp({ decisionDataDir: "/tmp/does-not-matter" });
+    const response = await app.inject({
+      method: "POST",
+      url: "/capital-allocation",
+      payload: { date: "2026-06-14", positions: { COMI: { held: "yes" } } },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("rejects a ticker key that isn't a plain identifier", async () => {
+    const app = testApp({ decisionDataDir: "/tmp/does-not-matter" });
+    const response = await app.inject({
+      method: "POST",
+      url: "/capital-allocation",
+      payload: { date: "2026-06-14", positions: { "../etc/passwd": { held: true } } },
+    });
+    expect(response.statusCode).toBe(400);
   });
 });

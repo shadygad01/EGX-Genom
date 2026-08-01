@@ -1,0 +1,143 @@
+{
+  "title": "الحالات الاستثمارية",
+  "description": "لماذا يجب أن أمتلك هذه الشركة؟ كل رمز تراه AGX حاليًا، مرتبًا حسب العائد المتوقع.",
+  "emptyTitle": "لا توجد حالات استثمارية بعد",
+  "emptyDetail": "يتطلب معرفة معتمدة واحدة على الأقل لوجود توصية حقيقية.",
+  "evidence": "الأدلة",
+  "evidenceTitle": "أدلة {{ticker}}",
+  "noOpportunitySelected": "لم يتم اختيار حالة",
+  "selectRowDetail": "اختر صفًا لمعاينة أدلته.",
+  "badgeTitle": "{{horizon}}: {{return}} بثقة {{confidence}}",
+  "columns": {
+    "opportunity": "الشركة",
+    "horizons": "إشارات الأفق الزمني"
+  },
+  "detail": {
+    "horizonBreakdown": "تفصيل الأفق الزمني",
+    "expReturnShort": "العائد المتوقع",
+    "noModelPrediction": "لا يوجد تنبؤ نموذجي لهذا الأفق.",
+    "researchSummary": "ملخص البحث",
+    "supportingEvidence": "الأدلة الداعمة",
+    "upcomingCatalysts": "المحفزات القادمة",
+    "noScheduledCatalysts": "لا توجد محفزات مجدولة.",
+    "catalystLine": "{{date}}: {{eventType}} — {{description}}",
+    "openCase": "عرض الحالة الاستثمارية الكاملة"
+  },
+  "caseDetail": {
+    "noCaseTitle": "لا توجد حالة استثمارية لهذا الرمز",
+    "noCaseDetail": "لا توجد توصية حالية -- إما أنه لا توجد معرفة معتمدة تغطيه، أو أن الأدلة لم تتجاوز الحد بعد.",
+    "decision": "القرار",
+    "targetAllocation": "التخصيص المستهدف",
+    "notInModelPortfolio": "غير موجود في المحفظة النموذجية",
+    "horizon": "الأفق الاستثماري",
+    "reviewBy": "المراجعة بحلول"
+  },
+  "thesis": {
+    "title": "الفرضية الاستثمارية",
+    "emptyTitle": "لا توجد فرضية بعد",
+    "emptyDetail": "لا توجد توصية حالية لهذا الرمز.",
+    "investmentThesis": "الفرضية الاستثمارية",
+    "risks": "المخاطر",
+    "supportingEvidence": "الأدلة الداعمة",
+    "contradictingEvidence": "أدلة معارضة",
+    "historicalSimilarCases": "حالات تاريخية مشابهة"
+  },
+  "upcomingCatalysts": {
+    "title": "المحفزات",
+    "subtitle": "أحداث مؤسسية حقيقية تم جمعها",
+    "emptyTitle": "لا توجد محفزات مجدولة",
+    "emptyDetail": "لا توجد أحداث مؤسسية قادمة لهذا الرمز."
+  },
+  "macroContext": {
+    "title": "السياق الكلي",
+    "subtitle": "أدلة وكيل الاقتصاد الكلي وراء هذه الفرضية",
+    "emptyTitle": "لا توجد أدلة اقتصاد كلي لهذا الرمز."
+  },
+  "qualityAssessment": {
+    "title": "تقييم الجودة",
+    "subtitle": "فحوصات النمو والهامش والرافعة المالية",
+    "emptyTitle": "لا توجد قوائم مالية مجمّعة",
+    "emptyDetail": "لا توجد بيانات أساسية لهذا الرمز بعد.",
+    "assessment": {
+      "positive": "أساسيات قوية",
+      "mixed": "أساسيات متباينة",
+      "weak": "أساسيات ضعيفة",
+      "insufficient": "بيانات غير كافية لتقييم الأساسيات"
+    }
+  },
+  "valuation": {
+    "title": "التقييم",
+    "description": "السعر مقابل القيمة العادلة المحسوبة",
+    "emptyTitle": "لم تُحسب قيمة عادلة",
+    "emptyDetail": "يتطلب حقولًا مالية كافية تم جمعها -- لا تُختلق في غيابها.",
+    "priceVsFairValue": "السعر مقابل القيمة العادلة"
+  },
+  "executionPlan": {
+    "title": "خطة التنفيذ الفنية",
+    "description": "شروط دخول وإبطال ومراجعة حقيقية من قرار الأفق الاستثماري",
+    "emptyTitle": "لا يوجد قرار قابل للتنفيذ لهذا الرمز",
+    "entryCondition": "شرط الدخول",
+    "invalidationCondition": "شرط الإبطال",
+    "reviewCondition": "شرط المراجعة",
+    "notApplicable": "لا ينطبق",
+    "namedInvalidationConditions": "شروط الإبطال المسمّاة"
+  },
+  "monitoringPlan": {
+    "title": "خطة المتابعة",
+    "description": "المعرفة الداعمة قيد المراجعة النشطة للتعلّم المستمر",
+    "emptyTitle": "لا شيء قيد المتابعة النشطة",
+    "emptyDetail": "لا توجد معرفة داعمة لهذا الرمز في حالة المتابعة حاليًا."
+  },
+  "decisionHistory": {
+    "title": "سجل القرارات",
+    "description": "كل قرار مسجّل لهذا الرمز، الأحدث أولاً",
+    "emptyTitle": "لا يوجد سجل قرارات بعد",
+    "emptyDetail": "لم يُسجَّل أي قرار لهذا الرمز في سجل القرارات.",
+    "asOf": "بتاريخ",
+    "horizon": "الأفق الزمني",
+    "outcome": "النتيجة",
+    "realizedReturn": "العائد المحقق"
+  },
+  "evidenceTimeline": {
+    "title": "الجدول الزمني للأدلة",
+    "description": "كل قطعة معرفة وراء فرضية هذا الرمز، الأحدث أولاً",
+    "emptyTitle": "لا توجد أدلة بعد",
+    "emptyDetail": "لا توجد معرفة تغطي هذا الرمز حاليًا.",
+    "confidencePct": "ثقة {{value}}"
+  },
+  "learningHistory": {
+    "title": "سجل التعلّم",
+    "description": "سلالة الجينات -- كل جيل مرّت به هذه الفرضية",
+    "emptyTitle": "لا يوجد سجل تعلّم بعد",
+    "emptyDetail": "لا توجد سلالة جينات لمعرفة هذا الرمز.",
+    "generationLabel": "{{id}} (الجيل {{generation}})"
+  },
+  "research": {
+    "title": "الأبحاث",
+    "description": "أعمق طبقة -- الأبحاث المنشورة، والبيانات المالية الخام، والإجراءات المؤسسية والأخبار وراء هذه الحالة",
+    "papers": {
+      "title": "الأبحاث المنشورة",
+      "subtitle": "النتائج المنشورة وراء هذه الفرضية",
+      "emptyTitle": "لا توجد أبحاث منشورة لهذا الرمز."
+    },
+    "news": {
+      "title": "الجدول الزمني للأخبار",
+      "subtitle": "أخبار حقيقية تم جمعها تذكر هذا الرمز",
+      "emptyTitle": "لا توجد أخبار مجمّعة لهذا الرمز."
+    },
+    "financials": {
+      "title": "القوائم المالية",
+      "subtitle": "كل بند تم جمعه",
+      "emptyTitle": "لا توجد قوائم مالية مجمّعة",
+      "emptyDetail": "لم يجمع أي مُجمِّع بيانات مالية لهذا الرمز بعد.",
+      "periodEnd": "نهاية الفترة",
+      "lineItem": "البند",
+      "value": "القيمة"
+    },
+    "corporateActions": {
+      "title": "الإجراءات المؤسسية",
+      "subtitle": "الأحداث المؤسسية السابقة",
+      "emptyTitle": "لا توجد إجراءات مؤسسية سابقة مسجّلة."
+    }
+  }
+}

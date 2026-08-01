@@ -377,7 +377,7 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.recycling.title")} subtitle={t("capitalAllocation.recycling.description")}>
-          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} />}
           {liveCapitalPlan && liveCapitalPlan.capital_recycled.length === 0 && (
             <EmptyState title={t("capitalAllocation.recycling.emptyTitle")} detail={t("capitalAllocation.recycling.emptyDetail")} />
           )}
@@ -394,7 +394,7 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.released.title")} subtitle={t("capitalAllocation.released.description")}>
-          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} />}
           {liveCapitalPlan && liveCapitalPlan.capital_released_today.length === 0 && (
             <EmptyState title={t("capitalAllocation.released.emptyTitle")} detail={t("capitalAllocation.released.emptyDetail")} />
           )}
@@ -442,7 +442,7 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.highestCost.title")} subtitle={t("capitalAllocation.highestCost.description")}>
-          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} />}
           {liveCapitalPlan && liveCapitalPlan.highest_opportunity_cost.length === 0 && (
             <EmptyState title={t("capitalAllocation.highestCost.emptyTitle")} detail={t("capitalAllocation.highestCost.emptyDetail")} />
           )}
@@ -459,7 +459,7 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.allocationChanges.title")} subtitle={t("capitalAllocation.allocationChanges.description")}>
-          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} />}
           {liveCapitalPlan && liveCapitalPlan.allocation_changes.length === 0 && (
             <EmptyState title={t("capitalAllocation.allocationChanges.emptyTitle")} detail={t("capitalAllocation.allocationChanges.emptyDetail")} />
           )}
@@ -503,7 +503,7 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.cashWaiting.title")} subtitle={t("capitalAllocation.cashWaiting.description")}>
-          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} detail={t("capitalAllocation.needsHoldingsDetail")} />}
+          {!liveCapitalPlan && <EmptyState title={t("capitalAllocation.needsHoldingsTitle")} />}
           {liveCapitalPlan && (
             <>
               <div className={styles.statGrid}>

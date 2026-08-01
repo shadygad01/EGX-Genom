@@ -2321,3 +2321,106 @@ itself (new TD-62); the position-unaware/model-portfolio path staying
 deliberately un-ranked (architectural, not a gap -- named above); every
 other already-open item (TD-59/TD-60/TD-61, confidence calibration,
 walk-forward backtesting) is unchanged by this mission.
+
+## EGX Investment Methodology (2026-08-01)
+
+The project owner declared software implementation no longer the primary
+mission and the platform architecture complete, and asked for the
+investment methodology itself: a permanent constitution governing every
+future decision, a situational playbook, exact minimum decision
+standards, portfolio construction standards, and a complete operational
+handbook detailed enough for another engineering team to rebuild the
+investment process without reading the source. Explicit instruction: not
+documentation in the descriptive sense — a governing doctrine; no code
+changes unless the writing process revealed a real architectural
+inconsistency requiring correction.
+
+**Method**: every claim in the five new documents is grounded in a real,
+already-implemented mechanism, read directly from source rather than
+inferred or assumed, and cited by exact module and threshold. Read in
+full for this mission: `decision_service/service.py`,
+`meta/decision_engine.py`, `meta/publication_gate.py`, `meta/readiness.py`,
+`meta/decision_ledger.py`, `decision_service/country_risk.py`,
+`decision_service/liquidity_floor.py`, `portfolio/constructor.py`,
+`capital_allocation/*.py`, `investment_proof/{categories,
+committee_validation,calibration,thesis_survival,stability,
+counterfactual,attribution,walk_forward}.py`, `learning/monitor.py`,
+`valuation/engine.py`, `dashboard/monitoring.py`, `knowledge/lifecycle.py`,
+`hypotheses/pipeline.py`, `market_memory/{regime,breadth}.py`,
+`causal/reasoner.py`, `review/{board,reviewers}.py`,
+`adversarial/attacks.py`, `horizons/knowledge_weighted.py`, `config.py`.
+One real gap in the mission's own working understanding was caught and
+corrected mid-write, not left in the delivered doctrine: the prediction
+model's confidence aggregation was initially assumed to be a genuine
+confidence-weighted mean; re-reading `horizons/knowledge_weighted.py`
+directly showed `total_weight / len(relevant)` is mathematically the
+plain arithmetic mean of confidences (the weight term cancels), and that
+a separate, real, previously-undocumented mechanism exists alongside it —
+active, corroborated events within 30 days apply a severity-weighted
+multiplicative penalty to both `expected_risk` (inflating it) and
+`confidence` (deflating it), capped at a combined 50%. Both documents
+were corrected to state the real formula rather than the assumed one.
+No code was changed — the mechanism was already correct; only the
+mission's own prior understanding of it, mid-draft, was wrong.
+
+**Delivered** (all under `docs/`, all cross-linked, all bound by the
+Constitution's own amendment rule — a numbered `docs/
+ARCHITECTURE_DECISIONS.md` entry required to ever contradict one):
+
+- `INVESTMENT_CONSTITUTION.md` — 11 articles (Why Invest, Why Reject,
+  When to Hold Cash/Increase/Reduce/Exit, How Capital Is Allocated, How
+  Confidence Is Interpreted, How Evidence Is Evaluated, How Conflicting
+  Evidence Is Handled, How Mistakes Are Reviewed) plus a preamble and an
+  amendment clause. Every article traces to a real mechanism -- e.g. "Why
+  Reject" enumerates every real trigger for `AVOID`/`WATCH`/`ABSTAIN`
+  rather than asserting a philosophy disconnected from
+  `MetaDecisionEngine`'s actual code.
+- `INVESTMENT_PLAYBOOK.md` -- 12 market situations (bull/bear markets,
+  interest-rate cycles, currency/inflation shocks, political risk,
+  liquidity crises, strong/weak earnings, sector rotation, market
+  panic/euphoria), each with Expected Behaviour/Decision Priorities/
+  Capital Allocation Priorities/Risk Adjustments/Monitoring Priorities.
+  Every entry explicitly separates **real, mechanically detected today**
+  (Market Regime's trend/volatility axes, Country & Macro Risk severity,
+  the liquidity floor, Market Breadth) from **doctrine awaiting a
+  detector that doesn't exist yet** (interest-rate cycles, inflation
+  shocks, sector rotation each name the real gap -- no dedicated
+  collector/classifier exists -- rather than pretending automated
+  detection where none exists).
+- `DECISION_STANDARDS.md` -- the exact minimum bar for Buy/Increase/
+  Hold/Reduce/Exit/No Action/Abstain, restating
+  `DecisionService._resolve_action`'s real logic as an auditable
+  standard, including the one subtlety most likely to be misread: there
+  is no seventh `PositionAction` value called "abstain" -- it is a
+  boolean modifier determining which of `hold`/`no_action` applies, and
+  documented as such explicitly to prevent future confusion.
+- `PORTFOLIO_STANDARDS.md` -- maximum concentration (Herfindahl 0.25,
+  sector 0.40, and the real, confidence-scaled 1-5% per-position ceiling
+  that actually binds on published decisions, distinct from the 25%
+  structural maximum), diversification, liquidity, cash, position sizing,
+  and capital recycling, each grounded in the exact real formula/
+  constant.
+- `INVESTMENT_HANDBOOK.md` -- a 13-chapter, rebuild-without-source-code
+  operational walkthrough (data foundations through agents, the 8-gate
+  pipeline plus 3 independent scrutiny layers, knowledge lifecycle and
+  prediction, readiness/publication gates, position-aware decisions,
+  capital allocation, portfolio construction, monitoring, continuous
+  learning, institutional validation/proof), closing with a glossary of
+  every real numeric constant this platform's decisions depend on.
+
+**No code changed.** The writing process surfaced one real documentation
+gap in the mission's own draft (the confidence-formula
+misunderstanding above), corrected before delivery, and zero architectural
+inconsistencies in the platform itself requiring a code fix -- the
+existing decision/capital-allocation/validation architecture (across
+every prior mission in this platform's history) was found, on direct
+re-reading, to already implement exactly the discipline this doctrine
+now states permanently. 855 backend / 31 `api` / 51 `web` tests remain
+unaffected (no source touched); `ruff check` unaffected.
+
+**Not done, named as next**: the playbook's three explicitly-named
+detector gaps (interest-rate cycles, inflation shocks, sector rotation)
+are real future engineering work, each already carrying its own honest
+"doctrine, not yet a dedicated detector" label in
+`INVESTMENT_PLAYBOOK.md` rather than a silent absence -- see
+`NEXT_MISSIONS.md`.

@@ -11,6 +11,25 @@ recorded on the returned `CapabilityDecision`, which the production
 pipeline persists as a Mission Control artifact (`acquisition_decisions.json`)
 so every decision is explainable, not just the outcome.
 
+One Collection -> One Canonical Dataset -> Multiple Consumers: several
+`SourceSpec` ids are deliberately listed under more than one `Capability`
+(e.g. `chief_egx_financials` under both Financial Statements and Investor
+Relations; `eac_egx_disclosures` under Corporate Disclosures, Corporate
+Actions, and News) because the *source* genuinely serves more than one
+decision-relevant purpose. That is not license to fetch it once per
+capability that lists it. A single `CapabilityDecisionEngine` instance is
+constructed once per production run and its `_executed_this_run` cache
+spans every `decide_and_execute` call made on it (the production
+pipeline's `for capability in Capability:` loop reuses the same instance)
+-- the first capability that reaches a given source id performs the real
+`CollectionService.run()` call; every later capability that also lists
+that id reuses the already-materialized `CollectionRunResult` (outcome
+`"reused"` in its own `CapabilityStrategyAttempt`, never silently folded
+into `"succeeded"`) instead of triggering a second real network fetch.
+This preserves each capability's own independent ranking/fallback
+decision (a capability can still fail over to its next candidate) while
+guaranteeing at most one real fetch per source id per run.
+
 Nothing here re-derives legality/stability from a fresh network probe --
 that is the Acquisition Intelligence Engine's job (`engine.py`) for
 *undiscovered* sources reached via homepage/sitemap scanning. This module
@@ -158,9 +177,23 @@ class CapabilityStrategyAttempt(BaseModel):
     source_id: str
     rank: int
     composite_score: float
-    outcome: str  # "succeeded" | "zero_yield" | "failed" | "skipped"
+    outcome: str  # "succeeded" | "reused" | "zero_yield" | "failed" | "skipped"
     reason: str
     yield_count: int = 0
+
+
+@dataclass
+class _ExecutedSource:
+    """One source id's real collection outcome this run, cached the first
+    time any capability actually fetches it so every later capability that
+    also lists this source id reuses it instead of fetching again -- see
+    this module's "One Collection -> One Canonical Dataset -> Multiple
+    Consumers" docstring section.
+    """
+
+    result: CollectionRunResult | None
+    produced: int
+    failed_reason: str | None
 
 
 class CapabilityDecision(BaseModel):
@@ -200,6 +233,14 @@ class CapabilityDecisionEngine:
         self.registry = registry
         self.collector_factory = collector_factory
         self.metrics = metrics
+        # One entry per source id actually fetched by *any* call to
+        # `decide_and_execute` made on this instance -- the production
+        # pipeline constructs one `CapabilityDecisionEngine` per run and
+        # calls `decide_and_execute` once per `Capability` on that same
+        # instance, so this persists for the whole run. See the module
+        # docstring's "One Collection -> One Canonical Dataset -> Multiple
+        # Consumers" section.
+        self._executed_this_run: dict[str, _ExecutedSource] = {}
 
     def decide_and_execute(
         self,
@@ -248,6 +289,49 @@ class CapabilityDecisionEngine:
                 )
                 continue
 
+            executed = self._executed_this_run.get(score.source_id)
+            if executed is not None:
+                # Already fetched for an earlier capability this run --
+                # reuse that canonical result rather than fetching this
+                # source a second time (see the module docstring).
+                if executed.result is not None:
+                    results[score.source_id] = executed.result
+                if executed.failed_reason is not None:
+                    failures[score.source_id] = executed.failed_reason
+                    attempts.append(
+                        CapabilityStrategyAttempt(
+                            source_id=score.source_id, rank=rank, composite_score=score.composite_score,
+                            outcome="failed",
+                            reason="Already attempted and failed earlier this run (reused, not "
+                            f"re-fetched): {executed.failed_reason}",
+                        )
+                    )
+                    continue
+                if executed.produced > 0:
+                    selected.append(score.source_id)
+                    attempts.append(
+                        CapabilityStrategyAttempt(
+                            source_id=score.source_id, rank=rank, composite_score=score.composite_score,
+                            outcome="reused",
+                            reason="Already collected earlier this run for another capability; "
+                            "reused that canonical result instead of fetching this source again.",
+                            yield_count=executed.produced,
+                        )
+                    )
+                    if not exhaustive:
+                        already_satisfied = True
+                else:
+                    attempts.append(
+                        CapabilityStrategyAttempt(
+                            source_id=score.source_id, rank=rank, composite_score=score.composite_score,
+                            outcome="zero_yield",
+                            reason="Already attempted earlier this run and produced zero usable "
+                            "records (reused, not re-fetched); falling through to the next "
+                            "strategy.",
+                        )
+                    )
+                continue
+
             collector = self.collector_factory(score.source_id, score.spec)
             if collector is None:
                 attempts.append(
@@ -267,6 +351,9 @@ class CapabilityDecisionEngine:
             except Exception as exc:  # noqa: BLE001 -- one source must not abort remaining sources
                 reason = f"{type(exc).__name__}: {exc}"
                 failures[score.source_id] = reason
+                self._executed_this_run[score.source_id] = _ExecutedSource(
+                    result=None, produced=0, failed_reason=reason,
+                )
                 attempts.append(
                     CapabilityStrategyAttempt(
                         source_id=score.source_id, rank=rank, composite_score=score.composite_score,
@@ -277,6 +364,9 @@ class CapabilityDecisionEngine:
 
             produced = collection_yield(result)
             results[score.source_id] = result
+            self._executed_this_run[score.source_id] = _ExecutedSource(
+                result=result, produced=produced, failed_reason=None,
+            )
             if produced > 0:
                 selected.append(score.source_id)
                 attempts.append(

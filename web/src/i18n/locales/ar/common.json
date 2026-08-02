@@ -111,6 +111,7 @@
     "activationStatus": { "active": "نشط", "paused": "متوقف مؤقتًا", "retired": "متقاعد" },
     "capabilityStrategyOutcome": {
       "succeeded": "نجح",
+      "reused": "أُعيد استخدامه",
       "zero_yield": "بدون نتائج",
       "failed": "فشل",
       "skipped": "تم التخطي"

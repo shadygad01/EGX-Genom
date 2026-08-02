@@ -564,7 +564,7 @@ export interface CollectorStatusRow {
 
 // --- acquisition_decisions.json ---
 
-export type CapabilityStrategyOutcome = "succeeded" | "zero_yield" | "failed" | "skipped";
+export type CapabilityStrategyOutcome = "succeeded" | "reused" | "zero_yield" | "failed" | "skipped";
 
 export interface CapabilityStrategyAttempt {
   source_id: string;

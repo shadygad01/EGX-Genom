@@ -279,3 +279,55 @@ def test_financial_statements_collects_every_ready_issuer():
     assert set(decision.selected_source_ids) == {"telecom_egypt_ir", "orascom_ir"}
     assert set(results) == {"telecom_egypt_ir", "orascom_ir"}
     assert service.calls == decision.selected_source_ids
+
+
+def test_decide_and_execute_reuses_a_source_already_collected_for_another_capability():
+    # Real-world shape (sources/catalog.py + capability.py, live-verified
+    # 2026-08-02): chief_egx_financials, telecom_egypt_ir, and orascom_ir
+    # are each catalogued under both FINANCIAL_STATEMENTS and
+    # INVESTOR_RELATIONS. Before "One Collection -> One Canonical Dataset
+    # -> Multiple Consumers", the production pipeline's `for capability in
+    # Capability:` loop -- which reuses one `CapabilityDecisionEngine`
+    # instance across every capability -- fetched each of these sources
+    # twice in a single run: once per capability that lists it.
+    registry = SourceRegistry()
+    registry.add(_spec("chief_egx_financials", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("telecom_egypt_ir", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("orascom_ir", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("egxpilot_fundamentals", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("egid_financial_filings", status=SourceStatus.TOS_REVIEW))
+    registry.add(_spec("company_ir", status=SourceStatus.PLANNED))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService(
+        {
+            "chief_egx_financials": _empty_result("chief_egx_financials", financials=5),
+            "telecom_egypt_ir": _empty_result("telecom_egypt_ir", financials=8),
+            "orascom_ir": _empty_result("orascom_ir", financials=3),
+            "egxpilot_fundamentals": _empty_result("egxpilot_fundamentals", financials=100),
+        }
+    )
+    engine = CapabilityDecisionEngine(registry, factory)
+
+    fs_decision, fs_results, _ = engine.decide_and_execute(Capability.FINANCIAL_STATEMENTS, service)
+    ir_decision, ir_results, _ = engine.decide_and_execute(Capability.INVESTOR_RELATIONS, service)
+
+    # Each real, shared source was fetched exactly once total across both
+    # capability calls, even though both capabilities were satisfied by it.
+    for source_id in ("chief_egx_financials", "telecom_egypt_ir", "orascom_ir"):
+        assert service.calls.count(source_id) == 1, source_id
+        assert source_id in fs_decision.selected_source_ids
+        assert source_id in ir_decision.selected_source_ids
+
+    # The second capability's own attempts are honestly labelled "reused",
+    # never silently folded into "succeeded" as if it had fetched again.
+    ir_attempts = {a.source_id: a for a in ir_decision.attempts}
+    for source_id in ("chief_egx_financials", "telecom_egypt_ir", "orascom_ir"):
+        assert ir_attempts[source_id].outcome == "reused"
+    assert ir_results["chief_egx_financials"].financial_statement_line_items_written == 5
+
+    # egxpilot_fundamentals is only catalogued under FINANCIAL_STATEMENTS,
+    # so it is correctly never even considered for INVESTOR_RELATIONS.
+    assert "egxpilot_fundamentals" not in ir_attempts

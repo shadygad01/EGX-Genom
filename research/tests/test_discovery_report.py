@@ -121,6 +121,30 @@ def test_run_discovery_report_verifies_a_reachable_rss_target():
     assert any(c.selected for c in candidates)
 
 
+def test_run_discovery_report_never_claims_verified_when_the_candidate_url_itself_failed_every_probe():
+    # Reproduces the real skynews_arabia_economy incident: the homepage
+    # resolves and a candidate feed URL is discovered on it (so a candidate
+    # exists and gets selected -- ranking a candidate above no candidate is
+    # deliberate, see ranking.py), but the discovered feed URL itself never
+    # returned a successful probe. Before this fix, this outcome was still
+    # labelled "verified_reachable" with a "flip to IMPLEMENTED" recommendation
+    # -- which is exactly how that source was wrongly promoted and then failed
+    # with a real HTTP 404 in production.
+    registry = SourceRegistry()
+    registry.add(make_spec())
+    engine, prober = make_engine(registry, reachable_urls={"https://testorg.com"})
+    history = DiscoveryHistoryRepository()
+
+    outcomes, candidates = run_discovery_report(engine, registry, [make_target()], history)
+
+    assert len(outcomes) == 1
+    outcome = outcomes[0]
+    assert outcome.verification_result == "candidate_selected_unconfirmed"
+    assert "No successful probe" in " ".join(outcome.evidence)
+    assert "Do not flip to IMPLEMENTED" in outcome.recommendation
+    assert any(c.selected for c in candidates)
+
+
 def test_run_discovery_report_reports_untargeted_source_without_fabricating():
     registry = SourceRegistry()
     registry.add(make_spec(id="no_target_source"))

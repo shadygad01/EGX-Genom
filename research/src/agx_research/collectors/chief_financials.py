@@ -100,8 +100,15 @@ class ChiefFinancialsCollector(Collector):
             page_url = f"{self.spec.base_url}page/{page_number}/"
             try:
                 html = self.fetcher.fetch_text(page_url, self.spec)
-            except (FetchError, FetchDisallowed) as exc:
-                self.fetch_warnings.append(f"index page {page_number}: {type(exc).__name__}: {exc}")
+            except (FetchError, FetchDisallowed):
+                # Same graceful-termination tier as the "no new company link"
+                # branch below (not logged as a warning either): the real page
+                # count isn't known in advance, so a page N+1 fetch failure is
+                # this walk's other designed way of finding the real end of
+                # pagination, not a partial-fetch anomaly. Treating it as a
+                # `fetch_warnings` entry previously forced every healthy run
+                # to report DEGRADED permanently, since Chief Capital's real
+                # index has always had exactly 2 pages.
                 break
             found = {match.group("url") for match in _COMPANY_LINK_RE.finditer(html)}
             if not found - company_urls:

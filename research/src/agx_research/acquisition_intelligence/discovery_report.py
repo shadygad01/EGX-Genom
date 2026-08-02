@@ -145,12 +145,40 @@ def plan_discovery_targets(
     return targeted, untargeted
 
 
+def _probe_actively_failed(result: AcquisitionResult) -> bool:
+    """True only for `assess_stability`'s specific "probes were supplied but
+    every single one failed" branch (score forced to exactly 0.0,
+    `insufficient_data=False`) -- as opposed to simply never having probed
+    the URL yet (`insufficient_data=True`), which is a weaker, honestly
+    partial signal, not an active disconfirmation. `select_best` still picks
+    this candidate if it is the only one (ranking a candidate above no
+    candidate is deliberate, see ranking.py's own docstring), but the
+    report's recommendation must not describe a candidate no probe ever
+    actually reached as "verified and stable" -- that exact overclaim
+    previously caused `skynews_arabia_economy` to be flipped to IMPLEMENTED
+    on discovery evidence alone and then fail with a real HTTP 404 in
+    production (see its catalog entry's notes).
+    """
+    assert result.selected is not None
+    stability = result.selected.stability
+    return stability.score == 0.0 and not stability.insufficient_data
+
+
 def _recommendation_for_result(result: AcquisitionResult) -> str:
     if not result.registered or result.selected is None or result.generated_spec is None:
         return (
             "No action -- no candidate cleared verification this run. Re-check after "
             "the next scheduled discovery run, or supply a corrected domain hint if the "
             "target organization's public domain is known to differ from what was tried."
+        )
+    if _probe_actively_failed(result):
+        return (
+            "Do not flip to IMPLEMENTED. This candidate was ranked best-available among "
+            "the discovered methods, but every probe against it failed -- there is no "
+            "confirmed successful response, only a URL shape and a legality clearance. "
+            "Re-check after the next scheduled discovery run once a probe actually "
+            "succeeds (see the skynews_arabia_economy catalog entry for what happens "
+            "when this step is skipped)."
         )
     ready_collector = _READY_GENERIC_COLLECTOR_BY_ACCESS_METHOD.get(
         result.selected.candidate.access_method_guess
@@ -185,7 +213,11 @@ def _outcome_for_result(spec: SourceSpec, result: AcquisitionResult) -> SourceDi
             previous_status=spec.status.value,
             current_status=result.generated_spec.status.value,
             discovered_endpoints=[result.selected.candidate.discovered_url],
-            verification_result="verified_reachable",
+            verification_result=(
+                "candidate_selected_unconfirmed"
+                if _probe_actively_failed(result)
+                else "verified_reachable"
+            ),
             reason_for_failure=None,
             evidence=evidence,
             recommendation=_recommendation_for_result(result),

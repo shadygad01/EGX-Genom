@@ -2584,3 +2584,100 @@ style state view is not planned -- `Portfolio.tsx` remains the real
 investor's own personalized, position-aware page (local/self-hosted `api/`
 only, by design, per AD-57), structurally distinct from the Shadow Fund's
 autonomous, platform-owned state.
+
+## Investment Operating System review: full-universe evidence, DCF/EBITDA/EV/P-B (2026-08-02)
+
+The project owner, acting as the fund's own investment manager, asked for
+a full review: connect every research report to a real decision, fix or
+remove disconnected/dead sources, add missing valuation metrics (DCF/
+EBITDA/EV/P-B), and confirm the full ~100-ticker universe (EGX30+EGX70) is
+in scope with no silently-missing data — explicitly free/legal sources
+only, full authority to restructure. Framed as continuing whatever the
+owner's own tooling ("Codex") had already done that session.
+
+**Found already done, same day, on `main`** (commits `4799994`, `72cd2f8`,
+`479ffc0`, none yet reflected in `CURRENT_MISSION.md`/`CHANGELOG.md`/this
+file before this entry): two new `IMPLEMENTED` sources —
+`egxpilot_fundamentals` (`EgxPilotFundamentalsCollector`, live-verified
+against 100/101 AGX tickers per its own catalog note, derives
+`shares_outstanding` from `market_cap`/`last_price` when the API omits it)
+and `chief_egx_financials` (`ChiefFinancialsCollector`, discovers whichever
+companies Chief Capital currently publishes and states `total_equity`/
+`total_debt`/`ebitda`/`SharesOutstanding` directly) — close the exact gap
+TD-55 named as blocking every ticker's fair value ("no combination of
+currently-collectable fields reaches the 3-model floor without
+`shares_outstanding`"). New `valuation.metrics.compute_valuation_metrics()`
+/`ValuationMetrics` (`enterprise_value`, `ev_to_ebitda`, `price_to_book`,
+`dcf_per_share`, market P/E/EPS/dividend-yield/beta, all `None` with a
+named `unavailable_reasons` entry rather than fabricated when a reported
+field is missing) is now exposed on `DecisionReadiness.valuation` and
+rendered on the Investment Case page's Valuation section.
+`meta.recommendation_service.RecommendationService` now generates a
+valuation-only INVESTMENT `Prediction` (`multi_model_fair_value`) when no
+knowledge-weighted model produces one, and blends a bounded market-P/E
+earnings-yield "carry" into `expected_return`; `meta.readiness
+.assess_decision_readiness` now allows `decision_allowed` from
+`fair_value_available` alone, not only an active `KnowledgeObject` — so a
+ticker with real reported fundamentals but no promoted research finding
+can still reach a real Investment-horizon decision instead of silently
+reporting nothing. A new full-universe opportunities table on `/cases`
+(`InvestmentCases.tsx`) ranks every constituent by
+`combined_expected_return` across all three horizons with a per-ticker
+data-coverage/blocker column — the "read the market, rank every
+opportunity top to bottom" view the mission asked for. `479ffc0`
+separately fixed a real event-risk double-counting bug: market-wide news
+headlines sharing one taxonomy subtype no longer each independently
+penalize every stock's confidence (kept to one representative event per
+subtype/channel, ticker-specific and market-wide channels weighted and
+capped independently).
+
+**This review's own contribution**: read every changed line across all
+three commits, ran the full test/lint/build matrix (887 backend tests,
+`ruff check`, 33 `api` tests, 53 `web` tests, both production builds,
+`contracts/` regeneration — zero drift anywhere), and found one real,
+previously-unnoticed bug: `decision_service.macro_overlay
+.assess_macro_overlay()` summed raw `importance_weight` floats into
+`available_weight` with no rounding (`0.20+0.20+0.15+0.05 =
+0.6000000000000001` in IEEE-754 arithmetic), breaking a `==` test
+assertion and risking the same float noise reaching the exported
+dashboard artifact. Fixed with `round(available_weight, 6)` at the point
+of computation — see `docs/TECHNICAL_DEBT.md`'s updated TD-55.
+
+Also audited every `DISABLED` source in the registry
+(`egx_official`/`cbe`/`yahoo_finance`/`stockanalysis`/`mubasher`/
+`investing_com`/`investing_news`/`imf`/`trading_economics`) against the
+project owner's explicit "delete truly dead sources" instruction. None
+were deleted: each carries a real, live-evidenced blocker (a network-level
+anti-bot TCP reset, an explicit ToS automation prohibition, a robots.txt
+disallow, or a free tier too limited to be a genuine source) rather than
+being abandoned dead code, and three (`yahoo_finance`/`stockanalysis`/
+`mubasher`) are already load-bearing fallback legs inside the real,
+`IMPLEMENTED` `egx_price_composite` collector via their `integrated_via`
+field — the standalone catalog entry exists only to document that role.
+Deleting any of them would erase the audit trail this codebase's own
+architecture explicitly protects (the `SourceCategory.ALTERNATIVE`
+incident is the standing cautionary precedent), for zero decision-quality
+gain.
+
+**Not verifiable from this sandbox, named honestly rather than asserted**:
+this session's own network egress is fully blocked (confirmed directly
+against the agent proxy's `recentRelayFailures`: `connect_rejected`/403
+for `stockanalysis.com`/`enterprise.press`/`api.stlouisfed.org`), the same
+constraint essentially every prior mission in this log has hit. The
+"100/101 tickers" `egxpilot_fundamentals` figure is its own author's
+live-run evidence recorded in `sources/catalog.py`, not something this
+review re-fetched; `chief_egx_financials`'s per-company coverage is
+explicitly partial ("discovered each run"). Whether the full universe
+actually clears the 3-of-7-model fair-value floor end to end, and how many
+tickers still lack `total_equity`/`total_debt`/`ebitda` specifically (the
+fields only `chief_egx_financials`/company-IR sources supply, not
+`egxpilot_fundamentals`'s market-cap-only data), can only be confirmed by
+the next real `deploy-pages.yml` run reading `financial_coverage.json`/
+`ticker_data_gap_report.json` afterward — a genuine data-availability
+question, not an engineering gap, and this platform's anti-fabrication
+principle forbids inventing values to close it pre-emptively.
+
+**Result**: 887 backend tests pass (1 fixed, formerly failing); `ruff
+check` clean; 33 `api` tests pass; 53 `web` tests pass; both `npm run
+build` clean; `contracts/` regeneration produced zero diff. See
+`CURRENT_MISSION.md`'s matching entry for the full narrative.

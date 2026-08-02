@@ -1,6 +1,94 @@
 # Current Mission
 
-## Current mission: Zero-Cost Production Deployment + Shadow Fund (2026-08-01)
+## Current mission: Investment Operating System review — connect every source to a decision, close the DCF/EBITDA/EV/P-B gap, verify the full 100+ ticker universe (2026-08-02)
+
+The project owner, acting as the fund's investment manager, asked for a
+full review of the platform with three explicit complaints: (1) many
+research reports/sources still don't reach a decision, (2) disconnected
+sources should be connected (or, if genuinely dead, removed) and
+free-alternative paths should be tried before giving up, (3) DCF/EBITDA/
+EV/P-B were reported missing from every ticker. Explicit constraints:
+free/legal sources only (no paid-service intent, ever), full authority to
+restructure sources/UI/decision quality, and the full ~100-ticker universe
+(EGX30+EGX70) must be in scope with no silently-missing data. Framed as a
+continuation of whatever the project owner's own tooling ("Codex") had
+already done that session — audit it, don't redo it.
+
+**Found on arrival**: three real, substantial, same-day commits already on
+`main` (`4799994` "Update macro sources and weight portfolio exposure",
+`72cd2f8` "Connect full-universe evidence to CIO decisions", `479ffc0`
+"Deduplicate market event risk channels") had already implemented almost
+exactly this mission — two new `IMPLEMENTED` sources
+(`egxpilot_fundamentals`, live-verified against 100/101 AGX tickers;
+`chief_egx_financials`, discovered per-run) supplying `shares_outstanding`/
+`total_equity`/`total_debt`/`ebitda`, closing TD-55's long-standing
+"no ticker can reach the 3-model fair-value floor" gap; a new
+`valuation.metrics.compute_valuation_metrics()`/`ValuationMetrics`
+computing `enterprise_value`, `ev_to_ebitda`, `price_to_book`,
+`dcf_per_share`, and market P/E/beta/dividend-yield from reported fields
+only; `meta.recommendation_service` now generates a valuation-only
+INVESTMENT prediction when no knowledge-weighted model produces one, and
+`meta.readiness` allows a decision from `fair_value_available` alone
+(previously required an active `KnowledgeObject`); a new full-universe
+opportunities table on `/cases` (`InvestmentCases.tsx`) ranking every
+constituent by `combined_expected_return` across all three horizons with a
+per-ticker data-coverage/blocker column — this is the "read the market,
+rank every opportunity" view the project owner asked for; a real
+event-risk double-counting bug fixed (market-wide headlines with the same
+subtype no longer each independently penalize confidence).
+
+**This session's own review, not a redo**: ran the full test/lint/build
+suite (887 backend, 33 `api`, 53 `web` tests; `ruff check`; `tsc`;
+production builds for both `api`/`web`; `contracts/` regeneration —
+zero drift), read every changed file in the three commits line by line,
+and found one real, previously-unnoticed bug:
+`decision_service.macro_overlay.assess_macro_overlay()` summed raw
+`importance_weight` floats into `available_weight` without rounding
+(`0.20+0.20+0.15+0.05 = 0.6000000000000001` in Python), breaking a `==`
+test assertion and risking the same float noise reaching the exported
+dashboard artifact. Fixed with `round(..., 6)` at the point of
+computation — see TD-55's updated entry and `docs/TECHNICAL_DEBT.md`.
+
+**Verified honestly, not asserted**: this sandbox has no network egress
+(confirmed directly against the agent proxy's own `recentRelayFailures` —
+`connect_rejected`/403 for `stockanalysis.com`, `enterprise.press`,
+`api.stlouisfed.org`), the same constraint every prior mission in this
+log has hit. `egxpilot_fundamentals`'s "100/101 tickers" figure is its own
+author's live-run evidence recorded in `sources/catalog.py`, not something
+this review re-fetched; `chief_egx_financials`'s per-company coverage is
+explicitly partial (`SourceSpec.notes`: "discovered each run"). Reviewed
+every `DISABLED` source in the registry (`egx_official`, `cbe`,
+`yahoo_finance`, `stockanalysis`, `mubasher`, `investing_com`/
+`investing_news`, `imf`, `trading_economics`) against the project owner's
+"delete truly dead sources" instruction and found each one is not dead
+code but a documented graveyard entry with a real, live-evidenced blocker
+(network-level anti-bot TCP resets, explicit ToS prohibition, robots.txt
+disallow, or a paid-tier-only free plan) — `yahoo_finance`/`stockanalysis`/
+`mubasher` specifically are already integrated as fallback legs inside the
+real `egx_price_composite` collector (`integrated_via` field) and only the
+standalone catalog entry is `DISABLED`; deleting any of these would erase
+the audit trail this codebase's own architecture (see the `SourceCategory.
+ALTERNATIVE` incident, `docs/PHASE_STATUS.md`) explicitly protects, for
+zero decision-quality gain. Nothing was deleted.
+
+**Not verifiable from this session, named as the real next step**: whether
+the full ~100-ticker universe now actually clears the fair-value/valuation
+floor end to end can only be confirmed by the next real `deploy-pages.yml`
+run (real network egress, real EGXpilot/Chief Capital fetches) — read
+`financial_coverage.json`/`ticker_data_gap_report.json` after that run to
+see exactly how many of the 101 tickers still show `ValuationMetrics.
+unavailable_reasons` for `total_equity`/`total_debt`/`ebitda` (the fields
+only `chief_egx_financials`/company-IR sources supply, not
+`egxpilot_fundamentals`'s market-cap-only data) — those are a genuine
+data-availability gap, not an engineering one, and this platform's own
+anti-fabrication rule forbids inventing values to close it.
+
+**Result**: 887 backend tests pass (1 fixed, 0 net new — this was a
+review pass, not new-feature work); `ruff check` clean; 33 `api` tests
+pass; 53 `web` tests pass; both `npm run build` clean; `contracts/`
+regeneration produced zero diff.
+
+## Prior mission: Zero-Cost Production Deployment + Shadow Fund (2026-08-01)
 
 The project owner redefined the production deployment architecture:
 permanently free, GitHub Actions + GitHub Pages only, explicitly no VPS/

@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased — Investment Operating System review: full-universe evidence, DCF/EBITDA/EV/P-B, one real bug fixed
+
+Reviewed three same-day commits (`4799994`, `72cd2f8`, `479ffc0`) that
+connected two new `IMPLEMENTED` sources (`egxpilot_fundamentals`,
+`chief_egx_financials`) supplying `shares_outstanding`/`total_equity`/
+`total_debt`/`ebitda` for the first time, closing TD-55's long-standing
+"no ticker can reach the 3-model fair-value floor" gap. New
+`valuation.metrics.ValuationMetrics` computes `enterprise_value`,
+`ev_to_ebitda`, `price_to_book`, and `dcf_per_share` from reported fields
+only; `meta.recommendation_service` and `meta.readiness` now let a
+valuation-only Investment-horizon decision reach a ticker with no
+promoted knowledge object; a new full-universe opportunities table on
+`/cases` ranks every constituent by expected return across all three
+horizons; a market-wide event-risk double-counting bug was fixed. See
+`CURRENT_MISSION.md`'s matching entry for the full report.
+
+**Found and fixed this review**: `decision_service.macro_overlay
+.assess_macro_overlay()` summed raw `importance_weight` floats into
+`available_weight` without rounding, producing `0.6000000000000001`
+instead of `0.6` — broke a test, and would have leaked the same float
+noise into the exported dashboard artifact. Fixed with `round(..., 6)`.
+See `docs/TECHNICAL_DEBT.md`'s updated TD-55.
+
+**Result**: 887 backend tests pass; `ruff check` clean; 33 `api` tests
+pass; 53 `web` tests pass; both `npm run build` clean; `contracts/`
+regeneration produced zero diff.
+
 ## Unreleased — Zero-Cost Production Deployment + Shadow Fund
 
 The project owner redefined the production deployment architecture:

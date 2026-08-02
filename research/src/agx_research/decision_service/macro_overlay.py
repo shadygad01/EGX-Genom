@@ -74,7 +74,7 @@ def assess_macro_overlay(
             change_pct=change,
             impact="supportive" if signal > 0 else "adverse" if signal < 0 else "neutral",
         ))
-    available_weight = sum(row.importance_weight for row in contributions)
+    available_weight = round(sum(row.importance_weight for row in contributions), 6)
     if available_weight == 0:
         return MacroDecisionOverlay(
             as_of=as_of, decision="insufficient_data", score=0.0,

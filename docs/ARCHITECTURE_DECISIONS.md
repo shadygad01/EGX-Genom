@@ -4,6 +4,157 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-59 — Run-scoped collection dedup cache: infrastructure concern, correctly interim, not yet a Canonical Dataset Cache
+
+**Classification: infrastructure concern, not a business concern.** The
+cache added to `CapabilityDecisionEngine` (`acquisition_intelligence/
+capability_engine.py`, `_executed_this_run`) does not touch what counts
+as evidence, does not change a gate/threshold, and does not affect which
+data a decision is allowed to use — it only prevents the *same already-
+collected bytes* from being fetched twice over the network within one
+run. It carries no investment-domain meaning and is not governed by
+`docs/INVESTMENT_CONSTITUTION.md`/`DECISION_STANDARDS.md`; it belongs
+entirely to the data-acquisition/collection layer (System 02), the same
+tier as `RawArchive`'s content-addressed write-once store or
+`ProvenanceIndexRepository` — plumbing that makes collection efficient
+and auditable, not plumbing that decides anything.
+
+### Current design
+
+`CapabilityDecisionEngine` is constructed exactly once per production
+run (`production/pipeline.py`'s `_stage_collector_execution`) and its
+`decide_and_execute()` is called once per `Capability` in a loop on that
+same instance. `_executed_this_run: dict[str, _ExecutedSource]` is
+private instance state, keyed by `source_id`, populated the first time
+any capability call reaches a real `CollectionService.run()` for that
+id (success, zero-yield, or failure all recorded). Every later
+capability call that also lists that `source_id` reads the cached
+`_ExecutedSource` instead of fetching again, recorded as an honest
+`"reused"` outcome in that capability's own `CapabilityStrategyAttempt`
+— never silently folded into `"succeeded"`.
+
+### Advantages
+
+- Minimal and surgical: no new module, abstraction, or public interface;
+  a private cache on the one class that was actually causing the
+  duplication.
+- Provably sufficient for the only real duplication path that exists
+  today: `CapabilityDecisionEngine.decide_and_execute` is the sole
+  caller of `CollectionService.run()` anywhere in the live pipeline
+  (verified — no other call site exists in `production/`).
+- Correctly scoped to one pipeline run's lifetime (tied to one engine
+  instance's lifetime, which the pipeline itself bounds to one run),
+  matching this codebase's existing "each day's run is its own
+  reproducible unit" posture elsewhere (`AD-02`, `RuntimeEngine`'s
+  per-day isolation) — it introduces no cross-day state to go stale.
+- Preserves full auditability: `acquisition_decisions.json` still
+  explains every attempt, including reused ones, rather than hiding the
+  optimization from Mission Control.
+- Zero change to each capability's own independent ranking/fallback
+  semantics (`EXHAUSTIVE_CAPABILITIES`, `already_satisfied` early-stop)
+  — only the underlying fetch is deduplicated.
+
+### Limitations
+
+- **Ownership mismatch.** The fact this cache holds — "has source X
+  already been collected this run" — is a property of the *acquisition/
+  collection layer*, not of capability ranking/decision logic.
+  `CapabilityDecisionEngine`'s job is to rank and select strategies; it
+  now also, incidentally, owns the platform's only record of what has
+  already been fetched this run. That it lives here today is an artifact
+  of "this happens to be the only caller," not a designed guarantee.
+- **Not visible or reusable outside the capability loop.** A future
+  caller that also needs to avoid re-fetching a source this run (a new
+  pipeline stage, `agx collect` running alongside `agx run`, the
+  Acquisition Intelligence Engine's continuity monitor) has no way to
+  see or share this cache — it is trapped in a private attribute of one
+  object.
+- **No addressable dataset identity.** The cache holds a raw
+  `CollectionRunResult`/failure reason, not a named, inspectable
+  "canonical dataset for run `2026-08-02`, source `chief_egx_financials`"
+  object. It cannot be queried or audited independently of
+  `CapabilityDecisionEngine`'s own internals, and it disappears with the
+  process — only the *outputs* `CollectionService` already wrote to disk
+  persist, not the *fact* that a fetch was already attempted.
+- **Coarse, implicit granularity.** Keyed only by `source_id`. Correct
+  today because every catalogued source happens to produce one coherent
+  bundle per run, but cannot express a future source that legitimately
+  serves two independently-refreshable canonical datasets (e.g.
+  different real-world update cadences) without a deeper change.
+- **The correctness invariant is enforced by convention, not by
+  structure.** The whole fix depends on "the production pipeline
+  constructs exactly one `CapabilityDecisionEngine` per run" staying
+  true. Nothing in the type system or call graph prevents a future
+  change (a second engine instance, a parallelized/multi-process
+  collection stage) from silently reintroducing the exact duplication
+  this decision closes, with no test failure pointing at the cause
+  unless that future change also breaks the regression tests written
+  against this specific call shape.
+
+### Long-term migration path
+
+If migration is ever warranted (see trigger conditions below), promote
+the cache out of `CapabilityDecisionEngine` into a **Canonical Dataset
+Cache** owned by the acquisition/collection layer itself (a new
+`collectors`- or `acquisition_intelligence`-level module, sibling to
+`RawArchive`/`ProvenanceIndexRepository`, not a capability-layer
+concept):
+
+1. A `RunScopedCollectionCache` (or similarly named) object, constructed
+   once by `ProductionPipeline.run()` itself — not implicitly tied to
+   `CapabilityDecisionEngine`'s lifetime — and passed by injection to
+   whatever needs it, the same dependency-injection shape
+   `CapabilityDecisionEngine` already uses for `collector_factory`.
+2. `CollectionService.run()` (or a thin wrapper immediately around it)
+   becomes the single place that consults/populates the cache, keyed by
+   `(source_id)` today and extensible to `(source_id, dataset_kind)` if
+   a source ever needs finer-grained reuse. Every caller — the capability
+   engine, and any future one — asks the *acquisition layer* whether a
+   source was already collected this run, rather than the capability
+   engine being the one place that happens to know.
+3. This turns "at most one real fetch per source per run" from true-by-
+   accident-of-the-current-call-graph into true-by-construction,
+   independent of how many callers exist — and makes the cache
+   independently testable and inspectable (e.g. exportable as a debug
+   artifact) without going through `CapabilityDecisionEngine` at all.
+
+### Conditions that would justify migrating
+
+1. A second real call site starts invoking `CollectionService.run()`
+   outside `CapabilityDecisionEngine.decide_and_execute` (e.g. `agx
+   collect` running in the same process as `agx run`, or a new pipeline
+   stage independently fetching a source already collected elsewhere
+   this run).
+2. A catalogued source is found to genuinely produce more than one
+   independently-refreshable canonical dataset, requiring a cache key
+   finer than `source_id`.
+3. The "exactly one `CapabilityDecisionEngine` instance per run"
+   invariant is ever broken (a refactor constructing a fresh engine per
+   capability, or a parallelized/multi-process collection stage) — at
+   that point the in-memory dict silently stops deduplicating.
+4. A future requirement needs "already collected this run" to survive
+   beyond one process's memory (resuming a partially-completed run, or a
+   distributed collection stage) — today's cache is memory-only and
+   process-bound.
+5. Operators want "what was collected, from where, exactly once, this
+   run" as a first-class, independently inspectable artifact (in the
+   spirit of `collector_status.json`) rather than something only
+   inferable from scattered `"reused"` outcomes inside
+   `acquisition_decisions.json`.
+
+None of these conditions hold today — there is exactly one call site,
+every source produces one bundle per run, one engine instance per run is
+guaranteed by `production/pipeline.py`'s own structure, nothing needs
+the fact to outlive one process, and the `"reused"` outcome already
+gives Mission Control the observability that exists today. The current
+design is therefore the *correct interim* implementation, not a
+placeholder rushed under time pressure — but it is deliberately not
+claimed as a permanent one: it trades a small, real, named coupling
+(capability-layer class incidentally owning an acquisition-layer fact)
+for avoiding a new module and interface that nothing yet needs. Revisit
+this decision the first time any condition above actually occurs, not
+preemptively.
+
 ## AD-33 — Calculate fair value inside AGX; never import Smartlist outputs
 
 AGX ports the Smartlist IVE V2 method as a pure, point-in-time engine over

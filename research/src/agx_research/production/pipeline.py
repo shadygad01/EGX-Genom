@@ -71,6 +71,7 @@ from agx_research.collectors.discovery_reconciliation import reconcile_discovery
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository
 from agx_research.collectors.raw import RawDocumentRepository
+from agx_research.methodology import MethodologyRegistry, seed_methodology_registry
 from agx_research.collectors.service import CollectionRunResult, CollectionService
 from agx_research.dashboard.committee_summary import build_committee_summary
 from agx_research.dashboard.export import ARTIFACT_FILENAMES, write_dashboard_artifacts
@@ -838,6 +839,12 @@ class ProductionPipeline:
             self.market_memory,
             agents,
             hypothesis_repository=HypothesisRepository(self.data_dir / "hypotheses.json"),
+            claim_registry=seed_methodology_registry(
+                MethodologyRegistry(
+                    self.data_dir / "methodology_sources.json",
+                    self.data_dir / "claims.json",
+                )
+            ).claims,
             knowledge_store=self.knowledge_store,
             genome=self.genome,
             paper_repository=PaperRepository(self.data_dir / "papers.json"),
@@ -1132,6 +1139,17 @@ class ProductionPipeline:
             json.dumps(hypotheses, indent=2, sort_keys=True) + "\n"
         )
         counts["hypotheses.json"] = len(hypotheses)
+
+        claims = production_artifacts.export_claims(
+            MethodologyRegistry(
+                self.data_dir / "methodology_sources.json",
+                self.data_dir / "claims.json",
+            ).claims
+        )
+        (dashboard_out / "claims.json").write_text(
+            json.dumps(claims, indent=2, sort_keys=True) + "\n"
+        )
+        counts["claims.json"] = len(claims)
 
         knowledge_graph = production_artifacts.export_knowledge_graph(
             KnowledgeGraph(self.data_dir / "graph_nodes.json", self.data_dir / "graph_edges.json")

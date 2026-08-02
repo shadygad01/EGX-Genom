@@ -26,6 +26,7 @@ import json
 from pathlib import Path
 
 from agx_research.capital_allocation import CapitalAllocationPlan
+from agx_research.claims import Claim
 from agx_research.dashboard.committee_summary import CommitteeSummaryReport
 from agx_research.dashboard.monitoring import MonitoringWarningsReport
 from agx_research.dashboard.portfolio_summary import PortfolioSummaryReport
@@ -44,6 +45,7 @@ from agx_research.universe.provider import UniverseArtifact
 CONTRACTS_DIR = Path(__file__).resolve().parents[2] / "contracts"
 
 MODELS = {
+    "claim.schema.json": Claim,
     "knowledge_object.schema.json": KnowledgeObject,
     "event.schema.json": Event,
     "recommendation.schema.json": Recommendation,

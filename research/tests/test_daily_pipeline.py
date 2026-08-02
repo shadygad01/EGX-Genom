@@ -7,6 +7,7 @@ from datetime import date
 from pathlib import Path
 
 from agx_research.agents.market_structure import MarketStructureAgent
+from agx_research.claims import ClaimStage
 from agx_research.data.mock_provider import MockDataProvider
 from agx_research.genome.gene import GeneStatus
 from agx_research.hypotheses.pipeline import StageName
@@ -63,6 +64,12 @@ def test_full_promotion_path_end_to_end():
     assert knowledge.statistical_evidence.method == "BootstrapExperiment"
     assert 0.0 <= knowledge.confidence <= 0.9  # capped, evidence-derived
     assert knowledge.economic_explanation  # causal gate required it
+    assert knowledge.provenance.inputs[0].kind == "claim"
+    claim = pipeline.claims.latest(outcome.hypothesis_id)
+    assert claim is not None
+    assert claim.stage == ClaimStage.VALIDATION
+    assert claim.is_experimentally_validated
+    assert claim.knowledge_id == knowledge.id
 
     # Gene, paper, and graph all exist and link back.
     gene = pipeline.genome.repository.latest(outcome.gene_id)
@@ -72,6 +79,7 @@ def test_full_promotion_path_end_to_end():
     paper = pipeline.papers.latest(outcome.paper_id)
     assert paper.gene_id == gene.id
     assert result.session.dataset_snapshot_id in paper.dataset
+    assert paper.id in claim.source_paper_ids
 
     assert pipeline.graph.nodes.latest(gene.id) is not None
     assert pipeline.graph.shortest_path(knowledge.id, paper.id) is not None

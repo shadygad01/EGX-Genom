@@ -23,6 +23,7 @@ import type {
   FinancialStatementLineItem,
   Gene,
   Hypothesis,
+  InvestmentClaim,
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
@@ -124,6 +125,10 @@ export class ApiProvider implements DashboardDataProvider {
 
   getPapers(): Promise<ResearchPaper[]> {
     return fetchJson<ResearchPaper[]>("/papers");
+  }
+
+  getClaims(): Promise<InvestmentClaim[]> {
+    return fetchJson<InvestmentClaim[]>("/claims");
   }
 
   getHypotheses(): Promise<Hypothesis[]> {

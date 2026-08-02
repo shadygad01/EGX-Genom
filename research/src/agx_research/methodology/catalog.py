@@ -28,18 +28,17 @@ to a production rule), kept structurally apart from the Operational
 Decision Pipeline (`production.pipeline.ProductionPipeline`, run daily) so
 the two are never mixed.
 
-Nothing in this codebase reads `seed_methodology_registry()`'s output yet
--- no CLI command, dashboard artifact, or agent. That is honestly a real
-gap, not fabricated closed: turning a collected paper into a
-`ResearchFinding` an agent can propose is the Research & Methodology
-Pipeline mission itself, named as future work in `docs/PHASE_STATUS.md`,
-not built here. This module only gives these sources a correctly-scoped,
-non-operational home instead of either deleting them or leaving them
-inside the registry that drives real decisions.
+The registry now also owns the Claim Registry used by the Research &
+Methodology Pipeline. Literature sources still have no operational collector
+or decision capability; papers must first be decomposed into claims and those
+claims must survive their evidence lifecycle before production eligibility.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from agx_research.claims.registry import ClaimRegistry
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.spec import (
     AccessMethod,
@@ -48,6 +47,23 @@ from agx_research.sources.spec import (
     SourceStatus,
     default_lifecycle_for_status,
 )
+
+
+class MethodologyRegistry(SourceRegistry):
+    """The existing methodology source registry, extended with claims.
+
+    Source lifecycle stays on ``SourceRegistry`` and claim lifecycle stays on
+    the shared versioned repository.  One registry owns both; production never
+    reads the literature-source side directly.
+    """
+
+    def __init__(
+        self,
+        source_persist_path: Path | str | None = None,
+        claim_persist_path: Path | str | None = None,
+    ):
+        super().__init__(source_persist_path)
+        self.claims = ClaimRegistry(claim_persist_path)
 
 
 def _spec(**kwargs) -> SourceSpec:
@@ -84,14 +100,18 @@ def seed_research_sources() -> list[SourceSpec]:
     ]
 
 
-def seed_methodology_registry(registry: SourceRegistry | None = None) -> SourceRegistry:
+def seed_methodology_registry(
+    registry: MethodologyRegistry | SourceRegistry | None = None,
+    *,
+    claim_persist_path: Path | str | None = None,
+) -> MethodologyRegistry | SourceRegistry:
     """Same add/sync/retire lifecycle `sources.catalog.seed_registry()`
     uses for the operational registry, applied to this independent
     instance -- so a future promotion (e.g. a verified real arXiv feed
     URL) or removal self-heals here exactly the same way, without
     duplicating that logic or its edge cases.
     """
-    registry = registry or SourceRegistry()
+    registry = registry or MethodologyRegistry(claim_persist_path=claim_persist_path)
     current_ids: set[str] = set()
     specs = seed_research_sources()
     for spec in specs:

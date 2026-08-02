@@ -92,6 +92,10 @@ export class ArtifactsReader {
     return readJsonOrDefault<T[]>(this.path("papers.json"), []);
   }
 
+  claims<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("claims.json"), []);
+  }
+
   hypotheses<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("hypotheses.json"), []);
   }

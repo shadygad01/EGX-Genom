@@ -144,3 +144,9 @@
 .toolLink:hover {
   text-decoration: underline;
 }
+.claimLifecycle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  min-width: 28rem;
+}

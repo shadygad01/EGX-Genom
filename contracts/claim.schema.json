@@ -1,0 +1,259 @@
+{
+  "$defs": {
+    "ClaimEvidence": {
+      "properties": {
+        "evidence_type": {
+          "title": "Evidence Type",
+          "type": "string"
+        },
+        "metrics": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Metrics",
+          "type": "object"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "stage": {
+          "$ref": "#/$defs/ClaimStage"
+        }
+      },
+      "required": [
+        "stage",
+        "evidence_type",
+        "ref_id",
+        "recorded_at",
+        "passed"
+      ],
+      "title": "ClaimEvidence",
+      "type": "object"
+    },
+    "ClaimStage": {
+      "enum": [
+        "hypothesis",
+        "experiment",
+        "validation",
+        "shadow_fund",
+        "investment_proof",
+        "promoted",
+        "rejected"
+      ],
+      "title": "ClaimStage",
+      "type": "string"
+    },
+    "GateSpec": {
+      "description": "One named gate in a validation pipeline, in a fixed order.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "order": {
+          "title": "Order",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "order"
+      ],
+      "title": "GateSpec",
+      "type": "object"
+    },
+    "Horizon": {
+      "description": "The three independent time horizons the platform optimizes simultaneously.",
+      "enum": [
+        "micro",
+        "swing",
+        "investment"
+      ],
+      "title": "Horizon",
+      "type": "string"
+    },
+    "Provenance": {
+      "properties": {
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "produced_at": {
+          "format": "date-time",
+          "title": "Produced At",
+          "type": "string"
+        },
+        "produced_by": {
+          "title": "Produced By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "produced_by",
+        "produced_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "description": "A pointer to one input entity: what kind it is, its id, and (if versioned) which version.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "ref_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Version"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affected_assets": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Affected Assets",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "evidence_history": {
+      "items": {
+        "$ref": "#/$defs/ClaimEvidence"
+      },
+      "title": "Evidence History",
+      "type": "array"
+    },
+    "horizon": {
+      "$ref": "#/$defs/Horizon"
+    },
+    "hypothesis_id": {
+      "title": "Hypothesis Id",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "knowledge_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Knowledge Id"
+    },
+    "methodology": {
+      "items": {
+        "$ref": "#/$defs/GateSpec"
+      },
+      "title": "Methodology",
+      "type": "array"
+    },
+    "methodology_id": {
+      "title": "Methodology Id",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "rejection_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rejection Reason"
+    },
+    "source_paper_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Paper Ids",
+      "type": "array"
+    },
+    "stage": {
+      "$ref": "#/$defs/ClaimStage",
+      "default": "hypothesis"
+    },
+    "statement": {
+      "title": "Statement",
+      "type": "string"
+    },
+    "version": {
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "statement",
+    "created_by",
+    "created_at",
+    "horizon",
+    "affected_assets",
+    "provenance",
+    "methodology_id",
+    "methodology",
+    "hypothesis_id"
+  ],
+  "title": "Claim",
+  "type": "object"
+}

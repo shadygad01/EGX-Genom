@@ -1,5 +1,19 @@
 # AGX Architecture
 
+## Investment Science Lab and Claim Registry
+
+`methodology.MethodologyRegistry` extends the existing methodology-source
+registry with an owned `ClaimRegistry`. Claims reuse
+`hypotheses.pipeline.GateSpec` and the shared versioned `JsonFileRepository`;
+papers remain containers linked through `Claim.source_paper_ids`, never workflow
+or production inputs. This is one methodology registry with two typed stores,
+not a parallel operational source or workflow architecture.
+
+The production chain is `Hypothesis -> Claim -> experimentally validated Claim
+-> KnowledgeObject`. Validation is the production-eligibility boundary. Shadow-
+fund and investment-proof evidence are later lifecycle gates leading to final
+promotion or rejection; missing evidence remains visibly pending.
+
 This describes the current shape of the codebase and how it is intended to
 grow. See `docs/ARCHITECTURE_AUDIT.md` (Epoch I), `docs/EPOCH_II_DESIGN.md`
 (Epoch II), and `docs/PHASE_STATUS.md` (the strict-order phase audit

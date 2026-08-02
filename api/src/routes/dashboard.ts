@@ -25,6 +25,7 @@ export async function dashboardRoutes(
   app.get("/execution-report", async () => artifacts.executionReport());
   app.get("/genes", async () => artifacts.genes());
   app.get("/papers", async () => artifacts.papers());
+  app.get("/claims", async () => artifacts.claims());
   app.get("/hypotheses", async () => artifacts.hypotheses());
   app.get("/knowledge-graph", async () => artifacts.knowledgeGraph());
   app.get("/financial-statements", async () => artifacts.financialStatements());

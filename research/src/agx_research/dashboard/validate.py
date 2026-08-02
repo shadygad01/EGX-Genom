@@ -41,6 +41,7 @@ from agx_research.meta.decision_quality import evaluate_decision_quality
 from agx_research.meta.system_maturity import SystemMaturityReport
 from agx_research.meta.readiness import DecisionReadiness, TickerDataGapReport
 from agx_research.papers.paper import ResearchPaper
+from agx_research.claims import Claim
 from agx_research.portfolio.constructor import PortfolioRecommendation
 from agx_research.production.mission_control import MissionControlStatus
 from agx_research.production.report import ExecutionReport
@@ -182,6 +183,7 @@ def validate_dashboard_artifacts(
     _validate_optional_model_list(directory, "genes.json", Gene, counts)
     _validate_optional_model_list(directory, "papers.json", ResearchPaper, counts)
     _validate_optional_model_list(directory, "hypotheses.json", Hypothesis, counts)
+    _validate_optional_model_list(directory, "claims.json", Claim, counts)
     _validate_optional_model_list(
         directory, "financial_statements.json", FinancialStatementLineItem, counts
     )

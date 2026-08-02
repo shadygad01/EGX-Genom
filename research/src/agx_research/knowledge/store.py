@@ -73,6 +73,9 @@ class KnowledgeStore:
                 f"(currently at gate '{evidence.current_stage_name}'); "
                 f"it must pass the pipeline's final gate first."
             )
+        evidence_kind = (
+            "claim" if hasattr(evidence, "is_experimentally_validated") else "hypothesis"
+        )
         knowledge = KnowledgeObject(
             id=evidence.id,
             version=1,
@@ -88,10 +91,10 @@ class KnowledgeStore:
             expected_risk=expected_risk,
             status=KnowledgeStatus.PROMOTED,
             provenance=Provenance(
-                produced_by="hypothesis_promotion_pipeline",
+                produced_by="claim_validation_pipeline",
                 produced_at=datetime.now(),
                 inputs=[
-                    ProvenanceRef(kind="hypothesis", ref_id=evidence.id, ref_version=evidence.version)
+                    ProvenanceRef(kind=evidence_kind, ref_id=evidence.id, ref_version=evidence.version)
                 ],
             ),
         )

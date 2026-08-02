@@ -42,6 +42,8 @@ from agx_research.adversarial.scientist import AdversarialScientist, apply_adver
 from agx_research.agents.base import ResearchAgent, ResearchFinding
 from agx_research.causal.assessment import CandidateCause
 from agx_research.causal.reasoner import EconomicRationaleGate
+from agx_research.claims.claim import ClaimStage
+from agx_research.claims.registry import ClaimRegistry
 from agx_research.data.adjustments import (
     HORIZON_FORWARD_TRADING_DAYS,
     horizon_forward_returns,
@@ -153,6 +155,7 @@ class DailyResearchPipeline:
         *,
         config: PipelineConfig | None = None,
         hypothesis_repository: HypothesisRepository | None = None,
+        claim_registry: ClaimRegistry | None = None,
         knowledge_store: KnowledgeStore | None = None,
         genome: AlphaGenome | None = None,
         paper_repository: PaperRepository | None = None,
@@ -163,6 +166,7 @@ class DailyResearchPipeline:
         self.agents = agents
         self.config = config or PipelineConfig()
         self.hypotheses = hypothesis_repository or HypothesisRepository()
+        self.claims = claim_registry or ClaimRegistry()
         self.knowledge = knowledge_store or KnowledgeStore()
         self.genome = genome or AlphaGenome()
         self.papers = paper_repository or PaperRepository()
@@ -231,6 +235,7 @@ class DailyResearchPipeline:
     ) -> HypothesisOutcome:
         snapshot = market_state.dataset_snapshot
         hypothesis = Hypothesis.from_finding(finding)
+        claim = self.claims.register_hypothesis(hypothesis)
         cfg = self.config
 
         def advance(stage: StageName, passed: bool, notes: str, **metrics: float) -> bool:
@@ -248,6 +253,21 @@ class DailyResearchPipeline:
             return passed
 
         def rejected(reason: str) -> HypothesisOutcome:
+            nonlocal claim
+            if claim.stage not in {ClaimStage.REJECTED, ClaimStage.PROMOTED}:
+                rejection_stage = (
+                    ClaimStage.VALIDATION
+                    if claim.stage == ClaimStage.EXPERIMENT
+                    else claim.stage
+                )
+                claim = self.claims.record(
+                    claim.id,
+                    stage=rejection_stage,
+                    evidence_type="pipeline_gate",
+                    ref_id=hypothesis.id,
+                    passed=False,
+                    notes=reason,
+                )
             return HypothesisOutcome(
                 hypothesis_id=hypothesis.id,
                 final_stage=hypothesis.current_stage_name,
@@ -311,6 +331,14 @@ class DailyResearchPipeline:
         )
         if not ok:
             return rejected("Too few experiments could run")
+        claim = self.claims.record(
+            claim.id,
+            stage=ClaimStage.EXPERIMENT,
+            evidence_type="experiment_batch",
+            ref_id=hypothesis.id,
+            passed=True,
+            notes=f"{len(experiment_results)} experiments produced results",
+        )
 
         # 5. STATISTICAL_VALIDATION: significance of the bootstrap evidence.
         bootstrap = experiment_results.get("BootstrapExperiment")
@@ -431,9 +459,21 @@ class DailyResearchPipeline:
         if not ok:
             return rejected(f"Review board rejected: {board_notes}")
 
+        # A paper is never promotion evidence. The claim becomes production-
+        # eligible only from the experiment/validation evidence above.
+        claim = self.claims.record(
+            claim.id,
+            stage=ClaimStage.VALIDATION,
+            evidence_type="peer_validated_experiment",
+            ref_id=hypothesis.id,
+            passed=True,
+            notes=board_notes,
+            metrics={"p_value": bootstrap.p_value, "corrected_alpha": corrected_alpha},
+        )
+
         # Promotion: the only write into the knowledge store.
         knowledge = self.knowledge.promote(
-            hypothesis,
+            claim,
             confidence=candidate.confidence,
             statistical_evidence=candidate.statistical_evidence,
             economic_explanation=candidate.economic_explanation,
@@ -451,6 +491,8 @@ class DailyResearchPipeline:
             dataset_snapshot_id=snapshot.id,
         )
         self.papers.add(paper)
+        self.claims.attach_knowledge(claim.id, knowledge.id)
+        self.claims.attach_paper(claim.id, paper.id)
         publication = self.artifacts.store(
             kind=ArtifactKind.KNOWLEDGE_PUBLICATION,
             payload=knowledge,

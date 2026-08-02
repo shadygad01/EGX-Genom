@@ -12,7 +12,7 @@ import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { formatPercent, formatSignedPercent } from "../lib/format";
-import type { DecisionReadiness, Hypothesis, KnowledgeStatus, ReadinessStatus, TickerDataGapReport } from "../types";
+import type { ClaimStage, DecisionReadiness, Hypothesis, KnowledgeStatus, ReadinessStatus, TickerDataGapReport } from "../types";
 import { Meter } from "../components/primitives/Meter";
 import styles from "./ResearchCenter.module.css";
 
@@ -23,6 +23,8 @@ const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
   monitoring: "accent",
   retired: "neutral",
 };
+
+const CLAIM_STAGES: ClaimStage[] = ["hypothesis", "experiment", "validation", "shadow_fund", "investment_proof", "promoted"];
 
 function hypothesisStatus(
   h: Hypothesis,
@@ -50,6 +52,7 @@ export function ResearchCenter() {
   const label = useEnumLabel();
   const { formatDate, formatDateTime } = useFormatters();
   const hypotheses = useArtifact((p) => p.getHypotheses());
+  const claims = useArtifact((p) => p.getClaims());
   const knowledge = useArtifact((p) => p.getKnowledge());
   const papers = useArtifact((p) => p.getPapers());
   const readiness = useArtifact((p) => p.getDecisionReadiness());
@@ -81,6 +84,39 @@ export function ResearchCenter() {
 
   return (
     <>
+      <Section title={t("claims.title")} description={t("claims.description")}>
+        {claims.loading && <LoadingState rows={4} />}
+        {claims.error && <ErrorState detail={claims.error.message} onRetry={claims.reload} />}
+        {!claims.loading && !claims.error && (
+          <Card dense>
+            <DataTable
+              rows={claims.data ?? []}
+              getRowKey={(claim) => claim.id}
+              emptyTitle={t("claims.emptyTitle")}
+              emptyDetail={t("claims.emptyDetail")}
+              columns={[
+                { key: "claim", header: t("claims.claim"), render: (claim) => claim.statement },
+                { key: "papers", header: t("claims.papers"), align: "right", render: (claim) => <span className="num">{claim.source_paper_ids.length}</span> },
+                {
+                  key: "lifecycle",
+                  header: t("claims.lifecycle"),
+                  render: (claim) => (
+                    <div className={styles.claimLifecycle}>
+                      {CLAIM_STAGES.map((stage) => {
+                        const reached = claim.stage !== "rejected" && CLAIM_STAGES.indexOf(stage) <= CLAIM_STAGES.indexOf(claim.stage);
+                        return <Badge key={stage} variant={reached ? (stage === "validation" ? "positive" : "accent") : "neutral"}>{t(`claims.stages.${stage}`)}</Badge>;
+                      })}
+                      {claim.stage === "rejected" && <Badge variant="negative">{t("claims.stages.rejected")}</Badge>}
+                    </div>
+                  ),
+                },
+                { key: "eligible", header: t("claims.production"), render: (claim) => <Badge variant={claim.evidence_history.some((e) => e.stage === "validation" && e.passed) && claim.stage !== "rejected" ? "positive" : "neutral"}>{claim.evidence_history.some((e) => e.stage === "validation" && e.passed) && claim.stage !== "rejected" ? t("claims.eligible") : t("claims.blocked")}</Badge> },
+              ]}
+            />
+          </Card>
+        )}
+      </Section>
+
       <Section title={t("pipeline.title")} description={t("pipeline.description")}>
         {hypotheses.loading && <LoadingState rows={4} />}
         {hypotheses.error && <ErrorState detail={hypotheses.error.message} onRetry={hypotheses.reload} />}

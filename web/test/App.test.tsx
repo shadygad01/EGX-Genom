@@ -22,6 +22,7 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getExecutionReport: async () => null,
     getGenes: async () => [],
     getPapers: async () => [],
+    getClaims: async () => [],
     getHypotheses: async () => [],
     getKnowledgeGraph: async () => ({ nodes: [], edges: [] }),
     getFinancialStatements: async () => [],

@@ -25,6 +25,7 @@ import type {
   FinancialCoverageReport,
   Gene,
   Hypothesis,
+  InvestmentClaim,
   InvestmentCases,
   KnowledgeGraphData,
   KnowledgeObject,
@@ -95,6 +96,7 @@ export interface DashboardDataProvider {
   getExecutionReport(): Promise<ExecutionReport | null>;
   getGenes(): Promise<Gene[]>;
   getPapers(): Promise<ResearchPaper[]>;
+  getClaims(): Promise<InvestmentClaim[]>;
   getHypotheses(): Promise<Hypothesis[]>;
   getKnowledgeGraph(): Promise<KnowledgeGraphData>;
   getFinancialStatements(): Promise<FinancialStatementLineItem[]>;

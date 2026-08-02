@@ -1,4 +1,4 @@
-from agx_research.methodology import seed_methodology_registry, seed_research_sources
+from agx_research.methodology import MethodologyRegistry, seed_methodology_registry, seed_research_sources
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.spec import SourceCategory, SourceStatus
 
@@ -24,6 +24,8 @@ def test_seed_methodology_registry_is_independent_of_the_operational_registry():
     assert isinstance(registry, SourceRegistry)
     ids = {s.id for s in registry.all_latest()}
     assert ids == {"arxiv", "ssrn", "nber"}
+    assert isinstance(registry, MethodologyRegistry)
+    assert registry.claims.all_latest() == []
 
 
 def test_seed_methodology_registry_is_idempotent():

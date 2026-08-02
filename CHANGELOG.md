@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — Investment Science Lab / Claim Registry
+
+Extended the newly introduced `MethodologyRegistry` with a versioned Claim
+Registry rather than creating a second research architecture. Academic papers
+are evidence containers decomposed into explicit claims; attaching a paper can
+never satisfy validation. Claims independently traverse hypothesis → experiment
+→ validation → Shadow Fund → Investment Proof → promotion/rejection. The daily
+production research path consumes only experimentally validated claims and
+records claim provenance. Added `claims.json`, schema/API/provider support, a
+bilingual Research Lab surface, and lifecycle/production-boundary tests.
+
 ## Unreleased — New Methodology & Research Registry: arxiv/ssrn/nber moved out of the operational catalog
 
 Follow-up to the Mission Control fix below, per explicit project owner

@@ -1,4 +1,25 @@
 {
+  "claims": {
+    "title": "Investment Science Lab — Claim Registry",
+    "description": "Claims are the units of learning. Papers only contain evidence; production is blocked until a claim passes experimental validation.",
+    "emptyTitle": "No claims registered",
+    "emptyDetail": "A claim appears when a falsifiable hypothesis enters the shared methodology pipeline.",
+    "claim": "Testable claim",
+    "papers": "Papers",
+    "lifecycle": "Lifecycle",
+    "production": "Production",
+    "eligible": "Validated",
+    "blocked": "Blocked",
+    "stages": {
+      "hypothesis": "Hypothesis",
+      "experiment": "Experiment",
+      "validation": "Validation",
+      "shadow_fund": "Shadow fund",
+      "investment_proof": "Investment proof",
+      "promoted": "Promoted",
+      "rejected": "Rejected"
+    }
+  },
   "pipeline": {
     "title": "Hypothesis Pipeline",
     "description": "Discovery History, Active Research, and the Validation Queue are all this same 8-gate pipeline, viewed by stage.",

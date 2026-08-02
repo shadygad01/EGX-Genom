@@ -22,6 +22,7 @@ from agx_research.financials.collected import CollectedFinancialStatementProvide
 from agx_research.genome.service import AlphaGenome
 from agx_research.graph.knowledge_graph import KnowledgeGraph
 from agx_research.hypotheses.repository import HypothesisRepository
+from agx_research.claims.registry import ClaimRegistry
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.breadth import MarketBreadthReport, compute_market_breadth
 from agx_research.market_memory.regime import MarketRegimeReport, compute_market_regime
@@ -287,6 +288,11 @@ def export_hypotheses(hypotheses: HypothesisRepository) -> list[dict[str, Any]]:
     already-persisted record, not three separate exports.
     """
     return [h.model_dump(mode="json") for h in hypotheses.all_latest()]
+
+
+def export_claims(claims: ClaimRegistry) -> list[dict[str, Any]]:
+    """Claim Registry, including failed and pre-production lifecycle states."""
+    return [claim.model_dump(mode="json") for claim in claims.all_latest()]
 
 
 def export_knowledge_graph(graph: KnowledgeGraph) -> dict[str, Any]:

@@ -736,6 +736,37 @@ export interface Gene {
 
 // --- papers.json / ResearchPaper ---
 
+export type ClaimStage = "hypothesis" | "experiment" | "validation" | "shadow_fund" | "investment_proof" | "promoted" | "rejected";
+
+export interface ClaimEvidence {
+  stage: ClaimStage;
+  evidence_type: string;
+  ref_id: string;
+  recorded_at: string;
+  passed: boolean;
+  notes: string;
+  metrics: Record<string, number>;
+}
+
+export interface InvestmentClaim {
+  id: string;
+  version: number;
+  statement: string;
+  created_by: string;
+  created_at: string;
+  horizon: Horizon;
+  affected_assets: string[];
+  provenance: Provenance;
+  methodology_id: string;
+  methodology: GateSpec[];
+  source_paper_ids: string[];
+  hypothesis_id: string;
+  knowledge_id: string | null;
+  stage: ClaimStage;
+  evidence_history: ClaimEvidence[];
+  rejection_reason: string | null;
+}
+
 export interface ResearchPaper {
   id: string;
   version: number;

@@ -71,7 +71,7 @@ from agx_research.sources.catalog import seed_registry
 from agx_research.sources.registry import SourceRegistry
 from agx_research.universe.bootstrap import materialize_universe_seed
 from agx_research.universe.collected import CollectedUniverseProvider
-from agx_research.universe.sector import StaticSectorProvider
+from agx_research.universe.sector import CollectedSectorProvider, StaticSectorProvider
 
 _DEFAULT_MOCK_DATA = Path(__file__).resolve().parents[2] / "data" / "mock"
 _DEFAULT_UNIVERSE_SEED = Path(__file__).resolve().parents[2] / "data" / "universe"
@@ -164,7 +164,7 @@ def build_position_aware_decisions(
     market_memory = MarketMemory(
         LocalCsvDataProvider(data_dir),
         CollectedUniverseProvider(data_dir),
-        StaticSectorProvider(),
+        CollectedSectorProvider(data_dir),
         macro_series_ids=MACRO_SERIES_IDS,
         lookback_days=30,
         event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),

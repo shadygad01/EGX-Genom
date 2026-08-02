@@ -562,6 +562,56 @@ def test_reingesting_same_financial_statement_line_items_is_idempotent(tmp_path)
     assert len(rows) == 2  # header + one row, not duplicated
 
 
+def test_sector_classifications_materialized_and_readable_via_collected_provider(tmp_path):
+    from agx_research.universe.sector import CollectedSectorProvider, SectorClassification
+
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    batch = good_batch(
+        price_bars=[],
+        sector_classifications=[
+            SectorClassification(
+                ticker="ARCC", sector="Building Materials",
+                source_id="chief_egx_financials", observed_date=date(2026, 8, 2),
+            )
+        ],
+    )
+    collector = StubCollector(make_spec(), {"https://x/1": batch})
+
+    result = service.run(collector, expected_records=1)
+
+    assert result.sector_classifications_written == 1
+    provider = CollectedSectorProvider(tmp_path)
+    assert provider.sector_of("ARCC", date(2026, 8, 2)) == "Building Materials"
+    # A ticker nothing has collected falls back to the static placeholder,
+    # never worse coverage than before this provider existed.
+    assert provider.sector_of("COMI", date(2026, 8, 2)) == "Banks"
+    assert provider.sector_of("TOTALLY_UNKNOWN", date(2026, 8, 2)) is None
+
+
+def test_reingesting_same_sector_classification_is_idempotent_and_latest_wins(tmp_path):
+    from agx_research.universe.sector import CollectedSectorProvider, SectorClassification
+
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    collector = StubCollector(make_spec(), {"https://x/1": good_batch(
+        price_bars=[],
+        sector_classifications=[
+            SectorClassification(
+                ticker="ARCC", sector="Building Materials",
+                source_id="chief_egx_financials", observed_date=date(2026, 8, 2),
+            )
+        ],
+    )})
+    service.run(collector, expected_records=1)
+    service.run(collector, expected_records=1)
+
+    path = tmp_path / "universe" / "sector_membership.csv"
+    rows = path.read_text().strip().splitlines()
+    assert len(rows) == 2  # header + one row, not duplicated
+
+    provider = CollectedSectorProvider(tmp_path)
+    assert provider.sector_of("ARCC", date(2026, 8, 2)) == "Building Materials"
+
+
 def test_parser_exception_is_withheld_and_recorded_not_propagated(tmp_path):
     class RaisingCollector(StubCollector):
         def parse(self, document):

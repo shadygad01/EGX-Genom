@@ -1,6 +1,6 @@
 from agx_research.market_memory.calendar import (
     EGX_FIXED_HOLIDAYS,
-    EGX_MOVABLE_HOLIDAYS_PLACEHOLDER,
+    EGX_MOVABLE_HOLIDAYS_2026,
     StaticEGXCalendar,
     TradingCalendar,
 )
@@ -14,6 +14,6 @@ __all__ = [
     "TradingCalendar",
     "StaticEGXCalendar",
     "EGX_FIXED_HOLIDAYS",
-    "EGX_MOVABLE_HOLIDAYS_PLACEHOLDER",
+    "EGX_MOVABLE_HOLIDAYS_2026",
     "is_egx_trading_day",
 ]

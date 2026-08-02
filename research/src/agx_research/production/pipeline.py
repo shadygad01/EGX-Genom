@@ -138,7 +138,7 @@ from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.reputation import SourceMetricsRepository
 from agx_research.universe.collected import CollectedUniverseProvider
 from agx_research.universe.provider import UniverseProvider
-from agx_research.universe.sector import StaticSectorProvider
+from agx_research.universe.sector import CollectedSectorProvider
 from agx_research.valuation import FairValueEngine
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
@@ -789,7 +789,7 @@ class ProductionPipeline:
         self.market_memory = MarketMemory(
             LocalCsvDataProvider(self.data_dir),
             self.universe_provider,
-            StaticSectorProvider(),
+            CollectedSectorProvider(self.data_dir),
             macro_series_ids=self.macro_series_ids,
             lookback_days=self.price_lookback_days,
             macro_lookback_days=self.macro_lookback_days,

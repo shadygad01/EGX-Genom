@@ -66,6 +66,7 @@ class CollectionRunResult:
     provider_documents: dict[str, int] = field(default_factory=dict)
     provider_yields: dict[str, int] = field(default_factory=dict)
     fetch_warnings: list[str] = field(default_factory=list)
+    sector_classifications_written: int = 0
     news_discovery_items_written: int = 0
 
 
@@ -84,7 +85,7 @@ def collection_yield(result: CollectionRunResult) -> int:
         result.price_bars_written + result.macro_observations_written
         + result.news_items_written + result.corporate_events_written
         + result.index_constituents_written + result.financial_statement_line_items_written
-        + result.news_discovery_items_written
+        + result.news_discovery_items_written + result.sector_classifications_written
     )
 
 
@@ -234,6 +235,37 @@ def _write_index_constituents(
         for key in sorted(existing):
             writer.writerow(existing[key])
     return len(constituents)
+
+
+def _write_sector_classifications(data_dir: Path, classifications, *, on_written=None) -> int:
+    path = data_dir / "universe" / "sector_membership.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing: dict[str, dict] = {}
+    if path.exists():
+        with path.open(newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                existing[row["ticker"]] = row
+    for item in classifications:
+        # Keyed by ticker only (not also observed_date): a sector rarely
+        # changes, so the latest collected classification simply replaces
+        # any earlier one -- the same "one current fact per ticker" shape
+        # `CollectedSectorProvider` reads, not a growing history.
+        existing[item.ticker] = {
+            "ticker": item.ticker,
+            "sector": item.sector,
+            "source_id": item.source_id,
+            "observed_date": item.observed_date.isoformat(),
+        }
+        if on_written:
+            on_written(item.ticker, item.sector, item.observed_date)
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=["ticker", "sector", "source_id", "observed_date"]
+        )
+        writer.writeheader()
+        for key in sorted(existing):
+            writer.writerow(existing[key])
+    return len(classifications)
 
 
 def _append_news_to(path: Path, items) -> int:
@@ -428,7 +460,7 @@ class CollectionService:
             produced = (
                 len(batch.price_bars) + len(batch.macro_observations) + len(batch.news_items)
                 + len(batch.corporate_events) + len(batch.index_constituents)
-                + len(batch.financial_statement_line_items)
+                + len(batch.financial_statement_line_items) + len(batch.sector_classifications)
             )
             materialized = assessment.confidence_score >= self.min_confidence
             provider = provider_for_document(document) if callable(provider_for_document) else None
@@ -528,6 +560,14 @@ class CollectionService:
                                 ),
                             )
                         )
+
+                if batch.sector_classifications:
+                    result.sector_classifications_written += _write_sector_classifications(
+                        self.data_dir, batch.sector_classifications,
+                        on_written=lambda ticker, sector, d: self._trace(
+                            "sector_classification", f"{ticker}|{sector}", d, collector, document
+                        ),
+                    )
             else:
                 result.batches_withheld += 1
 

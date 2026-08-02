@@ -20,6 +20,7 @@ from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError
 from agx_research.collectors.raw import RawDocument, build_raw_document
 from agx_research.financials.schema import FinancialStatementLineItem
+from agx_research.universe.sector import SectorClassification
 
 # Real, live-verified index pagination is `page/N/` (WordPress convention),
 # confirmed reachable through page 2. The number of real pages is not known
@@ -39,6 +40,21 @@ _TICKER_RE = re.compile(
 _CSV_RE = re.compile(
     r'csvURL:\s*["\'](?P<url>https://[^"\']+\.csv)["\']', re.IGNORECASE
 )
+# Chief's own CSV URLs embed the real category Chief Capital itself filed
+# the company under, e.g. ".../egx-egyptian-stock-exchange/banks/metrics.csv/
+# commercial-international-bank-egypt-cib.csv" -- a real fact about the
+# company already present in every fetch, not a guess. Not asserted to be
+# a complete industry taxonomy; only what Chief's own URL states.
+_SECTOR_FROM_URL_RE = re.compile(
+    r"egx-egyptian-stock-exchange/(?P<sector>[a-z0-9-]+)/", re.IGNORECASE
+)
+
+
+def _sector_from_csv_url(csv_url: str) -> str | None:
+    match = _SECTOR_FROM_URL_RE.search(csv_url)
+    if match is None:
+        return None
+    return match.group("sector").replace("-", " ").strip().title() or None
 
 # (canonical line item, statement type).  Source headers not listed here are
 # intentionally ignored instead of being guessed into an accounting concept.
@@ -130,6 +146,17 @@ class ChiefFinancialsCollector(Collector):
         if ticker not in self.tickers:
             batch.parse_warnings.append(f"Ticker {ticker} is outside the declared universe.")
             return batch
+
+        sector = _sector_from_csv_url(document.original_url)
+        if sector is not None:
+            batch.sector_classifications.append(
+                SectorClassification(
+                    ticker=ticker,
+                    sector=sector,
+                    source_id=document.source_id,
+                    observed_date=document.fetched_at.date(),
+                )
+            )
 
         reader = csv.DictReader(io.StringIO(payload))
         if not reader.fieldnames or "Year" not in reader.fieldnames:

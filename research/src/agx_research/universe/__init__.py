@@ -9,15 +9,19 @@ from agx_research.universe.provider import (
 )
 from agx_research.universe.sector import (
     EGX_SECTOR_PLACEHOLDER,
+    CollectedSectorProvider,
+    SectorClassification,
     SectorProvider,
     StaticSectorProvider,
 )
 
 __all__ = [
     "EGX_SECTOR_PLACEHOLDER",
+    "CollectedSectorProvider",
     "CollectedUniverseProvider",
     "IndexConstituent",
     "MappingUniverseProvider",
+    "SectorClassification",
     "SectorProvider",
     "StaticSectorProvider",
     "UniverseArtifact",

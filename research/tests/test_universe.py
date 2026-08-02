@@ -1,8 +1,10 @@
 import csv
 from datetime import date
+from pathlib import Path
 
 from agx_research.universe.collected import CollectedUniverseProvider
 from agx_research.universe.provider import MappingUniverseProvider
+from agx_research.universe.sector import CollectedSectorProvider
 
 
 def test_mapping_provider_requires_explicit_constituents_and_returns_a_copy():
@@ -64,3 +66,39 @@ def test_default_provider_combines_all_collected_indexes(tmp_path):
         "COMI": "Commercial International Bank",
         "ORAS": "Orascom",
     }
+
+
+def _write_sector_csv(data_dir, rows: list[tuple[str, str, str, str]]) -> None:
+    path = data_dir / "universe" / "sector_membership.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["ticker", "sector", "source_id", "observed_date"])
+        writer.writerows(rows)
+
+
+def test_collected_sector_provider_falls_back_to_placeholder_when_nothing_collected(tmp_path):
+    provider = CollectedSectorProvider(tmp_path)
+    # COMI is in the static placeholder -- never worse than before this
+    # provider existed, even before any real sector data is collected.
+    assert provider.sector_of("COMI", date(2026, 6, 14)) == "Banks"
+    assert provider.sector_of("NOT_A_REAL_TICKER", date(2026, 6, 14)) is None
+
+
+def test_collected_sector_provider_prefers_real_collected_data_over_placeholder(tmp_path):
+    _write_sector_csv(
+        tmp_path,
+        [("ARCC", "Building Materials", "chief_egx_financials", "2026-08-02")],
+    )
+    provider = CollectedSectorProvider(tmp_path)
+    assert provider.sector_of("ARCC", date(2026, 6, 14)) == "Building Materials"
+    # A ticker only the placeholder knows about is still covered.
+    assert provider.sector_of("COMI", date(2026, 6, 14)) == "Banks"
+
+
+def test_collected_sector_provider_custom_fallback_never_used_when_collected():
+    provider = CollectedSectorProvider(
+        Path("/nonexistent-data-dir-for-this-test"), fallback={"COMI": "Custom Sector"}
+    )
+    assert provider.sector_of("COMI", date(2026, 6, 14)) == "Custom Sector"
+    assert provider.sector_of("HRHO", date(2026, 6, 14)) is None

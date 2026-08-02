@@ -24,6 +24,7 @@ from agx_research.data.schemas import CorporateEvent, MacroObservation, NewsItem
 from agx_research.financials.schema import FinancialStatementLineItem
 from agx_research.sources.spec import SourceSpec, SourceStatus
 from agx_research.universe.constituent import IndexConstituent
+from agx_research.universe.sector import SectorClassification
 
 
 class CollectionBatch(BaseModel):
@@ -35,6 +36,7 @@ class CollectionBatch(BaseModel):
     corporate_events: list[CorporateEvent] = Field(default_factory=list)
     index_constituents: list[IndexConstituent] = Field(default_factory=list)
     financial_statement_line_items: list[FinancialStatementLineItem] = Field(default_factory=list)
+    sector_classifications: list[SectorClassification] = Field(default_factory=list)
     parse_warnings: list[str] = Field(default_factory=list)
 
 

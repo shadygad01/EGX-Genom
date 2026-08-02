@@ -87,6 +87,50 @@ def test_walks_index_pagination_until_a_page_adds_no_new_company():
     assert {doc.original_url for doc in documents} == set(csv_by_url)
 
 
+def test_derives_real_sector_from_chiefs_own_csv_url_category():
+    # Real, live-observed URL shape (2026-08-02 production run):
+    # ".../egx-egyptian-stock-exchange/building-materials/metrics.csv/
+    # arabian-cement-company.csv" -- Chief's own category, not a guess.
+    real_shaped_page = """
+    Ticker: <span class="cc-meta-value">ETEL</span>
+    <script>var ccData={csvURL: "https://chiefcapitalco.com/wp-content/uploads/companydata/egx-egyptian-stock-exchange/building-materials/metrics.csv/arabian-cement-company.csv"};</script>
+    """
+
+    class Fetcher:
+        request_latencies: list[float] = []
+
+        def fetch_text(self, url, spec):
+            if url.endswith("telecom-egypt/"):
+                return real_shaped_page
+            if url.endswith("arabian-cement-company.csv"):
+                return CSV
+            return INDEX
+
+    collector = ChiefFinancialsCollector(
+        seed_registry().latest("chief_egx_financials"), tickers=["ETEL"], fetcher=Fetcher()
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+
+    assert batch.parse_warnings == []
+    [classification] = batch.sector_classifications
+    assert classification.ticker == "ETEL"
+    assert classification.sector == "Building Materials"
+    assert classification.source_id == "chief_egx_financials"
+
+
+def test_no_sector_classification_when_url_has_no_category_segment():
+    # The existing fixture's CSV URL (no .../egx-egyptian-stock-exchange/
+    # {category}/ segment) -- must not fabricate a sector from nothing.
+    collector = ChiefFinancialsCollector(
+        seed_registry().latest("chief_egx_financials"), tickers=["ETEL"], fetcher=Fetcher()
+    )
+    [document] = collector.fetch()
+    batch = collector.parse(document)
+
+    assert batch.sector_classifications == []
+
+
 def test_discovers_public_csv_and_maps_only_explicit_financial_headers():
     collector = ChiefFinancialsCollector(
         seed_registry().latest("chief_egx_financials"), tickers=["ETEL"], fetcher=Fetcher()

@@ -33,7 +33,6 @@ from agx_research.acquisition_intelligence.target import (
     seed_target_organizations,
 )
 from agx_research.collectors.fetcher import HttpFetcher
-from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.rss import RssNewsCollector
@@ -57,13 +56,9 @@ from agx_research.institutional_validation.runner import run_institutional_valid
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_ledger import DecisionLedger
-from agx_research.meta.publication_gate import (
-    ExternalPublicationEvidence,
-    LegalPublicationApproval,
-    PublicationGateReport,
-    apply_publication_gate,
-    evaluate_publication_gate,
-)
+from agx_research.meta.decision_quality import apply_decision_quality_gate
+from agx_research.meta.publication_gate import LegalPublicationApproval
+from agx_research.meta.system_maturity import SystemMaturityReport, compute_system_maturity
 from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.production import ExecutionMode, ProductionPipeline, StageStatus
 from agx_research.runtime.engine import RunRecordRepository
@@ -99,54 +94,26 @@ def build_market_memory(data_dir: Path, mock_data: Path) -> MarketMemory:
     )
 
 
-def build_publication_gate_report(data_dir: Path, as_of: date) -> PublicationGateReport:
-    """The one real assembly of a `PublicationGateReport` -- shared by
-    `publication-status` (reports it) and `decide` (applies it via
-    `apply_publication_gate()` before scoring a portfolio). Before this was
-    shared, `decide` never called `apply_publication_gate()` at all, so
-    every `HorizonDecision.publication_status` silently stayed at its
-    `MetaDecisionEngine` default (`RESEARCH_ONLY`) and `max_position_pct`
-    stayed `0.0` regardless of real evidence strength -- `agx decide`
-    always produced `no_action`/zero target weight, with no reason in the
-    decision's own `explanation` naming the real cause (the fail-closed
-    publication gate, not "no positive expectancy"). Read-only: uses the
-    persisted registry/ledger/evidence files when they exist, never writes
-    to the inspected `--data-dir`.
+def build_system_maturity_report(data_dir: Path, as_of: date) -> SystemMaturityReport:
+    """Read-only assembly of the non-blocking `SystemMaturityReport` --
+    shared by `publication-status` (reports it) and available to any
+    future consumer that wants to display system credibility. Unlike the
+    old `PublicationGateReport` this replaced, nothing needs to be
+    supplied for this to compute a real (if honestly early-stage) answer
+    -- an optional `legal_publication_approval.json` can only ever raise
+    the reported level to "verified", never block anything.
     """
-    input_errors: list[str] = []
-    external = None
-    legal = None
-    external_path = data_dir / "publication_evidence.json"
     legal_path = data_dir / "legal_publication_approval.json"
-    if external_path.exists():
-        try:
-            external = ExternalPublicationEvidence.model_validate_json(
-                external_path.read_text(encoding="utf-8")
-            )
-        except (ValueError, OSError) as exc:
-            input_errors.append(f"publication_evidence.json invalid: {exc}")
-    else:
-        input_errors.append("publication_evidence.json missing")
+    legal = None
     if legal_path.exists():
         try:
             legal = LegalPublicationApproval.model_validate_json(legal_path.read_text(encoding="utf-8"))
-        except (ValueError, OSError) as exc:
-            input_errors.append(f"legal_publication_approval.json invalid: {exc}")
-    else:
-        input_errors.append("legal_publication_approval.json missing")
-
-    registry_path = data_dir / "source_registry.json"
-    registry = seed_registry(SourceRegistry(registry_path) if registry_path.exists() else SourceRegistry())
-    return evaluate_publication_gate(
+        except (ValueError, OSError):
+            legal = None
+    return compute_system_maturity(
         DecisionLedger(data_dir / "decision_ledger.json").performance_summary(),
         as_of=as_of,
-        external=external,
-        legal=legal,
-        raw_documents=RawDocumentRepository(data_dir / "raw_documents.json").all_latest(),
-        legally_cleared_source_ids={
-            source.id for source in registry.all_latest() if source.legal_use_status.value == "cleared"
-        },
-        input_errors=input_errors,
+        governance=legal,
     )
 
 
@@ -184,11 +151,10 @@ def build_position_aware_decisions(
     recommendation_service = RecommendationService(knowledge_store, event_platform=market_memory.event_platform)
     tickers = sorted(set(snapshot.tickers) | set(positions))
     recommendations = recommendation_service.recommend(tickers, as_of)
-    # Same real publication gate `agx publication-status` reports on -- see
-    # `build_publication_gate_report`'s own docstring for why this must
-    # run before scoring.
-    gate_report = build_publication_gate_report(data_dir, as_of)
-    recommendations = apply_publication_gate(recommendations, gate_report)
+    # Per-decision quality gate (evidence/thesis/invalidation/consistency)
+    # -- see meta.decision_quality's module docstring for why this
+    # replaced the old system-wide, track-record-and-legal-review gate.
+    recommendations = apply_decision_quality_gate(recommendations)
 
     country_risk = assess_country_risk(snapshot.macro_series, as_of)
     illiquid_tickers = compute_illiquid_tickers(snapshot)
@@ -399,10 +365,11 @@ def main(argv: list[str] | None = None) -> int:
 
     publication_parser = sub.add_parser(
         "publication-status",
-        help="Validate publication evidence, benchmark performance and legal approval "
-        "against archived raw documents; exits 2 while any gate remains blocked",
+        help="Report System Maturity: historical decision track record and optional human "
+        "governance review, as an informational credibility label -- never blocks publishing "
+        "(see meta.decision_quality for what actually gates a decision); always exits 0",
     )
-    publication_parser.add_argument("--date", required=True, help="Gate evaluation date (ISO)")
+    publication_parser.add_argument("--date", required=True, help="Evaluation date (ISO)")
 
     decide_parser = sub.add_parser(
         "decide",
@@ -799,8 +766,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "publication-status":
+        # Reports System Maturity (project owner direction, 2026-08-02):
+        # historical track record and optional human governance review
+        # are purely informational here -- they never block publishing
+        # (see meta.decision_quality, applied per decision in `decide`),
+        # so this always exits 0; there is no "blocked" status left to
+        # signal with a non-zero code.
         as_of = date.fromisoformat(args.date)
-        report = build_publication_gate_report(args.data_dir, as_of)
+        report = build_system_maturity_report(args.data_dir, as_of)
         payload = json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2)
         try:
             payload.encode(sys.stdout.encoding or "utf-8")
@@ -808,12 +781,11 @@ def main(argv: list[str] | None = None) -> int:
             # Windows terminals commonly expose a narrow codepage (e.g.
             # cp1252) that can't represent every character report content
             # might carry (e.g. a non-ASCII legal reviewer name). Preserve
-            # readable JSON and the meaningful 0/2 exit code instead of
-            # crashing during output.
+            # readable JSON instead of crashing during output.
             sys.stdout.buffer.write(payload.encode("utf-8") + b"\n")
         else:
             print(payload)
-        return 0 if report.publication_ready else 2
+        return 0
 
     if args.command == "validate-investment":
         from agx_research.institutional_validation.report import CheckVerdict

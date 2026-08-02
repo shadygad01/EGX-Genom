@@ -445,27 +445,28 @@ def test_market_regime_reflects_real_universe_price_history(tmp_path):
     assert len(regime["reasons"]) >= 2
 
 
-def test_pipeline_reports_missing_publication_controls_and_stays_all_cash(tmp_path):
+def test_pipeline_reports_system_maturity_and_stays_all_cash_with_no_evidence(tmp_path):
     dashboard_out = tmp_path / "dashboard"
     make_pipeline(tmp_path / "data").run(
         RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out
     )
 
-    gate = json.loads((dashboard_out / "publication_gate.json").read_text())
-    validation = next(
-        check for check in gate["checks"]
-        if check["id"] == "publication_input_validation"
-    )
-    assert "publication_evidence.json missing" in validation["blocker"]
-    assert "legal_publication_approval.json missing" in validation["blocker"]
-    assert gate["publication_ready"] is False
+    # System Maturity is informational, never a publish blocker (project
+    # owner direction, 2026-08-02) -- a mock run with no decision-ledger
+    # history honestly reports "early", not "publication_ready: false".
+    maturity = json.loads((dashboard_out / "system_maturity.json").read_text())
+    assert maturity["level"] == "early"
 
+    # The all-cash portfolio here is a real, unrelated fact: the mock
+    # fixture's 10 days of price history produce zero recommendations at
+    # all (no model has enough data to predict from), not a blocked gate.
     cases = json.loads((dashboard_out / "investment_cases.json").read_text())
+    assert cases["recommendations"] == []
     assert cases["portfolio"]["positions"] == []
     assert cases["portfolio"]["cash_weight"] == 1.0
 
 
-def test_dashboard_validator_rejects_non_cash_portfolio_while_publication_blocked(tmp_path):
+def test_dashboard_validator_rejects_non_cash_portfolio_with_no_eligible_ticker(tmp_path):
     from agx_research.dashboard.validate import DashboardArtifactError, validate_dashboard_artifacts
 
     dashboard_out = tmp_path / "dashboard"
@@ -481,7 +482,7 @@ def test_dashboard_validator_rejects_non_cash_portfolio_while_publication_blocke
         validate_dashboard_artifacts(dashboard_out)
 
 
-def test_dashboard_validator_rejects_ready_decision_behind_blocked_gate(tmp_path):
+def test_dashboard_validator_rejects_ready_decision_with_incomplete_evidence(tmp_path):
     from agx_research.dashboard.validate import DashboardArtifactError, validate_dashboard_artifacts
 
     dashboard_out = tmp_path / "dashboard"
@@ -517,7 +518,7 @@ def test_dashboard_validator_rejects_ready_decision_behind_blocked_gate(tmp_path
     first_decision["publication_status"] = "publication_ready"
     cases_path.write_text(json.dumps(cases))
 
-    with pytest.raises(DashboardArtifactError, match="without a passing"):
+    with pytest.raises(DashboardArtifactError, match="fails re-derived decision quality checks"):
         validate_dashboard_artifacts(dashboard_out)
 
 

@@ -81,7 +81,11 @@ def test_cli_run_and_status_and_backup(tmp_path, capsys):
     assert "OK" in capsys.readouterr().out
 
 
-def test_cli_publication_status_fails_closed_and_lists_missing_inputs(tmp_path, capsys):
+def test_cli_publication_status_reports_early_maturity_with_no_history(tmp_path, capsys):
+    # Reports System Maturity (project owner direction, 2026-08-02):
+    # informational only, always exits 0 -- nothing left to "fail closed"
+    # on, since publishing is governed per-decision by meta.decision_quality,
+    # not by this command.
     data_dir = tmp_path / "empty_production_data"
 
     assert main([
@@ -90,34 +94,21 @@ def test_cli_publication_status_fails_closed_and_lists_missing_inputs(tmp_path, 
         "publication-status",
         "--date",
         "2026-07-28",
-    ]) == 2
+    ]) == 0
 
     report = json.loads(capsys.readouterr().out)
-    assert report["publication_ready"] is False
-    validation = next(
-        check for check in report["checks"]
-        if check["id"] == "publication_input_validation"
-    )
-    assert validation["passed"] is False
-    assert "publication_evidence.json missing" in validation["blocker"]
-    assert "legal_publication_approval.json missing" in validation["blocker"]
-    assert {check["id"] for check in report["checks"]} >= {
-        "live_egx_market_data",
-        "official_disclosures_four_periods",
-        "current_cbe_capmas_macro",
-        "two_source_price_corroboration",
-        "benchmark_performance",
-        "legal_approval",
-    }
+    assert report["level"] == "early"
+    assert report["governance_reviewed"] is False
     assert not data_dir.exists(), "publication-status must not mutate the inspected directory"
 
 
-def test_cli_publication_status_rejects_malformed_evidence(tmp_path, capsys):
+def test_cli_publication_status_ignores_malformed_governance_review(tmp_path, capsys):
+    # An optional legal_publication_approval.json can only ever raise the
+    # reported level -- a malformed one is treated the same as a missing
+    # one (no real track record exists here either way, so this must
+    # still report "early", never error out or block).
     data_dir = tmp_path / "invalid_production_data"
     data_dir.mkdir()
-    (data_dir / "publication_evidence.json").write_text(
-        '{"live_egx_market_data": "not-a-boolean"}', encoding="utf-8"
-    )
     (data_dir / "legal_publication_approval.json").write_text("{}", encoding="utf-8")
 
     assert main([
@@ -126,15 +117,11 @@ def test_cli_publication_status_rejects_malformed_evidence(tmp_path, capsys):
         "publication-status",
         "--date",
         "2026-07-28",
-    ]) == 2
+    ]) == 0
 
     report = json.loads(capsys.readouterr().out)
-    validation = next(
-        check for check in report["checks"]
-        if check["id"] == "publication_input_validation"
-    )
-    assert "publication_evidence.json invalid" in validation["blocker"]
-    assert "legal_publication_approval.json invalid" in validation["blocker"]
+    assert report["level"] == "early"
+    assert report["governance_reviewed"] is False
 
 
 def test_cli_publication_status_writes_utf8_on_windows_code_page(tmp_path, monkeypatch):
@@ -148,16 +135,8 @@ def test_cli_publication_status_writes_utf8_on_windows_code_page(tmp_path, monke
         "publication-status",
         "--date",
         "2026-07-28",
-    ]) == 2
+    ]) == 0
 
     windows_stdout.flush()
     report = json.loads(raw_output.getvalue().decode("utf-8"))
-    assert report["publication_ready"] is False
-    assert {check["id"] for check in report["checks"]} >= {
-        "live_egx_market_data",
-        "official_disclosures_four_periods",
-        "current_cbe_capmas_macro",
-        "two_source_price_corroboration",
-        "benchmark_performance",
-        "legal_approval",
-    }
+    assert report["level"] == "early"

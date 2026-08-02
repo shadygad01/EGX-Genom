@@ -110,6 +110,7 @@
     "title": "Investment Committee Summary",
     "description": "Who agrees, who disagrees, and how much does it matter?",
     "emptyTitle": "No committee summary yet",
-    "emptyDetail": "Needs a non-empty model portfolio with real evidence behind it."
+    "emptyDetail": "Needs a non-empty model portfolio with real evidence behind it.",
+    "systemMaturity": "System Maturity"
   }
 }

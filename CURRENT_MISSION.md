@@ -1,6 +1,106 @@
 # Current Mission
 
-## Current mission: Investment Operating System review — connect every source to a decision, close the DCF/EBITDA/EV/P-B gap, verify the full 100+ ticker universe (2026-08-02)
+## Current mission: Redesign the publication gate — Decision Quality, System Maturity, Publication Governance (2026-08-02)
+
+Continuing the same-day comprehensive review below, the project owner (acting
+as the fund's investment manager) sent real dashboard screenshots showing
+"Investment Committee Summary: NO DATA" across all seven committees, "Capital
+Deployment Queue: no action required today," and a "Hypothesis Pipeline" full
+of old `FAILED AT DATA COLLECTION` rows, asking these be root-caused and fixed.
+
+**Root cause found**, not assumed: `meta.publication_gate
+.evaluate_publication_gate()` required a human-authored
+`legal_publication_approval.json` *and* `publication_evidence.json` *and*
+30+ benchmark-outperforming decision-ledger results per horizon — all
+simultaneously, system-wide — before *any* decision, of any quality, could
+ever size a position. Confirmed against real production data: neither file
+has ever existed, and `decision_ledger.json` has 29 records total, nowhere
+near 30 *per horizon*. Every decision this platform has ever produced
+therefore stayed `RESEARCH_ONLY` regardless of how complete or well-evidenced
+it was — `PortfolioConstructor.construct()` only ever includes
+`PUBLICATION_READY` decisions, so the model portfolio was always empty,
+which is why Committee Summary (built only from the model portfolio's own
+tickers) and Capital Deployment Queue (built only from real positions
+requesting capital) always showed nothing. The Hypothesis Pipeline's old
+`FAILED` rows were separately confirmed to be honest, correctly-preserved
+history from before an earlier (2026-07-31) fix — real evidence: hypotheses
+produced 2026-07-29/30 failed 777/777 at DATA_COLLECTION; hypotheses produced
+2026-08-02 passed 1018/1024 — not a currently-active bug.
+
+Presented this finding plainly; the project owner disagreed with the
+premise itself and gave an explicit architectural redesign directive:
+publishing should never wait on proving multi-year outperformance or
+requiring a legal sign-off before ever showing a decision — "institutional
+research platforms publish recommendations before they accumulate
+multi-year track records; their credibility comes from transparency, not
+from delaying publication." Redirected, via a clarifying question about the
+one check the directive hadn't explicitly addressed (the human legal
+review), into three independent layers: **Decision Quality** (evidence
+completeness, traceability, consistency, explainability — determines
+whether the system can produce a recommendation), **System Credibility/
+Maturity** (historical performance — informs confidence, never blocks),
+**Publication Governance** (legal/compliance sign-off — an operational
+process, decoupled from the decision engine, relevant only to a future
+regulated/officially-published distribution mode, never this platform's
+actual research/personal-use output).
+
+**Delivered** — see AD-58 (`docs/ARCHITECTURE_DECISIONS.md`) for the full
+architectural record: new `meta.decision_quality`
+(`evaluate_decision_quality()`/`apply_decision_quality_gate()`) evaluates
+six real checks — evidence present and traceable, thesis complete,
+confidence calculated, invalidation conditions defined, monitoring
+conditions defined, internal consistency — per ticker per horizon, directly
+against that decision's own `Explanation`/`HorizonDecision`, replacing one
+system-wide switch with a genuinely per-decision gate. New
+`meta.system_maturity` (`compute_system_maturity()`) reports
+`early`/`validating`/`developing`/`established`/`verified` from the exact
+same `DecisionPerformanceSummary` math the old gate's performance check
+used, now purely informational; `verified` requires `established` *and* an
+optional human governance review (the old `LegalPublicationApproval`,
+unchanged shape, kept but fully decoupled — supplying one can only ever
+raise the label, never gate publishing). `ExternalPublicationEvidence`/
+`PublicationGateReport`/`evaluate_publication_gate`/`apply_publication_gate`
+and the `publication_evidence.json` input are deleted outright.
+`dashboard.validate`'s cross-artifact safety check now independently
+re-derives each shipped `publication_ready` decision's quality rather than
+trusting a separate global report file — a stronger check than before, not
+a weaker one. `agx publication-status` now reports System Maturity and
+always exits 0 (there is nothing left to "fail closed" on). New dashboard
+artifact `system_maturity.json` (API `GET /system-maturity`, both web
+`DashboardDataProvider`s, new JSON Schema contract) replaces
+`publication_gate.json` throughout — `web`/`api` types, providers, and
+`deploy-pages.yml`'s artifact-presence check all updated, not left
+half-migrated. Full doctrine set updated in the same change per its own
+amendment rule: `INVESTMENT_CONSTITUTION.md` (Article II/IX),
+`DECISION_STANDARDS.md`, `PORTFOLIO_STANDARDS.md`, `INVESTMENT_HANDBOOK.md`
+(§6.2/6.2b), `DECISION_SYSTEM_ACCEPTANCE.md`, `RISK_REGISTER.md` (R-22),
+and `PUBLICATION_EVIDENCE_RUNBOOK.md` (rewritten — nothing in it is a manual
+step anymore).
+
+**Verified, not assumed**: every call site updated (`cli.py`'s `decide`
+command, `production/pipeline.py`'s dashboard-artifact stage,
+`institutional_validation/scenarios.py` and `investment_proof/
+capital_trust.py`'s synthetic-scenario helpers — both confirmed their
+real, `RecommendationService`-built fixtures already carry complete
+evidence and pass the new gate on their own merits, no fixture had to be
+weakened to pass). New test files `test_decision_quality.py` (11 cases,
+including one proving quality is evaluated independently per horizon —
+one horizon's complete evidence never rescues a sibling's incomplete one)
+and `test_system_maturity.py` (9 cases, including one proving a governance
+review alone can never substitute for a real track record). 910 backend
+tests pass (up from 895; the old `test_publication_gate.py` retired,
+replaced by the two new files); `ruff check` clean; 33 `api` tests pass;
+53 `web` tests pass; both production builds clean; `contracts/`
+regeneration added the one new `system_maturity.schema.json`, zero drift
+elsewhere.
+
+**Not done, named as genuinely next**: this redesign was not yet exercised
+against a real `agx run`/`deploy-pages.yml` cycle to see how many real
+tickers now actually reach `PUBLICATION_READY` — the next scheduled run is
+the real proof, the same honest posture every other real-data claim in this
+mission log takes.
+
+## Prior mission (same day): Investment Operating System review — connect every source to a decision, close the DCF/EBITDA/EV/P-B gap, verify the full 100+ ticker universe (2026-08-02)
 
 The project owner, acting as the fund's investment manager, asked for a
 full review of the platform with three explicit complaints: (1) many

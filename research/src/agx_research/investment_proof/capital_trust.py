@@ -58,7 +58,7 @@ from agx_research.knowledge.store import KnowledgeStore
 from agx_research.learning.monitor import ContinuousLearningMonitor
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_ledger import DecisionLedger
-from agx_research.meta.publication_gate import PublicationGateReport, apply_publication_gate
+from agx_research.meta.decision_quality import apply_decision_quality_gate
 from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.portfolio.constructor import PortfolioConstructor
 from agx_research.universe.provider import MappingUniverseProvider
@@ -271,11 +271,12 @@ class CapitalTrustReport(BaseModel):
 def _force_publication_ready(recommendations, as_of: date):
     """Same real-gate pattern `institutional_validation.scenarios` and
     `cli.py`'s `decide` command both use -- never hand-set
-    `publication_status` without also going through `apply_publication_gate()`,
-    or `max_position_pct` silently stays zero (see `docs/TECHNICAL_DEBT.md`
-    on the real bug this exact mistake caused in `DecisionService`)."""
-    report = PublicationGateReport(as_of=as_of, publication_ready=True, checks=[], blockers=[])
-    return apply_publication_gate(recommendations, report)
+    `publication_status` without also going through
+    `apply_decision_quality_gate()`, or `max_position_pct` silently stays
+    zero (see `docs/TECHNICAL_DEBT.md` on the real bug this exact mistake
+    caused in `DecisionService`)."""
+    del as_of  # kept for call-site compatibility; the gate is per-decision now
+    return apply_decision_quality_gate(recommendations)
 
 
 class InvestmentProofEngine:

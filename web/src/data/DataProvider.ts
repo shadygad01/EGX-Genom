@@ -38,7 +38,7 @@ import type {
   PortfolioSummaryReport,
   PositionAwareDecision,
   PositionInput,
-  PublicationGateReport,
+  SystemMaturityReport,
   Recommendation,
   ResearchPaper,
   RunRecord,
@@ -108,7 +108,7 @@ export interface DashboardDataProvider {
   getSourceTruth(): Promise<SourceTruthRow[]>;
   getDecisionHistory(): Promise<DecisionRecord[]>;
   getDecisionPerformance(): Promise<DecisionPerformanceSummary[]>;
-  getPublicationGate(): Promise<PublicationGateReport | null>;
+  getSystemMaturity(): Promise<SystemMaturityReport | null>;
   getDiscoveryReport(): Promise<DiscoveryOutcome[]>;
   getDiscoveryMetrics(): Promise<DiscoveryMetrics | null>;
   getEndpointCandidates(): Promise<EndpointCandidate[]>;

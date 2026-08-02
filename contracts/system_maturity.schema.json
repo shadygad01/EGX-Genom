@@ -1,0 +1,56 @@
+{
+  "$defs": {
+    "SystemMaturityLevel": {
+      "enum": [
+        "early",
+        "validating",
+        "developing",
+        "established",
+        "verified"
+      ],
+      "title": "SystemMaturityLevel",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "governance_reviewed": {
+      "default": false,
+      "title": "Governance Reviewed",
+      "type": "boolean"
+    },
+    "horizons_meeting_significance_floor": {
+      "title": "Horizons Meeting Significance Floor",
+      "type": "integer"
+    },
+    "level": {
+      "$ref": "#/$defs/SystemMaturityLevel"
+    },
+    "min_evaluated_across_horizons": {
+      "title": "Min Evaluated Across Horizons",
+      "type": "integer"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    },
+    "total_horizons": {
+      "title": "Total Horizons",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "as_of",
+    "level",
+    "rationale",
+    "horizons_meeting_significance_floor",
+    "total_horizons",
+    "min_evaluated_across_horizons"
+  ],
+  "title": "SystemMaturityReport",
+  "type": "object"
+}

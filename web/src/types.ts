@@ -294,19 +294,16 @@ export interface DecisionPerformanceSummary {
   sample_status: "sufficient" | "insufficient_sample" | "insufficient_benchmark";
 }
 
-export interface PublicationGateCheck {
-  id: string;
-  label: string;
-  passed: boolean;
-  evidence_refs: string[];
-  blocker: string | null;
-}
+export type SystemMaturityLevel = "early" | "validating" | "developing" | "established" | "verified";
 
-export interface PublicationGateReport {
+export interface SystemMaturityReport {
   as_of: string;
-  publication_ready: boolean;
-  checks: PublicationGateCheck[];
-  blockers: string[];
+  level: SystemMaturityLevel;
+  rationale: string;
+  horizons_meeting_significance_floor: number;
+  total_horizons: number;
+  min_evaluated_across_horizons: number;
+  governance_reviewed: boolean;
 }
 
 export type DecisionAction = "buy_candidate" | "watch" | "avoid" | "abstain";

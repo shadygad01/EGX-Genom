@@ -259,37 +259,69 @@ A ticker is `READY` only if at least one horizon is unblocked **and**
 active knowledge exists; `DEGRADED` if prices exist but nothing is ready;
 `BLOCKED` if no price history exists at all.
 
-### 6.2 Publication Gate (`meta.publication_gate.evaluate_publication_gate`)
+### 6.2 Decision Quality Gate (`meta.decision_quality.evaluate_decision_quality`)
 
-Six independent checks, **all** required for `publication_ready = True`:
+**Superseded 2026-08-02** (see `docs/ARCHITECTURE_DECISIONS.md`): until
+this date, §6.2 described a system-wide, six-check publication gate —
+live EGX market data, four periods of official disclosures, current
+CBE/CAPMAS macro data, two-source price corroboration, 30+ per-horizon
+benchmark-outperforming results, and human legal review, **all**
+required *simultaneously, for every ticker*, before *any* decision could
+ever size a position. None of these had ever been satisfied once in this
+platform's history, so every decision stayed `RESEARCH_ONLY` regardless
+of how complete or well-evidenced it was.
 
-1. Live, legally usable EGX market data (evidence ≤7 days old).
-2. Official disclosures covering four financial periods (evidence
-   ≤550 days old).
-3. Current CBE/CAPMAS macro data (evidence ≤45 days old).
-4. Price corroboration from **two independent source groups**
-   (evidence ≤7 days old).
-5. **30+ benchmark-evaluated results per horizon**, after transaction
-   costs, with: `mean_excess_return > 0`, `median_excess_return > 0`,
-   `excess_return_lower_95 > 0` (95%-confidence lower bound), positive
-   mean realized return, and `max_drawdown ≥ -25%`.
-6. A valid, dated, human legal review (reviewer, scope, evidence,
-   conflicts disclosed, methodology approved, not expired).
+The project owner's explicit correction: publication should be governed
+by decision quality, not by how much track record has accumulated or
+whether a human has formally signed off. Those two other concerns still
+matter — as separate, non-blocking layers:
 
-Every evidence reference must independently verify against a real,
-archived `RawDocument` (matching source, content hash, fetch timestamp,
-100% coverage, legally cleared source, within its max-age window) — a
-claim with no matching raw evidence never passes, regardless of what a
-config file asserts.
+- Historical track record and an optional human governance review now
+  only ever *label* system credibility (§6.2b below) — they never gate
+  whether a decision publishes.
+- The gate itself moved to being evaluated **per ticker per horizon**,
+  directly against that decision's own `Explanation`/`HorizonDecision`,
+  never as one system-wide switch. Six checks, all required for **that
+  specific decision**:
 
-`apply_publication_gate()` then, for every horizon decision:
-- Sets `publication_status = PUBLICATION_READY` only if the gate passed
-  **and** the action isn't `ABSTAIN` **and** (for `BUY_CANDIDATE`) real
-  entry/invalidation levels exist.
+1. Supporting evidence is present and traceable (`supporting_evidence`/
+   `evidence_refs` both non-empty on the relevant horizon's `Prediction
+   .explanation`).
+2. The investment thesis is complete (`why_this_stock`/`why_now`/
+   `why_not_others` all stated, not blank).
+3. Confidence was actually calculated (a finite number in `[0, 1]`).
+4. Invalidation conditions are defined (`HorizonDecision
+   .invalidation_conditions` non-empty).
+5. Entry and review (monitoring) conditions are defined (`entry_condition`/
+   `review_condition` both real statements).
+6. The decision is internally consistent — a `BUY_CANDIDATE` carries
+   numeric `entry_value`/`invalidation_value`.
+
+`apply_decision_quality_gate()` then, for every horizon decision:
+- Sets `publication_status = PUBLICATION_READY` only if that decision's
+  own quality report passed **and** the action isn't `ABSTAIN`.
 - Sets `max_position_pct = clamp(confidence × 0.05, 0.01, 0.05)` only when
   `PUBLICATION_READY` **and** `BUY_CANDIDATE`; otherwise `0.0`.
-- Appends every gate blocker to `abstention_reasons` when the gate
-  didn't pass — never a silent zero with no explanation.
+- Appends every failed check's blocker to `abstention_reasons` when the
+  gate didn't pass — never a silent zero with no explanation.
+
+`dashboard.validate`'s cross-artifact safety check independently
+re-derives this same per-decision verdict from each shipped
+recommendation's own data before allowing a dashboard build to pass —
+there is no separate global report file left to trust instead.
+
+### 6.2b System Maturity (`meta.system_maturity.compute_system_maturity`) — informational only
+
+Reports one of five levels — `early` / `validating` / `developing` /
+`established` / `verified` — from real `decision_ledger.json` history,
+using exactly the math §6.2's old check 5 used (30+ benchmark-evaluated
+results per horizon, `mean_excess_return > 0`, `median_excess_return > 0`,
+`excess_return_lower_95 > 0`). `verified` additionally requires a valid,
+dated human governance review (reviewer, scope, evidence, conflicts
+disclosed, methodology approved, not expired — the same shape §6.2's old
+check 6 used, now optional and decoupled). `agx publication-status`
+reports this and always exits `0` — there is no "blocked" outcome left
+to signal. Nothing here is read by, or gates, `agx decide`/`agx run`.
 
 ---
 

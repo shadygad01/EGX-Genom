@@ -5,7 +5,9 @@ This document specifies, exactly, the minimum standard every recommendation
 must clear before it may carry a given label. It is deliberately mechanical
 — every rule below is a direct restatement of real, already-implemented
 logic (`meta.decision_engine.MetaDecisionEngine._decision_for_prediction`,
-`meta.publication_gate.evaluate_publication_gate`/`apply_publication_gate`,
+`meta.decision_quality.evaluate_decision_quality`/`apply_decision_quality_gate`
+(replacing `meta.publication_gate.evaluate_publication_gate`/
+`apply_publication_gate`, 2026-08-02 — see `ARCHITECTURE_DECISIONS.md`),
 `decision_service.service.DecisionService._resolve_action`), not a new
 policy layered on top of it. If this document and the code it describes
 ever disagree, that is a real bug to fix, not a discretionary judgment
@@ -61,14 +63,16 @@ Requires **all** of the following, simultaneously:
   absent from the positions supplied).
 - A real `Recommendation` exists whose INVESTMENT-horizon `HorizonDecision`
   reached `BUY_CANDIDATE` (§0).
-- That decision's `publication_status == PUBLICATION_READY` — the full
-  publication gate has cleared (`docs/INVESTMENT_CONSTITUTION.md` Article
-  IX): live EGX market data, four periods of official disclosures,
-  current CBE/CAPMAS macro data, two-source price corroboration, 30+
-  per-horizon benchmark-outperforming results after costs, and a valid
-  human legal approval, all simultaneously current.
+- That decision's `publication_status == PUBLICATION_READY` — the
+  decision quality gate has cleared for *this specific decision*
+  (`docs/INVESTMENT_CONSTITUTION.md` Article IX): supporting evidence
+  present and traceable, a complete investment thesis, calculated
+  confidence, defined invalidation conditions, defined monitoring/review
+  conditions, and internal consistency — never a system-wide wait on
+  external evidence, track record, or legal sign-off (2026-08-02, see
+  `ARCHITECTURE_DECISIONS.md`).
 - `abstained = False` — no hard override (illiquidity, country-risk
-  crisis) and no publication-gate blocker applies.
+  crisis) and no decision-quality blocker applies.
 - The resulting `target_weight`, after the ticker's score is normalized
   jointly against every other ticker competing for the same capital
   (`docs/INVESTMENT_CONSTITUTION.md` Article VII), is strictly positive
@@ -76,10 +80,11 @@ Requires **all** of the following, simultaneously:
 
 A `buy` label without an executable entry price, an invalidation level,
 and a stated capital source (`docs/PORTFOLIO_STANDARDS.md` §5) is never
-valid — `apply_publication_gate()` explicitly downgrades any
-`BUY_CANDIDATE` lacking numeric entry/invalidation levels back to
-`RESEARCH_ONLY`, and the Capital Allocation Engine's `capital_sources`
-field is mandatory on every funded queue entry.
+valid — `apply_decision_quality_gate()`'s internal-consistency check
+explicitly downgrades any `BUY_CANDIDATE` lacking numeric entry/
+invalidation levels back to `RESEARCH_ONLY`, and the Capital Allocation
+Engine's `capital_sources` field is mandatory on every funded queue
+entry.
 
 ## 2. What Qualifies as **Increase**
 

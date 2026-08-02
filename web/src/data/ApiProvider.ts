@@ -35,7 +35,7 @@ import type {
   Pattern,
   PortfolioSummaryReport,
   PositionAwareDecision,
-  PublicationGateReport,
+  SystemMaturityReport,
   Recommendation,
   ResearchPaper,
   RunRecord,
@@ -178,8 +178,8 @@ export class ApiProvider implements DashboardDataProvider {
     return fetchJson<DecisionPerformanceSummary[]>("/decision-performance");
   }
 
-  getPublicationGate(): Promise<PublicationGateReport | null> {
-    return fetchJson<PublicationGateReport | null>("/publication-gate");
+  getSystemMaturity(): Promise<SystemMaturityReport | null> {
+    return fetchJson<SystemMaturityReport | null>("/system-maturity");
   }
 
   getDiscoveryReport(): Promise<DiscoveryOutcome[]> {

@@ -154,9 +154,9 @@ describe("dashboard artifact routes", () => {
     expect(body[0].id).toBe("stooq");
   });
 
-  it("GET /publication-gate fails closed to null when no report exists", async () => {
+  it("GET /system-maturity returns null when no report exists", async () => {
     const app = testApp();
-    const response = await app.inject({ method: "GET", url: "/publication-gate" });
+    const response = await app.inject({ method: "GET", url: "/system-maturity" });
     expect(response.statusCode).toBe(200);
     expect(response.json()).toBeNull();
   });

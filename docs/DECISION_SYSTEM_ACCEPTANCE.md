@@ -59,37 +59,50 @@ legal approval.
 - [x] Mission Control and System Administration use Arabic operational labels;
   the static audit finds zero English page/card/table/empty-state titles in
   `web/src/pages` (source-provided content and technical identifiers excluded).
-- [x] Dashboard validation enforces cross-artifact publication safety: a
-  blocked or missing gate cannot coexist with a publication-ready decision or
-  a non-cash portfolio, and every published portfolio ticker must have a
-  publication-ready numeric buy decision.
-- [x] The Pages release workflow requires publication gate, decision history,
+- [x] Dashboard validation enforces cross-artifact publication safety: every
+  `publication_ready` decision in `investment_cases.json` is independently
+  re-derived against `meta.decision_quality.evaluate_decision_quality()` and
+  must genuinely pass; a non-cash portfolio requires at least one ticker with
+  a publication-ready numeric buy decision, and every published portfolio
+  ticker must have one.
+- [x] The Pages release workflow requires system maturity, decision history,
   benchmark performance, source truth and ticker gap artifacts before upload;
   missing safety output fails the deployment.
 
-## External publication gates
+## Decision Quality Gate (2026-08-02, superseding the prior "external
+publication gates" checklist below)
 
-- [ ] Point-in-time live EGX universe, prices, liquidity and corporate actions
-  acquired under terms that permit automated research and the intended output.
-- [ ] Official EGX disclosures and at least four comparable company financial
-  periods connected with per-value provenance.
-- [ ] Current CBE/CAPMAS macro series connected and freshness-monitored.
-- [ ] At least two independent price observations agree within a documented
-  tolerance for every published ticker/date.
-- [ ] At least 30 expired, evaluated decisions per horizon and a positive result
-  after costs versus cash and the correct point-in-time EGX benchmark.
-- [ ] Human legal review for Egyptian publication, recorded with reviewer,
-  scope, date and expiry; conflicts and methodology disclosures approved.
+Publication is governed by the quality of each specific decision, not by a
+system-wide switch requiring every ticker to wait on the same external
+evidence, track record, or legal sign-off — project owner direction,
+2026-08-02, see `docs/ARCHITECTURE_DECISIONS.md` for the full reasoning and
+`meta.decision_quality`'s module docstring for the mechanism. A decision
+publishes when, for that specific ticker and horizon:
 
-Until every external gate is checked with evidence, every decision remains
-`research_only` and the only public-safe instruction is abstention/research.
+- [x] Supporting evidence is present and traceable (`supporting_evidence`/
+  `evidence_refs` both non-empty).
+- [x] The investment thesis is complete (`why_this_stock`/`why_now`/
+  `why_not_others` all stated).
+- [x] Confidence was actually calculated (a finite number in `[0, 1]`).
+- [x] Invalidation conditions are defined.
+- [x] Entry and review (monitoring) conditions are defined.
+- [x] The decision is internally consistent (a `BUY_CANDIDATE` carries
+  numeric entry and invalidation price levels).
 
-Runtime evidence is supplied only through `publication_evidence.json` and
-`legal_publication_approval.json` in the production data directory. The
-pipeline exports its independently evaluated result as `publication_gate.json`;
-editing a dashboard file cannot promote a decision.
+All six, automatically, per decision — no file to author, no separate
+command to run before a decision can publish.
 
-Operators must run `publication-status` and receive exit code `0` before a
-release can claim publication readiness. Exit code `2` is a hard stop. Exact
-schemas, freshness limits and the human approval workflow are documented in
-[`PUBLICATION_EVIDENCE_RUNBOOK.md`](PUBLICATION_EVIDENCE_RUNBOOK.md).
+### System Maturity — informational only, never a gate
+
+The five items the old checklist required simultaneously before *any*
+decision could publish (live EGX market data; four periods of official
+disclosures; current CBE/CAPMAS macro data; two independent price
+corroborations; 30+ per-horizon benchmark-outperforming results; human legal
+review) still matter — as inputs to
+`meta.system_maturity.compute_system_maturity()`'s non-blocking credibility label
+(`early`/`validating`/`developing`/`established`/`verified`), reported by
+`agx publication-status` (always exits `0` — there is no "blocked" outcome
+left to signal). A human legal/governance review file remains available and
+optional, and can only ever raise the reported level to `verified`; it never
+gates whether `agx decide`/`agx run` publishes anything. Exact mechanism
+documented in [`PUBLICATION_EVIDENCE_RUNBOOK.md`](PUBLICATION_EVIDENCE_RUNBOOK.md).

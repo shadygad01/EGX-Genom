@@ -144,8 +144,8 @@ export class ArtifactsReader {
     return readJsonOrDefault<T[]>(this.path("decision_performance.json"), []);
   }
 
-  publicationGate<T = unknown>(): Promise<T | null> {
-    return readJsonOrDefault<T | null>(this.path("publication_gate.json"), null);
+  systemMaturity<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("system_maturity.json"), null);
   }
 
   portfolioSummary<T = unknown>(): Promise<T | null> {

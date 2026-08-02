@@ -41,7 +41,7 @@ from agx_research.learning.monitor import ContinuousLearningMonitor
 from agx_research.market_memory.calendar import StaticEGXCalendar
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_engine import Recommendation
-from agx_research.meta.publication_gate import PublicationGateReport, apply_publication_gate
+from agx_research.meta.decision_quality import apply_decision_quality_gate
 from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import StaticSectorProvider
@@ -127,22 +127,27 @@ def synthetic_price_series(
 
 
 def _force_publication_ready(recommendations: list[Recommendation], as_of: date) -> list[Recommendation]:
-    """Runs the *real* `apply_publication_gate()` with a synthetic
-    all-checks-pass report, rather than hand-setting `publication_status`.
+    """Runs the *real* `apply_decision_quality_gate()`, rather than
+    hand-setting `publication_status`.
 
     This matters for a real reason a first attempt at this module got
     wrong: `PortfolioConstructor` also requires `HorizonDecision.
     max_position_pct` to be positive, and that field is set *only* by
-    `apply_publication_gate()` (`meta/publication_gate.py`), never by
+    the quality gate (`meta/decision_quality.py`), never by
     `MetaDecisionEngine`. Hand-setting `publication_status` alone silently
     left `max_position_pct=0.0`, which made every synthetic BUY_CANDIDATE
     portfolio-ineligible even though it scored positive -- a scenario-
     construction bug this framework's own Q6 check caught by refusing to
-    accept a portfolio with real positions but a zero weight sum. Using the
-    real gate function is both the fix and the more honest test.
+    accept a portfolio with real positions but a zero weight sum. Using
+    the real gate function is both the fix and the more honest test: this
+    framework's synthetic recommendations are built through the real
+    `RecommendationService`/`MetaDecisionEngine` code, so their
+    Explanations are already complete and genuinely pass quality on
+    their own merits -- "force" only in the sense that this scenario
+    framework never fabricates a fake blocked state to test around.
     """
-    report = PublicationGateReport(as_of=as_of, publication_ready=True, checks=[], blockers=[])
-    return apply_publication_gate(recommendations, report)
+    del as_of  # kept for call-site compatibility; the gate is per-decision now
+    return apply_decision_quality_gate(recommendations)
 
 
 # --- Full-universe synthetic scenario (Q1/Q2/Q3/Q4/Q6) ----------------------

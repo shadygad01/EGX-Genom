@@ -24,10 +24,13 @@ Two independent ceilings apply, and both must hold simultaneously:
   - `max_position_weight` defaults to `0.25` (25% of the portfolio) —
     the constructor-level cap shared by both `PortfolioConstructor` and
     `DecisionService`.
-  - `max_position_pct` is set per-decision by the publication gate, and
-    is *never* the full 25% for a real published decision: it is
+  - `max_position_pct` is set per-decision by the decision quality gate
+    (`meta.decision_quality.apply_decision_quality_gate`, replacing the
+    old system-wide `meta.publication_gate.apply_publication_gate` —
+    2026-08-02, see `docs/ARCHITECTURE_DECISIONS.md`), and is *never*
+    the full 25% for a real published decision: it is
     `min(0.05, max(0.01, confidence × 0.05))` — a confidence-scaled band
-    between 1% and 5% (`meta.publication_gate.apply_publication_gate`).
+    between 1% and 5%.
     In practice, the binding per-position ceiling on any real,
     publication-ready decision is this 1–5% band, not the 25% structural
     maximum, until this platform's own conviction (via measured

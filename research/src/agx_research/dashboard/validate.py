@@ -37,7 +37,8 @@ from agx_research.meta.decision_engine import (
     PublicationStatus,
     Recommendation,
 )
-from agx_research.meta.publication_gate import PublicationGateReport
+from agx_research.meta.decision_quality import evaluate_decision_quality
+from agx_research.meta.system_maturity import SystemMaturityReport
 from agx_research.meta.readiness import DecisionReadiness, TickerDataGapReport
 from agx_research.papers.paper import ResearchPaper
 from agx_research.portfolio.constructor import PortfolioRecommendation
@@ -174,6 +175,7 @@ def validate_dashboard_artifacts(
     _validate_optional_mission_status(directory, counts)
     _validate_optional_investment_cases(directory, counts)
     _validate_optional_publication_safety(directory, counts)
+    _validate_optional_system_maturity(directory, counts)
     _validate_optional_collector_status(directory, counts)
     _validate_optional_runtime_status(directory, counts)
     _validate_optional_dashboard_metrics(directory, counts)
@@ -444,48 +446,39 @@ def _validate_optional_investment_cases(directory: Path, counts: dict[str, int])
 
 
 def _validate_optional_publication_safety(directory: Path, counts: dict[str, int]) -> None:
-    gate_payload, gate_present = _load_optional_json(directory, "publication_gate.json")
+    """Re-derives the decision quality gate (`meta.decision_quality
+    .evaluate_decision_quality`) directly from each recommendation's own
+    explanation/decision, rather than trusting a separate global report
+    file -- since the gate is per-decision now (project owner direction,
+    2026-08-02), there is nothing left to cross-check against except the
+    recommendation's own data, and re-deriving it here is a stronger
+    check than comparing against a second copy of the same verdict would
+    have been.
+    """
     cases_payload, cases_present = _load_optional_json(directory, "investment_cases.json")
-    if not gate_present and not cases_present:
-        return
-
-    gate = None
-    if gate_present:
-        try:
-            gate = PublicationGateReport.model_validate(gate_payload)
-        except Exception as exc:
-            raise DashboardArtifactError(f"publication_gate.json: {exc}") from exc
-        counts["publication_gate.json"] = 1
-
     if not cases_present:
         return
     recommendations = [
         Recommendation.model_validate(item) for item in cases_payload.get("recommendations", [])
     ]
-    ready_decisions = {
-        (recommendation.ticker, decision.horizon)
-        for recommendation in recommendations
-        for decision in recommendation.horizon_decisions.values()
-        if decision.publication_status == PublicationStatus.PUBLICATION_READY
-    }
-    if ready_decisions and (gate is None or not gate.publication_ready):
-        raise DashboardArtifactError(
-            "investment_cases.json: publication_ready decision exists without a passing "
-            "publication_gate.json"
-        )
+    for recommendation in recommendations:
+        for horizon, decision in recommendation.horizon_decisions.items():
+            if decision.publication_status != PublicationStatus.PUBLICATION_READY:
+                continue
+            prediction = recommendation.horizon_predictions.get(horizon)
+            explanation = prediction.explanation if prediction is not None else recommendation.explanation
+            report = evaluate_decision_quality(recommendation.ticker, decision, explanation)
+            if not report.passed or decision.action == DecisionAction.ABSTAIN:
+                raise DashboardArtifactError(
+                    f"investment_cases.json: {recommendation.ticker}/{horizon.value} is "
+                    "publication_ready but fails re-derived decision quality checks "
+                    f"({[c.blocker for c in report.checks if c.blocker]})"
+                )
 
     portfolio_payload = cases_payload.get("portfolio")
     if portfolio_payload is None:
         return
     portfolio = PortfolioRecommendation.model_validate(portfolio_payload)
-    if gate is None or not gate.publication_ready:
-        if portfolio.positions or abs(portfolio.cash_weight - 1.0) > 1e-9:
-            raise DashboardArtifactError(
-                "investment_cases.json: blocked or missing publication gate requires "
-                "an all-cash portfolio"
-            )
-        return
-
     eligible_tickers = {
         recommendation.ticker
         for recommendation in recommendations
@@ -497,6 +490,11 @@ def _validate_optional_publication_safety(directory: Path, counts: dict[str, int
             for decision in recommendation.horizon_decisions.values()
         )
     }
+    if not eligible_tickers and (portfolio.positions or abs(portfolio.cash_weight - 1.0) > 1e-9):
+        raise DashboardArtifactError(
+            "investment_cases.json: no ticker has a publication-ready numeric buy decision, "
+            "so the portfolio must be an all-cash portfolio"
+        )
     ineligible = sorted(
         position.ticker
         for position in portfolio.positions
@@ -507,6 +505,18 @@ def _validate_optional_publication_safety(directory: Path, counts: dict[str, int
             "investment_cases.json: portfolio contains tickers without a publication-ready "
             f"numeric buy decision: {', '.join(ineligible)}"
         )
+
+
+def _validate_optional_system_maturity(directory: Path, counts: dict[str, int]) -> None:
+    payload, present = _load_optional_json(directory, "system_maturity.json")
+    if not present:
+        return
+    if payload is not None:
+        try:
+            SystemMaturityReport.model_validate(payload)
+        except Exception as exc:
+            raise DashboardArtifactError(f"system_maturity.json: {exc}") from exc
+    counts["system_maturity.json"] = 0 if payload is None else 1
 
 
 def _validate_optional_collector_status(directory: Path, counts: dict[str, int]) -> None:

@@ -2701,3 +2701,62 @@ source is the real fix if coverage stays low after that).
 `ruff check` clean; 33 `api` tests pass; 53 `web` tests pass; both `npm run
 build` clean; `contracts/` regeneration produced zero diff. See
 `CURRENT_MISSION.md`'s matching entry for the full narrative.
+
+## Redesign the publication gate: Decision Quality, System Maturity, Publication Governance (2026-08-02)
+
+Same-day continuation of the review above: real dashboard screenshots
+(Investment Committee Summary all `NO DATA`, Capital Deployment Queue
+empty, a Hypothesis Pipeline full of old `FAILED AT DATA COLLECTION`
+rows) traced to their real root cause rather than assumed — see
+`CURRENT_MISSION.md`'s matching entry for the full investigation and the
+project owner's explicit correction once the root cause (a system-wide
+publication gate that had never once passed in this platform's history)
+was found and explained.
+
+**Delivered**: see AD-58 (`docs/ARCHITECTURE_DECISIONS.md`) for the
+complete architectural record. Three independent layers replace the old
+`meta.publication_gate.evaluate_publication_gate()`/
+`apply_publication_gate()`: new `meta.decision_quality`
+(per-ticker-per-horizon evidence/thesis/confidence/invalidation/
+monitoring/consistency checks — this alone now gates
+`PublicationStatus.PUBLICATION_READY`), new `meta.system_maturity`
+(`early`/`validating`/`developing`/`established`/`verified`, purely
+informational, reusing the old performance-check math with none of its
+blocking consequence), and `LegalPublicationApproval` kept but fully
+decoupled (optional, can only ever raise the maturity label, never gates
+publishing). `ExternalPublicationEvidence`/`PublicationGateReport` and
+the `publication_evidence.json` input are deleted outright.
+`dashboard.validate`'s cross-artifact safety check independently
+re-derives each shipped `publication_ready` decision's quality instead
+of trusting a separate global report file. `agx publication-status` now
+reports System Maturity and always exits 0. New `system_maturity.json`
+dashboard artifact (`GET /system-maturity`) end to end: both web
+`DashboardDataProvider`s, `api` route/store, new JSON Schema contract,
+`deploy-pages.yml`'s artifact-presence check. Full doctrine set
+(`INVESTMENT_CONSTITUTION.md`, `DECISION_STANDARDS.md`,
+`PORTFOLIO_STANDARDS.md`, `INVESTMENT_HANDBOOK.md`,
+`DECISION_SYSTEM_ACCEPTANCE.md`, `RISK_REGISTER.md`,
+`PUBLICATION_EVIDENCE_RUNBOOK.md`) updated in the same change per its own
+amendment rule.
+
+**Verified**: every real call site updated and confirmed working, not
+just the module itself — `cli.py`'s `decide` command,
+`production/pipeline.py`'s dashboard-artifact stage, and both
+`institutional_validation/scenarios.py`'s and `investment_proof
+/capital_trust.py`'s synthetic-scenario helpers (their real,
+`RecommendationService`-built fixtures already carry complete evidence
+and pass the new per-decision gate on their own merits — no fixture
+needed weakening). New `test_decision_quality.py` (11 cases, including
+one proving quality is evaluated independently per horizon — one
+horizon's complete evidence never rescues a sibling's incomplete one)
+and `test_system_maturity.py` (9 cases, including one proving an
+optional governance review alone can never substitute for a real track
+record). 910 backend tests pass (up from 895; the old
+`test_publication_gate.py` retired); `ruff check` clean; 33 `api` / 53
+`web` tests pass; both production builds clean; `contracts/`
+regeneration added the one new schema, zero drift elsewhere.
+
+**Not done, named as genuinely next**: this redesign has not yet been
+exercised against a real `agx run`/`deploy-pages.yml` cycle to see how
+many real tickers now actually reach `PUBLICATION_READY` under the new
+gate — the next scheduled run is the real proof.

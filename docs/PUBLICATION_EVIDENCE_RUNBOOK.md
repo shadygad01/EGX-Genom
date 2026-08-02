@@ -1,65 +1,56 @@
 # Publication Evidence Runbook
 
-This runbook is the only supported route from `research_only` to
-`publication_ready`. It validates claims against archived inputs; it does not
-create evidence, grant data rights, or replace legal review.
+**Superseded (2026-08-02).** Until this date, this runbook described the
+only supported route from `research_only` to `publication_ready`: a
+human had to author two evidence files and clear a 30-result-per-horizon
+performance bar before *any* decision, of any quality, could size a
+position. Neither had ever been done once in this platform's history, so
+every decision stayed `research_only` regardless of how complete or
+well-evidenced it was.
 
-## Run the gate
+The project owner's explicit correction: publication should be governed
+by decision quality, not by how much track record has accumulated or
+whether a human has formally signed off. See `docs/ARCHITECTURE_DECISIONS.md`
+(the numbered entry for this change) for the full reasoning, and
+`research/src/agx_research/meta/decision_quality.py`'s module docstring
+for the mechanism. Nothing in this runbook is a manual step anymore.
 
-From `research/`, with the production environment installed:
+## What actually gates publication now
 
-```bash
-uv run python -m agx_research.cli \
-  --data-dir /absolute/path/to/production-data \
-  publication-status --date 2026-07-28
-```
+`meta.decision_quality.evaluate_decision_quality()`, evaluated
+automatically per ticker per horizon on every `agx decide`/`agx run` —
+no file to author, no command to run separately. A decision publishes
+when its own `Explanation` and `HorizonDecision` are complete:
 
-The command prints the complete JSON report. Exit code `0` means every check
-passed. Exit code `2` means publication remains blocked. Missing or malformed
-input files appear under `publication_input_validation` rather than being
-silently treated as approval.
+1. Supporting evidence is present and traceable (`supporting_evidence`/
+   `evidence_refs` both non-empty).
+2. The investment thesis is complete (`why_this_stock`/`why_now`/
+   `why_not_others` all stated).
+3. Confidence was actually calculated (a finite number in `[0, 1]`).
+4. Invalidation conditions are defined.
+5. Entry and review (monitoring) conditions are defined.
+6. The decision is internally consistent (a `BUY_CANDIDATE` carries
+   numeric entry and invalidation price levels).
 
-## External evidence file
+Nothing here needs external authoring — every one of these is already
+computed by the agent/model/decision-engine code that produced the
+recommendation in the first place.
 
-Copy `research/data/publication_evidence.template.json` to
-`<data-dir>/publication_evidence.json`. Keep every claim `false` until its
-references exist in the same data directory's `raw_documents.json`.
+## System Maturity — informational only, never a gate
 
-Each key changed to `true` needs references under the same `evidence_refs` key:
+`agx publication-status --date <ISO date>` reports
+`meta.system_maturity.SystemMaturityReport`: a label (`early` /
+`validating` / `developing` / `established` / `verified`) built from
+real `decision_ledger.json` history. It always exits `0` — there is no
+"blocked" outcome left to signal. Use it to see how much the platform's
+own track record has earned, not to decide whether to trust today's
+recommendations (that's what the per-decision quality checks above are
+for).
 
-```json
-{
-  "live_egx_market_data": true,
-  "official_disclosures_four_periods": false,
-  "current_cbe_capmas_macro": false,
-  "two_source_price_corroboration": false,
-  "evidence_refs": {
-    "live_egx_market_data": [{
-      "raw_document_id": "rawdoc_ID_FROM_ARCHIVE",
-      "source_id": "SOURCE_ID_FROM_REGISTRY",
-      "content_hash": "64_LOWERCASE_HEX_CHARACTERS_FROM_RAW_DOCUMENT",
-      "fetched_at": "2026-07-28T09:30:00",
-      "coverage_pct": 1.0,
-      "independent_group": "provider-family-name"
-    }]
-  }
-}
-```
+## Optional governance review — decoupled, never blocking
 
-The validator requires an exact raw-document id, source id, SHA-256 hash and
-fetch timestamp match. Coverage must equal `1.0`; the source must be legally
-cleared in `source_registry.json`; evidence must be no older than 7 days for
-live prices, 550 days for four-period disclosures, 45 days for macro, and 7
-days for price corroboration. Price corroboration needs at least two verified
-references with different `independent_group` values.
-
-Setting booleans to `true`, copying ids from another data directory, or editing
-an exported dashboard artifact cannot pass the gate.
-
-## Human legal approval file
-
-An actual legal reviewer—not an operator or automated process—creates
-`<data-dir>/legal_publication_approval.json` after reviewing the stated scope:
+`<data-dir>/legal_publication_approval.json` remains a real, optional
+input, unchanged in shape:
 
 ```json
 {
@@ -80,18 +71,17 @@ An actual legal reviewer—not an operator or automated process—creates
 }
 ```
 
-The signed review must itself be archived in `raw_documents.json`. Approval
-must be effective on the evaluation date, unexpired, fully scoped, and no more
-than 366 days old. Do not ship a pre-filled approval template: that would turn
-a human control into a copy-and-edit checkbox.
+Supplying one can only ever raise `SystemMaturityReport.level` to
+`verified` (and only once the real track record already reaches
+`established` on its own) — it is never read by, and never gates,
+`agx decide`/`agx run`. It exists for a future regulated/officially-
+published distribution mode this platform does not operate in today; a
+real fund manager using this platform's own recommendations for their
+own decisions (its only mode today) needs no governance file at all.
 
-## Performance gate
-
-The command reads `decision_ledger.json` directly. Every short, medium and long
-horizon must have at least 30 expired benchmark-matched decisions. After costs,
-mean and median excess return and the 95% lower confidence bound must all be
-positive; mean realized return must be positive and maximum drawdown must not
-be below -25%. Missing EGX30 observations fail the gate.
-
-Archive the emitted report and use generated `publication_gate.json` as the
-UI/API source. Do not override `publication_status` downstream.
+`research/data/publication_evidence.template.json` and the old
+`publication_evidence.json` input are retired entirely — the four
+external-evidence booleans they encoded are now implicitly, honestly
+answered by whether a specific decision actually has traceable evidence,
+per decision, rather than asserted system-wide by a human copying
+document ids into a file.

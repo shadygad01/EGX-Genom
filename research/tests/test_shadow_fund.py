@@ -15,11 +15,11 @@ from agx_research.config import Horizon
 from agx_research.data.schemas import PriceBar
 from agx_research.data.snapshot import DatasetSnapshot
 from agx_research.decision_service.country_risk import CountryRiskAssessment, CountryRiskSeverity
-from agx_research.domain.provenance import Provenance
+from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.explainability import Explanation
 from agx_research.horizons.base import Prediction
 from agx_research.meta.decision_engine import DecisionAction, MetaDecisionEngine
-from agx_research.meta.publication_gate import PublicationGateReport, apply_publication_gate
+from agx_research.meta.decision_quality import apply_decision_quality_gate
 from agx_research.decision_service.service import PositionAction
 from agx_research.shadow_fund.engine import (
     INCEPTION_NAV,
@@ -47,14 +47,18 @@ def make_recommendation(
         model_id="test", model_version="1",
         expected_return=expected_return, expected_risk=expected_risk, confidence=confidence,
         reference_price=100.0,
-        explanation=Explanation(why_this_stock="test", why_now="test", why_not_others="test"),
+        explanation=Explanation(
+            why_this_stock="test", why_now="test", why_not_others="test",
+            supporting_evidence=["test evidence"],
+            evidence_refs=[ProvenanceRef(kind="knowledge", ref_id="know-1")],
+            invalidation_conditions=["test invalidation condition"],
+        ),
         provenance=Provenance(produced_by="test", produced_at=datetime.now()),
     )
     recommendation = MetaDecisionEngine().decide(ticker, as_of, {Horizon.INVESTMENT: prediction})
     assert recommendation is not None
     if publication_ready:
-        gate = PublicationGateReport(as_of=as_of, publication_ready=True, checks=[], blockers=[])
-        recommendation = apply_publication_gate([recommendation], gate)[0]
+        recommendation = apply_decision_quality_gate([recommendation])[0]
     return recommendation
 
 

@@ -1,5 +1,40 @@
 # Changelog
 
+## Unreleased — Redesign the publication gate: Decision Quality, System Maturity, Publication Governance
+
+Replaced `meta.publication_gate`'s system-wide, all-or-nothing gate (a
+human-authored legal-approval file *and* 30+ per-horizon benchmark-
+outperforming results, required simultaneously before *any* decision
+could ever size a position — never once satisfied in this platform's
+history) with three independent layers, per explicit project owner
+direction: **Decision Quality** (new `meta.decision_quality`, evaluated
+per ticker per horizon — evidence present, thesis complete, confidence
+calculated, invalidation/monitoring conditions defined, internal
+consistency — this alone now gates publishing), **System Maturity** (new
+`meta.system_maturity`, `early`/`validating`/`developing`/`established`/
+`verified`, purely informational, computed from real decision-ledger
+history, never blocks anything), and **Publication Governance** (the old
+`LegalPublicationApproval`, kept, fully decoupled — can only ever raise
+System Maturity to `verified`, never gates `agx decide`/`agx run`). See
+AD-58 (`docs/ARCHITECTURE_DECISIONS.md`) for the full record and
+`CURRENT_MISSION.md`'s matching entry for the investigation that led here.
+
+New dashboard artifact `system_maturity.json` (`GET /system-maturity`)
+replaces `publication_gate.json` end to end (api/web providers, types,
+`deploy-pages.yml`, new `system_maturity.schema.json` contract).
+`dashboard.validate` now independently re-derives every shipped
+`publication_ready` decision's quality rather than trusting a separate
+report file. Full doctrine set (`INVESTMENT_CONSTITUTION.md`,
+`DECISION_STANDARDS.md`, `PORTFOLIO_STANDARDS.md`, `INVESTMENT_HANDBOOK.md`,
+`DECISION_SYSTEM_ACCEPTANCE.md`, `RISK_REGISTER.md`,
+`PUBLICATION_EVIDENCE_RUNBOOK.md`) updated in the same change.
+
+**Result**: 910 backend tests pass (test_publication_gate.py retired,
+replaced by test_decision_quality.py + test_system_maturity.py, 20 new
+cases); `ruff check` clean; 33 `api` / 53 `web` tests pass; both
+production builds clean; `contracts/` regeneration added one new schema,
+zero drift elsewhere.
+
 ## Unreleased — Investment Operating System review: full-universe evidence, DCF/EBITDA/EV/P-B, one real bug fixed
 
 Reviewed three same-day commits (`4799994`, `72cd2f8`, `479ffc0`) that

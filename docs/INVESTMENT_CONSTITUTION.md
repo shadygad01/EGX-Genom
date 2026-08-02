@@ -111,22 +111,33 @@ honestly-labeled outcomes, each with its own real trigger:
   - The ticker sits below the liquidity floor (Article III) or the
     country-risk severity is `CRISIS` (Article III) — both are hard
     overrides, not weighted evidence a strong thesis can outweigh.
-  - The publication gate itself is not cleared (Article IX) — even a
-    statistically excellent internal case is withheld from any real
-    capital consequence until live market data, four periods of official
-    disclosures, current macro data, two-source price corroboration,
-    30+ benchmark-outperforming results per horizon, and a valid human
-    legal review all exist simultaneously
-    (`meta.publication_gate.evaluate_publication_gate`).
+  - The decision quality gate itself is not cleared (Article IX,
+    `meta.decision_quality.evaluate_decision_quality()`, replacing the
+    old system-wide `meta.publication_gate.evaluate_publication_gate` —
+    2026-08-02, see `docs/ARCHITECTURE_DECISIONS.md`) — a decision is
+    withheld from any real capital consequence unless its own evidence,
+    thesis, confidence, invalidation conditions, monitoring conditions,
+    and internal consistency are all genuinely present. This is
+    evaluated per ticker per horizon, never as one system-wide switch:
+    historical track record and human governance review no longer
+    determine whether *any* decision can publish (see
+    `meta.system_maturity` for how they now inform, without ever
+    blocking, a separate credibility label).
 
-`ABSTAIN` is deliberately the platform's most common honest answer today:
-until a licensed EGX market-data vendor exists, the publication gate can
-never fully clear, so every real recommendation currently and correctly
-abstains from public consequence (`docs/DECISION_SYSTEM_ACCEPTANCE.md`).
-This is not a defect to work around — it is the constitution working
-exactly as designed. A system that quietly loosened this gate to "have
-more opinions" would be committing the platform's one unforgivable sin:
-manufacturing confidence that hasn't been earned.
+`ABSTAIN` remains one of the platform's common honest answers, but for a
+different, narrower reason than it once was: real data gaps (confidence
+below the research threshold, no reference price, no fair value from at
+least three valid models) still correctly withhold a decision, ticker by
+ticker — this is the constitution working exactly as designed, not a
+defect to work around. What changed (2026-08-02) is that a *complete,
+well-evidenced* decision is no longer withheld anyway, pending a
+system-wide track record or legal sign-off that could never accumulate
+without decisions publishing in the first place. A system that quietly
+fabricated evidence to force a decision through this gate would still be
+committing the platform's one unforgivable sin: manufacturing confidence
+that hasn't been earned. Requiring a *complete* case is not that; the
+old system-wide switch's real failure mode was withholding well-earned
+confidence anyway, which is a different and correctable defect.
 
 ---
 
@@ -388,14 +399,19 @@ can influence a real decision:
   data to assess country risk. A ticker missing any of these for a given
   horizon is not "researchable" at that horizon — full stop, regardless of
   how strong the rest of its case looks.
-- **The publication gate** (Article II) — the final, hardest gate,
-  because it is the only one requiring evidence about the real world
-  rather than about the platform's own internal statistics: live,
-  legally usable EGX market data; four periods of official disclosures;
-  current CBE/CAPMAS macro data; two independently-sourced price
-  corroborations; 30+ per-horizon benchmark-outperforming results at
-  95% confidence, after transaction costs; and a valid, dated human legal
-  review. All of it, simultaneously, or nothing is `PUBLICATION_READY`.
+- **The decision quality gate** (Article II, `meta.decision_quality`,
+  replacing the old system-wide publication gate — 2026-08-02, see
+  `docs/ARCHITECTURE_DECISIONS.md`) — the final gate, evaluated per
+  ticker per horizon against the decision's own evidence: supporting
+  evidence present and traceable, a complete investment thesis,
+  calculated confidence, defined invalidation conditions, defined
+  monitoring/review conditions, and internal consistency (a
+  `BUY_CANDIDATE` carries numeric entry and invalidation levels). All of
+  it, for *this specific decision*, or it stays `RESEARCH_ONLY` — never
+  a system-wide switch requiring every ticker to wait on the same
+  external evidence, track record, or legal sign-off (those now inform
+  `meta.system_maturity`'s separate, non-blocking credibility label
+  instead).
 
 ---
 

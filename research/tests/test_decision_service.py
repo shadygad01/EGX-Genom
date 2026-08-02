@@ -16,7 +16,7 @@ from agx_research.knowledge.lifecycle import KnowledgeStatus
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.meta.decision_engine import DecisionAction, MetaDecisionEngine, PublicationStatus
-from agx_research.meta.publication_gate import PublicationGateReport, apply_publication_gate
+from agx_research.meta.decision_quality import apply_decision_quality_gate
 from agx_research.validation.statistical import StatisticalEvidence
 
 NO_RISK = CountryRiskAssessment(as_of=date(2026, 6, 14), severity=CountryRiskSeverity.NORMAL)
@@ -42,7 +42,12 @@ def make_prediction(
         confidence=confidence,
         reference_price=reference_price,
         explanation=explanation
-        or Explanation(why_this_stock="test", why_now="test", why_not_others="test"),
+        or Explanation(
+            why_this_stock="test", why_now="test", why_not_others="test",
+            supporting_evidence=["test evidence"],
+            evidence_refs=[ProvenanceRef(kind="knowledge", ref_id="know-1")],
+            invalidation_conditions=["test invalidation condition"],
+        ),
         supporting_knowledge_ids=["know-1"],
         provenance=Provenance(produced_by="investment_alpha@0.1.0", produced_at=datetime.now()),
     )
@@ -53,29 +58,27 @@ def make_publication_ready_recommendation(
 ):
     """A real Recommendation, built the same way `MetaDecisionEngine` always
     builds one (not a hand-constructed fake), pushed through the real
-    `apply_publication_gate()` with a synthetic all-pass report -- a real
-    end-to-end gate needs 30 evaluated decisions and legal approval no
-    unit test can honestly provide, but hand-setting only
-    `publication_status` (not `max_position_pct`, which the same gate
-    function sets) previously left `max_position_pct=0.0`, silently
-    zeroing every target weight regardless of a real decision's action.
-    Using the real gate function is both the fix and the more honest
-    test -- the same lesson `institutional_validation/scenarios.py`
+    `apply_decision_quality_gate()` (`meta/decision_quality.py`) -- the
+    per-decision gate that replaced the old system-wide, track-record-
+    and-legal-review gate (project owner direction, 2026-08-02). Hand-
+    setting only `publication_status` (not `max_position_pct`, which the
+    same gate function sets) previously left `max_position_pct=0.0`,
+    silently zeroing every target weight regardless of a real decision's
+    action. Using the real gate function is both the fix and the more
+    honest test -- the same lesson `institutional_validation/scenarios.py`
     already learned from its own version of this bug."""
     prediction = make_prediction(ticker, expected_return, expected_risk, confidence)
     recommendation = MetaDecisionEngine().decide(ticker, date(2026, 6, 14), {Horizon.INVESTMENT: prediction})
     assert recommendation is not None
     decision = recommendation.horizon_decisions[Horizon.INVESTMENT]
     assert decision.action == DecisionAction.BUY_CANDIDATE  # sanity: score >= 1.0 threshold cleared
-    report = PublicationGateReport(as_of=date(2026, 6, 14), publication_ready=True, checks=[], blockers=[])
-    return apply_publication_gate([recommendation], report)[0]
+    return apply_decision_quality_gate([recommendation])[0]
 
 
 def _apply_publication_ready(recommendation):
     """Same real-gate fix as `make_publication_ready_recommendation`, for
     tests that hand-build a multi-horizon `Recommendation` directly."""
-    report = PublicationGateReport(as_of=date(2026, 6, 14), publication_ready=True, checks=[], blockers=[])
-    return apply_publication_gate([recommendation], report)[0]
+    return apply_decision_quality_gate([recommendation])[0]
 
 
 def make_research_only_recommendation(ticker: str):

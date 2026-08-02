@@ -193,14 +193,15 @@ class DecisionService:
                 reasons.extend(decision.abstention_reasons)
             elif decision.publication_status != PublicationStatus.PUBLICATION_READY:
                 # The model itself reached a real action (e.g. BUY_CANDIDATE),
-                # but `meta.publication_gate` hasn't cleared it -- target_weight
-                # is already zero from the eligibility check above; without this
-                # branch the decision would silently report no_action/hold with
-                # no reason naming the real cause (Principle 3/Rule 5).
+                # but `meta.decision_quality`'s per-decision gate hasn't
+                # cleared it -- target_weight is already zero from the
+                # eligibility check above; without this branch the decision
+                # would silently report no_action/hold with no reason naming
+                # the real cause (Principle 3/Rule 5).
                 abstained = True
                 reasons.extend(
                     decision.abstention_reasons
-                    or ["Not publication-ready; see meta.publication_gate's blockers for the exact reason."]
+                    or ["Not publication-ready; see meta.decision_quality's blockers for the exact reason."]
                 )
 
             action = self._resolve_action(

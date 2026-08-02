@@ -33,7 +33,7 @@ import type {
   MonitoringWarningsReport,
   Pattern,
   PortfolioSummaryReport,
-  PublicationGateReport,
+  SystemMaturityReport,
   Recommendation,
   ResearchPaper,
   RunRecord,
@@ -188,8 +188,8 @@ export class StaticJsonProvider implements DashboardDataProvider {
     return fetchList<DecisionPerformanceSummary>("decision_performance.json");
   }
 
-  getPublicationGate(): Promise<PublicationGateReport | null> {
-    return fetchObject<PublicationGateReport>("publication_gate.json");
+  getSystemMaturity(): Promise<SystemMaturityReport | null> {
+    return fetchObject<SystemMaturityReport>("system_maturity.json");
   }
 
   getDiscoveryReport(): Promise<DiscoveryOutcome[]> {

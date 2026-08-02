@@ -97,8 +97,9 @@ Layout:
   `ARCHITECTURE_DECISIONS.md`, `RISK_REGISTER.md` (and `CHANGELOG.md` at
   the repo root). Keep all of them current when making changes — in
   particular, a change to any decision-affecting threshold or gate
-  (`meta.decision_engine`, `meta.publication_gate`, `meta.readiness`,
-  `decision_service/`, `capital_allocation/`, `investment_proof/`) must be
+  (`meta.decision_engine`, `meta.decision_quality`, `meta.system_maturity`,
+  `meta.publication_gate`, `meta.readiness`, `decision_service/`,
+  `capital_allocation/`, `investment_proof/`) must be
   reflected in the doctrine set in the same change, per the doctrine's own
   amendment rule (`docs/INVESTMENT_CONSTITUTION.md`'s closing article):
   numbered decision, stated reason, permanent record — never a silent

@@ -94,11 +94,10 @@ from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_engine import Recommendation
 from agx_research.meta.decision_ledger import DecisionLedger
+from agx_research.meta.decision_quality import apply_decision_quality_gate
+from agx_research.meta.system_maturity import compute_system_maturity
 from agx_research.meta.publication_gate import (
-    ExternalPublicationEvidence,
     LegalPublicationApproval,
-    apply_publication_gate,
-    evaluate_publication_gate,
 )
 from agx_research.meta.readiness import assess_decision_readiness
 from agx_research.orchestration.pipeline import DailyResearchPipeline
@@ -985,51 +984,35 @@ class ProductionPipeline:
         )
         counts["decision_performance.json"] = len(decision_performance)
 
-        external_path = self.data_dir / "publication_evidence.json"
+        # Publishing is governed by each decision's own quality (evidence,
+        # thesis, invalidation conditions, internal consistency), not by
+        # historical track record or a human sign-off -- see
+        # `meta.decision_quality`'s module docstring for the full
+        # architectural reasoning (project owner direction, 2026-08-02).
+        gated_recommendations = apply_decision_quality_gate(
+            [Recommendation.model_validate(row) for row in investment_cases["recommendations"]]
+        )
+
+        # System Maturity is the separate, non-blocking credibility label
+        # historical track record now feeds instead -- an optional human
+        # governance review (unchanged shape, `LegalPublicationApproval`)
+        # can only ever raise it to "verified", never gate publishing.
         legal_path = self.data_dir / "legal_publication_approval.json"
-        publication_input_errors: list[str] = []
-        external_evidence = None
         legal_approval = None
-        if external_path.exists():
-            try:
-                external_evidence = ExternalPublicationEvidence.model_validate_json(
-                    external_path.read_text(encoding="utf-8")
-                )
-            except (ValueError, OSError) as exc:
-                publication_input_errors.append(f"publication_evidence.json invalid: {exc}")
-        else:
-            publication_input_errors.append("publication_evidence.json missing")
         if legal_path.exists():
             try:
                 legal_approval = LegalPublicationApproval.model_validate_json(
                     legal_path.read_text(encoding="utf-8")
                 )
-            except (ValueError, OSError) as exc:
-                publication_input_errors.append(f"legal_publication_approval.json invalid: {exc}")
-        else:
-            publication_input_errors.append("legal_publication_approval.json missing")
-        publication_gate = evaluate_publication_gate(
-            performance_models,
-            as_of=as_of or end,
-            external=external_evidence,
-            legal=legal_approval,
-            raw_documents=RawDocumentRepository(self.data_dir / "raw_documents.json").all_latest(),
-            legally_cleared_source_ids={
-                source.id
-                for source in self.registry.all_latest()
-                if source.legal_use_status.value == "cleared"
-            },
-            input_errors=publication_input_errors,
+            except (ValueError, OSError):
+                legal_approval = None
+        system_maturity = compute_system_maturity(
+            performance_models, as_of=as_of or end, governance=legal_approval
         )
-        (dashboard_out / "publication_gate.json").write_text(
-            json.dumps(publication_gate.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
+        (dashboard_out / "system_maturity.json").write_text(
+            json.dumps(system_maturity.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
         )
-        counts["publication_gate.json"] = 1
-
-        gated_recommendations = apply_publication_gate(
-            [Recommendation.model_validate(row) for row in investment_cases["recommendations"]],
-            publication_gate,
-        )
+        counts["system_maturity.json"] = 1
         investment_cases["recommendations"] = [
             item.model_dump(mode="json") for item in gated_recommendations
         ]
@@ -1164,7 +1147,7 @@ class ProductionPipeline:
         # provider, and `FinancialCoverageReport.as_of` requires a real
         # `date` regardless. Fall back to `end` (the pipeline's own
         # requested date), matching the exact pattern this stage already
-        # uses for `evaluate_publication_gate`/`PortfolioConstructor` above.
+        # uses for `compute_system_maturity`/`PortfolioConstructor` above.
         coverage_as_of = as_of or end
         financial_statements = production_artifacts.export_financial_statements(
             self.data_dir, self._tickers(coverage_as_of), coverage_as_of

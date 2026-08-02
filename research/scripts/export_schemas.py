@@ -35,6 +35,7 @@ from agx_research.events.event import Event
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.decision_engine import Recommendation
+from agx_research.meta.system_maturity import SystemMaturityReport
 from agx_research.runtime.engine import RunRecord
 from agx_research.shadow_fund.models import ShadowFundHistory, ShadowFundPublicState
 from agx_research.sources.spec import SourceSpec
@@ -58,6 +59,7 @@ MODELS = {
     "capital_allocation_plan.schema.json": CapitalAllocationPlan,
     "shadow_fund.schema.json": ShadowFundPublicState,
     "shadow_fund_history.schema.json": ShadowFundHistory,
+    "system_maturity.schema.json": SystemMaturityReport,
 }
 
 

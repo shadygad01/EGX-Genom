@@ -25,7 +25,7 @@ from agx_research.investment_proof.portfolio_validation import PortfolioValidati
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.knowledge.store import KnowledgeStore
-from agx_research.meta.publication_gate import PublicationGateReport, apply_publication_gate
+from agx_research.meta.decision_quality import apply_decision_quality_gate
 from agx_research.meta.recommendation_service import RecommendationService
 from agx_research.portfolio.constructor import PortfolioConstructor, PortfolioPosition, PortfolioRecommendation
 from agx_research.validation.statistical import StatisticalEvidence
@@ -102,7 +102,7 @@ def test_build_warnings_detects_macro_risk_broken_thesis_catalyst_and_review():
     store._repo.add(retired)
 
     recs = RecommendationService(store).recommend(["COMI"], AS_OF, latest_prices={"COMI": 90.0})
-    recs = apply_publication_gate(recs, PublicationGateReport(as_of=AS_OF, publication_ready=True, checks=[], blockers=[]))
+    recs = apply_decision_quality_gate(recs)
     portfolio = PortfolioConstructor().construct(recs, AS_OF)
     assert portfolio.positions, "expected COMI to be a real, funded position"
 
@@ -134,7 +134,7 @@ def test_build_warnings_empty_when_nothing_is_wrong():
     store = KnowledgeStore()
     store._repo.add(make_knowledge("k-comi", "COMI", "macro_agent", 0.08))
     recs = RecommendationService(store).recommend(["COMI"], AS_OF, latest_prices={"COMI": 90.0})
-    recs = apply_publication_gate(recs, PublicationGateReport(as_of=AS_OF, publication_ready=True, checks=[], blockers=[]))
+    recs = apply_decision_quality_gate(recs)
     portfolio = PortfolioConstructor().construct(recs, AS_OF)
     country_risk = CountryRiskAssessment(as_of=AS_OF, severity=CountryRiskSeverity.NORMAL)
     pv = PortfolioValidationEngine().validate(portfolio.positions, portfolio.cash_weight, AS_OF)

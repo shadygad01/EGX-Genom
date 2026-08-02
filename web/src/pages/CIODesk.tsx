@@ -22,6 +22,7 @@ import type {
   PortfolioPosition,
   PositionAwareDecision,
   Recommendation,
+  SystemMaturityLevel,
 } from "../types";
 import styles from "./CIODesk.module.css";
 
@@ -68,6 +69,14 @@ const COMMITTEE_STANCE_VARIANT: Record<string, BadgeVariant> = {
   no_data: "neutral",
 };
 
+const SYSTEM_MATURITY_VARIANT: Record<SystemMaturityLevel, BadgeVariant> = {
+  early: "neutral",
+  validating: "neutral",
+  developing: "warning",
+  established: "positive",
+  verified: "positive",
+};
+
 type OpportunityRow = { kind: "opportunity"; position: PortfolioPosition; companyName: string; recommendation: Recommendation | null };
 type ActionRow = { kind: "decision"; decision: PositionAwareDecision; companyName: string };
 type TodaysActionRow = OpportunityRow | ActionRow;
@@ -93,6 +102,7 @@ export function CIODesk() {
   const portfolioSummary = useArtifact((p) => p.getPortfolioSummary());
   const warnings = useArtifact((p) => p.getWarnings());
   const committeeSummary = useArtifact((p) => p.getCommitteeSummary());
+  const systemMaturity = useArtifact((p) => p.getSystemMaturity());
 
   const [liveDecisions, setLiveDecisions] = useState<PositionAwareDecision[] | null>(null);
   const [liveCapitalPlan, setLiveCapitalPlan] = useState<CapitalAllocationPlan | null>(null);
@@ -589,6 +599,15 @@ export function CIODesk() {
       </Section>
 
       <Section title={t("committeeSummary.title")} description={t("committeeSummary.description")}>
+        {!systemMaturity.loading && !systemMaturity.error && systemMaturity.data && (
+          <div className={styles.systemMaturityRow}>
+            <span className={styles.systemMaturityLabel}>{t("committeeSummary.systemMaturity")}</span>
+            <Badge variant={SYSTEM_MATURITY_VARIANT[systemMaturity.data.level] ?? "neutral"}>
+              {label("systemMaturity", systemMaturity.data.level)}
+            </Badge>
+            <span className={styles.systemMaturityRationale}>{systemMaturity.data.rationale}</span>
+          </div>
+        )}
         {committeeSummary.loading && <LoadingState rows={2} />}
         {committeeSummary.error && <ErrorState detail={committeeSummary.error.message} onRetry={committeeSummary.reload} />}
         {!committeeSummary.loading && !committeeSummary.error && !committeeSummary.data && (

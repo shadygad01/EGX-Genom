@@ -2760,3 +2760,128 @@ regeneration added the one new schema, zero drift elsewhere.
 exercised against a real `agx run`/`deploy-pages.yml` cycle to see how
 many real tickers now actually reach `PUBLICATION_READY` under the new
 gate — the next scheduled run is the real proof.
+
+## Retired sources still showing as dead links in Mission Control (2026-08-02)
+
+The project owner sent a real Settings-page screenshot: rows like
+`company_social_official`, `public_telegram`, `patents`, `hiring_signals`,
+`google_scholar`, `researchgate` (all `UNAVAILABLE`/`UNKNOWN`, reason
+"Source explicitly disabled in the registry") sitting in the same
+"Collectors" table as genuinely still-catalogued blocked sources like
+`arxiv`/`ssrn`/`nber`/`moodys_ratings`/`sp_global_ratings`/`fitch_ratings`
+— indistinguishable from each other, reading as a page full of dead links.
+
+**Root cause found**: this is the unfinished half of "The real
+DATA_COLLECTION-starvation bug and dead-source retirement" mission above.
+That mission's `SourceRegistry.retire_removed()` (AD-52/AD-53) correctly
+retires a source dropped from `sources.catalog.seed_sources()` in the
+registry itself — but `production.collector_plan.unavailable_sources()`,
+the function that actually builds the `collector_status.json` artifact
+behind Settings' "Collectors" table (and Mission Control before it), was
+never updated to exclude what `retire_removed()` now marks. It iterated
+`registry.all_latest()` unconditionally, so a permanently-removed
+tombstone and a still-catalogued source deliberately kept `DISABLED` for a
+real, evidenced reason (e.g. `egx_official`'s TCP reset) — which share the
+exact same `status=DISABLED`/`activation_status=RETIRED` via
+`default_lifecycle_for_status` — were reported identically. The registry-level
+fix shipped; the one consumer that actually renders on screen never picked
+it up.
+
+**Closed**: `unavailable_sources()` now cross-references the current
+`seed_sources()` id set (the same source of truth `retire_removed()`
+itself uses to decide what counts as removed) and skips any spec absent
+from it, before applying the existing status-to-reason mapping. `SourceIntelligence.tsx`
+already did the equivalent filter for the CIO-facing page
+(`status !== "disabled" && activation_status !== "retired"`); this closes
+the same gap for the Settings/Mission Control operational table without
+hiding a still-catalogued `DISABLED` source's real, evidenced reason.
+
+**Verified, not changed — the other two rows in the screenshot are honest,
+not a bug**:
+- `arxiv`/`ssrn`/`nber` (Research Papers capability) and
+  `moodys_ratings`/`sp_global_ratings`/`fitch_ratings` (sovereign rating
+  actions, feeding `decision_service.country_risk`'s `CRISIS` override) are
+  real, still-catalogued `PLANNED` sources — genuinely pending real
+  endpoint verification, not tombstones. This session's remote environment
+  has zero outbound network access to any external host (confirmed by
+  direct probes to arxiv.org, nber.org, ssrn.com, and even a control
+  request to en.wikipedia.org — every one rejected by organization egress
+  policy before reaching the destination), so no endpoint could be
+  verified here without breaking this codebase's own "never wire a
+  collector against a guessed URL" rule. Verifying these needs either a
+  network-capable session or the project owner supplying an already-verified
+  feed/API URL.
+- `docs/FREE_DECISION_DATA_BLUEPRINT.md` (Part 3) already documents
+  `arxiv`/`ssrn`/`nber` as "methodology only" with "None directly" for
+  decision impact — deliberately kept anyway (unlike `google_scholar`/
+  `researchgate`, cut as redundant) as a Research Papers capability input.
+  Confirmed by code search: nothing downstream currently reads
+  `Capability.RESEARCH_PAPERS`'s collected output — a real, named gap, not
+  claimed closed by this change. Presented this finding to the project
+  owner, who decided the same day — see the next entry below for what
+  changed as a result.
+
+**Verified**: new regression test
+`test_unavailable_sources_excludes_retired_tombstones` in
+`test_production_pipeline.py`, directly reproducing the screenshot (a
+retired `company_social_official` tombstone excluded, a genuinely-disabled
+`egx_official` and a genuinely-planned `mof_egypt` both still visible). 912
+backend tests pass (up from 911); `ruff check` clean. See `CHANGELOG.md`'s
+matching entry.
+
+## Methodology & Research Registry: arxiv/ssrn/nber moved out of the operational catalog (2026-08-02)
+
+Direct continuation of the entry above: presented with the finding that
+`Capability.RESEARCH_PAPERS` (`arxiv`/`ssrn`/`nber`) had zero downstream
+consumer while the platform's own `docs/FREE_DECISION_DATA_BLUEPRINT.md`
+already documented these three as methodology-only, the project owner gave
+an explicit, more specific direction than a binary keep-or-delete: **never
+classify academic papers as decision-time data, and don't delete them
+either — give them a genuinely separate Methodology & Research Registry**,
+purpose-scoped to investment-methodology evolution, hypothesis generation,
+model improvement, rule discovery, and literature review, feeding a future
+**Research & Methodology Pipeline** kept structurally apart from the daily
+**Operational Decision Pipeline** — "operational sources produce investment
+decisions, methodology sources produce better methodologies," never mixed.
+Any hypothesis that eventually comes from this line of work must still
+survive this codebase's existing 8-gate `hypotheses.pipeline` validation,
+Shadow Fund backtest, and Investment Proof, exactly like any other
+hypothesis — never a shortcut straight to a production rule.
+
+**Delivered**: new `agx_research.methodology` package
+(`methodology/catalog.py`) — `seed_research_sources()` (arxiv/ssrn/nber,
+unchanged fields) and `seed_methodology_registry()`, a second, fully
+independent instance of the same generic, versioned `SourceRegistry`/
+`SourceSpec` machinery `sources.registry`/`sources.catalog` already use
+(reused as-is, not duplicated as a new type), persisted separately from
+`source_registry.json`. Removed all three from `sources.catalog
+.seed_sources()` (the operational catalog `production.pipeline
+.ProductionPipeline` actually reads) and removed
+`Capability.RESEARCH_PAPERS`/its `CAPABILITY_STRATEGIES` entry from
+`acquisition_intelligence.capability` outright — `production.pipeline`
+iterates every `Capability` once per day, so this also stops wasting one
+`CapabilityDecision` per run on a capability that could never be satisfied.
+`acquisition_intelligence.target.seed_target_organizations()`'s
+arxiv/ssrn/nber `TargetOrganization` entries removed the same way (that
+engine only discovers candidates for the operational catalog). A
+previously-persisted operational registry with these three ids self-heals
+via the existing `retire_removed()` mechanism (the same one this session's
+first fix already relies on) — no special-casing needed.
+
+**Verified, not fabricated as done**: no CLI command, dashboard artifact,
+or agent reads `seed_methodology_registry()`'s output yet — turning a
+collected paper into a `ResearchFinding` an agent can propose is the
+Research & Methodology Pipeline mission itself, explicitly named as future
+work, not built in this change. New `test_methodology_registry.py` (5
+cases: catalog membership, PLANNED/uncatalogued-for-decisions invariants,
+independence from the operational registry, idempotent seeding, and its
+own `retire_removed` self-healing); `test_source_registry.py` gained a
+disjointness regression test. 918 backend tests pass (up from 912, and
+895 before this session started); `ruff check` clean. `web/src/i18n
+/locales/ar/common.json`'s now-orphaned `research_papers` label removed
+(JSON validity confirmed; zero code references existed to it — this
+frontend field is typed as plain `string`, not a strict enum, so no
+frontend/API change was otherwise needed). `web`/`api` test suites were
+not run in this session's environment (no installed `node_modules`); the
+only touched frontend file was the one-line translation-key removal
+described above.

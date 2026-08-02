@@ -216,8 +216,7 @@
       "trading_calendar": "تقويم التداول",
       "index_constituents": "مكونات المؤشر",
       "sector_membership": "الانتماء القطاعي",
-      "economic_releases": "الإصدارات الاقتصادية",
-      "research_papers": "الأوراق البحثية"
+      "economic_releases": "الإصدارات الاقتصادية"
     },
     "corporateEventType": {
       "stock_split": "تجزئة أسهم",

@@ -1,5 +1,65 @@
 # Changelog
 
+## Unreleased — New Methodology & Research Registry: arxiv/ssrn/nber moved out of the operational catalog
+
+Follow-up to the Mission Control fix below, per explicit project owner
+direction: academic literature must never be classified as decision-time
+data, but shouldn't be deleted either. New `agx_research.methodology`
+package (`seed_research_sources()`/`seed_methodology_registry()`) gives
+`arxiv`/`ssrn`/`nber` a genuinely separate, non-operational home — a
+second, independent instance of the existing `SourceRegistry`/`SourceSpec`
+machinery, persisted apart from `source_registry.json` — intended to feed
+a future Research & Methodology Pipeline (literature → hypothesis
+generation → the existing 8-gate `hypotheses.pipeline` validation → Shadow
+Fund backtest → Investment Proof, never a shortcut to a production rule),
+kept structurally apart from the daily Operational Decision Pipeline.
+Removed all three from `sources.catalog.seed_sources()`,
+`Capability.RESEARCH_PAPERS`/its `CAPABILITY_STRATEGIES` entry from
+`acquisition_intelligence.capability` (this also stops the daily pipeline
+wasting a `CapabilityDecision` on a capability nothing could ever satisfy),
+and their `TargetOrganization` discovery-engine entries. A previously-
+persisted operational registry with these ids self-heals via the existing
+`retire_removed()` mechanism. New `test_methodology_registry.py` (5 cases)
+plus a disjointness regression in `test_source_registry.py`; 918 backend
+tests pass (up from 912); `ruff check` clean. Not fabricated as done: no
+CLI command, dashboard artifact, or agent reads the new registry yet —
+that's the Research & Methodology Pipeline mission itself, explicitly
+named as future work. See `docs/PHASE_STATUS.md`'s matching entry.
+
+## Unreleased — Retired sources no longer show as dead links in Mission Control
+
+Root-caused a real, user-reported bug from a live dashboard screenshot:
+Settings' "Collectors" table listed sources like `company_social_official`,
+`public_telegram`, `patents`, `hiring_signals`, `google_scholar`, and
+`researchgate` as `UNAVAILABLE`, indistinguishable from genuinely-pending
+sources — even though every one of them was removed from the source
+catalog months ago (Decision-Centric Redesign, 2026-07-30) for having zero
+`Capability` mapping and no consumer. `SourceRegistry.retire_removed()`
+(AD-52/AD-53) already correctly retires these in the registry itself
+(`status=DISABLED`, `activation_status=RETIRED`), but
+`production.collector_plan.unavailable_sources()` — the function that
+actually builds the `collector_status.json` artifact behind that table —
+iterated the full registry unconditionally, so the retired tombstones kept
+surfacing next to real, still-catalogued blocked sources (e.g.
+`egx_official`, `arxiv`, `moodys_ratings`). Both a permanently-removed
+tombstone and a deliberately-kept-disabled source share the exact same
+`status`/`activation_status`, so the fix cross-references
+`sources.catalog.seed_sources()`'s current id set (the same source of
+truth `retire_removed()` itself uses) rather than relying on either field
+alone. New regression test
+(`test_unavailable_sources_excludes_retired_tombstones`); 912 backend
+tests pass (up from 911); `ruff check` clean.
+
+Also verified, not changed: `arxiv`/`ssrn`/`nber` (Research Papers
+capability) and `moodys_ratings`/`sp_global_ratings`/`fitch_ratings`
+(sovereign rating actions) remain genuinely `PLANNED` — this session's
+sandboxed environment has no outbound network access to any external
+host (confirmed via direct probes; every request was rejected by
+organization egress policy before reaching the destination), so no new
+endpoint could be verified without violating this codebase's own rule
+against wiring a collector against a guessed URL. See `docs/PHASE_STATUS.md`'s
+matching entry for what's still genuinely open here.
+
 ## Unreleased — Redesign the publication gate: Decision Quality, System Maturity, Publication Governance
 
 Replaced `meta.publication_gate`'s system-wide, all-or-nothing gate (a

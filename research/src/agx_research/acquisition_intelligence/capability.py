@@ -2,22 +2,33 @@
 
 Root-principle correction (see `docs/ACQUISITION_STRATEGY.md`): a homepage
 is not a data source, and a company website is not a capability. AGX needs
-independent kinds of data -- Price Data, Corporate Disclosures, Corporate
-Actions, Financial Statements, Investor Relations, News, Macroeconomic
-Data, Market Breadth, Trading Calendar, Index Constituents, Sector
-Membership, Economic Releases, Research Papers -- and each one may have
-more than one legal acquisition strategy. This module is that mapping
-turned into runtime data, not narrative: `CAPABILITY_STRATEGIES` is a
-declared, ranked pool of *catalogued* `SourceSpec` ids per capability
-(never a fabricated or guessed source), which `capability_engine.py` then
-ranks with live registry/reputation data and executes with automatic
-fallback.
+independent kinds of *decision-relevant* data -- Price Data, Corporate
+Disclosures, Corporate Actions, Financial Statements, Investor Relations,
+News, Macroeconomic Data, Market Breadth, Trading Calendar, Index
+Constituents, Sector Membership -- and each one may have more than one
+legal acquisition strategy. This module is that mapping turned into
+runtime data, not narrative: `CAPABILITY_STRATEGIES` is a declared, ranked
+pool of *catalogued* `SourceSpec` ids per capability (never a fabricated
+or guessed source), which `capability_engine.py` then ranks with live
+registry/reputation data and executes with automatic fallback.
 
 A capability with only one candidate today (e.g. Trading Calendar) is
 honestly not yet diversified, not silently padded with an invented
 alternative -- diversification happens by cataloguing a second legal
 strategy (see `docs/ACQUISITION_STRATEGY.md`'s per-capability analysis),
 never by adding a placeholder id here.
+
+Research Papers was a `Capability` here until a real user-reported audit
+(2026-08-02) found it had zero downstream consumer -- no agent,
+hypothesis, or decision ever read its output, and every daily run wasted
+one `CapabilityDecision` on a capability that could never be satisfied
+(`arxiv`/`ssrn`/`nber` are honestly `PLANNED`, never `IMPLEMENTED`).
+Academic literature isn't an *operational* data requirement the way price
+or disclosures are -- it feeds methodology, not same-day decisions -- so
+it was moved out to `agx_research.methodology.catalog`, a deliberately
+separate, non-operational registry, rather than kept here or deleted
+outright. See that module's docstring and `docs/PHASE_STATUS.md`'s
+matching entry for the full reasoning.
 """
 
 from __future__ import annotations
@@ -42,7 +53,6 @@ class Capability(str, Enum):
     TRADING_CALENDAR = "trading_calendar"
     INDEX_CONSTITUENTS = "index_constituents"
     SECTOR_MEMBERSHIP = "sector_membership"
-    RESEARCH_PAPERS = "research_papers"
 
 
 # Declared candidate pools per capability -- every id here is a real
@@ -159,5 +169,4 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     Capability.TRADING_CALENDAR: ["egx_official"],
     Capability.INDEX_CONSTITUENTS: ["egx_universe_seed", "egx_official"],
     Capability.SECTOR_MEMBERSHIP: ["egx_official"],
-    Capability.RESEARCH_PAPERS: ["arxiv", "ssrn", "nber"],
 }

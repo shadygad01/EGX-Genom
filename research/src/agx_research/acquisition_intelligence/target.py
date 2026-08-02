@@ -361,35 +361,16 @@ def seed_target_organizations() -> list[TargetOrganization]:
         # Centric Gap Audit / Architecture Adversarial Review): zero
         # capability mapping, zero agent consumer, no credible decision
         # path -- see sources/catalog.py's removal note.
-        TargetOrganization(
-            id="arxiv",
-            name="arXiv",
-            category=SourceCategory.RESEARCH,
-            country="US",
-            domain_hints=["arxiv.org", "www.arxiv.org"],
-            existing_source_id="arxiv",
-            priority=PRIORITY_ADDITIONAL_DISCOVERED,
-        ),
-        TargetOrganization(
-            id="ssrn",
-            name="SSRN",
-            category=SourceCategory.RESEARCH,
-            country="US",
-            domain_hints=["ssrn.com", "www.ssrn.com"],
-            existing_source_id="ssrn",
-            priority=PRIORITY_ADDITIONAL_DISCOVERED,
-        ),
-        TargetOrganization(
-            id="nber",
-            name="National Bureau of Economic Research",
-            category=SourceCategory.RESEARCH,
-            country="US",
-            domain_hints=["nber.org", "www.nber.org"],
-            existing_source_id="nber",
-            priority=PRIORITY_ADDITIONAL_DISCOVERED,
-        ),
-        # google_scholar/researchgate targets removed alongside their
-        # SourceSpec entries -- redundant with arxiv/ssrn/nber above.
+        #
+        # arxiv/ssrn/nber (and, before them, google_scholar/researchgate)
+        # targets removed the same way (2026-08-02): this engine discovers
+        # candidates for the *operational* catalog specifically (every
+        # discovery eventually maps to a `Capability`/`CAPABILITY_STRATEGIES`
+        # entry), and academic literature sources no longer belong to that
+        # catalog at all -- they moved to the separate, non-operational
+        # `agx_research.methodology.catalog` registry. Re-discovering them
+        # here would just recreate the exact "no consumer" gap that moved
+        # them out in the first place.
         #
         # ---- Architecture Adversarial Review (2026-07-30): new Sovereign
         # & Credit Context targets feeding the merged Country & Macro Risk

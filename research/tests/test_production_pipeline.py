@@ -27,10 +27,18 @@ from agx_research.production.collector_plan import (
     LIVE_STOOQ_TICKER_SUFFIX,
     LIVE_WORLDBANK_INDICATORS,
     ExecutionMode,
+    unavailable_sources,
 )
 from agx_research.production.pipeline import ProductionPipeline
 from agx_research.production.stages import StageName, StageStatus
-from agx_research.sources.catalog import seed_sources
+from agx_research.sources.catalog import seed_registry, seed_sources
+from agx_research.sources.spec import (
+    AccessMethod,
+    SourceCategory,
+    SourceSpec,
+    SourceStatus,
+    default_lifecycle_for_status,
+)
 from agx_research.universe.provider import MappingUniverseProvider
 
 TICKERS = ["COMI", "MFPC", "EAST", "ETEL"]  # small universe: fast tests, still exercises pairing
@@ -677,6 +685,53 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
     # the wider window; MOCK/REPLAY (see below) stays at 30.
     assert pipeline.price_lookback_days == LIVE_PRICE_LOOKBACK_DAYS
     assert snapshot.lookback_days == LIVE_PRICE_LOOKBACK_DAYS
+
+
+def test_unavailable_sources_excludes_retired_tombstones():
+    # Regression test for a real, user-reported bug (2026-08-02 screenshot):
+    # `SourceRegistry.retire_removed()` (AD-52/AD-53) correctly transitions a
+    # source dropped from `sources.catalog.seed_sources()` to
+    # `status=DISABLED`/`activation_status=RETIRED`, but `unavailable_sources()`
+    # iterated `registry.all_latest()` unconditionally, so those permanent
+    # audit-trail tombstones (e.g. `company_social_official`, `patents`,
+    # `hiring_signals` -- removed for zero capability mapping, see
+    # docs/DECISION_CENTRIC_AUDIT_2026-07-30.md) still showed up in Mission
+    # Control's collector table as `UNAVAILABLE`, indistinguishable from a
+    # genuinely still-catalogued, currently-blocked source. A still-catalogued
+    # source kept deliberately `DISABLED` for a real, evidenced reason (e.g.
+    # `egx_official`'s TCP reset) gets the exact same `status=DISABLED` from
+    # `default_lifecycle_for_status`, so only cross-referencing the current
+    # catalog -- not `status`/`activation_status` alone -- can tell them apart.
+    registry = seed_registry()
+    lifecycle_state, activation_status = default_lifecycle_for_status(SourceStatus.DISABLED)
+    registry.add(
+        SourceSpec(
+            id="company_social_official",
+            name="Company Social (Official)",
+            category=SourceCategory.ALTERNATIVE,
+            access_method=AccessMethod.HTML_SCRAPE,
+            status=SourceStatus.DISABLED,
+            lifecycle_state=lifecycle_state,
+            activation_status=activation_status,
+            reliability_score=0.3,
+            freshness_score=0.3,
+            notes=(
+                "Retired: no longer in the source catalog (removed as a source "
+                "with zero capability mapping and no consumer)."
+            ),
+        )
+    )
+
+    reasons = unavailable_sources(registry, wired_ids=set())
+
+    assert "company_social_official" not in reasons
+    # A still-catalogued, genuinely-DISABLED source must still be visible.
+    assert "egx_official" in reasons
+    # A still-catalogued, genuinely-PLANNED source must still be visible.
+    # (arxiv/ssrn/nber moved out of this catalog entirely on 2026-08-02 --
+    # see agx_research.methodology.catalog -- so mof_egypt is used here
+    # instead as a still-operational PLANNED example.)
+    assert "mof_egypt" in reasons
 
 
 def test_live_mode_fails_loudly_when_every_collector_fails(tmp_path, monkeypatch):

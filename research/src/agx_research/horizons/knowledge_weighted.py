@@ -30,6 +30,12 @@ from agx_research.knowledge import KnowledgeObject
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 
 _EGX_MARKET_ENTITY_ID = "EGX"
+_SEVERITY_RANK = {
+    EventSeverity.LOW: 1,
+    EventSeverity.MEDIUM: 2,
+    EventSeverity.HIGH: 3,
+    EventSeverity.CRITICAL: 4,
+}
 
 
 def _event_headline(event: Event) -> str:
@@ -43,6 +49,41 @@ def _event_headline(event: Event) -> str:
     """
     headline = event.metadata.get("headline")
     return f'"{headline}" ' if headline else ""
+
+
+def _representative_events(events: list[Event]) -> list[Event]:
+    """Keep one decision input per event subtype.
+
+    News feeds often publish dozens of market-wide headlines with the same
+    taxonomy label.  Counting every headline as an independent risk shock
+    double-counts one information channel and can halve confidence for every
+    stock.  The strongest, freshest event in each subtype represents that
+    channel; different subtypes still contribute independently.
+    """
+    by_subtype: dict[str, Event] = {}
+    for event in events:
+        previous = by_subtype.get(event.subtype)
+        score = (_SEVERITY_RANK[event.severity], event.confidence, event.event_date, event.id)
+        if previous is None:
+            by_subtype[event.subtype] = event
+            continue
+        previous_score = (
+            _SEVERITY_RANK[previous.severity],
+            previous.confidence,
+            previous.event_date,
+            previous.id,
+        )
+        if score > previous_score:
+            by_subtype[event.subtype] = event
+    return sorted(
+        by_subtype.values(),
+        key=lambda event: (
+            -_SEVERITY_RANK[event.severity],
+            -event.confidence,
+            -event.event_date.toordinal(),
+            event.id,
+        ),
+    )
 
 
 class KnowledgeWeightedHorizonModel(HorizonModel):
@@ -84,31 +125,44 @@ class KnowledgeWeightedHorizonModel(HorizonModel):
             if self.event_platform is not None
             else []
         )
-        active_events = []
+        ticker_events: list[Event] = []
+        market_events: list[Event] = []
         if self.event_platform is not None:
-            candidate_events = {
-                event.id: event
-                for canonical_id in (ticker, _EGX_MARKET_ENTITY_ID)
-                for event in self.event_platform.events_for_entity(canonical_id)
-            }.values()
-            active_events = [
+            def eligible(event: Event) -> bool:
+                return (
+                    event.event_date <= as_of
+                    and (as_of - event.event_date).days <= 30
+                    and self.horizon in event.impact_horizons
+                    and event.status in (EventStatus.CONFIRMED, EventStatus.CORROBORATED)
+                )
+
+            ticker_events = _representative_events([
                 event
-                for event in candidate_events
-                if event.event_date <= as_of
-                and (as_of - event.event_date).days <= 30
-                and self.horizon in event.impact_horizons
-                and event.status in (EventStatus.CONFIRMED, EventStatus.CORROBORATED)
-            ]
+                for event in self.event_platform.events_for_entity(ticker)
+                if eligible(event)
+            ])
+            ticker_event_ids = {event.id for event in ticker_events}
+            market_events = _representative_events([
+                event
+                for event in self.event_platform.events_for_entity(_EGX_MARKET_ENTITY_ID)
+                if event.id not in ticker_event_ids and eligible(event)
+            ])
         severity_penalty = {
             EventSeverity.LOW: 0.02,
             EventSeverity.MEDIUM: 0.05,
             EventSeverity.HIGH: 0.12,
             EventSeverity.CRITICAL: 0.25,
         }
-        event_risk = min(
-            0.50,
-            sum(severity_penalty[event.severity] * event.confidence for event in active_events),
+        ticker_event_risk = min(
+            0.30,
+            sum(severity_penalty[event.severity] * event.confidence for event in ticker_events),
         )
+        market_event_risk = min(
+            0.10,
+            sum(severity_penalty[event.severity] * event.confidence for event in market_events),
+        )
+        event_risk = min(0.50, ticker_event_risk + market_event_risk)
+        active_events = [*ticker_events, *market_events]
         expected_risk *= 1.0 + event_risk
         confidence *= 1.0 - event_risk
         explanation = Explanation(

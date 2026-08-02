@@ -202,6 +202,43 @@ def test_recent_market_wide_event_reduces_every_egx_ticker_confidence():
     assert any("sources=alborsa" in item for item in adjusted.explanation.supporting_evidence)
 
 
+def test_repeated_market_headlines_do_not_multiply_the_same_risk_channel():
+    store = promoted_store()
+    one_event = EventPlatform()
+    many_events = EventPlatform()
+    for index in range(6):
+        candidate = build_candidate_event(
+            event_type=EventType.NEWS,
+            subtype=EventSubtype.MACRO_NEWS,
+            entities=[EntityRef(
+                kind=EntityKind.MARKET,
+                canonical_id="EGX",
+                raw_mention=f"market headline {index}",
+            )],
+            event_date=date(2026, 6, 9 + index),
+            source=f"free-news-{index}",
+            confidence=0.6,
+            severity=EventSeverity.LOW,
+            provenance=Provenance(
+                produced_by="RssNewsCollector", produced_at=datetime.now()
+            ),
+        )
+        many_events.register(candidate)
+        if index == 5:
+            one_event.register(candidate)
+
+    one = RecommendationService(store, event_platform=one_event).recommend(
+        ["COMI"], date(2026, 6, 14)
+    )[0]
+    many = RecommendationService(store, event_platform=many_events).recommend(
+        ["COMI"], date(2026, 6, 14)
+    )[0]
+
+    assert many.confidence == one.confidence
+    assert many.combined_expected_risk == one.combined_expected_risk
+    assert sum(item.startswith("event ") for item in many.explanation.supporting_evidence) == 1
+
+
 class _FairValueFinancialsProvider:
     """Enough real annual line items for `FairValueEngine` to compute a
     value; unscaled and without a sector hint (matching how

@@ -69,7 +69,7 @@ def test_default_provider_combines_all_collected_indexes(tmp_path):
 
 
 def _write_sector_csv(data_dir, rows: list[tuple[str, str, str, str]]) -> None:
-    path = data_dir / "universe" / "sector_membership.csv"
+    path = data_dir / "sectors" / "sector_membership.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="") as f:
         writer = csv.writer(f)

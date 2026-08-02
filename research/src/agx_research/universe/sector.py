@@ -64,11 +64,21 @@ class StaticSectorProvider(SectorProvider):
 
 
 class CollectedSectorProvider(SectorProvider):
-    """Reads `<data_dir>/universe/sector_membership.csv` (the layout
+    """Reads `<data_dir>/sectors/sector_membership.csv` (the layout
     `collectors.service.CollectionService` writes whenever a batch carries
     `SectorClassification`s), falling back to `fallback` (the static
     placeholder by default) for any ticker nothing has collected yet --
-    never worse coverage than `StaticSectorProvider` alone, only better."""
+    never worse coverage than `StaticSectorProvider` alone, only better.
+
+    Deliberately its own top-level directory, not `<data_dir>/universe/`:
+    `universe.collected.CollectedUniverseProvider.constituents()` globs
+    *every* CSV under `universe/` and requires each one to have an
+    `as_of_date` column (the index-constituent format) -- a real, live-
+    evidenced incident (2026-08-02 production run) confirmed this file
+    sitting in `universe/` crashes every pipeline stage with
+    `KeyError: 'as_of_date'` the moment `CollectedUniverseProvider` scans
+    the directory. Never place a differently-shaped CSV inside
+    `universe/` again."""
 
     def __init__(self, data_dir: Path | str, *, fallback: dict[str, str] | None = None):
         self.data_dir = Path(data_dir)
@@ -76,7 +86,7 @@ class CollectedSectorProvider(SectorProvider):
         self._sectors = self._load()
 
     def _load(self) -> dict[str, str]:
-        path = self.data_dir / "universe" / "sector_membership.csv"
+        path = self.data_dir / "sectors" / "sector_membership.csv"
         if not path.exists():
             return {}
         sectors: dict[str, str] = {}

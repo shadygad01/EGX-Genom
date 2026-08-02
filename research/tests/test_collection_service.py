@@ -604,12 +604,50 @@ def test_reingesting_same_sector_classification_is_idempotent_and_latest_wins(tm
     service.run(collector, expected_records=1)
     service.run(collector, expected_records=1)
 
-    path = tmp_path / "universe" / "sector_membership.csv"
+    path = tmp_path / "sectors" / "sector_membership.csv"
     rows = path.read_text().strip().splitlines()
     assert len(rows) == 2  # header + one row, not duplicated
 
     provider = CollectedSectorProvider(tmp_path)
     assert provider.sector_of("ARCC", date(2026, 8, 2)) == "Building Materials"
+
+
+def test_sector_membership_csv_never_lands_inside_universe_dir(tmp_path):
+    """Real, live-evidenced regression (2026-08-02 production incident):
+    `CollectedUniverseProvider.constituents()` globs *every* CSV under
+    `universe/` and requires an `as_of_date` column -- a sector CSV with a
+    different schema sitting there crashed the entire live pipeline with
+    `KeyError: 'as_of_date'` at collector_execution and every stage after
+    it. Collecting both real index constituents and real sector data into
+    the same data_dir must never break universe lookup again."""
+    from agx_research.universe.collected import CollectedUniverseProvider
+    from agx_research.universe.constituent import IndexConstituent
+    from agx_research.universe.sector import SectorClassification
+
+    service = CollectionService(tmp_path, min_confidence=0.5)
+    service.run(StubCollector(make_spec(), {"https://x/1": good_batch(
+        price_bars=[],
+        index_constituents=[
+            IndexConstituent(
+                index="EGX30", ticker="ARCC", company_name="Arabian Cement",
+                as_of_date=date(2026, 8, 2),
+            )
+        ],
+    )}), expected_records=1)
+    service.run(StubCollector(make_spec(), {"https://x/2": good_batch(
+        price_bars=[],
+        sector_classifications=[
+            SectorClassification(
+                ticker="ARCC", sector="Building Materials",
+                source_id="chief_egx_financials", observed_date=date(2026, 8, 2),
+            )
+        ],
+    )}), expected_records=1)
+
+    assert not (tmp_path / "universe" / "sector_membership.csv").exists()
+    assert CollectedUniverseProvider(tmp_path).constituents(date(2026, 8, 2)) == {
+        "ARCC": "Arabian Cement"
+    }
 
 
 def test_parser_exception_is_withheld_and_recorded_not_propagated(tmp_path):

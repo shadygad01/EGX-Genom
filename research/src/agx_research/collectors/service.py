@@ -238,7 +238,12 @@ def _write_index_constituents(
 
 
 def _write_sector_classifications(data_dir: Path, classifications, *, on_written=None) -> int:
-    path = data_dir / "universe" / "sector_membership.csv"
+    # Deliberately NOT under data_dir/"universe/" -- see
+    # universe.sector.CollectedSectorProvider's docstring for the real,
+    # live-evidenced incident (2026-08-02) this avoids:
+    # CollectedUniverseProvider.constituents() globs every CSV in
+    # universe/ expecting an as_of_date column.
+    path = data_dir / "sectors" / "sector_membership.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[str, dict] = {}
     if path.exists():

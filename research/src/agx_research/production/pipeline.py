@@ -79,6 +79,7 @@ from agx_research.dashboard.portfolio_summary import build_portfolio_summary
 from agx_research.data.mock_provider import LocalCsvDataProvider
 from agx_research.decision_service.country_risk import assess_country_risk
 from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
+from agx_research.decision_service.macro_overlay import MacroDecisionOverlay, assess_macro_overlay
 from agx_research.domain.identifiers import new_id
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
@@ -895,6 +896,7 @@ class ProductionPipeline:
         latest_prices = None
         if as_of is not None:
             state = self.market_memory.reconstruct(as_of)
+            macro_overlay = assess_macro_overlay(state.dataset_snapshot.macro_series, as_of)
             readiness_rows = assess_decision_readiness(
                 state,
                 CollectedFinancialStatementProvider(self.data_dir),
@@ -932,6 +934,7 @@ class ProductionPipeline:
             ready_horizons_by_ticker=ready_horizons_by_ticker,
             latest_prices=latest_prices,
             fair_value_engine=FairValueEngine(CollectedFinancialStatementProvider(self.data_dir)),
+            macro_overlay=macro_overlay,
         )
         n = len(self.investment_cases["recommendations"])
         return (
@@ -961,6 +964,7 @@ class ProductionPipeline:
             "as_of": None,
             "recommendations": [],
             "portfolio": None,
+            "macro_overlay": None,
         }
         (dashboard_out / "investment_cases.json").write_text(
             json.dumps(investment_cases, indent=2, sort_keys=True) + "\n"
@@ -1027,7 +1031,17 @@ class ProductionPipeline:
         ]
         investment_cases["portfolio"] = (
             PortfolioConstructor()
-            .construct(gated_recommendations, as_of or end)
+            .construct(
+                gated_recommendations,
+                as_of or end,
+                macro_overlay=(
+                    MacroDecisionOverlay.model_validate(
+                        investment_cases["macro_overlay"]
+                    )
+                    if investment_cases.get("macro_overlay")
+                    else None
+                ),
+            )
             .model_dump(mode="json")
         )
         (dashboard_out / "investment_cases.json").write_text(

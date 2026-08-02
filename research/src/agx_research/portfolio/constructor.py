@@ -23,6 +23,7 @@ from agx_research.domain.identifiers import new_id
 from agx_research.domain.provenance import Provenance, ProvenanceRef
 from agx_research.explainability import Explanation
 from agx_research.meta.decision_engine import DecisionAction, PublicationStatus, Recommendation
+from agx_research.decision_service.macro_overlay import MacroDecisionOverlay
 
 _EPS = 1e-9
 
@@ -54,7 +55,8 @@ class PortfolioConstructor:
         self.max_position_weight = max_position_weight
 
     def construct(
-        self, recommendations: list[Recommendation], as_of: date
+        self, recommendations: list[Recommendation], as_of: date, *,
+        macro_overlay: MacroDecisionOverlay | None = None,
     ) -> PortfolioRecommendation:
         scored = []
         for rec in recommendations:
@@ -80,7 +82,7 @@ class PortfolioConstructor:
                     score / total_score,
                     self.max_position_weight,
                     decision.max_position_pct,
-                )
+                ) * (macro_overlay.exposure_multiplier if macro_overlay else 1.0)
                 positions.append(
                     PortfolioPosition(
                         ticker=rec.ticker,
@@ -109,7 +111,7 @@ class PortfolioConstructor:
             ),
             supporting_evidence=[
                 f"{p.ticker}: score={p.score:.4f}, weight={p.weight:.3f}" for p in positions
-            ],
+            ] + ([macro_overlay.rationale] if macro_overlay else []),
             evidence_refs=[
                 ProvenanceRef(kind="knowledge", ref_id=kid)
                 for p in positions

@@ -53,6 +53,10 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
         "records": ["macro_observations"],
         "consumers": ["macro_agent", "validation", "meta_decision_engine"],
     },
+    "egypt_nsdp": {
+        "records": ["macro_observations"],
+        "consumers": ["macro_agent", "validation", "meta_decision_engine"],
+    },
     "undata": {
         "records": ["macro_observations"],
         "consumers": ["macro_agent", "validation", "meta_decision_engine"],

@@ -43,6 +43,10 @@ ASSUMED_PUBLICATION_LAG_DAYS: dict[str, int] = {
     "worldbank": 30,
     "undata": 30,
     "capmas": 30,
+    # The NSDP row carries a reporting period, not its original publication
+    # timestamp. Keep the same conservative floor as other periodic official
+    # statistics rather than making it knowable at quarter/month end.
+    "egypt_nsdp": 30,
     # FRED series used here (oil, FX, yields, VIX) are same-day/next-day;
     # no assumed delay.
     "fred": 0,

@@ -22,6 +22,17 @@
     "emptyTitle": "No macro data yet",
     "noObservations": "No observations"
   },
+  "macroDecision": {
+    "title": "Macro investment decision",
+    "subtitle": "Weighted macro contribution applied directly to portfolio exposure",
+    "empty": "No macro decision available",
+    "decision": "Decision",
+    "score": "Weighted score",
+    "exposure": "Equity exposure cap",
+    "coverage": "Data weight covered",
+    "states": {"supportive": "Supportive", "cautious": "Cautious", "defensive": "Defensive", "insufficient_data": "Insufficient data"},
+    "impacts": {"supportive": "Supportive", "neutral": "Neutral", "adverse": "Adverse"}
+  },
   "upcomingEvents": {
     "title": "Upcoming Earnings, Corporate Actions & Disclosures",
     "subtitle": "Scheduled events across the covered universe",

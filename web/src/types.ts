@@ -487,6 +487,30 @@ export interface InvestmentCases {
   as_of: string | null;
   recommendations: Recommendation[];
   portfolio: PortfolioRecommendation | null;
+  macro_overlay: MacroDecisionOverlay | null;
+}
+
+export interface MacroContribution {
+  factor: string;
+  series_id: string;
+  importance_weight: number;
+  effective_weight: number;
+  signal: -1 | 0 | 1;
+  latest_value: number;
+  previous_value: number;
+  latest_date: string;
+  change_pct: number;
+  impact: "supportive" | "neutral" | "adverse";
+}
+
+export interface MacroDecisionOverlay {
+  as_of: string;
+  decision: "supportive" | "cautious" | "defensive" | "insufficient_data";
+  score: number;
+  exposure_multiplier: number;
+  available_weight: number;
+  contributions: MacroContribution[];
+  rationale: string;
 }
 
 // --- collector_status.json ---

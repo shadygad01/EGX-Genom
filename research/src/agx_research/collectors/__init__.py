@@ -5,6 +5,7 @@ from agx_research.collectors.browser import BrowserAutomationCollector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
+from agx_research.collectors.egypt_nsdp import EgyptNsdpCollector
 from agx_research.collectors.excel import ExcelSeriesCollector
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
 from agx_research.collectors.filesystem import FilesystemCollector
@@ -39,6 +40,7 @@ __all__ = [
     "Collector",
     "EgxCompositePriceCollector",
     "EgxDisclosureCollector",
+    "EgyptNsdpCollector",
     "ExcelSeriesCollector",
     "FetchDisallowed",
     "FetchError",

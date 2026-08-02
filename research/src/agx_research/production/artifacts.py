@@ -28,6 +28,7 @@ from agx_research.market_memory.regime import MarketRegimeReport, compute_market
 from agx_research.market_memory.state import MarketState
 from agx_research.meta.readiness import DecisionReadiness, build_ticker_data_gap_report
 from agx_research.meta.recommendation_service import RecommendationService
+from agx_research.decision_service.macro_overlay import MacroDecisionOverlay
 from agx_research.papers.repository import PaperRepository
 from agx_research.portfolio.constructor import PortfolioConstructor
 from agx_research.runtime.engine import RunRecord
@@ -50,6 +51,7 @@ def export_investment_cases(
     ready_horizons_by_ticker: dict[str, set[Horizon]] | None = None,
     latest_prices: dict[str, float] | None = None,
     fair_value_engine: FairValueEngine | None = None,
+    macro_overlay: MacroDecisionOverlay | None = None,
 ) -> dict[str, Any]:
     """The Investment Case Generator: per-ticker recommendations (already
     `meta.RecommendationService`) plus the cross-ticker portfolio built from
@@ -67,11 +69,14 @@ def export_investment_cases(
         ready_horizons_by_ticker=ready_horizons_by_ticker,
         latest_prices=latest_prices,
     )
-    portfolio = PortfolioConstructor().construct(recommendations, as_of)
+    portfolio = PortfolioConstructor().construct(
+        recommendations, as_of, macro_overlay=macro_overlay
+    )
     return {
         "as_of": as_of.isoformat(),
         "recommendations": [r.model_dump(mode="json") for r in recommendations],
         "portfolio": portfolio.model_dump(mode="json"),
+        "macro_overlay": macro_overlay.model_dump(mode="json") if macro_overlay else None,
     }
 
 

@@ -45,6 +45,7 @@ from agx_research.collectors.base import Collector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
+from agx_research.collectors.egypt_nsdp import EgyptNsdpCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
@@ -120,12 +121,19 @@ LIVE_CAPMAS_INDICATORS = {
     },
     2268: {"Urban Egypt": "egypt_urban_cpi_mom"},
 }
+LIVE_EGYPT_NSDP_SERIES_IDS = [
+    "egypt_net_international_reserves_usd",
+    "egypt_external_debt_usd",
+]
 # FRED excluded (see LIVE_FRED_SERIES_IDS' comment / TD-50): no live
 # collector in the actual capability-driven path produces these ids, so
 # querying for them would only ever find nothing.
 LIVE_MACRO_SERIES_IDS = list(LIVE_WORLDBANK_INDICATORS.values())
 LIVE_MACRO_SERIES_IDS += [
     local_id for mappings in LIVE_UN_SDG_SERIES.values() for local_id in mappings.values()
+]
+LIVE_MACRO_SERIES_IDS += [
+    series_id for series_id in LIVE_EGYPT_NSDP_SERIES_IDS if series_id not in LIVE_MACRO_SERIES_IDS
 ]
 LIVE_MACRO_SERIES_IDS += [
     local_id for mappings in LIVE_CAPMAS_INDICATORS.values() for local_id in mappings.values()
@@ -146,6 +154,7 @@ LIVE_MACRO_SERIES_SOURCES: dict[str, str] = {
         for mappings in LIVE_CAPMAS_INDICATORS.values()
         for local_id in mappings.values()
     },
+    **{sid: "egypt_nsdp" for sid in LIVE_EGYPT_NSDP_SERIES_IDS},
 }
 
 # World Bank/UN SDG report annually (often with a 1-2 year publication lag)
@@ -198,6 +207,7 @@ EXPECTED_RECORDS_LIVE = {
     "worldbank": 10,
     "undata": 10,
     "capmas": 10,
+    "egypt_nsdp": 2,
     "gdelt": 10,
     "telecom_egypt_ir": 8,
     "orascom_ir": 3,
@@ -429,6 +439,8 @@ def build_live_collector(
         return CapmasIndicatorCollector(
             spec, indicators=dict(LIVE_CAPMAS_INDICATORS), fetcher=fetcher
         )
+    if source_id == "egypt_nsdp":
+        return EgyptNsdpCollector(spec, fetcher=fetcher)
     if source_id == "gdelt":
         # AND-of-ORs, not a single broad OR: a real historical run of the
         # old query (Egypt OR Egyptian OR "Egyptian Exchange" OR EGX) pulled

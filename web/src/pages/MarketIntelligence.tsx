@@ -6,7 +6,7 @@ import { EmptyState, ErrorState, LoadingState } from "../components/primitives/S
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
-import { formatNumber, formatSignedPercent, titleCase } from "../lib/format";
+import { formatNumber, formatPercent, formatSignedPercent, titleCase } from "../lib/format";
 import type { CorporateEvent, MacroObservation } from "../types";
 import styles from "./MarketIntelligence.module.css";
 
@@ -23,6 +23,7 @@ export function MarketIntelligence() {
   const marketState = useArtifact((p) => p.getMarketState());
   const breadth = useArtifact((p) => p.getMarketBreadth());
   const regime = useArtifact((p) => p.getMarketRegime());
+  const investmentCases = useArtifact((p) => p.getInvestmentCases());
 
   const sectors = marketState.data?.sectors ?? {};
   const constituents = marketState.data?.constituents ?? {};
@@ -109,6 +110,34 @@ export function MarketIntelligence() {
       </div>
 
       <div className={styles.twoCol}>
+        <Card title={t("macroDecision.title")} subtitle={t("macroDecision.subtitle")}>
+          {!investmentCases.data?.macro_overlay ? (
+            <EmptyState title={t("macroDecision.empty")} />
+          ) : (
+            <div>
+              <div className={styles.grid}>
+                <StatTile label={t("macroDecision.decision")} value={t(`macroDecision.states.${investmentCases.data.macro_overlay.decision}`)} />
+                <StatTile label={t("macroDecision.score")} value={formatSignedPercent(investmentCases.data.macro_overlay.score)} />
+                <StatTile label={t("macroDecision.exposure")} value={formatPercent(investmentCases.data.macro_overlay.exposure_multiplier)} />
+                <StatTile label={t("macroDecision.coverage")} value={formatPercent(investmentCases.data.macro_overlay.available_weight)} />
+              </div>
+              <div className={styles.list}>
+                {investmentCases.data.macro_overlay.contributions.map((row) => (
+                  <div className={styles.listItem} key={row.factor}>
+                    <div className={styles.listItemHead}>
+                      <span className={styles.listItemTitle}>{titleCase(row.factor)}</span>
+                      <span className={styles.listItemMeta}>{formatPercent(row.effective_weight)}</span>
+                    </div>
+                    <span className={styles.listItemDetail}>
+                      {t(`macroDecision.impacts.${row.impact}`)} · {formatSignedPercent(row.change_pct)} · {titleCase(row.series_id)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </Card>
+
         <Card title={t("upcomingEvents.title")} subtitle={t("upcomingEvents.subtitle")}>
           {upcoming.length === 0 ? (
             <EmptyState title={t("upcomingEvents.emptyTitle")} detail={t("upcomingEvents.emptyDetail")} />

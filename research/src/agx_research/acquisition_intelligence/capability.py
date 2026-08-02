@@ -119,6 +119,7 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     # Credit Context sources feeding the Country & Macro Risk severity
     # classification's crisis rung (Architecture Adversarial Review R3/R8).
     Capability.MACROECONOMIC: [
+        "egypt_nsdp",
         "worldbank",
         # "fred" deliberately excluded from live ranking (project owner
         # direction, 2026-07-31): 3 consecutive real `deploy-pages.yml` LIVE

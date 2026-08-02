@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased — Retired sources no longer show as dead links in Mission Control
+
+Root-caused a real, user-reported bug from a live dashboard screenshot:
+Settings' "Collectors" table listed sources like `company_social_official`,
+`public_telegram`, `patents`, `hiring_signals`, `google_scholar`, and
+`researchgate` as `UNAVAILABLE`, indistinguishable from genuinely-pending
+sources — even though every one of them was removed from the source
+catalog months ago (Decision-Centric Redesign, 2026-07-30) for having zero
+`Capability` mapping and no consumer. `SourceRegistry.retire_removed()`
+(AD-52/AD-53) already correctly retires these in the registry itself
+(`status=DISABLED`, `activation_status=RETIRED`), but
+`production.collector_plan.unavailable_sources()` — the function that
+actually builds the `collector_status.json` artifact behind that table —
+iterated the full registry unconditionally, so the retired tombstones kept
+surfacing next to real, still-catalogued blocked sources (e.g.
+`egx_official`, `arxiv`, `moodys_ratings`). Both a permanently-removed
+tombstone and a deliberately-kept-disabled source share the exact same
+`status`/`activation_status`, so the fix cross-references
+`sources.catalog.seed_sources()`'s current id set (the same source of
+truth `retire_removed()` itself uses) rather than relying on either field
+alone. New regression test
+(`test_unavailable_sources_excludes_retired_tombstones`); 912 backend
+tests pass (up from 911); `ruff check` clean.
+
+Also verified, not changed: `arxiv`/`ssrn`/`nber` (Research Papers
+capability) and `moodys_ratings`/`sp_global_ratings`/`fitch_ratings`
+(sovereign rating actions) remain genuinely `PLANNED` — this session's
+sandboxed environment has no outbound network access to any external
+host (confirmed via direct probes; every request was rejected by
+organization egress policy before reaching the destination), so no new
+endpoint could be verified without violating this codebase's own rule
+against wiring a collector against a guessed URL. See `docs/PHASE_STATUS.md`'s
+matching entry for what's still genuinely open here.
+
 ## Unreleased — Redesign the publication gate: Decision Quality, System Maturity, Publication Governance
 
 Replaced `meta.publication_gate`'s system-wide, all-or-nothing gate (a

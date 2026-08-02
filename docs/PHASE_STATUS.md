@@ -2760,3 +2760,71 @@ regeneration added the one new schema, zero drift elsewhere.
 exercised against a real `agx run`/`deploy-pages.yml` cycle to see how
 many real tickers now actually reach `PUBLICATION_READY` under the new
 gate — the next scheduled run is the real proof.
+
+## Retired sources still showing as dead links in Mission Control (2026-08-02)
+
+The project owner sent a real Settings-page screenshot: rows like
+`company_social_official`, `public_telegram`, `patents`, `hiring_signals`,
+`google_scholar`, `researchgate` (all `UNAVAILABLE`/`UNKNOWN`, reason
+"Source explicitly disabled in the registry") sitting in the same
+"Collectors" table as genuinely still-catalogued blocked sources like
+`arxiv`/`ssrn`/`nber`/`moodys_ratings`/`sp_global_ratings`/`fitch_ratings`
+— indistinguishable from each other, reading as a page full of dead links.
+
+**Root cause found**: this is the unfinished half of "The real
+DATA_COLLECTION-starvation bug and dead-source retirement" mission above.
+That mission's `SourceRegistry.retire_removed()` (AD-52/AD-53) correctly
+retires a source dropped from `sources.catalog.seed_sources()` in the
+registry itself — but `production.collector_plan.unavailable_sources()`,
+the function that actually builds the `collector_status.json` artifact
+behind Settings' "Collectors" table (and Mission Control before it), was
+never updated to exclude what `retire_removed()` now marks. It iterated
+`registry.all_latest()` unconditionally, so a permanently-removed
+tombstone and a still-catalogued source deliberately kept `DISABLED` for a
+real, evidenced reason (e.g. `egx_official`'s TCP reset) — which share the
+exact same `status=DISABLED`/`activation_status=RETIRED` via
+`default_lifecycle_for_status` — were reported identically. The registry-level
+fix shipped; the one consumer that actually renders on screen never picked
+it up.
+
+**Closed**: `unavailable_sources()` now cross-references the current
+`seed_sources()` id set (the same source of truth `retire_removed()`
+itself uses to decide what counts as removed) and skips any spec absent
+from it, before applying the existing status-to-reason mapping. `SourceIntelligence.tsx`
+already did the equivalent filter for the CIO-facing page
+(`status !== "disabled" && activation_status !== "retired"`); this closes
+the same gap for the Settings/Mission Control operational table without
+hiding a still-catalogued `DISABLED` source's real, evidenced reason.
+
+**Verified, not changed — the other two rows in the screenshot are honest,
+not a bug**:
+- `arxiv`/`ssrn`/`nber` (Research Papers capability) and
+  `moodys_ratings`/`sp_global_ratings`/`fitch_ratings` (sovereign rating
+  actions, feeding `decision_service.country_risk`'s `CRISIS` override) are
+  real, still-catalogued `PLANNED` sources — genuinely pending real
+  endpoint verification, not tombstones. This session's remote environment
+  has zero outbound network access to any external host (confirmed by
+  direct probes to arxiv.org, nber.org, ssrn.com, and even a control
+  request to en.wikipedia.org — every one rejected by organization egress
+  policy before reaching the destination), so no endpoint could be
+  verified here without breaking this codebase's own "never wire a
+  collector against a guessed URL" rule. Verifying these needs either a
+  network-capable session or the project owner supplying an already-verified
+  feed/API URL.
+- `docs/FREE_DECISION_DATA_BLUEPRINT.md` (Part 3) already documents
+  `arxiv`/`ssrn`/`nber` as "methodology only" with "None directly" for
+  decision impact — deliberately kept anyway (unlike `google_scholar`/
+  `researchgate`, cut as redundant) as a Research Papers capability input.
+  Confirmed by code search: nothing downstream currently reads
+  `Capability.RESEARCH_PAPERS`'s collected output — a real, named gap, not
+  claimed closed by this change. Left for the project owner to decide:
+  keep as a future methodology-quality input, or remove the capability
+  entirely given zero current consumer.
+
+**Verified**: new regression test
+`test_unavailable_sources_excludes_retired_tombstones` in
+`test_production_pipeline.py`, directly reproducing the screenshot (a
+retired `company_social_official` tombstone excluded, a genuinely-disabled
+`egx_official` and a genuinely-planned `arxiv` both still visible). 912
+backend tests pass (up from 911); `ruff check` clean. See `CHANGELOG.md`'s
+matching entry.

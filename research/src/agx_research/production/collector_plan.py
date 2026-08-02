@@ -60,6 +60,7 @@ from agx_research.collectors.telecom_egypt_financials import (
 )
 from agx_research.collectors.un_sdg import UnSdgCollector
 from agx_research.collectors.worldbank import WorldBankCollector
+from agx_research.sources.catalog import seed_sources
 from agx_research.sources.registry import SourceRegistry
 from agx_research.sources.spec import SourceSpec, SourceStatus
 
@@ -248,12 +249,26 @@ def unavailable_sources(registry: SourceRegistry, wired_ids: set[str]) -> dict[s
     instead of silently omitting a source (the mission's graceful-
     degradation requirement: unavailable sources must be visible, not
     invisible, and every remaining collector must keep running regardless).
+
+    A source retired via `SourceRegistry.retire_removed()` (its id no
+    longer appears in `sources.catalog.seed_sources()` at all -- e.g. a
+    source cut for zero capability mapping/no consumer) is excluded here:
+    it is a permanent audit-trail tombstone, not a pending or blocked
+    *current* candidate, and `default_lifecycle_for_status` gives it the
+    exact same `status=DISABLED` as a still-catalogued source kept
+    deliberately disabled for a real, evidenced blocker (e.g.
+    `egx_official`'s TCP reset). Surfacing both identically made Mission
+    Control's collector table indistinguishable from a page full of dead
+    links -- a real, user-reported bug, not a hypothetical one.
     """
+    current_catalog_ids = {spec.id for spec in seed_sources()}
     reasons: dict[str, str] = {}
     for spec in registry.all_latest():
         if spec.id in wired_ids:
             continue
         if spec.integrated_via and spec.integrated_via in wired_ids:
+            continue
+        if spec.id not in current_catalog_ids:
             continue
         reasons[spec.id] = _UNAVAILABLE_REASON_BY_STATUS.get(
             spec.status,

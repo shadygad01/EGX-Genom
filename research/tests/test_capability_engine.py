@@ -331,3 +331,34 @@ def test_decide_and_execute_reuses_a_source_already_collected_for_another_capabi
     # egxpilot_fundamentals is only catalogued under FINANCIAL_STATEMENTS,
     # so it is correctly never even considered for INVESTOR_RELATIONS.
     assert "egxpilot_fundamentals" not in ir_attempts
+
+
+def test_sector_membership_is_satisfied_by_chief_egx_financials_without_a_second_fetch():
+    # chief_egx_financials derives real SectorClassification records as a
+    # byproduct of collecting financial statements (see
+    # chief_financials.py's `_sector_from_csv_url`); it was already running
+    # for FINANCIAL_STATEMENTS/INVESTOR_RELATIONS but, before this fix,
+    # was never listed under SECTOR_MEMBERSHIP -- so this capability always
+    # reported `succeeded=False` even on a run with real sector data.
+    registry = SourceRegistry()
+    registry.add(_spec("chief_egx_financials", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("egx_official", status=SourceStatus.DISABLED))
+
+    def factory(source_id, spec):
+        return _FakeCollector(source_id)
+
+    service = _FakeCollectionService(
+        {"chief_egx_financials": _empty_result("chief_egx_financials", financials=5)}
+    )
+    engine = CapabilityDecisionEngine(registry, factory)
+
+    engine.decide_and_execute(Capability.FINANCIAL_STATEMENTS, service)
+    sector_decision, _, _ = engine.decide_and_execute(Capability.SECTOR_MEMBERSHIP, service)
+
+    assert sector_decision.succeeded is True
+    assert sector_decision.selected_source_ids == ["chief_egx_financials"]
+    sector_attempt = next(
+        a for a in sector_decision.attempts if a.source_id == "chief_egx_financials"
+    )
+    assert sector_attempt.outcome == "reused"
+    assert service.calls.count("chief_egx_financials") == 1

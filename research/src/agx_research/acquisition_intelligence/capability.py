@@ -166,7 +166,22 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "suez_canal_stats",
     ],
     Capability.MARKET_BREADTH: [],
+    # Real, verified external blocker, not an engineering gap: the only
+    # source with authoritative EGX trading-day/holiday data is
+    # egx_official, disabled site-wide (see its own catalog notes). No
+    # other catalogued or already-running collector produces trading-
+    # calendar data as a byproduct -- unlike Sector Membership below, there
+    # is no free canonical dataset to point this at yet.
     Capability.TRADING_CALENDAR: ["egx_official"],
     Capability.INDEX_CONSTITUENTS: ["egx_universe_seed", "egx_official"],
-    Capability.SECTOR_MEMBERSHIP: ["egx_official"],
+    # chief_egx_financials already derives a real SectorClassification per
+    # company from its own CSV url's category path as a byproduct of
+    # collecting financial statements (chief_financials.py's
+    # `_sector_from_csv_url`) -- it was already running (FINANCIAL_STATEMENTS/
+    # INVESTOR_RELATIONS) but never listed here, so this capability always
+    # reported `succeeded=False` even on a day it had real sector data. Safe
+    # to add now that CapabilityDecisionEngine dedupes by source id: chief_
+    # egx_financials always runs earlier in `Capability`'s enum order, so
+    # this always resolves via the "reused" outcome, never a second fetch.
+    Capability.SECTOR_MEMBERSHIP: ["chief_egx_financials", "egx_official"],
 }

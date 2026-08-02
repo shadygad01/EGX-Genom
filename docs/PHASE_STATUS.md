@@ -2634,14 +2634,16 @@ capped independently).
 **This review's own contribution**: read every changed line across all
 three commits, ran the full test/lint/build matrix (887 backend tests,
 `ruff check`, 33 `api` tests, 53 `web` tests, both production builds,
-`contracts/` regeneration — zero drift anywhere), and found one real,
-previously-unnoticed bug: `decision_service.macro_overlay
+`contracts/` regeneration — zero drift anywhere), and found two real,
+previously-unnoticed defects. (1) `decision_service.macro_overlay
 .assess_macro_overlay()` summed raw `importance_weight` floats into
 `available_weight` with no rounding (`0.20+0.20+0.15+0.05 =
 0.6000000000000001` in IEEE-754 arithmetic), breaking a `==` test
 assertion and risking the same float noise reaching the exported
 dashboard artifact. Fixed with `round(available_weight, 6)` at the point
-of computation — see `docs/TECHNICAL_DEBT.md`'s updated TD-55.
+of computation. (2) A hardcoded 2-page pagination cap in
+`ChiefFinancialsCollector.fetch()` — see below for the full real-evidence
+finding and fix. Both — see `docs/TECHNICAL_DEBT.md`'s updated TD-55.
 
 Also audited every `DISABLED` source in the registry
 (`egx_official`/`cbe`/`yahoo_finance`/`stockanalysis`/`mubasher`/
@@ -2659,25 +2661,43 @@ architecture explicitly protects (the `SourceCategory.ALTERNATIVE`
 incident is the standing cautionary precedent), for zero decision-quality
 gain.
 
-**Not verifiable from this sandbox, named honestly rather than asserted**:
-this session's own network egress is fully blocked (confirmed directly
+**This sandbox's own network egress is fully blocked** (confirmed directly
 against the agent proxy's `recentRelayFailures`: `connect_rejected`/403
 for `stockanalysis.com`/`enterprise.press`/`api.stlouisfed.org`), the same
-constraint essentially every prior mission in this log has hit. The
-"100/101 tickers" `egxpilot_fundamentals` figure is its own author's
-live-run evidence recorded in `sources/catalog.py`, not something this
-review re-fetched; `chief_egx_financials`'s per-company coverage is
-explicitly partial ("discovered each run"). Whether the full universe
-actually clears the 3-of-7-model fair-value floor end to end, and how many
-tickers still lack `total_equity`/`total_debt`/`ebitda` specifically (the
-fields only `chief_egx_financials`/company-IR sources supply, not
-`egxpilot_fundamentals`'s market-cap-only data), can only be confirmed by
-the next real `deploy-pages.yml` run reading `financial_coverage.json`/
-`ticker_data_gap_report.json` afterward — a genuine data-availability
-question, not an engineering gap, and this platform's anti-fabrication
-principle forbids inventing values to close it pre-emptively.
+constraint essentially every prior mission in this log has hit — but
+`deploy-pages.yml` (real GitHub Actions egress) had already run twice
+against today's commits before this review started, so rather than assert
+anything, this review fetched the real `production/state-latest` branch
+(commit `c3aa5c9`, 2026-08-02 12:39 UTC) and ran `FairValueEngine`/
+`compute_valuation_metrics()` directly against its real collected data.
 
-**Result**: 887 backend tests pass (1 fixed, formerly failing); `ruff
-check` clean; 33 `api` tests pass; 53 `web` tests pass; both `npm run
+Real, evidenced findings, not projections: `egxpilot_fundamentals` really
+did fetch both endpoints for all 100 non-AIDC universe tickers (200 real
+URLs present in the real `raw_documents.json`); `financial_statements/
+*.csv` exists for all 100 universe tickers. But only **4 of 100** tickers
+currently clear the 3-of-7-model fair-value floor: `cash_and_equivalents`
+is missing for 100/100, `ebitda` for 98/100, `total_debt` for 99/100,
+`total_equity` for 95/100. Tracing the root cause in the same real
+`raw_documents.json`: `chief_egx_financials` only ever discovered **5**
+real companies (ARCC/COMI/CIEB/EXPA/ETEL) because
+`ChiefFinancialsCollector.fetch()` had a hardcoded 2-page index-pagination
+cap — not a real site limit. **Fixed**: it now walks `page/3/`, `page/4/`,
+... until a page adds no new company link or a fetch itself fails (bounded
+at 20 pages as a runaway guard only), with a new regression test. Also
+confirmed directly from the real CSV headers quoted in `raw_documents.json`
+(e.g. ARCC: `Year,Assets,Liabilities,BookValue,Revenue,GrossProfit,
+NetProfit,...,SharesOutstanding,...,P/E,P/BV,ClosingPrice,...`) that
+`EBITDA`/`TotalDebt`/`Cash` genuinely have no column in Chief Capital's
+real per-company export for the 5 companies seen so far, and bank CSVs
+report `CustomerDeposits` rather than `TotalDebt` (correctly not treated
+as equivalent) — a real data-availability gap this platform will not
+fabricate around, not a code defect. See `docs/TECHNICAL_DEBT.md`'s
+updated TD-55 for the complete real-evidence breakdown and next steps
+(re-run this same check against the next `production/state-latest` once
+the pagination fix has had a live run; a genuinely new free balance-sheet
+source is the real fix if coverage stays low after that).
+
+**Result**: 888 backend tests pass (1 bug fixed, 1 new regression test);
+`ruff check` clean; 33 `api` tests pass; 53 `web` tests pass; both `npm run
 build` clean; `contracts/` regeneration produced zero diff. See
 `CURRENT_MISSION.md`'s matching entry for the full narrative.

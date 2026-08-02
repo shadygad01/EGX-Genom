@@ -16,16 +16,26 @@ promoted knowledge object; a new full-universe opportunities table on
 horizons; a market-wide event-risk double-counting bug was fixed. See
 `CURRENT_MISSION.md`'s matching entry for the full report.
 
-**Found and fixed this review**: `decision_service.macro_overlay
+**Found and fixed this review**: (1) `decision_service.macro_overlay
 .assess_macro_overlay()` summed raw `importance_weight` floats into
 `available_weight` without rounding, producing `0.6000000000000001`
 instead of `0.6` — broke a test, and would have leaked the same float
 noise into the exported dashboard artifact. Fixed with `round(..., 6)`.
-See `docs/TECHNICAL_DEBT.md`'s updated TD-55.
+(2) Pulled the real `production/state-latest` branch (a real
+`deploy-pages.yml` run against today's new sources) and ran
+`FairValueEngine`/`compute_valuation_metrics()` against it directly:
+only 4/100 tickers currently clear the 3-model fair-value floor because
+`cash_and_equivalents`/`ebitda`/`total_debt` are missing for
+100/98/99 of 100 tickers respectively. Root cause found in the real
+`raw_documents.json`: `ChiefFinancialsCollector.fetch()` had a hardcoded
+2-page index-pagination cap, discovering only 5 real companies
+(ARCC/COMI/CIEB/EXPA/ETEL). Fixed to walk pages until one adds no new
+company or a fetch fails. See `docs/TECHNICAL_DEBT.md`'s updated TD-55
+for the full real-evidence breakdown.
 
-**Result**: 887 backend tests pass; `ruff check` clean; 33 `api` tests
-pass; 53 `web` tests pass; both `npm run build` clean; `contracts/`
-regeneration produced zero diff.
+**Result**: 888 backend tests pass (1 bug fixed, 1 new regression test);
+`ruff check` clean; 33 `api` tests pass; 53 `web` tests pass; both `npm
+run build` clean; `contracts/` regeneration produced zero diff.
 
 ## Unreleased — Zero-Cost Production Deployment + Shadow Fund
 

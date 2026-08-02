@@ -17,8 +17,18 @@ import io
 import re
 
 from agx_research.collectors.base import CollectionBatch, Collector
+from agx_research.collectors.fetcher import FetchDisallowed, FetchError
 from agx_research.collectors.raw import RawDocument, build_raw_document
 from agx_research.financials.schema import FinancialStatementLineItem
+
+# Real, live-verified index pagination is `page/N/` (WordPress convention),
+# confirmed reachable through page 2. The number of real pages is not known
+# in advance -- rather than hardcode a guessed total, this walks forward
+# until a page adds no new company link or the fetch itself fails, so
+# coverage grows automatically as Chief Capital publishes more companies.
+# The cap only guards against an unexpected infinite series of empty-but-
+# fetchable pages; it is not a declared real page count.
+_MAX_INDEX_PAGES = 20
 
 _COMPANY_LINK_RE = re.compile(
     r'href=["\'](?P<url>https://chiefcapitalco\.com/companies/[^"\']+/)["\']', re.IGNORECASE
@@ -65,9 +75,24 @@ class ChiefFinancialsCollector(Collector):
 
     def fetch(self) -> list[RawDocument]:
         company_urls: set[str] = set()
-        for page in (self.spec.base_url, f"{self.spec.base_url}page/2/"):
-            html = self.fetcher.fetch_text(page, self.spec)
-            company_urls.update(match.group("url") for match in _COMPANY_LINK_RE.finditer(html))
+        # Page 1 failing is a real fetch failure (propagates, same as every
+        # other collector) -- only page 2+ failing is treated as "reached
+        # the end of real pagination" and stops the walk gracefully.
+        html = self.fetcher.fetch_text(self.spec.base_url, self.spec)
+        company_urls.update(match.group("url") for match in _COMPANY_LINK_RE.finditer(html))
+        for page_number in range(2, _MAX_INDEX_PAGES + 1):
+            page_url = f"{self.spec.base_url}page/{page_number}/"
+            try:
+                html = self.fetcher.fetch_text(page_url, self.spec)
+            except (FetchError, FetchDisallowed) as exc:
+                self.fetch_warnings.append(f"index page {page_number}: {type(exc).__name__}: {exc}")
+                break
+            found = {match.group("url") for match in _COMPANY_LINK_RE.finditer(html)}
+            if not found - company_urls:
+                # No company link on this page is new -- either the same
+                # page repeated (end of real pagination) or an empty page.
+                break
+            company_urls.update(found)
 
         documents: list[RawDocument] = []
         for company_url in sorted(company_urls):

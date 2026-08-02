@@ -71,20 +71,36 @@ the audit trail this codebase's own architecture (see the `SourceCategory.
 ALTERNATIVE` incident, `docs/PHASE_STATUS.md`) explicitly protects, for
 zero decision-quality gain. Nothing was deleted.
 
-**Not verifiable from this session, named as the real next step**: whether
-the full ~100-ticker universe now actually clears the fair-value/valuation
-floor end to end can only be confirmed by the next real `deploy-pages.yml`
-run (real network egress, real EGXpilot/Chief Capital fetches) — read
-`financial_coverage.json`/`ticker_data_gap_report.json` after that run to
-see exactly how many of the 101 tickers still show `ValuationMetrics.
-unavailable_reasons` for `total_equity`/`total_debt`/`ebitda` (the fields
-only `chief_egx_financials`/company-IR sources supply, not
-`egxpilot_fundamentals`'s market-cap-only data) — those are a genuine
-data-availability gap, not an engineering one, and this platform's own
-anti-fabrication rule forbids inventing values to close it.
+**This sandbox has no live network egress, but `deploy-pages.yml` (real
+GitHub Actions egress) already ran twice against today's commits before
+this review started** — so instead of guessing, this review pulled the
+real `production/state-latest` branch (commit `c3aa5c9`, 2026-08-02
+12:39 UTC) and ran `FairValueEngine`/`compute_valuation_metrics()`
+directly against its real collected data. Real findings, not projected
+ones: `egxpilot_fundamentals` really did fetch 100 distinct tickers'
+market-fundamentals + history endpoints (200 real URLs in
+`raw_documents.json`); `financial_statements/*.csv` exists for all 100
+universe tickers; but only **4 of 100** currently clear the 3-of-7-model
+fair-value floor, because `cash_and_equivalents` is missing for 100/100,
+`ebitda` for 98/100, `total_debt` for 99/100. Digging into *why*:
+`chief_egx_financials` only ever discovered **5** real companies
+(ARCC/COMI/CIEB/EXPA/ETEL) — not because Chief Capital only publishes 5,
+but because `ChiefFinancialsCollector.fetch()` had a hardcoded 2-page
+index-pagination cap. Fixed: it now walks `page/3/`, `page/4/`, ... until
+a page adds no new company or a fetch fails (bounded at 20 pages as a
+runaway guard, not an assumed real page count) — new regression test
+`test_walks_index_pagination_until_a_page_adds_no_new_company`. This may
+recover more companies (and possibly the missing balance-sheet fields for
+some of them) on the next real run, but the real headers already seen for
+ARCC/ETEL genuinely have no `EBITDA`/`TotalDebt`/`Cash` column at all —
+this platform will not fabricate those, so EV/EBITDA and DCF broad
+coverage stays a named, honest, real gap (updated TD-55) pending either a
+larger real Chief Capital catalog or a new free balance-sheet-detail
+source — the latter needs either a live `agx discover-sources` run or the
+project owner naming a candidate, since this sandbox cannot search live.
 
-**Result**: 887 backend tests pass (1 fixed, 0 net new — this was a
-review pass, not new-feature work); `ruff check` clean; 33 `api` tests
+**Result**: 888 backend tests pass (1 bug fixed, 1 new regression test);
+`ruff check` clean; 33 `api` tests
 pass; 53 `web` tests pass; both `npm run build` clean; `contracts/`
 regeneration produced zero diff.
 

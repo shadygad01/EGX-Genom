@@ -2817,14 +2817,71 @@ not a bug**:
   `researchgate`, cut as redundant) as a Research Papers capability input.
   Confirmed by code search: nothing downstream currently reads
   `Capability.RESEARCH_PAPERS`'s collected output — a real, named gap, not
-  claimed closed by this change. Left for the project owner to decide:
-  keep as a future methodology-quality input, or remove the capability
-  entirely given zero current consumer.
+  claimed closed by this change. Presented this finding to the project
+  owner, who decided the same day — see the next entry below for what
+  changed as a result.
 
 **Verified**: new regression test
 `test_unavailable_sources_excludes_retired_tombstones` in
 `test_production_pipeline.py`, directly reproducing the screenshot (a
 retired `company_social_official` tombstone excluded, a genuinely-disabled
-`egx_official` and a genuinely-planned `arxiv` both still visible). 912
+`egx_official` and a genuinely-planned `mof_egypt` both still visible). 912
 backend tests pass (up from 911); `ruff check` clean. See `CHANGELOG.md`'s
 matching entry.
+
+## Methodology & Research Registry: arxiv/ssrn/nber moved out of the operational catalog (2026-08-02)
+
+Direct continuation of the entry above: presented with the finding that
+`Capability.RESEARCH_PAPERS` (`arxiv`/`ssrn`/`nber`) had zero downstream
+consumer while the platform's own `docs/FREE_DECISION_DATA_BLUEPRINT.md`
+already documented these three as methodology-only, the project owner gave
+an explicit, more specific direction than a binary keep-or-delete: **never
+classify academic papers as decision-time data, and don't delete them
+either — give them a genuinely separate Methodology & Research Registry**,
+purpose-scoped to investment-methodology evolution, hypothesis generation,
+model improvement, rule discovery, and literature review, feeding a future
+**Research & Methodology Pipeline** kept structurally apart from the daily
+**Operational Decision Pipeline** — "operational sources produce investment
+decisions, methodology sources produce better methodologies," never mixed.
+Any hypothesis that eventually comes from this line of work must still
+survive this codebase's existing 8-gate `hypotheses.pipeline` validation,
+Shadow Fund backtest, and Investment Proof, exactly like any other
+hypothesis — never a shortcut straight to a production rule.
+
+**Delivered**: new `agx_research.methodology` package
+(`methodology/catalog.py`) — `seed_research_sources()` (arxiv/ssrn/nber,
+unchanged fields) and `seed_methodology_registry()`, a second, fully
+independent instance of the same generic, versioned `SourceRegistry`/
+`SourceSpec` machinery `sources.registry`/`sources.catalog` already use
+(reused as-is, not duplicated as a new type), persisted separately from
+`source_registry.json`. Removed all three from `sources.catalog
+.seed_sources()` (the operational catalog `production.pipeline
+.ProductionPipeline` actually reads) and removed
+`Capability.RESEARCH_PAPERS`/its `CAPABILITY_STRATEGIES` entry from
+`acquisition_intelligence.capability` outright — `production.pipeline`
+iterates every `Capability` once per day, so this also stops wasting one
+`CapabilityDecision` per run on a capability that could never be satisfied.
+`acquisition_intelligence.target.seed_target_organizations()`'s
+arxiv/ssrn/nber `TargetOrganization` entries removed the same way (that
+engine only discovers candidates for the operational catalog). A
+previously-persisted operational registry with these three ids self-heals
+via the existing `retire_removed()` mechanism (the same one this session's
+first fix already relies on) — no special-casing needed.
+
+**Verified, not fabricated as done**: no CLI command, dashboard artifact,
+or agent reads `seed_methodology_registry()`'s output yet — turning a
+collected paper into a `ResearchFinding` an agent can propose is the
+Research & Methodology Pipeline mission itself, explicitly named as future
+work, not built in this change. New `test_methodology_registry.py` (5
+cases: catalog membership, PLANNED/uncatalogued-for-decisions invariants,
+independence from the operational registry, idempotent seeding, and its
+own `retire_removed` self-healing); `test_source_registry.py` gained a
+disjointness regression test. 918 backend tests pass (up from 912, and
+895 before this session started); `ruff check` clean. `web/src/i18n
+/locales/ar/common.json`'s now-orphaned `research_papers` label removed
+(JSON validity confirmed; zero code references existed to it — this
+frontend field is typed as plain `string`, not a strict enum, so no
+frontend/API change was otherwise needed). `web`/`api` test suites were
+not run in this session's environment (no installed `node_modules`); the
+only touched frontend file was the one-line translation-key removal
+described above.

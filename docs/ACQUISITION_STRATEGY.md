@@ -387,7 +387,10 @@ Control's existing artifact-export pattern) with no new architecture:
 
 - **`acquisition_intelligence.capability.Capability`**: the 12 named data
   requirements above, plus Research Papers (named by this phase's mission
-  alongside them), as a runtime enum. `CAPABILITY_STRATEGIES` maps each one
+  alongside them, later moved out entirely on 2026-08-02 once a real audit
+  found it had zero downstream consumer — see `docs/PHASE_STATUS.md`'s
+  "Retired sources still showing as dead links in Mission Control" entry
+  and `agx_research.methodology.catalog`), as a runtime enum. `CAPABILITY_STRATEGIES` maps each one
   to its declared candidate pool of *catalogued* `SourceSpec` ids (verified
   to exist in `sources/catalog.py`, never invented) — a capability is the
   primary object; a source id is one interchangeable implementation of it.

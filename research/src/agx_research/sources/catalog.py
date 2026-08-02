@@ -954,47 +954,32 @@ def seed_sources() -> list[SourceSpec]:
         # that makes the signal near-irrelevant), not omitted by default.
         # See docs/FREE_DECISION_DATA_BLUEPRINT.md Part 3.
         #
-        # ---- RESEARCH ----
-        # google_scholar/researchgate removed: redundant with arxiv/ssrn/
-        # nber (below) for the same "new quant-finance papers" need, via a
-        # strictly worse access method (HTML_SCRAPE vs. RSS/API), and never
-        # mapped in acquisition_intelligence.capability.CAPABILITY_STRATEGIES.
-        *[
-            _spec(
-                id=source_id,
-                name=name,
-                category=SourceCategory.RESEARCH,
-                access_method=access,
-                status=status,
-                reliability_score=0.7,
-                freshness_score=0.3,
-                conflict_priority=30,
-                notes=note,
-            )
-            for source_id, name, access, status, note in [
-                (
-                    "arxiv",
-                    "arXiv (q-fin)",
-                    AccessMethod.RSS_FEED,
-                    SourceStatus.PLANNED,
-                    "Official free API/RSS.",
-                ),
-                (
-                    "ssrn",
-                    "SSRN",
-                    AccessMethod.RSS_FEED,
-                    SourceStatus.PLANNED,
-                    "Public RSS for new papers.",
-                ),
-                (
-                    "nber",
-                    "NBER",
-                    AccessMethod.RSS_FEED,
-                    SourceStatus.PLANNED,
-                    "Public new-papers feed.",
-                ),
-            ]
-        ],
+        # ---- RESEARCH: moved out entirely (project owner direction,
+        # 2026-08-02) ----
+        # arxiv/ssrn/nber (academic quant-finance papers) used to be
+        # catalogued here as SourceCategory.RESEARCH, mapped to a
+        # Capability.RESEARCH_PAPERS entry in
+        # acquisition_intelligence.capability.CAPABILITY_STRATEGIES. A real
+        # user-reported audit found that capability had zero downstream
+        # consumer -- no agent, hypothesis, or decision ever read its
+        # output -- while `docs/FREE_DECISION_DATA_BLUEPRINT.md` Part 3
+        # itself already documented these three as "methodology only,
+        # None directly" for decision impact. The project owner's explicit
+        # correction: academic literature must never be decision-time data,
+        # but shouldn't be deleted either -- it belongs to a *separate*
+        # Methodology & Research Registry feeding a future Research &
+        # Methodology Pipeline (literature -> hypothesis generation ->
+        # this codebase's existing 8-gate validation -> Shadow Fund
+        # backtest -> Investment Proof, never a shortcut straight to a
+        # production rule), kept structurally apart from this operational
+        # catalog and everything `production.pipeline.ProductionPipeline`
+        # reads. See `agx_research.methodology.catalog` for where they live
+        # now and `docs/PHASE_STATUS.md`'s matching entry for the full
+        # reasoning. google_scholar/researchgate stay removed outright
+        # (never moved anywhere): redundant with arxiv/ssrn/nber for the
+        # same need via a strictly worse access method, so there was never
+        # a case for giving them a home in the new registry either.
+        #
         # ---- SOVEREIGN & CREDIT (Architecture Adversarial Review, R3/R8:
         # feeds the merged Country & Macro Risk severity classification's
         # crisis rung -- rating actions are the one free, discrete, public

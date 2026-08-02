@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased — New Methodology & Research Registry: arxiv/ssrn/nber moved out of the operational catalog
+
+Follow-up to the Mission Control fix below, per explicit project owner
+direction: academic literature must never be classified as decision-time
+data, but shouldn't be deleted either. New `agx_research.methodology`
+package (`seed_research_sources()`/`seed_methodology_registry()`) gives
+`arxiv`/`ssrn`/`nber` a genuinely separate, non-operational home — a
+second, independent instance of the existing `SourceRegistry`/`SourceSpec`
+machinery, persisted apart from `source_registry.json` — intended to feed
+a future Research & Methodology Pipeline (literature → hypothesis
+generation → the existing 8-gate `hypotheses.pipeline` validation → Shadow
+Fund backtest → Investment Proof, never a shortcut to a production rule),
+kept structurally apart from the daily Operational Decision Pipeline.
+Removed all three from `sources.catalog.seed_sources()`,
+`Capability.RESEARCH_PAPERS`/its `CAPABILITY_STRATEGIES` entry from
+`acquisition_intelligence.capability` (this also stops the daily pipeline
+wasting a `CapabilityDecision` on a capability nothing could ever satisfy),
+and their `TargetOrganization` discovery-engine entries. A previously-
+persisted operational registry with these ids self-heals via the existing
+`retire_removed()` mechanism. New `test_methodology_registry.py` (5 cases)
+plus a disjointness regression in `test_source_registry.py`; 918 backend
+tests pass (up from 912); `ruff check` clean. Not fabricated as done: no
+CLI command, dashboard artifact, or agent reads the new registry yet —
+that's the Research & Methodology Pipeline mission itself, explicitly
+named as future work. See `docs/PHASE_STATUS.md`'s matching entry.
+
 ## Unreleased — Retired sources no longer show as dead links in Mission Control
 
 Root-caused a real, user-reported bug from a live dashboard screenshot:

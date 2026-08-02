@@ -728,7 +728,10 @@ def test_unavailable_sources_excludes_retired_tombstones():
     # A still-catalogued, genuinely-DISABLED source must still be visible.
     assert "egx_official" in reasons
     # A still-catalogued, genuinely-PLANNED source must still be visible.
-    assert "arxiv" in reasons
+    # (arxiv/ssrn/nber moved out of this catalog entirely on 2026-08-02 --
+    # see agx_research.methodology.catalog -- so mof_egypt is used here
+    # instead as a still-operational PLANNED example.)
+    assert "mof_egypt" in reasons
 
 
 def test_live_mode_fails_loudly_when_every_collector_fails(tmp_path, monkeypatch):

@@ -31,9 +31,25 @@ def test_seed_sources_covers_every_named_category_still_in_active_use():
     # Audit, 2026-07-30), but the enum member itself must stay so real,
     # already-persisted production registry state with that category
     # (from before the cleanup) keeps deserializing -- see sources/spec.py.
+    # SourceCategory.RESEARCH is excluded the same way, for the same
+    # reason: arxiv/ssrn/nber moved out to the separate, non-operational
+    # `agx_research.methodology.catalog` registry (2026-08-02), but the
+    # enum member stays for the same real-persisted-data reason.
     specs = seed_sources()
     categories = {s.category for s in specs}
-    assert categories == set(SourceCategory) - {SourceCategory.ALTERNATIVE}
+    assert categories == set(SourceCategory) - {
+        SourceCategory.ALTERNATIVE,
+        SourceCategory.RESEARCH,
+    }
+
+
+def test_research_sources_moved_out_of_the_operational_catalog():
+    # Regression test for the 2026-08-02 registry split: arxiv/ssrn/nber
+    # must never appear in the operational catalog (they'd otherwise be
+    # picked up by production.pipeline.ProductionPipeline / the capability
+    # engine) -- they live in agx_research.methodology.catalog instead.
+    ids = {s.id for s in seed_sources()}
+    assert ids.isdisjoint({"arxiv", "ssrn", "nber"})
 
 
 def test_legacy_alternative_category_still_deserializes():

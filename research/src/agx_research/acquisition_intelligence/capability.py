@@ -83,12 +83,15 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "zawya",
     ],
     Capability.FINANCIAL_STATEMENTS: [
+        "egxpilot_fundamentals",
+        "chief_egx_financials",
         "egid_financial_filings",
         "telecom_egypt_ir",
         "orascom_ir",
         "company_ir",
     ],
     Capability.INVESTOR_RELATIONS: [
+        "chief_egx_financials",
         "egid_financial_filings",
         "telecom_egypt_ir",
         "orascom_ir",

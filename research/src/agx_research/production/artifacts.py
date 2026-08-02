@@ -50,6 +50,7 @@ def export_investment_cases(
     as_of: date | None,
     ready_horizons_by_ticker: dict[str, set[Horizon]] | None = None,
     latest_prices: dict[str, float] | None = None,
+    sectors_by_ticker: dict[str, str] | None = None,
     fair_value_engine: FairValueEngine | None = None,
     macro_overlay: MacroDecisionOverlay | None = None,
 ) -> dict[str, Any]:
@@ -68,6 +69,7 @@ def export_investment_cases(
         as_of,
         ready_horizons_by_ticker=ready_horizons_by_ticker,
         latest_prices=latest_prices,
+        sectors_by_ticker=sectors_by_ticker,
     )
     portfolio = PortfolioConstructor().construct(
         recommendations, as_of, macro_overlay=macro_overlay

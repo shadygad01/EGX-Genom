@@ -47,6 +47,7 @@ class MarketMemory:
         calendar: TradingCalendar | None = None,
         event_platform: EventPlatform | None = None,
         financials_provider: FinancialStatementProvider | None = None,
+        financials_lookback_days: int = 730,
     ):
         self.data_provider = data_provider
         self.universe_provider = universe_provider
@@ -59,6 +60,7 @@ class MarketMemory:
         self.calendar = calendar or StaticEGXCalendar()
         self.event_platform = event_platform or EventPlatform()
         self.financials_provider = financials_provider
+        self.financials_lookback_days = financials_lookback_days
 
     def reconstruct(self, as_of: date) -> MarketState:
         constituents = self.universe_provider.constituents(as_of)
@@ -73,6 +75,7 @@ class MarketMemory:
             macro_series_sources=self.macro_series_sources,
             pattern_lookback_days=self.pattern_lookback_days,
             financials_provider=self.financials_provider,
+            financials_lookback_days=self.financials_lookback_days,
         )
         sectors = {
             ticker: sector

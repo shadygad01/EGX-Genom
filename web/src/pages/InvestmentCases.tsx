@@ -13,7 +13,7 @@ import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { dedupeEvidence, formatPercent, formatSignedPercent, humanizeEvidence } from "../lib/format";
-import type { CorporateEvent, Horizon, Recommendation } from "../types";
+import type { CorporateEvent, DecisionReadiness, Horizon, Recommendation } from "../types";
 import styles from "./InvestmentCases.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
@@ -29,6 +29,7 @@ export function InvestmentCases() {
   const label = useEnumLabel();
   const { formatDate } = useFormatters();
   const recommendations = useArtifact((p) => p.getRecommendations());
+  const readiness = useArtifact((p) => p.getDecisionReadiness());
   const marketState = useArtifact((p) => p.getMarketState());
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
@@ -37,6 +38,23 @@ export function InvestmentCases() {
   );
   const companyNames = marketState.data?.constituents ?? {};
   const selected = ranked.find((r) => r.ticker === selectedTicker) ?? ranked[0] ?? null;
+  const recommendationByTicker = new Map(ranked.map((row) => [row.ticker, row]));
+  const readinessByTicker = new Map((readiness.data ?? []).map((row) => [row.ticker, row]));
+  const universeRows = Object.keys(companyNames)
+    .map((ticker) => ({
+      ticker,
+      recommendation: recommendationByTicker.get(ticker) ?? null,
+      readiness: readinessByTicker.get(ticker) ?? null,
+    }))
+    .sort((a, b) => {
+      const ar = a.recommendation?.combined_expected_return;
+      const br = b.recommendation?.combined_expected_return;
+      if (ar != null && br != null) return br - ar;
+      if (ar != null) return -1;
+      if (br != null) return 1;
+      return a.ticker.localeCompare(b.ticker);
+    })
+    .map((row, index) => ({ ...row, rank: index + 1 }));
 
   const catalystsForSelected: CorporateEvent[] = selected
     ? (marketState.data?.dataset_snapshot.corporate_events[selected.ticker] ?? [])
@@ -125,6 +143,56 @@ export function InvestmentCases() {
           </Card>
         </div>
       )}
+
+      <Section title={t("universe.title")} description={t("universe.description")}>
+        {(marketState.loading || readiness.loading) && <LoadingState rows={6} />}
+        {!marketState.loading && !readiness.loading && (
+          <Card dense>
+            <DataTable
+              rows={universeRows}
+              getRowKey={(row) => row.ticker}
+              emptyTitle={t("universe.empty")}
+              columns={[
+                {
+                  key: "rank",
+                  header: t("universe.rank"),
+                  align: "right",
+                  render: (row) => <span className="num">{row.rank}</span>,
+                },
+                {
+                  key: "ticker",
+                  header: t("columns.opportunity"),
+                  render: (row) => <Link className="num" to={`/cases/${row.ticker}`}>{row.ticker}</Link>,
+                },
+                ...HORIZON_ORDER.map((horizon) => ({
+                  key: horizon,
+                  header: label("horizon", horizon),
+                  render: (row: { ticker: string; recommendation: Recommendation | null; readiness: DecisionReadiness | null }) => {
+                    const decision = row.recommendation?.horizon_decisions[horizon];
+                    const prediction = row.recommendation?.horizon_predictions[horizon];
+                    return (
+                      <Badge variant={decision?.action === "buy_candidate" ? "positive" : decision?.action === "avoid" ? "negative" : decision?.action === "watch" ? "warning" : "neutral"}>
+                        {label("decision", decision?.action ?? "abstain")}
+                        {prediction ? ` ${formatSignedPercent(prediction.expected_return)}` : ""}
+                      </Badge>
+                    );
+                  },
+                })),
+                {
+                  key: "coverage",
+                  header: t("universe.coverage"),
+                  render: (row) => <span className="num">{row.readiness ? `${row.readiness.ready_horizons.length}/3` : "0/3"}</span>,
+                },
+                {
+                  key: "blocker",
+                  header: t("universe.blocker"),
+                  render: (row) => row.readiness?.blockers[0] ?? t("universe.none"),
+                },
+              ]}
+            />
+          </Card>
+        )}
+      </Section>
     </Section>
   );
 }

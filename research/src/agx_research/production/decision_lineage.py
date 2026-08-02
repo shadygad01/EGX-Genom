@@ -83,6 +83,26 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
             "meta_decision_engine",
         ],
     },
+    "chief_egx_financials": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_performance_agent",
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
+    "egxpilot_fundamentals": {
+        "records": ["financial_statement_line_items", "market_fundamental_snapshot"],
+        "consumers": [
+            "valuation_metrics",
+            "financial_readiness",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
     "rss_generic": {
         "records": ["news_items", "events"],
         "consumers": ["event_risk_overlay", "meta_decision_engine"],

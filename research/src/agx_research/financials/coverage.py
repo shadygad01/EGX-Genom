@@ -51,7 +51,11 @@ def build_financial_coverage_report(
     by_ticker_period: dict[str, dict[date, set[str]]] = defaultdict(lambda: defaultdict(set))
     universe = set(tickers)
     for item in items:
-        if item.ticker in universe and item.period_end_date <= as_of:
+        if (
+            item.ticker in universe
+            and item.period_end_date <= as_of
+            and item.period_type.upper() in {"ANNUAL", "QUARTERLY"}
+        ):
             by_ticker_period[item.ticker][item.period_end_date].add(item.line_item)
 
     rows: list[TickerFinancialCoverage] = []

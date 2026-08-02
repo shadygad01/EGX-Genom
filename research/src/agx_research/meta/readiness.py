@@ -16,7 +16,7 @@ from agx_research.decision_service.liquidity_floor import compute_illiquid_ticke
 from agx_research.financials.provider import FinancialStatementProvider
 from agx_research.knowledge.schema import KnowledgeObject
 from agx_research.market_memory.state import MarketState
-from agx_research.valuation import FairValueEngine
+from agx_research.valuation import FairValueEngine, ValuationMetrics, compute_valuation_metrics
 
 # Added per docs/ARCHITECTURE_ADVERSARIAL_REVIEW.md R2 (extend this
 # existing gate rather than build a second, parallel one) and R4 (a
@@ -46,6 +46,7 @@ class DecisionReadiness(BaseModel):
     corporate_events: int = 0
     financial_periods: int = 0
     fair_value_available: bool = False
+    valuation: ValuationMetrics | None = None
     # (current_price - weighted_fair_value) / weighted_fair_value: positive
     # means the current price sits above the calculated fair value
     # (expensive), negative means below it (a margin of safety). `None`
@@ -173,14 +174,32 @@ def assess_decision_readiness(
         news = [item for item in snapshot.news if ticker in item.tickers]
         events = snapshot.corporate_events.get(ticker, [])
         items = financials.get_line_items(
-            ticker, market_state.as_of - timedelta(days=730), market_state.as_of
+            ticker, market_state.as_of - timedelta(days=3000), market_state.as_of
         )
-        financial_periods = len({item.period_end_date for item in items})
+        financial_periods = len(
+            {
+                item.period_end_date
+                for item in items
+                if item.period_type.upper() in {"ANNUAL", "QUARTERLY"}
+            }
+        )
         fair_value_result = (
             fair_value_engine.value(
                 ticker, market_state.as_of, sector=market_state.sectors.get(ticker)
             )
             if fair_value_engine else None
+        )
+        valuation = (
+            compute_valuation_metrics(
+                ticker,
+                market_state.as_of,
+                latest_bar.close if latest_bar else None,
+                financials,
+                fair_value_engine,
+                sector=market_state.sectors.get(ticker),
+            )
+            if fair_value_engine
+            else None
         )
         fair_value_available = bool(fair_value_result)
         price_vs_fair_value_pct = (
@@ -256,9 +275,9 @@ def assess_decision_readiness(
             horizon_blockers[Horizon.INVESTMENT].append(
                 "Insufficient exchange-rate data to assess country risk."
             )
-        if not knowledge_by_horizon[Horizon.INVESTMENT]:
+        if not knowledge_by_horizon[Horizon.INVESTMENT] and not fair_value_available:
             horizon_blockers[Horizon.INVESTMENT].append(
-                "No active knowledge for the Investment horizon."
+                "No active Investment knowledge or reliable multi-model fair value."
             )
         if is_illiquid:
             horizon_blockers[Horizon.INVESTMENT].append(
@@ -299,11 +318,11 @@ def assess_decision_readiness(
         if is_illiquid:
             blockers.append("Liquidity is below the executable minimum for any decision.")
             next_actions.append("Do not force a decision on an illiquid ticker; wait for liquidity to improve or exclude it.")
-        if not active_knowledge:
+        if not active_knowledge and not fair_value_available:
             blockers.append("No active, validated knowledge object covers this ticker.")
             next_actions.append("Run hypotheses through validation before issuing any decision.")
 
-        decision_allowed = bool(ready_horizons and active_knowledge)
+        decision_allowed = bool(ready_horizons and (active_knowledge or fair_value_available))
         status = (
             ReadinessStatus.READY
             if decision_allowed
@@ -325,6 +344,7 @@ def assess_decision_readiness(
                 corporate_events=len(events),
                 financial_periods=financial_periods,
                 fair_value_available=fair_value_available,
+                valuation=valuation,
                 price_vs_fair_value_pct=price_vs_fair_value_pct,
                 macro_series=macro_series,
                 active_knowledge=len(active_knowledge),

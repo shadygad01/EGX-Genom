@@ -9,6 +9,7 @@ from agx_research.events.entity import EntityKind, EntityRef
 from agx_research.events.event import EventRelationshipType, EventSeverity, EventType
 from agx_research.events.identity import compute_event_fingerprint
 from agx_research.events.lifecycle import EventStatus
+from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform, build_candidate_event
 from agx_research.events.taxonomy import EventSubtype
 
@@ -34,7 +35,7 @@ def candidate(
         confidence=0.8,
         severity=EventSeverity.MEDIUM,
         metadata=metadata or {"dividend_amount": 3.5},
-        provenance=Provenance(produced_by="test", produced_at=datetime.now()),
+        provenance=Provenance(produced_by="test", produced_at=datetime.now().astimezone()),
     )
 
 
@@ -103,6 +104,30 @@ def test_same_source_replay_is_idempotent_and_does_not_inflate_confidence():
     replay = platform.register(candidate(source="source_a"))
     assert replay.version == first.version
     assert replay.confidence == first.confidence
+
+
+def test_register_all_flushes_the_repository_once(monkeypatch, tmp_path):
+    repository = EventRepository(tmp_path / "events.json")
+    calls = 0
+    original_save = repository._save
+
+    def counted_save():
+        nonlocal calls
+        calls += 1
+        original_save()
+
+    monkeypatch.setattr(repository, "_save", counted_save)
+    platform = EventPlatform(repository=repository)
+
+    platform.register_all(
+        [
+            candidate(event_date=date(2026, 6, 4)),
+            candidate(event_date=date(2026, 6, 5)),
+        ]
+    )
+
+    assert calls == 1
+    assert len(EventRepository(tmp_path / "events.json").all_latest()) == 2
 
 
 def test_agreeing_second_source_corroborates_and_raises_confidence():
@@ -204,7 +229,7 @@ def test_subtype_must_belong_to_event_type():
             source="s",
             confidence=1.0,
             severity=EventSeverity.LOW,
-            provenance=Provenance(produced_by="test", produced_at=datetime.now()),
+            provenance=Provenance(produced_by="test", produced_at=datetime.now().astimezone()),
         )
 
 

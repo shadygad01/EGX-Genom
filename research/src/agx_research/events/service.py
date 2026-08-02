@@ -103,11 +103,11 @@ class EventPlatform:
         self.repository = repository or EventRepository()
         self.conflict_policy = conflict_policy or ConservativeConflictPolicy()
 
-    def register(self, candidate: Event) -> Event:
+    def register(self, candidate: Event, *, persist: bool = True) -> Event:
         existing = self.repository.latest(candidate.id)
         if existing is None:
             first = candidate.model_copy(update={"status": EventStatus.CONFIRMED})
-            return self.repository.add(first)
+            return self.repository.add(first, persist=persist)
 
         if existing.status in (EventStatus.RETRACTED, EventStatus.SUPERSEDED, EventStatus.ARCHIVED):
             # A terminal event is never resurrected by re-registration; a
@@ -148,7 +148,7 @@ class EventPlatform:
                 ],
                 "provenance": Provenance(
                     produced_by="event_platform.register",
-                    produced_at=datetime.now(),
+                    produced_at=datetime.now().astimezone(),
                     inputs=[
                         ProvenanceRef(kind="event", ref_id=existing.id, ref_version=existing.version),
                         *candidate.provenance.inputs,
@@ -156,10 +156,21 @@ class EventPlatform:
                 ),
             }
         )
-        return self.repository.add(merged)
+        return self.repository.add(merged, persist=persist)
 
     def register_all(self, candidates: list[Event]) -> list[Event]:
-        return [self.register(candidate) for candidate in candidates]
+        # Conflict resolution must remain sequential because later candidates
+        # can corroborate an event added earlier in this same batch. Persistence
+        # does not: writing the entire growing JSON repository after every event
+        # made a 252-session universe run quadratic. Accumulate in memory, then
+        # atomically flush once.
+        registered: list[Event] = []
+        try:
+            for candidate in candidates:
+                registered.append(self.register(candidate, persist=False))
+        finally:
+            self.repository.flush()
+        return registered
 
     def transition_status(self, event_id: str, target: EventStatus, *, reason: str = "") -> Event:
         current = self.repository.latest(event_id)

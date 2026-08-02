@@ -12,6 +12,15 @@
     "opportunity": "Company",
     "horizons": "Horizon signals"
   },
+  "universe": {
+    "rank": "Rank",
+    "title": "Full-universe decision board",
+    "description": "Every EGX30/EGX70 security is shown. Available model returns are ranked first; missing evidence produces an explicit abstention, never a fabricated return.",
+    "coverage": "Ready horizons",
+    "blocker": "Primary blocker",
+    "none": "No blocker",
+    "empty": "No universe loaded"
+  },
   "detail": {
     "horizonBreakdown": "Horizon breakdown",
     "expReturnShort": "Exp. return",
@@ -70,7 +79,17 @@
     "description": "Price versus calculated fair value",
     "emptyTitle": "No fair value calculated",
     "emptyDetail": "Needs enough collected financial-statement fields (see docs/TECHNICAL_DEBT.md) -- not fabricated in its absence.",
-    "priceVsFairValue": "Price vs. Fair Value"
+    "priceVsFairValue": "Price vs. Fair Value",
+    "fairValue": "Weighted Fair Value",
+    "dcf": "DCF / Share",
+    "enterpriseValue": "Enterprise Value (EV)",
+    "ebitda": "EBITDA",
+    "evEbitda": "EV / EBITDA",
+    "priceBook": "Price / Book (P/B)",
+    "marketPe": "Market P/E",
+    "marketCap": "Market Capitalisation",
+    "dividendYield": "Dividend Yield",
+    "beta": "Beta"
   },
   "executionPlan": {
     "title": "Technical Execution Plan",

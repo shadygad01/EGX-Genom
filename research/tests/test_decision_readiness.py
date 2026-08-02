@@ -206,9 +206,9 @@ def test_investment_horizon_blocked_when_price_far_above_fair_value(tmp_path):
 
 
 def test_investment_horizon_not_blocked_when_price_near_fair_value(tmp_path):
-    # Same fixture scaled 5x lands the weighted fair value at ~67.41,
-    # within MAX_PRICE_ABOVE_FAIR_VALUE_PCT of COMI's real 68.40 mock
-    # close -- the price-quality criterion must not fire on a fair entry.
+    # The bank-safe residual-income/P-E/P-B fixture scaled 8x lands the
+    # weighted fair value near COMI's 68.40 mock close.  The price-quality
+    # criterion must not fire on a fair entry.
     snapshot = build_snapshot(
         MockDataProvider(MOCK_ROOT),
         tickers=["COMI"],
@@ -223,7 +223,7 @@ def test_investment_horizon_not_blocked_when_price_near_fair_value(tmp_path):
         sectors={"COMI": "Banks"},
         trading_session=TradingSession(session_date=date(2026, 6, 14), is_trading_day=True),
     )
-    fair_value_engine = FairValueEngine(_FairValueFinancialsProvider("COMI", scale=5))
+    fair_value_engine = FairValueEngine(_FairValueFinancialsProvider("COMI", scale=8))
     row = assess_decision_readiness(
         state, CollectedFinancialStatementProvider(tmp_path), [], fair_value_engine
     )[0]

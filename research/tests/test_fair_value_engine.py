@@ -1,7 +1,7 @@
 from datetime import date
 
 from agx_research.financials.schema import FinancialStatementLineItem
-from agx_research.valuation import FairValueEngine
+from agx_research.valuation import FairValueEngine, compute_valuation_metrics
 
 
 class Provider:
@@ -29,7 +29,10 @@ def test_ported_engine_runs_seven_models_and_robustly_blends_at_least_three():
     assert result is not None
     assert len(result.included_models) >= 3
     assert result.bear_case <= result.base_case <= result.bull_case
-    assert result.assumptions_version == "smartlist-ive-v2.1"
+    assert result.assumptions_version == "smartlist-ive-v2.2"
+    assert result.models["dcf"] is None
+    assert result.models["earnings_power"] is None
+    assert result.models["ev_ebitda"] is None
 
 
 def test_engine_refuses_to_fabricate_value_without_share_count():
@@ -59,3 +62,37 @@ def test_latest_four_quarters_are_aggregated_as_ttm_not_treated_as_one_quarter()
     result = FairValueEngine(Provider(quarterly)).value("TEST", date(2026, 6, 30))
     assert result is not None
     assert result.models["pe"] == 1.8 * 11.0
+
+
+def test_decision_metrics_expose_dcf_ev_ebitda_and_price_to_book_without_estimation():
+    provider = Provider(_items())
+    engine = FairValueEngine(provider)
+    result = compute_valuation_metrics(
+        "TEST", date(2026, 6, 30), 10.0, provider, engine, sector="Materials"
+    )
+    assert result.dcf_per_share is not None
+    assert result.enterprise_value == 910.0
+    assert result.ebitda == 300
+    assert result.ev_to_ebitda == 910 / 300
+    assert result.price_to_book == 1000 / 860
+    assert result.weighted_fair_value is not None
+
+
+def test_market_snapshot_does_not_make_financial_statements_look_fresh():
+    stale = [item.model_copy(update={"period_end_date": date(2023, 12, 31)}) for item in _items()]
+    snapshot = FinancialStatementLineItem(
+        ticker="TEST",
+        period_end_date=date(2026, 6, 30),
+        period_type="SNAPSHOT",
+        statement_type="MARKET_FUNDAMENTALS",
+        line_item="market_pe",
+        value=8.0,
+    )
+    provider = Provider([*stale, snapshot])
+    engine = FairValueEngine(provider)
+
+    assert engine.value("TEST", date(2026, 6, 30)) is None
+    metrics = compute_valuation_metrics("TEST", date(2026, 6, 30), 10.0, provider, engine)
+    assert metrics.latest_financial_period == date(2023, 12, 31)
+    assert metrics.latest_market_snapshot_date == date(2026, 6, 30)
+    assert metrics.market_pe == 8.0

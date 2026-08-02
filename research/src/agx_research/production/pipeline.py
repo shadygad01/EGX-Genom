@@ -797,6 +797,7 @@ class ProductionPipeline:
             pattern_lookback_days=self.pattern_lookback_days,
             event_platform=self.event_platform,
             financials_provider=CollectedFinancialStatementProvider(self.data_dir),
+            financials_lookback_days=3000,
         )
         state = self.market_memory.reconstruct(as_of)
         self.market_state_summary = (
@@ -894,6 +895,7 @@ class ProductionPipeline:
         as_of = self._latest_successful_as_of()
         ready_horizons_by_ticker = None
         latest_prices = None
+        sectors_by_ticker = None
         if as_of is not None:
             state = self.market_memory.reconstruct(as_of)
             macro_overlay = assess_macro_overlay(state.dataset_snapshot.macro_series, as_of)
@@ -911,6 +913,7 @@ class ProductionPipeline:
                 for ticker, bars in state.dataset_snapshot.price_history.items()
                 if bars
             }
+            sectors_by_ticker = state.sectors
         if as_of is None:
             # A real, live incident (2026-07-31): this stage previously
             # called `self._tickers(None)` unconditionally before this
@@ -933,6 +936,7 @@ class ProductionPipeline:
             as_of=as_of,
             ready_horizons_by_ticker=ready_horizons_by_ticker,
             latest_prices=latest_prices,
+            sectors_by_ticker=sectors_by_ticker,
             fair_value_engine=FairValueEngine(CollectedFinancialStatementProvider(self.data_dir)),
             macro_overlay=macro_overlay,
         )
@@ -1029,6 +1033,16 @@ class ProductionPipeline:
         investment_cases["recommendations"] = [
             item.model_dump(mode="json") for item in gated_recommendations
         ]
+        # `write_dashboard_artifacts()` writes a legacy recommendation view
+        # before the production readiness gates are assembled. Keep the
+        # canonical dashboard endpoint in lock-step with the final, gated
+        # investment-case payload; otherwise the CIO table silently loses
+        # valuation-only Investment decisions that were generated later in
+        # this stage.
+        (dashboard_out / "recommendations.json").write_text(
+            json.dumps(investment_cases["recommendations"], indent=2, sort_keys=True) + "\n"
+        )
+        counts["recommendations.json"] = len(gated_recommendations)
         investment_cases["portfolio"] = (
             PortfolioConstructor()
             .construct(

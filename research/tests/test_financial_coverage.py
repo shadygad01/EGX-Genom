@@ -57,3 +57,21 @@ def test_report_is_complete_only_when_every_ticker_is_covered():
     assert report.coverage_percent == 100
     assert report.complete is True
     assert [row.ticker for row in report.tickers] == ["COMI", "MFPC"]
+
+
+def test_market_snapshot_is_not_misreported_as_financial_statement_coverage():
+    snapshot = FinancialStatementLineItem(
+        ticker="COMI",
+        period_end_date=date(2026, 6, 30),
+        period_type="SNAPSHOT",
+        statement_type="MARKET_FUNDAMENTALS",
+        line_item="market_pe",
+        value=8.0,
+    )
+
+    report = build_financial_coverage_report(
+        tickers=["COMI"], items=[snapshot], as_of=date(2026, 6, 30)
+    )
+
+    assert report.covered_count == 0
+    assert report.tickers[0].latest_period_end_date is None

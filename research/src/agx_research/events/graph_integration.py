@@ -92,16 +92,19 @@ def relationship_edges(event: Event) -> list[GraphEdge]:
     ]
 
 
-def project_event(graph: KnowledgeGraph, event: Event) -> None:
+def project_event(graph: KnowledgeGraph, event: Event, *, persist: bool = True) -> None:
     """Add one event, its entities, and every derived edge to the graph."""
-    graph.add_node(event_node(event))
+    graph.add_node(event_node(event), persist=persist)
     for node in entity_nodes(event):
         if graph.nodes.latest(node.id) is None:
-            graph.add_node(node)
+            graph.add_node(node, persist=persist)
     for edge in [*involvement_edges(event), *relationship_edges(event)]:
-        graph.add_edge(edge)
+        graph.add_edge(edge, persist=persist)
 
 
 def project_events(graph: KnowledgeGraph, events: list[Event]) -> None:
-    for event in events:
-        project_event(graph, event)
+    try:
+        for event in events:
+            project_event(graph, event, persist=False)
+    finally:
+        graph.flush()

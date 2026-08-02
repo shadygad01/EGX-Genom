@@ -249,9 +249,18 @@ def test_fair_value_blends_into_investment_prediction_and_surfaces_as_evidence()
         expected_risk=0.05,
         provenance=Provenance(produced_by="test", produced_at=datetime.now()),
     ))
-    service = RecommendationService(
-        store, fair_value_engine=FairValueEngine(_FairValueFinancialsProvider())
+    provider = _FairValueFinancialsProvider()
+    provider.items.append(
+        FinancialStatementLineItem(
+            ticker="COMI",
+            period_end_date=date(2026, 6, 14),
+            period_type="SNAPSHOT",
+            statement_type="MARKET_FUNDAMENTALS",
+            line_item="market_pe",
+            value=8.0,
+        )
     )
+    service = RecommendationService(store, fair_value_engine=FairValueEngine(provider))
     recommendations = service.recommend(
         ["COMI"], date(2026, 6, 14), latest_prices={"COMI": 68.40}
     )
@@ -265,7 +274,36 @@ def test_fair_value_blends_into_investment_prediction_and_surfaces_as_evidence()
     evidence = " ".join(recommendations[0].explanation.supporting_evidence)
     assert "Calculated fair value=14.67" in evidence
     assert "vs. fair value" in evidence
+    assert "Market P/E=8.00" in evidence
     assert any(ref.kind == "calculated_fair_value" for ref in recommendations[0].explanation.evidence_refs)
+    assert any(
+        ref.kind == "market_fundamental_snapshot"
+        for ref in recommendations[0].explanation.evidence_refs
+    )
+
+
+def test_reliable_fair_value_can_issue_an_investment_prediction_without_promoted_knowledge():
+    service = RecommendationService(
+        KnowledgeStore(),
+        fair_value_engine=FairValueEngine(_FairValueFinancialsProvider()),
+    )
+
+    [recommendation] = service.recommend(
+        ["COMI"],
+        date(2026, 6, 14),
+        ready_horizons_by_ticker={"COMI": {Horizon.INVESTMENT}},
+        latest_prices={"COMI": 10.0},
+    )
+
+    prediction = recommendation.horizon_predictions[Horizon.INVESTMENT]
+    assert prediction.model_id == "multi_model_fair_value"
+    assert prediction.expected_return > 0
+    assert prediction.confidence >= 0.70
+    assert recommendation.supporting_knowledge_ids == []
+    assert any(
+        ref.kind == "calculated_fair_value"
+        for ref in recommendation.explanation.evidence_refs
+    )
 
 
 def test_portfolio_construction_allocates_and_explains():

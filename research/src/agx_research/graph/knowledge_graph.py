@@ -25,11 +25,15 @@ class KnowledgeGraph:
         self.nodes: JsonFileRepository[GraphNode] = JsonFileRepository(GraphNode, node_persist_path)
         self.edges: JsonFileRepository[GraphEdge] = JsonFileRepository(GraphEdge, edge_persist_path)
 
-    def add_node(self, node: GraphNode) -> GraphNode:
-        return self.nodes.add(node)
+    def add_node(self, node: GraphNode, *, persist: bool = True) -> GraphNode:
+        return self.nodes.add(node, persist=persist)
 
-    def add_edge(self, edge: GraphEdge) -> GraphEdge:
-        return self.edges.add(edge)
+    def add_edge(self, edge: GraphEdge, *, persist: bool = True) -> GraphEdge:
+        return self.edges.add(edge, persist=persist)
+
+    def flush(self) -> None:
+        self.nodes.flush()
+        self.edges.flush()
 
     def neighbors(self, node_id: str) -> list[GraphEdge]:
         return [

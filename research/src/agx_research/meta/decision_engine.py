@@ -174,9 +174,20 @@ class MetaDecisionEngine:
                 if ref.kind != "knowledge"
             ],
             similar_historical_cases=[],
-            invalidation_conditions=[
-                "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
-            ],
+            invalidation_conditions=list(dict.fromkeys(
+                [
+                    condition
+                    for prediction in predictions.values()
+                    for condition in prediction.explanation.invalidation_conditions
+                ]
+                + (
+                    [
+                        "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
+                    ]
+                    if knowledge_ids
+                    else []
+                )
+            )),
         )
 
         return Recommendation(

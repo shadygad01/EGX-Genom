@@ -43,8 +43,10 @@ from enum import Enum
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import Collector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
+from agx_research.collectors.chief_financials import ChiefFinancialsCollector
 from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
+from agx_research.collectors.egxpilot_fundamentals import EgxPilotFundamentalsCollector
 from agx_research.collectors.egypt_nsdp import EgyptNsdpCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
@@ -186,8 +188,10 @@ LIVE_PATTERN_LOOKBACK_DAYS = 1460
 # days spanning 2026-01-28 to 2026-07-30, yet all 777 hypotheses recorded so
 # far failed DATA_COLLECTION with only 19-21 aligned observations each --
 # every one of them was starved by the window, not by a genuine lack of
-# history. ~180 calendar days (~115-120 real trading days at EGX's cadence)
-# clears the 60-observation floor with real margin for holidays and for two
+# history. 550 calendar days contains the full 252-session public history
+# now collected from EGXpilot, clearing both the 120-session Swing and
+# 252-session Investment evidence floors without lowering either gate.
+# It also clears the 60-observation floor with real margin for holidays and for two
 # tickers' series not perfectly overlapping, while staying a bounded,
 # explainable "recent regime" window rather than reaching for years of
 # history the way the pattern-search window above deliberately does.
@@ -195,7 +199,7 @@ LIVE_PATTERN_LOOKBACK_DAYS = 1460
 # test assertions are sized to that window, and this bug is LIVE-only:
 # nothing in either mode's price data ever exceeded 30 calendar days before
 # now, so widening it can only ever add data, never remove any.
-LIVE_PRICE_LOOKBACK_DAYS = 180
+LIVE_PRICE_LOOKBACK_DAYS = 550
 
 # Conservative floors, not true full-history sizes (unknown until a real
 # fetch happens) -- `assess_quality`'s coverage score is capped at 1.0, so
@@ -211,6 +215,8 @@ EXPECTED_RECORDS_LIVE = {
     "gdelt": 10,
     "telecom_egypt_ir": 8,
     "orascom_ir": 3,
+    "chief_egx_financials": 50,
+    "egxpilot_fundamentals": 5,
     "enterprise_press": 5,
     "fra_egypt": 5,
     "alborsa": 5,
@@ -466,6 +472,10 @@ def build_live_collector(
         return TelecomEgyptFinancialHighlightsCollector(spec, fetcher=fetcher)
     if source_id == "orascom_ir":
         return OrascomFinancialHighlightsCollector(spec, fetcher=fetcher)
+    if source_id == "chief_egx_financials":
+        return ChiefFinancialsCollector(spec, tickers=tickers, fetcher=fetcher)
+    if source_id == "egxpilot_fundamentals":
+        return EgxPilotFundamentalsCollector(spec, tickers=tickers, fetcher=fetcher)
     if (
         spec.access_method.value == "rss_feed"
         and spec.collector == "RssNewsCollector"
@@ -509,6 +519,8 @@ def live_wired_source_ids(registry: SourceRegistry) -> set[str]:
         "gdelt",
         "telecom_egypt_ir",
         "orascom_ir",
+        "chief_egx_financials",
+        "egxpilot_fundamentals",
     }
     return {
         spec.id

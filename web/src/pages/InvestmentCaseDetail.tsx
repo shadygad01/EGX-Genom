@@ -36,6 +36,18 @@ const DECISION_VARIANT: Record<DecisionAction, BadgeVariant> = {
 
 const HORIZONS: Horizon[] = ["micro", "swing", "investment"];
 
+function formatFinancialLineItem(lineItem: string, value: number, currency: string): string {
+  if (lineItem.includes("yield")) return `${formatNumber(value, 2)}%`;
+  if (lineItem === "market_beta") return formatNumber(value, 2);
+  if (lineItem.endsWith("_pe") || lineItem.endsWith("_pb")) {
+    return `${formatNumber(value, 2)}x`;
+  }
+  if (lineItem === "shares_outstanding") return formatCompactNumber(value);
+  return ["EGP", "USD"].includes(currency)
+    ? `${formatCompactNumber(value)} ${currency}`
+    : `${formatNumber(value, 1)}${currency}`;
+}
+
 /** Investment Case -- "why should I own this company?" The page begins
  * with the decision, not charts: Decision / Target Allocation / Horizon /
  * Confidence first, then thesis, then every layer of supporting evidence,
@@ -297,16 +309,26 @@ export function InvestmentCaseDetail() {
 
       <Section title={t("valuation.title")} description={t("valuation.description")}>
         {decisionReadiness.loading && <LoadingState rows={1} />}
-        {!decisionReadiness.loading && !readiness?.fair_value_available && (
+        {!decisionReadiness.loading && !readiness?.valuation?.latest_financial_period && !readiness?.valuation?.latest_market_snapshot_date && (
           <EmptyState title={t("valuation.emptyTitle")} detail={t("valuation.emptyDetail")} />
         )}
-        {readiness?.fair_value_available && (
+        {readiness?.valuation && (readiness.valuation.latest_financial_period || readiness.valuation.latest_market_snapshot_date) && (
           <div className={styles.grid}>
             <StatTile
               label={t("valuation.priceVsFairValue")}
-              value={readiness.price_vs_fair_value_pct != null ? formatSignedPercent(readiness.price_vs_fair_value_pct / 100) : "—"}
+              value={readiness.price_vs_fair_value_pct != null ? formatSignedPercent(readiness.price_vs_fair_value_pct) : "—"}
               deltaSign={readiness.price_vs_fair_value_pct != null ? (readiness.price_vs_fair_value_pct > 0 ? -1 : 1) : undefined}
             />
+            <StatTile label={t("valuation.fairValue")} value={readiness.valuation.weighted_fair_value != null ? formatNumber(readiness.valuation.weighted_fair_value, 2) : "—"} />
+            <StatTile label={t("valuation.dcf")} value={readiness.valuation.dcf_per_share != null ? formatNumber(readiness.valuation.dcf_per_share, 2) : "—"} />
+            <StatTile label={t("valuation.enterpriseValue")} value={readiness.valuation.enterprise_value != null ? formatCompactNumber(readiness.valuation.enterprise_value) : "—"} />
+            <StatTile label={t("valuation.ebitda")} value={readiness.valuation.ebitda != null ? formatCompactNumber(readiness.valuation.ebitda) : "—"} />
+            <StatTile label={t("valuation.evEbitda")} value={readiness.valuation.ev_to_ebitda != null ? `${formatNumber(readiness.valuation.ev_to_ebitda, 2)}x` : "—"} />
+            <StatTile label={t("valuation.priceBook")} value={readiness.valuation.price_to_book != null ? `${formatNumber(readiness.valuation.price_to_book, 2)}x` : "—"} />
+            <StatTile label={t("valuation.marketPe")} value={readiness.valuation.market_pe != null ? `${formatNumber(readiness.valuation.market_pe, 2)}x` : "—"} />
+            <StatTile label={t("valuation.marketCap")} value={readiness.valuation.market_cap != null ? formatCompactNumber(readiness.valuation.market_cap) : "—"} />
+            <StatTile label={t("valuation.dividendYield")} value={readiness.valuation.dividend_yield != null ? `${formatNumber(readiness.valuation.dividend_yield, 2)}%` : "—"} />
+            <StatTile label={t("valuation.beta")} value={readiness.valuation.beta != null ? formatNumber(readiness.valuation.beta, 2) : "—"} />
           </div>
         )}
       </Section>
@@ -495,9 +517,7 @@ export function InvestmentCaseDetail() {
                 align: "right",
                 render: (f) => (
                   <span className="num">
-                    {["EGP", "USD"].includes(f.currency)
-                      ? `${formatCompactNumber(f.value)} ${f.currency}`
-                      : `${formatNumber(f.value, 1)}${f.currency}`}
+                    {formatFinancialLineItem(f.line_item, f.value, f.currency)}
                   </span>
                 ),
               },

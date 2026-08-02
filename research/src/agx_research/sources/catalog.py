@@ -309,11 +309,8 @@ def seed_sources() -> list[SourceSpec]:
             supported_languages=["ar", "en"],
             notes=(
                 "Not a paid-service block -- cbe.org.eg's WAF returns an explicit 'Request "
-                "Rejected... consult with your administrator' page, confirmed repeatedly "
-                "including today's automated discovery run. Disabled rather than left "
-                "'planned' with no real path forward; a separate, non-WAF-protected CBE data "
-                "API/subdomain remains an unverified possibility, not assumed -- reopen if one "
-                "is found. See docs/ACQUISITION_STRATEGY.md capability 7/12."
+                "Rejected... consult with your administrator' page, confirmed repeatedly. "
+                "Disabled rather than left planned with no real path forward."
             ),
         ),
         _spec(
@@ -429,6 +426,82 @@ def seed_sources() -> list[SourceSpec]:
                 "Live-verified official updates archive and Q1 2026 result article. "
                 "The collector fails closed unless a period plus one issuer-labelled "
                 "revenue/EBITDA/net-profit highlight sentence is present."
+            ),
+        ),
+        _spec(
+            id="chief_egx_financials",
+            name="Chief Capital structured EGX fundamentals",
+            category=SourceCategory.COMPANY,
+            access_method=AccessMethod.CSV_DOWNLOAD,
+            status=SourceStatus.IMPLEMENTED,
+            legal_use_status=LegalUseStatus.RESEARCH_ONLY,
+            base_url="https://chiefcapitalco.com/companies/",
+            reliability_score=0.82,
+            freshness_score=0.75,
+            historical_coverage="Up to eight annual periods for each currently published company",
+            expected_latency="after annual filing normalisation",
+            update_frequency="annual",
+            collector="ChiefFinancialsCollector",
+            collector_version="1.0.0",
+            license=(
+                "Public no-key CSVs derived from public EGX filings; research use with "
+                "Chief and underlying filing attribution. Raw CSV content is not redistributed."
+            ),
+            terms_of_use_url="https://chiefcapitalco.com/disclaimer/",
+            validation_rules=[
+                "ticker must belong to the declared universe",
+                "explicit Year column and recognised numeric financial headers",
+            ],
+            normalization_rules=["calendar year to 31 December", "source header to canonical line item"],
+            conflict_priority=80,
+            priority=93,
+            supported_event_types=["corporate"],
+            supported_languages=["en"],
+            notes=(
+                "Live-verified public company index and CSV exports. robots.txt does not "
+                "disallow company or upload paths. Coverage is partial and discovered each run; "
+                "no missing company or value is estimated."
+            ),
+        ),
+        _spec(
+            id="egxpilot_fundamentals",
+            name="EGXpilot market fundamentals API",
+            category=SourceCategory.MARKET_DATA,
+            access_method=AccessMethod.JSON_API,
+            status=SourceStatus.IMPLEMENTED,
+            legal_use_status=LegalUseStatus.RESEARCH_ONLY,
+            base_url="https://www.egxpilot.com/api/stocks/",
+            reliability_score=0.75,
+            freshness_score=0.95,
+            historical_coverage="Current fundamentals plus 252-session OHLCV history",
+            expected_latency="intraday",
+            update_frequency="daily",
+            collector="EgxPilotFundamentalsCollector",
+            collector_version="1.0.0",
+            license=(
+                "Public no-key API; robots.txt allows reference use and disallows model "
+                "training. AGX stores numeric facts with attribution and does not consume "
+                "the provider's recommendation or AI-generated opinion."
+            ),
+            terms_of_use_url="https://www.egxpilot.com/terms.html",
+            validation_rules=[
+                "universe ticker match",
+                "numeric facts only",
+                "dated OHLCV rows only; opaque analysis signals ignored",
+            ],
+            normalization_rules=[
+                "market-cap and price strings to numeric EGP",
+                "shares = market_cap / last_price only when Shares is absent",
+            ],
+            conflict_priority=70,
+            priority=92,
+            supported_event_types=["market"],
+            supported_languages=["en"],
+            notes=(
+                "Live-verified JSON endpoints, including the documented stockanalysis history. "
+                "The all-stocks endpoint matched 100/101 AGX "
+                "securities on 2026-08-02; AIDC was absent. Provider Buy/Sell labels are "
+                "intentionally ignored because their methodology is not auditable."
             ),
         ),
         # Generic per-company IR expansion remains planned.
@@ -689,11 +762,8 @@ def seed_sources() -> list[SourceSpec]:
                 conflict_priority=priority,
                 supported_event_types=["news"],
                 notes=(
-                    "Not a paid-service block -- investing.com (the same domain this feed would "
-                    "live on) returns 403 Forbidden site-wide, confirmed on a direct fetch and "
-                    "reconfirmed by today's automated discovery run. Disabled alongside the "
-                    "investing_com market-data entry rather than left as a separately-open "
-                    "'planned' item on a domain already known to be unreachable."
+                    "The domain returns 403 Forbidden site-wide; disabled rather than left "
+                    "as a separately-open planned item."
                     if source_id == "investing_news"
                     else "Feed URL to be verified, then this becomes RssNewsCollector configuration."
                 ),
@@ -807,11 +877,10 @@ def seed_sources() -> list[SourceSpec]:
                     "imf",
                     "IMF",
                     AccessMethod.JSON_API,
-                    "Not a paid-service block -- IMF's real current public endpoint "
-                    "(imf.org/external/datamapper/api/v1/{indicator}/EGY, free and keyless) "
-                    "returned 403 Forbidden on every real indicator probed live, a WAF/bot-"
-                    "detection block in the same class as CBE's. Disabled rather than left "
-                    "'planned' with no real path forward.",
+                    (
+                        "The public DataMapper endpoint returned 403 for every live indicator "
+                        "probe; disabled rather than left planned with no working path."
+                    ),
                 ),
                 ("oecd", "OECD", AccessMethod.JSON_API, "SDMX API free; Egypt coverage partial."),
                 (
@@ -827,12 +896,10 @@ def seed_sources() -> list[SourceSpec]:
                     "trading_economics",
                     "Trading Economics",
                     AccessMethod.JSON_API,
-                    "Real production use requires a paid subscription -- the free tier is too "
-                    "limited to serve as a genuine data source, and this platform is scoped to "
-                    "sources collectable with no paid service or key of any kind (same policy "
-                    "that already removed FMP/AlphaVantage/Polygon/Tiingo). Live discovery also "
-                    "confirms no candidate on the free tier clears legal review. Disabled, not "
-                    "left as an open 'planned' item a free collector will eventually satisfy.",
+                    (
+                        "Production use requires a paid subscription; disabled because this "
+                        "platform is permanently scoped to free, no-key sources."
+                    ),
                 ),
             ]
         ],

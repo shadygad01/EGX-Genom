@@ -26,6 +26,7 @@ export interface DecisionReadiness {
   corporate_events: number;
   financial_periods: number;
   fair_value_available: boolean;
+  valuation: ValuationMetrics | null;
   // (current_price - weighted_fair_value) / weighted_fair_value: positive
   // means price sits above the calculated fair value (expensive), negative
   // means below it (a margin of safety). null when no fair value could be
@@ -35,6 +36,29 @@ export interface DecisionReadiness {
   active_knowledge: number;
   blockers: string[];
   next_actions: string[];
+}
+
+export interface ValuationMetrics {
+  ticker: string;
+  as_of: string;
+  latest_financial_period: string | null;
+  latest_market_snapshot_date: string | null;
+  current_price: number | null;
+  market_cap: number | null;
+  market_pe: number | null;
+  market_eps: number | null;
+  dividend_yield: number | null;
+  beta: number | null;
+  enterprise_value: number | null;
+  ebitda: number | null;
+  ev_to_ebitda: number | null;
+  price_to_book: number | null;
+  dcf_per_share: number | null;
+  weighted_fair_value: number | null;
+  bear_case: number | null;
+  bull_case: number | null;
+  included_models: string[];
+  unavailable_reasons: string[];
 }
 
 export interface DataLayerGap {

@@ -55,7 +55,7 @@ const REPUTATION_DIMENSIONS = [
   ["historical_usefulness", "historicalUsefulness"],
 ] as const;
 
-/** Every source AGX knows about -- health, availability, coverage,
+/** Every active decision source -- health, availability, coverage,
  * freshness, latency, qualification, validation score, and (for a still-
  * PLANNED source) the weekly Discovery workflow's own evidenced attempt to
  * verify a real endpoint -- joined across the source registry, source
@@ -75,7 +75,12 @@ export function SourceIntelligence() {
   const collectorById = new Map((collectorStatus.data ?? []).map((c) => [c.source_id, c]));
   const discoveryById = new Map((discoveryReport.data ?? []).map((d) => [d.source_id, d]));
 
-  const sorted = [...(sourceRegistry.data ?? [])].sort((a, b) => a.priority - b.priority);
+  // Disabled/retired tombstones remain in the internal registry so a dead or
+  // legally blocked source is not accidentally rediscovered. They are not an
+  // investable-data source and therefore do not belong on the CIO workspace.
+  const sorted = [...(sourceRegistry.data ?? [])]
+    .filter((source) => source.status !== "disabled" && source.activation_status !== "retired")
+    .sort((a, b) => a.priority - b.priority);
   const selected = sorted.find((s) => s.id === selectedId) ?? sorted[0] ?? null;
   const selectedMetrics = selected ? metricsById.get(selected.id) : undefined;
   const selectedCollector = selected ? collectorById.get(selected.id) : undefined;

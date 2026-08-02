@@ -25,7 +25,7 @@ SECTOR_MULTIPLES = {
 
 
 class ValuationAssumptions(BaseModel):
-    version: str = "smartlist-ive-v2.1"
+    version: str = "smartlist-ive-v2.2"
     risk_free_rate: float = 0.125
     equity_risk_premium: float = 0.07
     beta: float = 1.0
@@ -83,6 +83,10 @@ def _multiples(sector):
     return SECTOR_MULTIPLES["default"]
 
 
+def _is_bank(sector: str | None) -> bool:
+    return bool(sector and "bank" in sector.lower())
+
+
 def _build_rows(items):
     periods: dict[date, dict[str, float]] = {}
     period_types: dict[date, str] = {}
@@ -120,9 +124,15 @@ class FairValueEngine:
 
     def value(self, ticker: str, as_of: date, *, sector: str | None = None) -> FairValueResult | None:
         items = self.provider.get_line_items(ticker, as_of - timedelta(days=1100), as_of)
-        if not items:
+        # A current market snapshot (P/E, market cap, beta) is useful for
+        # relative valuation, but it is not a reporting period and must never
+        # make stale statements look fresh or enter the DCF forecast history.
+        reported_items = [
+            item for item in items if item.period_type.upper() in {"ANNUAL", "QUARTERLY"}
+        ]
+        if not reported_items:
             return None
-        rows = _build_rows(items)
+        rows = _build_rows(reported_items)
         latest_period = rows[-1]["period"]
         if (as_of - latest_period).days > 550:
             return None
@@ -158,7 +168,15 @@ class FairValueEngine:
             results["pe"] = eps * pe
         if shares and shares > 0:
             fcf = [row["free_cash_flow"] for row in forecasts]
-            if all(value is not None for value in fcf) and a.wacc > a.terminal_growth:
+            # FCFF DCF, EPV and EV/EBITDA are not economically comparable for
+            # banks: deposits are operating funding and regulatory capital is
+            # the binding constraint.  Keep the raw fields visible, but never
+            # let these industrial-company models influence a bank fair value.
+            if (
+                not _is_bank(sector)
+                and all(value is not None for value in fcf)
+                and a.wacc > a.terminal_growth
+            ):
                 pv = sum(value / (1 + a.wacc) ** year for year, value in enumerate(fcf, 1))
                 terminal = fcf[-1] * (1 + a.terminal_growth) / (a.wacc - a.terminal_growth)
                 results["dcf"] = (pv + terminal / (1 + a.wacc) ** 5 + cash - (debt or 0)) / shares
@@ -173,11 +191,11 @@ class FairValueEngine:
                 terminal_ri = (forecasts[-1]["eps"] - ke * bv) * 0.5 / (ke - a.terminal_growth)
                 results["residual_income"] = equity / shares + pv_ri + terminal_ri / (1 + ke) ** 5
             ebit_values = [row.get("operating_income") for row in rows[-3:] if row.get("operating_income") is not None]
-            if ebit_values:
+            if ebit_values and not _is_bank(sector):
                 epv = (sum(ebit_values) / len(ebit_values)) * (1 - a.tax_rate) / a.wacc
                 results["earnings_power"] = (epv + cash - (debt or 0)) / shares
             ebitda = _latest(rows, "ebitda")
-            if ebitda and ebitda > 0:
+            if ebitda and ebitda > 0 and not _is_bank(sector):
                 results["ev_ebitda"] = (ebitda * ev_ebitda + cash - (debt or 0)) / shares
             if equity and equity > 0:
                 results["pb"] = equity / shares * pb

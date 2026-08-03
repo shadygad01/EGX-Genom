@@ -6,6 +6,7 @@ from agx_research.discovery.company_financial_registry import (
     CompanyRegistryStatus,
 )
 from agx_research.discovery.gleif_lookup import GleifLegalEntityClient, GleifLookupAttempt
+from agx_research.discovery.resolution_memory import ClaimAttribute, ClaimStatus, ObservationOutcome
 
 IR_PAGE = """
 <html><body>
@@ -226,7 +227,7 @@ class _Attempt:
         self.rejection_reason = rejection_reason
 
 
-def test_resolution_memory_persists_every_proposed_candidate_and_rejected_domain():
+def test_resolution_memory_records_an_observation_and_claim_for_every_candidate():
     engine = _engine(
         website_strategies=[
             _Strategy("wikidata", {"COMI": "bad-first.example"}),
@@ -238,18 +239,40 @@ def test_resolution_memory_persists_every_proposed_candidate_and_rejected_domain
     memory = report.records[0].resolution_memory
 
     assert memory is not None
-    assert {c.source for c in memory.website_candidates_proposed} == {"wikidata", "web_search"}
     assert memory.resolved_hostname == "cibeg.com"
-    probed_domains = {a.domain: a for a in memory.website_probe_attempts}
-    assert probed_domains["bad-first.example"].reachable is False
-    assert probed_domains["bad-first.example"].rejection_reason
-    assert probed_domains["cibeg.com"].reachable is True
+
+    # every proposal is an immutable PROPOSED observation, whatever happens next
+    proposed_sources = {
+        o.source for o in memory.observations
+        if o.attribute == ClaimAttribute.WEBSITE and o.outcome == ObservationOutcome.PROPOSED
+    }
+    assert proposed_sources == {"wikidata", "web_search"}
+
+    # every domain actually probed is a VERIFIED/REFUTED observation...
+    probe_observations = {
+        o.value: o for o in memory.observations
+        if o.outcome in (ObservationOutcome.VERIFIED, ObservationOutcome.REFUTED)
+    }
+    assert probe_observations["bad-first.example"].outcome == ObservationOutcome.REFUTED
+    assert probe_observations["bad-first.example"].rejection_reason
+    assert probe_observations["cibeg.com"].outcome == ObservationOutcome.VERIFIED
+
+    # ...and each is synthesized into a claim with the same verdict
+    claims_by_value = {c.value: c for c in memory.claims if c.attribute == ClaimAttribute.WEBSITE}
+    assert claims_by_value["bad-first.example"].status == ClaimStatus.REFUTED
+    assert claims_by_value["cibeg.com"].status == ClaimStatus.CONFIRMED
+    # every claim traces back to real observations, never asserted bare
+    for value, claim in claims_by_value.items():
+        assert claim.supporting_observations
+        referenced_values = {memory.observations[i].value for i in claim.supporting_observations}
+        assert value in referenced_values
 
 
-def test_resolution_memory_records_never_attempted_candidates_as_absent_not_rejected():
+def test_resolution_memory_marks_never_probed_candidates_unverified_not_refuted():
     """A candidate the resolver never got to (because an earlier, higher-
-    confidence one already won) must not be fabricated into the persisted
-    record as "rejected" -- it must simply not appear in probe attempts."""
+    confidence one already won) must synthesize to UNVERIFIED, never
+    REFUTED -- "never checked" and "checked and rejected" must stay
+    distinct all the way through to the claim."""
     engine = _engine(
         website_strategies=[
             _Strategy("wikidata", {"COMI": "cibeg.com"}),  # ran first -> highest confidence -> probed first
@@ -259,14 +282,22 @@ def test_resolution_memory_records_never_attempted_candidates_as_absent_not_reje
     )
     report = engine.resolve({"COMI": "Commercial International Bank"})
     memory = report.records[0].resolution_memory
-    assert [a.domain for a in memory.website_probe_attempts] == ["cibeg.com"]
+
     # proposed regardless (a real strategy really proposed it this run)...
-    assert "never-reached.example" in {c.hostname for c in memory.website_candidates_proposed}
-    # ...but never appears as a probe attempt, since it was never reached.
-    assert "never-reached.example" not in {a.domain for a in memory.website_probe_attempts}
+    assert any(
+        o.value == "never-reached.example" and o.outcome == ObservationOutcome.PROPOSED
+        for o in memory.observations
+    )
+    # ...but never appears as a VERIFIED/REFUTED observation, since it was never reached
+    assert not any(
+        o.value == "never-reached.example" and o.outcome in (ObservationOutcome.VERIFIED, ObservationOutcome.REFUTED)
+        for o in memory.observations
+    )
+    claim = next(c for c in memory.claims if c.value == "never-reached.example")
+    assert claim.status == ClaimStatus.UNVERIFIED
 
 
-def test_resolution_memory_persists_wikidata_source_attempt_rejection_reason():
+def test_resolution_memory_persists_wikidata_absent_observation_and_claim():
     engine = _engine(
         website_strategies=[
             _TraceStrategy("wikidata", {"EGCH": _Attempt(matched=False, rejection_reason="no candidate entities")}),
@@ -275,11 +306,16 @@ def test_resolution_memory_persists_wikidata_source_attempt_rejection_reason():
     )
     report = engine.resolve({"EGCH": "Egyptian Chemical Industries"})
     memory = report.records[0].resolution_memory
-    assert len(memory.website_source_attempts) == 1
-    attempt = memory.website_source_attempts[0]
-    assert attempt.source == "wikidata"
-    assert attempt.matched is False
-    assert attempt.rejection_reason == "no candidate entities"
+
+    absent = [o for o in memory.observations if o.outcome == ObservationOutcome.ABSENT]
+    assert len(absent) == 1
+    assert absent[0].source == "wikidata"
+    assert absent[0].rejection_reason == "no candidate entities"
+
+    claim = next(c for c in memory.claims if c.attribute == ClaimAttribute.WEBSITE)
+    assert claim.status == ClaimStatus.NOT_FOUND
+    assert claim.rejection_reason == "no candidate entities"
+    assert memory.observations[claim.supporting_observations[0]] is absent[0]
 
 
 def test_resolution_memory_persists_gleif_rejection_reason_even_on_miss():
@@ -298,12 +334,45 @@ def test_resolution_memory_persists_gleif_rejection_reason_even_on_miss():
     report = engine.resolve({"HRHO": "EFG Hermes Holding"})
     memory = report.records[0].resolution_memory
 
-    assert len(memory.legal_entity_attempts) == 1
-    attempt = memory.legal_entity_attempts[0]
-    assert attempt.source == "gleif"
-    assert attempt.matched is False
-    assert attempt.rejection_reason == "no fuzzy-completions candidate"
+    legal_claims = [c for c in memory.claims if c.attribute == ClaimAttribute.LEGAL_NAME]
+    assert len(legal_claims) == 1
+    assert legal_claims[0].status == ClaimStatus.NOT_FOUND
+    assert legal_claims[0].rejection_reason == "no fuzzy-completions candidate"
     assert memory.legal_name is None  # a rejected attempt must never populate the canonical field
+
+
+def test_resolution_memory_synthesizes_alias_claims_from_gleif_match():
+    class _FakeGleif(GleifLegalEntityClient):
+        def __init__(self):
+            pass
+
+        def lookup_with_trace(self, companies):
+            from agx_research.discovery.gleif_lookup import LegalEntityMatch
+
+            return {
+                "JUFO": GleifLookupAttempt(
+                    ticker="JUFO", matched=True,
+                    match=LegalEntityMatch(
+                        lei="LEI123", legal_name="JUHAYNA FOOD INDUSTRIES S.A.E.",
+                        aliases=["Juhayna"], match_confidence=0.9, evidence="GLEIF LEI record LEI123",
+                    ),
+                )
+            }
+
+    engine = _engine(website_strategies=[], reachable_urls=set(), legal_entity_client=_FakeGleif())
+    report = engine.resolve({"JUFO": "Juhayna Food Industries"})
+    memory = report.records[0].resolution_memory
+
+    alias_claims = [c for c in memory.claims if c.attribute == ClaimAttribute.ALIAS]
+    assert len(alias_claims) == 1
+    assert alias_claims[0].value == "Juhayna"
+    assert alias_claims[0].status == ClaimStatus.CONFIRMED
+    assert alias_claims[0].identifier == "LEI123"
+    assert alias_claims[0].identifier_scheme == "LEI"
+
+    legal_claim = next(c for c in memory.claims if c.attribute == ClaimAttribute.LEGAL_NAME)
+    assert legal_claim.identifier == "LEI123"
+    assert legal_claim.identifier_scheme == "LEI"
 
 
 def test_resolution_memory_reserved_fields_stay_empty():

@@ -150,6 +150,20 @@ def _best_match(candidates: list[tuple[str, str]], name: str) -> tuple[str, str,
     return best
 
 
+class GleifLookupAttempt(BaseModel):
+    """One company's GLEIF lookup attempt this run, whatever the outcome --
+    same purpose as `wikidata_lookup.WikidataLookupAttempt`: a miss carries
+    a real reason ("no fuzzy-completions candidate", "candidate matched but
+    its LEI record fetch failed") instead of silently vanishing, so
+    `discovery.resolution_memory` can persist why a ticker still has no
+    legal-entity match rather than just that it doesn't."""
+
+    ticker: str
+    matched: bool
+    match: LegalEntityMatch | None = None
+    rejection_reason: str | None = None  # populated only when matched=False
+
+
 class GleifLegalEntityClient:
     name = "gleif"
 
@@ -164,27 +178,54 @@ class GleifLegalEntityClient:
         the rest -- same honest per-company degradation as
         `WikidataOfficialWebsiteClient.lookup`.
         """
-        found: dict[str, LegalEntityMatch] = {}
-        for ticker, name in companies.items():
-            match = self._lookup_one(name)
-            if match is not None:
-                found[ticker] = match
-        return found
+        return {
+            ticker: attempt.match
+            for ticker, attempt in self.lookup_with_trace(companies).items()
+            if attempt.matched and attempt.match is not None
+        }
 
-    def _lookup_one(self, name: str) -> LegalEntityMatch | None:
+    def lookup_with_trace(self, companies: dict[str, str]) -> dict[str, GleifLookupAttempt]:
+        """Same lookups as `lookup()`, but returns one `GleifLookupAttempt`
+        per company regardless of outcome."""
+        return {ticker: self._lookup_one(ticker, name) for ticker, name in companies.items()}
+
+    def _lookup_one(self, ticker: str, name: str) -> GleifLookupAttempt:
         completions_payload = self.fetch_json(build_fuzzy_completions_url(name))
         if not isinstance(completions_payload, dict):
-            return None
+            return GleifLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason="GLEIF fuzzy-completions request failed or returned a malformed response.",
+            )
         candidates = parse_fuzzy_completions(completions_payload)
+        if not candidates:
+            return GleifLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason="GLEIF fuzzy-completions search returned no candidate legal names.",
+            )
         best = _best_match(candidates, name)
         if best is None:
-            return None
-        lei, _legal_name, confidence = best
+            return GleifLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason=(
+                    "GLEIF fuzzy-completions returned candidates, but none shared every "
+                    "significant token of the company's display name."
+                ),
+            )
+        lei, legal_name, confidence = best
 
         record_payload = self.fetch_json(build_lei_record_url(lei))
         if not isinstance(record_payload, dict):
-            return None
+            return GleifLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason=f"Matched candidate legal name {legal_name!r} (LEI {lei}), but its LEI record fetch failed.",
+            )
         match = parse_lei_record(record_payload)
         if match is None:
-            return None
-        return match.model_copy(update={"match_confidence": round(confidence, 4)})
+            return GleifLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason=f"LEI record {lei} fetched but did not contain a parseable entity/legalName.",
+            )
+        return GleifLookupAttempt(
+            ticker=ticker, matched=True,
+            match=match.model_copy(update={"match_confidence": round(confidence, 4)}),
+        )

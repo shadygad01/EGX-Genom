@@ -4,6 +4,116 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-63 — Entity resolution is cumulative knowledge, modeled as Observation vs. Claim, not a stateless search or an execution log (TD-67)
+
+**Decision.** Every attempt `discovery.company_entity_resolution
+.EntityResolutionEngine.resolve()` makes is now persisted regardless of
+outcome, via a new store, `discovery.resolution_memory.ResolutionMemory`
+(one `ResolutionMemoryRecord` per ticker per run, composing
+`storage.JsonFileRepository` exactly like `knowledge/store.py` and
+`hypotheses/repository.py` already do). Before this, a run's by-products
+only survived if they won: `HeuristicDomainResolver.resolve()` returned
+the first reachable domain and silently discarded every candidate it
+probed and rejected along the way; `WikidataOfficialWebsiteClient.lookup()`
+and `GleifLegalEntityClient.lookup()` returned only their hits, degrading
+every miss to "absent from the dict" with no record of why.
+
+A first draft of this store modeled every attempt as four separate,
+pipeline-shaped record types (a proposed-candidate list, a per-strategy
+attempt list, a domain-probe list, a GLEIF-specific attempt list) -- a
+direct reification of *today's* three-stage pipeline (propose -> strategy
+trace -> probe) rather than a stable domain concept. An architectural
+verification pass caught this before the PR opened: fields like
+`WebsiteProbeAttempt.status_code: int`/`error: str` were HTTP-prober-
+specific (meaningless the moment verification stops being an HTTP GET),
+and a future parent-company/brand-name source would have needed yet
+another bespoke class each. That is execution logging, not institutional
+knowledge, and would not have survived a future resolver-implementation
+change.
+
+The shipped design separates two concepts instead, the same way
+`Hypothesis` (accumulating evidence) sits below `KnowledgeObject` (the
+accepted synthesis) elsewhere in this codebase:
+
+- `resolution_memory.Observation` -- a directly-observed, **immutable**
+  fact from one source at one point in time ("Wikidata's P856 claim for
+  entity Q123 was X", "an HTTP GET to X returned 200", "GLEIF's
+  fuzzy-completions search returned nothing"). Never edited after the
+  fact; a later run that learns more adds a new one. `ObservationOutcome`
+  (`PROPOSED`/`VERIFIED`/`REFUTED`/`ABSENT`) describes only what *that one
+  observation* established, never a verdict about the company as a whole.
+- `resolution_memory.Claim` -- a **synthesized** statement ("COMI's
+  official website is cibeg.com"), built from one or more supporting
+  `Observation`s referenced by index (`Claim.supporting_observations`), so
+  every synthesis is traceable to real evidence rather than asserted
+  independently of it. `ClaimStatus` (`UNVERIFIED`/`CONFIRMED`/`REFUTED`/
+  `NOT_FOUND`) is the protocol-agnostic generalization an HTTP-specific
+  `reachable: bool` never could be -- it applies identically to a future
+  non-HTTP verification mechanism. A `Claim` may evolve as more
+  observations arrive; an `Observation` never changes once recorded.
+
+Both share one `ClaimAttribute` enum (`WEBSITE`/`LEGAL_NAME`/`ALIAS`/
+`BRAND_NAME`/`PARENT_COMPANY`) -- a stable, closed set of *concepts*, not
+implementation names, so a future attribute a new strategy resolves is a
+new enum member, never a new record shape. `BRAND_NAME`/`PARENT_COMPANY`
+are reserved: no strategy in this codebase resolves them yet, so no
+`Observation`/`Claim` of that attribute exists today -- honestly absent,
+never guessed, same posture as `patterns.json` staying `[]` until a
+dedicated `Pattern` model exists (TD-15). Protocol-specific detail (an
+HTTP status, a GLEIF record id) is never a typed field -- it is folded
+into `evidence` (free text, matching `LegalEntityMatch.evidence`/
+`FinancialDocumentEntry.evidence` elsewhere in this codebase) or, for a
+durable external identifier reusable across sources, `identifier`/
+`identifier_scheme` (`"LEI"` today; a national companies-registry number
+would use the same two fields tomorrow). `resolved_hostname`/`legal_name`/
+`aliases`/`lei`/`brand_names`/`parent_company` remain as this run's
+currently-accepted values -- a denormalized summary always reconstructible
+from `claims`, kept for ergonomics, the same "accepted synthesis backed by
+versioned evidence" relationship `KnowledgeObject` already has to its
+supporting evidence.
+
+**Rationale.** This is deliberately an *observability* addition, not a
+resolution-algorithm change: `resolve()`'s decision logic (strategy
+priority order, first-reachable-domain-wins, GLEIF token-overlap
+confidence scoring) is byte-for-byte unchanged. `resolve()` now calls
+`.resolve_with_trace()`/`.lookup_with_trace()` instead of
+`.resolve()`/`.lookup()` so every attempt is captured in the same single
+network round-trip that already happened -- never a second, duplicate
+call purely to build the memory record. `resolve()`/`lookup()` themselves
+become thin wrappers around their `_with_trace` siblings, so every
+existing caller and test keeps its exact prior behavior. A domain the
+resolver never reached (because an earlier, higher-confidence candidate
+already won) is never recorded as an observation at all, and its claim
+synthesizes to `UNVERIFIED`, never `REFUTED` -- "never attempted" and
+"attempted and rejected" stay honestly distinct, the same discipline every
+other honesty rule in this package already follows (never assert what
+wasn't observed).
+
+Deliberately deferred, not forgotten: each `ResolutionMemoryRecord`
+version today holds only the observations its own run produced --
+carrying prior versions' observations forward so a synthesis pass sees
+full cross-run history (rather than just one run's) is a real, useful next
+step (TD-67), but it is a resolution-*behavior* change (what gets
+re-probed, and when) and stays out of scope here on purpose; the model
+already supports it without a schema change. `CompanyFinancialSourceRegistry
+.is_resumable_skip()`'s existing company-level resumability
+(`BLOCKED`/`HOMEPAGE_UNRESOLVED` always re-attempted, only `VALIDATED`
+skipped) is unchanged and unaffected.
+
+**Test protection.** `test_resolution_memory.py` covers the store's
+versioning/persistence contract directly (a failed attempt is still
+retrievable, `history()` keeps every past run's observations, a claim's
+`supporting_observations` really dereferences to the observations it
+claims to be built from, disk round-trip). `test_company_entity_resolution.py
+::test_resolution_memory_marks_never_probed_candidates_unverified_not_refuted`
+is the key regression: a candidate after the winner in priority order
+must synthesize to `UNVERIFIED`, never `REFUTED`.
+`test_acquisition_domain_resolution.py`, `test_wikidata_lookup.py`, and
+`test_gleif_lookup.py` each add `_with_trace`-specific coverage (a
+delegation test confirming the
+pre-existing method's behavior is unchanged, plus one test per real
+rejection-reason branch).
+
 ## AD-62 — Entity resolution is multi-strategy and independent of collector work (TD-66)
 
 **Decision.** `discovery.company_entity_resolution.EntityResolutionEngine`

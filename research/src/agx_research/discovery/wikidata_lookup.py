@@ -41,6 +41,8 @@ from __future__ import annotations
 from typing import Callable
 from urllib.parse import quote, urlsplit
 
+from pydantic import BaseModel
+
 from agx_research.discovery.engine import significant_tokens
 
 FetchJson = Callable[[str], object]
@@ -102,6 +104,23 @@ def _find_matching_entity(candidates: list[tuple[str, str]], name: str) -> str |
     return None
 
 
+class WikidataLookupAttempt(BaseModel):
+    """One company's Wikidata lookup attempt this run, whatever the outcome
+    -- the raw material `discovery.resolution_memory` persists so a later
+    run (or a human debugging low coverage) can see *why* a ticker has no
+    Wikidata hint instead of just that it doesn't: "no search hit at all"
+    is a structurally different gap from "matched an entity with no P856
+    website claim," and neither should be silently collapsed into the
+    other."""
+
+    ticker: str
+    matched: bool
+    hostname: str | None = None
+    matched_entity_id: str | None = None
+    matched_label: str | None = None
+    rejection_reason: str | None = None  # populated only when matched=False
+
+
 class WikidataOfficialWebsiteClient:
     name = "wikidata"
 
@@ -117,24 +136,61 @@ class WikidataOfficialWebsiteClient:
         "no hint", the same honest fallback every other network-dependent
         step in this package uses.
         """
-        found: dict[str, str] = {}
-        for ticker, name in companies.items():
-            website = self._lookup_one(name)
-            if website is None:
-                continue
-            hostname = urlsplit(website).netloc
-            if hostname:
-                found[ticker] = hostname
-        return found
+        return {
+            ticker: attempt.hostname
+            for ticker, attempt in self.lookup_with_trace(companies).items()
+            if attempt.matched and attempt.hostname
+        }
 
-    def _lookup_one(self, name: str) -> str | None:
+    def lookup_with_trace(self, companies: dict[str, str]) -> dict[str, WikidataLookupAttempt]:
+        """Same lookups as `lookup()`, but returns one `WikidataLookupAttempt`
+        per company regardless of outcome -- a miss is recorded with a real
+        rejection reason instead of silently vanishing from the result."""
+        return {ticker: self._lookup_one(ticker, name) for ticker, name in companies.items()}
+
+    def _lookup_one(self, ticker: str, name: str) -> WikidataLookupAttempt:
         search_payload = self.fetch_json(build_wikidata_search_url(name))
         if not isinstance(search_payload, dict):
-            return None
-        entity_id = _find_matching_entity(parse_wikidata_search_results(search_payload), name)
+            return WikidataLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason="Wikidata search request failed or returned a malformed response.",
+            )
+        search_results = parse_wikidata_search_results(search_payload)
+        if not search_results:
+            return WikidataLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason="Wikidata name search returned no candidate entities.",
+            )
+        entity_id = _find_matching_entity(search_results, name)
         if entity_id is None:
-            return None
+            return WikidataLookupAttempt(
+                ticker=ticker, matched=False,
+                rejection_reason=(
+                    "Wikidata search returned candidates, but none shared every "
+                    "significant token of the company's display name."
+                ),
+            )
+        matched_label = next((label for eid, label in search_results if eid == entity_id), None)
+
         claims_payload = self.fetch_json(build_wikidata_claims_url(entity_id))
         if not isinstance(claims_payload, dict):
-            return None
-        return parse_wikidata_official_website(claims_payload)
+            return WikidataLookupAttempt(
+                ticker=ticker, matched=False, matched_entity_id=entity_id, matched_label=matched_label,
+                rejection_reason="Wikidata claims request failed or returned a malformed response.",
+            )
+        website = parse_wikidata_official_website(claims_payload)
+        if website is None:
+            return WikidataLookupAttempt(
+                ticker=ticker, matched=False, matched_entity_id=entity_id, matched_label=matched_label,
+                rejection_reason=f"Matched entity {entity_id} has no P856 (official website) claim.",
+            )
+        hostname = urlsplit(website).netloc
+        if not hostname:
+            return WikidataLookupAttempt(
+                ticker=ticker, matched=False, matched_entity_id=entity_id, matched_label=matched_label,
+                rejection_reason=f"Matched entity {entity_id}'s P856 claim {website!r} has no parseable hostname.",
+            )
+        return WikidataLookupAttempt(
+            ticker=ticker, matched=True, hostname=hostname,
+            matched_entity_id=entity_id, matched_label=matched_label,
+        )

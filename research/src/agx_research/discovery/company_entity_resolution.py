@@ -46,7 +46,9 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 from agx_research.acquisition_intelligence.domain_resolution import (
+    DomainProbeAttempt,
     HeuristicDomainResolver,
+    ProbeResult,
     ResolvedDomain,
 )
 from agx_research.acquisition_intelligence.target import TargetOrganization
@@ -56,8 +58,18 @@ from agx_research.discovery.company_financial_registry import (
     CompanyFinancialSourceRecord,
     CompanyRegistryStatus,
 )
-from agx_research.discovery.gleif_lookup import GleifLegalEntityClient, LegalEntityMatch
+from agx_research.discovery.gleif_lookup import GleifLegalEntityClient, GleifLookupAttempt, LegalEntityMatch
+from agx_research.discovery.resolution_memory import (
+    Claim,
+    ClaimAttribute,
+    ClaimStatus,
+    Observation,
+    ObservationOutcome,
+    ResolutionMemoryRecord,
+)
 from agx_research.sources.spec import SourceCategory
+
+_HEURISTIC_NAME_GUESS_SOURCE = "heuristic_name_guess"
 
 
 class WebsiteHintStrategy(Protocol):
@@ -103,6 +115,11 @@ class EntityResolutionRecord:
     # delegated entirely to the existing, unmodified
     # discover_company_financial_sources() once a website is resolved.
     financial_record: CompanyFinancialSourceRecord | None = None
+
+    # Permanent, cumulative record of this attempt regardless of outcome --
+    # see discovery.resolution_memory's module docstring for why this
+    # exists alongside financial_record rather than folded into it.
+    resolution_memory: ResolutionMemoryRecord | None = None
 
     @property
     def website_resolved(self) -> bool:
@@ -179,22 +196,60 @@ class EntityResolutionEngine:
         unreachable. Order of `website_strategies` is the confidence
         order: earlier strategies' candidates are tried first by
         `HeuristicDomainResolver`."""
-        candidates: dict[str, list[HintCandidate]] = {ticker: [] for ticker in companies}
-        strategy_count = len(self.website_strategies) or 1
-        for rank, strategy in enumerate(self.website_strategies):
-            hints = strategy.lookup(companies)
-            confidence = round(1.0 - (rank / strategy_count) * 0.5, 4)
-            for ticker, hostname in hints.items():
-                if ticker in candidates:
-                    candidates[ticker].append(
-                        HintCandidate(hostname=hostname, source=strategy.name, confidence=confidence)
-                    )
+        candidates, _absent = self._resolve_website_candidates_and_absent_sources(companies)
         return candidates
 
+    def _resolve_website_candidates_and_absent_sources(
+        self, companies: dict[str, str]
+    ) -> tuple[dict[str, list[HintCandidate]], dict[str, list[tuple[str, str | None]]]]:
+        """Same resolution as `resolve_website_candidates`, plus a per-ticker
+        list of `(source, rejection_reason)` for every strategy that
+        proposed *nothing at all* this run, for strategies that expose
+        `lookup_with_trace` -- currently
+        `wikidata_lookup.WikidataOfficialWebsiteClient`. Calling
+        `lookup_with_trace` once here (instead of `lookup` here and
+        `lookup_with_trace` again elsewhere) is what keeps this a single
+        network round-trip per strategy per run, not two. A source that
+        *did* propose a value needs no separate entry here -- its proposal
+        becomes a `resolution_memory.Observation` directly from the
+        returned `HintCandidate`."""
+        candidates: dict[str, list[HintCandidate]] = {ticker: [] for ticker in companies}
+        absent_sources: dict[str, list[tuple[str, str | None]]] = {ticker: [] for ticker in companies}
+        strategy_count = len(self.website_strategies) or 1
+        for rank, strategy in enumerate(self.website_strategies):
+            confidence = round(1.0 - (rank / strategy_count) * 0.5, 4)
+            lookup_with_trace = getattr(strategy, "lookup_with_trace", None)
+            if lookup_with_trace is not None:
+                for ticker, attempt in lookup_with_trace(companies).items():
+                    if ticker not in candidates:
+                        continue
+                    if attempt.matched and attempt.hostname:
+                        candidates[ticker].append(
+                            HintCandidate(hostname=attempt.hostname, source=strategy.name, confidence=confidence)
+                        )
+                    else:
+                        absent_sources[ticker].append((strategy.name, attempt.rejection_reason))
+            else:
+                hints = strategy.lookup(companies)
+                for ticker, hostname in hints.items():
+                    if ticker in candidates:
+                        candidates[ticker].append(
+                            HintCandidate(hostname=hostname, source=strategy.name, confidence=confidence)
+                        )
+        return candidates, absent_sources
+
     def resolve_legal_entities(self, companies: dict[str, str]) -> dict[str, LegalEntityMatch]:
+        matches, _attempts = self._resolve_legal_entities_and_attempts(companies)
+        return matches
+
+    def _resolve_legal_entities_and_attempts(
+        self, companies: dict[str, str]
+    ) -> tuple[dict[str, LegalEntityMatch], dict[str, GleifLookupAttempt]]:
         if self.legal_entity_client is None:
-            return {}
-        return self.legal_entity_client.lookup(companies)
+            return {}, {}
+        attempts = self.legal_entity_client.lookup_with_trace(companies)
+        matches = {t: a.match for t, a in attempts.items() if a.matched and a.match is not None}
+        return matches, attempts
 
     def resolve(
         self,
@@ -210,8 +265,10 @@ class EntityResolutionEngine:
         `CompanyFinancialSourceRegistry.is_resumable_skip` already
         enforces; this method itself never mutates a stored registry."""
         existing_records = existing_records or {}
-        website_candidates = self.resolve_website_candidates(companies)
-        legal_entities = self.resolve_legal_entities(companies)
+        website_candidates, absent_website_sources = self._resolve_website_candidates_and_absent_sources(
+            companies
+        )
+        legal_entities, legal_entity_attempts = self._resolve_legal_entities_and_attempts(companies)
 
         records: list[EntityResolutionRecord] = []
         for ticker, name in companies.items():
@@ -240,7 +297,7 @@ class EntityResolutionEngine:
                 domain_hints=[c.hostname for c in record.website_candidates],
                 company_ticker=ticker,
             )
-            record.resolved_domain = self.domain_resolver.resolve(target)
+            record.resolved_domain, domain_probe_attempts = self.domain_resolver.resolve_with_trace(target)
 
             base_record = existing or CompanyFinancialSourceRecord(
                 id=ticker, ticker=ticker, company_name=name,
@@ -264,6 +321,205 @@ class EntityResolutionEngine:
                     }
                 )
 
+            record.resolution_memory = _build_resolution_memory_record(
+                ticker=ticker,
+                company_name=name,
+                website_candidates=record.website_candidates,
+                absent_website_sources=absent_website_sources.get(ticker, []),
+                domain_probe_attempts=domain_probe_attempts,
+                resolved_domain=record.resolved_domain,
+                legal_entity_attempt=legal_entity_attempts.get(ticker),
+                legal_name=record.legal_name,
+                aliases=record.aliases,
+                lei=record.lei,
+            )
+
             records.append(record)
 
         return EntityResolutionReport(records=records)
+
+
+def _probe_evidence(probe: ProbeResult) -> str:
+    if probe.status_code is not None:
+        return f"HTTP {probe.status_code}"
+    return probe.error or ""
+
+
+def _probe_rejection_reason(probe: ProbeResult) -> str | None:
+    if probe.reachable:
+        return None
+    return probe.error or f"Homepage probe returned HTTP {probe.status_code}."
+
+
+def _build_resolution_memory_record(
+    *,
+    ticker: str,
+    company_name: str,
+    website_candidates: list[HintCandidate],
+    absent_website_sources: list[tuple[str, str | None]],
+    domain_probe_attempts: list[DomainProbeAttempt],
+    resolved_domain: ResolvedDomain | None,
+    legal_entity_attempt: GleifLookupAttempt | None,
+    legal_name: str | None,
+    aliases: list[str],
+    lei: str | None,
+) -> ResolutionMemoryRecord:
+    """Assembles this run's immutable `Observation`s and the `Claim`s
+    synthesized from them into one permanent record -- see
+    `discovery.resolution_memory`'s module docstring for why the two are
+    kept separate and what real signal each field traces back to."""
+    observations: list[Observation] = []
+    claims: list[Claim] = []
+
+    # A website-hint strategy that proposed nothing at all this run is its
+    # own observation and its own NOT_FOUND claim -- there is no candidate
+    # value to later attach a probe observation to.
+    for source, reason in absent_website_sources:
+        observations.append(
+            Observation(
+                attribute=ClaimAttribute.WEBSITE, source=source,
+                outcome=ObservationOutcome.ABSENT, rejection_reason=reason,
+            )
+        )
+        claims.append(
+            Claim(
+                attribute=ClaimAttribute.WEBSITE, status=ClaimStatus.NOT_FOUND,
+                rejection_reason=reason, supporting_observations=[len(observations) - 1],
+            )
+        )
+
+    # Every strategy's proposed hostname is a PROPOSED observation, whether
+    # or not it ever gets probed.
+    proposal_index_by_hostname: dict[str, int] = {}
+    source_by_hostname: dict[str, str] = {}
+    for candidate in website_candidates:
+        observations.append(
+            Observation(
+                attribute=ClaimAttribute.WEBSITE, source=candidate.source,
+                value=candidate.hostname, outcome=ObservationOutcome.PROPOSED,
+            )
+        )
+        proposal_index_by_hostname[candidate.hostname] = len(observations) - 1
+        source_by_hostname[candidate.hostname] = candidate.source
+
+    # Every domain actually probed is a VERIFIED/REFUTED observation --
+    # attributed to whichever strategy proposed it, or to the heuristic
+    # name-guess source when no strategy proposed it at all (only possible
+    # when the candidate list was empty to begin with).
+    probe_index_by_domain: dict[str, int] = {}
+    for attempt in domain_probe_attempts:
+        reachable = attempt.probe.reachable
+        source = source_by_hostname.get(attempt.domain, _HEURISTIC_NAME_GUESS_SOURCE)
+        observations.append(
+            Observation(
+                attribute=ClaimAttribute.WEBSITE, source=source, value=attempt.domain,
+                outcome=ObservationOutcome.VERIFIED if reachable else ObservationOutcome.REFUTED,
+                evidence=_probe_evidence(attempt.probe),
+                rejection_reason=_probe_rejection_reason(attempt.probe),
+            )
+        )
+        probe_index_by_domain[attempt.domain] = len(observations) - 1
+
+    # Synthesize one WEBSITE claim per proposed hostname: CONFIRMED/REFUTED
+    # if it was probed, UNVERIFIED if a higher-priority candidate already
+    # won and this one was never reached.
+    for candidate in website_candidates:
+        proposal_idx = proposal_index_by_hostname[candidate.hostname]
+        probe_idx = probe_index_by_domain.get(candidate.hostname)
+        if probe_idx is None:
+            claims.append(
+                Claim(
+                    attribute=ClaimAttribute.WEBSITE, value=candidate.hostname,
+                    status=ClaimStatus.UNVERIFIED, confidence=candidate.confidence,
+                    supporting_observations=[proposal_idx],
+                )
+            )
+        else:
+            confirmed = observations[probe_idx].outcome == ObservationOutcome.VERIFIED
+            claims.append(
+                Claim(
+                    attribute=ClaimAttribute.WEBSITE, value=candidate.hostname,
+                    status=ClaimStatus.CONFIRMED if confirmed else ClaimStatus.REFUTED,
+                    confidence=candidate.confidence,
+                    rejection_reason=observations[probe_idx].rejection_reason,
+                    supporting_observations=[proposal_idx, probe_idx],
+                )
+            )
+
+    # A heuristic name-guess has no strategy proposal to pair with -- its
+    # probe observation is its own, single-observation claim.
+    for attempt in domain_probe_attempts:
+        if attempt.domain in proposal_index_by_hostname:
+            continue
+        probe_idx = probe_index_by_domain[attempt.domain]
+        confirmed = observations[probe_idx].outcome == ObservationOutcome.VERIFIED
+        claims.append(
+            Claim(
+                attribute=ClaimAttribute.WEBSITE, value=attempt.domain,
+                status=ClaimStatus.CONFIRMED if confirmed else ClaimStatus.REFUTED,
+                rejection_reason=observations[probe_idx].rejection_reason,
+                supporting_observations=[probe_idx],
+            )
+        )
+
+    if legal_entity_attempt is not None:
+        if legal_entity_attempt.matched and legal_entity_attempt.match is not None:
+            match = legal_entity_attempt.match
+            observations.append(
+                Observation(
+                    attribute=ClaimAttribute.LEGAL_NAME, source="gleif", value=match.legal_name,
+                    outcome=ObservationOutcome.VERIFIED,
+                    identifier=match.lei, identifier_scheme="LEI", evidence=match.evidence,
+                )
+            )
+            claims.append(
+                Claim(
+                    attribute=ClaimAttribute.LEGAL_NAME, value=match.legal_name,
+                    status=ClaimStatus.CONFIRMED, confidence=match.match_confidence,
+                    identifier=match.lei, identifier_scheme="LEI",
+                    supporting_observations=[len(observations) - 1],
+                )
+            )
+            for alias in match.aliases:
+                observations.append(
+                    Observation(
+                        attribute=ClaimAttribute.ALIAS, source="gleif", value=alias,
+                        outcome=ObservationOutcome.VERIFIED,
+                        identifier=match.lei, identifier_scheme="LEI", evidence=match.evidence,
+                    )
+                )
+                claims.append(
+                    Claim(
+                        attribute=ClaimAttribute.ALIAS, value=alias,
+                        status=ClaimStatus.CONFIRMED, confidence=match.match_confidence,
+                        identifier=match.lei, identifier_scheme="LEI",
+                        supporting_observations=[len(observations) - 1],
+                    )
+                )
+        else:
+            observations.append(
+                Observation(
+                    attribute=ClaimAttribute.LEGAL_NAME, source="gleif",
+                    outcome=ObservationOutcome.ABSENT,
+                    rejection_reason=legal_entity_attempt.rejection_reason,
+                )
+            )
+            claims.append(
+                Claim(
+                    attribute=ClaimAttribute.LEGAL_NAME, status=ClaimStatus.NOT_FOUND,
+                    rejection_reason=legal_entity_attempt.rejection_reason,
+                    supporting_observations=[len(observations) - 1],
+                )
+            )
+
+    return ResolutionMemoryRecord(
+        id=ticker,
+        ticker=ticker,
+        company_name=company_name,
+        observations=observations,
+        claims=claims,
+        resolved_hostname=resolved_domain.domain if resolved_domain else None,
+        legal_name=legal_name,
+        aliases=aliases,
+        lei=lei,
+    )

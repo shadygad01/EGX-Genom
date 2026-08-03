@@ -53,6 +53,7 @@ from agx_research.discovery.company_financial_registry import (
     CompanyFinancialSourceRegistry,
     CompanyRegistryStatus,
 )
+from agx_research.discovery.resolution_memory import ResolutionMemory
 from agx_research.discovery.web_search_hints import WebSearchHintStrategy, load_web_search_domain_hints
 
 _UNIVERSE_DIR = Path(__file__).resolve().parent.parent / "data" / "universe"
@@ -70,6 +71,7 @@ def main(argv: list[str] | None = None) -> int:
     data_dir.mkdir(parents=True, exist_ok=True)
 
     registry = CompanyFinancialSourceRegistry(data_dir / "company_financial_sources.json")
+    resolution_memory = ResolutionMemory(data_dir / "resolution_memory.json")
     fetcher = HttpFetcher()
     web_search_hints = load_web_search_domain_hints(_UNIVERSE_DIR / "egx30_web_search_domain_hints.json")
 
@@ -123,6 +125,13 @@ def main(argv: list[str] | None = None) -> int:
             }
         )
         registry.record(result)
+        # Persisted regardless of outcome -- a rejected domain or a GLEIF
+        # miss this run is still permanent knowledge, not discarded the
+        # moment `result` is computed. See discovery.resolution_memory's
+        # module docstring for why this is a separate store from `registry`
+        # rather than folded into `CompanyFinancialSourceRecord`.
+        if record.resolution_memory is not None:
+            resolution_memory.record(record.resolution_memory)
         detail = f" -- {result.blocked_reason}" if result.blocked_reason else ""
         legal = f" [legal_name via {record.legal_name_source}]" if record.legal_name else ""
         print(f"{record.ticker}: {result.status.value}{detail}{legal}")

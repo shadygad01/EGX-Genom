@@ -259,6 +259,38 @@ Layout:
   `storage.JsonFileRepository`, following the pattern in
   `knowledge/store.py` and `hypotheses/repository.py` — not a new bespoke
   persistence mechanism.
+- `discovery.resolution_memory.ResolutionMemory` is entity resolution's
+  permanent, cumulative institutional knowledge — modeled as two distinct
+  concepts, not one execution log. `Observation` is a directly-observed,
+  immutable fact from one source ("Wikidata's P856 claim was X", "an HTTP
+  probe of X returned 200") — never edited after the fact. `Claim` is a
+  synthesized statement about the company's identity ("this ticker's
+  website is X"), built from one or more supporting `Observation`s
+  referenced by index (`Claim.supporting_observations`) — never asserted
+  independently of real evidence, and free to evolve (its `ClaimStatus`
+  can change) as more observations arrive, unlike the `Observation`s
+  themselves. Both share one `ClaimAttribute` enum (`WEBSITE`/
+  `LEGAL_NAME`/`ALIAS`/`BRAND_NAME`/`PARENT_COMPANY`) so a future attribute
+  a new strategy resolves is a new enum member, never a new record shape —
+  don't add a bespoke type per attribute or per pipeline stage the way an
+  earlier draft of this store did (see AD-63's rationale for exactly why
+  that was rejected). Protocol-specific detail (an HTTP status code, a
+  GLEIF record id) is never a typed field of its own — fold it into
+  `evidence` (free text) or, for a durable external identifier reusable
+  across sources, `identifier`/`identifier_scheme`. `EntityResolutionEngine
+  .resolve()` builds both lists on every call via `HeuristicDomainResolver
+  .resolve_with_trace()` and `WikidataOfficialWebsiteClient`/
+  `GleifLegalEntityClient.lookup_with_trace()` — the plain
+  `resolve()`/`lookup()` methods are thin wrappers over these, so adding a
+  new trace-capable strategy should follow the same `_with_trace`
+  sibling-method pattern rather than changing what the plain method
+  returns. A candidate the resolver never reached (an earlier one already
+  won) must never become an `Observation` at all, and its `Claim` must
+  synthesize to `UNVERIFIED`, never `REFUTED`. This store models knowledge,
+  not resolution behavior: it does not (yet) carry observations forward
+  across runs or skip re-probing a domain it already knows is dead (TD-67)
+  — don't wire that in without treating it as the separate, deliberate
+  algorithm change it would be.
 - `KnowledgeObject`/`KnowledgeStore` remain the system of record for the
   promotion gate. `genome.Gene`/`AlphaGenome` are the lineage layer *on
   top* — don't fold gene fields into `KnowledgeObject` or vice versa.

@@ -73,3 +73,44 @@ def test_never_asserts_an_unprobed_domain_as_reachable():
     resolver = HeuristicDomainResolver(prober)
     assert resolver.resolve(target) is None
     assert "https://fake-domain-that-does-not-exist.example" in probed
+
+
+def test_resolve_with_trace_records_every_probe_up_to_and_including_the_winner():
+    def prober(url):
+        reachable = url == "https://good.example"
+        return ProbeResult(url=url, reachable=reachable, status_code=200 if reachable else 404)
+
+    target = make_target(domain_hints=["bad-first.example", "good.example", "never-reached.example"])
+    resolver = HeuristicDomainResolver(prober)
+    resolved, attempts = resolver.resolve_with_trace(target)
+
+    assert resolved is not None
+    assert resolved.domain == "good.example"
+    # every candidate up to and including the winner was really probed...
+    assert [a.domain for a in attempts] == ["bad-first.example", "good.example"]
+    assert attempts[0].probe.reachable is False
+    assert attempts[1].probe.reachable is True
+    # ...but a candidate after the winner was never reached, so it must
+    # never appear here as either "attempted" or "rejected".
+    assert "never-reached.example" not in [a.domain for a in attempts]
+
+
+def test_resolve_with_trace_records_every_candidate_when_nothing_is_reachable():
+    resolver = HeuristicDomainResolver(prober=lambda url: ProbeResult(url=url, reachable=False, status_code=404))
+    target = make_target(domain_hints=["a.example", "b.example"])
+    resolved, attempts = resolver.resolve_with_trace(target)
+
+    assert resolved is None
+    assert [a.domain for a in attempts] == ["a.example", "b.example"]
+    assert all(not a.probe.reachable for a in attempts)
+
+
+def test_resolve_delegates_to_resolve_with_trace():
+    """resolve() must still return exactly what it always did -- adding the
+    trace-capable method must not change its behavior or signature."""
+    def prober(url):
+        return ProbeResult(url=url, reachable=url == "https://testorg.com")
+
+    target = make_target(domain_hints=["testorg.com"])
+    resolver = HeuristicDomainResolver(prober)
+    assert resolver.resolve(target).domain == "testorg.com"

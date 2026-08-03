@@ -133,3 +133,68 @@ def test_client_lookup_empty_companies():
     client = WikidataOfficialWebsiteClient(lambda url: calls.append(url))
     assert client.lookup({}) == {}
     assert calls == []
+
+
+def test_lookup_with_trace_records_a_matched_attempt():
+    def fetch_json(url):
+        if "wbsearchentities" in url:
+            return _SEARCH_RESPONSE_COMI
+        return _CLAIMS_RESPONSE_WITH_WEBSITE
+
+    client = WikidataOfficialWebsiteClient(fetch_json)
+    trace = client.lookup_with_trace({"COMI": "Commercial International Bank"})
+
+    attempt = trace["COMI"]
+    assert attempt.matched is True
+    assert attempt.hostname == "www.cibeg.com"
+    assert attempt.matched_entity_id == "Q1163037"
+    assert attempt.matched_label == "Commercial International Bank"
+    assert attempt.rejection_reason is None
+
+
+def test_lookup_with_trace_records_no_search_hit_reason():
+    def fetch_json(url):
+        return {"search": [{"id": "Q1", "label": "Completely Unrelated Company"}]}
+
+    client = WikidataOfficialWebsiteClient(fetch_json)
+    trace = client.lookup_with_trace({"HRHO": "EFG Hermes Holding"})
+
+    attempt = trace["HRHO"]
+    assert attempt.matched is False
+    assert attempt.hostname is None
+    assert "token" in attempt.rejection_reason.lower()
+
+
+def test_lookup_with_trace_records_no_claim_reason():
+    def fetch_json(url):
+        if "wbsearchentities" in url:
+            return _SEARCH_RESPONSE_COMI
+        return {"claims": {}}
+
+    client = WikidataOfficialWebsiteClient(fetch_json)
+    trace = client.lookup_with_trace({"COMI": "Commercial International Bank"})
+
+    attempt = trace["COMI"]
+    assert attempt.matched is False
+    assert attempt.matched_entity_id == "Q1163037"
+    assert "P856" in attempt.rejection_reason
+
+
+def test_lookup_with_trace_records_empty_search_reason():
+    client = WikidataOfficialWebsiteClient(lambda url: {"search": []})
+    trace = client.lookup_with_trace({"EGCH": "Egyptian Chemical Industries"})
+
+    attempt = trace["EGCH"]
+    assert attempt.matched is False
+    assert "no candidate" in attempt.rejection_reason.lower()
+
+
+def test_lookup_delegates_to_lookup_with_trace():
+    """lookup() must still return exactly what it always did."""
+    def fetch_json(url):
+        if "wbsearchentities" in url:
+            return _SEARCH_RESPONSE_COMI
+        return _CLAIMS_RESPONSE_WITH_WEBSITE
+
+    client = WikidataOfficialWebsiteClient(fetch_json)
+    assert client.lookup({"COMI": "Commercial International Bank"}) == {"COMI": "www.cibeg.com"}

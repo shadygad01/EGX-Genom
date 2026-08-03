@@ -65,6 +65,10 @@ jobs:
               > /tmp/company_financial_sources.json.tmp 2> /dev/null; then
               mv /tmp/company_financial_sources.json.tmp research/data/registry/company_financial_sources.json
             fi
+            if git show origin/discovery/latest:research/data/registry/resolution_memory.json \
+              > /tmp/resolution_memory.json.tmp 2> /dev/null; then
+              mv /tmp/resolution_memory.json.tmp research/data/registry/resolution_memory.json
+            fi
           fi
 
       - name: Run weekly source discovery

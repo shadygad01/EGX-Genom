@@ -32,10 +32,16 @@ export function InvestmentCases() {
   const readiness = useArtifact((p) => p.getDecisionReadiness());
   const marketState = useArtifact((p) => p.getMarketState());
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const [horizonFilter, setHorizonFilter] = useState<Horizon | "all">("all");
 
-  const ranked = [...(recommendations.data ?? [])].sort(
-    (a, b) => b.combined_expected_return - a.combined_expected_return,
-  );
+  const ranked = [...(recommendations.data ?? [])]
+    .filter((r) => horizonFilter === "all" || r.horizon_predictions[horizonFilter] != null)
+    .sort((a, b) => {
+      const returnA = horizonFilter === "all" ? a.combined_expected_return : (a.horizon_predictions[horizonFilter]?.expected_return ?? -100);
+      const returnB = horizonFilter === "all" ? b.combined_expected_return : (b.horizon_predictions[horizonFilter]?.expected_return ?? -100);
+      return returnB - returnA;
+    });
+
   const companyNames = marketState.data?.constituents ?? {};
   const selected = ranked.find((r) => r.ticker === selectedTicker) ?? ranked[0] ?? null;
   const recommendationByTicker = new Map(ranked.map((row) => [row.ticker, row]));
@@ -65,6 +71,28 @@ export function InvestmentCases() {
   return (
     <Section title={t("title")} description={t("description")}>
       <Disclaimer />
+
+      <div style={{ display: "flex", gap: "var(--space-2)", marginBottom: "var(--space-3)", alignItems: "center" }}>
+        <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-muted)" }}>{tCommon("table.horizonFilter") || "Horizon Filter"}:</span>
+        <button
+          className="btn"
+          style={{ padding: "4px 12px", fontSize: "0.8rem", background: horizonFilter === "all" ? "var(--accent)" : "var(--surface-2)", color: horizonFilter === "all" ? "#fff" : "var(--text-main)" }}
+          onClick={() => setHorizonFilter("all")}
+        >
+          All Horizons
+        </button>
+        {HORIZON_ORDER.map((h) => (
+          <button
+            key={h}
+            className="btn"
+            style={{ padding: "4px 12px", fontSize: "0.8rem", background: horizonFilter === h ? "var(--accent)" : "var(--surface-2)", color: horizonFilter === h ? "#fff" : "var(--text-main)" }}
+            onClick={() => setHorizonFilter(h)}
+          >
+            {label("horizon", h)}
+          </button>
+        ))}
+      </div>
+
       {recommendations.loading && <LoadingState rows={4} />}
       {recommendations.error && <ErrorState detail={recommendations.error.message} onRetry={recommendations.reload} />}
 
@@ -97,11 +125,14 @@ export function InvestmentCases() {
                   key: "return",
                   header: tCommon("table.expReturn"),
                   align: "right",
-                  render: (r) => (
-                    <span className="num" style={{ color: r.combined_expected_return >= 0 ? "var(--positive)" : "var(--negative)" }}>
-                      {formatSignedPercent(r.combined_expected_return)}
-                    </span>
-                  ),
+                  render: (r) => {
+                    const val = horizonFilter === "all" ? r.combined_expected_return : (r.horizon_predictions[horizonFilter]?.expected_return ?? r.combined_expected_return);
+                    return (
+                      <span className="num" style={{ color: val >= 0 ? "var(--positive)" : "var(--negative)", fontWeight: 700 }}>
+                        {formatSignedPercent(val)}
+                      </span>
+                    );
+                  },
                 },
                 {
                   key: "risk",
@@ -112,26 +143,44 @@ export function InvestmentCases() {
                 {
                   key: "horizons",
                   header: t("columns.horizons"),
-                  render: (r) => (
-                    <div className={styles.horizonBadges}>
-                      {HORIZON_ORDER.filter((h) => r.horizon_predictions[h]).map((h) => {
-                        const prediction = r.horizon_predictions[h]!;
-                        return (
-                          <Badge
-                            key={h}
-                            variant={prediction.expected_return >= 0 ? "positive" : "negative"}
-                            title={t("badgeTitle", {
-                              horizon: label("horizon", h),
-                              return: formatSignedPercent(prediction.expected_return),
-                              confidence: formatPercent(prediction.confidence),
-                            })}
-                          >
-                            {label("horizon", h)} <span className="num">{formatSignedPercent(prediction.expected_return)}</span>
+                  render: (r) => {
+                    const readinessVal = readinessByTicker.get(r.ticker)?.valuation;
+                    return (
+                      <div className={styles.horizonBadges} style={{ gap: "4px", flexWrap: "wrap" }}>
+                        {HORIZON_ORDER.filter((h) => r.horizon_predictions[h]).map((h) => {
+                          const prediction = r.horizon_predictions[h]!;
+                          return (
+                            <Badge
+                              key={h}
+                              variant={prediction.expected_return >= 0 ? "positive" : "negative"}
+                              title={t("badgeTitle", {
+                                horizon: label("horizon", h),
+                                return: formatSignedPercent(prediction.expected_return),
+                                confidence: formatPercent(prediction.confidence),
+                              })}
+                            >
+                              {label("horizon", h)} <span className="num">{formatSignedPercent(prediction.expected_return)}</span>
+                            </Badge>
+                          );
+                        })}
+                        {readinessVal?.dcf_per_share != null && (
+                          <Badge variant="accent" title={`DCF Fair Value: ${readinessVal.dcf_per_share.toFixed(2)} EGP`}>
+                            DCF: {readinessVal.dcf_per_share.toFixed(2)}
                           </Badge>
-                        );
-                      })}
-                    </div>
-                  ),
+                        )}
+                        {readinessVal?.ev_to_ebitda != null && (
+                          <Badge variant="neutral" title={`EV/EBITDA: ${readinessVal.ev_to_ebitda.toFixed(1)}x`}>
+                            EV/EBITDA: {readinessVal.ev_to_ebitda.toFixed(1)}x
+                          </Badge>
+                        )}
+                        {readinessVal?.price_to_book != null && (
+                          <Badge variant="neutral" title={`P/B: ${readinessVal.price_to_book.toFixed(2)}x`}>
+                            P/B: {readinessVal.price_to_book.toFixed(2)}x
+                          </Badge>
+                        )}
+                      </div>
+                    );
+                  },
                 },
               ]}
             />
@@ -139,7 +188,14 @@ export function InvestmentCases() {
 
           <Card title={selected ? t("evidenceTitle", { ticker: selected.ticker }) : t("evidence")} dense>
             {!selected && <EmptyState title={t("noOpportunitySelected")} detail={t("selectRowDetail")} />}
-            {selected && <CasePreview recommendation={selected} companyName={companyNames[selected.ticker]} catalysts={catalystsForSelected} />}
+            {selected && (
+              <CasePreview
+                recommendation={selected}
+                companyName={companyNames[selected.ticker]}
+                catalysts={catalystsForSelected}
+                valuation={readinessByTicker.get(selected.ticker)?.valuation}
+              />
+            )}
           </Card>
         </div>
       )}
@@ -201,10 +257,12 @@ function CasePreview({
   recommendation,
   companyName,
   catalysts,
+  valuation,
 }: {
   recommendation: Recommendation;
   companyName: string | undefined;
   catalysts: CorporateEvent[];
+  valuation?: import("../types").ValuationMetrics | null;
 }) {
   const { t } = useTranslation("investmentCases");
   const { t: tCommon } = useTranslation("common");
@@ -227,6 +285,44 @@ function CasePreview({
         />
         <StatTile label={tCommon("table.expRisk")} value={formatPercent(recommendation.combined_expected_risk)} />
       </div>
+
+      {valuation && (
+        <div className={styles.block} style={{ background: "var(--surface-2)", padding: "var(--space-3)", borderRadius: "var(--radius-md)", marginBottom: "var(--space-3)" }}>
+          <div className={styles.blockTitle}>Valuation & Quantitative Metrics</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: "var(--space-2)", marginTop: "var(--space-2)" }}>
+            {valuation.weighted_fair_value != null && (
+              <div>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block" }}>Fair Value</span>
+                <strong className="num" style={{ fontSize: "0.95rem" }}>{valuation.weighted_fair_value.toFixed(2)} EGP</strong>
+              </div>
+            )}
+            {valuation.dcf_per_share != null && (
+              <div>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block" }}>DCF / Share</span>
+                <strong className="num" style={{ fontSize: "0.95rem" }}>{valuation.dcf_per_share.toFixed(2)} EGP</strong>
+              </div>
+            )}
+            {valuation.ev_to_ebitda != null && (
+              <div>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block" }}>EV / EBITDA</span>
+                <strong className="num" style={{ fontSize: "0.95rem" }}>{valuation.ev_to_ebitda.toFixed(1)}x</strong>
+              </div>
+            )}
+            {valuation.price_to_book != null && (
+              <div>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block" }}>P / B Ratio</span>
+                <strong className="num" style={{ fontSize: "0.95rem" }}>{valuation.price_to_book.toFixed(2)}x</strong>
+              </div>
+            )}
+            {valuation.market_pe != null && (
+              <div>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block" }}>P / E Ratio</span>
+                <strong className="num" style={{ fontSize: "0.95rem" }}>{valuation.market_pe.toFixed(1)}x</strong>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className={styles.block}>
         <div className={styles.blockTitle}>{t("detail.horizonBreakdown")}</div>

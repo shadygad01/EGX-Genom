@@ -1,0 +1,13 @@
+{
+  "completed_at": "2026-08-03T09:42:02.407598",
+  "error": null,
+  "hypotheses": 202,
+  "id": "run_0b66e816a82b",
+  "notes": "",
+  "promoted": 0,
+  "run_date": "2026-07-26",
+  "session_id": "session_30d980cdc5c0",
+  "started_at": "2026-08-03T09:40:43.516484",
+  "status": "succeeded",
+  "version": 1
+}

@@ -1,0 +1,86 @@
+{
+  "as_of": "2026-07-26",
+  "opinions": [
+    {
+      "agreement_rate": null,
+      "committee": "catalyst",
+      "decisive_rate": null,
+      "note": "No knowledge from this category in today's model portfolio.",
+      "stance": "no_data",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "liquidity",
+      "decisive_rate": null,
+      "note": "No knowledge from this category in today's model portfolio.",
+      "stance": "no_data",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "macro",
+      "decisive_rate": null,
+      "note": "No knowledge from this category in today's model portfolio.",
+      "stance": "no_data",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "quality",
+      "decisive_rate": null,
+      "note": "No knowledge from this category in today's model portfolio.",
+      "stance": "no_data",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "sector",
+      "decisive_rate": null,
+      "note": "No knowledge from this category in today's model portfolio.",
+      "stance": "no_data",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "technical",
+      "decisive_rate": null,
+      "note": "No knowledge from this category in today's model portfolio.",
+      "stance": "no_data",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "value",
+      "decisive_rate": null,
+      "note": "No knowledge from this category in today's model portfolio.",
+      "stance": "no_data",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "risk",
+      "decisive_rate": null,
+      "note": "Herfindahl 0.000 (diversified).",
+      "stance": "normal",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "portfolio",
+      "decisive_rate": null,
+      "note": "weights_reconcile=True, 0 decision conflict(s).",
+      "stance": "consistent",
+      "tickers_present": 0
+    },
+    {
+      "agreement_rate": null,
+      "committee": "chief_investment_officer",
+      "decisive_rate": null,
+      "note": "2/2 committee(s) aligned, 0/2 diverging.",
+      "stance": "aligned",
+      "tickers_present": 0
+    }
+  ],
+  "tickers_evaluated": 0
+}

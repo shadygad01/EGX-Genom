@@ -1,0 +1,239 @@
+[
+  {
+    "category": "market_data",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "EGX price provider (Yahoo + StockAnalysis + Mubasher fallback)",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "egx_price_composite"
+  },
+  {
+    "category": "market_data",
+    "first_run_at": "2026-08-03T09:31:00.132296",
+    "last_run_at": "2026-08-03T09:40:42.939360",
+    "name": "Stooq",
+    "reputation": {
+      "accuracy": 0.7800000000000001,
+      "availability": 1.0,
+      "composite": 0.8542857142857143,
+      "correction_rate": 1.0,
+      "coverage": 0.5,
+      "duplicate_rate": null,
+      "freshness": 0.7000000000000001,
+      "historical_usefulness": 1.0,
+      "latency": null,
+      "observations": 7,
+      "schema_stability": 1.0
+    },
+    "runs_total": 6,
+    "source_id": "stooq"
+  },
+  {
+    "category": "macroeconomic",
+    "first_run_at": "2026-08-03T09:31:00.195875",
+    "last_run_at": "2026-08-03T09:40:43.064290",
+    "name": "FRED (St. Louis Fed)",
+    "reputation": {
+      "accuracy": 0.84,
+      "availability": 1.0,
+      "composite": 0.8771428571428571,
+      "correction_rate": 1.0,
+      "coverage": 0.5,
+      "duplicate_rate": null,
+      "freshness": 0.7999999999999999,
+      "historical_usefulness": 1.0,
+      "latency": null,
+      "observations": 7,
+      "schema_stability": 1.0
+    },
+    "runs_total": 6,
+    "source_id": "fred"
+  },
+  {
+    "category": "news",
+    "first_run_at": "2026-08-03T09:31:00.272208",
+    "last_run_at": "2026-08-03T09:40:43.137872",
+    "name": "Generic RSS/Atom collector (serves every feed-publishing outlet)",
+    "reputation": {
+      "accuracy": 0.8800000000000002,
+      "availability": 1.0,
+      "composite": 0.9725,
+      "correction_rate": 1.0,
+      "coverage": 1.0,
+      "duplicate_rate": 1.0,
+      "freshness": 0.9,
+      "historical_usefulness": 1.0,
+      "latency": null,
+      "observations": 8,
+      "schema_stability": 1.0
+    },
+    "runs_total": 3,
+    "source_id": "rss_generic"
+  },
+  {
+    "category": "macroeconomic",
+    "first_run_at": "2026-08-03T09:31:00.312332",
+    "last_run_at": "2026-08-03T09:40:43.218449",
+    "name": "World Bank Open Data",
+    "reputation": {
+      "accuracy": 0.8800000000000002,
+      "availability": 1.0,
+      "composite": 0.9114285714285714,
+      "correction_rate": 1.0,
+      "coverage": 1.0,
+      "duplicate_rate": null,
+      "freshness": 0.5,
+      "historical_usefulness": 1.0,
+      "latency": null,
+      "observations": 7,
+      "schema_stability": 1.0
+    },
+    "runs_total": 3,
+    "source_id": "worldbank"
+  },
+  {
+    "category": "official",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Official EGX30/EGX70 Universe snapshot",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "egx_universe_seed"
+  },
+  {
+    "category": "official",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Financial Regulatory Authority (FRA)",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "fra_egypt"
+  },
+  {
+    "category": "official",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "CAPMAS",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "capmas"
+  },
+  {
+    "category": "company",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Telecom Egypt Investor Relations",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "telecom_egypt_ir"
+  },
+  {
+    "category": "company",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Orascom Construction Investor Relations",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "orascom_ir"
+  },
+  {
+    "category": "company",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Chief Capital structured EGX fundamentals",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "chief_egx_financials"
+  },
+  {
+    "category": "market_data",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "EGXpilot market fundamentals API",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "egxpilot_fundamentals"
+  },
+  {
+    "category": "news",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Enterprise",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "enterprise_press"
+  },
+  {
+    "category": "official",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Egypt National Summary Data Page (NSDP)",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "egypt_nsdp"
+  },
+  {
+    "category": "arabic_news",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "EAC Finance EGX Market Announcements",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "eac_egx_disclosures"
+  },
+  {
+    "category": "news",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "GDELT DOC 2.0",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "gdelt"
+  },
+  {
+    "category": "arabic_news",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Al Borsa News",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "alborsa"
+  },
+  {
+    "category": "arabic_news",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Masrawy Economy",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "masrawy_economy"
+  },
+  {
+    "category": "macroeconomic",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "UN Statistics SDG API",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "undata"
+  },
+  {
+    "category": "global_markets",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Global benchmarks via Stooq/FRED series",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "global_benchmarks"
+  },
+  {
+    "category": "arabic_news",
+    "first_run_at": null,
+    "last_run_at": null,
+    "name": "Amwal Al Ghad",
+    "reputation": null,
+    "runs_total": 0,
+    "source_id": "amwal_alghad"
+  }
+]

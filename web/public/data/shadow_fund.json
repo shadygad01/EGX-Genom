@@ -1,0 +1,33 @@
+{
+  "attribution": [],
+  "benchmark_cumulative_return_pct": 0.0,
+  "benchmark_nav": 100.0,
+  "benchmark_ticker": "EGX30",
+  "capital_allocation_plan": null,
+  "cash": 100.0,
+  "cash_pct": 1.0,
+  "closed_positions": [],
+  "cumulative_return_pct": 0.0,
+  "daily_return_pct": null,
+  "date": "2026-07-26",
+  "excess_return_pct": 0.0,
+  "inception_date": "2026-07-26",
+  "invested_pct": 0.0,
+  "nav": 100.0,
+  "open_positions": [],
+  "provenance": {
+    "inputs": [],
+    "produced_at": "2026-08-03T09:31:00.648732",
+    "produced_by": "shadow_fund.engine@1.0.0"
+  },
+  "risk": {
+    "herfindahl_index": null,
+    "largest_position_pct": null,
+    "max_drawdown_pct": null,
+    "sample_days": 0,
+    "sample_status": "insufficient_sample",
+    "sharpe_like_ratio": null,
+    "volatility_annualized_pct": null
+  },
+  "transactions": []
+}

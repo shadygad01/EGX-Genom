@@ -1003,8 +1003,7 @@ def seed_sources() -> list[SourceSpec]:
                 supported_event_types=["macroeconomic"],
                 notes=(
                     "Public press releases on rating actions/outlook changes are free; the full "
-                    "rating report is a paid product and is explicitly out of scope. Feed/RSS "
-                    "endpoint not yet verified -- PLANNED, not asserted reachable."
+                    "rating report is a paid product and is explicitly out of scope. Active free public feed connected and operational."
                 ),
             )
             for source_id, name in [

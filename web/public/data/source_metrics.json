@@ -10,8 +10,8 @@
   },
   {
     "category": "market_data",
-    "first_run_at": "2026-08-03T09:31:00.132296",
-    "last_run_at": "2026-08-03T09:58:22.524927",
+    "first_run_at": "2026-08-03T12:22:49.657665",
+    "last_run_at": "2026-08-03T12:23:37.465656",
     "name": "Stooq",
     "reputation": {
       "accuracy": 0.7800000000000001,
@@ -26,13 +26,13 @@
       "observations": 7,
       "schema_stability": 1.0
     },
-    "runs_total": 8,
+    "runs_total": 6,
     "source_id": "stooq"
   },
   {
     "category": "macroeconomic",
-    "first_run_at": "2026-08-03T09:31:00.195875",
-    "last_run_at": "2026-08-03T09:58:22.603148",
+    "first_run_at": "2026-08-03T12:22:49.773194",
+    "last_run_at": "2026-08-03T12:23:37.537199",
     "name": "FRED (St. Louis Fed)",
     "reputation": {
       "accuracy": 0.84,
@@ -47,16 +47,16 @@
       "observations": 7,
       "schema_stability": 1.0
     },
-    "runs_total": 8,
+    "runs_total": 6,
     "source_id": "fred"
   },
   {
     "category": "news",
-    "first_run_at": "2026-08-03T09:31:00.272208",
-    "last_run_at": "2026-08-03T09:58:22.656032",
+    "first_run_at": "2026-08-03T12:22:49.898729",
+    "last_run_at": "2026-08-03T12:23:37.586872",
     "name": "Generic RSS/Atom collector (serves every feed-publishing outlet)",
     "reputation": {
-      "accuracy": 0.8800000000000001,
+      "accuracy": 0.8800000000000002,
       "availability": 1.0,
       "composite": 0.9725,
       "correction_rate": 1.0,
@@ -68,16 +68,16 @@
       "observations": 8,
       "schema_stability": 1.0
     },
-    "runs_total": 4,
+    "runs_total": 3,
     "source_id": "rss_generic"
   },
   {
     "category": "macroeconomic",
-    "first_run_at": "2026-08-03T09:31:00.312332",
-    "last_run_at": "2026-08-03T09:58:22.704430",
+    "first_run_at": "2026-08-03T12:22:49.970915",
+    "last_run_at": "2026-08-03T12:23:37.629631",
     "name": "World Bank Open Data",
     "reputation": {
-      "accuracy": 0.8800000000000001,
+      "accuracy": 0.8800000000000002,
       "availability": 1.0,
       "composite": 0.9114285714285714,
       "correction_rate": 1.0,
@@ -89,7 +89,7 @@
       "observations": 7,
       "schema_stability": 1.0
     },
-    "runs_total": 4,
+    "runs_total": 3,
     "source_id": "worldbank"
   },
   {

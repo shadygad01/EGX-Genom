@@ -15,7 +15,7 @@
     "getFlatRead": "Get a flat-portfolio read (no positions held)"
   },
   "unavailable": {
-    "title": "Portfolio needs a live backend"
+    "title": "Model Portfolio & Capital Allocation"
   },
   "summary": {
     "title": "Portfolio Summary",

@@ -33,5 +33,8 @@ dist/
 # fresh in CI before the Pages build; see .github/workflows/deploy-pages.yml)
 # web/public/data/ intentionally committed for static GitHub Pages distribution
 
+# Generated research runtime data
+research/agx_data/
+
 # Logs
 *.log

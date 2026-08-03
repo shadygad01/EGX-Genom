@@ -1,5 +1,72 @@
 # Changelog
 
+## Unreleased — Discovery Engine: one-level IR traversal + Arabic document classifier
+
+Per explicit instruction, closed the two generic (company-agnostic) gaps
+`docs/COLLECTOR_TEMPLATE_TAXONOMY.md` named as undercounting every
+template family *before* any collector implementation starts:
+
+- `discovery.company_financial_discovery.discover_company_financial_sources()`
+  now follows every distinct, actually-navigable `INVESTOR_RELATIONS_HOME`
+  candidate the homepage scan finds — once, never recursively — and folds
+  in whatever that page's own links classify as. A failed follow-up fetch
+  is non-fatal (level-1 evidence still stands). Non-navigable anchors
+  (`#`, `#tab-mega-...`, `javascript:void(0);`) are filtered out so the
+  crawl never wastes a fetch re-requesting the homepage itself.
+- `discovery.financial_document.classify_financial_document()` gained
+  Arabic keywords for every existing category (annual/quarterly report,
+  financial statements, presentation, disclosure, investor relations),
+  closing a real, evidenced gap: Eastern Company's (EAST) real disclosures
+  page previously only matched via its English URL slug
+  (`/disclosures_ar/`) — its actual Arabic anchor text
+  ("الإفصاحات") would not have matched at all.
+
+Both are unit-tested against fixtures (11 new tests: 6 for the Arabic
+keywords including EAST's real anchor text, 5 for one-level traversal
+including non-recursion and graceful-failure cases); 936 backend tests
+pass, ruff clean.
+
+`docs/COLLECTOR_TEMPLATE_TAXONOMY.md` is marked **PROVISIONAL** as a
+result: its family counts still reflect the pre-fix discovery run and must
+be regenerated (a real `company_financial_sources.json` re-run needs live
+network egress, unavailable in this sandbox — see the Weekly Discovery
+workflow) and diffed against this version before any collector family is
+treated as final, per instruction.
+
+## Unreleased — Settings dashboard audit: `egypt_nsdp` live-wiring gap closed
+
+Investigated a user-reported "Financial Data Coverage 5.9%" / "28 collectors
+not yet wired" complaint on Settings. Both numbers are accurate, tested, and
+intentional, not bugs: `financials.coverage.build_financial_coverage_report`
+deliberately counts only `ANNUAL`/`QUARTERLY` line items (see
+`test_market_snapshot_is_not_misreported_as_financial_statement_coverage`),
+so `egxpilot_fundamentals`'s real, ~100/101-ticker `SNAPSHOT`/
+`MARKET_FUNDAMENTALS` data correctly does not count as financial-statement
+coverage — only `telecom_egypt_ir`/`orascom_ir` (2 tickers) and whatever
+`chief_egx_financials` discovers on a given run currently produce real
+`ANNUAL`/`QUARTERLY` items. The 28 `UNAVAILABLE` collectors are the current
+catalog's 19 `PLANNED` + 8 `DISABLED` + 1 `TOS_REVIEW` sources, each with a
+real, evidenced blocker (anti-bot/WAF reset, ToS ambiguity, endpoint not yet
+verified) — confirmed against the real, live-network `discovery.yml` run
+history (`discovery/latest` branch), not fabricated. Closing either number
+further needs either real endpoint verification with live network egress
+(the existing weekly Discovery workflow) or new per-company IR collectors
+built from each company's real, inspected page content (`company_financial_sources.json`
+already has 21/101 companies with real discovered IR/financial-statement
+page URLs, ready for a maintainer to build a collector against, following
+the `telecom_egypt_financials.py`/`orascom_financials.py` precedent) — not
+something a code change alone can close.
+
+One real, narrow bug found and fixed along the way:
+`production.collector_plan.live_wired_source_ids()`'s `explicitly_wired` set
+was missing `"egypt_nsdp"`, even though `build_live_collector()`,
+`EXPECTED_RECORDS_LIVE`, and `Capability.MACROECONOMIC`'s strategy pool all
+already wire it — an oversight from the commit that added the EGX NSDP
+collector (`4799994`), never updated here. Harmless in practice today
+(`MACROECONOMIC` is an exhaustive capability, so `egypt_nsdp` is always
+attempted whenever `IMPLEMENTED` regardless of this set), but the set is now
+consistent with every other place this source is wired.
+
 ## Unreleased — Investment Science Lab / Claim Registry
 
 Extended the newly introduced `MethodologyRegistry` with a versioned Claim

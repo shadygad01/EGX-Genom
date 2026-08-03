@@ -231,8 +231,14 @@ export class StaticJsonProvider implements DashboardDataProvider {
   }
 
   async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {
-    const recommendations = await this.getRecommendations();
-    const marketState = await this.getMarketState();
+    let recommendations: Recommendation[] = [];
+    let marketState: MarketState | null = null;
+    try {
+      recommendations = await this.getRecommendations();
+      marketState = await this.getMarketState();
+    } catch {
+      // Gracefully handle unpopulated artifacts
+    }
     const recMap = new Map(recommendations.map((r) => [r.ticker, r]));
     const asOf = request.date || marketState?.as_of || new Date().toISOString().slice(0, 10);
     const positions = request.positions || {};

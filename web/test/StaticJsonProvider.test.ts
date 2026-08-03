@@ -76,18 +76,18 @@ describe("StaticJsonProvider", () => {
     await expect(provider.getKnowledge()).rejects.toThrow(/500/);
   });
 
-  it("postDecisions always reports itself unavailable, never fabricating a decision", async () => {
+  it("computes position-aware decisions client-side from portfolio positions", async () => {
     const provider = new StaticJsonProvider();
-    await expect(provider.postDecisions({ date: "2026-06-14" })).rejects.toThrow(
-      LiveDecisionsUnavailableError,
-    );
+    const result = await provider.postDecisions({ date: "2026-06-14", positions: { COMI: { held: true, current_weight: 0.15, average_cost: 100 } } });
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
   });
 
-  it("postCapitalAllocation always reports itself unavailable, never fabricating a plan", async () => {
+  it("computes capital allocation plan client-side from portfolio positions", async () => {
     const provider = new StaticJsonProvider();
-    await expect(provider.postCapitalAllocation({ date: "2026-06-14" })).rejects.toThrow(
-      LiveDecisionsUnavailableError,
-    );
+    const plan = await provider.postCapitalAllocation({ date: "2026-06-14", positions: { COMI: { held: true, current_weight: 0.15, average_cost: 100 } } });
+    expect(plan).toBeDefined();
+    expect(plan.ranking).toBeDefined();
   });
 
   it("fetches the CIO Desk artifacts (portfolio summary, warnings, committee summary)", async () => {

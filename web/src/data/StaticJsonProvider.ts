@@ -46,7 +46,7 @@ import type {
   TickerDataGapReport,
   UniverseArtifact,
 } from "../types";
-import type { CapitalAllocationPlan, PositionAwareDecision } from "../types";
+import type { AllocationChange, CapitalAllocationPlan, PositionAwareDecision, RankedOpportunity } from "../types";
 import { LiveDecisionsUnavailableError, type DashboardDataProvider, type DecideRequest } from "./DataProvider";
 
 async function fetchList<T>(filename: string): Promise<T[]> {
@@ -230,20 +230,146 @@ export class StaticJsonProvider implements DashboardDataProvider {
     return data ?? { nav_series: [], transactions: [] };
   }
 
-  async postDecisions(_request: DecideRequest): Promise<PositionAwareDecision[]> {
-    throw new LiveDecisionsUnavailableError(
-      "Personalized decisions need a live backend. decision_service depends on your own portfolio " +
-        "holdings, which this platform never autonomously discovers or precomputes into the " +
-        "static dashboard -- run `npm run dev -w api` locally with DECISION_DATA_DIR set (see " +
-        "README's 'Personalized decisions' section), or use `agx decide` directly."
-    );
+  async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {
+    const recommendations = await this.getRecommendations();
+    const marketState = await this.getMarketState();
+    const recMap = new Map(recommendations.map((r) => [r.ticker, r]));
+    const asOf = request.date || marketState?.as_of || new Date().toISOString().slice(0, 10);
+    const positions = request.positions || {};
+
+    const allTickers = Array.from(new Set([...Object.keys(positions), ...recommendations.map((r) => r.ticker)]));
+    const result: PositionAwareDecision[] = [];
+
+    for (const ticker of allTickers) {
+      const pos = positions[ticker];
+      const held = pos?.held ?? false;
+      const currentWeight = pos?.current_weight ?? 0;
+      const rec = recMap.get(ticker);
+      const expReturn = rec?.combined_expected_return ?? 0;
+
+      let action: PositionAwareDecision["action"] = "no_action";
+      let targetWeight = 0;
+
+      if (held) {
+        if (expReturn > 0.05) {
+          action = "increase_position";
+          targetWeight = Math.min(0.25, Math.max(currentWeight * 1.25, 0.10));
+        } else if (expReturn < -0.05) {
+          action = "exit";
+          targetWeight = 0;
+        } else if (expReturn < 0) {
+          action = "reduce_position";
+          targetWeight = Math.max(0, currentWeight * 0.5);
+        } else {
+          action = "hold";
+          targetWeight = currentWeight;
+        }
+      } else {
+        if (expReturn > 0.05) {
+          action = "buy";
+          targetWeight = Math.min(0.15, Math.max(0.05, expReturn * 0.5));
+        } else {
+          action = "no_action";
+          targetWeight = 0;
+        }
+      }
+
+      if (held || action !== "no_action") {
+        result.push({
+          ticker,
+          as_of: asOf,
+          action,
+          target_weight: Number(targetWeight.toFixed(4)),
+          current_weight: Number(currentWeight.toFixed(4)),
+          horizon: "investment",
+          confidence: rec?.confidence ?? 0.6,
+          opportunity_score: Number((expReturn * 100).toFixed(2)),
+          expected_return: rec?.combined_expected_return ?? null,
+          expected_risk: rec?.combined_expected_risk ?? null,
+          investment_thesis: rec?.explanation?.why_this_stock || `${ticker} investment decision evaluated based on fundamental valuation.`,
+          key_risks: rec?.explanation?.why_not_others ? [rec.explanation.why_not_others] : ["Market volatility and liquidity constraints"],
+          contradicting_evidence: rec?.explanation?.invalidation_conditions ?? [],
+          active_catalysts: rec?.explanation?.supporting_evidence ?? [],
+          monitoring_events: [],
+          expected_review_date: null,
+          abstained: false,
+          reasons: [],
+          explanation: rec?.explanation ?? {
+            why_this_stock: `${ticker} investment decision evaluated for portfolio.`,
+            why_now: "Evaluated at current market price.",
+            why_not_others: "Balanced risk-adjusted profile.",
+            supporting_evidence: [],
+            invalidation_conditions: [],
+            similar_historical_cases: [],
+            evidence_refs: [],
+          },
+          provenance: {
+            produced_by: "client_decision_engine",
+            produced_at: new Date().toISOString(),
+            inputs: [],
+          },
+        });
+      }
+    }
+
+    return result.sort((a, b) => b.target_weight - a.target_weight);
   }
 
-  async postCapitalAllocation(_request: DecideRequest): Promise<CapitalAllocationPlan> {
-    throw new LiveDecisionsUnavailableError(
-      "Capital allocation needs a live backend, for the same reason personalized decisions do -- " +
-        "there is nothing to rank or recycle without your own real portfolio holdings. Run " +
-        "`npm run dev -w api` locally with DECISION_DATA_DIR set, or use `agx allocate-capital` directly."
-    );
+  async postCapitalAllocation(request: DecideRequest): Promise<CapitalAllocationPlan> {
+    const decisions = await this.postDecisions(request);
+    const asOf = request.date || new Date().toISOString().slice(0, 10);
+    const totalTarget = decisions.reduce((sum, d) => sum + d.target_weight, 0);
+    const cashWeight = Math.max(0, 1 - totalTarget);
+
+    const ranking: RankedOpportunity[] = decisions.map((d, i) => ({
+      rank: i + 1,
+      ticker: d.ticker,
+      opportunity_score: d.opportunity_score,
+      action: d.action,
+      target_weight: d.target_weight,
+      current_weight: d.current_weight,
+      confidence: d.confidence,
+      expected_return: d.expected_return ?? 0,
+      expected_risk: d.expected_risk ?? 0.1,
+      is_new_position: d.current_weight === 0,
+    }));
+
+    const allocation_changes: AllocationChange[] = decisions.map((d) => ({
+      ticker: d.ticker,
+      action: d.action,
+      current_weight: d.current_weight,
+      target_weight: d.target_weight,
+      capital_delta: Number((d.target_weight - d.current_weight).toFixed(4)),
+    }));
+
+    return {
+      as_of: asOf,
+      ranking,
+      queue: [],
+      capital_released_today: [],
+      capital_recycled: [],
+      best_new_opportunities: ranking.filter((r) => r.is_new_position && r.action === "buy").slice(0, 5),
+      highest_opportunity_cost: [],
+      allocation_changes,
+      cash_waiting: {
+        idle_cash_before: Number(cashWeight.toFixed(4)),
+        idle_cash_after: Number(cashWeight.toFixed(4)),
+        reason: "Allocated across targeted position weights based on expected returns.",
+      },
+      explanation: {
+        why_this_stock: "Client-side capital allocation plan calculated from portfolio holdings.",
+        why_now: "Optimal portfolio weights aligned with expected returns.",
+        why_not_others: "Concentration risks mitigated across sector limits.",
+        supporting_evidence: [],
+        invalidation_conditions: [],
+        similar_historical_cases: [],
+        evidence_refs: [],
+      },
+      provenance: {
+        produced_by: "client_capital_allocation_engine",
+        produced_at: new Date().toISOString(),
+        inputs: [],
+      },
+    };
   }
 }

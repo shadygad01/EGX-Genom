@@ -25,7 +25,19 @@ EPOCH_II_REPORT.md` (Epoch II) explain *why* it's shaped this way. `docs/
 PHASE_STATUS.md` is the living, must-be-updated audit of where every one
 of `MASTER_PROMPT.md`'s 18 systems actually stands — check it before
 starting new work: per the charter, a later system's work should not
-start while an earlier one still has closeable gaps.
+start while an earlier one still has closeable gaps. `docs/
+TRUTH_PRESERVATION_POLICY.md` (`AD-60`) is permanent governing law of the
+same standing as the investment doctrine set, specifically for *never
+fabricating* investment information: it defines what counts as
+fabrication, the zero-fabrication rules, and the enforcement mechanisms
+(`research/scripts/check_truth_preservation.py`, run in CI and by
+`research/tests/test_truth_preservation.py`/`web/test/truthPreservation
+.test.ts`, plus `.github/pull_request_template.md`'s required checklist).
+Read it before touching `valuation/`, `meta/readiness.py`,
+`financials/`, `decision_service/`, `capital_allocation/`, `shadow_fund/`,
+`sources/`, `production/`, `acquisition_intelligence/`, or
+`web/src/data/` — every rule in it is illustrated with the exact real
+incident (`06a6882`) that made it necessary, not a hypothetical.
 
 ## What this repository is
 

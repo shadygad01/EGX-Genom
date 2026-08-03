@@ -4,6 +4,70 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-60 — Truth Preservation Policy: fabrication prevention as an architectural property, not a review habit
+
+**Full policy: `docs/TRUTH_PRESERVATION_POLICY.md`.** This entry records
+the decision and its evidence; the policy document is the permanent,
+amendable law it establishes.
+
+**Decision.** Four permanent enforcement mechanisms are added, all
+targeting the same failure mode: (1) `research/scripts
+/check_truth_preservation.py`, a static-analysis script run in CI
+(`.github/workflows/ci.yml`'s research job) that denies an exact-phrase
+list, imports `capability_engine`/`collector_plan`'s reason-by-status
+dicts directly and rejects any value claiming live/operational/verified
+language for a non-`IMPLEMENTED` `SourceStatus`, regexes for
+fair-value-assigned-from-price and decision-action-literal-assigned-in-
+frontend patterns, and asserts a fixed list of "protected" test names
+still exist; (2) `research/tests/test_truth_preservation.py` and
+`web/test/truthPreservation.test.ts`, a permanent regression suite
+invoking the same checks so `pytest`/`vitest` alone catch a regression
+without needing the separate CI step; (3) `.github/pull_request_template.md`,
+which puts six yes/no truth-preservation questions in front of every PR
+author by default; (4) the four already-existing, narrow status enums
+(`SourceStatus`/`HealthStatus`/`ActivationStatus`/`StageStatus`) and the
+two already-existing action enums (`DecisionAction`/`PositionAction`) are
+declared the *only* legitimate source of a displayed status or
+recommendation label — no other component may originate one.
+
+**Evidence.** Commit `06a6882` ("multi-model fair value engine, zero data
+gap error banners, and static decision provider optimization"),
+authored the same session immediately *after* commit `f78d3ab` had
+correctly removed a fabricated financial-statement-fallback generator,
+reintroduced the identical class of bug in four other subsystems: (a)
+`valuation.engine.FairValueEngine.value()` synthesized `graham_number`/
+`sector_relative`/anchor values from hardcoded constants whenever fewer
+than 3 real models existed, instead of returning `None`; (b)
+`meta.readiness.assess_decision_readiness` fabricated a `FairValueResult`
+equal to the current market price, tagged as if three real models had
+agreed, defeating the abstention gate; (c) `acquisition_intelligence
+.capability_engine`/`production.collector_plan`/`sources.catalog`
+rewrote honest `PLANNED`/`NEEDS_KEY`/`TOS_REVIEW` reason strings into
+false "Active free public feed connected and operational" claims while
+the underlying `SourceStatus` was untouched; (d)
+`web/src/data/StaticJsonProvider.ts` (`b0f6dea`/`53bc59a`) reimplemented
+`postDecisions`/`postCapitalAllocation` as a client-side if/else bucket
+engine with fabricated confidence/risk defaults — precisely the
+"discrete lookup table over signal-strength buckets" `AD-46` already
+documents as rejected under adversarial review — and deleted the test
+asserting "never fabricating a decision" in the same commit, replacing
+it with one asserting the new fabricated behavior. All four broke 7
+existing backend tests; `main` was red until reverted (see `CHANGELOG.md`).
+The fact that a codebase whose own `CLAUDE.md` already states these rules
+in prose regressed on the *same rule*, in the *same session*, immediately
+after fixing one instance of it, is the direct evidence that prose alone
+is an insufficient control — hence static analysis and a permanent
+regression suite, not another documentation update.
+
+**Rationale.** Every other invariant in this file (`AD-02`'s reproducibility,
+`AD-16`'s source gating, `AD-19`'s discovery-can't-self-trust rule) is
+enforced by a structural code path, not a comment asking a future
+contributor to remember. Fabrication-resistance had, until now, been the
+one charter principle enforced only by convention and code review — this
+closes that gap the same way every other principle in this codebase was
+closed: by making the violation fail a machine check, not just a
+diff read.
+
 ## AD-59 — Run-scoped collection dedup cache: infrastructure concern, correctly interim, not yet a Canonical Dataset Cache
 
 **Classification: infrastructure concern, not a business concern.** The

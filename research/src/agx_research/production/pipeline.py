@@ -456,23 +456,25 @@ class ProductionPipeline:
         # The report written above can't include its own finalizing stage;
         # rewrite once more so the artifact on disk is complete.
         final_report = report.model_copy(update={"stages": list(stages)})
-        execution_report_path.write_text(
-            json.dumps(final_report.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
-        )
-
-        if staging_dir is not None:
-            # AD-65: the only call in this codebase permitted to touch the
-            # canonical directory. Re-validates the fully-staged bundle from
-            # scratch (shape, provenance, cross-artifact consistency) and
-            # publishes atomically only if every check passes; raises
-            # PublicationError (nothing published, canonical directory left
-            # exactly as it was) otherwise. Not wrapped in execute() --
-            # a publish failure must fail run() itself, not be absorbed into
-            # a stage-level FAILED entry the overall report could still call
-            # SUCCEEDED/PARTIAL around.
-            try:
+        try:
+            execution_report_path.write_text(
+                json.dumps(final_report.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
+            )
+            if staging_dir is not None:
+                # AD-65: the only call in this codebase permitted to touch the
+                # canonical directory. Re-validates the fully-staged bundle from
+                # scratch (shape, provenance, cross-artifact consistency) and
+                # publishes atomically only if every check passes; raises
+                # PublicationError (nothing published, canonical directory left
+                # exactly as it was) otherwise. Not wrapped in execute() --
+                # a publish failure must fail run() itself, not be absorbed into
+                # a stage-level FAILED entry the overall report could still call
+                # SUCCEEDED/PARTIAL around.
                 publish_canonical_dataset(staging_dir, canonical_dir=CANONICAL_PRODUCTION_DASHBOARD_DIR)
-            finally:
+        finally:
+            # Staging cleanup must run even if the report write itself fails
+            # (disk error, serialization error) -- not just when publish fails.
+            if staging_dir is not None:
                 shutil.rmtree(staging_dir, ignore_errors=True)
         return final_report
 

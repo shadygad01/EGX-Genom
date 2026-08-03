@@ -49,7 +49,10 @@ def validate_bundle_consistency(bundle_dir: Path) -> list[str]:
     manifest_raw = _load_json(bundle_dir / "manifest.json")
     if manifest_raw is None:
         return ["manifest.json is missing -- cannot verify cross-artifact consistency"]
-    manifest = ArtifactPublicationManifest.model_validate(manifest_raw)
+    try:
+        manifest = ArtifactPublicationManifest.model_validate(manifest_raw)
+    except Exception as exc:  # this function's own contract is "return problems, never raise"
+        return [f"manifest.json failed to parse as ArtifactPublicationManifest: {exc}"]
 
     execution_report = _load_json(bundle_dir / "execution_report.json")
     if execution_report is None:

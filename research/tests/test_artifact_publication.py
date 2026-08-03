@@ -211,6 +211,41 @@ def test_fully_canonical_and_consistent_bundle_publishes_atomically(tmp_path):
     assert (canonical_dir / "investment_cases.json").exists()
 
 
+def test_atomic_replace_rolls_back_if_the_final_rename_fails(tmp_path, monkeypatch):
+    """CodeRabbit-flagged gap: if the swap's second rename (new_dir ->
+    canonical_dir) fails after the first rename (canonical_dir -> old_dir)
+    already succeeded, the previous canonical content must be restored --
+    never leave canonical_dir missing with both bundles stranded in the
+    temp dir about to be cleaned up."""
+    from agx_research.dashboard.publish import _atomic_replace
+
+    canonical_dir = tmp_path / "canonical"
+    canonical_dir.mkdir()
+    (canonical_dir / "old.txt").write_text("old content")
+
+    staged_dir = tmp_path / "staged"
+    staged_dir.mkdir()
+    (staged_dir / "new.txt").write_text("new content")
+
+    original_rename = Path.rename
+    calls = {"n": 0}
+
+    def flaky_rename(self, target):
+        calls["n"] += 1
+        if calls["n"] == 2:  # the final new_dir -> canonical_dir rename
+            raise OSError("simulated disk error")
+        return original_rename(self, target)
+
+    monkeypatch.setattr(Path, "rename", flaky_rename)
+
+    with pytest.raises(OSError, match="simulated disk error"):
+        _atomic_replace(staged_dir, canonical_dir)
+
+    assert canonical_dir.exists()
+    assert (canonical_dir / "old.txt").read_text() == "old content"
+    assert not (canonical_dir / "new.txt").exists()
+
+
 def test_a_rejected_publish_never_touches_pre_existing_canonical_content(tmp_path):
     """The exact regression requirement: non-canonical (or inconsistent)
     artifacts can never overwrite what's already published, even

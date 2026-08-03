@@ -13,16 +13,25 @@ export function ProvenanceBanner() {
   const { t } = useTranslation("common");
   const manifest = useArtifact((p) => p.getArtifactManifest());
 
-  if (manifest.loading || manifest.error) return null;
-  const issue = provenanceIssue(manifest.data);
-  if (issue === null) return null;
+  // Only the loading state stays silent. A fetch failure (network error, an
+  // older API with no /manifest route) is its own distinct warning -- it
+  // must never be conflated with "the request succeeded and returned no
+  // manifest," which is what provenanceIssue's "missing_manifest" means.
+  if (manifest.loading) return null;
 
-  const detailKey =
-    issue === "missing_manifest"
-      ? "provenanceBanner.detailMissing"
-      : issue === "non_live_mode"
-        ? "provenanceBanner.detailMode"
-        : "provenanceBanner.detailWorkflow";
+  const detailKey = manifest.error
+    ? "provenanceBanner.detailError"
+    : (() => {
+        const issue = provenanceIssue(manifest.data);
+        return issue === null
+          ? null
+          : issue === "missing_manifest"
+            ? "provenanceBanner.detailMissing"
+            : issue === "non_live_mode"
+              ? "provenanceBanner.detailMode"
+              : "provenanceBanner.detailWorkflow";
+      })();
+  if (detailKey === null) return null;
 
   return (
     <div className={styles.banner} role="alert">

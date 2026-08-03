@@ -11,7 +11,8 @@
     "title": "Not production-generated:",
     "detailMissing": "No artifact provenance manifest was found for this data. It cannot be verified as a genuine GitHub Actions production run and may be stale, mock, or locally generated.",
     "detailMode": "This data was generated in \"{{mode}}\" mode, not by the canonical GitHub Actions production workflow. Treat every figure on this dashboard as unverified.",
-    "detailWorkflow": "This data's manifest does not match the canonical production workflow or repository. It cannot be verified as production-generated."
+    "detailWorkflow": "This data's manifest does not match the canonical production workflow or repository. It cannot be verified as production-generated.",
+    "detailError": "The provenance check itself failed to load (a network error, or this backend has no manifest endpoint yet). This data's provenance is unverified until that check succeeds."
   },
   "nav": {
     "cioDesk": "CIO Desk",

@@ -9,6 +9,9 @@ jobs:
   research:
     name: Python research engine
     runs-on: ubuntu-latest
+    # This job only reads git history and runs checks; it never pushes.
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: research
@@ -16,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v3
       - run: uv sync
       - run: uv run ruff check .

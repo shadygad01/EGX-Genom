@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { DashboardDataProvider } from "../src/data/DataProvider";
@@ -327,7 +327,11 @@ describe("Artifact provenance banner (AD-64)", () => {
     });
     await renderApp("/");
     await screen.findByText("Market Regime");
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    // Explicitly wait for the settled state rather than relying on
+    // findByText's polling to have incidentally flushed the manifest
+    // fetch too -- the banner's own getArtifactManifest() call is a
+    // sibling effect, not something findByText waits on directly.
+    await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
   });
 
   it("shows a mode-specific message when the manifest says mock mode", async () => {

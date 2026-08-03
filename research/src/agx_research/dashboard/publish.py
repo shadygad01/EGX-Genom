@@ -80,7 +80,17 @@ def _atomic_replace(staged_dir: Path, canonical_dir: Path) -> None:
     with tempfile.TemporaryDirectory(dir=canonical_dir.parent, prefix=".dashboard_publish_") as tmp:
         new_dir = Path(tmp) / "new"
         shutil.copytree(staged_dir, new_dir)
-        if canonical_dir.exists():
-            old_dir = Path(tmp) / "old"
+        old_dir = Path(tmp) / "old"
+        had_previous = canonical_dir.exists()
+        if had_previous:
             canonical_dir.rename(old_dir)
-        new_dir.rename(canonical_dir)
+        try:
+            new_dir.rename(canonical_dir)
+        except OSError:
+            # The rename itself failed (disk error, permission, concurrent
+            # access) -- restore the previous canonical directory before this
+            # temp dir is cleaned up, or both the old and new bundles are
+            # lost. Never leave canonical_dir missing.
+            if had_previous:
+                old_dir.rename(canonical_dir)
+            raise

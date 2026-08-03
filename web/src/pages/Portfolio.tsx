@@ -13,7 +13,7 @@ import { LiveDecisionsUnavailableError } from "../data/DataProvider";
 import { useArtifact } from "../hooks/useArtifact";
 import { useFormatters } from "../hooks/useFormatters";
 import { usePortfolioPositions, type HeldPosition } from "../hooks/usePortfolioPositions";
-import { formatPercent, titleCase } from "../lib/format";
+import { formatPercent, normalizeDecimalInput, titleCase } from "../lib/format";
 import type { PositionAwareDecision } from "../types";
 import styles from "./Portfolio.module.css";
 
@@ -46,12 +46,14 @@ function emptyRowInput(): PositionRowInput {
 
 function parseRowInputs(inputRows: PositionRowInput[]): HeldPosition[] {
   return inputRows.map((row) => {
-    const weightNum = parseFloat(row.currentWeight);
-    const costNum = parseFloat(row.averageCost);
+    const weightText = normalizeDecimalInput(row.currentWeight);
+    const costText = normalizeDecimalInput(row.averageCost);
+    const weightNum = parseFloat(weightText);
+    const costNum = parseFloat(costText);
     return {
       ticker: row.ticker,
       currentWeight: isNaN(weightNum) ? 0 : weightNum,
-      averageCost: isNaN(costNum) || row.averageCost.trim() === "" ? null : costNum,
+      averageCost: isNaN(costNum) || costText.trim() === "" ? null : costNum,
     };
   });
 }
@@ -173,7 +175,7 @@ export function Portfolio() {
                 inputMode="decimal"
                 onChange={(e) => {
                   const next = [...rows];
-                  next[index] = { ...row, currentWeight: e.target.value };
+                  next[index] = { ...row, currentWeight: normalizeDecimalInput(e.target.value) };
                   setRows(next);
                 }}
               />
@@ -184,7 +186,7 @@ export function Portfolio() {
                 inputMode="decimal"
                 onChange={(e) => {
                   const next = [...rows];
-                  next[index] = { ...row, averageCost: e.target.value };
+                  next[index] = { ...row, averageCost: normalizeDecimalInput(e.target.value) };
                   setRows(next);
                 }}
               />

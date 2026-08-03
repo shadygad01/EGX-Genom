@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { dedupeEvidence, formatRelativeToNow, humanizeEvidence } from "../src/lib/format";
+import { dedupeEvidence, formatRelativeToNow, humanizeEvidence, normalizeDecimalInput } from "../src/lib/format";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -77,6 +77,28 @@ describe("humanizeEvidence", () => {
 
   it("humanizes a bare snake_case token with no key=value form", () => {
     expect(humanizeEvidence("macro_news, severity=low")).toBe("Macro News, Severity: low");
+  });
+});
+
+describe("normalizeDecimalInput", () => {
+  it("leaves an ordinary Latin-digit decimal unchanged", () => {
+    expect(normalizeDecimalInput("87.63")).toBe("87.63");
+  });
+
+  it("converts Arabic-Indic digits to Latin digits", () => {
+    expect(normalizeDecimalInput("٨٧٫٦٣")).toBe("87.63");
+  });
+
+  it("converts the Arabic decimal separator to a period", () => {
+    expect(normalizeDecimalInput("0٫05")).toBe("0.05");
+  });
+
+  it("converts Extended Arabic-Indic (Farsi) digits to Latin digits", () => {
+    expect(normalizeDecimalInput("۸۷.۶۳")).toBe("87.63");
+  });
+
+  it("drops the Arabic thousands separator", () => {
+    expect(normalizeDecimalInput("١٬٢٣٤")).toBe("1234");
   });
 });
 

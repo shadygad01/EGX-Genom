@@ -84,6 +84,42 @@ export function formatRelativeToNow(value: string | null | undefined, locale: st
   return rtf.format(-diffDays, "day");
 }
 
+// Arabic-Indic (U+0660-0669) and Extended Arabic-Indic (U+06F0-06F9) digits,
+// plus the Arabic decimal separator "٫" (U+066B) and thousands separator "٬"
+// (U+066C). A phone/browser set to Arabic puts these on the numeric keypad
+// for any <input inputMode="decimal">, so a value typed as "87٫63" or "٠.٠٥"
+// must still parse as 87.63 / 0.05 -- `parseFloat` stops at the first
+// non-Latin-digit character and silently truncates to a whole number
+// otherwise. Purely an input-parsing normalization; display formatting
+// already stays Latin-numeral-only (see this file's `DEFAULT_LOCALE` note).
+const ARABIC_INDIC_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+const EXTENDED_ARABIC_INDIC_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
+
+export function normalizeDecimalInput(value: string): string {
+  let result = "";
+  for (const char of value) {
+    const arabicIndicIndex = ARABIC_INDIC_DIGITS.indexOf(char);
+    if (arabicIndicIndex !== -1) {
+      result += String(arabicIndicIndex);
+      continue;
+    }
+    const extendedIndicIndex = EXTENDED_ARABIC_INDIC_DIGITS.indexOf(char);
+    if (extendedIndicIndex !== -1) {
+      result += String(extendedIndicIndex);
+      continue;
+    }
+    if (char === "٫") {
+      result += ".";
+      continue;
+    }
+    if (char === "٬") {
+      continue;
+    }
+    result += char;
+  }
+  return result;
+}
+
 export function titleCase(value: string): string {
   return value
     .split(/[_\s]+/)

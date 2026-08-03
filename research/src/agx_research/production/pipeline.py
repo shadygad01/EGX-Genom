@@ -67,6 +67,7 @@ from agx_research.agents.macro import MacroAgent
 from agx_research.agents.market_structure import MarketStructureAgent
 from agx_research.agents.news_intelligence import NewsIntelligenceAgent
 from agx_research.agents.technical_structure import TechnicalStructureAgent
+from agx_research.collectors.archive import RawArchive
 from agx_research.collectors.discovery_reconciliation import reconcile_discovery_news
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.provenance_index import ProvenanceIndexRepository
@@ -609,6 +610,7 @@ class ProductionPipeline:
             min_confidence=0.5,
         )
         fetcher = HttpFetcher()
+        raw_archive = RawArchive(self.data_dir / "raw_archive")
 
         def factory(source_id: str, spec):
             return build_live_collector(
@@ -617,6 +619,7 @@ class ProductionPipeline:
                 fetcher=fetcher,
                 tickers=self._tickers(self._run_as_of),
                 companies=self._ticker_companies(self._run_as_of),
+                archive=raw_archive,
             )
 
         engine = CapabilityDecisionEngine(self.registry, factory, metrics=self.metrics)

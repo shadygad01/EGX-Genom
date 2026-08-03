@@ -40,10 +40,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
+from agx_research.collectors.archive import RawArchive
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
 from agx_research.collectors.base import Collector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.chief_financials import ChiefFinancialsCollector
+from agx_research.collectors.company_earnings_table import CompanyEarningsTablePdfCollector
 from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.egxpilot_fundamentals import EgxPilotFundamentalsCollector
@@ -216,6 +218,8 @@ EXPECTED_RECORDS_LIVE = {
     "gdelt": 10,
     "telecom_egypt_ir": 8,
     "orascom_ir": 3,
+    "rmda_ir": 4,
+    "tmgh_ir": 4,
     "chief_egx_financials": 50,
     "egxpilot_fundamentals": 5,
     "enterprise_press": 5,
@@ -427,6 +431,7 @@ def build_live_collector(
     fetcher: HttpFetcher,
     tickers: list[str],
     companies: dict[str, str] | None = None,
+    archive: RawArchive | None = None,
 ) -> Collector | None:
     """The one place that knows how to construct a real, network-backed
     `Collector` for a given source id in LIVE mode -- reused by both the
@@ -489,6 +494,16 @@ def build_live_collector(
         return OrascomFinancialHighlightsCollector(spec, fetcher=fetcher)
     if source_id == "chief_egx_financials":
         return ChiefFinancialsCollector(spec, tickers=tickers, fetcher=fetcher)
+    if source_id in ("rmda_ir", "tmgh_ir"):
+        # Family B PDF earnings-release collector (docs/COLLECTOR_TEMPLATE_TAXONOMY.md).
+        # Needs a RawArchive to store fetched PDF bytes -- if the caller hasn't
+        # provided one, this source is skipped (None), never wired half-built.
+        if archive is None or not spec.base_url:
+            return None
+        ticker = spec.supported_entities[0] if spec.supported_entities else source_id.split("_")[0].upper()
+        return CompanyEarningsTablePdfCollector(
+            spec, ticker, [spec.base_url], archive=archive, fetcher=fetcher
+        )
     if source_id == "egxpilot_fundamentals":
         return EgxPilotFundamentalsCollector(spec, tickers=tickers, fetcher=fetcher)
     if (

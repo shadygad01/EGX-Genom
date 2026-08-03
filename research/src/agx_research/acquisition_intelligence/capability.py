@@ -98,6 +98,8 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "egid_financial_filings",
         "telecom_egypt_ir",
         "orascom_ir",
+        "rmda_ir",
+        "tmgh_ir",
         "company_ir",
     ],
     Capability.INVESTOR_RELATIONS: [
@@ -105,6 +107,8 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
         "egid_financial_filings",
         "telecom_egypt_ir",
         "orascom_ir",
+        "rmda_ir",
+        "tmgh_ir",
         "company_ir",
     ],
     Capability.NEWS: [

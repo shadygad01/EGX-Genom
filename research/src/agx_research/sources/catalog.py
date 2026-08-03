@@ -464,6 +464,88 @@ def seed_sources() -> list[SourceSpec]:
             ),
         ),
         _spec(
+            id="rmda_ir",
+            name="Rameda Pharmaceuticals Investor Relations (quarterly earnings-release PDF)",
+            category=SourceCategory.COMPANY,
+            access_method=AccessMethod.PDF_DOWNLOAD,
+            status=SourceStatus.IMPLEMENTED,
+            legal_use_status=LegalUseStatus.RESEARCH_ONLY,
+            base_url="https://ramedapharma-ir.com/wp-content/uploads/2026/05/Rameda-1Q26-Earnings-Release.pdf",
+            reliability_score=0.9,
+            freshness_score=0.85,
+            historical_coverage="Latest issuer-published quarterly earnings-release summary table",
+            expected_latency="issuer publication",
+            update_frequency="quarterly",
+            collector="CompanyEarningsTablePdfCollector",
+            collector_version="1.0.0",
+            license=(
+                "Public primary issuer investor-relations release; research use with "
+                "source attribution. Raw PDF content is not redistributed."
+            ),
+            validation_rules=[
+                "FinancialStatementLineItem schema",
+                "explicit 'EGP mn <period> <period> ...' summary table header",
+                "whitelisted line-item label",
+            ],
+            normalization_rules=["EGP mn to EGP units", "NQYY quarter label to ISO period end"],
+            conflict_priority=90,
+            priority=88,
+            supported_entities=["RMDA"],
+            supported_event_types=["corporate"],
+            supported_languages=["en"],
+            notes=(
+                "Live-verified via a real GitHub Actions fetch (run 30810863486, "
+                "2026-08-03) -- robots.txt allows it per the discovery/latest "
+                "company_financial_sources.json record. URL is the company's current "
+                "1Q26 release; a maintainer updates it to the newest release when the "
+                "weekly discovery workflow finds one, same as AD-53/AD-54's catalog-sync "
+                "precedent. The collector only reads the structured summary table, never "
+                "prose, and fails closed (empty + warning) if the table shape isn't found."
+            ),
+        ),
+        _spec(
+            id="tmgh_ir",
+            name="TMG Holding Investor Relations (quarterly earnings-release PDF)",
+            category=SourceCategory.COMPANY,
+            access_method=AccessMethod.PDF_DOWNLOAD,
+            status=SourceStatus.IMPLEMENTED,
+            legal_use_status=LegalUseStatus.RESEARCH_ONLY,
+            base_url="https://talaatmoustafa.com/upload/TMG%20Holding%201Q26%20ER%20-%20EN.pdf",
+            reliability_score=0.9,
+            freshness_score=0.85,
+            historical_coverage="Latest issuer-published quarterly earnings-release summary table",
+            expected_latency="issuer publication",
+            update_frequency="quarterly",
+            collector="CompanyEarningsTablePdfCollector",
+            collector_version="1.0.0",
+            license=(
+                "Public primary issuer investor-relations release; research use with "
+                "source attribution. Raw PDF content is not redistributed."
+            ),
+            validation_rules=[
+                "FinancialStatementLineItem schema",
+                "explicit 'EGP mn <period> <period> ...' summary table header",
+                "whitelisted line-item label",
+            ],
+            normalization_rules=["EGP mn to EGP units", "NQYY quarter label to ISO period end"],
+            conflict_priority=90,
+            priority=88,
+            supported_entities=["TMGH"],
+            supported_event_types=["corporate"],
+            supported_languages=["en"],
+            notes=(
+                "Live-verified via a real GitHub Actions fetch (run 30810863486, "
+                "2026-08-03) -- robots.txt allows it per the discovery/latest "
+                "company_financial_sources.json record. TMG Holding also publishes a "
+                "64-document PDF archive (docs/COLLECTOR_TEMPLATE_TAXONOMY.md Family B) "
+                "including full audited separate/consolidated financial statements; only "
+                "the quarterly earnings-release summary table is wired today, not that "
+                "larger archive. The collector only reads the structured summary table, "
+                "never prose, and fails closed (empty + warning) if the table shape "
+                "isn't found."
+            ),
+        ),
+        _spec(
             id="egxpilot_fundamentals",
             name="EGXpilot market fundamentals API",
             category=SourceCategory.MARKET_DATA,

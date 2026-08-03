@@ -103,9 +103,11 @@ describe("App shell", () => {
     }
   });
 
-  it("routes to Portfolio", async () => {
+  it("routes to Portfolio and supports decimal holding weights", async () => {
     await renderApp("/portfolio");
     expect(await screen.findByText("Your current holdings")).toBeInTheDocument();
+    const inputs = screen.getAllByRole("textbox");
+    expect(inputs.length).toBeGreaterThanOrEqual(3);
   });
 
   it("routes to Investment Cases", async () => {

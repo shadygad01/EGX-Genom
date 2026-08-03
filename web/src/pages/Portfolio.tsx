@@ -26,8 +26,34 @@ const ACTION_VARIANT: Record<string, BadgeVariant> = {
   no_action: "default",
 };
 
-function emptyRow(): HeldPosition {
-  return { ticker: "", currentWeight: 0, averageCost: null };
+interface PositionRowInput {
+  ticker: string;
+  currentWeight: string;
+  averageCost: string;
+}
+
+function toRowInput(pos: HeldPosition): PositionRowInput {
+  return {
+    ticker: pos.ticker,
+    currentWeight: pos.currentWeight === 0 ? "" : String(pos.currentWeight),
+    averageCost: pos.averageCost == null ? "" : String(pos.averageCost),
+  };
+}
+
+function emptyRowInput(): PositionRowInput {
+  return { ticker: "", currentWeight: "", averageCost: "" };
+}
+
+function parseRowInputs(inputRows: PositionRowInput[]): HeldPosition[] {
+  return inputRows.map((row) => {
+    const weightNum = parseFloat(row.currentWeight);
+    const costNum = parseFloat(row.averageCost);
+    return {
+      ticker: row.ticker,
+      currentWeight: isNaN(weightNum) ? 0 : weightNum,
+      averageCost: isNaN(costNum) || row.averageCost.trim() === "" ? null : costNum,
+    };
+  });
 }
 
 /** Portfolio -- "is my capital allocated correctly?" Owns two things no
@@ -44,7 +70,9 @@ export function Portfolio() {
   const marketState = useArtifact((p) => p.getMarketState());
   const { positions: savedPositions, setPositions: savePositions, toPositionInputs } = usePortfolioPositions();
 
-  const [rows, setRows] = useState<HeldPosition[]>(savedPositions.length > 0 ? savedPositions : [emptyRow()]);
+  const [rows, setRows] = useState<PositionRowInput[]>(() =>
+    savedPositions.length > 0 ? savedPositions.map(toRowInput) : [emptyRowInput()]
+  );
   const [decisions, setDecisions] = useState<PositionAwareDecision[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -52,12 +80,13 @@ export function Portfolio() {
 
   const defaultDate = marketState.data?.as_of ?? new Date().toISOString().slice(0, 10);
 
-  async function runDecide(nextRows: HeldPosition[]) {
-    savePositions(nextRows);
+  async function runDecide(inputRows: PositionRowInput[]) {
+    const parsedPositions = parseRowInputs(inputRows);
+    savePositions(parsedPositions);
     setLoading(true);
     setError(null);
     try {
-      const positions = toPositionInputsFor(nextRows);
+      const positions = toPositionInputsFor(parsedPositions);
       const result = await dataProvider.postDecisions({ date: defaultDate, positions });
       setDecisions(result);
       setSelectedTicker(result[0]?.ticker ?? null);
@@ -81,7 +110,7 @@ export function Portfolio() {
   // Auto-fetch on first load if holdings were already saved from a prior visit.
   useEffect(() => {
     if (savedPositions.length > 0) {
-      runDecide(savedPositions);
+      runDecide(savedPositions.map(toRowInput));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -139,24 +168,23 @@ export function Portfolio() {
               />
               <input
                 className={styles.input}
-                value={row.currentWeight || ""}
+                value={row.currentWeight}
                 placeholder="0.05"
                 inputMode="decimal"
                 onChange={(e) => {
                   const next = [...rows];
-                  next[index] = { ...row, currentWeight: Number(e.target.value) || 0 };
+                  next[index] = { ...row, currentWeight: e.target.value };
                   setRows(next);
                 }}
               />
               <input
                 className={styles.input}
-                value={row.averageCost ?? ""}
+                value={row.averageCost}
                 placeholder={t("positions.optional")}
                 inputMode="decimal"
                 onChange={(e) => {
                   const next = [...rows];
-                  const value = e.target.value;
-                  next[index] = { ...row, averageCost: value === "" ? null : Number(value) };
+                  next[index] = { ...row, averageCost: e.target.value };
                   setRows(next);
                 }}
               />
@@ -172,7 +200,7 @@ export function Portfolio() {
           ))}
         </div>
         <div className={styles.actionsRow}>
-          <button type="button" className={styles.secondaryButton} onClick={() => setRows([...rows, emptyRow()])}>
+          <button type="button" className={styles.secondaryButton} onClick={() => setRows([...rows, emptyRowInput()])}>
             {t("positions.addRow")}
           </button>
           <button type="button" className={styles.primaryButton} disabled={loading} onClick={() => runDecide(rows)}>

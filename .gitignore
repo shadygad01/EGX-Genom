@@ -31,7 +31,7 @@ dist/
 
 # Generated dashboard artifacts (agx_research.cli export-dashboard writes these
 # fresh in CI before the Pages build; see .github/workflows/deploy-pages.yml)
-# web/public/data/ intentionally committed for static GitHub Pages distribution
+web/public/data/
 
 # Logs
 *.log

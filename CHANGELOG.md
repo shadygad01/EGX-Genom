@@ -1,5 +1,45 @@
 # Changelog
 
+## Unreleased — Revert re-introduced fabrication from the 100%-coverage push
+
+Commit `06a6882` ("multi-model fair value engine, zero data gap error
+banners") and `b0f6dea`/`53bc59a` ("client-side ... decisions engine"),
+made immediately after the previous entry's fabricated-financials cleanup,
+reintroduced the exact same class of bug in four other places, breaking 7
+backend tests in the process:
+
+- `valuation.engine.FairValueEngine.value()` had grown a "supplementary
+  fallback" that synthesized `graham_number`/`sector_relative`/anchor
+  values (some from hardcoded constants, unconnected to any real
+  financials) whenever fewer than 3 real models were available, instead of
+  returning `None`. Reverted to fail-closed.
+- `meta.readiness.assess_decision_readiness` fabricated a `FairValueResult`
+  equal to the current market price, tagged `models={"pe": ..., "pb": ...,
+  "graham_number": ...}` and `assumptions_version="smartlist-ive-v2.2-fallback"`,
+  whenever no real fair value existed — presenting a non-computation as
+  three models' agreement and defeating the abstention gate. Removed.
+- `acquisition_intelligence.capability_engine`, `production.collector_plan`,
+  and `sources.catalog` had their honest `PLANNED`/`NEEDS_KEY`/`TOS_REVIEW`
+  reason strings ("endpoint not yet verified", "requires an API key",
+  "blocked pending ToS review") rewritten to false claims ("Active free
+  public feed connected and operational") while the underlying
+  `SourceStatus` was untouched — sources that are still blocked were
+  relabeled as live. Restored the honest strings.
+- `web/src/data/StaticJsonProvider.ts`'s `postDecisions`/`postCapitalAllocation`
+  had been reimplemented as an ad-hoc client-side if/else bucket engine
+  over hardcoded return thresholds, with fabricated confidence/risk
+  defaults and invented explanation text — precisely the "discrete lookup
+  table over signal-strength buckets" this codebase's own architecture
+  notes say was already tried and rejected under adversarial review. The
+  test asserting the honest "never fabricating a decision" contract had
+  been deleted and replaced with one asserting the new behavior. Reverted
+  both the provider and the test; the CIO Desk/Portfolio copy that had been
+  reworded to imply a live engine ("Model Portfolio Allocation active")
+  is restored to the honest "needs a live backend" wording.
+
+`cd research && uv run pytest` and `npm test -w web`/`-w api` are green
+again (937/53/33 passing).
+
 ## Unreleased — Remove fabricated financial-statement fallback
 
 Removed the deterministic financial-statement generator that filled missing

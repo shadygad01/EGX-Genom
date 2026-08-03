@@ -202,23 +202,6 @@ def assess_decision_readiness(
             else None
         )
         fair_value_available = bool(fair_value_result)
-        if not fair_value_available and latest_bar:
-            est_fair = round(latest_bar.close, 4)
-            from agx_research.valuation.engine import FairValueResult
-            fair_value_result = FairValueResult(
-                ticker=ticker,
-                as_of=market_state.as_of,
-                weighted_fair_value=est_fair,
-                bear_case=round(est_fair * 0.8, 4),
-                base_case=est_fair,
-                bull_case=round(est_fair * 1.2, 4),
-                models={"pe": est_fair, "pb": est_fair, "graham_number": est_fair},
-                included_models=["pe", "pb", "graham_number"],
-                latest_period=market_state.as_of,
-                assumptions_version="smartlist-ive-v2.2-fallback",
-            )
-            fair_value_available = True
-
         price_vs_fair_value_pct = (
             round(
                 (latest_bar.close - fair_value_result.weighted_fair_value)

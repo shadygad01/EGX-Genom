@@ -62,8 +62,16 @@ jobs:
           if git ls-remote --exit-code --heads origin production/state-latest > /dev/null 2>&1; then
             git fetch origin production/state-latest
             git archive origin/production/state-latest -- data/production | tar -x || true
+            if compgen -G 'data/production/raw_documents.json.gz.part-*' > /dev/null; then
+              cat data/production/raw_documents.json.gz.part-* > data/production/raw_documents.json.gz
+              rm data/production/raw_documents.json.gz.part-*
+            fi
             if [ -f data/production/raw_documents.json.gz ]; then
               gzip -d data/production/raw_documents.json.gz
+            fi
+            if compgen -G 'data/production/provenance_index.json.gz.part-*' > /dev/null; then
+              cat data/production/provenance_index.json.gz.part-* > data/production/provenance_index.json.gz
+              rm data/production/provenance_index.json.gz.part-*
             fi
             if [ -f data/production/provenance_index.json.gz ]; then
               gzip -d data/production/provenance_index.json.gz
@@ -186,6 +194,9 @@ jobs:
           # on the state branch and restore it before the next run above.
           if [ -f research/data/production/raw_documents.json ]; then
             gzip -9 research/data/production/raw_documents.json
+            split -b 90m research/data/production/raw_documents.json.gz \
+              research/data/production/raw_documents.json.gz.part-
+            rm research/data/production/raw_documents.json.gz
           fi
           # provenance_index.json (ProvenanceIndexRepository: one record per
           # artifact_type/key/record_date, so it grows with every ticker's
@@ -197,6 +208,9 @@ jobs:
           # gzip buys headroom, it does not cap the underlying growth.
           if [ -f research/data/production/provenance_index.json ]; then
             gzip -9 research/data/production/provenance_index.json
+            split -b 90m research/data/production/provenance_index.json.gz \
+              research/data/production/provenance_index.json.gz.part-
+            rm research/data/production/provenance_index.json.gz
           fi
           git add research/data/production/
           if ! git diff --cached --quiet; then

@@ -20,6 +20,13 @@ def test_returns_empty_when_nothing_collected(tmp_path):
     assert provider.get_line_items("COMI", date(2026, 1, 1), date(2026, 12, 31)) == []
 
 
+def test_production_path_never_fabricates_missing_financials(tmp_path):
+    production_data = tmp_path / "data" / "production"
+    provider = CollectedFinancialStatementProvider(production_data)
+
+    assert provider.get_line_items("ABUK", date(2023, 1, 1), date(2026, 12, 31)) == []
+
+
 def test_returns_items_in_date_range_sorted(tmp_path):
     _write_line_items_csv(
         tmp_path, "COMI",

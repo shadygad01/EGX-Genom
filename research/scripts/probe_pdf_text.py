@@ -1,27 +1,33 @@
-"""One-off diagnostic: fetch real, already-discovered company PDF earnings-
-release/financial-statement URLs and print their extracted text, so a real,
-evidence-based parser can be written for a Family B PDF financial-statement
+"""Reusable diagnostic: fetch real company PDF earnings-release/financial-
+statement URLs and print their extracted text, so a real, evidence-based
+parser can be written or extended for a Family B PDF financial-statement
 collector (see docs/COLLECTOR_TEMPLATE_TAXONOMY.md, "Family B — PDF report
-repository").
+repository", and TD-32/AD-61's repayment trigger).
 
-URLs below come from `research/data/registry/company_financial_sources.json`
-on the `discovery/latest` branch (a real, live GitHub Actions discovery run,
-2026-08-03) -- not guessed. This script performs REAL network fetches
-(respecting robots.txt via the existing `HttpFetcher`); it must only be run
-in an environment with real egress (a GitHub Actions runner), never assumed
-to work from a sandboxed session with no outbound access.
+URLs in TARGETS below come from
+`research/data/registry/company_financial_sources.json` on the
+`discovery/latest` branch (a real, live GitHub Actions discovery run) --
+not guessed. This script performs REAL network fetches (respecting
+robots.txt via the existing `HttpFetcher`); it must only be run in an
+environment with real egress (a GitHub Actions runner), never assumed to
+work from a sandboxed session with no outbound access.
 
-This is diagnostic only: it writes to sources/catalog.py, creates no
-SourceSpec revision, and produces no dashboard artifact. The throwaway
+This is diagnostic only: it does NOT write to sources/catalog.py, creates
+no SourceSpec revision, and produces no dashboard artifact. The throwaway
 SourceSpec below is never persisted to the SourceRegistry -- marking it
 `IMPLEMENTED` only satisfies `Collector.__init__`'s constructor guard for
 this one ephemeral object; it does not relax `AD-16`'s real rule that a
 catalogued source only becomes `IMPLEMENTED` after independently verified
 reachability. Writing a real collector/parser and promoting a catalog entry
-from `PLANNED` to `IMPLEMENTED` stays a separate, reviewed commit made after
-inspecting this script's real output.
+to `IMPLEMENTED` stays a separate, reviewed commit made after inspecting
+this script's real output.
 
-Run via `uv run python scripts/probe_pdf_text.py` from `research/`.
+To inspect a new company: add its real, already-discovered URLs to
+TARGETS (never a guessed URL), run via
+`uv run python scripts/probe_pdf_text.py` from `research/` in an
+environment with real egress (e.g. `.github/workflows/probe-pdf-text.yml`,
+`workflow_dispatch`), then read the real extracted text before writing or
+extending any parser.
 """
 
 from __future__ import annotations

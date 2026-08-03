@@ -175,6 +175,13 @@ export class ArtifactsReader {
     );
   }
 
+  // Artifact provenance (AD-64): absent means no provenance-aware exporter
+  // ever wrote this bundle -- the honest "unverified" case, never defaulted
+  // to a manifest that looks canonical.
+  manifest<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("manifest.json"), null);
+  }
+
   // Written by the weekly Discovery workflow (.github/workflows/discovery.yml),
   // not by agx run/export-dashboard -- absent until the first scheduled run's
   // PR merges. See docs/DATA_ACQUISITION.md's "Discovery workflow" section.

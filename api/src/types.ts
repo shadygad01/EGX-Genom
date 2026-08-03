@@ -477,6 +477,10 @@ export interface ExecutionReport {
   version: number;
   pipeline_version: string;
   execution_mode: string;
+  // Sourced from the same manifest.json this run wrote (AD-65) -- compare
+  // against ArtifactPublicationManifest's own fields, never independently.
+  git_commit: string | null;
+  workflow_run_id: string | null;
   run_dates: string[];
   started_at: string;
   completed_at: string;
@@ -1066,4 +1070,23 @@ export interface ShadowFundPublicState {
 export interface ShadowFundHistory {
   nav_series: ShadowFundNavPoint[];
   transactions: ShadowFundTransaction[];
+}
+
+// --- manifest.json / ArtifactPublicationManifest (AD-64) ---
+// See docs/ARCHITECTURE_DECISIONS.md's AD-64: provenance for the
+// artifact bundle this API instance is serving, so a caller can tell a
+// canonical GitHub Actions production run apart from any other source.
+
+export type PipelineMode = "live" | "mock" | "replay";
+
+export interface ArtifactPublicationManifest {
+  generated_at: string;
+  pipeline_mode: PipelineMode;
+  git_commit: string | null;
+  workflow_run_id: string | null;
+  workflow_name: string | null;
+  repository: string | null;
+  generator_version: string;
+  source_data_as_of: string | null;
+  schema_version: string;
 }

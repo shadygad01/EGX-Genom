@@ -9,11 +9,17 @@ jobs:
   research:
     name: Python research engine
     runs-on: ubuntu-latest
+    # This job only reads git history and runs checks; it never pushes.
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: research
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v3
       - run: uv sync
       - run: uv run ruff check .
@@ -28,6 +34,8 @@ jobs:
                  "commit the result, and update api/src/types.ts and web/src/types.ts to match."
             exit 1
           }
+      - name: Artifact provenance gate (AD-64) -- web/public/data changes need a canonical manifest
+        run: uv run python scripts/check_artifact_provenance.py
 
   api-and-web:
     name: TypeScript api + web

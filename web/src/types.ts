@@ -306,6 +306,26 @@ export interface SystemMaturityReport {
   governance_reviewed: boolean;
 }
 
+export type PipelineMode = "live" | "mock" | "replay";
+
+// Provenance for one published dashboard artifact bundle (AD-64, see
+// docs/ARCHITECTURE_DECISIONS.md). `workflow_run_id`/`workflow_name`/
+// `repository`/`git_commit` are `null` whenever the generating run didn't
+// actually have that identity (a local run, a fork) -- never a
+// fabricated placeholder. See web/src/lib/provenance.ts's
+// `isProductionVerified()` for what "canonical production" requires.
+export interface ArtifactPublicationManifest {
+  generated_at: string;
+  pipeline_mode: PipelineMode;
+  git_commit: string | null;
+  workflow_run_id: string | null;
+  workflow_name: string | null;
+  repository: string | null;
+  generator_version: string;
+  source_data_as_of: string | null;
+  schema_version: string;
+}
+
 export type DecisionAction = "buy_candidate" | "watch" | "avoid" | "abstain";
 export type PublicationStatus = "research_only" | "publication_ready";
 export type PriceConditionOperator = "at_or_below" | "below" | "not_applicable";
@@ -696,6 +716,10 @@ export interface ExecutionReport {
   version: number;
   pipeline_version: string;
   execution_mode: string;
+  // Sourced from the same manifest.json this run wrote (AD-65) -- compare
+  // against ArtifactPublicationManifest's own fields, never independently.
+  git_commit: string | null;
+  workflow_run_id: string | null;
   run_dates: string[];
   started_at: string;
   completed_at: string;

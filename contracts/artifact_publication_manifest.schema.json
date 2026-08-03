@@ -1,0 +1,96 @@
+{
+  "description": "Provenance for one published dashboard artifact bundle. Written\nonce per `write_dashboard_artifacts`/production pipeline export,\nalongside the artifact files themselves -- not per individual file,\nsince every file in a bundle shares one generation event.",
+  "properties": {
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "generator_version": {
+      "title": "Generator Version",
+      "type": "string"
+    },
+    "git_commit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Git Commit"
+    },
+    "pipeline_mode": {
+      "enum": [
+        "live",
+        "mock",
+        "replay"
+      ],
+      "title": "Pipeline Mode",
+      "type": "string"
+    },
+    "repository": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Repository"
+    },
+    "schema_version": {
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_data_as_of": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Data As Of"
+    },
+    "workflow_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Workflow Name"
+    },
+    "workflow_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Workflow Run Id"
+    }
+  },
+  "required": [
+    "generated_at",
+    "pipeline_mode",
+    "generator_version"
+  ],
+  "title": "ArtifactPublicationManifest",
+  "type": "object"
+}

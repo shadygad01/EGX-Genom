@@ -7,6 +7,7 @@
 
 import type {
   AcquisitionDecision,
+  ArtifactPublicationManifest,
   CollectorStatusRow,
   DashboardMetrics,
   DashboardSystemStatus,
@@ -228,6 +229,10 @@ export class StaticJsonProvider implements DashboardDataProvider {
   async getShadowFundHistory(): Promise<ShadowFundHistory> {
     const data = await fetchObject<ShadowFundHistory>("shadow_fund_history.json");
     return data ?? { nav_series: [], transactions: [] };
+  }
+
+  getArtifactManifest(): Promise<ArtifactPublicationManifest | null> {
+    return fetchObject<ArtifactPublicationManifest>("manifest.json");
   }
 
   async postDecisions(_request: DecideRequest): Promise<PositionAwareDecision[]> {

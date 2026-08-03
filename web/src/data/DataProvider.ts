@@ -9,6 +9,7 @@
 
 import type {
   AcquisitionDecision,
+  ArtifactPublicationManifest,
   CapitalAllocationPlan,
   CollectorStatusRow,
   DashboardMetrics,
@@ -129,6 +130,13 @@ export interface DashboardDataProvider {
   // real investor's) is safe to precompute.
   getShadowFund(): Promise<ShadowFundPublicState | null>;
   getShadowFundHistory(): Promise<ShadowFundHistory>;
+
+  // Artifact provenance (AD-64, docs/ARCHITECTURE_DECISIONS.md): where the
+  // currently-served bundle actually came from. `null` means no manifest
+  // was published alongside it at all -- itself a signal the bundle
+  // predates provenance tracking or wasn't written by a provenance-aware
+  // exporter. See web/src/lib/provenance.ts's `isProductionVerified()`.
+  getArtifactManifest(): Promise<ArtifactPublicationManifest | null>;
 
   // The one write-shaped call on this interface: computes fresh, position-
   // aware decisions on demand (see api/src/routes/decisions.ts). Never

@@ -23,6 +23,12 @@ class ExecutionReport(BaseModel):
     version: int = 1
     pipeline_version: str = PIPELINE_VERSION
     execution_mode: str
+    # Same identity fields as dashboard.manifest.ArtifactPublicationManifest,
+    # sourced from that exact manifest object (not independently
+    # recomputed) so the two agree by construction -- see AD-65,
+    # dashboard.consistency.validate_bundle_consistency.
+    git_commit: str | None = None
+    workflow_run_id: str | None = None
     run_dates: list[str] = Field(default_factory=list)
     started_at: datetime
     completed_at: datetime

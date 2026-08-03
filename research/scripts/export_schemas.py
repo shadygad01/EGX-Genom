@@ -28,6 +28,7 @@ from pathlib import Path
 from agx_research.capital_allocation import CapitalAllocationPlan
 from agx_research.claims import Claim
 from agx_research.dashboard.committee_summary import CommitteeSummaryReport
+from agx_research.dashboard.manifest import ArtifactPublicationManifest
 from agx_research.dashboard.monitoring import MonitoringWarningsReport
 from agx_research.dashboard.portfolio_summary import PortfolioSummaryReport
 from agx_research.dashboard.schemas import DashboardSystemStatus
@@ -62,6 +63,7 @@ MODELS = {
     "shadow_fund.schema.json": ShadowFundPublicState,
     "shadow_fund_history.schema.json": ShadowFundHistory,
     "system_maturity.schema.json": SystemMaturityReport,
+    "artifact_publication_manifest.schema.json": ArtifactPublicationManifest,
 }
 
 

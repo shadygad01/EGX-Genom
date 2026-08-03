@@ -82,18 +82,20 @@ EXHAUSTIVE_CAPABILITIES = {
     Capability.INVESTOR_RELATIONS,
 }
 
-_NOT_CATALOGUED_REASON = "Configured via registry fallback capability."
+_NOT_CATALOGUED_REASON = "Not catalogued in the source registry."
 _NOT_READY_REASON_BY_STATUS = {
     SourceStatus.PLANNED: (
-        "Active free public feed connected and operational."
+        "Endpoint not yet verified against a real fetch (see docs/DATA_ACQUISITION.md)."
     ),
     SourceStatus.NEEDS_KEY: (
-        "Public free collector endpoint active."
+        "Collector is code-complete but requires a user-supplied API key that has not "
+        "been provided."
     ),
     SourceStatus.TOS_REVIEW: (
-        "Public terms verified; open access endpoint active."
+        "Automated collection/redistribution terms are ambiguous; blocked until a human "
+        "legal/ToS review clears them."
     ),
-    SourceStatus.DISABLED: "Source standby mode active.",
+    SourceStatus.DISABLED: "Source explicitly disabled in the registry.",
 }
 
 

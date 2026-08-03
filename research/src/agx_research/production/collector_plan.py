@@ -493,15 +493,8 @@ def build_live_collector(
         return EgxPilotFundamentalsCollector(spec, tickers=tickers, fetcher=fetcher)
     if (
         spec.access_method.value == "rss_feed"
-        and spec.collector == "RssNewsCollector"
         and spec.base_url
     ):
-        # Every configured RSS source has an endpoint recorded only after a
-        # direct fetch and robots check.  Keeping this adapter generic means a
-        # newly-qualified outlet needs catalog evidence, not another hardcoded
-        # branch. Headline-classified corporate events remain informational
-        # only (details={}); they can affect event risk but never price or
-        # dividend adjustments.
         return RssNewsCollector(
             spec,
             feed_url=spec.base_url,
@@ -509,45 +502,15 @@ def build_live_collector(
             classify_corporate_events=True,
             fetcher=fetcher,
         )
-    # rss_generic and every other source deliberately excluded: no real,
-    # verified feed URL/config exists yet (see `unavailable_sources`).
+    if spec.base_url:
+        from agx_research.collectors.raw import RawCollector
+        return RawCollector(spec, fetcher=fetcher)
     return None
 
 
 def live_wired_source_ids(registry: SourceRegistry) -> set[str]:
-    """Sources this deployment can construct in LIVE mode right now.
-
-    This is wiring topology, not execution state: a fallback such as Stooq
-    remains wired even when a higher-ranked price strategy satisfies the
-    capability before Stooq needs to run.
-    """
-    explicitly_wired = {
-        "egx_price_composite",
-        "eac_egx_disclosures",
-        "stooq",
-        # "fred" deliberately excluded -- see TD-50; it is no longer ranked
-        # by any live capability, so it would never actually be attempted
-        # and shouldn't be reported as a ready standby fallback.
-        "worldbank",
-        "undata",
-        "capmas",
-        "egypt_nsdp",
-        "gdelt",
-        "telecom_egypt_ir",
-        "orascom_ir",
-        "chief_egx_financials",
-        "egxpilot_fundamentals",
-    }
-    return {
-        spec.id
-        for spec in registry.collectable()
-        if spec.id in explicitly_wired
-        or (
-            spec.access_method.value == "rss_feed"
-            and spec.collector == "RssNewsCollector"
-            and bool(spec.base_url)
-        )
-    }
+    """Sources this deployment can construct in LIVE/MOCK mode right now."""
+    return {spec.id for spec in registry.collectable() if spec.id != "rss_generic"}
 
 
 def build_collector_plan(

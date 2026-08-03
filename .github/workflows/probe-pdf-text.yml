@@ -1,0 +1,32 @@
+name: Probe PDF text (diagnostic, manual only)
+
+# Ad hoc, manually-triggered diagnostic -- fetches real, already-discovered
+# company financial-statement/earnings-release PDFs (see
+# research/scripts/probe_pdf_text.py's docstring for the exact URLs and
+# their provenance) and prints their extracted text to this run's own logs.
+# Writes nothing to any tracked file, creates no SourceSpec, produces no
+# dashboard artifact -- purely evidence-gathering so a real Family B PDF
+# parser (docs/COLLECTOR_TEMPLATE_TAXONOMY.md) can be written against real
+# extracted text instead of a guess. Delete this workflow once that parser
+# exists and has been verified; it is not meant to be a permanent job.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Install research package
+        working-directory: research
+        run: uv sync
+
+      - name: Fetch and print real PDF text
+        working-directory: research
+        run: uv run python scripts/probe_pdf_text.py

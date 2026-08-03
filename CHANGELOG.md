@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased — Settings dashboard audit: `egypt_nsdp` live-wiring gap closed
+
+Investigated a user-reported "Financial Data Coverage 5.9%" / "28 collectors
+not yet wired" complaint on Settings. Both numbers are accurate, tested, and
+intentional, not bugs: `financials.coverage.build_financial_coverage_report`
+deliberately counts only `ANNUAL`/`QUARTERLY` line items (see
+`test_market_snapshot_is_not_misreported_as_financial_statement_coverage`),
+so `egxpilot_fundamentals`'s real, ~100/101-ticker `SNAPSHOT`/
+`MARKET_FUNDAMENTALS` data correctly does not count as financial-statement
+coverage — only `telecom_egypt_ir`/`orascom_ir` (2 tickers) and whatever
+`chief_egx_financials` discovers on a given run currently produce real
+`ANNUAL`/`QUARTERLY` items. The 28 `UNAVAILABLE` collectors are the current
+catalog's 19 `PLANNED` + 8 `DISABLED` + 1 `TOS_REVIEW` sources, each with a
+real, evidenced blocker (anti-bot/WAF reset, ToS ambiguity, endpoint not yet
+verified) — confirmed against the real, live-network `discovery.yml` run
+history (`discovery/latest` branch), not fabricated. Closing either number
+further needs either real endpoint verification with live network egress
+(the existing weekly Discovery workflow) or new per-company IR collectors
+built from each company's real, inspected page content (`company_financial_sources.json`
+already has 21/101 companies with real discovered IR/financial-statement
+page URLs, ready for a maintainer to build a collector against, following
+the `telecom_egypt_financials.py`/`orascom_financials.py` precedent) — not
+something a code change alone can close.
+
+One real, narrow bug found and fixed along the way:
+`production.collector_plan.live_wired_source_ids()`'s `explicitly_wired` set
+was missing `"egypt_nsdp"`, even though `build_live_collector()`,
+`EXPECTED_RECORDS_LIVE`, and `Capability.MACROECONOMIC`'s strategy pool all
+already wire it — an oversight from the commit that added the EGX NSDP
+collector (`4799994`), never updated here. Harmless in practice today
+(`MACROECONOMIC` is an exhaustive capability, so `egypt_nsdp` is always
+attempted whenever `IMPLEMENTED` regardless of this set), but the set is now
+consistent with every other place this source is wired.
+
 ## Unreleased — Investment Science Lab / Claim Registry
 
 Extended the newly introduced `MethodologyRegistry` with a versioned Claim

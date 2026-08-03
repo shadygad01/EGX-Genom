@@ -531,6 +531,7 @@ def live_wired_source_ids(registry: SourceRegistry) -> set[str]:
         "worldbank",
         "undata",
         "capmas",
+        "egypt_nsdp",
         "gdelt",
         "telecom_egypt_ir",
         "orascom_ir",

@@ -4,6 +4,63 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-62 — Entity resolution is multi-strategy and independent of collector work (TD-66)
+
+**Decision.** `discovery.company_entity_resolution.EntityResolutionEngine`
+solves company-identity discovery as its own layer, strictly upstream of
+any collector/parser: given a ticker/name, it resolves (1-2) a canonical
+legal entity name and known aliases via a new, independent strategy
+(`discovery.gleif_lookup.GleifLegalEntityClient`, the free/no-key GLEIF
+LEI registry) and (3) a verified official website, by running *every*
+configured website-hint strategy (Wikidata's `P856` property; the
+reviewed web-search snapshot) and keeping *all* of their candidates,
+confidence-ordered, rather than one strategy's result silently winning
+and the other's being discarded. Items (4-6) — Investor Relations entry
+point, financial-report repository, PDF locations — are not re-solved by
+this engine at all: once a website is confirmed reachable by the
+existing, unmodified `HeuristicDomainResolver`, the existing, unmodified
+`discovery.company_financial_discovery.discover_company_financial_sources`
+does that work exactly as it already did. `EntityResolutionEngine` is the
+identity-resolution layer specifically; it is not, and must not become, a
+second copy of document-discovery logic that already exists and is
+already tested.
+
+**Rationale.** Auditing the existing discovery code (TD-66) found two
+real, structural gaps, neither closed by adding a fabricated signal: (a)
+`scripts/build_financial_source_registry.py` — the script that actually
+produces `company_financial_sources.json`, the real data behind the
+Collector Template Taxonomy and every coverage-gap analysis this mission
+line has produced — only ever consulted the static web-search snapshot;
+`WikidataOfficialWebsiteClient` existed, was tested, and was already wired
+into `cli.py discover-sources`'s *separate* `SourceRegistry`-building path,
+but nobody had wired it into this one, so a company resolvable by
+Wikidata alone was recorded `HOMEPAGE_UNRESOLVED` in this specific
+registry for no reason grounded in real unavailability. (b) `cli.py
+discover-sources` itself narrowed each company to a single winning hint
+by source priority (`t.model_copy(update={"domain_hints": [hint]})`)
+even though `TargetOrganization.domain_hints` is already a `list[str]`
+and `domain_resolution.HeuristicDomainResolver.candidate_domains()`
+already tries every hint in order, falling back to a heuristic guess only
+once all of them are exhausted — a company's higher-priority hint turning
+out unreachable silently lost the fallback try at its own independent,
+possibly-correct second hint. Both are pure information loss from how the
+existing, already-correct machinery was *wired*, not a defect in
+`HeuristicDomainResolver`, `WikidataOfficialWebsiteClient`, or
+`discover_company_financial_sources` themselves — all three are reused
+completely unchanged.
+
+**Test protection.** `EntityResolutionEngine`'s multi-strategy behavior is
+directly regression-tested (`test_company_entity_resolution.py
+::test_second_strategy_hint_wins_when_first_is_unreachable`): a company
+whose first-priority hint is unreachable must still resolve via its
+second, independent hint, and `EntityResolutionReport
+.website_resolutions_by_source()` must attribute the win to the strategy
+that actually supplied the reachable candidate, not the one that ran
+first. `GleifLegalEntityClient` follows `WikidataOfficialWebsiteClient`'s
+exact fixture-based testing convention (fake `fetch_json` closures, no
+live network in the test suite) and the same honest per-company
+degradation (one company's lookup failing never blocks the rest).
+
 ## AD-61 — Family B PDF financial-statement collector: real-evidence-first, table-only, not prose
 
 `collectors.company_earnings_table.CompanyEarningsTablePdfCollector` (TD-32,

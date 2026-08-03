@@ -20,6 +20,7 @@ from agx_research.acquisition_intelligence.discovery_report import (
     build_discovery_metrics,
     run_discovery_report,
 )
+from agx_research.acquisition_intelligence.domain_resolution import HeuristicDomainResolver
 from agx_research.acquisition_intelligence.engine import AcquisitionIntelligenceEngine
 from agx_research.acquisition_intelligence.live import (
     build_live_fetch_text,
@@ -46,7 +47,8 @@ from agx_research.decision_service.country_risk import assess_country_risk
 from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
 from agx_research.decision_service.position import PositionState
 from agx_research.decision_service.service import DecisionService, PositionAwareDecision
-from agx_research.discovery.web_search_hints import load_web_search_domain_hints
+from agx_research.discovery.company_entity_resolution import EntityResolutionEngine
+from agx_research.discovery.web_search_hints import WebSearchHintStrategy, load_web_search_domain_hints
 from agx_research.data.mock_provider import LocalCsvDataProvider, MockDataProvider
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
@@ -613,41 +615,42 @@ def main(argv: list[str] | None = None) -> int:
         universe = universe_provider.constituents(date.today())
         company_ir_targets = generate_company_ir_targets(universe)
 
-        # A second, independent free hint source that does not depend on
-        # `egx_official` being reachable at all: Wikidata's own declared
-        # `P856` (official website) property, matched by company name (see
-        # `discovery.wikidata_lookup`). `run_catalog`'s own
-        # `discover_company_directory_links` pass (via egx_official or any
-        # other resolved catalog target) can still supply a hint later in
-        # the same run for any ticker this lookup missed -- it never
-        # overrides a hint a target already carries, so applying this first
-        # only ever adds coverage, never removes it.
-        wikidata_hints = build_live_wikidata_client().lookup(universe)
-        if wikidata_hints:
-            company_ir_targets = [
-                t.model_copy(update={"domain_hints": [wikidata_hints[t.company_ticker]]})
-                if t.company_ticker in wikidata_hints
-                else t
-                for t in company_ir_targets
-            ]
-
-        # A third, independent hint source (see TD-38): a reviewed, evidenced
-        # web-search snapshot (`discovery.load_web_search_domain_hints`),
-        # applied only to tickers Wikidata's own structured P856 claim did
-        # not already resolve -- Wikidata is preferred where both exist
-        # since it's independently machine-verifiable, not just text search
-        # evidence. Like every other hint here, nothing is trusted directly:
-        # `HeuristicDomainResolver` still independently probes it.
+        # Multi-strategy website-hint resolution (discovery.company_entity_resolution
+        # .EntityResolutionEngine, TD-66): Wikidata's declared `P856` property
+        # and the reviewed web-search snapshot (TD-38) each independently
+        # propose a hostname per company; ALL candidates a company gets are
+        # kept, ordered by strategy confidence, instead of picking one
+        # strategy's winner and discarding the other's hint outright. This
+        # matters concretely: a company whose Wikidata hint turns out
+        # unreachable previously had no fallback to its own, independently
+        # correct web-search hint -- `HeuristicDomainResolver` (inside
+        # `run_for_target`/`run_catalog`, unchanged) now gets a real chance
+        # at every candidate before falling back to a name-derived guess.
+        # `run_catalog`'s own `discover_company_directory_links` pass (via
+        # egx_official or any other resolved catalog target) can still add a
+        # further hint later in the same run for any ticker these two missed.
         web_search_hints = load_web_search_domain_hints(
             args.universe_seed_dir / "egx30_web_search_domain_hints.json"
         )
-        if web_search_hints:
-            company_ir_targets = [
-                t.model_copy(update={"domain_hints": [web_search_hints[t.company_ticker]]})
-                if t.company_ticker in web_search_hints and t.company_ticker not in wikidata_hints
-                else t
-                for t in company_ir_targets
-            ]
+        entity_resolution_engine = EntityResolutionEngine(
+            website_strategies=[build_live_wikidata_client(), WebSearchHintStrategy(web_search_hints)],
+            domain_resolver=HeuristicDomainResolver(build_live_prober(fetcher)),
+            fetcher=fetcher,
+        )
+        website_candidates = entity_resolution_engine.resolve_website_candidates(universe)
+        company_ir_targets = [
+            t.model_copy(
+                update={
+                    "domain_hints": [
+                        c.hostname
+                        for c in sorted(website_candidates.get(t.company_ticker, []), key=lambda c: -c.confidence)
+                    ]
+                }
+            )
+            if t.company_ticker in website_candidates and website_candidates[t.company_ticker]
+            else t
+            for t in company_ir_targets
+        ]
         all_targets = [*seed_target_organizations(), *company_ir_targets]
 
         results = []

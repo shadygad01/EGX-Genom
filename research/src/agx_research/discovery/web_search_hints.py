@@ -38,3 +38,19 @@ def load_web_search_domain_hints(path: Path | str) -> dict[str, str]:
         for ticker, entry in hints.items()
         if isinstance(entry, dict) and entry.get("hostname")
     }
+
+
+class WebSearchHintStrategy:
+    """Adapts `load_web_search_domain_hints`'s static snapshot to the
+    `discovery.company_entity_resolution.WebsiteHintStrategy` shape, so it
+    can be composed alongside `WikidataOfficialWebsiteClient` and any
+    other live strategy in one `EntityResolutionEngine` instead of being
+    special-cased at each call site."""
+
+    name = "web_search"
+
+    def __init__(self, hints: dict[str, str]):
+        self._hints = hints
+
+    def lookup(self, companies: dict[str, str]) -> dict[str, str]:
+        return {ticker: hostname for ticker, hostname in self._hints.items() if ticker in companies}

@@ -66,6 +66,14 @@ class CompanyFinancialSourceRecord(BaseModel):
     blocked_reason: str | None = None
     last_attempted_at: datetime = Field(default_factory=datetime.now)
     notes: str = ""
+    # Canonical legal entity + aliases (discovery.gleif_lookup via
+    # discovery.company_entity_resolution.EntityResolutionEngine) -- all
+    # optional/default-empty so existing persisted records without these
+    # fields still deserialize unchanged.
+    legal_name: str | None = None
+    legal_name_source: str | None = None  # e.g. "gleif"
+    aliases: list[str] = Field(default_factory=list)
+    lei: str | None = None
 
 
 class CompanyFinancialSourceRegistry(JsonFileRepository[CompanyFinancialSourceRecord]):

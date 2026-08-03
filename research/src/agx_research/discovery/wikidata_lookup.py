@@ -103,6 +103,8 @@ def _find_matching_entity(candidates: list[tuple[str, str]], name: str) -> str |
 
 
 class WikidataOfficialWebsiteClient:
+    name = "wikidata"
+
     def __init__(self, fetch_json: FetchJson):
         self.fetch_json = fetch_json
 

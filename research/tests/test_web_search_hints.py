@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from agx_research.discovery.web_search_hints import load_web_search_domain_hints
+from agx_research.discovery.web_search_hints import WebSearchHintStrategy, load_web_search_domain_hints
 
 
 def test_missing_file_returns_empty_dict(tmp_path):
@@ -45,3 +45,10 @@ def test_real_egx30_hints_file_loads_and_covers_expected_tickers():
     # must never appear as a fabricated hint.
     for unresolved in ("EGCH", "HELI", "MCQE", "OIH", "PHDC"):
         assert unresolved not in hints
+
+
+def test_web_search_hint_strategy_filters_to_requested_companies():
+    strategy = WebSearchHintStrategy({"COMI": "www.cibeg.com", "ETEL": "www.telecomegypt.eg"})
+    assert strategy.name == "web_search"
+    assert strategy.lookup({"COMI": "CIB"}) == {"COMI": "www.cibeg.com"}
+    assert strategy.lookup({"HRHO": "EFG Hermes"}) == {}

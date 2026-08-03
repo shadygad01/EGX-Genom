@@ -22,6 +22,7 @@ import urllib.request
 from agx_research.acquisition_intelligence.domain_resolution import ProbeResult
 from agx_research.acquisition_intelligence.historical import WaybackAvailabilityClient
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
+from agx_research.discovery.gleif_lookup import GleifLegalEntityClient
 from agx_research.discovery.wikidata_lookup import WikidataOfficialWebsiteClient
 from agx_research.sources.spec import (
     AccessMethod,
@@ -174,3 +175,66 @@ def build_live_wikidata_client(
         return {}
 
     return WikidataOfficialWebsiteClient(fetch_json)
+
+
+_GLEIF_MAX_429_RETRIES = 3
+_GLEIF_DEFAULT_RETRY_AFTER_SECONDS = 5.0
+_GLEIF_MAX_RETRY_DELAY_SECONDS = 15.0
+
+
+def build_live_gleif_client(
+    *, timeout_seconds: float = 30.0, min_seconds_between_requests: float = 0.3,
+) -> GleifLegalEntityClient:
+    """Same pacing/429-backoff shape as `build_live_wikidata_client` above,
+    applied preemptively rather than reactively: unlike Wikidata's client,
+    this one has not yet been exercised against the real GLEIF API from a
+    live-egress environment, so there is no confirmed real rate-limit
+    incident to calibrate against (the honest state is "defensively
+    built, not yet live-verified" -- see `discovery.gleif_lookup`'s module
+    docstring). `GleifLegalEntityClient.lookup` still degrades every
+    per-company failure to "no match" and never raises to the caller,
+    the same honest fallback every other live adapter here uses.
+    """
+    last_request_at = 0.0
+
+    def fetch_json(url: str):
+        nonlocal last_request_at
+        for attempt in range(_GLEIF_MAX_429_RETRIES + 1):
+            elapsed = time.monotonic() - last_request_at
+            if elapsed < min_seconds_between_requests:
+                time.sleep(min_seconds_between_requests - elapsed)
+            last_request_at = time.monotonic()
+
+            request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+            try:
+                with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+                    return json.loads(response.read().decode("utf-8", errors="replace"))
+            except urllib.error.HTTPError as exc:
+                body = exc.read().decode("utf-8", errors="replace")[:300]
+                if exc.code == 429 and attempt < _GLEIF_MAX_429_RETRIES:
+                    retry_after = exc.headers.get("Retry-After") if exc.headers else None
+                    try:
+                        delay = float(retry_after) if retry_after else _GLEIF_DEFAULT_RETRY_AFTER_SECONDS
+                    except ValueError:
+                        delay = _GLEIF_DEFAULT_RETRY_AFTER_SECONDS
+                    delay = min(delay, _GLEIF_MAX_RETRY_DELAY_SECONDS)
+                    print(
+                        f"GLEIF API rate-limited (attempt {attempt + 1}/"
+                        f"{_GLEIF_MAX_429_RETRIES + 1}); retrying in {delay:.1f}s.",
+                        file=sys.stderr,
+                    )
+                    time.sleep(delay)
+                    continue
+                # Diagnostic only, same posture as build_live_wikidata_client:
+                # GleifLegalEntityClient.lookup degrades to "no match" either
+                # way -- this just lets a live run's logs distinguish
+                # "the endpoint rejected/rate-limited the request" from
+                # "no matching entity/record exists".
+                print(f"GLEIF API request failed: HTTP {exc.code} {exc.reason}: {body}", file=sys.stderr)
+                return {}
+            except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError) as exc:
+                print(f"GLEIF API request failed: {exc!r}", file=sys.stderr)
+                return {}
+        return {}
+
+    return GleifLegalEntityClient(fetch_json)

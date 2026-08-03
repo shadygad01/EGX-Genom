@@ -1,5 +1,17 @@
 # Collector Template Taxonomy
 
+**Update (2026-08-03, same day): Family B roadmap step 2 is now partially
+implemented, not just taxonomy.** `collectors.company_earnings_table
+.CompanyEarningsTablePdfCollector` is real, tested production code wired
+for `rmda_ir`/`tmgh_ir` (see TD-32, `AD-61`) — built only after fetching
+and inspecting RMDA's and TMGH's real extracted PDF text via a live GitHub
+Actions run. It reads only the structured summary table described in
+Family B below, never prose. The other 6 real members (JUFO, ORWE, EAST,
+ADIB, CCAP, ORHD) are unchanged from this document's taxonomy-only status
+below — their real text was inspected too, but didn't show the same table
+shape in what was fetched (prose-only, or in one case a scanned/image PDF
+with 0 extractable characters), so no parser was guessed for them.
+
 **Status: REGENERATED against fixed discovery code (2026-08-03).** The
 first version of this document was built from a discovery run with two
 known, real limitations: crawl depth capped at the homepage (Gap 1) and an

@@ -4,6 +4,29 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-61 — Family B PDF financial-statement collector: real-evidence-first, table-only, not prose
+
+`collectors.company_earnings_table.CompanyEarningsTablePdfCollector` (TD-32,
+partially closed) only reads a company's own structured quarterly
+earnings-release summary table (`EGP mn <period> <period> <change>` header
++ `<Label> <value> <value> <pct>` rows), never free-form prose, and only
+ever records a fixed, real-evidence-derived label whitelist. This was
+written only after fetching and inspecting real extracted text from real,
+already-discovered PDFs (`research/scripts/probe_pdf_text.py`, run against
+a live GitHub Actions execution — `30810863486` — since this session's own
+sandbox has no network egress). That inspection found two real risks a
+guessed generic parser would have hit blind: different companies phrase
+the same figures in prose differently (a single regex over narrative text
+does not generalize the way `telecom_egypt_financials.py`'s ETEL-specific
+patterns do for one issuer), and a structurally identical `<label> <num>
+<num> <pct>` table shape recurs elsewhere in the same real document for
+unrelated data (per-channel sales breakdowns, per-segment revenue) — a bare
+regex without a label whitelist would have silently mismatched those.
+Wired for `rmda_ir`/`tmgh_ir` only (the two companies whose real fetched
+text confirmed this exact table shape); the other 6 real, live-discovered
+Family B members are left for a follow-up that inspects each one's real
+text first (see TD-32), not extended by guessing their likely phrasing.
+
 ## AD-60 — Truth Preservation Policy: fabrication prevention as an architectural property, not a review habit
 
 **Full policy: `docs/TRUTH_PRESERVATION_POLICY.md`.** This entry records

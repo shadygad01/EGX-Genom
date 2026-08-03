@@ -94,6 +94,26 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
             "meta_decision_engine",
         ],
     },
+    "rmda_ir": {
+        "records": ["financial_statement_line_items"],
+        "consumers": [
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
+    "tmgh_ir": {
+        "records": ["financial_statement_line_items"],
+        "consumers": [
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
     "egxpilot_fundamentals": {
         "records": ["financial_statement_line_items", "market_fundamental_snapshot"],
         "consumers": [

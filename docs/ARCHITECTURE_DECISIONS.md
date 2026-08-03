@@ -4,6 +4,75 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-64 — Artifact Publication Provenance: every published dashboard artifact must prove which pipeline produced it (TD-68)
+
+**Decision.** Four permanent mechanisms, same shape as AD-60's enforcement
+set but targeting a distinct failure mode (provenance, not fabricated
+content): (1) `agx_research.dashboard.manifest.ArtifactPublicationManifest`
+— one manifest written per exported bundle (`manifest.json`, alongside
+every other dashboard artifact) recording `generated_at`, `pipeline_mode`
+(`live`/`mock`/`replay`), `git_commit`, `workflow_run_id`, `workflow_name`,
+`repository`, `generator_version`, `source_data_as_of`, and
+`schema_version`; `workflow_run_id`/`workflow_name`/`repository` are only
+ever populated from the real `GITHUB_RUN_ID`/`GITHUB_WORKFLOW`/
+`GITHUB_REPOSITORY` environment GitHub Actions sets — a local run leaves
+them `None` rather than fabricating a workflow identity it doesn't have,
+the same "unknown over wrong" discipline `AD-60` already established.
+(2) `is_canonical_production()`/the equivalent web
+`web/src/lib/provenance.ts:isProductionVerified()` — both true only when
+every field matches `CANONICAL_WORKFLOW_NAME` ("Deploy web dashboard to
+GitHub Pages") and `CANONICAL_REPOSITORY` ("shadygad01/EGX-Genom") *and*
+`workflow_run_id`/`git_commit` are present; partial evidence (a manifest
+merely claiming `pipeline_mode: "live"` with no workflow identity behind
+it) is not enough. `ProvenanceBanner` renders a specific, honest reason
+(no manifest at all / wrong mode / wrong workflow) globally in
+`AppShell`, above every routed page, whenever verification fails — never
+silently hidden on some routes and shown on others. (3)
+`ProductionPipeline.run()` structurally refuses outright (before any
+stage executes, an uncaught `ValueError`, not just one stage marked
+FAILED while every other stage keeps writing) whenever `mode != LIVE` and
+`dashboard_out` resolves to `CANONICAL_PRODUCTION_DASHBOARD_DIR`
+(`web/public/data`) — a mock or replay run cannot land artifacts in the
+one directory GitHub Pages actually serves, full stop. (4)
+`research/scripts/check_artifact_provenance.py`, run in CI's research job
+(`.github/workflows/ci.yml`, `fetch-depth: 0` so `origin/main` is
+resolvable): if a PR/push diff touches `web/public/data/`, the manifest
+committed alongside it must prove a canonical production run or the build
+fails. Already-existing non-canonical artifacts predating this check are
+not retroactively failed — only new changes are gated — because
+regenerating them correctly is deliberately a separate, later step
+(TD-68).
+
+**Evidence.** A 2026-08-03 investigation into an empty CIO Desk Capital
+Allocation section traced the cause all the way back through
+`investment_cases.json` → `KnowledgeStore` (0 promoted) →
+`DailyResearchPipeline` (all 404 hypotheses rejected at DATA_COLLECTION,
+"0 aligned observations") → `MarketMemory.reconstruct()`'s empty
+`price_history` → `research/data/mock/prices/*.csv` (data ending
+2026-06-14) run against `as_of=2026-07-26`, a date `production/pipeline
+.py`'s mock-mode 30-day `price_lookback_days` window couldn't reach. The
+committed `execution_report.json` proved `"execution_mode": "mock"`, and
+its own `dashboard_artifact_generator` stage detail contained a path from
+an entirely different machine (`C:\Users\...\.gemini\antigravity\
+worktrees\...\verify_repo_connection\...`) — an out-of-band local mock
+run had been committed to `main`'s `web/public/data/` indistinguishable,
+to the pipeline or the web app, from a genuine GitHub Actions production
+run. `git log` confirmed `.github/workflows/deploy-pages.yml` never
+commits `web/public/data/` back to `main` at all — the only route by
+which this data reached the repository was a direct, unverified commit.
+The dashboard's honest "no recommendations" empty state was itself
+*correct* given the data it had; nothing in the system could tell that
+data apart from real production output, which is the actual gap this
+closes.
+
+**Rationale.** This is deliberately scoped as detection-and-prevention
+only, not a fix for the currently-stale data (see TD-68): regenerating
+`web/public/data/` before this existed would just produce another
+unverifiable local artifact, the same mistake one level removed. Same
+posture as `AD-60`'s closing argument — every other invariant in this
+file is enforced by a structural code path, not a comment asking a future
+contributor to remember, and provenance is now one of them.
+
 ## AD-63 — Entity resolution is cumulative knowledge, modeled as Observation vs. Claim, not a stateless search or an execution log (TD-67)
 
 **Decision.** Every attempt `discovery.company_entity_resolution

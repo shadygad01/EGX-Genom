@@ -45,6 +45,7 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
     getCommitteeSummary: async () => null,
     getShadowFund: async () => null,
     getShadowFundHistory: async () => ({ nav_series: [], transactions: [] }),
+    getArtifactManifest: async () => null,
     postDecisions: async () => [],
     postCapitalAllocation: async () => ({
       as_of: "2026-07-22",
@@ -301,6 +302,50 @@ describe("CIO Desk", () => {
     await renderApp("/");
     expect((await screen.findAllByText("COMI")).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Suggested").length).toBeGreaterThan(0);
+  });
+});
+
+describe("Artifact provenance banner (AD-64)", () => {
+  it("shows the unverified banner when no manifest is published (the default test provider)", async () => {
+    await renderApp("/");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Not production-generated");
+  });
+
+  it("hides the banner when the manifest proves a canonical production run", async () => {
+    mockProvider = fakeProvider({
+      getArtifactManifest: async () => ({
+        generated_at: "2026-08-03T12:00:00",
+        pipeline_mode: "live",
+        git_commit: "deadbeef",
+        workflow_run_id: "123456",
+        workflow_name: "Deploy web dashboard to GitHub Pages",
+        repository: "shadygad01/EGX-Genom",
+        generator_version: "1.0.0",
+        source_data_as_of: "2026-08-01",
+        schema_version: "1",
+      }),
+    });
+    await renderApp("/");
+    await screen.findByText("Market Regime");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("shows a mode-specific message when the manifest says mock mode", async () => {
+    mockProvider = fakeProvider({
+      getArtifactManifest: async () => ({
+        generated_at: "2026-08-03T12:00:00",
+        pipeline_mode: "mock",
+        git_commit: "deadbeef",
+        workflow_run_id: null,
+        workflow_name: null,
+        repository: null,
+        generator_version: "1.0.0",
+        source_data_as_of: "2026-07-26",
+        schema_version: "1",
+      }),
+    });
+    await renderApp("/");
+    expect(await screen.findByRole("alert")).toHaveTextContent("mock");
   });
 });
 

@@ -1,0 +1,27 @@
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-3) var(--space-4) 0;
+  background: var(--negative-subtle);
+  border: 1px solid var(--negative);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--negative);
+  font-size: var(--text-sm);
+}
+
+.title {
+  color: var(--text-primary);
+}
+
+.detail {
+  color: var(--text-secondary);
+}

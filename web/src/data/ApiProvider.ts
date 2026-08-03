@@ -7,6 +7,7 @@
 
 import type {
   AcquisitionDecision,
+  ArtifactPublicationManifest,
   CapitalAllocationPlan,
   CollectorStatusRow,
   DashboardMetrics,
@@ -217,6 +218,10 @@ export class ApiProvider implements DashboardDataProvider {
 
   getShadowFundHistory(): Promise<ShadowFundHistory> {
     return fetchJson<ShadowFundHistory>("/shadow-fund-history");
+  }
+
+  getArtifactManifest(): Promise<ArtifactPublicationManifest | null> {
+    return fetchJson<ArtifactPublicationManifest | null>("/manifest");
   }
 
   async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {

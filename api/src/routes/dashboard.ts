@@ -57,4 +57,8 @@ export async function dashboardRoutes(
   // same as every other artifact above (never computed on demand).
   app.get("/shadow-fund", async () => artifacts.shadowFund());
   app.get("/shadow-fund-history", async () => artifacts.shadowFundHistory());
+
+  // Artifact provenance (AD-64): where the bundle this api/ instance is
+  // serving actually came from -- see docs/ARCHITECTURE_DECISIONS.md.
+  app.get("/manifest", async () => artifacts.manifest());
 }

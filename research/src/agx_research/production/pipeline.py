@@ -76,6 +76,7 @@ from agx_research.methodology import MethodologyRegistry, seed_methodology_regis
 from agx_research.collectors.service import CollectionRunResult, CollectionService
 from agx_research.dashboard.committee_summary import build_committee_summary
 from agx_research.dashboard.export import ARTIFACT_FILENAMES, write_dashboard_artifacts
+from agx_research.dashboard.manifest import build_manifest
 from agx_research.dashboard.monitoring import build_warnings
 from agx_research.dashboard.portfolio_summary import build_portfolio_summary
 from agx_research.data.mock_provider import LocalCsvDataProvider
@@ -143,6 +144,16 @@ from agx_research.universe.sector import CollectedSectorProvider
 from agx_research.valuation import FairValueEngine
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
+
+# The one path the real GitHub Pages deploy publishes to (AD-64,
+# docs/ARCHITECTURE_DECISIONS.md). A mock/replay run writing here would
+# recreate the exact incident that motivated artifact provenance in the
+# first place -- stale, out-of-band data indistinguishable from a genuine
+# `--mode live` production run. Structurally refused in
+# `_stage_dashboard_artifact_generator` below, never left to convention.
+CANONICAL_PRODUCTION_DASHBOARD_DIR = (
+    Path(__file__).resolve().parents[4] / "web" / "public" / "data"
+)
 
 # Egyptian Live Data Sprint (original): fresh discovery started restricted
 # to exactly the project owner's first named priority order (EGX official ->
@@ -271,6 +282,20 @@ class ProductionPipeline:
         if end < start:
             raise ValueError("end must be on or after start")
         dashboard_out = dashboard_out or (self.data_dir / "dashboard")
+        # Artifact provenance (AD-64): refuse outright, before any stage
+        # runs, rather than letting one stage fail while every other stage
+        # (mission_control_update, execution_report) still writes into the
+        # same forbidden directory. Mock/replay runs publish nowhere near
+        # what GitHub Pages actually serves -- not "mostly nowhere".
+        if mode != ExecutionMode.LIVE and (
+            dashboard_out.resolve() == CANONICAL_PRODUCTION_DASHBOARD_DIR
+        ):
+            raise ValueError(
+                f"Refusing to run in {mode.value} mode with dashboard_out="
+                f"{CANONICAL_PRODUCTION_DASHBOARD_DIR}, the canonical production "
+                "publication path. Mock/replay runs must publish to a different "
+                "directory -- see AD-64 in docs/ARCHITECTURE_DECISIONS.md."
+            )
         self.mode = mode
         self._run_as_of = end
         if self._macro_series_ids_override is not None:
@@ -959,6 +984,8 @@ class ProductionPipeline:
     def _stage_dashboard_artifact_generator(self, dashboard_out: Path, end: date):
         if self.knowledge_store is None or self.market_memory is None:
             return StageStatus.SKIPPED, "Nothing to export yet.", []
+        # The mock/production path-separation guard lives in run(), before
+        # any stage executes -- see AD-64. Not repeated here.
         dashboard_out.mkdir(parents=True, exist_ok=True)
 
         as_of = self._latest_successful_as_of()
@@ -1340,6 +1367,18 @@ class ProductionPipeline:
             json.dumps(dashboard_metrics, indent=2, sort_keys=True) + "\n"
         )
         counts["dashboard_metrics.json"] = len(counts)
+
+        # Artifact provenance (AD-64): every published bundle records where
+        # it actually came from -- written last, over the final `counts`,
+        # so `manifest.json` always reflects the same execution that
+        # produced every file alongside it.
+        manifest = build_manifest(
+            mode=self.mode.value, generator_version=PIPELINE_VERSION, source_data_as_of=as_of
+        )
+        (dashboard_out / "manifest.json").write_text(
+            json.dumps(manifest.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
+        )
+        counts["manifest.json"] = 1
 
         self.dashboard_counts = counts
         return (

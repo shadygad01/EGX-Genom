@@ -1,5 +1,46 @@
 # Changelog
 
+## Unreleased — Make canonical publication atomic, exclusive, and self-validating (AD-65)
+
+Follow-up to AD-64: that change made every bundle carry a provenance
+manifest and gated CI on it, but didn't yet make the publish act itself
+atomic or exclusive. Added `dashboard.publish.publish_canonical_dataset()`
+as the one function permitted to write into
+`CANONICAL_PRODUCTION_DASHBOARD_DIR` (now defined once, in
+`dashboard/publish.py`, imported everywhere else that needs it) -- it
+re-validates a staged bundle from scratch (schema, provenance, and a new
+`dashboard.consistency.validate_bundle_consistency()` cross-artifact
+check that every artifact's as_of/timestamp/mode/commit/run-id agrees
+with `manifest.json`) and only publishes atomically, via same-filesystem
+directory renames, if every check passes. `ProductionPipeline.run()` now
+stages every artifact privately and never writes into the canonical
+directory itself; a LIVE-mode run that isn't actually the canonical
+GitHub Actions workflow is rejected at this same gate by the real
+manifest check, not by mode alone. `ExecutionReport` gained
+`git_commit`/`workflow_run_id`, sourced from the same manifest object
+already built that run, so cross-checking them is meaningful.
+
+While implementing this, found (not introduced) that
+`.github/workflows/deploy-pages.yml`'s "Persist updated production state"
+step force-pushes the shared `production/state-latest` branch with no
+branch gate at all -- a `workflow_dispatch` test run from a feature
+branch would have corrupted that shared continuity. Gated it to
+`github.ref == 'refs/heads/main'`, matching the `deploy` job's existing
+main-only gate, and added `test_deploy_workflow_safety.py` to regression-
+test both halves plus a structural floor against any future `git push`
+step in that workflow being added ungated.
+
+12 new tests in `test_artifact_publication.py` prove a mock or internally
+-inconsistent bundle is rejected, a fully canonical+consistent bundle
+publishes atomically, and -- the literal regression requirement -- a
+rejected publish never touches pre-existing canonical content (checked
+byte-for-byte), plus two full `ProductionPipeline.run()` end-to-end tests
+(canned network, never real) proving the complete staging/publish wiring.
+See `docs/ARCHITECTURE_DECISIONS.md`'s AD-65.
+
+`cd research && uv run pytest` (1035 passing) and `npm test -w api`/
+`-w web` (33/68 passing) are green.
+
 ## Unreleased — Add Artifact Publication Provenance (AD-64)
 
 Traced the CIO Desk's empty Capital Allocation section all the way back

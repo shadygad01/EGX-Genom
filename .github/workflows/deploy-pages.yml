@@ -182,8 +182,16 @@ jobs:
       # makes the underlying data *content* (knowledge/genome/events/etc.)
       # accumulate across days; each day's commit here is a fresh single
       # snapshot, same discipline as discovery.yml's own `discovery/latest`.
+      #
+      # Main-only, same as the `deploy` job's own gate (AD-65): a
+      # workflow_dispatch test run from a feature branch must be able to
+      # exercise collection/analysis/validation end-to-end without ever
+      # force-pushing this shared branch -- production/state-latest is
+      # real accumulated state every scheduled main-branch run restores
+      # from, and a feature-branch test run overwriting it would corrupt
+      # that continuity for everyone, not just the branch under test.
       - name: Persist updated production state to production/state-latest
-        if: steps.check_run.outputs.already_ran != 'true'
+        if: steps.check_run.outputs.already_ran != 'true' && github.ref == 'refs/heads/main'
         working-directory: .
         run: |
           git config user.name "agx-production-bot"

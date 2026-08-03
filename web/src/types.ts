@@ -716,6 +716,10 @@ export interface ExecutionReport {
   version: number;
   pipeline_version: string;
   execution_mode: string;
+  // Sourced from the same manifest.json this run wrote (AD-65) -- compare
+  // against ArtifactPublicationManifest's own fields, never independently.
+  git_commit: string | null;
+  workflow_run_id: string | null;
   run_dates: string[];
   started_at: string;
   completed_at: string;

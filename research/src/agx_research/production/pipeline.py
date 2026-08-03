@@ -38,6 +38,8 @@ isolates one bad day from the rest of a range.
 from __future__ import annotations
 
 import json
+import shutil
+import tempfile
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -76,9 +78,13 @@ from agx_research.methodology import MethodologyRegistry, seed_methodology_regis
 from agx_research.collectors.service import CollectionRunResult, CollectionService
 from agx_research.dashboard.committee_summary import build_committee_summary
 from agx_research.dashboard.export import ARTIFACT_FILENAMES, write_dashboard_artifacts
-from agx_research.dashboard.manifest import build_manifest
+from agx_research.dashboard.manifest import ArtifactPublicationManifest, build_manifest
 from agx_research.dashboard.monitoring import build_warnings
 from agx_research.dashboard.portfolio_summary import build_portfolio_summary
+from agx_research.dashboard.publish import (
+    CANONICAL_PRODUCTION_DASHBOARD_DIR,
+    publish_canonical_dataset,
+)
 from agx_research.data.mock_provider import LocalCsvDataProvider
 from agx_research.decision_service.country_risk import assess_country_risk
 from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
@@ -144,16 +150,6 @@ from agx_research.universe.sector import CollectedSectorProvider
 from agx_research.valuation import FairValueEngine
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
-
-# The one path the real GitHub Pages deploy publishes to (AD-64,
-# docs/ARCHITECTURE_DECISIONS.md). A mock/replay run writing here would
-# recreate the exact incident that motivated artifact provenance in the
-# first place -- stale, out-of-band data indistinguishable from a genuine
-# `--mode live` production run. Structurally refused in
-# `_stage_dashboard_artifact_generator` below, never left to convention.
-CANONICAL_PRODUCTION_DASHBOARD_DIR = (
-    Path(__file__).resolve().parents[4] / "web" / "public" / "data"
-)
 
 # Egyptian Live Data Sprint (original): fresh discovery started restricted
 # to exactly the project owner's first named priority order (EGX official ->
@@ -232,6 +228,10 @@ class ProductionPipeline:
         self.run_records_this_execution: list[RunRecord] = []
         self.investment_cases: dict | None = None
         self.dashboard_counts: dict[str, int] = {}
+        # Set by _stage_dashboard_artifact_generator; ExecutionReport's own
+        # git_commit/workflow_run_id are sourced from this exact object
+        # (AD-65), never independently recomputed, so the two always agree.
+        self._last_manifest: ArtifactPublicationManifest | None = None
         self.mode: ExecutionMode = ExecutionMode.LIVE
         self._unavailable: dict[str, str] = {}
         self._standby: dict[str, str] = {}
@@ -281,21 +281,36 @@ class ProductionPipeline:
         end = end or start
         if end < start:
             raise ValueError("end must be on or after start")
-        dashboard_out = dashboard_out or (self.data_dir / "dashboard")
+        requested_out = dashboard_out or (self.data_dir / "dashboard")
+        publishing_canonically = requested_out.resolve() == CANONICAL_PRODUCTION_DASHBOARD_DIR
         # Artifact provenance (AD-64): refuse outright, before any stage
         # runs, rather than letting one stage fail while every other stage
         # (mission_control_update, execution_report) still writes into the
         # same forbidden directory. Mock/replay runs publish nowhere near
-        # what GitHub Pages actually serves -- not "mostly nowhere".
-        if mode != ExecutionMode.LIVE and (
-            dashboard_out.resolve() == CANONICAL_PRODUCTION_DASHBOARD_DIR
-        ):
+        # what GitHub Pages actually serves -- not "mostly nowhere". A
+        # LIVE-mode run that isn't actually the canonical GitHub Actions
+        # workflow is not rejected here (mode alone can't know that) -- it
+        # runs all the way through and is rejected at the atomic publish
+        # step below instead, by the real manifest check (AD-65).
+        if mode != ExecutionMode.LIVE and publishing_canonically:
             raise ValueError(
                 f"Refusing to run in {mode.value} mode with dashboard_out="
                 f"{CANONICAL_PRODUCTION_DASHBOARD_DIR}, the canonical production "
                 "publication path. Mock/replay runs must publish to a different "
                 "directory -- see AD-64 in docs/ARCHITECTURE_DECISIONS.md."
             )
+        staging_dir: Path | None = None
+        if publishing_canonically:
+            # AD-65: never write directly into the canonical path. Every
+            # stage below writes into a private staging directory instead;
+            # publish_canonical_dataset() re-validates the finished bundle
+            # from scratch (shape, provenance, cross-artifact consistency)
+            # and only then atomically replaces the canonical directory --
+            # this method never touches it directly itself.
+            staging_dir = Path(tempfile.mkdtemp(prefix="agx_dashboard_staging_"))
+            dashboard_out = staging_dir
+        else:
+            dashboard_out = requested_out
         self.mode = mode
         self._run_as_of = end
         if self._macro_series_ids_override is not None:
@@ -395,6 +410,10 @@ class ProductionPipeline:
         report = ExecutionReport(
             id=new_id("execution"),
             execution_mode=mode.value,
+            # Sourced from the same manifest _stage_dashboard_artifact_generator
+            # just wrote, not recomputed -- see AD-65.
+            git_commit=self._last_manifest.git_commit if self._last_manifest else None,
+            workflow_run_id=self._last_manifest.workflow_run_id if self._last_manifest else None,
             run_dates=[
                 (start + timedelta(days=i)).isoformat() for i in range((end - start).days + 1)
             ],
@@ -440,6 +459,21 @@ class ProductionPipeline:
         execution_report_path.write_text(
             json.dumps(final_report.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
         )
+
+        if staging_dir is not None:
+            # AD-65: the only call in this codebase permitted to touch the
+            # canonical directory. Re-validates the fully-staged bundle from
+            # scratch (shape, provenance, cross-artifact consistency) and
+            # publishes atomically only if every check passes; raises
+            # PublicationError (nothing published, canonical directory left
+            # exactly as it was) otherwise. Not wrapped in execute() --
+            # a publish failure must fail run() itself, not be absorbed into
+            # a stage-level FAILED entry the overall report could still call
+            # SUCCEEDED/PARTIAL around.
+            try:
+                publish_canonical_dataset(staging_dir, canonical_dir=CANONICAL_PRODUCTION_DASHBOARD_DIR)
+            finally:
+                shutil.rmtree(staging_dir, ignore_errors=True)
         return final_report
 
     def _overall_status(self, stages: list[StageResult]) -> StageStatus:
@@ -1379,6 +1413,7 @@ class ProductionPipeline:
             json.dumps(manifest.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
         )
         counts["manifest.json"] = 1
+        self._last_manifest = manifest
 
         self.dashboard_counts = counts
         return (

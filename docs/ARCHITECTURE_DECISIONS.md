@@ -4,6 +4,69 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-65 — Canonical publication is atomic, exclusive, and re-validated at the point of publish, not trusted from the caller
+
+**Decision.** AD-64 made every bundle carry a manifest and gated *commits*
+of `web/public/data/` in CI; it did not yet make the *publish act itself*
+atomic or exclusive. Four additions close that: (1)
+`dashboard.publish.CANONICAL_PRODUCTION_DASHBOARD_DIR` is now defined in
+exactly one place (`dashboard/publish.py`); `production.pipeline` imports
+it rather than redefining it, so "exactly one canonical publication path"
+is a fact about the codebase, not a convention two files could drift on.
+(2) `dashboard.publish.publish_canonical_dataset()` is the *only* function
+permitted to write into that directory, and it never trusts its caller:
+it re-validates a staged bundle from scratch, in order — artifact shape
+(`dashboard.validate.validate_dashboard_artifacts`), provenance
+(`dashboard.manifest.is_canonical_production` — mode alone is never
+enough; workflow name, repository, run id, and commit must all be
+present and match), and a new `dashboard.consistency
+.validate_bundle_consistency()` cross-check (every artifact's own
+as_of/timestamp/mode/commit/run-id must agree with `manifest.json`, so no
+artifact can be a stale leftover from a different execution). Any failure
+raises `PublicationError`; nothing is published. (3) `ProductionPipeline
+.run()` never writes into the canonical directory directly, even when
+asked to: whenever `dashboard_out` resolves there, every stage writes
+into a private staging directory instead, and only the single call to
+`publish_canonical_dataset()` at the very end (outside `execute()`'s
+per-stage isolation, so a publish failure fails `run()` itself, not just
+one stage) ever touches the real path — via same-filesystem directory
+renames, each individually atomic, so a concurrent reader never observes
+a half-old/half-new mix. A LIVE-mode run that isn't actually the
+canonical GitHub Actions workflow (a developer's own machine, real
+network, `mode="live"`) is not rejected by mode alone — it runs all the
+way through and is rejected at this same publish gate, by the real
+manifest check. (4) `ExecutionReport.git_commit`/`workflow_run_id` are new
+fields sourced from the exact same `ArtifactPublicationManifest` object
+`_stage_dashboard_artifact_generator` just built (stored on
+`self._last_manifest`), never independently recomputed — so
+`validate_bundle_consistency()` comparing them is a check against a
+value that's identical by construction, not two computations that happen
+to agree.
+
+`.github/workflows/deploy-pages.yml`'s "Persist updated production state
+to production/state-latest" step is now also gated to
+`github.ref == 'refs/heads/main'`, matching the `deploy` job's pre-existing
+main-only gate. This was found, not introduced, while implementing the
+above: that step force-pushes a real shared branch every scheduled
+main-branch run restores from, with no branch gate at all -- a
+`workflow_dispatch` test run from a feature branch (used to validate this
+mission's own architecture end-to-end against real live collectors)
+would otherwise corrupt that shared continuity. `test_deploy_workflow_safety.py`
+regression-tests both halves of "a feature branch can execute
+collection/analysis/validation but never mutate shared production
+state," plus a structural floor asserting any future `git push` step
+added to this workflow is main-gated too.
+
+**Rationale.** AD-64's manifest+CI-gate answers "can I tell this bundle
+apart from a fake one" but left two adjacent gaps open: nothing stopped
+`ProductionPipeline.run()` itself from writing partial/inconsistent state
+directly into the canonical path mid-run, and nothing checked that a
+bundle's own files agreed with each other rather than just each looking
+individually well-formed. Both are exactly the kind of gap AD-60's
+closing argument already generalizes: an invariant enforced by convention
+regresses; the same invariant enforced by a structural code path (one
+function, atomic swap, re-validated inputs) does not.
+
 ## AD-64 — Artifact Publication Provenance: every published dashboard artifact must prove which pipeline produced it (TD-68)
 
 **Decision.** Four permanent mechanisms, same shape as AD-60's enforcement

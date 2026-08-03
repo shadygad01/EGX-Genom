@@ -43,8 +43,6 @@ from agx_research.meta.readiness import DecisionReadiness, TickerDataGapReport
 from agx_research.papers.paper import ResearchPaper
 from agx_research.claims import Claim
 from agx_research.portfolio.constructor import PortfolioRecommendation
-from agx_research.production.mission_control import MissionControlStatus
-from agx_research.production.report import ExecutionReport
 from agx_research.runtime.engine import RunRecord
 from agx_research.shadow_fund.models import ShadowFundHistory, ShadowFundPublicState
 from agx_research.sources.spec import SourceSpec
@@ -408,6 +406,12 @@ def _load_optional_json(directory: Path, filename: str):
 
 
 def _validate_optional_execution_report(directory: Path, counts: dict[str, int]) -> None:
+    # Imported lazily: agx_research.production's package __init__ eagerly
+    # imports ProductionPipeline, which imports dashboard.publish, which
+    # imports this module for validate_dashboard_artifacts() -- a
+    # module-level import here would be circular.
+    from agx_research.production.report import ExecutionReport  # noqa: PLC0415
+
     payload, present = _load_optional_json(directory, "execution_report.json")
     if not present:
         return
@@ -419,6 +423,10 @@ def _validate_optional_execution_report(directory: Path, counts: dict[str, int])
 
 
 def _validate_optional_mission_status(directory: Path, counts: dict[str, int]) -> None:
+    # Imported lazily -- same circular-import reason as ExecutionReport
+    # above.
+    from agx_research.production.mission_control import MissionControlStatus  # noqa: PLC0415
+
     payload, present = _load_optional_json(directory, "mission_status.json")
     if not present:
         return

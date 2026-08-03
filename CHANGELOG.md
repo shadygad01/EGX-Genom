@@ -1,5 +1,38 @@
 # Changelog
 
+## Unreleased — Discovery Engine: one-level IR traversal + Arabic document classifier
+
+Per explicit instruction, closed the two generic (company-agnostic) gaps
+`docs/COLLECTOR_TEMPLATE_TAXONOMY.md` named as undercounting every
+template family *before* any collector implementation starts:
+
+- `discovery.company_financial_discovery.discover_company_financial_sources()`
+  now follows every distinct, actually-navigable `INVESTOR_RELATIONS_HOME`
+  candidate the homepage scan finds — once, never recursively — and folds
+  in whatever that page's own links classify as. A failed follow-up fetch
+  is non-fatal (level-1 evidence still stands). Non-navigable anchors
+  (`#`, `#tab-mega-...`, `javascript:void(0);`) are filtered out so the
+  crawl never wastes a fetch re-requesting the homepage itself.
+- `discovery.financial_document.classify_financial_document()` gained
+  Arabic keywords for every existing category (annual/quarterly report,
+  financial statements, presentation, disclosure, investor relations),
+  closing a real, evidenced gap: Eastern Company's (EAST) real disclosures
+  page previously only matched via its English URL slug
+  (`/disclosures_ar/`) — its actual Arabic anchor text
+  ("الإفصاحات") would not have matched at all.
+
+Both are unit-tested against fixtures (11 new tests: 6 for the Arabic
+keywords including EAST's real anchor text, 5 for one-level traversal
+including non-recursion and graceful-failure cases); 936 backend tests
+pass, ruff clean.
+
+`docs/COLLECTOR_TEMPLATE_TAXONOMY.md` is marked **PROVISIONAL** as a
+result: its family counts still reflect the pre-fix discovery run and must
+be regenerated (a real `company_financial_sources.json` re-run needs live
+network egress, unavailable in this sandbox — see the Weekly Discovery
+workflow) and diffed against this version before any collector family is
+treated as final, per instruction.
+
 ## Unreleased — Settings dashboard audit: `egypt_nsdp` live-wiring gap closed
 
 Investigated a user-reported "Financial Data Coverage 5.9%" / "28 collectors

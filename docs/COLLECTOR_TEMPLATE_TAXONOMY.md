@@ -1,5 +1,19 @@
 # Collector Template Taxonomy
 
+**Status: PROVISIONAL.** Everything below was sized from a discovery run
+with two known, real limitations: crawl depth capped at the homepage (Gap
+1) and an English-only document classifier (Gap 2). Both are now fixed in
+code (`discovery.company_financial_discovery`'s one-level IR traversal;
+`discovery.financial_document`'s Arabic keyword vocabulary — see
+`CHANGELOG.md`), but the family counts and members below still reflect the
+*old*, pre-fix discovery run (`discovery/latest` branch, 2026-07-31) — they
+have not yet been regenerated against a fresh, live re-run using the fixed
+code. Per explicit instruction, no collector implementation should start
+from this version of the taxonomy. Once a fresh `discover-planned-report`-
+style run regenerates `company_financial_sources.json` with the fixed
+discovery pipeline, this document must be regenerated and diffed against
+this version before any family is treated as final.
+
 This document answers a scalability question, not a data-availability one:
 `docs/DATA_ACQUISITION.md`/`docs/ACQUISITION_STRATEGY.md` already established
 *that* free company-level financial data exists to be found; the Financial

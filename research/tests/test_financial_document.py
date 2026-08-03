@@ -53,3 +53,51 @@ def test_more_specific_category_wins_over_generic_ir_keyword():
         )
         == FinancialDocumentCategory.ANNUAL_REPORT
     )
+
+
+def test_classifies_real_arabic_disclosure_anchor_text():
+    # Real evidence this mattered: Eastern Company's (EAST) actual, live-
+    # fetched disclosures page only matched before via its English URL
+    # slug (/disclosures_ar/) -- its real Arabic anchor text below would
+    # not have matched the pre-Arabic-vocabulary keyword list at all.
+    assert (
+        classify_financial_document("https://www.easternegypt.com/disclosures_ar/", "الإفصاحات")
+        == FinancialDocumentCategory.DISCLOSURE
+    )
+
+
+def test_classifies_arabic_annual_report():
+    assert (
+        classify_financial_document("https://example.com/reports/2025", "التقرير السنوي 2025")
+        == FinancialDocumentCategory.ANNUAL_REPORT
+    )
+
+
+def test_classifies_arabic_quarterly_report():
+    assert (
+        classify_financial_document("https://example.com/q3-2026", "نتائج الربع الثالث 2026")
+        == FinancialDocumentCategory.QUARTERLY_REPORT
+    )
+
+
+def test_classifies_arabic_financial_statements():
+    assert (
+        classify_financial_document("https://example.com/fs", "القوائم المالية")
+        == FinancialDocumentCategory.FINANCIAL_STATEMENTS
+    )
+
+
+def test_classifies_arabic_investor_relations_home_as_catch_all():
+    assert (
+        classify_financial_document("https://example.com/ir", "علاقات المستثمرين")
+        == FinancialDocumentCategory.INVESTOR_RELATIONS_HOME
+    )
+
+
+def test_arabic_specific_category_still_wins_over_generic_ir_keyword():
+    assert (
+        classify_financial_document(
+            "https://example.com/ir/annual-2025", "علاقات المستثمرين - التقرير السنوي"
+        )
+        == FinancialDocumentCategory.ANNUAL_REPORT
+    )

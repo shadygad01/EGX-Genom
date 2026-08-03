@@ -259,6 +259,23 @@ Layout:
   `storage.JsonFileRepository`, following the pattern in
   `knowledge/store.py` and `hypotheses/repository.py` — not a new bespoke
   persistence mechanism.
+- `discovery.resolution_memory.ResolutionMemory` is entity resolution's
+  permanent, cumulative attempt log — every proposed website candidate,
+  every domain actually probed (reachable or rejected, with a reason),
+  every legal-entity match/miss (with a reason), regardless of whether the
+  attempt succeeded. `EntityResolutionEngine.resolve()` builds one on every
+  call via `HeuristicDomainResolver.resolve_with_trace()` and
+  `WikidataOfficialWebsiteClient`/`GleifLegalEntityClient
+  .lookup_with_trace()` — the plain `resolve()`/`lookup()` methods are thin
+  wrappers over these, so adding a new trace-capable strategy should follow
+  the same `_with_trace` sibling-method pattern rather than changing what
+  the plain method returns. A candidate the resolver never reached (an
+  earlier one already won) must never be recorded as rejected — only a
+  domain actually probed belongs in `website_probe_attempts`. This store is
+  observability, not a resolution-behavior change: it does not (yet) skip
+  re-probing a domain it already knows is dead (TD-67) — don't wire that in
+  without treating it as the separate, deliberate algorithm change it
+  would be.
 - `KnowledgeObject`/`KnowledgeStore` remain the system of record for the
   promotion gate. `genome.Gene`/`AlphaGenome` are the lineage layer *on
   top* — don't fold gene fields into `KnowledgeObject` or vice versa.

@@ -5,7 +5,7 @@ from agx_research.discovery.company_financial_registry import (
     CompanyFinancialSourceRecord,
     CompanyRegistryStatus,
 )
-from agx_research.discovery.gleif_lookup import GleifLegalEntityClient
+from agx_research.discovery.gleif_lookup import GleifLegalEntityClient, GleifLookupAttempt
 
 IR_PAGE = """
 <html><body>
@@ -128,14 +128,18 @@ def test_resolve_legal_entities_uses_gleif_when_configured():
         def __init__(self):
             pass
 
-        def lookup(self, companies):
-            from agx_research.discovery.gleif_lookup import LegalEntityMatch
+        def lookup_with_trace(self, companies):
+            from agx_research.discovery.gleif_lookup import GleifLookupAttempt, LegalEntityMatch
 
             return {
-                "JUFO": LegalEntityMatch(
-                    lei="LEI123", legal_name="JUHAYNA FOOD INDUSTRIES S.A.E.",
-                    aliases=["Juhayna"], jurisdiction_country="EG",
-                    match_confidence=0.9, evidence="GLEIF LEI record LEI123",
+                "JUFO": GleifLookupAttempt(
+                    ticker="JUFO",
+                    matched=True,
+                    match=LegalEntityMatch(
+                        lei="LEI123", legal_name="JUHAYNA FOOD INDUSTRIES S.A.E.",
+                        aliases=["Juhayna"], jurisdiction_country="EG",
+                        match_confidence=0.9, evidence="GLEIF LEI record LEI123",
+                    ),
                 )
             }
 
@@ -196,3 +200,117 @@ def test_website_candidates_are_sorted_by_confidence_before_probing():
     record_candidates = sorted(candidates["COMI"], key=lambda c: -c.confidence)
     assert record_candidates[0].source == "web_search"  # ran first, so highest prior confidence
     assert isinstance(record_candidates[0], HintCandidate)
+
+
+class _TraceStrategy:
+    """A website-hint strategy that exposes lookup_with_trace, matching the
+    real shape `wikidata_lookup.WikidataOfficialWebsiteClient` uses -- lets
+    tests exercise EntityResolutionEngine's trace-capable code path without
+    a real Wikidata client."""
+
+    def __init__(self, name, attempts):
+        self.name = name
+        self._attempts = attempts  # ticker -> object with matched/hostname/rejection_reason
+
+    def lookup(self, companies):
+        return {t: a.hostname for t, a in self._attempts.items() if t in companies and a.matched and a.hostname}
+
+    def lookup_with_trace(self, companies):
+        return {t: a for t, a in self._attempts.items() if t in companies}
+
+
+class _Attempt:
+    def __init__(self, matched, hostname=None, rejection_reason=None):
+        self.matched = matched
+        self.hostname = hostname
+        self.rejection_reason = rejection_reason
+
+
+def test_resolution_memory_persists_every_proposed_candidate_and_rejected_domain():
+    engine = _engine(
+        website_strategies=[
+            _Strategy("wikidata", {"COMI": "bad-first.example"}),
+            _Strategy("web_search", {"COMI": "cibeg.com"}),
+        ],
+        reachable_urls={"https://cibeg.com"},
+    )
+    report = engine.resolve({"COMI": "Commercial International Bank"})
+    memory = report.records[0].resolution_memory
+
+    assert memory is not None
+    assert {c.source for c in memory.website_candidates_proposed} == {"wikidata", "web_search"}
+    assert memory.resolved_hostname == "cibeg.com"
+    probed_domains = {a.domain: a for a in memory.website_probe_attempts}
+    assert probed_domains["bad-first.example"].reachable is False
+    assert probed_domains["bad-first.example"].rejection_reason
+    assert probed_domains["cibeg.com"].reachable is True
+
+
+def test_resolution_memory_records_never_attempted_candidates_as_absent_not_rejected():
+    """A candidate the resolver never got to (because an earlier, higher-
+    confidence one already won) must not be fabricated into the persisted
+    record as "rejected" -- it must simply not appear in probe attempts."""
+    engine = _engine(
+        website_strategies=[
+            _Strategy("wikidata", {"COMI": "cibeg.com"}),  # ran first -> highest confidence -> probed first
+            _Strategy("web_search", {"COMI": "never-reached.example"}),
+        ],
+        reachable_urls={"https://cibeg.com"},
+    )
+    report = engine.resolve({"COMI": "Commercial International Bank"})
+    memory = report.records[0].resolution_memory
+    assert [a.domain for a in memory.website_probe_attempts] == ["cibeg.com"]
+    # proposed regardless (a real strategy really proposed it this run)...
+    assert "never-reached.example" in {c.hostname for c in memory.website_candidates_proposed}
+    # ...but never appears as a probe attempt, since it was never reached.
+    assert "never-reached.example" not in {a.domain for a in memory.website_probe_attempts}
+
+
+def test_resolution_memory_persists_wikidata_source_attempt_rejection_reason():
+    engine = _engine(
+        website_strategies=[
+            _TraceStrategy("wikidata", {"EGCH": _Attempt(matched=False, rejection_reason="no candidate entities")}),
+        ],
+        reachable_urls=set(),
+    )
+    report = engine.resolve({"EGCH": "Egyptian Chemical Industries"})
+    memory = report.records[0].resolution_memory
+    assert len(memory.website_source_attempts) == 1
+    attempt = memory.website_source_attempts[0]
+    assert attempt.source == "wikidata"
+    assert attempt.matched is False
+    assert attempt.rejection_reason == "no candidate entities"
+
+
+def test_resolution_memory_persists_gleif_rejection_reason_even_on_miss():
+    class _FakeGleif(GleifLegalEntityClient):
+        def __init__(self):
+            pass
+
+        def lookup_with_trace(self, companies):
+            return {
+                "HRHO": GleifLookupAttempt(
+                    ticker="HRHO", matched=False, rejection_reason="no fuzzy-completions candidate",
+                )
+            }
+
+    engine = _engine(website_strategies=[], reachable_urls=set(), legal_entity_client=_FakeGleif())
+    report = engine.resolve({"HRHO": "EFG Hermes Holding"})
+    memory = report.records[0].resolution_memory
+
+    assert len(memory.legal_entity_attempts) == 1
+    attempt = memory.legal_entity_attempts[0]
+    assert attempt.source == "gleif"
+    assert attempt.matched is False
+    assert attempt.rejection_reason == "no fuzzy-completions candidate"
+    assert memory.legal_name is None  # a rejected attempt must never populate the canonical field
+
+
+def test_resolution_memory_reserved_fields_stay_empty():
+    """brand_names/parent_company have no real source in this codebase yet
+    -- they must stay honestly empty, never guessed."""
+    engine = _engine(website_strategies=[], reachable_urls=set())
+    report = engine.resolve({"EGCH": "Egyptian Chemical Industries"})
+    memory = report.records[0].resolution_memory
+    assert memory.brand_names == []
+    assert memory.parent_company is None

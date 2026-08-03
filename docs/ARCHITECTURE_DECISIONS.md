@@ -4,6 +4,77 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-63 — Entity resolution is cumulative memory, not a stateless search (TD-67)
+
+**Decision.** Every attempt `discovery.company_entity_resolution
+.EntityResolutionEngine.resolve()` makes is now persisted regardless of
+outcome, via a new store, `discovery.resolution_memory.ResolutionMemory`
+(one `ResolutionMemoryRecord` per ticker per run, composing
+`storage.JsonFileRepository` exactly like `knowledge/store.py` and
+`hypotheses/repository.py` already do). Before this, a run's by-products
+only survived if they won: `HeuristicDomainResolver.resolve()` returned
+the first reachable domain and silently discarded every candidate it
+probed and rejected along the way; `WikidataOfficialWebsiteClient.lookup()`
+and `GleifLegalEntityClient.lookup()` returned only their hits, degrading
+every miss to "absent from the dict" with no record of why. A re-run (or
+a human auditing low coverage) had to re-derive the same rejected domains
+and "no match" verdicts from scratch every time.
+
+`ResolutionMemoryRecord` persists: every proposed website candidate from
+every strategy (`website_candidates_proposed`); every domain actually
+probed and its outcome, i.e. every rejected domain plus the winner if any
+(`website_probe_attempts`, from the new `HeuristicDomainResolver
+.resolve_with_trace()`); every strategy's own match/miss verdict with a
+real reason (`website_source_attempts`, from the new
+`WikidataOfficialWebsiteClient.lookup_with_trace()`); every legal-entity
+match/miss attempt with its confidence, evidence, and rejection reason
+(`legal_entity_attempts`, from the new `GleifLegalEntityClient
+.lookup_with_trace()`); and the resulting canonical `legal_name`/`aliases`/
+`lei`. `brand_names`/`parent_company`/`parent_company_source`/
+`parent_company_evidence` are reserved fields, honestly `None`/`[]` --
+no strategy in this codebase resolves a brand name distinct from a legal
+name, or a parent-company relationship, yet. Same posture as
+`patterns.json` staying `[]` until a dedicated `Pattern` model exists
+(TD-15): reserved for a real future source, never filled with a guess.
+
+**Rationale.** This is deliberately an *observability* addition, not a
+resolution-algorithm change: `resolve()`'s decision logic (strategy
+priority order, first-reachable-domain-wins, GLEIF token-overlap
+confidence scoring) is byte-for-byte unchanged. `resolve()` now calls
+`.resolve_with_trace()`/`.lookup_with_trace()` instead of
+`.resolve()`/`.lookup()` so every attempt is captured in the same single
+network round-trip that already happened -- never a second, duplicate
+call purely to build the memory record. `resolve()`/`lookup()` themselves
+become thin wrappers around their `_with_trace` siblings, so every
+existing caller and test keeps its exact prior behavior. A domain the
+resolver never reached (because an earlier, higher-confidence candidate
+already won) is never recorded as "rejected" -- `resolve_with_trace()`
+only appends a `DomainProbeAttempt` for a domain it actually sent a
+request to, keeping "never attempted" and "attempted and rejected"
+honestly distinct, the same discipline every other honesty rule in this
+package already follows (never assert what wasn't observed).
+
+Deliberately deferred, not forgotten: `ResolutionMemory` does not yet
+change *when* discovery re-probes a domain -- a previously-rejected
+domain is still re-tried on the next run, exactly as
+`CompanyFinancialSourceRegistry.is_resumable_skip()` already does at the
+company level (`BLOCKED`/`HOMEPAGE_UNRESOLVED` always re-attempted, only
+`VALIDATED` is skipped). Using this new memory to skip re-probing a
+domain already known dead would be a real, useful next step, but it is a
+resolution-*behavior* change and stays out of scope here on purpose.
+
+**Test protection.** `test_resolution_memory.py` covers the store's
+versioning/persistence contract directly (a failed attempt is still
+retrievable, `history()` keeps every past run's rejected domains, disk
+round-trip). `test_company_entity_resolution.py
+::test_resolution_memory_records_never_attempted_candidates_as_absent_not_rejected`
+is the key regression: a candidate after the winner in priority order
+must never appear in `website_probe_attempts`. `test_acquisition_domain_resolution.py`,
+`test_wikidata_lookup.py`, and `test_gleif_lookup.py` each add
+`_with_trace`-specific coverage (a delegation test confirming the
+pre-existing method's behavior is unchanged, plus one test per real
+rejection-reason branch).
+
 ## AD-62 — Entity resolution is multi-strategy and independent of collector work (TD-66)
 
 **Decision.** `discovery.company_entity_resolution.EntityResolutionEngine`

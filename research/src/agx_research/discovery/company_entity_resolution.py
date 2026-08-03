@@ -46,6 +46,7 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 from agx_research.acquisition_intelligence.domain_resolution import (
+    DomainProbeAttempt,
     HeuristicDomainResolver,
     ResolvedDomain,
 )
@@ -56,7 +57,14 @@ from agx_research.discovery.company_financial_registry import (
     CompanyFinancialSourceRecord,
     CompanyRegistryStatus,
 )
-from agx_research.discovery.gleif_lookup import GleifLegalEntityClient, LegalEntityMatch
+from agx_research.discovery.gleif_lookup import GleifLegalEntityClient, GleifLookupAttempt, LegalEntityMatch
+from agx_research.discovery.resolution_memory import (
+    LegalEntityAttempt,
+    ProposedWebsiteCandidate,
+    ResolutionMemoryRecord,
+    WebsiteProbeAttempt,
+    WebsiteSourceAttempt,
+)
 from agx_research.sources.spec import SourceCategory
 
 
@@ -103,6 +111,11 @@ class EntityResolutionRecord:
     # delegated entirely to the existing, unmodified
     # discover_company_financial_sources() once a website is resolved.
     financial_record: CompanyFinancialSourceRecord | None = None
+
+    # Permanent, cumulative record of this attempt regardless of outcome --
+    # see discovery.resolution_memory's module docstring for why this
+    # exists alongside financial_record rather than folded into it.
+    resolution_memory: ResolutionMemoryRecord | None = None
 
     @property
     def website_resolved(self) -> bool:
@@ -179,22 +192,60 @@ class EntityResolutionEngine:
         unreachable. Order of `website_strategies` is the confidence
         order: earlier strategies' candidates are tried first by
         `HeuristicDomainResolver`."""
-        candidates: dict[str, list[HintCandidate]] = {ticker: [] for ticker in companies}
-        strategy_count = len(self.website_strategies) or 1
-        for rank, strategy in enumerate(self.website_strategies):
-            hints = strategy.lookup(companies)
-            confidence = round(1.0 - (rank / strategy_count) * 0.5, 4)
-            for ticker, hostname in hints.items():
-                if ticker in candidates:
-                    candidates[ticker].append(
-                        HintCandidate(hostname=hostname, source=strategy.name, confidence=confidence)
-                    )
+        candidates, _source_attempts = self._resolve_website_candidates_and_source_attempts(companies)
         return candidates
 
+    def _resolve_website_candidates_and_source_attempts(
+        self, companies: dict[str, str]
+    ) -> tuple[dict[str, list[HintCandidate]], dict[str, list[WebsiteSourceAttempt]]]:
+        """Same resolution as `resolve_website_candidates`, plus a per-ticker
+        trace of every strategy's own attempt (matched or not, with a real
+        rejection reason) for strategies that expose `lookup_with_trace` --
+        currently `wikidata_lookup.WikidataOfficialWebsiteClient`. Calling
+        `lookup_with_trace` once here (instead of `lookup` here and
+        `lookup_with_trace` again elsewhere) is what keeps this a single
+        network round-trip per strategy per run, not two."""
+        candidates: dict[str, list[HintCandidate]] = {ticker: [] for ticker in companies}
+        source_attempts: dict[str, list[WebsiteSourceAttempt]] = {ticker: [] for ticker in companies}
+        strategy_count = len(self.website_strategies) or 1
+        for rank, strategy in enumerate(self.website_strategies):
+            confidence = round(1.0 - (rank / strategy_count) * 0.5, 4)
+            lookup_with_trace = getattr(strategy, "lookup_with_trace", None)
+            if lookup_with_trace is not None:
+                for ticker, attempt in lookup_with_trace(companies).items():
+                    if ticker not in candidates:
+                        continue
+                    if attempt.matched and attempt.hostname:
+                        candidates[ticker].append(
+                            HintCandidate(hostname=attempt.hostname, source=strategy.name, confidence=confidence)
+                        )
+                    source_attempts[ticker].append(
+                        WebsiteSourceAttempt(
+                            source=strategy.name, matched=attempt.matched,
+                            hostname=attempt.hostname, rejection_reason=attempt.rejection_reason,
+                        )
+                    )
+            else:
+                hints = strategy.lookup(companies)
+                for ticker, hostname in hints.items():
+                    if ticker in candidates:
+                        candidates[ticker].append(
+                            HintCandidate(hostname=hostname, source=strategy.name, confidence=confidence)
+                        )
+        return candidates, source_attempts
+
     def resolve_legal_entities(self, companies: dict[str, str]) -> dict[str, LegalEntityMatch]:
+        matches, _attempts = self._resolve_legal_entities_and_attempts(companies)
+        return matches
+
+    def _resolve_legal_entities_and_attempts(
+        self, companies: dict[str, str]
+    ) -> tuple[dict[str, LegalEntityMatch], dict[str, GleifLookupAttempt]]:
         if self.legal_entity_client is None:
-            return {}
-        return self.legal_entity_client.lookup(companies)
+            return {}, {}
+        attempts = self.legal_entity_client.lookup_with_trace(companies)
+        matches = {t: a.match for t, a in attempts.items() if a.matched and a.match is not None}
+        return matches, attempts
 
     def resolve(
         self,
@@ -210,8 +261,10 @@ class EntityResolutionEngine:
         `CompanyFinancialSourceRegistry.is_resumable_skip` already
         enforces; this method itself never mutates a stored registry."""
         existing_records = existing_records or {}
-        website_candidates = self.resolve_website_candidates(companies)
-        legal_entities = self.resolve_legal_entities(companies)
+        website_candidates, website_source_attempts = self._resolve_website_candidates_and_source_attempts(
+            companies
+        )
+        legal_entities, legal_entity_attempts = self._resolve_legal_entities_and_attempts(companies)
 
         records: list[EntityResolutionRecord] = []
         for ticker, name in companies.items():
@@ -240,7 +293,7 @@ class EntityResolutionEngine:
                 domain_hints=[c.hostname for c in record.website_candidates],
                 company_ticker=ticker,
             )
-            record.resolved_domain = self.domain_resolver.resolve(target)
+            record.resolved_domain, domain_probe_attempts = self.domain_resolver.resolve_with_trace(target)
 
             base_record = existing or CompanyFinancialSourceRecord(
                 id=ticker, ticker=ticker, company_name=name,
@@ -264,6 +317,82 @@ class EntityResolutionEngine:
                     }
                 )
 
+            record.resolution_memory = _build_resolution_memory_record(
+                ticker=ticker,
+                company_name=name,
+                website_candidates=record.website_candidates,
+                website_source_attempts=website_source_attempts.get(ticker, []),
+                domain_probe_attempts=domain_probe_attempts,
+                resolved_domain=record.resolved_domain,
+                legal_entity_attempt=legal_entity_attempts.get(ticker),
+                legal_name=record.legal_name,
+                aliases=record.aliases,
+                lei=record.lei,
+            )
+
             records.append(record)
 
         return EntityResolutionReport(records=records)
+
+
+def _build_resolution_memory_record(
+    *,
+    ticker: str,
+    company_name: str,
+    website_candidates: list[HintCandidate],
+    website_source_attempts: list[WebsiteSourceAttempt],
+    domain_probe_attempts: list[DomainProbeAttempt],
+    resolved_domain: ResolvedDomain | None,
+    legal_entity_attempt: GleifLookupAttempt | None,
+    legal_name: str | None,
+    aliases: list[str],
+    lei: str | None,
+) -> ResolutionMemoryRecord:
+    """Assembles this run's full attempt trace into one permanent record --
+    see `discovery.resolution_memory`'s module docstring for why every one
+    of these fields exists and what real signal each traces back to."""
+    legal_entity_attempts: list[LegalEntityAttempt] = []
+    if legal_entity_attempt is not None:
+        match = legal_entity_attempt.match
+        legal_entity_attempts.append(
+            LegalEntityAttempt(
+                source="gleif",
+                matched=legal_entity_attempt.matched,
+                lei=match.lei if match else None,
+                legal_name=match.legal_name if match else None,
+                aliases=match.aliases if match else [],
+                match_confidence=match.match_confidence if match else None,
+                evidence=match.evidence if match else None,
+                rejection_reason=legal_entity_attempt.rejection_reason,
+            )
+        )
+
+    return ResolutionMemoryRecord(
+        id=ticker,
+        ticker=ticker,
+        company_name=company_name,
+        website_candidates_proposed=[
+            ProposedWebsiteCandidate(hostname=c.hostname, source=c.source, confidence=c.confidence)
+            for c in website_candidates
+        ],
+        website_source_attempts=website_source_attempts,
+        website_probe_attempts=[
+            WebsiteProbeAttempt(
+                domain=attempt.domain,
+                origin=attempt.origin,
+                reachable=attempt.probe.reachable,
+                status_code=attempt.probe.status_code,
+                error=attempt.probe.error,
+                rejection_reason=(
+                    None if attempt.probe.reachable
+                    else (attempt.probe.error or f"Probe returned status {attempt.probe.status_code}.")
+                ),
+            )
+            for attempt in domain_probe_attempts
+        ],
+        resolved_hostname=resolved_domain.domain if resolved_domain else None,
+        legal_entity_attempts=legal_entity_attempts,
+        legal_name=legal_name,
+        aliases=aliases,
+        lei=lei,
+    )

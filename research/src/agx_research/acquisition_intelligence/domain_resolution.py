@@ -41,6 +41,21 @@ class ResolvedDomain:
     origin: str  # "hint" | "heuristic" -- was this a known brand hint or a generated guess
 
 
+@dataclass
+class DomainProbeAttempt:
+    """One candidate domain this run actually probed over the network,
+    whatever the outcome -- the raw material `discovery.resolution_memory`
+    persists as a rejected (or winning) domain. Only ever built for a
+    domain `resolve_with_trace` really sent a request to; a candidate the
+    resolver never reached because an earlier one already won is not in
+    this list at all (never fabricated as "rejected" when it was simply
+    never tried)."""
+
+    domain: str
+    origin: str  # "hint" | "heuristic"
+    probe: ProbeResult
+
+
 def _normalize_name(name: str) -> str:
     stripped = re.sub(r"\(.*?\)", "", name)  # drop parenthetical acronyms/qualifiers
     return re.sub(r"[^a-z0-9]", "", stripped.lower())
@@ -71,9 +86,25 @@ class HeuristicDomainResolver:
         return unique
 
     def resolve(self, target: TargetOrganization) -> ResolvedDomain | None:
+        resolved, _attempts = self.resolve_with_trace(target)
+        return resolved
+
+    def resolve_with_trace(
+        self, target: TargetOrganization
+    ) -> tuple[ResolvedDomain | None, list[DomainProbeAttempt]]:
+        """Same resolution as `resolve()` -- first reachable candidate wins,
+        probing stops there -- but also returns every candidate actually
+        probed along the way (the winner included), so a caller can persist
+        the full attempt trace instead of only the final answer. Candidates
+        after the winner are never probed and so never appear here; that
+        distinction (never tried vs. tried and rejected) is exactly what
+        `resolution_memory` needs to stay honest.
+        """
+        attempts: list[DomainProbeAttempt] = []
         for domain, origin in self.candidate_domains(target):
             url = f"https://{domain}"
             result = self.prober(url)
+            attempts.append(DomainProbeAttempt(domain=domain, origin=origin, probe=result))
             if result.reachable:
-                return ResolvedDomain(domain=domain, homepage_url=url, probe=result, origin=origin)
-        return None
+                return ResolvedDomain(domain=domain, homepage_url=url, probe=result, origin=origin), attempts
+        return None, attempts

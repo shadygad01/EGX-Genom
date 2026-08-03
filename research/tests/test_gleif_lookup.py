@@ -148,3 +148,81 @@ def test_client_lookup_empty_companies():
     client = GleifLegalEntityClient(lambda url: calls.append(url))
     assert client.lookup({}) == {}
     assert calls == []
+
+
+def test_lookup_with_trace_records_a_matched_attempt():
+    def fetch_json(url):
+        if "fuzzycompletions" in url:
+            return _FUZZY_RESPONSE_JUFO
+        return _RECORD_RESPONSE_JUFO
+
+    client = GleifLegalEntityClient(fetch_json)
+    trace = client.lookup_with_trace({"JUFO": "Juhayna Food Industries"})
+
+    attempt = trace["JUFO"]
+    assert attempt.matched is True
+    assert attempt.match.legal_name == "JUHAYNA FOOD INDUSTRIES S.A.E."
+    assert attempt.rejection_reason is None
+
+
+def test_lookup_with_trace_records_no_token_overlap_reason():
+    def fetch_json(url):
+        return {"data": [{"attributes": {"value": "Completely Unrelated Corp"},
+                           "relationships": {"lei-records": {"data": {"id": "LEIXXXX"}}}}]}
+
+    client = GleifLegalEntityClient(fetch_json)
+    trace = client.lookup_with_trace({"HRHO": "EFG Hermes Holding"})
+
+    attempt = trace["HRHO"]
+    assert attempt.matched is False
+    assert attempt.match is None
+    assert "token" in attempt.rejection_reason.lower()
+
+
+def test_lookup_with_trace_records_lei_record_fetch_failure_reason():
+    def fetch_json(url):
+        if "fuzzycompletions" in url:
+            return _FUZZY_RESPONSE_JUFO
+        return None  # simulates an unreachable/malformed response, not merely an empty one
+
+    client = GleifLegalEntityClient(fetch_json)
+    trace = client.lookup_with_trace({"JUFO": "Juhayna Food Industries"})
+
+    attempt = trace["JUFO"]
+    assert attempt.matched is False
+    assert "LEI record fetch failed" in attempt.rejection_reason
+
+
+def test_lookup_with_trace_records_unparseable_lei_record_reason():
+    def fetch_json(url):
+        if "fuzzycompletions" in url:
+            return _FUZZY_RESPONSE_JUFO
+        return {}  # a real, reachable response that just lacks the expected shape
+
+    client = GleifLegalEntityClient(fetch_json)
+    trace = client.lookup_with_trace({"JUFO": "Juhayna Food Industries"})
+
+    attempt = trace["JUFO"]
+    assert attempt.matched is False
+    assert "did not contain a parseable" in attempt.rejection_reason
+
+
+def test_lookup_with_trace_records_no_candidates_reason():
+    client = GleifLegalEntityClient(lambda url: {"data": []})
+    trace = client.lookup_with_trace({"EGCH": "Egyptian Chemical Industries"})
+
+    attempt = trace["EGCH"]
+    assert attempt.matched is False
+    assert "no candidate" in attempt.rejection_reason.lower()
+
+
+def test_lookup_delegates_to_lookup_with_trace():
+    """lookup() must still return exactly what it always did."""
+    def fetch_json(url):
+        if "fuzzycompletions" in url:
+            return _FUZZY_RESPONSE_JUFO
+        return _RECORD_RESPONSE_JUFO
+
+    client = GleifLegalEntityClient(fetch_json)
+    result = client.lookup({"JUFO": "Juhayna Food Industries"})
+    assert result["JUFO"].legal_name == "JUHAYNA FOOD INDUSTRIES S.A.E."

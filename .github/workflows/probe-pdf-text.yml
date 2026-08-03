@@ -2,13 +2,20 @@ name: Probe PDF text (diagnostic, manual only)
 
 # Ad hoc, manually-triggered diagnostic -- fetches real, already-discovered
 # company financial-statement/earnings-release PDFs (see
-# research/scripts/probe_pdf_text.py's docstring for the exact URLs and
+# research/scripts/probe_pdf_text.py's TARGETS dict for the exact URLs and
 # their provenance) and prints their extracted text to this run's own logs.
 # Writes nothing to any tracked file, creates no SourceSpec, produces no
 # dashboard artifact -- purely evidence-gathering so a real Family B PDF
 # parser (docs/COLLECTOR_TEMPLATE_TAXONOMY.md) can be written against real
-# extracted text instead of a guess. Delete this workflow once that parser
-# exists and has been verified; it is not meant to be a permanent job.
+# extracted text instead of a guess.
+#
+# First used 2026-08-03 (run 30810863486) to build
+# collectors.company_earnings_table.CompanyEarningsTablePdfCollector for
+# rmda_ir/tmgh_ir (see AD-61, TD-32). Kept as a reusable tool, not deleted:
+# TD-32's own repayment trigger is to update TARGETS with a remaining
+# Family B company's real URLs (JUFO/ORWE/EAST/ADIB/CCAP/ORHD) and re-run
+# this workflow before writing or extending any parser for it -- never by
+# guessing that company's likely phrasing.
 
 on:
   workflow_dispatch: {}

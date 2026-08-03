@@ -31,9 +31,25 @@ import tempfile
 from pathlib import Path
 
 from agx_research.collectors.archive import RawArchive
+from agx_research.collectors.base import CollectionBatch
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError, HttpFetcher
 from agx_research.collectors.pdf import PdfDocumentCollector
+from agx_research.collectors.raw import RawDocument
 from agx_research.sources.spec import AccessMethod, SourceCategory, SourceSpec, SourceStatus
+
+
+class _ProbeCollector(PdfDocumentCollector):
+    """Concrete only so this diagnostic can instantiate the abstract
+    `PdfDocumentCollector` -- this probe only ever calls `fetch()`/
+    `extract_text()`, never `parse()`, so the override below is
+    unreachable in normal use; it exists solely to satisfy Python's ABC
+    machinery, not to represent any real parsing capability."""
+
+    name = "ProbeCollector"
+    version = "0.0.0-diagnostic"
+
+    def parse(self, document: RawDocument) -> CollectionBatch:
+        raise NotImplementedError("diagnostic-only collector; parse() is intentionally unused")
 
 # Narrowest, most tractable Family B targets per the taxonomy doc's roadmap
 # step 2: the 4-company "Quarterly Earnings Release PDF" sub-pattern, one
@@ -79,7 +95,7 @@ def main() -> int:
             print(f"\n{'=' * 88}\n{ticker}\n{'=' * 88}")
             for url in urls:
                 spec = _diagnostic_spec(ticker, url)
-                collector = PdfDocumentCollector(spec, [url], archive=archive, fetcher=fetcher)
+                collector = _ProbeCollector(spec, [url], archive=archive, fetcher=fetcher)
                 try:
                     documents = collector.fetch()
                 except (FetchDisallowed, FetchError) as exc:

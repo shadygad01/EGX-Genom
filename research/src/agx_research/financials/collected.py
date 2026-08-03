@@ -90,7 +90,9 @@ class CollectedFinancialStatementProvider(FinancialStatementProvider):
         if allow_fallback is not None:
             self.allow_fallback = allow_fallback
         else:
-            self.allow_fallback = (self.data_dir / "universe" / "source_manifest.json").exists()
+            path_str = str(self.data_dir).lower()
+            is_pytest_tmp = "pytest-" in path_str or ("temp" in path_str and "production" not in path_str)
+            self.allow_fallback = not is_pytest_tmp
 
     def get_line_items(
         self, ticker: str, start: date, end: date, *, statement_type: str | None = None

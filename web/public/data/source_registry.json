@@ -123,7 +123,7 @@
     "validation_rules": [
       "data.quality.validate_price_bars"
     ],
-    "version": 13
+    "version": 17
   },
   {
     "access_method": "csv_download",
@@ -185,7 +185,7 @@
     "validation_rules": [
       "numeric values; '.' means missing and is dropped"
     ],
-    "version": 13
+    "version": 17
   },
   {
     "access_method": "rss_feed",
@@ -244,7 +244,7 @@
       "title+date required",
       "entry link preserved as original URL"
     ],
-    "version": 7
+    "version": 9
   },
   {
     "access_method": "json_api",
@@ -302,7 +302,7 @@
     "validation_rules": [
       "value present (null years dropped, never imputed)"
     ],
-    "version": 7
+    "version": 9
   },
   {
     "access_method": "csv_download",

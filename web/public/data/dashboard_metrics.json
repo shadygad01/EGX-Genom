@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "acquisition_decisions.json": 0,
-    "claims.json": 404,
+    "claims.json": 606,
     "collector_status.json": 49,
     "committee_summary.json": 1,
     "decision_history.json": 0,
@@ -12,7 +12,7 @@
     "financial_coverage.json": 101,
     "financial_statements.json": 6060,
     "genes.json": 0,
-    "hypotheses.json": 404,
+    "hypotheses.json": 606,
     "investment_cases.json": 0,
     "knowledge.json": 0,
     "knowledge_graph.json": 0,
@@ -23,7 +23,7 @@
     "patterns.json": 0,
     "portfolio_summary.json": 1,
     "recommendations.json": 0,
-    "runtime_metrics.json": 3,
+    "runtime_metrics.json": 4,
     "runtime_status.json": 1,
     "shadow_fund.json": 1,
     "shadow_fund_history.json": 1,
@@ -36,7 +36,7 @@
     "universe.json": 101,
     "warnings.json": 0
   },
-  "dashboard_dir": "research\\data\\dashboard",
-  "generated_at": "2026-08-03T09:42:03.595873",
+  "dashboard_dir": "web\\public\\data",
+  "generated_at": "2026-08-03T09:59:45.159866",
   "total_artifacts": 35
 }

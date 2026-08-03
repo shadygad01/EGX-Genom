@@ -1,7 +1,7 @@
 {
   "artifacts_produced": {
     "acquisition_decisions.json": 0,
-    "claims.json": 404,
+    "claims.json": 606,
     "collector_status.json": 49,
     "committee_summary.json": 1,
     "dashboard_metrics.json": 35,
@@ -13,7 +13,7 @@
     "financial_coverage.json": 101,
     "financial_statements.json": 6060,
     "genes.json": 0,
-    "hypotheses.json": 404,
+    "hypotheses.json": 606,
     "investment_cases.json": 0,
     "knowledge.json": 0,
     "knowledge_graph.json": 0,
@@ -24,7 +24,7 @@
     "patterns.json": 0,
     "portfolio_summary.json": 1,
     "recommendations.json": 0,
-    "runtime_metrics.json": 3,
+    "runtime_metrics.json": 4,
     "runtime_status.json": 1,
     "shadow_fund.json": 1,
     "shadow_fund_history.json": 1,
@@ -38,15 +38,15 @@
     "warnings.json": 0
   },
   "current_execution_mode": "mock",
-  "execution_duration_seconds": 80.7357,
-  "generated_at": "2026-08-03T09:42:03.605503",
+  "execution_duration_seconds": 82.698149,
+  "generated_at": "2026-08-03T09:59:45.175749",
   "genome_updated": 0,
   "knowledge_updated": 0,
   "last_failed_pipeline_at": null,
   "last_failed_pipeline_id": null,
-  "last_successful_pipeline_at": "2026-08-03T09:42:03.601189",
-  "last_successful_pipeline_id": "execution_f31c016764db",
+  "last_successful_pipeline_at": "2026-08-03T09:59:45.175749",
+  "last_successful_pipeline_id": "execution_b4e47d57adf3",
   "pipeline_status": "succeeded",
   "pipeline_version": "1.0.0",
-  "total_executions": 3
+  "total_executions": 4
 }

@@ -8,32 +8,6 @@
     "previous_status": "planned",
     "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
     "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "egx_official",
-    "verification_result": "no_reachable_domain",
-    "verified_at": "2026-07-27T11:12:10.074167"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No acquisition-method candidates discovered on the homepage or its sitemap.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "cbe",
-    "verification_result": "no_candidates_discovered",
-    "verified_at": "2026-07-27T08:09:07.874890"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
     "source_id": "mof_egypt",
     "verification_result": "no_reachable_domain",
     "verified_at": "2026-07-27T16:17:05.717951"
@@ -50,32 +24,6 @@
     "source_id": "egypt_open_data",
     "verification_result": "no_reachable_domain",
     "verified_at": "2026-07-27T16:17:10.707874"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "investing_com",
-    "verification_result": "no_reachable_domain",
-    "verified_at": "2026-07-27T16:17:16.721603"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No discovered candidate cleared the legality gate.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "tradingview",
-    "verification_result": "legality_blocked",
-    "verified_at": "2026-07-27T16:24:10.090703"
   },
   {
     "confidence": 0.575,
@@ -177,19 +125,6 @@
   {
     "confidence": 0.0,
     "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "investing_news",
-    "verification_result": "no_reachable_domain",
-    "verified_at": "2026-07-27T08:22:48.375720"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
     "discovered_endpoints": [
       "https://skynewsarabia.com/rss.xml"
     ],
@@ -255,35 +190,9 @@
     "previous_status": "planned",
     "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
     "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "imf",
-    "verification_result": "no_reachable_domain",
-    "verified_at": "2026-07-27T16:25:21.144407"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
     "source_id": "oecd",
     "verification_result": "no_reachable_domain",
     "verified_at": "2026-07-27T16:25:27.139467"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No discovered candidate cleared the legality gate.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "trading_economics",
-    "verification_result": "legality_blocked",
-    "verified_at": "2026-07-27T08:43:47.875803"
   },
   {
     "confidence": 0.0,
@@ -305,63 +214,11 @@
     "evidence": [],
     "from_cache": true,
     "previous_status": "planned",
-    "reason_for_failure": "No acquisition-method candidates discovered on the homepage or its sitemap.",
+    "reason_for_failure": "No discovered candidate cleared the legality gate.",
     "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "wikipedia_pageviews",
-    "verification_result": "no_candidates_discovered",
-    "verified_at": "2026-07-27T16:26:04.214578"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No acquisition-method candidates discovered on the homepage or its sitemap.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "google_trends",
-    "verification_result": "no_candidates_discovered",
-    "verified_at": "2026-07-27T16:26:16.097411"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No acquisition-method candidates discovered on the homepage or its sitemap.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "arxiv",
-    "verification_result": "no_candidates_discovered",
-    "verified_at": "2026-07-27T16:26:28.333978"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No acquisition-method candidates discovered on the homepage or its sitemap.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "ssrn",
-    "verification_result": "no_candidates_discovered",
-    "verified_at": "2026-07-27T16:26:41.536025"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": true,
-    "previous_status": "planned",
-    "reason_for_failure": "No acquisition-method candidates discovered on the homepage or its sitemap.",
-    "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "nber",
-    "verification_result": "no_candidates_discovered",
-    "verified_at": "2026-07-27T16:26:52.581020"
+    "source_id": "moodys_ratings",
+    "verification_result": "legality_blocked",
+    "verified_at": "2026-07-31T13:56:10.880669"
   },
   {
     "confidence": 0.0,
@@ -372,9 +229,9 @@
     "previous_status": "planned",
     "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
     "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "google_scholar",
+    "source_id": "sp_global_ratings",
     "verification_result": "no_reachable_domain",
-    "verified_at": "2026-07-27T16:26:55.339138"
+    "verified_at": "2026-07-31T13:56:14.439918"
   },
   {
     "confidence": 0.0,
@@ -383,11 +240,11 @@
     "evidence": [],
     "from_cache": true,
     "previous_status": "planned",
-    "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
+    "reason_for_failure": "No discovered candidate cleared the legality gate.",
     "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
-    "source_id": "researchgate",
-    "verification_result": "no_reachable_domain",
-    "verified_at": "2026-07-27T16:27:01.042652"
+    "source_id": "fitch_ratings",
+    "verification_result": "legality_blocked",
+    "verified_at": "2026-07-31T14:02:34.593211"
   },
   {
     "confidence": 0.0,
@@ -400,71 +257,6 @@
     "recommendation": "Add a TargetOrganization entry (acquisition_intelligence/target.py) with the organization's own publicly-known brand domain as a hint before this source can be verified -- never fabricate a domain for it here.",
     "source_id": "company_ir",
     "verification_result": "not_targeted",
-    "verified_at": "2026-07-29T05:21:02.644584"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": false,
-    "previous_status": "planned",
-    "reason_for_failure": "No TargetOrganization entry maps to this source id yet; the discovery engine has nothing to resolve/probe for it.",
-    "recommendation": "Add a TargetOrganization entry (acquisition_intelligence/target.py) with the organization's own publicly-known brand domain as a hint before this source can be verified -- never fabricate a domain for it here.",
-    "source_id": "github_releases",
-    "verification_result": "not_targeted",
-    "verified_at": "2026-07-29T05:21:02.644596"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": false,
-    "previous_status": "planned",
-    "reason_for_failure": "No TargetOrganization entry maps to this source id yet; the discovery engine has nothing to resolve/probe for it.",
-    "recommendation": "Add a TargetOrganization entry (acquisition_intelligence/target.py) with the organization's own publicly-known brand domain as a hint before this source can be verified -- never fabricate a domain for it here.",
-    "source_id": "company_social_official",
-    "verification_result": "not_targeted",
-    "verified_at": "2026-07-29T05:21:02.644600"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": false,
-    "previous_status": "planned",
-    "reason_for_failure": "No TargetOrganization entry maps to this source id yet; the discovery engine has nothing to resolve/probe for it.",
-    "recommendation": "Add a TargetOrganization entry (acquisition_intelligence/target.py) with the organization's own publicly-known brand domain as a hint before this source can be verified -- never fabricate a domain for it here.",
-    "source_id": "public_telegram",
-    "verification_result": "not_targeted",
-    "verified_at": "2026-07-29T05:21:02.644603"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": false,
-    "previous_status": "planned",
-    "reason_for_failure": "No TargetOrganization entry maps to this source id yet; the discovery engine has nothing to resolve/probe for it.",
-    "recommendation": "Add a TargetOrganization entry (acquisition_intelligence/target.py) with the organization's own publicly-known brand domain as a hint before this source can be verified -- never fabricate a domain for it here.",
-    "source_id": "patents",
-    "verification_result": "not_targeted",
-    "verified_at": "2026-07-29T05:21:02.644607"
-  },
-  {
-    "confidence": 0.0,
-    "current_status": "planned",
-    "discovered_endpoints": [],
-    "evidence": [],
-    "from_cache": false,
-    "previous_status": "planned",
-    "reason_for_failure": "No TargetOrganization entry maps to this source id yet; the discovery engine has nothing to resolve/probe for it.",
-    "recommendation": "Add a TargetOrganization entry (acquisition_intelligence/target.py) with the organization's own publicly-known brand domain as a hint before this source can be verified -- never fabricate a domain for it here.",
-    "source_id": "hiring_signals",
-    "verification_result": "not_targeted",
-    "verified_at": "2026-07-29T05:21:02.644612"
+    "verified_at": "2026-08-03T12:45:09.383607"
   }
 ]

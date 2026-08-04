@@ -99,7 +99,7 @@ def _build_rows(items):
         quarters = quarterly[-4:]
         flow_fields = {
             "revenue", "cost_of_revenue", "gross_profit", "operating_income",
-            "net_income", "operating_cash_flow", "free_cash_flow", "ebitda",
+            "net_income", "net_income_attributable", "operating_cash_flow", "free_cash_flow", "ebitda",
             "dividend_per_share", "eps_basic", "eps_diluted",
         }
         ttm = {"period": quarters[-1]["period"]}

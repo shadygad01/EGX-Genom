@@ -63,7 +63,7 @@ def test_parse_extracts_only_explicit_issuer_highlights():
     assert [(row.line_item, row.value) for row in batch.financial_statement_line_items] == [
         ("revenue", 1_468_400_000.0),
         ("ebitda", 108_300_000.0),
-        ("net_income", 53_400_000.0),
+        ("net_income_attributable", 53_400_000.0),
     ]
     assert all(row.period_end_date == date(2026, 3, 31) for row in batch.financial_statement_line_items)
     assert all(row.currency == "USD" for row in batch.financial_statement_line_items)
@@ -102,7 +102,7 @@ def test_collection_materializes_and_traces_every_financial_value(tmp_path):
     ).run(OrascomFinancialHighlightsCollector(_spec(), fetcher=fetcher), expected_records=3)
 
     assert result.financial_statement_line_items_written == 3
-    for line_item in ("revenue", "ebitda", "net_income"):
+    for line_item in ("revenue", "ebitda", "net_income_attributable"):
         record = provenance.trace(
             "financial_statement", f"ORAS|INCOME_STATEMENT|{line_item}", date(2026, 3, 31)
         )

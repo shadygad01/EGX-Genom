@@ -81,8 +81,14 @@ class OrascomFinancialHighlightsCollector(Collector):
             period_end = date(year, q * 3, 31 if q in (1, 4) else 30)
             period_type = "QUARTERLY"
 
+        # The issuer highlight explicitly states "attributable to
+        # shareholders" -- Chief Capital's own collector already
+        # distinguishes this from total consolidated net profit as
+        # `net_income_attributable` (`NetProfitToShareholders`), so this
+        # must use the same label rather than the generic `net_income`,
+        # which would silently conflate the two concepts.
         for line_item, raw_value in zip(
-            ("revenue", "ebitda", "net_income"), highlights.groups(), strict=True
+            ("revenue", "ebitda", "net_income_attributable"), highlights.groups(), strict=True
         ):
             batch.financial_statement_line_items.append(
                 FinancialStatementLineItem(

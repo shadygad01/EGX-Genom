@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased — Financial Coverage Completion Mission: normalization fix
+
+`OrascomFinancialHighlightsCollector` (`orascom_ir`) was labelling the
+value it explicitly parses as "net profit **attributable to
+shareholders**" under the generic `net_income` line item. Chief Capital's
+own collector (`chief_egx_financials`) already distinguishes this exact
+concept from total consolidated net profit as `net_income_attributable`
+(`NetProfitToShareholders` vs `NetProfit`) -- Orascom's collector was
+silently conflating the two under one label. Renamed to
+`net_income_attributable`, added it to `STANDARD_LINE_ITEMS`
+(`financials/schema.py`) and to `valuation/engine.py`'s TTM flow-summing
+field set (so quarterly figures still roll up into an annualized figure
+exactly as `net_income` did). Verified this does not regress ORAS's
+financial-coverage status (`build_financial_coverage_report()` only
+requires *any* reported line item, never a specific name) or its
+valuation inputs (the P/E model reads `eps`, not `net_income`, and
+`net_income`/`net_income_attributable` were otherwise only read as part
+of the same TTM-summing set). Full research suite green (1036 tests).
+
 ## Unreleased — Make canonical publication atomic, exclusive, and self-validating (AD-65)
 
 Follow-up to AD-64: that change made every bundle carry a provenance

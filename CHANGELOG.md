@@ -1,5 +1,40 @@
 # Changelog
 
+## Unreleased — Financial Coverage Completion Mission: normalization fix
+
+`OrascomFinancialHighlightsCollector` (`orascom_ir`) was labelling the
+value it explicitly parses as "net profit **attributable to
+shareholders**" under the generic `net_income` line item. Chief Capital's
+own collector (`chief_egx_financials`) already distinguishes this exact
+concept from total consolidated net profit as `net_income_attributable`
+(`NetProfitToShareholders` vs `NetProfit`) -- Orascom's collector was
+silently conflating the two under one label. Renamed to
+`net_income_attributable`, added it to `STANDARD_LINE_ITEMS`
+(`financials/schema.py`) and to `valuation/engine.py`'s TTM flow-summing
+field set (so quarterly figures still roll up into an annualized figure
+exactly as `net_income` did). Verified this does not regress ORAS's
+financial-coverage status (`build_financial_coverage_report()` only
+requires *any* reported line item, never a specific name) or its
+valuation inputs (the P/E model reads `eps`, not `net_income`, and
+`net_income`/`net_income_attributable` were otherwise only read as part
+of the same TTM-summing set).
+
+Caught by CodeRabbit review: `_write_financial_statement_line_items` merges
+by `(period_end_date, statement_type, line_item)`, so the rename alone would
+leave ORAS's already-materialized `net_income` row for the same period
+behind as stale, never-refreshed data instead of updating it. Added
+`CollectionBatch.superseded_line_items` -- a collector-declared list of old
+keys to drop at write time, scoped to exactly the ticker/period that batch
+already covers, never a blanket rewrite of another collector's or an
+earlier run's history (`ChiefFinancialsCollector`'s multi-year accumulation
+depends on that staying true). `OrascomFinancialHighlightsCollector` now
+declares its old `net_income` key superseded whenever it writes
+`net_income_attributable` for the same period; version bumped to `1.1.0`
+(both the class attribute and the catalog `collector_version`) to record
+the semantic change. New regression test proves a pre-existing stale
+`net_income` row is dropped, not left alongside the new one. Full research
+suite green (1037 tests).
+
 ## Unreleased — Make canonical publication atomic, exclusive, and self-validating (AD-65)
 
 Follow-up to AD-64: that change made every bundle carry a provenance

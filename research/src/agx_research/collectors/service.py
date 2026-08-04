@@ -172,7 +172,7 @@ def _write_corporate_events(
 
 
 def _write_financial_statement_line_items(
-    data_dir: Path, ticker: str, items, *, on_written=None
+    data_dir: Path, ticker: str, items, *, superseded=(), on_written=None
 ) -> int:
     path = data_dir / "financial_statements" / f"{ticker}.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -181,6 +181,8 @@ def _write_financial_statement_line_items(
         with path.open(newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 existing[(row["period_end_date"], row["statement_type"], row["line_item"])] = row
+    for period_end_date, statement_type, line_item in superseded:
+        existing.pop((period_end_date.isoformat(), statement_type, line_item), None)
     for item in items:
         key = (item.period_end_date.isoformat(), item.statement_type, item.line_item)
         existing[key] = {
@@ -556,10 +558,17 @@ class CollectionService:
                     by_stmt_ticker: dict[str, list] = {}
                     for item in batch.financial_statement_line_items:
                         by_stmt_ticker.setdefault(item.ticker, []).append(item)
+                    # `superseded_line_items` carries no ticker of its own: a
+                    # batch's superseded keys are only ever declared alongside
+                    # that same ticker's replacement items (see
+                    # OrascomFinancialHighlightsCollector), never in isolation,
+                    # so applying them for every ticker this batch touches is
+                    # exact, not a broadening of scope.
                     for ticker, items in by_stmt_ticker.items():
                         result.financial_statement_line_items_written += (
                             _write_financial_statement_line_items(
                                 self.data_dir, ticker, items,
+                                superseded=batch.superseded_line_items,
                                 on_written=lambda stmt, line, d, t=ticker: self._trace(
                                     "financial_statement", f"{t}|{stmt}|{line}", d, collector, document
                                 ),

@@ -33,6 +33,7 @@ STANDARD_LINE_ITEMS: tuple[str, ...] = (
     "gross_profit",
     "operating_income",
     "net_income",
+    "net_income_attributable",
     "eps_basic",
     "eps_diluted",
     "total_assets",

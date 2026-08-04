@@ -243,3 +243,92 @@
   margin-top: var(--space-2);
   line-height: var(--leading-normal);
 }
+
+/* ── Macro Intelligence Panel ─────────────────────────────────── */
+.macroGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.macroCard {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-raised);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.macroCard:hover {
+  border-color: var(--accent-strong);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.macroCardLabel {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.macroCardValue {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.macroCardChange {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.macroPositive { color: var(--positive); }
+.macroNegative { color: var(--negative); }
+
+.macroCardSrc {
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-1);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-1);
+}
+
+.macroImplications {
+  border: 1px solid var(--accent-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--accent-strong) 5%, transparent);
+}
+
+.macroImplicationsTitle {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+  margin-bottom: var(--space-3);
+}
+
+.macroImplicationRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+  padding: var(--space-1) 0;
+}
+
+.macroImplicationBullet {
+  color: var(--accent-strong);
+  font-size: 8px;
+  flex-shrink: 0;
+  margin-top: 5px;
+}

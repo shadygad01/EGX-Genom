@@ -214,6 +214,10 @@ export class StaticJsonProvider implements DashboardDataProvider {
     return fetchObject<PortfolioSummaryReport>("portfolio_summary.json");
   }
 
+  getMacroSnapshot(): Promise<import("./DataProvider").MacroSnapshot | null> {
+    return fetchObject<import("./DataProvider").MacroSnapshot>("macro_snapshot.json");
+  }
+
   getWarnings(): Promise<MonitoringWarningsReport | null> {
     return fetchObject<MonitoringWarningsReport>("warnings.json");
   }

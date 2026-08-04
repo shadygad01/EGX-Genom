@@ -53,6 +53,37 @@ import type {
   UniverseArtifact,
 } from "../types";
 
+// Unified macroeconomic snapshot produced by fetch_macro_data.py.
+// All fields are real, sourced from Yahoo Finance / World Bank / FRED.
+export interface MacroSnapshot {
+  as_of: string;
+  egp_usd: {
+    current: number | null;
+    date: string | null;
+    change_30d_pct: number | null;
+    series_length: number;
+  };
+  cpi_inflation_pct: {
+    current: number | null;
+    date: string | null;
+    regime: string;
+  };
+  brent_usd: {
+    current: number | null;
+    date: string | null;
+  };
+  interest_rate_real_pct: {
+    current: number | null;
+    date: string | null;
+  };
+  gdp_growth_pct: {
+    current: number | null;
+    date: string | null;
+  };
+  decision_implications: string[];
+  sources: Record<string, string>;
+}
+
 export interface DecideRequest {
   date: string;
   positions?: Record<string, PositionInput>;
@@ -121,6 +152,11 @@ export interface DashboardDataProvider {
   getPortfolioSummary(): Promise<PortfolioSummaryReport | null>;
   getWarnings(): Promise<MonitoringWarningsReport | null>;
   getCommitteeSummary(): Promise<CommitteeSummaryReport | null>;
+
+  // Macroeconomic snapshot: real EGP/USD, CPI, Brent, GDP, interest rate.
+  // Produced by research/scripts/fetch_macro_data.py and exported to
+  // web/public/data/macro_snapshot.json — never fabricated.
+  getMacroSnapshot(): Promise<MacroSnapshot | null>;
 
   // Shadow Fund: the persistent virtual-portfolio state produced
   // autonomously as a stage inside `agx run` (shadow_fund/engine.py) --

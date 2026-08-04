@@ -10,7 +10,7 @@ import { Section } from "../components/primitives/Section";
 import { StatTile } from "../components/primitives/StatTile";
 import { EmptyState, ErrorState, LoadingState } from "../components/primitives/States";
 import { dataProvider } from "../data/factory";
-import { LiveDecisionsUnavailableError } from "../data/DataProvider";
+import { LiveDecisionsUnavailableError, type MacroSnapshot } from "../data/DataProvider";
 import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
@@ -103,6 +103,7 @@ export function CIODesk() {
   const warnings = useArtifact((p) => p.getWarnings());
   const committeeSummary = useArtifact((p) => p.getCommitteeSummary());
   const systemMaturity = useArtifact((p) => p.getSystemMaturity());
+  const macroSnapshot = useArtifact((p) => p.getMacroSnapshot());
 
   const [liveDecisions, setLiveDecisions] = useState<PositionAwareDecision[] | null>(null);
   const [liveCapitalPlan, setLiveCapitalPlan] = useState<CapitalAllocationPlan | null>(null);
@@ -592,6 +593,114 @@ export function CIODesk() {
                   </Badge>
                 </div>
                 <span className={styles.warningDetail}>{w.detail}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
+
+      <Section title="الاقتصاد الكلي ومركز القرار" description="بيانات حقيقية من Yahoo Finance وWorld Bank — تُحدَّث يومياً وتدخل في صناعة قرار الشراء والبيع">
+        {macroSnapshot.loading && <LoadingState rows={2} />}
+        {macroSnapshot.error && <ErrorState detail={macroSnapshot.error.message} onRetry={macroSnapshot.reload} />}
+        {!macroSnapshot.loading && !macroSnapshot.error && !macroSnapshot.data && (
+          <EmptyState
+            title="بيانات الاقتصاد الكلي غير متاحة"
+            detail="شغّل research/scripts/fetch_macro_data.py لجلب البيانات الحقيقية"
+          />
+        )}
+        {macroSnapshot.data && (
+          <div className={styles.macroGrid}>
+            {/* EGP/USD */}
+            <div className={styles.macroCard}>
+              <div className={styles.macroCardLabel}>سعر الصرف</div>
+              <div className={styles.macroCardValue}>
+                {macroSnapshot.data.egp_usd.current != null
+                  ? `${(1 / macroSnapshot.data.egp_usd.current).toFixed(2)} جنيه / دولار`
+                  : "—"}
+              </div>
+              {macroSnapshot.data.egp_usd.change_30d_pct != null && (
+                <div className={`${styles.macroCardChange} ${
+                  macroSnapshot.data.egp_usd.change_30d_pct > 0 ? styles.macroPositive : styles.macroNegative
+                }`}>
+                  {macroSnapshot.data.egp_usd.change_30d_pct > 0 ? "↑" : "↓"}
+                  {Math.abs(macroSnapshot.data.egp_usd.change_30d_pct).toFixed(1)}% (30 يوم)
+                </div>
+              )}
+              <div className={styles.macroCardSrc}>Yahoo Finance · {macroSnapshot.data.egp_usd.series_length} قراءة</div>
+            </div>
+
+            {/* Brent Oil */}
+            {macroSnapshot.data.brent_usd.current != null && (
+              <div className={styles.macroCard}>
+                <div className={styles.macroCardLabel}>خام برنت</div>
+                <div className={styles.macroCardValue}>
+                  ${macroSnapshot.data.brent_usd.current.toFixed(1)} / برميل
+                </div>
+                <div className={styles.macroCardChange}>
+                  {macroSnapshot.data.brent_usd.current > 90
+                    ? "مرتفع — يدعم AMOC وEGCH"
+                    : macroSnapshot.data.brent_usd.current < 70
+                    ? "منخفض — يضغط على قطاع الطاقة"
+                    : "معتدل — تأثير محدود"}
+                </div>
+                <div className={styles.macroCardSrc}>Yahoo Finance · {macroSnapshot.data.brent_usd.date}</div>
+              </div>
+            )}
+
+            {/* CPI Inflation */}
+            <div className={styles.macroCard}>
+              <div className={styles.macroCardLabel}>التضخم</div>
+              <div className={styles.macroCardValue}>
+                {macroSnapshot.data.cpi_inflation_pct.current != null
+                  ? `${macroSnapshot.data.cpi_inflation_pct.current.toFixed(1)}%`
+                  : "غير متاح"}
+              </div>
+              <div className={`${styles.macroCardChange} ${
+                macroSnapshot.data.cpi_inflation_pct.regime === "very_high" || macroSnapshot.data.cpi_inflation_pct.regime === "high"
+                  ? styles.macroNegative
+                  : macroSnapshot.data.cpi_inflation_pct.regime === "low"
+                  ? styles.macroPositive
+                  : ""
+              }`}>
+                {macroSnapshot.data.cpi_inflation_pct.regime === "very_high" && "مرتفع جداً — يضغط العوائد الحقيقية"}
+                {macroSnapshot.data.cpi_inflation_pct.regime === "high" && "مرتفع — راقب قرارات CBE"}
+                {macroSnapshot.data.cpi_inflation_pct.regime === "moderate" && "معتدل"}
+                {macroSnapshot.data.cpi_inflation_pct.regime === "low" && "منخفض — بيئة داعمة"}
+                {macroSnapshot.data.cpi_inflation_pct.regime === "unknown" && "يتطلب تحديث البيانات"}
+              </div>
+              <div className={styles.macroCardSrc}>World Bank · {macroSnapshot.data.cpi_inflation_pct.date ?? "N/A"}</div>
+            </div>
+
+            {/* GDP Growth */}
+            {macroSnapshot.data.gdp_growth_pct.current != null && (
+              <div className={styles.macroCard}>
+                <div className={styles.macroCardLabel}>نمو الناتج المحلي</div>
+                <div className={styles.macroCardValue}>
+                  {macroSnapshot.data.gdp_growth_pct.current.toFixed(1)}%
+                </div>
+                <div className={`${styles.macroCardChange} ${
+                  macroSnapshot.data.gdp_growth_pct.current > 4 ? styles.macroPositive : ""
+                }`}>
+                  {macroSnapshot.data.gdp_growth_pct.current > 5
+                    ? "نمو قوي — داعم لتوسع الأرباح"
+                    : macroSnapshot.data.gdp_growth_pct.current > 3
+                    ? "نمو معقول"
+                    : "نمو بطيء"}
+                </div>
+                <div className={styles.macroCardSrc}>World Bank · {macroSnapshot.data.gdp_growth_pct.date?.slice(0, 4)}</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Decision Implications */}
+        {macroSnapshot.data && macroSnapshot.data.decision_implications.length > 0 && (
+          <div className={styles.macroImplications}>
+            <div className={styles.macroImplicationsTitle}>تأثير الاقتصاد الكلي على قرارات الاستثمار</div>
+            {macroSnapshot.data.decision_implications.map((imp, i) => (
+              <div key={i} className={styles.macroImplicationRow}>
+                <span className={styles.macroImplicationBullet}>◆</span>
+                <span>{imp}</span>
               </div>
             ))}
           </div>

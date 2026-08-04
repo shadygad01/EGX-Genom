@@ -15,6 +15,7 @@ from html import unescape
 from urllib.parse import urljoin
 
 from agx_research.collectors.base import CollectionBatch, Collector
+from agx_research.collectors.html_text import visible_text
 from agx_research.collectors.raw import RawDocument, build_raw_document
 from agx_research.financials.schema import FinancialStatementLineItem
 
@@ -22,8 +23,6 @@ _RELEASE_LINK = re.compile(
     r'''href=["']([^"']*/CorporateNews/PressRelease/\d+/[^"']*Results[^"']*)["']''',
     re.IGNORECASE,
 )
-_TAG = re.compile(r"<[^>]+>")
-_SPACE = re.compile(r"\s+")
 _QUARTER = re.compile(r"\bQ([1-4])\s+(20\d{2})\b", re.IGNORECASE)
 _EXPLICIT_END = re.compile(
     r"(?:ended|period[- ]end(?:ed)?)\s+(?:on\s+)?(\d{1,2})\s+"
@@ -91,12 +90,6 @@ _DECISION_METRICS = (
 )
 
 
-def _visible_text(html: str) -> str:
-    without_scripts = re.sub(r"<script[\s\S]*?</script>", " ", html, flags=re.IGNORECASE)
-    without_styles = re.sub(r"<style[\s\S]*?</style>", " ", without_scripts, flags=re.IGNORECASE)
-    return _SPACE.sub(" ", unescape(_TAG.sub(" ", without_styles))).strip()
-
-
 def _period_end(text: str) -> date | None:
     explicit = _EXPLICIT_END.search(text)
     if explicit:
@@ -137,7 +130,7 @@ class TelecomEgyptFinancialHighlightsCollector(Collector):
 
     def parse(self, document: RawDocument) -> CollectionBatch:
         batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)
-        text = _visible_text(document.content_text)
+        text = visible_text(document.content_text)
         period_end = _period_end(text)
         if period_end is None:
             batch.parse_warnings.append("Could not identify the financial reporting period; nothing parsed.")

@@ -8,6 +8,7 @@ from html import unescape
 from urllib.parse import urljoin
 
 from agx_research.collectors.base import CollectionBatch, Collector
+from agx_research.collectors.html_text import visible_text
 from agx_research.collectors.raw import RawDocument, build_raw_document
 from agx_research.financials.schema import FinancialStatementLineItem
 
@@ -15,8 +16,6 @@ _RESULT_LINK = re.compile(
     r'''href=["']([^"']*/updates/orascom-construction-reports[^"']*(?:q[1-4]|fy)[^"']*)["']''',
     re.IGNORECASE,
 )
-_TAG = re.compile(r"<[^>]+>")
-_SPACE = re.compile(r"\s+")
 _PERIOD = re.compile(r"\b(Q([1-4])|FY)\s*(20\d{2})\b", re.IGNORECASE)
 _HIGHLIGHTS = re.compile(
     r"Revenue of USD\s+([\d,]+(?:\.\d+)?)\s+million,\s*"
@@ -24,12 +23,6 @@ _HIGHLIGHTS = re.compile(
     r"net profit attributable to shareholders of USD\s+([\d,]+(?:\.\d+)?)\s+million",
     re.IGNORECASE,
 )
-
-
-def _visible_text(html: str) -> str:
-    without_scripts = re.sub(r"<script[\s\S]*?</script>", " ", html, flags=re.IGNORECASE)
-    without_styles = re.sub(r"<style[\s\S]*?</style>", " ", without_scripts, flags=re.IGNORECASE)
-    return _SPACE.sub(" ", unescape(_TAG.sub(" ", without_styles))).strip()
 
 
 def _number(value: str) -> float:
@@ -63,7 +56,7 @@ class OrascomFinancialHighlightsCollector(Collector):
 
     def parse(self, document: RawDocument) -> CollectionBatch:
         batch = CollectionBatch(source_id=document.source_id, raw_document_id=document.id)
-        text = _visible_text(document.content_text)
+        text = visible_text(document.content_text)
         period = _PERIOD.search(text)
         highlights = _HIGHLIGHTS.search(text)
         if period is None or highlights is None:

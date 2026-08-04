@@ -111,3 +111,32 @@ def test_collection_materializes_and_traces_every_financial_value(tmp_path):
         assert record.collector == "OrascomFinancialHighlightsCollector"
         assert record.content_hash
         assert record.raw_document_id
+
+
+def test_collection_drops_the_old_net_income_key_for_a_period_it_renames(tmp_path):
+    csv_path = tmp_path / "financial_statements" / "ORAS.csv"
+    csv_path.parent.mkdir(parents=True)
+    csv_path.write_text(
+        "period_end_date,period_type,statement_type,line_item,value,currency\n"
+        "2026-03-31,QUARTERLY,INCOME_STATEMENT,net_income,53400000.0,USD\n"
+    )
+
+    article_url = "https://orascom.com/updates/orascom-construction-reports-q1-2026/"
+    fetcher = MockFetcher(
+        {
+            _spec().base_url: f'<a href="{article_url}">Q1 2026 results</a>',
+            article_url: (
+                "<h1>Q1 2026</h1><p>Revenue of USD 1,468.4 million, "
+                "EBITDA of USD 108.3 million, and net profit attributable to "
+                "shareholders of USD 53.4 million in Q1 2026</p>"
+            ),
+        }
+    )
+    CollectionService(tmp_path, min_confidence=0.5).run(
+        OrascomFinancialHighlightsCollector(_spec(), fetcher=fetcher), expected_records=3
+    )
+
+    rows = csv_path.read_text().splitlines()[1:]
+    line_items = {row.split(",")[3] for row in rows}
+    assert line_items == {"revenue", "ebitda", "net_income_attributable"}
+    assert "net_income" not in line_items

@@ -15,6 +15,7 @@ offline against recorded-format fixtures.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import date
 
 from pydantic import BaseModel, Field
 
@@ -36,6 +37,16 @@ class CollectionBatch(BaseModel):
     corporate_events: list[CorporateEvent] = Field(default_factory=list)
     index_constituents: list[IndexConstituent] = Field(default_factory=list)
     financial_statement_line_items: list[FinancialStatementLineItem] = Field(default_factory=list)
+    # A collector's own line_item vocabulary for one ticker occasionally needs
+    # correcting (e.g. a generic label discovered to conflate two distinct
+    # accounting concepts). `_write_financial_statement_line_items` merges by
+    # (period_end_date, statement_type, line_item), so a renamed line_item
+    # would otherwise leave the old key behind forever as stale, unrefreshed
+    # data. Declaring the old (period_end_date, statement_type, line_item)
+    # key here drops it from storage instead -- scoped to exactly the ticker/
+    # period this batch already covers, never a blanket wipe of history a
+    # different collector (or an earlier run) contributed.
+    superseded_line_items: list[tuple[date, str, str]] = Field(default_factory=list)
     sector_classifications: list[SectorClassification] = Field(default_factory=list)
     parse_warnings: list[str] = Field(default_factory=list)
 

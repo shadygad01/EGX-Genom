@@ -410,7 +410,7 @@ def seed_sources() -> list[SourceSpec]:
             expected_latency="issuer publication",
             update_frequency="quarterly",
             collector="OrascomFinancialHighlightsCollector",
-            collector_version="1.0.0",
+            collector_version="1.1.0",
             license=(
                 "Public primary issuer investor-relations release; research use with "
                 "source attribution. Raw article content is not redistributed."

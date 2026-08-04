@@ -33,7 +33,10 @@ class OrascomFinancialHighlightsCollector(Collector):
     """Collect only explicitly labelled headline values from the issuer site."""
 
     name = "OrascomFinancialHighlightsCollector"
-    version = "1.0.0"
+    # 1.1.0: net_income -> net_income_attributable (see parse()) -- bumped so
+    # the version recorded in provenance/materialized rows reflects the
+    # semantic rename, not just an unversioned silent relabel.
+    version = "1.1.0"
 
     def fetch(self) -> list[RawDocument]:
         archive = self.fetcher.fetch_text(self.spec.base_url, self.spec)
@@ -79,7 +82,11 @@ class OrascomFinancialHighlightsCollector(Collector):
         # distinguishes this from total consolidated net profit as
         # `net_income_attributable` (`NetProfitToShareholders`), so this
         # must use the same label rather than the generic `net_income`,
-        # which would silently conflate the two concepts.
+        # which would silently conflate the two concepts. A prior collector
+        # version wrote this exact period under the old `net_income` key;
+        # declare it superseded so that stale row is dropped, not left
+        # behind forever unrefreshed alongside the new one.
+        batch.superseded_line_items.append((period_end, "INCOME_STATEMENT", "net_income"))
         for line_item, raw_value in zip(
             ("revenue", "ebitda", "net_income_attributable"), highlights.groups(), strict=True
         ):

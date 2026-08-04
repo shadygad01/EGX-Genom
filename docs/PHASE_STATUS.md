@@ -2897,3 +2897,34 @@ frontend/API change was otherwise needed). `web`/`api` test suites were
 not run in this session's environment (no installed `node_modules`); the
 only touched frontend file was the one-line translation-key removal
 described above.
+
+## Financial Coverage Completion Mission (started 2026-08-04)
+
+A new autonomous mission, distinct from the Financial Statement Collection
+phase above (that phase built the data-source *machinery*; this mission
+maximizes real *coverage* using free/legal sources only, never estimating
+or inferring a missing value). Live tracker with the full per-ticker
+status and every piece of supporting evidence:
+`docs/FINANCIAL_COVERAGE_COMPLETION_MISSION_2026-08-04.md` — do not
+duplicate its per-ticker table here; this entry only marks that the
+mission exists and points to the source of truth.
+
+Baseline confirmed from the real production run on `main`
+(`30844985214`, 2026-08-03): 8/101 tickers (7.92%) have a real
+`ANNUAL`/`QUARTERLY` financial-statement dataset (ETEL, ARCC, COMI, CIEB,
+EXPA, RMDA, TMGH, ORAS). First concrete fix from this mission's
+collector/parser-family audit: `orascom_ir`'s collector was labelling a
+value the issuer explicitly reports as "net profit attributable to
+shareholders" under the generic `net_income` line item, conflating it
+with the distinct concept `chief_egx_financials` already tracks
+separately as `net_income_attributable` — corrected, with
+`net_income_attributable` added to `STANDARD_LINE_ITEMS` and to
+`valuation/engine.py`'s TTM quarterly-summing field set (no coverage or
+valuation-input regression; full suite green).
+
+The mission's main lever, `company_ir` (currently `PLANNED`), is being
+tested against real network egress via `.github/workflows
+/discover-sources.yml`'s full-catalog mode (every EGX30/EGX70
+`company_ir` target, read-only, never auto-writes to the catalog) — see
+the tracker doc for the run URL and, once it completes, real per-target
+results.

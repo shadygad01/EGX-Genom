@@ -17,10 +17,10 @@ Sources tested (in order):
 import csv
 import json
 import time
-import urllib.request
-import urllib.parse
 import urllib.error
-from datetime import datetime, timezone, timedelta
+import urllib.parse
+import urllib.request
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ROOT       = Path(__file__).parent.parent.parent
@@ -49,10 +49,10 @@ MISSING = {
 SOURCE_LOG = {}  # ticker -> {source, status, detail}
 
 def now_ts():
-    return int(datetime.now(timezone.utc).timestamp())
+    return int(datetime.now(UTC).timestamp())
 
 def days_ago_ts(d):
-    return int((datetime.now(timezone.utc) - timedelta(days=d)).timestamp())
+    return int((datetime.now(UTC) - timedelta(days=d)).timestamp())
 
 def http_get(url, headers=None, timeout=15):
     h = {**HEADERS_GENERAL, **(headers or {})}
@@ -93,7 +93,7 @@ def try_yahoo(ticker):
     for sym in YAHOO_VARIANTS.get(ticker, [f"{ticker}.CA"]):
         url = (f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}"
                f"?interval=1d&period1={days_ago_ts(400)}&period2={now_ts()}")
-        data, status = http_get(url)
+        data, _status = http_get(url)
         if data:
             try:
                 d = json.loads(data)
@@ -103,7 +103,7 @@ def try_yahoo(ticker):
                 bars = []
                 for ts, c in zip(tss, q.get("close", [])):
                     if c is None: continue
-                    bars.append({"date": datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d"),
+                    bars.append({"date": datetime.fromtimestamp(ts, tz=UTC).strftime("%Y-%m-%d"),
                                  "open": None, "high": None, "low": None,
                                  "close": round(float(c), 4), "volume": 0})
                 if bars and len(bars) >= 3:
@@ -120,7 +120,7 @@ def try_mubasher(ticker):
     """Mubasher covers EGX with Arabic financial data."""
     # Mubasher public chart endpoint
     url = f"https://www.mubasher.info/api/st/chart-data?symbol={ticker}&exchange=XCAI&period=1Y&type=line"
-    data, status = http_get(url)
+    data, _status = http_get(url)
     if data:
         try:
             d = json.loads(data)
@@ -132,7 +132,7 @@ def try_mubasher(ticker):
                     if isinstance(point, (list, tuple)) and len(point) >= 2:
                         ts, price = point[0], point[1]
                         if price:
-                            dt = datetime.fromtimestamp(ts/1000 if ts > 1e10 else ts, tz=timezone.utc)
+                            dt = datetime.fromtimestamp(ts/1000 if ts > 1e10 else ts, tz=UTC)
                             bars.append({"date": dt.strftime("%Y-%m-%d"), "open": None, "high": None,
                                          "low": None, "close": round(float(price), 4), "volume": 0})
                     elif isinstance(point, dict):
@@ -168,7 +168,7 @@ def try_egx_official(ticker):
             if '"close"' in text.lower() or '"price"' in text.lower() or "EGP" in text:
                 # Try to parse as JSON first
                 try:
-                    d = json.loads(text)
+                    json.loads(text)
                     print(f"  [EGX_OFFICIAL] {ticker}: Got JSON response from {url[:60]}")
                     return None, "EGX:partial"
                 except Exception:
@@ -185,7 +185,7 @@ def try_alphavantage(ticker):
     key = "demo"
     url = (f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY"
            f"&symbol={ticker}.CAI&apikey={key}&outputsize=compact")
-    data, status = http_get(url)
+    data, _status = http_get(url)
     if data:
         try:
             d = json.loads(data)
@@ -224,7 +224,7 @@ def try_investing_com(ticker):
     # Try search first
     search_url = f"https://api.investing.com/api/search/v2/search?q={ticker}+Egypt&limit=5"
     headers_inv = {**HEADERS_GENERAL, "X-Site-Current-Path": "/equities", "domain-id": "www"}
-    data, status = http_get(search_url, headers=headers_inv)
+    data, _status = http_get(search_url, headers=headers_inv)
     if data:
         try:
             d = json.loads(data)
@@ -298,7 +298,7 @@ def try_fmp(ticker):
     """FMP free tier - limited but covers some EGX stocks via EGX exchange."""
     url = (f"https://financialmodelingprep.com/api/v3/historical-price-full/EGX:{ticker}"
            f"?apikey=demo&from=2024-01-01")
-    data, status = http_get(url)
+    data, _status = http_get(url)
     if data:
         try:
             d = json.loads(data)
@@ -326,7 +326,7 @@ def try_eodhd(ticker):
     """EODHD has Egypt (EGX) market data, free demo available."""
     url = (f"https://eodhd.com/api/eod/{ticker}.EGX"
            f"?api_token=demo&fmt=json&from=2024-01-01&to=2026-08-04")
-    data, status = http_get(url)
+    data, _status = http_get(url)
     if data:
         try:
             d = json.loads(data)
@@ -354,7 +354,7 @@ def try_marketstack(ticker):
     """Marketstack free tier - covers Egypt (CAI exchange)."""
     url = (f"https://api.marketstack.com/v1/eod"
            f"?access_key=demo&symbols={ticker}.XCAI&limit=200&date_from=2024-01-01")
-    data, status = http_get(url)
+    data, _status = http_get(url)
     if data:
         try:
             d = json.loads(data)
@@ -446,7 +446,7 @@ def main():
 
     # Save log
     log = {
-        "run_at": datetime.now(timezone.utc).isoformat(),
+        "run_at": datetime.now(UTC).isoformat(),
         "sources_tested": [s[0] for s in SOURCES],
         "results": results,
         "source_attempts": source_attempts,

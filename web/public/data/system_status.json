@@ -1,9 +1,9 @@
 {
   "by_status": {},
   "failed": 0,
-  "generated_at": "2026-08-03T12:24:29.332375",
+  "generated_at": "2026-08-03T09:42:02.764910",
   "knowledge_objects": 0,
   "pipeline_run_date": "2026-07-26",
-  "runs": 2,
-  "succeeded": 2
+  "runs": 3,
+  "succeeded": 3
 }

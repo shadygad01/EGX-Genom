@@ -24,10 +24,10 @@ def main() -> int:
     lines = [
         "## Weekly Source Discovery",
         "",
-        "Automated, evidenced run of the Acquisition Intelligence Engine against every "
+        ("Automated, evidenced run of the Acquisition Intelligence Engine against every "
         "`PLANNED`/`CANDIDATE` catalogued source with a `TargetOrganization`. Nothing here "
         "flips a source to `IMPLEMENTED` or edits `sources/catalog.py` -- that stays a "
-        "reviewed, manual step (see `docs/DATA_ACQUISITION.md`'s Discovery workflow section).",
+        "reviewed, manual step (see `docs/DATA_ACQUISITION.md`'s Discovery workflow section)."),
         "",
         f"- Sources in report: **{metrics['sources_in_report']}**",
         f"- Checked fresh this run: **{metrics['sources_checked_fresh_this_run']}**",

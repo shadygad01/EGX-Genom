@@ -230,11 +230,11 @@ def check_decision_literal_assignment_in_frontend(violations: list[Violation]) -
 def check_status_reason_dicts(violations: list[Violation]) -> None:
     sys.path.insert(0, str(REPO_ROOT / "research" / "src"))
     try:
-        from agx_research.acquisition_intelligence.capability_engine import (  # noqa: PLC0415
+        from agx_research.acquisition_intelligence.capability_engine import (
             _NOT_CATALOGUED_REASON,
             _NOT_READY_REASON_BY_STATUS,
         )
-        from agx_research.production.collector_plan import (  # noqa: PLC0415
+        from agx_research.production.collector_plan import (
             _UNAVAILABLE_REASON_BY_STATUS,
         )
     except ImportError as exc:  # pragma: no cover - structural check, not a runtime path

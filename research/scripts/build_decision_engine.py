@@ -18,7 +18,7 @@ Rules:
 import csv
 import json
 import math
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from statistics import mean, stdev
 
@@ -28,7 +28,7 @@ MACRO_DIR    = ROOT / "data" / "macro"
 DASHBOARD_DIR = ROOT / "data" / "dashboard"
 DASHBOARD_DIR.mkdir(parents=True, exist_ok=True)
 
-TODAY = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+TODAY = datetime.now(UTC).strftime("%Y-%m-%d")
 
 # ── Minimum data requirements (no fabrication allowed) ────────────────────
 MIN_PRICE_BARS_MICRO      = 10   # for swing/micro decision
@@ -74,8 +74,8 @@ def load_price_bars(ticker: str) -> list[dict]:
 def is_price_stale(bars: list[dict]) -> bool:
     if not bars:
         return True
-    latest_date = datetime.strptime(bars[-1]["date"], "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    cutoff = datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)
+    latest_date = datetime.strptime(bars[-1]["date"], "%Y-%m-%d").replace(tzinfo=UTC)
+    cutoff = datetime.now(UTC) - timedelta(days=STALE_DAYS)
     return latest_date < cutoff
 
 def compute_price_stats(bars: list[dict]) -> dict | None:
@@ -313,7 +313,7 @@ def build_market_breadth(all_stats: dict[str, dict]) -> dict:
     tickers_with_volume = 0
     daily_returns = []
 
-    for ticker, stats in all_stats.items():
+    for stats in all_stats.values():
         if not stats:
             continue
         tickers_with_price += 1
@@ -401,7 +401,7 @@ def build_market_regime(all_stats: dict[str, dict], macro: dict) -> dict:
 
     macro_regime = (macro.get("cpi_inflation_pct") or {}).get("regime", "unknown")
     if macro_regime == "very_high":
-        reasons.append(f"Very high inflation constrains monetary easing and real returns")
+        reasons.append("Very high inflation constrains monetary easing and real returns")
     elif macro_regime == "low":
         reasons.append("Normalizing inflation supports equity multiples")
 
@@ -434,7 +434,6 @@ def main():
     all_price_stats = {}
     skipped_no_price = []
     skipped_stale = []
-    skipped_no_fairvalue = []
     abstained = []
     actionable = []
 
@@ -513,7 +512,7 @@ def main():
     save_json(DASHBOARD_DIR / "market_regime.json", regime)
     save_json(DASHBOARD_DIR / "acquisition_decisions.json", acq_decisions)
 
-    print(f"\n=== SUMMARY ===")
+    print("\n=== SUMMARY ===")
     print(f"Total tickers:    {len(tickers)}")
     print(f"With live prices: {len([s for s in all_price_stats.values() if s])}")
     print(f"No price data:    {len(skipped_no_price)} → {', '.join(skipped_no_price[:5])}{'...' if len(skipped_no_price)>5 else ''}")
@@ -522,10 +521,10 @@ def main():
     print(f"Abstained:        {len(abstained)}")
     print(f"\nMarket Regime: {regime['trend']} / volatility={regime['volatility']}")
     print(f"Breadth: {breadth['advancers']} advancers / {breadth['decliners']} decliners")
-    print(f"\nTop acquisition targets:")
+    print("\nTop acquisition targets:")
     for a in acq_decisions[:5]:
         print(f"  {a['ticker']:6s} | {a['action']:12s} | upside={a['upside_pct']}%")
-    print(f"\nSaved: recommendations.json, market_breadth.json, market_regime.json, acquisition_decisions.json")
+    print("\nSaved: recommendations.json, market_breadth.json, market_regime.json, acquisition_decisions.json")
 
 
 if __name__ == "__main__":

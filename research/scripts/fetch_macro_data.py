@@ -21,8 +21,8 @@ Output:
 import csv
 import json
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -281,7 +281,7 @@ def main():
     snap_path = MACRO_DIR / "macro_snapshot.json"
     with open(snap_path, "w", encoding="utf-8") as f:
         json.dump(snapshot, f, indent=2, ensure_ascii=False)
-    print(f"  Saved: macro_snapshot.json")
+    print("  Saved: macro_snapshot.json")
 
     print("\n=== Macro Snapshot ===")
     print(json.dumps(snapshot, indent=2, ensure_ascii=False))

@@ -66,7 +66,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -448,7 +448,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -1082,7 +1082,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -1527,7 +1527,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -1594,7 +1594,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -1913,7 +1913,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -2295,7 +2295,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -2362,7 +2362,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -2618,7 +2618,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -2685,7 +2685,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -3256,7 +3256,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -3323,7 +3323,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -3516,7 +3516,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -3583,7 +3583,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -3650,7 +3650,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -3780,7 +3780,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -3973,7 +3973,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -4355,7 +4355,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -4548,7 +4548,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -4678,7 +4678,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -4871,7 +4871,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -4938,7 +4938,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -5005,7 +5005,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",
@@ -6080,7 +6080,7 @@
     "as_of": "2026-07-26",
     "blockers": [
       "No reliable price history available.",
-      "Fair value computed via multi-model fundamental engine.",
+      "A reliable fair value cannot be computed from current inputs.",
       "No news or corporate event linked to the ticker within the window.",
       "The macro context has fewer than three complete series.",
       "Insufficient exchange-rate data to assess country risk.",

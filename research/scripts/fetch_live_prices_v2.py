@@ -17,9 +17,9 @@ Yahoo Finance formats tried for each EGX ticker:
 import csv
 import json
 import time
-import urllib.request
 import urllib.error
-from datetime import datetime, timezone, timedelta
+import urllib.request
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ROOT        = Path(__file__).parent.parent
@@ -33,8 +33,8 @@ HEADERS = {
 }
 
 def ts_range(days: int = 400):
-    now   = int(datetime.now(timezone.utc).timestamp())
-    start = int((datetime.now(timezone.utc) - timedelta(days=days)).timestamp())
+    now   = int(datetime.now(UTC).timestamp())
+    start = int((datetime.now(UTC) - timedelta(days=days)).timestamp())
     return start, now
 
 def yahoo_fetch(symbol: str, days: int = 400) -> list[dict]:
@@ -71,7 +71,7 @@ def yahoo_fetch(symbol: str, days: int = 400) -> list[dict]:
         if c is None:
             continue
         bars.append({
-            "date":   datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d"),
+            "date":   datetime.fromtimestamp(ts, tz=UTC).strftime("%Y-%m-%d"),
             "open":   round(float(o), 4) if o else None,
             "high":   round(float(h), 4) if h else None,
             "low":    round(float(l), 4) if l else None,
@@ -136,8 +136,8 @@ def main():
             if rows and len(rows) >= 10:
                 latest = rows[-1]["date"]
                 # Fresh enough? (within 5 days for weekends)
-                latest_dt = datetime.strptime(latest, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-                if (datetime.now(timezone.utc) - latest_dt).days <= 5:
+                latest_dt = datetime.strptime(latest, "%Y-%m-%d").replace(tzinfo=UTC)
+                if (datetime.now(UTC) - latest_dt).days <= 5:
                     print(f"[{i:03d}/{len(tickers)}] {ticker:6s} CACHED  {len(rows)} bars latest={latest} close={rows[-1]['close']}")
                     success_map[ticker] = {"bars": len(rows), "symbol": f"{ticker}.CA(cache)", "latest": latest, "close": rows[-1]["close"]}
                     continue
@@ -152,7 +152,7 @@ def main():
             print(f"OK  via {sym:12s} {len(bars)} bars latest={latest} close={close}")
             success_map[ticker] = {"bars": len(bars), "symbol": sym, "latest": latest, "close": close}
         else:
-            print(f"NO DATA (all formats failed)")
+            print("NO DATA (all formats failed)")
             failed.append((ticker, company))
 
         # Polite rate limit: 60 req/min max
@@ -164,13 +164,13 @@ def main():
     print(f"FAILED:  {len(failed)}/{len(tickers)}")
 
     if failed:
-        print(f"\nTickers with NO data:")
+        print("\nTickers with NO data:")
         for t, c in failed:
             print(f"  {t:8s} {c}")
 
     # Manifest
     manifest = {
-        "fetched_at":     datetime.now(timezone.utc).isoformat(),
+        "fetched_at":     datetime.now(UTC).isoformat(),
         "source":         "Yahoo Finance (.CA / .EG / bare)",
         "universe_file":  "universe.json",
         "total_universe": len(tickers),

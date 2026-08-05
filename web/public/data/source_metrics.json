@@ -10,8 +10,8 @@
   },
   {
     "category": "market_data",
-    "first_run_at": "2026-08-03T12:22:49.657665",
-    "last_run_at": "2026-08-03T12:23:37.465656",
+    "first_run_at": "2026-08-03T09:31:00.132296",
+    "last_run_at": "2026-08-03T09:40:42.939360",
     "name": "Stooq",
     "reputation": {
       "accuracy": 0.7800000000000001,
@@ -31,8 +31,8 @@
   },
   {
     "category": "macroeconomic",
-    "first_run_at": "2026-08-03T12:22:49.773194",
-    "last_run_at": "2026-08-03T12:23:37.537199",
+    "first_run_at": "2026-08-03T09:31:00.195875",
+    "last_run_at": "2026-08-03T09:40:43.064290",
     "name": "FRED (St. Louis Fed)",
     "reputation": {
       "accuracy": 0.84,
@@ -52,8 +52,8 @@
   },
   {
     "category": "news",
-    "first_run_at": "2026-08-03T12:22:49.898729",
-    "last_run_at": "2026-08-03T12:23:37.586872",
+    "first_run_at": "2026-08-03T09:31:00.272208",
+    "last_run_at": "2026-08-03T09:40:43.137872",
     "name": "Generic RSS/Atom collector (serves every feed-publishing outlet)",
     "reputation": {
       "accuracy": 0.8800000000000002,
@@ -73,8 +73,8 @@
   },
   {
     "category": "macroeconomic",
-    "first_run_at": "2026-08-03T12:22:49.970915",
-    "last_run_at": "2026-08-03T12:23:37.629631",
+    "first_run_at": "2026-08-03T09:31:00.312332",
+    "last_run_at": "2026-08-03T09:40:43.218449",
     "name": "World Bank Open Data",
     "reputation": {
       "accuracy": 0.8800000000000002,

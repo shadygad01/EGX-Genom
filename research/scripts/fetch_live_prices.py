@@ -12,8 +12,8 @@ Output: research/data/prices/{TICKER}.csv  (date,open,high,low,close,volume)
 import csv
 import json
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -103,7 +103,7 @@ def save_ticker(ticker: str, bars: list[dict]) -> None:
 
 
 def main():
-    print(f"=== EGX Live Price Fetcher ===")
+    print("=== EGX Live Price Fetcher ===")
     print(f"Fetching {len(EGX_TICKERS)} tickers from Yahoo Finance (.CA suffix)")
     print(f"Output: {PRICES_DIR}\n")
 
@@ -122,7 +122,7 @@ def main():
         # Polite rate limiting — Yahoo allows ~60/min
         time.sleep(0.4)
 
-    print(f"\n=== DONE ===")
+    print("\n=== DONE ===")
     print(f"Success: {len(success)}/{len(EGX_TICKERS)}")
     print(f"Skipped: {len(skipped)}")
     if skipped:

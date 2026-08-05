@@ -72,11 +72,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 60,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.8542857142857143,
     "evidence_tier": "primary",
     "expected_latency": "end-of-day",
     "freshness_score": 0.7,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "multi-year daily OHLCV; EGX symbols suffixed .eg; global indices/commodities/FX",
     "id": "stooq",
     "integrated_capabilities": [],
@@ -123,7 +123,7 @@
     "validation_rules": [
       "data.quality.validate_price_bars"
     ],
-    "version": 1
+    "version": 13
   },
   {
     "access_method": "csv_download",
@@ -135,11 +135,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 85,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.8771428571428571,
     "evidence_tier": "primary",
     "expected_latency": "days (series-dependent)",
     "freshness_score": 0.8,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "decades, series-dependent",
     "id": "fred",
     "integrated_capabilities": [],
@@ -185,7 +185,7 @@
     "validation_rules": [
       "numeric values; '.' means missing and is dropped"
     ],
-    "version": 1
+    "version": 13
   },
   {
     "access_method": "rss_feed",
@@ -197,11 +197,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 40,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9725,
     "evidence_tier": "primary",
     "expected_latency": "minutes to hours",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "feed window only (typically days)",
     "id": "rss_generic",
     "integrated_capabilities": [],
@@ -244,7 +244,7 @@
       "title+date required",
       "entry link preserved as original URL"
     ],
-    "version": 1
+    "version": 7
   },
   {
     "access_method": "json_api",
@@ -256,11 +256,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 85,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9114285714285714,
     "evidence_tier": "primary",
     "expected_latency": "annual (some indicators lag a year or more)",
     "freshness_score": 0.5,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "annual indicators, decades of history, Egypt included",
     "id": "worldbank",
     "integrated_capabilities": [],
@@ -302,7 +302,7 @@
     "validation_rules": [
       "value present (null years dropped, never imputed)"
     ],
-    "version": 1
+    "version": 7
   },
   {
     "access_method": "csv_download",
@@ -2492,7 +2492,7 @@
     "lifecycle_state": "candidate",
     "name": "Moody's Ratings (Egypt sovereign, public press releases)",
     "normalization_rules": [],
-    "notes": "Public press releases on rating actions/outlook changes are free; the full rating report is a paid product and is explicitly out of scope. Active free public feed connected and operational.",
+    "notes": "Public press releases on rating actions/outlook changes are free; the full rating report is a paid product and is explicitly out of scope. Feed/RSS endpoint not yet verified -- PLANNED, not asserted reachable.",
     "priority": 50,
     "provenance_policy": "raw_document_envelope",
     "rate_limit": {
@@ -2546,7 +2546,7 @@
     "lifecycle_state": "candidate",
     "name": "S&P Global Ratings (Egypt sovereign, public press releases)",
     "normalization_rules": [],
-    "notes": "Public press releases on rating actions/outlook changes are free; the full rating report is a paid product and is explicitly out of scope. Active free public feed connected and operational.",
+    "notes": "Public press releases on rating actions/outlook changes are free; the full rating report is a paid product and is explicitly out of scope. Feed/RSS endpoint not yet verified -- PLANNED, not asserted reachable.",
     "priority": 50,
     "provenance_policy": "raw_document_envelope",
     "rate_limit": {
@@ -2600,7 +2600,7 @@
     "lifecycle_state": "candidate",
     "name": "Fitch Ratings (Egypt sovereign, public press releases)",
     "normalization_rules": [],
-    "notes": "Public press releases on rating actions/outlook changes are free; the full rating report is a paid product and is explicitly out of scope. Active free public feed connected and operational.",
+    "notes": "Public press releases on rating actions/outlook changes are free; the full rating report is a paid product and is explicitly out of scope. Feed/RSS endpoint not yet verified -- PLANNED, not asserted reachable.",
     "priority": 50,
     "provenance_policy": "raw_document_envelope",
     "rate_limit": {

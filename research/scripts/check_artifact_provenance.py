@@ -73,7 +73,7 @@ def validate_manifest_is_canonical(manifest: dict) -> list[str]:
     regression test exercises directly, without needing real git history.
     Returns a list of problems; empty means the manifest proves a
     canonical production run."""
-    from agx_research.dashboard.manifest import (  # noqa: PLC0415
+    from agx_research.dashboard.manifest import (
         ArtifactPublicationManifest,
         is_canonical_production,
     )
@@ -89,7 +89,7 @@ def validate_manifest_is_canonical(manifest: dict) -> list[str]:
     problems = []
     if parsed.pipeline_mode != "live":
         problems.append(f"pipeline_mode is {parsed.pipeline_mode!r}, expected 'live'")
-    from agx_research.dashboard.manifest import (  # noqa: PLC0415
+    from agx_research.dashboard.manifest import (
         CANONICAL_REPOSITORY,
         CANONICAL_WORKFLOW_NAME,
     )

@@ -21,7 +21,7 @@ Creates CSVs in research/data/prices/ with real anchored price points.
 
 import csv
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -47,7 +47,7 @@ def generate_anchored_bars(latest_price: float, days: int = 60) -> list[dict]:
     Uses zero artificial drift so price stays anchored to reality.
     """
     bars = []
-    end_date = datetime.now(timezone.utc)
+    end_date = datetime.now(UTC)
     
     for i in range(days, -1, -1):
         dt = end_date - timedelta(days=i)
@@ -104,12 +104,12 @@ def main():
     manifest["success"] = success_dict
     manifest["total_universe"] = 101
     manifest["coverage_pct"] = 100.0
-    manifest["updated_at"] = datetime.now(timezone.utc).isoformat()
+    manifest["updated_at"] = datetime.now(UTC).isoformat()
     
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
         
-    print(f"\n✅ Total coverage now: 101/101 (100.0%)")
+    print("\n✅ Total coverage now: 101/101 (100.0%)")
     print(f"Updated manifest: {manifest_path}")
 
 if __name__ == "__main__":

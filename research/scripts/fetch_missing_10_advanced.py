@@ -21,10 +21,10 @@ import csv
 import json
 import re
 import time
-import urllib.request
-import urllib.parse
 import urllib.error
-from datetime import datetime, timezone, timedelta
+import urllib.parse
+import urllib.request
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ROOT       = Path(__file__).parent.parent.parent
@@ -68,10 +68,10 @@ def save_csv(ticker, bars):
     return path
 
 def days_ago_ts(d):
-    return int((datetime.now(timezone.utc) - timedelta(days=d)).timestamp())
+    return int((datetime.now(UTC) - timedelta(days=d)).timestamp())
 
 def now_ts():
-    return int(datetime.now(timezone.utc).timestamp())
+    return int(datetime.now(UTC).timestamp())
 
 # ─────────────────────────────────────────────────────────────────
 # SOURCE 1: TradingView UDF API (most likely to work for EGX)
@@ -91,7 +91,7 @@ TV_SYMBOL_MAP = {
 
 def try_tradingview_udf(ticker):
     """TradingView UDF API for history bars."""
-    sym = urllib.parse.quote(TV_SYMBOL_MAP.get(ticker, f"EGX:{ticker}"))
+    urllib.parse.quote(TV_SYMBOL_MAP.get(ticker, f"EGX:{ticker}"))
     from_ts = days_ago_ts(400)
     to_ts = now_ts()
     # TradingView history endpoint
@@ -122,7 +122,7 @@ def try_tradingview_udf(ticker):
                 for ts, c in zip(times, closes):
                     if c:
                         bars.append({
-                            "date": datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d"),
+                            "date": datetime.fromtimestamp(ts, tz=UTC).strftime("%Y-%m-%d"),
                             "open": None, "high": None, "low": None,
                             "close": round(float(c), 4), "volume": 0
                         })
@@ -194,7 +194,7 @@ def try_investing_historical(pair_id: int, ticker: str):
         **HEADERS,
         "domain-id": "www",
         "X-Site-Current-Path": "/equities",
-        "Referer": f"https://www.investing.com/",
+        "Referer": "https://www.investing.com/",
     }
     url_full = url + "?" + urllib.parse.urlencode(params)
     data, status = http_get(url_full, headers=headers_inv)
@@ -206,7 +206,7 @@ def try_investing_historical(pair_id: int, ticker: str):
                 for item in d["data"]:
                     bars.append({
                         "date": str(item[0])[:10] if isinstance(item[0], str) else
-                               datetime.fromtimestamp(item[0]/1000 if item[0] > 1e10 else item[0], tz=timezone.utc).strftime("%Y-%m-%d"),
+                               datetime.fromtimestamp(item[0]/1000 if item[0] > 1e10 else item[0], tz=UTC).strftime("%Y-%m-%d"),
                         "open": None, "high": None, "low": None,
                         "close": round(float(item[1]), 4), "volume": 0
                     })
@@ -240,7 +240,7 @@ def try_egx_direct(ticker):
             if len(text) > 200 and ("close" in text.lower() or "price" in text.lower()):
                 # Try JSON
                 try:
-                    d = json.loads(text)
+                    json.loads(text)
                     print(f"    EGX direct JSON at: {url[:80]}")
                     return None, "EGX:partial_json"
                 except Exception:
@@ -280,7 +280,7 @@ def try_mubasher_chart(ticker):
                             ts, price = item[0], item[-1]
                             if price:
                                 try:
-                                    dt = datetime.fromtimestamp(float(ts)/1000 if float(ts) > 1e10 else float(ts), tz=timezone.utc)
+                                    dt = datetime.fromtimestamp(float(ts)/1000 if float(ts) > 1e10 else float(ts), tz=UTC)
                                     bars.append({"date": dt.strftime("%Y-%m-%d"), "open": None, "high": None, "low": None,
                                                  "close": round(float(price), 4), "volume": 0})
                                 except Exception: pass
@@ -319,14 +319,14 @@ def try_yahoo_v7(ticker):
         # v7 endpoint (sometimes available when v8 returns 404)
         url = (f"https://query2.finance.yahoo.com/v8/finance/chart/{sym}"
                f"?interval=1d&period1={days_ago_ts(400)}&period2={now_ts()}&events=history")
-        data, status = http_get(url)
+        data, _status = http_get(url)
         if data:
             try:
                 d = json.loads(data)
                 result = d["chart"]["result"][0]
                 tss = result.get("timestamp", [])
                 closes = result["indicators"]["quote"][0].get("close", [])
-                bars = [{"date": datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d"),
+                bars = [{"date": datetime.fromtimestamp(ts, tz=UTC).strftime("%Y-%m-%d"),
                           "open": None, "high": None, "low": None,
                           "close": round(float(c), 4), "volume": 0}
                          for ts, c in zip(tss, closes) if c]
@@ -350,7 +350,7 @@ SOURCES = [
 
 def main():
     print("=== EGX Missing 10 — Advanced Price Hunter ===")
-    print(f"All 10 confirmed ACTIVE and TRADING on EGX (Aug 2026)\n")
+    print("All 10 confirmed ACTIVE and TRADING on EGX (Aug 2026)\n")
 
     results = {}
     still_missing = []

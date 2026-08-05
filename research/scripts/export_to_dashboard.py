@@ -17,7 +17,7 @@ Run this AFTER:
 
 import json
 import shutil
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT        = Path(__file__).parent.parent.parent   # EGX-Genom root
@@ -83,7 +83,7 @@ def copy_artifact(src: Path, dst: Path) -> tuple[bool, str]:
 
 def build_export_manifest(copied: list, skipped: list) -> dict:
     return {
-        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "exported_at": datetime.now(UTC).isoformat(),
         "total_artifacts": len(DASHBOARD_ARTIFACTS),
         "copied": len(copied),
         "skipped": len(skipped),
@@ -127,7 +127,7 @@ def main():
     if manifest_src.exists():
         manifest_dst = WEB_PUBLIC / "prices_manifest.json"
         shutil.copy2(manifest_src, manifest_dst)
-        print(f"  [OK]  prices_manifest.json")
+        print("  [OK]  prices_manifest.json")
         copied.append("prices_manifest.json")
 
     # ── 4. Validate key decision files ───────────────────────────────────
@@ -155,7 +155,7 @@ def main():
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
 
-    print(f"\n=== DONE ===")
+    print("\n=== DONE ===")
     print(f"Copied:  {len(copied)}")
     print(f"Skipped: {len(skipped)}")
     print(f"Manifest saved: {manifest_path}")

@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "acquisition_decisions.json": 0,
-    "claims.json": 430,
+    "claims.json": 404,
     "collector_status.json": 49,
     "committee_summary.json": 1,
     "decision_history.json": 0,
@@ -23,7 +23,7 @@
     "patterns.json": 0,
     "portfolio_summary.json": 1,
     "recommendations.json": 0,
-    "runtime_metrics.json": 2,
+    "runtime_metrics.json": 3,
     "runtime_status.json": 1,
     "shadow_fund.json": 1,
     "shadow_fund_history.json": 1,
@@ -36,7 +36,7 @@
     "universe.json": 101,
     "warnings.json": 0
   },
-  "dashboard_dir": "C:\\Users\\Lap001\\.gemini\\antigravity\\worktrees\\EGX-Genom\\verify_repo_connection\\web\\public\\data",
-  "generated_at": "2026-08-03T12:24:30.185744",
+  "dashboard_dir": "research\\data\\dashboard",
+  "generated_at": "2026-08-03T09:42:03.595873",
   "total_artifacts": 35
 }

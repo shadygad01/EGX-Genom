@@ -5,7 +5,14 @@
     "catalogued": true,
     "category": "market_data",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "market_structure_agent",
+      "liquidity_agent",
+      "technical_structure_agent",
+      "corporate_events_agent",
+      "validation",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -17,71 +24,88 @@
     "source_id": "egx_price_composite"
   },
   {
-    "attempted_this_run": false,
-    "blocker": "IMPLEMENTED collector exists, but this pipeline has no verified live configuration (e.g. a real per-outlet feed URL) for it yet.",
+    "attempted_this_run": true,
+    "blocker": null,
     "catalogued": true,
     "category": "market_data",
-    "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "collector_status": "COLLECTED",
+    "consumers": [
+      "market_structure_agent",
+      "liquidity_agent",
+      "technical_structure_agent",
+      "validation",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
-    "fetched_this_run": false,
-    "fresh": false,
-    "last_run_at": null,
+    "fetched_this_run": true,
+    "fresh": true,
+    "last_run_at": "2026-08-03T09:40:42.939360",
     "legally_usable": false,
     "name": "Stooq",
-    "produced_records": 0,
-    "reached_decision_path": false,
+    "produced_records": 20,
+    "reached_decision_path": true,
     "source_id": "stooq"
   },
   {
-    "attempted_this_run": false,
-    "blocker": "IMPLEMENTED collector exists, but this pipeline has no verified live configuration (e.g. a real per-outlet feed URL) for it yet.",
+    "attempted_this_run": true,
+    "blocker": null,
     "catalogued": true,
     "category": "macroeconomic",
-    "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "collector_status": "COLLECTED",
+    "consumers": [
+      "macro_agent",
+      "validation",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
-    "fetched_this_run": false,
-    "fresh": false,
-    "last_run_at": null,
+    "fetched_this_run": true,
+    "fresh": true,
+    "last_run_at": "2026-08-03T09:40:43.064290",
     "legally_usable": true,
     "name": "FRED (St. Louis Fed)",
-    "produced_records": 0,
-    "reached_decision_path": false,
+    "produced_records": 20,
+    "reached_decision_path": true,
     "source_id": "fred"
   },
   {
-    "attempted_this_run": false,
-    "blocker": "IMPLEMENTED collector exists, but this pipeline has no verified live configuration (e.g. a real per-outlet feed URL) for it yet.",
+    "attempted_this_run": true,
+    "blocker": null,
     "catalogued": true,
     "category": "news",
-    "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "collector_status": "COLLECTED",
+    "consumers": [
+      "event_risk_overlay",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
-    "fetched_this_run": false,
-    "fresh": false,
-    "last_run_at": null,
+    "fetched_this_run": true,
+    "fresh": true,
+    "last_run_at": "2026-08-03T09:40:43.137872",
     "legally_usable": false,
     "name": "Generic RSS/Atom collector (serves every feed-publishing outlet)",
-    "produced_records": 0,
-    "reached_decision_path": false,
+    "produced_records": 5,
+    "reached_decision_path": true,
     "source_id": "rss_generic"
   },
   {
-    "attempted_this_run": false,
-    "blocker": "IMPLEMENTED collector exists, but this pipeline has no verified live configuration (e.g. a real per-outlet feed URL) for it yet.",
+    "attempted_this_run": true,
+    "blocker": null,
     "catalogued": true,
     "category": "macroeconomic",
-    "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "collector_status": "COLLECTED",
+    "consumers": [
+      "macro_agent",
+      "validation",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
-    "fetched_this_run": false,
-    "fresh": false,
-    "last_run_at": null,
+    "fetched_this_run": true,
+    "fresh": true,
+    "last_run_at": "2026-08-03T09:40:43.218449",
     "legally_usable": true,
     "name": "World Bank Open Data",
-    "produced_records": 0,
-    "reached_decision_path": false,
+    "produced_records": 2,
+    "reached_decision_path": true,
     "source_id": "worldbank"
   },
   {
@@ -124,7 +148,13 @@
     "catalogued": true,
     "category": "official",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "universe_provider",
+      "market_memory",
+      "research_pipeline",
+      "opportunity_center",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -141,7 +171,11 @@
     "catalogued": true,
     "category": "official",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "corporate_events_agent",
+      "event_risk_overlay",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -171,7 +205,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "official",
     "collector_status": "UNAVAILABLE",
@@ -192,7 +226,11 @@
     "catalogued": true,
     "category": "official",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "macro_agent",
+      "validation",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -205,7 +243,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "official",
     "collector_status": "UNAVAILABLE",
@@ -226,7 +264,12 @@
     "catalogued": true,
     "category": "company",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "financial_readiness",
+      "company_workspace",
+      "opportunity_center",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -243,7 +286,12 @@
     "catalogued": true,
     "category": "company",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "financial_readiness",
+      "company_workspace",
+      "opportunity_center",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -260,7 +308,14 @@
     "catalogued": true,
     "category": "company",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "financial_performance_agent",
+      "fair_value_engine",
+      "financial_readiness",
+      "company_workspace",
+      "opportunity_center",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -277,7 +332,12 @@
     "catalogued": true,
     "category": "market_data",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "valuation_metrics",
+      "financial_readiness",
+      "opportunity_center",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -290,7 +350,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "company",
     "collector_status": "UNAVAILABLE",
@@ -341,7 +401,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "market_data",
     "collector_status": "UNAVAILABLE",
@@ -362,7 +422,11 @@
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "corporate_events_agent",
+      "event_risk_overlay",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -379,7 +443,11 @@
     "catalogued": true,
     "category": "official",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "macro_agent",
+      "validation",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -396,7 +464,12 @@
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "corporate_events_agent",
+      "event_risk_overlay",
+      "company_workspace",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -413,7 +486,10 @@
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "event_risk_overlay",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -430,7 +506,11 @@
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "corporate_events_agent",
+      "event_risk_overlay",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -447,7 +527,11 @@
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "corporate_events_agent",
+      "event_risk_overlay",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -460,7 +544,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
@@ -477,7 +561,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
@@ -494,7 +578,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
@@ -511,7 +595,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
@@ -528,7 +612,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
@@ -545,7 +629,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "news",
     "collector_status": "UNAVAILABLE",
@@ -596,7 +680,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
@@ -613,7 +697,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
@@ -630,7 +714,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
@@ -647,7 +731,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
@@ -681,7 +765,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "macroeconomic",
     "collector_status": "UNAVAILABLE",
@@ -702,7 +786,11 @@
     "catalogued": true,
     "category": "macroeconomic",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "macro_agent",
+      "validation",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -736,7 +824,11 @@
     "catalogued": true,
     "category": "global_markets",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "market_agents",
+      "macro_agent",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,
@@ -749,7 +841,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "global_markets",
     "collector_status": "UNAVAILABLE",
@@ -766,7 +858,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "macroeconomic",
     "collector_status": "UNAVAILABLE",
@@ -783,7 +875,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "macroeconomic",
     "collector_status": "UNAVAILABLE",
@@ -800,7 +892,7 @@
   },
   {
     "attempted_this_run": false,
-    "blocker": "Active free public endpoint connected and operational.",
+    "blocker": "Endpoint not yet verified against a real fetch; this codebase's own rule forbids wiring a collector against a guessed URL (see docs/DATA_ACQUISITION.md).",
     "catalogued": true,
     "category": "macroeconomic",
     "collector_status": "UNAVAILABLE",
@@ -821,7 +913,11 @@
     "catalogued": true,
     "category": "arabic_news",
     "collector_status": "UNAVAILABLE",
-    "consumers": [],
+    "consumers": [
+      "corporate_events_agent",
+      "event_risk_overlay",
+      "meta_decision_engine"
+    ],
     "corroborated": false,
     "fetched_this_run": false,
     "fresh": false,

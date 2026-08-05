@@ -1,7 +1,7 @@
 {
   "artifacts_produced": {
     "acquisition_decisions.json": 0,
-    "claims.json": 430,
+    "claims.json": 404,
     "collector_status.json": 49,
     "committee_summary.json": 1,
     "dashboard_metrics.json": 35,
@@ -24,7 +24,7 @@
     "patterns.json": 0,
     "portfolio_summary.json": 1,
     "recommendations.json": 0,
-    "runtime_metrics.json": 2,
+    "runtime_metrics.json": 3,
     "runtime_status.json": 1,
     "shadow_fund.json": 1,
     "shadow_fund_history.json": 1,
@@ -38,15 +38,15 @@
     "warnings.json": 0
   },
   "current_execution_mode": "mock",
-  "execution_duration_seconds": 52.774399,
-  "generated_at": "2026-08-03T12:24:30.196782",
+  "execution_duration_seconds": 80.7357,
+  "generated_at": "2026-08-03T09:42:03.605503",
   "genome_updated": 0,
   "knowledge_updated": 0,
   "last_failed_pipeline_at": null,
   "last_failed_pipeline_id": null,
-  "last_successful_pipeline_at": "2026-08-03T12:24:30.192750",
-  "last_successful_pipeline_id": "execution_2e8b868760a1",
+  "last_successful_pipeline_at": "2026-08-03T09:42:03.601189",
+  "last_successful_pipeline_id": "execution_f31c016764db",
   "pipeline_status": "succeeded",
   "pipeline_version": "1.0.0",
-  "total_executions": 2
+  "total_executions": 3
 }

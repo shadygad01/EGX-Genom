@@ -54,7 +54,10 @@ from agx_research.discovery.company_financial_registry import (
     CompanyRegistryStatus,
 )
 from agx_research.discovery.resolution_memory import ResolutionMemory
-from agx_research.discovery.web_search_hints import WebSearchHintStrategy, load_web_search_domain_hints
+from agx_research.discovery.web_search_hints import (
+    WebSearchHintStrategy,
+    load_web_search_domain_hints,
+)
 
 _UNIVERSE_DIR = Path(__file__).resolve().parent.parent / "data" / "universe"
 _DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "registry"

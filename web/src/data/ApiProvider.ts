@@ -224,6 +224,10 @@ export class ApiProvider implements DashboardDataProvider {
     return fetchJson<ArtifactPublicationManifest | null>("/manifest");
   }
 
+  getMacroSnapshot(): Promise<import("./DataProvider").MacroSnapshot | null> {
+    return fetchJson<import("./DataProvider").MacroSnapshot | null>("/macro-snapshot");
+  }
+
   async postDecisions(request: DecideRequest): Promise<PositionAwareDecision[]> {
     const response = await fetch("/api/decisions", {
       method: "POST",

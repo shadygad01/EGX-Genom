@@ -60,6 +60,7 @@ function fakeProvider(overrides: Partial<DashboardDataProvider> = {}): Dashboard
       explanation: { why_this_stock: "", why_now: "", why_not_others: "" },
       provenance: { produced_by: "test", produced_at: "2026-07-22T00:00:00", inputs: [] },
     }),
+    getMacroSnapshot: async () => null,
     ...overrides,
   };
 }

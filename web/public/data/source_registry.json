@@ -123,7 +123,7 @@
     "validation_rules": [
       "data.quality.validate_price_bars"
     ],
-    "version": 13
+    "version": 17
   },
   {
     "access_method": "csv_download",
@@ -185,7 +185,7 @@
     "validation_rules": [
       "numeric values; '.' means missing and is dropped"
     ],
-    "version": 13
+    "version": 17
   },
   {
     "access_method": "rss_feed",
@@ -244,7 +244,7 @@
       "title+date required",
       "entry link preserved as original URL"
     ],
-    "version": 7
+    "version": 9
   },
   {
     "access_method": "json_api",
@@ -302,7 +302,7 @@
     "validation_rules": [
       "value present (null years dropped, never imputed)"
     ],
-    "version": 7
+    "version": 9
   },
   {
     "access_method": "csv_download",
@@ -808,7 +808,7 @@
     "base_url": "https://orascom.com/updates/",
     "category": "company",
     "collector": "OrascomFinancialHighlightsCollector",
-    "collector_version": "1.0.0",
+    "collector_version": "1.1.0",
     "conflict_priority": 95,
     "country": "EG",
     "data_quality_score": null,
@@ -859,7 +859,7 @@
       "FinancialStatementLineItem schema",
       "explicit USD-labelled values"
     ],
-    "version": 1
+    "version": 2
   },
   {
     "access_method": "csv_download",
@@ -2680,6 +2680,128 @@
     "terms_of_use_url": null,
     "update_frequency": "unknown",
     "validation_rules": [],
+    "version": 1
+  },
+  {
+    "access_method": "pdf_download",
+    "activation_status": "active",
+    "authentication": "none",
+    "base_url": "https://ramedapharma-ir.com/wp-content/uploads/2026/05/Rameda-1Q26-Earnings-Release.pdf",
+    "category": "company",
+    "collector": "CompanyEarningsTablePdfCollector",
+    "collector_version": "1.0.0",
+    "conflict_priority": 90,
+    "country": "EG",
+    "data_quality_score": null,
+    "evidence_tier": "primary",
+    "expected_latency": "issuer publication",
+    "freshness_score": 0.85,
+    "health_status": "unknown",
+    "historical_coverage": "Latest issuer-published quarterly earnings-release summary table",
+    "id": "rmda_ir",
+    "integrated_capabilities": [],
+    "integrated_via": null,
+    "legal_use_status": "research_only",
+    "license": "Public primary issuer investor-relations release; research use with source attribution. Raw PDF content is not redistributed.",
+    "lifecycle_state": "trusted",
+    "name": "Rameda Pharmaceuticals Investor Relations (quarterly earnings-release PDF)",
+    "normalization_rules": [
+      "EGP mn to EGP units",
+      "NQYY quarter label to ISO period end"
+    ],
+    "notes": "Live-verified via a real GitHub Actions fetch (run 30810863486, 2026-08-03) -- robots.txt allows it per the discovery/latest company_financial_sources.json record. URL is the company's current 1Q26 release; a maintainer updates it to the newest release when the weekly discovery workflow finds one, same as AD-53/AD-54's catalog-sync precedent. The collector only reads the structured summary table, never prose, and fails closed (empty + warning) if the table shape isn't found.",
+    "priority": 88,
+    "provenance_policy": "raw_document_envelope",
+    "rate_limit": {
+      "min_seconds_between_requests": 1.0,
+      "requests_per_minute": 10
+    },
+    "reliability_score": 0.9,
+    "reputation_score": null,
+    "retry_policy": {
+      "backoff_multiplier": 2.0,
+      "backoff_seconds": 2.0,
+      "max_attempts": 3
+    },
+    "schema_version": "1.0",
+    "status": "implemented",
+    "supported_entities": [
+      "RMDA"
+    ],
+    "supported_event_types": [
+      "corporate"
+    ],
+    "supported_languages": [
+      "en"
+    ],
+    "terms_of_use_url": null,
+    "update_frequency": "quarterly",
+    "validation_rules": [
+      "FinancialStatementLineItem schema",
+      "explicit 'EGP mn <period> <period> ...' summary table header",
+      "whitelisted line-item label"
+    ],
+    "version": 1
+  },
+  {
+    "access_method": "pdf_download",
+    "activation_status": "active",
+    "authentication": "none",
+    "base_url": "https://talaatmoustafa.com/upload/TMG%20Holding%201Q26%20ER%20-%20EN.pdf",
+    "category": "company",
+    "collector": "CompanyEarningsTablePdfCollector",
+    "collector_version": "1.0.0",
+    "conflict_priority": 90,
+    "country": "EG",
+    "data_quality_score": null,
+    "evidence_tier": "primary",
+    "expected_latency": "issuer publication",
+    "freshness_score": 0.85,
+    "health_status": "unknown",
+    "historical_coverage": "Latest issuer-published quarterly earnings-release summary table",
+    "id": "tmgh_ir",
+    "integrated_capabilities": [],
+    "integrated_via": null,
+    "legal_use_status": "research_only",
+    "license": "Public primary issuer investor-relations release; research use with source attribution. Raw PDF content is not redistributed.",
+    "lifecycle_state": "trusted",
+    "name": "TMG Holding Investor Relations (quarterly earnings-release PDF)",
+    "normalization_rules": [
+      "EGP mn to EGP units",
+      "NQYY quarter label to ISO period end"
+    ],
+    "notes": "Live-verified via a real GitHub Actions fetch (run 30810863486, 2026-08-03) -- robots.txt allows it per the discovery/latest company_financial_sources.json record. TMG Holding also publishes a 64-document PDF archive (docs/COLLECTOR_TEMPLATE_TAXONOMY.md Family B) including full audited separate/consolidated financial statements; only the quarterly earnings-release summary table is wired today, not that larger archive. The collector only reads the structured summary table, never prose, and fails closed (empty + warning) if the table shape isn't found.",
+    "priority": 88,
+    "provenance_policy": "raw_document_envelope",
+    "rate_limit": {
+      "min_seconds_between_requests": 1.0,
+      "requests_per_minute": 10
+    },
+    "reliability_score": 0.9,
+    "reputation_score": null,
+    "retry_policy": {
+      "backoff_multiplier": 2.0,
+      "backoff_seconds": 2.0,
+      "max_attempts": 3
+    },
+    "schema_version": "1.0",
+    "status": "implemented",
+    "supported_entities": [
+      "TMGH"
+    ],
+    "supported_event_types": [
+      "corporate"
+    ],
+    "supported_languages": [
+      "en"
+    ],
+    "terms_of_use_url": null,
+    "update_frequency": "quarterly",
+    "validation_rules": [
+      "FinancialStatementLineItem schema",
+      "explicit 'EGP mn <period> <period> ...' summary table header",
+      "whitelisted line-item label"
+    ],
     "version": 1
   }
 ]

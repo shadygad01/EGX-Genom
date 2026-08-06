@@ -1,0 +1,25 @@
+[Unit]
+Description=EGX-Genom Autonomous Market Data & Research Collector
+Documentation=file:///opt/egx-genom/docs/ARCHITECTURE.md
+After=network-online.target egx-api.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/egx-genom
+Environment="PYTHONPATH=/opt/egx-genom/research/src"
+Environment="DATA_DIR=/opt/egx-genom/research/data"
+ExecStart=/bin/bash -c 'DATE=$({ /opt/egx-genom/venv/bin/python -c "from datetime import date; print(date.today().isoformat())"; } 2>/dev/null || date +%%Y-%%m-%%d); /opt/egx-genom/venv/bin/python -m agx_research.cli run --mode live --date "$DATE" --data-dir /opt/egx-genom/research/data --dashboard-out /opt/egx-genom/web/public/data'
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=egx-collector
+TimeoutStartSec=120
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/egx-genom/research/data /opt/egx-genom/web/public/data
+
+[Install]
+WantedBy=multi-user.target

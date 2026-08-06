@@ -1,0 +1,12 @@
+[Unit]
+Description=EGX-Genom Collector 1-Minute Operational Timer
+Requires=egx-collector.service
+
+[Timer]
+OnCalendar=*:*
+AccuracySec=1s
+Unit=egx-collector.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

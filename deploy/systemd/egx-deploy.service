@@ -1,0 +1,20 @@
+[Unit]
+Description=EGX-Genom Auto-Deploy (pull main, rebuild, reinstall if changed)
+Documentation=file:///opt/egx-genom/deploy/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/egx-genom
+Environment="PATH=/root/.local/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/bin/bash /opt/egx-genom/deploy/systemd/auto-deploy.sh
+TimeoutStartSec=600
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=egx-deploy
+
+[Install]
+WantedBy=multi-user.target

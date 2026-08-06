@@ -17,60 +17,47 @@ Everything below assumes the repo is checked out at `/opt/egx-genom`. Adjust
 every path in the two systemd units and `deploy/nginx/egx-genom.conf` if you
 use a different directory.
 
-## Continuous deployment (recommended): GitHub Actions → VPS
+## Continuous deployment (recommended): the VPS pulls from GitHub itself
 
-Steps 1-4 below are the one-time manual bootstrap. After that, every push
-to `main` touching `deploy/`, `api/`, `web/`, `research/`, or
-`package*.json` can redeploy automatically via
-`.github/workflows/deploy-vps.yml` — it SSHs in, `git reset --hard
-origin/main`, rebuilds, reruns `deploy/systemd/install.sh`, then runs the
-same health checks as the "Verification checklist" below and **fails the
-job loudly if any of them fail** (nothing is marked successful on a guess).
+No SSH keys, no GitHub secrets, no credentials anywhere. This repo is
+public, so `git fetch` needs no authentication — the VPS reaches out to
+GitHub on its own schedule (same "pull, don't get pushed to" shape as
+`egx-collector.timer` already uses for market data), instead of GitHub
+reaching into the VPS.
 
-This requires three repository secrets that nobody but you can set — a
-GitHub Actions runner has real internet access to reach your VPS; nothing
-in this repo or any automated session does, by design, so this step can't
-be done for you:
+`deploy/systemd/egx-deploy.timer` fires `egx-deploy.service` every 5
+minutes, which runs `deploy/systemd/auto-deploy.sh`:
+1. `git fetch origin main`; if `HEAD` already matches `origin/main`, it
+   exits immediately — no wasted rebuilds when nothing changed.
+2. Otherwise: `git reset --hard origin/main` (only affects tracked files
+   — `egx-collector.service`'s own runtime output under `research/data/`
+   is untracked and untouched), rebuild (`uv sync --frozen`, `npm ci`,
+   `npm run build -w api`, `npm run build -w web -- --mode selfhosted`),
+   rerun `deploy/systemd/install.sh`.
+3. Verify: `systemctl is-active` on `egx-api.service`/`nginx`, real
+   `curl` checks against the API directly and through nginx, and the
+   dashboard's HTTP status — printed to the journal either way, and the
+   unit is left in `failed` state if any check doesn't actually pass
+   (`journalctl -u egx-deploy` / `systemctl status egx-deploy.service` is
+   your evidence, not a guess).
 
-1. Generate a dedicated deploy keypair (do this on your own machine, not
-   by pasting anything into an AI chat):
-   ```bash
-   ssh-keygen -t ed25519 -C "egx-genom-deploy" -f ./egx_deploy_key -N ""
-   ```
-2. Authorize the **public** half on the VPS (`ssh root@162.245.186.123`,
-   or InterServer's web console if you'd rather not use the still-shared
-   root password):
-   ```bash
-   mkdir -p ~/.ssh && chmod 700 ~/.ssh
-   echo "<paste contents of egx_deploy_key.pub>" >> ~/.ssh/authorized_keys
-   chmod 600 ~/.ssh/authorized_keys
-   ```
-   Prefer a dedicated non-root deploy user with narrow `sudo` rights over
-   using `root` directly for CI, if you're willing to set that up — but
-   `root` matches every other convention already in this `deploy/`
-   directory (`egx-api.service`/`egx-collector.service` both run as
-   `User=root`), so it's not a new risk relative to what's already here.
-3. In GitHub: **Settings → Secrets and variables → Actions → New
-   repository secret**, add:
-   - `VPS_HOST` = `162.245.186.123`
-   - `VPS_USER` = `root` (or your dedicated deploy user)
-   - `VPS_SSH_KEY` = the **private** half (`cat egx_deploy_key`) — paste
-     the whole thing, including the `-----BEGIN/END-----` lines
-   - Delete `egx_deploy_key`/`egx_deploy_key.pub` locally once added, or
-     keep them somewhere safe — GitHub never displays a secret's value
-     again after you save it.
-4. Rotate the root password (per the earlier warning in this
-   conversation) — do it after step 2 if you authorized the deploy key as
-   `root`, so the new deploy key survives the rotation.
+This installs automatically as part of `deploy/systemd/install.sh` (step
+4 below) — nothing else to configure. To confirm it's live and see proof
+of the last run:
 
-Once the secrets exist, either push a qualifying change to `main`, or
-trigger it manually from the Actions tab (or ask for a manual
-`workflow_dispatch` run) — the job's own log is verifiable proof: it
-prints `systemctl is-active` for every unit, real `curl` output from the
-API/nginx/dashboard, and ends with `VERIFICATION PASSED` only if every
-check actually succeeded.
+```bash
+systemctl list-timers egx-deploy.timer --no-pager   # shows next scheduled check
+journalctl -u egx-deploy.service --no-pager | tail -40
+# Force an immediate check instead of waiting up to 5 minutes:
+systemctl start egx-deploy.service && journalctl -u egx-deploy.service -f
+```
 
-## Manual deployment (one-off, or if you'd rather not wire up CI)
+The only remaining manual credential on this box is the root
+password used to reach it at all (SSH / the InterServer console) — rotate
+it per the earlier warning in this conversation; nothing added here
+depends on it.
+
+## Manual deployment (one-off, or if you'd rather not wire up auto-deploy)
 
 ## 1. Build
 
@@ -129,10 +116,12 @@ cd /opt/egx-genom
 bash deploy/systemd/install.sh
 ```
 
-This installs and starts `egx-api.service` (the live backend) and
+This installs and starts `egx-api.service` (the live backend),
 `egx-collector.service`/`egx-collector.timer` (the every-minute data
 refresh that keeps both the API's and the static site's data current), and
-runs a `curl 127.0.0.1:3001/health` sanity check at the end.
+`egx-deploy.service`/`egx-deploy.timer` (the every-5-minute check for new
+commits on `main` — see "Continuous deployment" above), then runs a
+`curl 127.0.0.1:3001/health` sanity check at the end.
 
 ## Verification checklist
 

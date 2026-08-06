@@ -123,9 +123,37 @@ refresh that keeps both the API's and the static site's data current), and
 commits on `main` — see "Continuous deployment" above), then runs a
 `curl 127.0.0.1:3001/health` sanity check at the end.
 
-## Verification checklist
+## Verification: is the migration actually complete and correct?
 
-Run these **on the server** (or paste the output back for review — this
+Run this **on the server**, anytime:
+
+```bash
+bash /opt/egx-genom/deploy/verify.sh
+```
+
+It answers exactly the three things that matter, with real evidence, not
+a guess, and exits non-zero if anything is wrong:
+
+1. **Is the server running the latest code?** Compares the server's `git`
+   `HEAD` against `origin/main` directly — the same check
+   `egx-deploy.service` uses to decide whether to redeploy at all.
+2. **Are all the services actually up?** `systemctl is-active` on
+   `egx-api.service`, `egx-collector.timer`, `egx-deploy.timer`, `nginx`.
+3. **Do the live features actually work**, not just the static ones? Real
+   `curl` calls to the API directly, through nginx, the dashboard's HTTP
+   status, and a real `POST /api/decisions` call — a `501` there means
+   Decision Center/Capital Allocation are still silently unconfigured
+   even if everything else is green.
+
+Paste the full output back if you want it reviewed — that's the
+"دليل وبرهان" (evidence and proof): every line is either a real command's
+real output or an explicit `PASS`/`FAIL`, never an assumption.
+
+### Manual checklist (what `verify.sh` automates)
+
+The individual commands below are what the script above already runs for
+you — kept here for when you want to debug one specific piece by hand
+instead of the full sweep (or paste the output back for review — this
 sandbox cannot reach the VPS directly: it's not on this session's network
 egress allowlist, and SSH/raw TCP isn't proxied even for allowed hosts):
 

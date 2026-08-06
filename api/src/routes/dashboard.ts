@@ -61,4 +61,5 @@ export async function dashboardRoutes(
   // Artifact provenance (AD-64): where the bundle this api/ instance is
   // serving actually came from -- see docs/ARCHITECTURE_DECISIONS.md.
   app.get("/manifest", async () => artifacts.manifest());
+  app.get("/macro-snapshot", async () => artifacts.macroSnapshot());
 }

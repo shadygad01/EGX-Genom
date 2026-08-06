@@ -197,4 +197,8 @@ export class ArtifactsReader {
   endpointCandidates<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("endpoint_candidates.json"), []);
   }
+
+  macroSnapshot<T = unknown>(): Promise<T | null> {
+    return readJsonOrDefault<T | null>(this.path("macro_snapshot.json"), null);
+  }
 }

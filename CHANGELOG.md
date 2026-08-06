@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased — Automatic VPS deployment on push to main
+
+Merging to `main` previously did not reach the self-hosted VPS at all —
+only `deploy-pages.yml` (GitHub Pages, a separate target) is triggered by
+a push. Added `.github/workflows/deploy-vps.yml`: on a qualifying push to
+`main` (or manual dispatch), SSHs into the VPS from the GitHub Actions
+runner (which has real internet access, unlike a sandboxed coding
+session), `git reset --hard origin/main`s the checkout, rebuilds
+(`uv sync --frozen`, `npm ci`, `npm run build -w api`,
+`npm run build -w web -- --mode selfhosted`), reruns
+`deploy/systemd/install.sh`, then runs the same checks as `deploy/README.md`'s
+verification checklist and fails the job loudly if any fail, rather than
+reporting success on an unverified guess. Requires three repo secrets
+(`VPS_HOST`/`VPS_USER`/`VPS_SSH_KEY`) that only the repo owner can set —
+documented with exact one-time setup commands in `deploy/README.md`'s new
+"Continuous deployment" section. `git reset --hard` only affects tracked
+files, so the collector's own runtime output under `research/data/`
+(`knowledge.json`, `events.json`, `shadow_fund.json`, etc. — all
+untracked) is never touched by a deploy.
+
 ## Unreleased — Self-hosted VPS deployment tooling
 
 Added the missing pieces to run a private, self-hosted instance with a live

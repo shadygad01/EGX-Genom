@@ -24,10 +24,12 @@ dist/
 .env
 .env.*
 !.env.example
-# Non-secret, checked-in Vite mode config (no credentials; see web/.env.production
-# and web/.env.development) -- everything else matching .env.* stays ignored.
+# Non-secret, checked-in Vite mode config (no credentials; see web/.env.production,
+# web/.env.development, and web/.env.selfhosted) -- everything else matching
+# .env.* stays ignored.
 !web/.env.production
 !web/.env.development
+!web/.env.selfhosted
 
 # Generated dashboard artifacts (agx_research.cli export-dashboard writes these
 # fresh in CI before the Pages build; see .github/workflows/deploy-pages.yml)

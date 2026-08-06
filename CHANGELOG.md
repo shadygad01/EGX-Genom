@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased — Self-hosted VPS deployment tooling
+
+Added the missing pieces to run a private, self-hosted instance with a live
+`api/` (Decision Center / Capital Allocation working against real holdings)
+on a VPS -- the "local-only/self-hosted" option AD-57 already names as
+permanent, just documented and packaged for a remote host instead of a
+laptop. Does not touch or reverse AD-57's public-site static-only
+guarantee (`.github/workflows/deploy-pages.yml` unchanged).
+
+`deploy/systemd/egx-collector.service` already declared `After=...
+egx-api.service`, but no such unit existed in the repo -- added
+`deploy/systemd/egx-api.service`, with env vars wired to the exact paths
+`egx-collector.service`'s `agx run` writes to (`DASHBOARD_ARTIFACTS_DIR`
+matching its `--dashboard-out`, `DECISION_DATA_DIR` matching its
+`--data-dir`), so the API serves the same data the rest of the dashboard
+shows rather than a second, divergent directory. Added
+`deploy/nginx/egx-genom.conf` (serves `web/dist` under `/EGX-Genom/`,
+matching `vite.config.ts`'s hardcoded production `base`; reverse-proxies
+`/api/` to the API, replicating `vite.config.ts`'s dev-server proxy
+rewrite behavior in production). Added `web/.env.selfhosted`
+(`VITE_DATA_PROVIDER=api`) since the default production build
+(`web/.env.production`) is hard-locked to `static` for the public site and
+must not be reused unmodified for a self-hosted build, or every live
+feature silently falls back to bundled JSON. Extended
+`deploy/systemd/install.sh` to install/enable `egx-api.service` alongside
+the collector and end with a `/health` check. `deploy/README.md` is the
+full build → seed → nginx → systemd runbook plus a verification checklist.
+
 ## Unreleased — Financial Coverage Completion Mission: normalization fix
 
 `OrascomFinancialHighlightsCollector` (`orascom_ir`) was labelling the

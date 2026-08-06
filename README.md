@@ -78,3 +78,5 @@ by you), so it's reachable two ways:
   static GitHub Pages build has no backend to compute this against, so
   Decision Center honestly reports itself unavailable there rather than
   fabricating a result — use the CLI, or self-host `api/`, instead.
+  For a persistent self-hosted deployment (e.g. a private VPS) rather than
+  a local `npm run dev`, see [`deploy/README.md`](deploy/README.md).

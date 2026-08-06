@@ -1,0 +1,13 @@
+[Unit]
+Description=EGX-Genom Auto-Deploy Timer (checks GitHub main every 5 minutes)
+Requires=egx-deploy.service
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Persistent=true
+Unit=egx-deploy.service
+
+[Install]
+WantedBy=timers.target

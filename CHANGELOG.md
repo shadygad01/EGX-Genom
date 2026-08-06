@@ -1,24 +1,30 @@
 # Changelog
 
-## Unreleased — Automatic VPS deployment on push to main
+## Unreleased — Automatic VPS deployment: pull-based, no credentials
 
-Merging to `main` previously did not reach the self-hosted VPS at all —
-only `deploy-pages.yml` (GitHub Pages, a separate target) is triggered by
-a push. Added `.github/workflows/deploy-vps.yml`: on a qualifying push to
-`main` (or manual dispatch), SSHs into the VPS from the GitHub Actions
-runner (which has real internet access, unlike a sandboxed coding
-session), `git reset --hard origin/main`s the checkout, rebuilds
-(`uv sync --frozen`, `npm ci`, `npm run build -w api`,
-`npm run build -w web -- --mode selfhosted`), reruns
-`deploy/systemd/install.sh`, then runs the same checks as `deploy/README.md`'s
-verification checklist and fails the job loudly if any fail, rather than
-reporting success on an unverified guess. Requires three repo secrets
-(`VPS_HOST`/`VPS_USER`/`VPS_SSH_KEY`) that only the repo owner can set —
-documented with exact one-time setup commands in `deploy/README.md`'s new
-"Continuous deployment" section. `git reset --hard` only affects tracked
-files, so the collector's own runtime output under `research/data/`
-(`knowledge.json`, `events.json`, `shadow_fund.json`, etc. — all
-untracked) is never touched by a deploy.
+Superseded this mission's first attempt (a GitHub-Actions-SSHes-into-the-VPS
+workflow requiring an `VPS_SSH_KEY` repo secret) after the project owner
+asked to avoid SSH entirely. Removed `.github/workflows/deploy-vps.yml`.
+Replaced it with the opposite direction: the VPS pulls from GitHub on its
+own schedule, the same "pull, don't get pushed to" shape
+`egx-collector.timer` already uses for market data. Since this repo is
+public, `git fetch` needs no authentication at all — zero SSH keys, zero
+GitHub secrets, zero credentials anywhere in this design.
+
+Added `deploy/systemd/auto-deploy.sh` (checks `origin/main` against
+`HEAD`; no-ops if unchanged; otherwise `git reset --hard origin/main` —
+tracked files only, never touching the collector's untracked runtime
+state under `research/data/` — rebuilds, reruns
+`deploy/systemd/install.sh`, then runs the same verification checks as
+`deploy/README.md`'s checklist, leaving the unit in `failed` state if any
+of them don't actually pass), `deploy/systemd/egx-deploy.service`
+(oneshot wrapper), and `deploy/systemd/egx-deploy.timer` (every 5
+minutes). `deploy/systemd/install.sh` now installs and enables all three
+services alongside `egx-api`/`egx-collector`; careful to only
+enable+start the *timer*, never restart `egx-deploy.service` itself from
+inside `install.sh`, since an automated run reaches `install.sh` by being
+invoked *from* that exact service instance — restarting it mid-run would
+kill the deploy in progress.
 
 ## Unreleased — Self-hosted VPS deployment tooling
 

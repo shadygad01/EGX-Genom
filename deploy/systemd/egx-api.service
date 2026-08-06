@@ -1,0 +1,43 @@
+[Unit]
+Description=EGX-Genom API (Fastify) -- live Decision Center / Capital Allocation backend
+Documentation=file:///opt/egx-genom/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/egx-genom/api
+# uv must be resolvable: decisions.ts shells out to `uv run --project
+# <researchDir> python -m agx_research.cli ...` for /decisions and
+# /capital-allocation (see api/src/routes/decisions.ts). Adjust if uv was
+# installed somewhere else on this host (`command -v uv`).
+Environment="PATH=/root/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PORT=3001"
+Environment="KNOWLEDGE_STORE_PATH=/opt/egx-genom/research/data/knowledge.json"
+Environment="EVENTS_STORE_PATH=/opt/egx-genom/research/data/events.json"
+Environment="RUNS_STORE_PATH=/opt/egx-genom/research/data/runs.json"
+# Must match egx-collector.service's --dashboard-out exactly -- the API
+# serves whatever the collector last wrote there, nothing else.
+Environment="DASHBOARD_ARTIFACTS_DIR=/opt/egx-genom/web/public/data"
+# Same --data-dir egx-collector.service's `agx run` uses -- Decision Center
+# and Capital Allocation must compute against the data the rest of the
+# dashboard is already showing, never a second/guessed directory.
+Environment="DECISION_DATA_DIR=/opt/egx-genom/research/data"
+Environment="UNIVERSE_SEED_DIR=/opt/egx-genom/research/data/universe"
+# Resolved via PATH (set above) rather than a hardcoded /usr/bin/node,
+# since Node's install location varies (apt, NodeSource, nvm system-wide).
+ExecStart=/usr/bin/env node /opt/egx-genom/api/dist/index.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=egx-api
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/egx-genom/research/data
+
+[Install]
+WantedBy=multi-user.target

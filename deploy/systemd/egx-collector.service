@@ -20,20 +20,35 @@ PrivateTmp=true
 ProtectSystem=full
 ProtectHome=read-only
 ReadWritePaths=/opt/egx-genom/research/data /opt/egx-genom/web/public/data
-# This box hosts other independent services -- this unit fires every
-# minute (see egx-collector.timer) and, unbounded, a single full-universe/
-# full-history collection run measured up to ~2.5GB peak RSS in this
-# repo's own profiling harness (scripts/profile_egx_collector_memory.py;
-# see the memory report this ships with). That harness's own fix
-# (research/src/agx_research/collectors/service.py's `_row_changed` guard)
-# already stops steady-state growth across repeated runs; this ceiling is
-# the remaining safety net for the standing cost of one large ingest (a
-# cold start, or a real Yahoo history deeper than this repo has verified)
-# so a worst-case run degrades this one Type=oneshot unit -- next
-# minute's timer simply retries -- instead of taking down every other
-# tenant on the host. MemoryHigh throttles before MemoryMax's hard kill.
-MemoryHigh=3G
-MemoryMax=4G
+# This box hosts other independent services, and this unit fires every
+# minute (see egx-collector.timer) -- coexistence, not accommodating this
+# unit's own worst case, is the policy these limits enforce. Sized from
+# this repo's own measured *steady-state* production usage (docs/
+# EGX_COLLECTOR_MEMORY_REPORT.md §5.1, commit ee32e1f vs. c345691's fix
+# for `_row_changed`/`record_step`'s growth guard): 101 tickers x 5
+# repeated runs against an accumulating store plateaus at 320-344MB RSS
+# from the second run onward (this is what >99% of this unit's firings
+# actually are -- egx-collector.timer's *:* cadence means most runs see no
+# new trading data at all). MemoryHigh=512M is ~1.5x that measured peak,
+# comfortable headroom for ordinary run-to-run variance (a genuine new
+# trading day, a heavier corporate-actions day) without ever throttling
+# steady-state operation; MemoryMax=768M is ~2.2x the measured peak, giving
+# a throttled run real room to finish before the hard kill, while still
+# bounding this unit's worst-case impact on other tenants to well under
+# 1GB (down from an unbounded process before this pass). This does NOT
+# cover a cold-start/very-deep-history first ingest (measured up to
+# ~2.5GB in the same report's stress test, ADDRESSED separately -- see
+# deploy/README.md's manual "seed runtime data" step, already documented
+# to run once by hand, outside this unit, before the timer/service take
+# over): a fresh deployment's first run should still use that documented
+# manual step, not rely on this unit's now-steady-state-sized ceiling. If
+# a first run is ever let through this unit directly, MemoryMax killing it
+# is the intended fail-safe (Type=oneshot; egx-collector.timer retries
+# next minute) -- but if that becomes routine rather than a one-time
+# bootstrap event, that is itself the signal this ceiling needs revisiting
+# against new evidence, not silently raised back up.
+MemoryHigh=512M
+MemoryMax=768M
 
 [Install]
 WantedBy=multi-user.target

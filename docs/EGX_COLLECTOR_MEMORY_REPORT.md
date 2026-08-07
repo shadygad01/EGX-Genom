@@ -16,6 +16,9 @@ network calls (a `MappingFetcher` serves synthetic, wire-format-correct
 Yahoo/StockAnalysis payloads), and never edits collector/service source to
 take a measurement — instrumentation is a wrapper around `collector.fetch`,
 not a patch.
+**Commits compared (§5.1's production-scale before/after):** `ee32e1f`
+(before the fix) vs. `c345691` (the fix; unchanged through this report's
+own `HEAD`, `e3960f0`).
 
 ## TL;DR
 
@@ -287,10 +290,23 @@ This section reproduces that specific failure mode at production scale
 (101 tickers, the real universe size) and proves it's gone.
 
 **Setup:** `growth --static --universe-size 101 --history-days 1500
---sa-days 250 --days 5`, run twice — once against the pre-fix code
-(`git checkout HEAD~2 -- collectors/service.py collectors/raw.py`, i.e.
-the commit before the fix), once against the fix as shipped — with the
-*same* corrected, wire-format-realistic synthetic payloads both times.
+--sa-days 250 --days 5`, run twice against `collectors/service.py`/
+`collectors/raw.py` at two exact commits, both times against the *same*
+corrected, wire-format-realistic synthetic payloads (the harness itself
+was not reverted, only the two files the fix touches):
+
+- **Before:** commit `ee32e1f` — "Add memory profiling harness for the
+  EGX price collector" (the harness this report is built on, one commit
+  before the fix; `_row_changed` and the `record_step` guard are absent —
+  confirmed via
+  `git show ee32e1f:research/src/agx_research/collectors/service.py`).
+- **After:** commit `c345691` — "Fix unbounded provenance/raw-document
+  growth found via EGX collector memory profiling" (the fix commit
+  itself). Verified unchanged in these two files through the current
+  `HEAD` at the time of writing (`e3960f0`) —
+  `git diff c345691 HEAD -- collectors/service.py collectors/raw.py` is
+  empty.
+
 1,500 days is this report's best available stand-in for real Yahoo
 `range=max` depth (still unverified without live access — see §1); five
 repeated runs against byte-identical content stands in for
@@ -361,15 +377,17 @@ provenance-recording work is now skipped entirely once nothing has
 changed.
 
 **Does the fix comfortably fit the shared-VPS memory budget?** Yes.
-Steady-state RSS (~320–350 MB) uses under 12% of the `MemoryHigh=3G`/
-`MemoryMax=4G` ceiling set on `egx-collector.service` (§7) — comfortable
-margin for the timer's dominant real-world case (repeated polling with no
-new data). The remaining, separate cost this fix does *not* touch is the
-one-time, cold-start cost of a genuinely deep first-time history ingest
-(§2's 2.45 GB at 101×5,500 days) — unaffected by this fix by design (there
-is nothing to deduplicate against on an empty store), and already why that
-ceiling has real headroom above the steady-state number rather than being
-sized tightly to it.
+Steady-state RSS (~320–350 MB) sits inside the `MemoryHigh=512M`/
+`MemoryMax=768M` ceiling set on `egx-collector.service` (§7), sized
+directly from this measurement rather than a generous guess — the
+timer's dominant real-world case (repeated polling with no new data)
+never approaches `MemoryHigh`, let alone the hard `MemoryMax` kill. The
+remaining, separate cost this fix does *not* touch is the one-time,
+cold-start cost of a genuinely deep first-time history ingest (§2's
+2.45 GB at 101×5,500 days) — unaffected by this fix by design (there is
+nothing to deduplicate against on an empty store). That case is
+intentionally *not* what this ceiling is sized for; see §7 for why that's
+a deliberate policy choice rather than a gap.
 
 **Is the 1.7 GB peak eliminated, or does another major consumer remain?**
 Eliminated, confirmed two ways:
@@ -419,14 +437,40 @@ other tenants' services, not just its own.
   not load-tested under this mission. `MemoryHigh` throttles via cgroup
   memory pressure before `MemoryMax`'s hard kill, so a brief spike degrades
   gracefully.
-- **`deploy/systemd/egx-collector.service`**: added `MemoryHigh=3G` /
-  `MemoryMax=4G`, sized with real margin above this report's measured
-  worst-case single-run peak (2.45 GB) — the fix above stops cross-run
-  accumulation, but a single large ingest (cold start, or a real Yahoo
-  history deeper than this report's stress-test assumption) still has a
-  legitimate standing cost, and this ceiling exists so that a worst case
-  degrades this one `Type=oneshot` unit — the timer just retries next
-  minute — instead of taking down every other tenant on the host.
+- **`deploy/systemd/egx-collector.service`**: added `MemoryHigh=512M` /
+  `MemoryMax=768M`, sized from §5.1's *measured steady-state* RSS
+  (320–344 MB across 5 repeated production-scale runs), not the rare
+  cold-start/deep-history peak — a deliberate policy choice, not an
+  oversight: `egx-collector.timer`'s `*:*` cadence means well over 99% of
+  this unit's firings are the steady-state case (no new trading data,
+  most of the time), and the box's coexistence requirement applies to
+  what this unit actually does almost every time it runs, not its rarest
+  case.
+  - `MemoryHigh=512M` ≈ 1.5x the measured 344 MB peak — comfortable
+    headroom for ordinary run-to-run variance (a genuine new trading day,
+    a heavier corporate-actions day) without the cgroup throttling normal
+    operation; throttling itself (reclaim pressure, not a kill) is where
+    `MemoryHigh` differs from `MemoryMax`.
+  - `MemoryMax=768M` ≈ 2.2x the measured peak — gives a throttled run real
+    room to finish before the hard kill, while still bounding this unit's
+    worst-case impact on every other tenant on the host to well under
+    1 GB (down from a fully unbounded process before this pass, and down
+    from this same pass's own first-draft 4 GB ceiling, which was sized
+    to the cold-start case instead).
+  - This intentionally does **not** cover a cold-start/very-deep-history
+    first ingest (§2's 2.45 GB stress-test upper bound) — but that case
+    already has a documented home outside this unit:
+    `deploy/README.md`'s "Seed runtime data" step already instructs
+    running the very first `agx run` by hand before the timer/service
+    take over, specifically so the API has something to serve immediately
+    on a fresh deploy. Sizing this service unit to steady-state usage is
+    consistent with that existing practice, not a new gap it introduces.
+    If a first run is ever let through this unit directly, `MemoryMax`
+    killing it is the intended fail-safe (`Type=oneshot`;
+    `egx-collector.timer` retries next minute) — but that becoming
+    routine rather than a one-time bootstrap event would itself be the
+    signal this ceiling needs revisiting against new evidence, not
+    silently raised back up.
 
 ### Light review of `api/` (flagged, not changed this pass)
 

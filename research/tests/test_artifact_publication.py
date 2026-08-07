@@ -100,6 +100,35 @@ def test_mismatched_as_of_is_a_problem(tmp_path):
     assert any("portfolio_summary.json" in p for p in problems)
 
 
+def test_source_data_as_of_earlier_than_run_dates_is_not_a_problem(tmp_path):
+    # Real production incident (2026-08-07): a run requested for a Friday
+    # (an EGX non-trading day) legitimately publishes data as_of the last
+    # successful trading day, earlier than the requested run_dates --
+    # `_latest_successful_as_of()`'s documented weekend/holiday fallback.
+    # This must never be flagged as a staleness problem.
+    bundle = _mock_bundle(tmp_path)
+    report_path = bundle / "execution_report.json"
+    report = _read_json(report_path)
+    report["run_dates"] = ["2026-06-15"]  # later than manifest's 2026-06-14
+    _write_json(report_path, report)
+
+    problems = validate_bundle_consistency(bundle)
+    assert not any("run_dates" in p for p in problems)
+
+
+def test_source_data_as_of_later_than_run_dates_is_a_problem(tmp_path):
+    # The one direction that's never legitimate: published data claiming
+    # to be newer than anything this run was even asked to produce.
+    bundle = _mock_bundle(tmp_path)
+    manifest_path = bundle / "manifest.json"
+    manifest = _read_json(manifest_path)
+    manifest["source_data_as_of"] = "2026-06-15"  # later than run_dates' 2026-06-14
+    _write_json(manifest_path, manifest)
+
+    problems = validate_bundle_consistency(bundle)
+    assert any("run_dates" in p and "later than" in p for p in problems)
+
+
 def test_stale_generation_timestamp_is_a_problem(tmp_path):
     bundle = _mock_bundle(tmp_path)
     manifest_path = bundle / "manifest.json"
@@ -294,6 +323,37 @@ def test_end_to_end_live_run_with_canonical_workflow_identity_publishes(tmp_path
     assert manifest["pipeline_mode"] == "live"
     assert manifest["workflow_run_id"] == "987654321"
     assert manifest["git_commit"] == "deadbeefcafe"
+    assert validate_bundle_consistency(canonical_dir) == []
+
+
+def test_end_to_end_run_requested_for_a_non_trading_day_still_publishes(tmp_path, monkeypatch):
+    """Direct reproduction of the real 2026-08-07 production incident: a
+    canonical run requested for a Friday (EGX non-trading day) must still
+    publish, with source_data_as_of honestly lagging to the last real
+    trading day -- not rejected as a false 'stale/inconsistent bundle'."""
+    monkeypatch.setattr(HttpFetcher, "_robots_allows", lambda self, url: True)
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
+    monkeypatch.setattr(urllib.request, "urlopen", _canned_live_urlopen(_live_content_fixture()))
+    monkeypatch.setenv("GITHUB_SHA", "deadbeefcafe")
+    monkeypatch.setenv("GITHUB_RUN_ID", "987654321")
+    monkeypatch.setenv("GITHUB_WORKFLOW", CANONICAL_WORKFLOW_NAME)
+    monkeypatch.setenv("GITHUB_REPOSITORY", CANONICAL_REPOSITORY)
+
+    canonical_dir = tmp_path / "canonical" / "data"
+    monkeypatch.setattr("agx_research.production.pipeline.CANONICAL_PRODUCTION_DASHBOARD_DIR", canonical_dir)
+    data_dir = tmp_path / "data"
+
+    # Seed a real successful trading-day run first (2026-06-14, a Sunday --
+    # EGX trades Sun-Thu), the same way a prior day's canonical run would
+    # have.
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.LIVE, dashboard_out=canonical_dir)
+
+    friday = date(2026, 6, 19)  # the following Friday -- EGX non-trading
+    report = make_pipeline(data_dir).run(friday, mode=ExecutionMode.LIVE, dashboard_out=canonical_dir)
+
+    assert report.overall_status.value != "failed"
+    manifest = _read_json(canonical_dir / "manifest.json")
+    assert manifest["source_data_as_of"] == RUN_DATE.isoformat()  # honestly lags the Friday request
     assert validate_bundle_consistency(canonical_dir) == []
 
 

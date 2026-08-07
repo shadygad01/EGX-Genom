@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased — Fix a real publish-blocking bug: weekend/holiday runs were rejected as "inconsistent" (AD-67)
+
+Every GitHub Pages deploy on 2026-08-07 (a Friday, EGX non-trading day)
+failed with `manifest.json source_data_as_of='2026-08-06' is not among
+execution_report.json run_dates=['2026-08-07']` — `dashboard.consistency
+.validate_bundle_consistency()`'s AD-65 check required exact membership,
+but `ProductionPipeline._latest_successful_as_of()` deliberately (and
+correctly) falls back to the last real trading day's data on a
+weekend/holiday run. Fixed by making the check a one-sided bound
+(`source_data_as_of` may lag `run_dates`, never exceed it) instead of
+exact membership. Found and fixed while verifying the twice-daily refresh
+cadence below actually publishes; without this fix every Friday/Saturday
+rebuild would have kept failing regardless of schedule. Reproduced
+end-to-end in a new regression test before the fix, confirmed fixed
+after. Full suite (1062) and ruff check pass.
+
 ## Unreleased — Twice-daily refresh cadence (07:00/16:00 Egypt time) for the VPS collector and GitHub Pages deploy
 
 Project owner request: the site (and everything that refreshes its data)

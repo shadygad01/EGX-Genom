@@ -4,6 +4,47 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-67 — `source_data_as_of` vs. `run_dates` consistency is a one-sided bound, not exact membership (fixes a real publish-blocking incident)
+
+**Decision.** AD-65's `dashboard.consistency.validate_bundle_consistency()`
+required `manifest.json`'s `source_data_as_of` to be an exact member of
+`execution_report.json`'s `run_dates` (the raw calendar range `run()` was
+invoked for). This is now a one-sided bound instead:
+`source_data_as_of` may never be *later* than the latest date in
+`run_dates` (still flagged, still a real problem — published data cannot
+be newer than what the run was even asked to produce), but it may
+legitimately be *earlier*. `git_commit`/`workflow_run_id` equality and
+the `generated_at`/`completed_at` timestamp-skew bound (both unchanged,
+both exact) already prove a bundle came from one execution; the
+individual-artifact `as_of` cross-checks (`investment_cases.json`,
+`portfolio_summary.json`, etc. vs. `source_data_as_of`) still catch every
+artifact disagreeing with the manifest regardless of this change — this
+fix only removes the one check that was testing the wrong invariant.
+
+**Rationale.** A real production incident (2026-08-07): every GitHub
+Pages deploy that day — one triggered by an ordinary code push, two
+triggered by this session's own merges — failed identically with
+`manifest.json source_data_as_of='2026-08-06' is not among
+execution_report.json run_dates=['2026-08-07']`. 2026-08-07 is a Friday,
+an EGX non-trading day; `production.pipeline.ProductionPipeline
+._latest_successful_as_of()` — whose own docstring already documents
+this exact case ("Pages can be rebuilt on any calendar day, for example
+after a UI push on Friday") — correctly fell back to 2026-08-06 (the
+last real successful trading-day run) rather than fabricating research
+for a day EGX never traded. AD-65's exact-membership check had never
+been exercised against a real weekend/holiday run before this date and
+rejected that entirely honest, deliberate fallback as if it were a stale
+leftover from a different execution — the specific failure mode AD-65
+was written to catch, misapplied to a case it was never designed for.
+Left unfixed, this would have permanently blocked every Friday/Saturday
+rebuild (and any push-triggered rebuild landing on one) — directly
+undermining the twice-daily refresh cadence this same investigation
+(project owner request, 2026-08-07) was in the middle of establishing.
+Reproduced directly in `test_artifact_publication.py`
+(`test_end_to_end_run_requested_for_a_non_trading_day_still_publishes`,
+a genuine `ProductionPipeline.run()` call across a real trading day then
+a real Friday) before being fixed, not inferred from the log alone.
+
 ## AD-66 — Sector concentration, return correlation, and the market-wide macro overlay become real, enforced inputs to `DecisionService.decide_portfolio()`, not just post-hoc validation or an autonomous-portfolio-only dampener
 
 **Decision.** Four additions close a real gap the Capital Allocation

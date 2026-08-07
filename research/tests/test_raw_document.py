@@ -84,6 +84,52 @@ def test_record_step_normalization_kind_uses_normalization_history():
     assert updated.validation_history == []
 
 
+def test_record_step_skips_an_identical_consecutive_step(tmp_path):
+    """A source that always returns its full payload re-fetches
+    byte-identical content between two calendar trading days, so
+    `CollectionService` calls `record_step` on the same already-known
+    document again with the same outcome -- `egx-collector.timer` does
+    this every minute. Recording an identical note every time grows this
+    repository (and the JSON file it persists to) without bound. Only a
+    genuinely different outcome should earn a new revision."""
+    repo = RawDocumentRepository()
+    document = repo.add(make_document())
+    step = ProcessingStep(
+        step="quality_assessment", performed_by="tester", performed_at=datetime.now(), detail="ok",
+    )
+    first = repo.record_step(document.id, kind="validation", step=step)
+    assert first.version == 2
+
+    repeat = ProcessingStep(
+        step="quality_assessment", performed_by="tester", performed_at=datetime.now(), detail="ok",
+    )
+    second = repo.record_step(document.id, kind="validation", step=repeat)
+    assert second.version == 2  # same outcome, no new revision
+    assert len(second.validation_history) == 1
+    assert len(repo.history(document.id)) == 2  # v1 (fetch) + v2 (first step) only
+
+
+def test_record_step_records_a_genuinely_different_outcome(tmp_path):
+    repo = RawDocumentRepository()
+    document = repo.add(make_document())
+    repo.record_step(
+        document.id,
+        kind="validation",
+        step=ProcessingStep(
+            step="quality_assessment", performed_by="tester", performed_at=datetime.now(), detail="ok",
+        ),
+    )
+    updated = repo.record_step(
+        document.id,
+        kind="validation",
+        step=ProcessingStep(
+            step="quality_assessment", performed_by="tester", performed_at=datetime.now(), detail="changed",
+        ),
+    )
+    assert updated.version == 3
+    assert [s.detail for s in updated.validation_history] == ["ok", "changed"]
+
+
 def test_record_step_unknown_document_raises():
     repo = RawDocumentRepository()
     step = ProcessingStep(step="x", performed_by="tester", performed_at=datetime.now())

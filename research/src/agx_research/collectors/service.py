@@ -89,6 +89,32 @@ def collection_yield(result: CollectionRunResult) -> int:
     )
 
 
+def _row_changed(prior: dict | None, new_row: dict, fields: tuple[str, ...]) -> bool:
+    """True if `new_row`'s tracked `fields` differ from the CSV row already
+    on disk, or there was no prior row at all.
+
+    A full-history source (e.g. Yahoo's `range=max` leg inside
+    `EgxCompositePriceCollector`) re-sends every historical record on every
+    single collection run, not just genuinely new ones -- `egx-collector.
+    timer` fires this every minute (`deploy/systemd/egx-collector.timer`).
+    Without this check, every `_write_*` function below traced every one of
+    those unchanged historical records as newly-written on every run,
+    which is exactly what made `ProvenanceIndexRepository` (and, via
+    `CollectionService._record_run_outcome`, downstream metrics) grow
+    without bound purely from run *count*, never plateauing even when the
+    underlying data never changes (confirmed empirically: see
+    `scripts/profile_egx_collector_memory.py`'s `growth --static` scenario).
+    `prior` comes from `csv.DictReader`, so every value is already a `str`;
+    comparing `str(new_row[field])` against it is exactly what a round trip
+    through `csv.DictWriter` (which stringifies non-str values the same
+    way) would have produced, so this never disagrees with what's actually
+    on disk.
+    """
+    if prior is None:
+        return True
+    return any(str(new_row[field]) != prior.get(field) for field in fields)
+
+
 def _write_price_bars(
     data_dir: Path, ticker: str, bars, *, on_written=None
 ) -> int:
@@ -100,15 +126,18 @@ def _write_price_bars(
             for row in csv.DictReader(f):
                 existing[row["date"]] = row
     for bar in bars:
-        existing[bar.trade_date.isoformat()] = {
-            "date": bar.trade_date.isoformat(),
+        key = bar.trade_date.isoformat()
+        new_row = {
+            "date": key,
             "open": bar.open,
             "high": bar.high,
             "low": bar.low,
             "close": bar.close,
             "volume": bar.volume,
         }
-        if on_written:
+        prior = existing.get(key)
+        existing[key] = new_row
+        if on_written and _row_changed(prior, new_row, ("open", "high", "low", "close", "volume")):
             on_written(bar.trade_date)
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["date", "open", "high", "low", "close", "volume"])
@@ -129,8 +158,10 @@ def _write_macro_observations(
             for row in csv.DictReader(f):
                 existing[row["date"]] = row["value"]
     for obs in observations:
-        existing[obs.observation_date.isoformat()] = str(obs.value)
-        if on_written:
+        key = obs.observation_date.isoformat()
+        prior = existing.get(key)
+        existing[key] = str(obs.value)
+        if on_written and (prior is None or prior != str(obs.value)):
             on_written(obs.observation_date)
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -152,14 +183,16 @@ def _write_corporate_events(
                 existing[(row["ticker"], row["date"], row["event_type"])] = row
     for event in events:
         key = (event.ticker, event.event_date.isoformat(), event.event_type)
-        existing[key] = {
+        new_row = {
             "ticker": event.ticker,
             "date": event.event_date.isoformat(),
             "event_type": event.event_type,
             "description": event.description,
             "details_json": json.dumps(event.details) if event.details else "",
         }
-        if on_written:
+        prior = existing.get(key)
+        existing[key] = new_row
+        if on_written and _row_changed(prior, new_row, ("description", "details_json")):
             on_written(event.event_type, event.event_date)
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
@@ -185,7 +218,7 @@ def _write_financial_statement_line_items(
         existing.pop((period_end_date.isoformat(), statement_type, line_item), None)
     for item in items:
         key = (item.period_end_date.isoformat(), item.statement_type, item.line_item)
-        existing[key] = {
+        new_row = {
             "period_end_date": item.period_end_date.isoformat(),
             "period_type": item.period_type,
             "statement_type": item.statement_type,
@@ -193,7 +226,9 @@ def _write_financial_statement_line_items(
             "value": item.value,
             "currency": item.currency,
         }
-        if on_written:
+        prior = existing.get(key)
+        existing[key] = new_row
+        if on_written and _row_changed(prior, new_row, ("period_type", "value", "currency")):
             on_written(item.statement_type, item.line_item, item.period_end_date)
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
@@ -220,12 +255,14 @@ def _write_index_constituents(
                 existing[(row["ticker"], row["as_of_date"])] = row
     for constituent in constituents:
         key = (constituent.ticker, constituent.as_of_date.isoformat())
-        existing[key] = {
+        new_row = {
             "ticker": constituent.ticker,
             "company_name": constituent.company_name,
             "as_of_date": constituent.as_of_date.isoformat(),
         }
-        if on_written:
+        prior = existing.get(key)
+        existing[key] = new_row
+        if on_written and _row_changed(prior, new_row, ("company_name",)):
             on_written(constituent.ticker, constituent.as_of_date)
     with path.open("w", newline="", encoding="utf-8") as f:
         optional_fields = ("isin", "reuters_code", "weight_percent", "source_url")
@@ -257,13 +294,15 @@ def _write_sector_classifications(data_dir: Path, classifications, *, on_written
         # changes, so the latest collected classification simply replaces
         # any earlier one -- the same "one current fact per ticker" shape
         # `CollectedSectorProvider` reads, not a growing history.
-        existing[item.ticker] = {
+        new_row = {
             "ticker": item.ticker,
             "sector": item.sector,
             "source_id": item.source_id,
             "observed_date": item.observed_date.isoformat(),
         }
-        if on_written:
+        prior = existing.get(item.ticker)
+        existing[item.ticker] = new_row
+        if on_written and _row_changed(prior, new_row, ("sector", "source_id", "observed_date")):
             on_written(item.ticker, item.sector, item.observed_date)
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(

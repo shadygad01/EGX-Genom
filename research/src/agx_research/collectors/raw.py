@@ -150,11 +150,27 @@ class RawDocumentRepository(JsonFileRepository[RawDocument]):
         if current is None:
             raise KeyError(f"No raw document with id {document_id}")
         field = "normalization_history" if kind == "normalization" else "validation_history"
+        history = getattr(current, field)
+        # A source that always returns its full payload (e.g. Yahoo's
+        # `range=max` leg) re-fetches byte-identical content between two
+        # calendar trading days, so the same already-known document gets
+        # re-processed on every run -- `egx-collector.timer` does this every
+        # minute (deploy/systemd/egx-collector.timer). Appending an
+        # identical step every time grows this repository (and the JSON
+        # file it flushes to) without bound and records no new information
+        # -- only a step whose outcome actually differs from the last one
+        # earns a new revision. `performed_at` is deliberately excluded from
+        # this comparison since it always differs; `performed_by`/`detail`
+        # capture everything about *what happened*.
+        if history and (history[-1].performed_by, history[-1].detail) == (
+            step.performed_by, step.detail,
+        ):
+            return current
         return self.add(
             current.model_copy(
                 update={
                     "version": current.version + 1,
-                    field: [*getattr(current, field), step],
+                    field: [*history, step],
                 }
             ),
             persist=persist,

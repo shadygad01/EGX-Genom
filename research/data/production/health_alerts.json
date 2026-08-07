@@ -1,0 +1,686 @@
+{
+  "healthalert_72aea374419a": [
+    {
+      "id": "healthalert_72aea374419a",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-29T12:30:51.365261",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+EGX%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_f052ffff78e5": [
+    {
+      "id": "healthalert_f052ffff78e5",
+      "version": 1,
+      "source_id": "fred",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-29T12:42:45.324022",
+      "message": "RuntimeError: Every configured FRED series failed: BAMLH0A0HYM2: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2: The read operation timed out; DCOILBRENTEU: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU: The read operation timed out; DCOILWTICO: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO: The read operation timed out; DGS10: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10: The read operation timed out; DGS2: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2: The read operation timed out; DTWEXBGS: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS: The read operation timed out; VIXCLS: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS: The read operation timed out",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_1a11396e7987": [
+    {
+      "id": "healthalert_1a11396e7987",
+      "version": 1,
+      "source_id": "fred",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-30T17:16:02.006743",
+      "message": "RuntimeError: Every configured FRED series failed: BAMLH0A0HYM2: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2: The read operation timed out; DCOILBRENTEU: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU: The read operation timed out; DCOILWTICO: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO: The read operation timed out; DGS10: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10: The read operation timed out; DGS2: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2: The read operation timed out; DTWEXBGS: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS: The read operation timed out; VIXCLS: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS: The read operation timed out",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_0faebf75e467": [
+    {
+      "id": "healthalert_0faebf75e467",
+      "version": 1,
+      "source_id": "fred",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-31T07:58:45.757860",
+      "message": "RuntimeError: Every configured FRED series failed: BAMLH0A0HYM2: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2: The read operation timed out; DCOILBRENTEU: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU: The read operation timed out; DCOILWTICO: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO: The read operation timed out; DGS10: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10: The read operation timed out; DGS2: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2: The read operation timed out; DTWEXBGS: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS: The read operation timed out; VIXCLS: FetchError: fred: 3 attempt(s) failed for https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS: The read operation timed out",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_490fccf5c8b8": [
+    {
+      "id": "healthalert_490fccf5c8b8",
+      "version": 1,
+      "source_id": "fred",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-07-31T07:58:45.757880",
+      "message": "3 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_c37f0c449dd0": [
+    {
+      "id": "healthalert_c37f0c449dd0",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-31T10:50:02.727140",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_92dfceec4017": [
+    {
+      "id": "healthalert_92dfceec4017",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-31T13:39:40.072118",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_0215b328462b": [
+    {
+      "id": "healthalert_0215b328462b",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-31T14:21:32.550288",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_925fb2498ea2": [
+    {
+      "id": "healthalert_925fb2498ea2",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-07-31T15:01:08.264910",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_5b440e8fda04": [
+    {
+      "id": "healthalert_5b440e8fda04",
+      "version": 1,
+      "source_id": "worldbank",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-01T16:38:48.559939",
+      "message": "FetchError: worldbank: 3 attempt(s) failed for https://api.worldbank.org/v2/country/EGY/indicator/BX.KLT.DINV.WD.GD.ZS?format=json&per_page=1000: The read operation timed out",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_0dd0c4a33fe5": [
+    {
+      "id": "healthalert_0dd0c4a33fe5",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-01T19:16:29.990692",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_b7c067cd6d6e": [
+    {
+      "id": "healthalert_b7c067cd6d6e",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-02T06:56:59.997749",
+      "message": "FetchError: eac_egx_disclosures: 3 attempt(s) failed for https://www.eac-finance.com/posts/category-1: ('Windows trust store is unavailable',)",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_f7fe21b2d776": [
+    {
+      "id": "healthalert_f7fe21b2d776",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-02T06:57:25.228372",
+      "message": "FetchError: eac_egx_disclosures: 3 attempt(s) failed for https://www.eac-finance.com/posts/category-1: ('Windows trust store is unavailable',)",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_bb27980ca9f1": [
+    {
+      "id": "healthalert_bb27980ca9f1",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-02T06:59:07.350499",
+      "message": "FetchError: eac_egx_disclosures: 3 attempt(s) failed for https://www.eac-finance.com/posts/category-1: ('Windows trust store is unavailable',)",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_bf46ad4c6bc8": [
+    {
+      "id": "healthalert_bf46ad4c6bc8",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-08-02T06:59:07.350521",
+      "message": "3 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_d7449c47e7a4": [
+    {
+      "id": "healthalert_d7449c47e7a4",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-02T07:01:20.651434",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_b791d90df354": [
+    {
+      "id": "healthalert_b791d90df354",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T11:30:53.939446",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_f970ddafbb79": [
+    {
+      "id": "healthalert_f970ddafbb79",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T11:31:35.496869",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_d241e318627f": [
+    {
+      "id": "healthalert_d241e318627f",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T11:46:03.854711",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_1e3d2d2f1aba": [
+    {
+      "id": "healthalert_1e3d2d2f1aba",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T12:14:43.069324",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_be57a4f8ade2": [
+    {
+      "id": "healthalert_be57a4f8ade2",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T12:15:27.065745",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_0d5114a2913c": [
+    {
+      "id": "healthalert_0d5114a2913c",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T12:32:18.325956",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_492e8fd7aa08": [
+    {
+      "id": "healthalert_492e8fd7aa08",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T17:49:59.535343",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_455403cef1f6": [
+    {
+      "id": "healthalert_455403cef1f6",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T17:50:49.538204",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_e007492df081": [
+    {
+      "id": "healthalert_e007492df081",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T18:09:48.663899",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_4612ecdef4a3": [
+    {
+      "id": "healthalert_4612ecdef4a3",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-02T20:25:09.026442",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_13562f947f65": [
+    {
+      "id": "healthalert_13562f947f65",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-03T08:26:17.615180",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_b2ffbc3217db": [
+    {
+      "id": "healthalert_b2ffbc3217db",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-03T09:55:10.778592",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_0f31185148d6": [
+    {
+      "id": "healthalert_0f31185148d6",
+      "version": 1,
+      "source_id": "worldbank",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T10:18:27.855976",
+      "message": "FetchError: worldbank: 3 attempt(s) failed for https://api.worldbank.org/v2/country/EGY/indicator/FP.CPI.TOTL.ZG?format=json&per_page=1000: The read operation timed out",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_36108722464c": [
+    {
+      "id": "healthalert_36108722464c",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T12:58:48.844867",
+      "message": "FetchError: eac_egx_disclosures: 3 attempt(s) failed for https://www.eac-finance.com/posts/category-1: ('Windows trust store is unavailable',)",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_91cd6fd018ff": [
+    {
+      "id": "healthalert_91cd6fd018ff",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T13:25:14.520314",
+      "message": "FetchError: EGXpilot returned no usable ticker documents (202 failures): ABUK/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ABUK: HTTP Error 530: <none>; ABUK/history: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stockanalysis/ABUK: HTTP Error 530: <none>; ACTF/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ACTF: HTTP Error 530: <none>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_9e29a06b0168": [
+    {
+      "id": "healthalert_9e29a06b0168",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T13:30:10.289621",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_3b72a75927cb": [
+    {
+      "id": "healthalert_3b72a75927cb",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-03T15:47:09.802823",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_fb088b5f0d1d": [
+    {
+      "id": "healthalert_fb088b5f0d1d",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T16:13:34.638213",
+      "message": "FetchError: EGXpilot returned no usable ticker documents (202 failures): ABUK/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ABUK: HTTP Error 530: <none>; ABUK/history: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stockanalysis/ABUK: HTTP Error 530: <none>; ACTF/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ACTF: HTTP Error 530: <none>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_bc7618fdc091": [
+    {
+      "id": "healthalert_bc7618fdc091",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-03T19:26:19.144240",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_d670359d9d8e": [
+    {
+      "id": "healthalert_d670359d9d8e",
+      "version": 1,
+      "source_id": "rmda_ir",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T19:29:40.348060",
+      "message": "FetchError: rmda_ir: 3 attempt(s) failed for https://ramedapharma-ir.com/wp-content/uploads/2026/05/Rameda-1Q26-Earnings-Release.pdf: <urlopen error timed out>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_467a23ebbedb": [
+    {
+      "id": "healthalert_467a23ebbedb",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T19:54:12.310719",
+      "message": "FetchError: EGXpilot returned no usable ticker documents (202 failures): ABUK/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ABUK: HTTP Error 530: <none>; ABUK/history: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stockanalysis/ABUK: HTTP Error 530: <none>; ACTF/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ACTF: HTTP Error 530: <none>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_cdaff53f9efd": [
+    {
+      "id": "healthalert_cdaff53f9efd",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-08-03T19:54:12.310789",
+      "message": "3 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_48b48d43133d": [
+    {
+      "id": "healthalert_48b48d43133d",
+      "version": 1,
+      "source_id": "chief_egx_financials",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T19:56:20.303291",
+      "message": "FetchError: chief_egx_financials: 3 attempt(s) failed for https://chiefcapitalco.com/companies/: <urlopen error [Errno 101] Network is unreachable>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_8b476d19cf09": [
+    {
+      "id": "healthalert_8b476d19cf09",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-03T19:58:49.068624",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_ff62d32b23a4": [
+    {
+      "id": "healthalert_ff62d32b23a4",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-04T09:22:24.459662",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_afb7fa6c6695": [
+    {
+      "id": "healthalert_afb7fa6c6695",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-04T09:48:19.577906",
+      "message": "FetchError: EGXpilot returned no usable ticker documents (202 failures): ABUK/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ABUK: HTTP Error 530: <none>; ABUK/history: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stockanalysis/ABUK: HTTP Error 530: <none>; ACTF/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ACTF: HTTP Error 530: <none>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_14a53a4292b4": [
+    {
+      "id": "healthalert_14a53a4292b4",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-08-04T09:48:19.578032",
+      "message": "4 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_f2111a19d8ea": [
+    {
+      "id": "healthalert_f2111a19d8ea",
+      "version": 1,
+      "source_id": "rmda_ir",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-04T09:50:29.045474",
+      "message": "FetchError: rmda_ir: 3 attempt(s) failed for https://ramedapharma-ir.com/wp-content/uploads/2026/05/Rameda-1Q26-Earnings-Release.pdf: <urlopen error timed out>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_d419c437f59e": [
+    {
+      "id": "healthalert_d419c437f59e",
+      "version": 1,
+      "source_id": "chief_egx_financials",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-04T09:52:37.376499",
+      "message": "FetchError: chief_egx_financials: 3 attempt(s) failed for https://chiefcapitalco.com/companies/: <urlopen error [Errno 101] Network is unreachable>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_9e9178c0dd38": [
+    {
+      "id": "healthalert_9e9178c0dd38",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-04T09:55:53.849642",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_640ddde71533": [
+    {
+      "id": "healthalert_640ddde71533",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-04T18:42:00.322969",
+      "message": "FetchError: EGXpilot returned no usable ticker documents (202 failures): ABUK/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ABUK: HTTP Error 530: <none>; ABUK/history: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stockanalysis/ABUK: HTTP Error 530: <none>; ACTF/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ACTF: HTTP Error 530: <none>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_00168789d0a8": [
+    {
+      "id": "healthalert_00168789d0a8",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-08-04T18:42:00.322996",
+      "message": "5 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_f5454ac8e8fd": [
+    {
+      "id": "healthalert_f5454ac8e8fd",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-04T18:47:17.901435",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_244a80241410": [
+    {
+      "id": "healthalert_244a80241410",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-08-04T18:47:17.901521",
+      "message": "3 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_e5cb197c88e5": [
+    {
+      "id": "healthalert_e5cb197c88e5",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-05T06:38:49.141664",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_d4ca958dbf6f": [
+    {
+      "id": "healthalert_d4ca958dbf6f",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-05T07:04:38.876624",
+      "message": "FetchError: EGXpilot returned no usable ticker documents (202 failures): ABUK/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ABUK: HTTP Error 530: <none>; ABUK/history: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stockanalysis/ABUK: HTTP Error 530: <none>; ACTF/fundamentals: FetchError: egxpilot_fundamentals: 3 attempt(s) failed for https://www.egxpilot.com/api/stocks/ACTF: HTTP Error 530: <none>",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_bbafea13e417": [
+    {
+      "id": "healthalert_bbafea13e417",
+      "version": 1,
+      "source_id": "egxpilot_fundamentals",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-08-05T07:04:38.876706",
+      "message": "6 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_e0c94366e7c1": [
+    {
+      "id": "healthalert_e0c94366e7c1",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-05T07:10:05.675071",
+      "message": "FetchError: gdelt: 3 attempt(s) failed for https://api.gdeltproject.org/api/v2/doc/doc?query=%28Egypt+OR+Egyptian+OR+%22Egyptian+Exchange%22+OR+%22EGX30%22+OR+%22Cairo+Stock+Exchange%22%29+%28stock+OR+shares+OR+exchange+OR+economy+OR+pound+OR+inflation+OR+%22interest+rate%22+OR+IPO+OR+earnings+OR+investors+OR+market+OR+trading%29&mode=artlist&maxrecords=50&timespan=7d&sort=datedesc&format=json: HTTP Error 429: Too Many Requests",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_dba8ef0d0c52": [
+    {
+      "id": "healthalert_dba8ef0d0c52",
+      "version": 1,
+      "source_id": "gdelt",
+      "kind": "consecutive_failures",
+      "severity": "critical",
+      "detected_at": "2026-08-05T07:10:05.675093",
+      "message": "4 consecutive failed runs.",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_b73c2c80d4e7": [
+    {
+      "id": "healthalert_b73c2c80d4e7",
+      "version": 1,
+      "source_id": "eac_egx_disclosures",
+      "kind": "fetch_failure",
+      "severity": "warning",
+      "detected_at": "2026-08-07T15:22:54.391029",
+      "message": "FetchError: eac_egx_disclosures: 3 attempt(s) failed for https://www.eac-finance.com/posts/category-1: ('Windows trust store is unavailable',)",
+      "resolved_at": null
+    }
+  ],
+  "healthalert_965d416d89ad": [
+    {
+      "id": "healthalert_965d416d89ad",
+      "version": 1,
+      "source_id": "fra_egypt",
+      "kind": "layout_change",
+      "severity": "warning",
+      "detected_at": "2026-08-07T15:22:58.360972",
+      "message": "Source previously produced records; this run's parse produced none (possible layout/schema change).",
+      "resolved_at": null
+    }
+  ]
+}

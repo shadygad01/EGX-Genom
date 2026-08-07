@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased — Twice-daily refresh cadence (07:00/16:00 Egypt time) for the VPS collector and GitHub Pages deploy
+
+Project owner request: the site (and everything that refreshes its data)
+should update automatically only twice a day, not continuously.
+`deploy/systemd/egx-collector.timer` (the self-hosted VPS's collector,
+previously firing every single minute via `OnCalendar=*:*`) now fires at
+`07:00` and `16:00` `Africa/Cairo` local time — systemd resolves this real
+IANA timezone itself, so it stays correct through Egypt's DST transitions
+automatically, unlike a plain UTC cron. `.github/workflows/deploy-pages.yml`
+(the public GitHub Pages refresh, previously once daily at 15:30 UTC) now
+fires twice daily at 05:00 and 14:00 UTC — GitHub Actions' schedule
+trigger has no timezone/DST support, so this is a declared UTC
+approximation of 07:00/16:00 Egypt Standard Time (drifting to 08:00/17:00
+local during Egypt's DST window), not a guarantee of exact local time.
+`egx-collector.service`'s memory-limit rationale comment updated to note
+it was sized under the old every-minute cadence. `docs/ROADMAP.md`
+updated to match. The always-on `egx-api.service` (serves requests, isn't
+a periodic refresh job) and `egx-deploy.timer` (a 5-minute code-sync
+poller, not a data refresh) are unchanged — this is about how often data
+is *collected/refreshed*, not how often the API answers requests or how
+quickly a code push reaches the VPS.
+
 ## Unreleased — Capital Allocation Engine: sector/correlation concentration caps and macro overlay become real, enforced inputs (AD-66)
 
 `DecisionService.decide_portfolio()` — the position-aware engine behind

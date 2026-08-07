@@ -1,10 +1,18 @@
 [Unit]
-Description=EGX-Genom Collector 1-Minute Operational Timer
+Description=EGX-Genom Collector Twice-Daily Timer (07:00 and 16:00 Cairo time)
 Requires=egx-collector.service
 
 [Timer]
-OnCalendar=*:*
-AccuracySec=1s
+# Twice a day, Africa/Cairo local time -- systemd resolves this real IANA
+# timezone itself (unlike a GitHub Actions cron schedule, which is
+# UTC-only with no timezone support), so this stays correct at both the
+# 07:00/16:00 EET (UTC+2) offset and, automatically, through Egypt's DST
+# window (EEST, UTC+3) without needing a seasonal edit. 07:00 catches
+# overnight macro/pre-market data; 16:00 is after EGX's Sun-Thu close, so
+# each day's run picks up that session's close.
+OnCalendar=*-*-* 07:00:00 Africa/Cairo
+OnCalendar=*-*-* 16:00:00 Africa/Cairo
+AccuracySec=1min
 Unit=egx-collector.service
 Persistent=true
 

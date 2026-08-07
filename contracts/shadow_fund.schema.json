@@ -148,7 +148,7 @@
       "type": "object"
     },
     "CapitalQueueEntry": {
-      "description": "One proposal requesting capital, ranked against every other\nproposal -- the Capital Deployment Queue. `capital_sources` and\n`opportunity_cost_note` are what make the underlying action answer\n\"better than what?\" and \"funded by what?\" instead of a bare BUY/\nINCREASE label.",
+      "description": "One proposal requesting capital, ranked against every other\nproposal -- the Capital Deployment Queue. `capital_sources` and\n`opportunity_cost_note` are what make the underlying action answer\n\"better than what?\" and \"funded by what?\" instead of a bare BUY/\nINCREASE label. `reasoning` (AD-66) is the full transparent\nexplanation for this entry's rank and sizing -- expected return,\nmarginal risk, confidence, and, when they applied, the exact\nliquidity/country/sector/correlation/macro overrides\n`DecisionService.decide_portfolio()` computed for this ticker --\nassembled entirely from that decision's own already-computed fields,\nnever a fresh judgment made here.",
       "properties": {
         "action": {
           "$ref": "#/$defs/PositionAction"
@@ -163,6 +163,10 @@
           },
           "title": "Capital Sources",
           "type": "array"
+        },
+        "confidence": {
+          "title": "Confidence",
+          "type": "number"
         },
         "current_weight": {
           "title": "Current Weight",
@@ -204,9 +208,28 @@
           "title": "Priority",
           "type": "integer"
         },
+        "reasoning": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasoning",
+          "type": "array"
+        },
         "required_action": {
           "title": "Required Action",
           "type": "string"
+        },
+        "sector": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sector"
         },
         "target_weight": {
           "title": "Target Weight",
@@ -225,6 +248,7 @@
         "current_weight",
         "capital_delta",
         "marginal_benefit",
+        "confidence",
         "required_action",
         "opportunity_cost_note"
       ],
@@ -504,6 +528,18 @@
         "rank": {
           "title": "Rank",
           "type": "integer"
+        },
+        "sector": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sector"
         },
         "target_weight": {
           "title": "Target Weight",

@@ -2334,6 +2334,67 @@ deliberately un-ranked (architectural, not a gap -- named above); every
 other already-open item (TD-59/TD-60/TD-61, confidence calibration,
 walk-forward backtesting) is unchanged by this mission.
 
+### Follow-up: sector/correlation concentration and macro overlay become real inputs (AD-66)
+
+A later, direct project-owner request asked whether Capital Allocation
+was "the best use of capital available today," using "correlation, ...
+portfolio concentration limits, sector exposure" -- research against the
+codebase confirmed expected return/risk/liquidity/buying-power were
+already real, but sector concentration was declared and validated
+*after the fact* only, correlation did not exist anywhere in the
+position-aware path, and the macro overlay dampened only the autonomous
+model portfolio, never a real investor's own allocation. Closed by:
+
+- New `decision_service.concentration.compute_concentration_caps()` --
+  a sector cap (reusing `PortfolioValidationEngine`'s existing 0.40
+  ceiling, now imported from a shared `portfolio.concentration_limits`
+  module to avoid a circular import) and a new correlation-cluster cap
+  (`CORRELATION_CONCENTRATION_THRESHOLD=0.70`,
+  `MAX_CORRELATED_CLUSTER_WEIGHT=0.40`, both declared/uncalibrated,
+  TD-69), both applied inside `DecisionService.decide_portfolio()` in
+  best-opportunity-score-first order, both returning trimmed weight to
+  cash rather than fabricating a redistribution.
+- `decide_portfolio()` gained `snapshot`/`sectors`/`macro_overlay`/
+  `event_platform` optional kwargs; `cli.py`'s shared
+  `build_position_aware_decisions()` now supplies all four real inputs
+  it already had in scope. `assess_macro_overlay()`'s exposure multiplier
+  now dampens the position-aware path exactly as it already dampened
+  `PortfolioConstructor`'s autonomous one. `Explanation
+  .similar_historical_cases` -- previously hardcoded `[]` in
+  `DecisionService._explanation()` despite `explainability
+  .find_similar_cases()` already existing -- is now populated from real
+  prior events when an `EventPlatform` is supplied.
+- `PositionAwareDecision.sector` (passthrough) and
+  `RankedOpportunity.sector`/`CapitalQueueEntry.sector`/`confidence`/
+  `reasoning` are new fields; `CapitalQueueEntry.reasoning` is a full,
+  transparent per-ticker explanation (opportunity score, confidence,
+  expected return/risk, sector, and any override that applied) built
+  entirely from `PositionAwareDecision`'s own already-computed fields --
+  `CapitalAllocationEngine` still never rescoring/reweighing anything
+  `decide_portfolio()` computed, the mission's "conviction score" ask met
+  by making the already-real `confidence` visibly part of every entry's
+  reasoning rather than inventing a second, ungrounded number (Article
+  VIII forbids treating confidence as a portfolio-weight substitute).
+  `web/src/pages/CIODesk.tsx`'s Capital Deployment Queue table renders a
+  sector tag, a Confidence meter column, and a "Why" column listing the
+  full `reasoning` for each entry.
+- Contracts regenerated (`position_aware_decision`/
+  `capital_allocation_plan`/`shadow_fund` schemas); `api/src/types.ts`
+  and `web/src/types.ts` updated to match by hand, per this repo's
+  existing (not-yet-codegenned) contract-mirroring convention.
+- 18 new backend tests (`test_concentration.py`, plus additions to
+  `test_decision_service.py`/`test_capital_allocation.py`); all 1059
+  backend tests, `api`/`web` `tsc --noEmit`, and `ruff check` pass.
+
+**Not done, named as next**: a mean-variance/covariance-matrix portfolio
+optimizer remains deliberately out of scope (same "needs real data
+depth this platform doesn't have yet" reasoning `portfolio/
+constructor.py`'s own docstring already gives) -- the correlation-cluster
+cap is a real, transparent guardrail against one specific concentrated-
+bet pattern, not a claim to have solved portfolio optimization. Both new
+thresholds are declared, uncalibrated (TD-69) until real multi-year EGX
+history exists to test them against.
+
 ## EGX Investment Methodology (2026-08-01)
 
 The project owner declared software implementation no longer the primary

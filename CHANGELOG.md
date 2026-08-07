@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased — Capital Allocation Engine: sector/correlation concentration caps and macro overlay become real, enforced inputs (AD-66)
+
+`DecisionService.decide_portfolio()` — the position-aware engine behind
+`agx allocate-capital`/`POST /capital-allocation` — now enforces two new
+hard, pre-emptive concentration overrides (`decision_service
+.concentration.compute_concentration_caps()`): a sector cap reusing
+`PortfolioValidationEngine`'s existing 0.40 ceiling (previously validated
+only *after* the fact, never actually enforced), and a new
+correlation-cluster cap using real, split/dividend-adjusted return
+correlation (`features.correlation`) to stop a highly-correlated cluster
+of positions from silently exceeding the same 0.40 ceiling — both walked
+best-opportunity-score-first, both returning any trimmed weight to cash
+rather than fabricating a redistribution. The market-wide macro exposure
+overlay (`assess_macro_overlay`), previously wired only into the
+autonomous, position-unaware model portfolio, now dampens this real,
+personalized allocation path identically. `Explanation
+.similar_historical_cases` — previously always empty despite
+`explainability.find_similar_cases()` already existing — is now
+populated from real prior events for the ticker. Every `CapitalQueueEntry`
+now carries a transparent `reasoning` list (opportunity score, confidence,
+expected return/risk, sector, and any override that applied), plus new
+`sector`/`confidence` fields, surfaced in CIO Desk's Capital Deployment
+Queue table. See `docs/ARCHITECTURE_DECISIONS.md` AD-66,
+`docs/PORTFOLIO_STANDARDS.md` §2/§5, `docs/INVESTMENT_CONSTITUTION.md`
+Article VII, and `docs/TECHNICAL_DEBT.md` TD-69 for the new declared,
+uncalibrated thresholds. 18 new backend tests; full suite (1059), `api`/
+`web` typecheck, and `ruff check` all pass.
+
 ## Unreleased — EGX collector memory profiling: found and fixed unbounded provenance growth
 
 Instrumented `EgxCompositePriceCollector`/`CollectionService` with a

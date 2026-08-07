@@ -31,6 +31,7 @@ class RankedOpportunity(BaseModel):
     confidence: float
     expected_return: float | None = None
     expected_risk: float | None = None
+    sector: str | None = None
     is_new_position: bool
 
 
@@ -58,7 +59,13 @@ class CapitalQueueEntry(BaseModel):
     proposal -- the Capital Deployment Queue. `capital_sources` and
     `opportunity_cost_note` are what make the underlying action answer
     "better than what?" and "funded by what?" instead of a bare BUY/
-    INCREASE label."""
+    INCREASE label. `reasoning` (AD-66) is the full transparent
+    explanation for this entry's rank and sizing -- expected return,
+    marginal risk, confidence, and, when they applied, the exact
+    liquidity/country/sector/correlation/macro overrides
+    `DecisionService.decide_portfolio()` computed for this ticker --
+    assembled entirely from that decision's own already-computed fields,
+    never a fresh judgment made here."""
 
     ticker: str
     priority: int
@@ -69,9 +76,12 @@ class CapitalQueueEntry(BaseModel):
     expected_contribution: float | None = None
     marginal_benefit: float
     marginal_risk: float | None = None
+    confidence: float
+    sector: str | None = None
     capital_sources: list[CapitalSource] = Field(default_factory=list)
     required_action: str
     opportunity_cost_note: str
+    reasoning: list[str] = Field(default_factory=list)
 
 
 class CapitalRelease(BaseModel):

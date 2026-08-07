@@ -6,6 +6,7 @@ concentration limits, diversification principles, liquidity rules, cash
 rules, position sizing, and capital recycling — exactly as implemented in
 `portfolio.constructor.PortfolioConstructor`,
 `decision_service.service.DecisionService`,
+`decision_service.concentration.compute_concentration_caps` (AD-66),
 `investment_proof.portfolio_validation.PortfolioValidationEngine`, and
 `capital_allocation.CapitalAllocationEngine`. Every numeric threshold
 below is cited from real code, and every threshold marked *declared,
@@ -53,15 +54,55 @@ portfolio's actual current state, not against trading intent.
 
 ## 2. Diversification Principles
 
-- **Sector concentration is checked independently of position
-  concentration.** `PortfolioValidationEngine` computes real sector
-  exposures (from whatever sector mapping is available) and flags the
-  portfolio `concentrated` if the single largest sector weight exceeds
-  `MAX_SECTOR_CONCENTRATION = 0.40` (40%) — *declared, uncalibrated*, same
-  posture as the Herfindahl ceiling. A portfolio can be
-  position-diversified (no single ticker near 25%) while still being
-  sector-concentrated, and both checks run independently; passing one
-  never substitutes for the other.
+- **Sector concentration is now enforced pre-emptively, not only checked
+  after the fact (AD-66).** `decision_service.concentration
+  .compute_concentration_caps()` walks every ticker `DecisionService
+  .decide_portfolio()` is about to size, best-opportunity-score-first, and
+  caps a ticker's target weight the moment its own sector's cumulative
+  target weight would exceed `MAX_SECTOR_CONCENTRATION = 0.40` (40%) —
+  the exact same constant `PortfolioValidationEngine` already validated,
+  now imported from a shared, dependency-free `portfolio
+  .concentration_limits` module so the two can never drift apart. Weight
+  trimmed by this cap returns to cash, never to another ticker (§6).
+  *Declared, uncalibrated*, same posture as the Herfindahl ceiling.
+  `PortfolioValidationEngine`'s own independent post-hoc check is
+  unchanged and still runs — a second, cheap confirmation that the
+  pre-emptive cap actually held, not a redundant mechanism.
+- **A correlated cluster of positions is capped the same way sectors are
+  (AD-66), new.** `compute_concentration_caps()` also computes real,
+  split/dividend-adjusted daily-return Pearson correlation
+  (`features.correlation.compute_pairwise_return_correlation`) between a
+  candidate ticker and every higher-ranked ticker already allocated in
+  the same pass. When that correlation is `>= CORRELATION_CONCENTRATION_
+  THRESHOLD = 0.70` to one or more already-allocated tickers, their
+  combined weight is capped at `MAX_CORRELATED_CLUSTER_WEIGHT = 0.40` —
+  the same numeric ceiling as the sector cap by deliberate design choice,
+  not because a sector and a correlated cluster are the same concept.
+  Both thresholds are *declared, uncalibrated* (`docs/TECHNICAL_DEBT.md`
+  TD-69): no real multi-year EGX portfolio history exists yet to test
+  whether 0.70 is the correlation level that actually separates a real
+  concentrated bet from ordinary co-movement. This is deliberately *not*
+  a mean-variance/covariance-matrix optimization — `portfolio
+  /constructor.py`'s own docstring already explains why that needs real
+  data depth this platform doesn't have; the cluster cap is a real,
+  computed, transparent guardrail, not a fabricated optimizer.
+- **A missing sector or missing price history never fabricates a cap.**
+  Exactly like the liquidity floor (§3) and country-risk override, both
+  new checks degrade honestly: a ticker with no sector classification is
+  never capped by a guessed sector, and correlation is simply not
+  computed for a ticker pair without enough shared price history — the
+  check is skipped, not defaulted to a pass or a fail.
+- **The market-wide macro overlay now dampens the position-aware path
+  too (AD-66).** `decision_service.macro_overlay.assess_macro_overlay()`'s
+  `exposure_multiplier` previously only throttled
+  `PortfolioConstructor.construct()`'s autonomous, position-unaware model
+  portfolio. `DecisionService.decide_portfolio()` now accepts the same
+  `MacroDecisionOverlay` and applies the identical multiplier to every
+  ticker's already-capped target weight before the liquidity/country hard
+  overrides — a `defensive` regime (`exposure_multiplier=0.50`) now
+  dampens a real investor's position-aware allocation exactly as it
+  already dampened the model portfolio, never leaving the personalized
+  path silently un-dampened during a stressed macro regime.
 - **Diversification is a consequence of the evidence chain, never a
   target achieved by forcing trades.** No mechanism in this platform buys
   a weak idea merely because a sector or position is under-represented —
@@ -159,6 +200,14 @@ portfolio's actual current state, not against trading intent.
   position.** A ticker that fails §0 of `docs/DECISION_STANDARDS.md`
   contributes `0.0` to its own score, not a token minimum position —
   there is no minimum-position floor that overrides the evidence chain.
+- **Every sizing decision is transparently explained, never a bare
+  number (AD-66).** `CapitalQueueEntry.reasoning` states, for every
+  queued proposal, its opportunity score, confidence, expected return and
+  risk, sector (when classified), and the exact text of any liquidity/
+  country/sector/correlation/macro override that applied — assembled
+  entirely from `PositionAwareDecision`'s own already-computed fields
+  (Article VIII: confidence discounts the score ranking is built from, it
+  is never a separate, invented "conviction" number standing next to it).
 
 ## 6. Capital Recycling Philosophy
 

@@ -286,6 +286,25 @@ competition rather than left implicit:
   abstained decision — no fresh evidence, not a decisive sell — never
   participates in capital-flow matching even though its raw target
   weight computes to zero (Article VI, `_effective_target()`).
+- **A crowded sector or a cluster of highly correlated positions never
+  claims more than its share, even with strong individual evidence
+  (AD-66).** `DecisionService.decide_portfolio()` caps a ticker's target
+  weight the moment its sector's cumulative allocation, or its combined
+  weight with already-allocated tickers whose real return correlation to
+  it is `>= 0.70`, would exceed `0.40` of the portfolio — walked in the
+  same best-opportunity-score-first order the Global Opportunity Ranking
+  already uses, so the strongest idea in a crowded sector or cluster
+  always gets the room, never a weaker one that happened to be
+  considered first. Weight trimmed by either cap returns to cash, exactly
+  like every other unmet demand in this article — never redistributed to
+  a different ticker.
+- **A defensive market-wide macro regime dampens every real allocation,
+  not only the autonomous model portfolio (AD-66).** The same exposure
+  multiplier `decision_service.macro_overlay.assess_macro_overlay()`
+  already applies to `PortfolioConstructor`'s position-unaware view now
+  applies identically inside `decide_portfolio()`, so a real investor's
+  position-aware allocation is never silently left un-dampened during a
+  stressed macro regime the model portfolio is already reacting to.
 
 Capital allocation is, structurally, the platform's answer to "is this
 the best use of capital available today?" rather than "is this stock

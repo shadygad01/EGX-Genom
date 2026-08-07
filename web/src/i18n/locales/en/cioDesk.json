@@ -42,6 +42,8 @@
       "marginalRisk": "Marginal Risk",
       "capitalSources": "Capital Source",
       "opportunityCost": "Opportunity Cost",
+      "confidence": "Confidence",
+      "reasoning": "Why (Reasoning)",
       "fallbackNote": "Full queue economics (priority, capital source, opportunity cost) need your real holdings — showing today's actions only."
     },
     "recycling": {

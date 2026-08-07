@@ -1,5 +1,7 @@
 from datetime import date, datetime
 
+import pytest
+
 from agx_research.config import Horizon
 from agx_research.data.schemas import CorporateEvent
 from agx_research.decision_service.country_risk import CountryRiskAssessment, CountryRiskSeverity
@@ -212,6 +214,104 @@ def test_country_risk_crisis_forces_no_action_for_unheld_ticker():
         [rec], positions={}, as_of=date(2026, 6, 14), country_risk=crisis
     )
     assert decisions[0].action == PositionAction.NO_ACTION
+
+
+def test_macro_overlay_dampens_target_weight_and_records_a_reason():
+    from agx_research.decision_service.macro_overlay import MacroDecisionOverlay
+
+    rec = make_publication_ready_recommendation("COMI")
+    undampened = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )[0]
+
+    defensive_overlay = MacroDecisionOverlay(
+        as_of=date(2026, 6, 14), decision="defensive", score=-0.5,
+        exposure_multiplier=0.5, available_weight=1.0,
+        rationale="test: defensive macro regime",
+    )
+    dampened = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK,
+        macro_overlay=defensive_overlay,
+    )[0]
+
+    assert dampened.target_weight == pytest.approx(undampened.target_weight * 0.5)
+    assert any("Macro overlay" in reason for reason in dampened.reasons)
+
+
+def test_supportive_macro_overlay_leaves_target_weight_unchanged():
+    from agx_research.decision_service.macro_overlay import MacroDecisionOverlay
+
+    rec = make_publication_ready_recommendation("COMI")
+    supportive_overlay = MacroDecisionOverlay(
+        as_of=date(2026, 6, 14), decision="supportive", score=0.5,
+        exposure_multiplier=1.0, available_weight=1.0,
+        rationale="test: supportive macro regime",
+    )
+    undampened = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )[0]
+    with_overlay = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK,
+        macro_overlay=supportive_overlay,
+    )[0]
+    assert with_overlay.target_weight == pytest.approx(undampened.target_weight)
+    assert not any("Macro overlay" in reason for reason in with_overlay.reasons)
+
+
+def test_sector_is_passed_through_from_the_sectors_map():
+    rec = make_publication_ready_recommendation("COMI")
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK,
+        sectors={"COMI": "Banks"},
+    )
+    assert decisions[0].sector == "Banks"
+
+
+def test_unclassified_ticker_has_no_fabricated_sector():
+    rec = make_publication_ready_recommendation("COMI")
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK,
+    )
+    assert decisions[0].sector is None
+
+
+def test_similar_historical_cases_populated_from_real_prior_events():
+    from agx_research.events.entity import EntityKind, EntityRef
+    from agx_research.events.event import EventSeverity, EventType
+    from agx_research.events.service import EventPlatform, build_candidate_event
+    from agx_research.events.taxonomy import EventSubtype
+
+    event_platform = EventPlatform()
+    event_platform.register(
+        build_candidate_event(
+            event_type=EventType.CORPORATE,
+            subtype=EventSubtype.DIVIDEND,
+            entities=[EntityRef(kind=EntityKind.COMPANY, canonical_id="COMI", raw_mention="COMI")],
+            event_date=date(2026, 5, 1),
+            source="test",
+            confidence=0.8,
+            severity=EventSeverity.MEDIUM,
+            provenance=Provenance(produced_by="test", produced_at=datetime.now()),
+        )
+    )
+
+    rec = make_publication_ready_recommendation("COMI")
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK,
+        event_platform=event_platform,
+    )
+    cases = decisions[0].explanation.similar_historical_cases
+    assert len(cases) == 1
+    assert "2026-05-01" in cases[0]
+    assert "dividend" in cases[0].lower()
+
+
+def test_no_event_platform_leaves_similar_historical_cases_honestly_empty():
+    rec = make_publication_ready_recommendation("COMI")
+    decisions = DecisionService().decide_portfolio(
+        [rec], positions={}, as_of=date(2026, 6, 14), country_risk=NO_RISK
+    )
+    assert decisions[0].explanation.similar_historical_cases == []
 
 
 def test_invalid_max_position_weight_rejected():

@@ -32,6 +32,9 @@ def _decision(
     expected_return: float | None = 0.05,
     expected_risk: float | None = 0.03,
     abstained: bool = False,
+    sector: str | None = None,
+    confidence: float = 0.7,
+    reasons: list[str] | None = None,
 ) -> PositionAwareDecision:
     return PositionAwareDecision(
         ticker=ticker,
@@ -40,12 +43,14 @@ def _decision(
         target_weight=target,
         current_weight=current,
         horizon=Horizon.INVESTMENT,
-        confidence=0.7,
+        confidence=confidence,
         opportunity_score=score,
         expected_return=expected_return,
         expected_risk=expected_risk,
+        sector=sector,
         investment_thesis="test thesis",
         abstained=abstained,
+        reasons=reasons or [],
         explanation=Explanation(why_this_stock="x", why_now="x", why_not_others="x"),
         provenance=Provenance(produced_by="test", produced_at=AS_OF.isoformat(), inputs=[]),
     )
@@ -211,6 +216,49 @@ def test_abstained_held_ticker_never_triggers_a_fabricated_capital_release():
     # The abstained ticker still appears in the ranking (transparency),
     # just never as a capital source/demand.
     assert "NO_FRESH_EVIDENCE" in {r.ticker for r in plan.ranking}
+
+
+def test_sector_passes_through_to_ranking_and_queue_entry():
+    decisions = [
+        _decision("NEW", PositionAction.BUY, target=0.2, current=0.0, score=1.0, sector="Banks"),
+    ]
+    plan = CapitalAllocationEngine().build(decisions, AS_OF)
+    assert plan.ranking[0].sector == "Banks"
+    assert plan.queue[0].sector == "Banks"
+
+
+def test_unclassified_ticker_has_no_fabricated_sector_in_the_plan():
+    decisions = [
+        _decision("NEW", PositionAction.BUY, target=0.2, current=0.0, score=1.0),
+    ]
+    plan = CapitalAllocationEngine().build(decisions, AS_OF)
+    assert plan.ranking[0].sector is None
+    assert plan.queue[0].sector is None
+
+
+def test_queue_entry_reasoning_surfaces_return_risk_confidence_and_upstream_overrides():
+    decisions = [
+        _decision(
+            "NEW", PositionAction.BUY, target=0.05, current=0.0, score=1.0,
+            expected_return=0.12, expected_risk=0.06, sector="Banks", confidence=0.65,
+            reasons=["Sector concentration cap: Banks sector already accounts for 35.00% ..."],
+        ),
+    ]
+    plan = CapitalAllocationEngine().build(decisions, AS_OF)
+    reasoning = plan.queue[0].reasoning
+    assert any("confidence=0.65" in r for r in reasoning)
+    assert any("+12.00%" in r for r in reasoning)
+    assert any("6.00%" in r for r in reasoning)
+    assert any("Banks" in r for r in reasoning)
+    assert any("Sector concentration cap" in r for r in reasoning)
+
+
+def test_queue_entry_confidence_matches_the_decision():
+    decisions = [
+        _decision("NEW", PositionAction.BUY, target=0.2, current=0.0, score=1.0, confidence=0.42),
+    ]
+    plan = CapitalAllocationEngine().build(decisions, AS_OF)
+    assert plan.queue[0].confidence == pytest.approx(0.42)
 
 
 def test_empty_universe_produces_an_honest_empty_plan():

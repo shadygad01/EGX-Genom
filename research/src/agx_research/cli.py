@@ -45,6 +45,7 @@ from agx_research.dashboard.validate import DashboardArtifactError
 from agx_research.capital_allocation import CapitalAllocationEngine
 from agx_research.decision_service.country_risk import assess_country_risk
 from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
+from agx_research.decision_service.macro_overlay import assess_macro_overlay
 from agx_research.decision_service.position import PositionState
 from agx_research.decision_service.service import DecisionService, PositionAwareDecision
 from agx_research.discovery.company_entity_resolution import EntityResolutionEngine
@@ -130,10 +131,11 @@ def build_position_aware_decisions(
     reconstructing it a second time.
     """
     materialize_universe_seed(universe_seed_dir, data_dir)
+    sector_provider = CollectedSectorProvider(data_dir)
     market_memory = MarketMemory(
         LocalCsvDataProvider(data_dir),
         CollectedUniverseProvider(data_dir),
-        CollectedSectorProvider(data_dir),
+        sector_provider,
         macro_series_ids=MACRO_SERIES_IDS,
         lookback_days=30,
         event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
@@ -160,6 +162,16 @@ def build_position_aware_decisions(
 
     country_risk = assess_country_risk(snapshot.macro_series, as_of)
     illiquid_tickers = compute_illiquid_tickers(snapshot)
+    # AD-66: sector map for the sector-concentration override, the real
+    # macro overlay this path previously never applied (only
+    # PortfolioConstructor's autonomous model portfolio did), and the
+    # correlation-cluster override reads `snapshot` directly below.
+    sectors = {
+        ticker: sector
+        for ticker in tickers
+        if (sector := sector_provider.sector_of(ticker, as_of)) is not None
+    }
+    macro_overlay = assess_macro_overlay(snapshot.macro_series, as_of)
 
     return DecisionService().decide_portfolio(
         recommendations,
@@ -169,6 +181,10 @@ def build_position_aware_decisions(
         illiquid_tickers=illiquid_tickers,
         corporate_events=snapshot.corporate_events,
         knowledge_store=knowledge_store,
+        snapshot=snapshot,
+        sectors=sectors,
+        macro_overlay=macro_overlay,
+        event_platform=market_memory.event_platform,
     )
 
 

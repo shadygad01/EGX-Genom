@@ -55,6 +55,31 @@ No `PositionAction` may ever be more permissive than this floor. A ticker
 that fails to reach `BUY_CANDIDATE` here can never resolve to `buy` or
 `increase_position` downstream, regardless of position state.
 
+### 0a. Portfolio-level caps applied after the research floor, before the action label (AD-66)
+
+Even a ticker that clears §0 and every eligibility check below can still
+have its `target_weight` trimmed — never fully re-scored, only capped —
+by `decision_service.concentration.compute_concentration_caps()`: a
+sector cap (that ticker's sector already at `MAX_SECTOR_CONCENTRATION =
+0.40` of the portfolio) and a correlation-cluster cap (combined weight
+with already-allocated, `≥ 0.70`-correlated tickers already at `0.40`),
+both walked best-opportunity-score-first so the strongest idea in a
+crowded sector/cluster is never the one trimmed. Unlike the liquidity
+floor and country-risk crisis override (§7), which always force
+`target_weight` to exactly zero, these two caps trim to whatever room
+remains — zero only when none does. The resulting action label follows
+mechanically from whatever the capped `target_weight` turns out to be:
+still `buy`/`increase_position` if room remained, `reduce_position` if the
+cap left a smaller-but-still-positive weight on a held ticker, or
+`exit`/`no_action` only if the cap left exactly zero room. A trimmed
+ticker's `reasons` always names which cap applied and by how much — never
+a silent, unexplained smaller number. Separately, a `macro_overlay`
+(`decision_service.macro_overlay.assess_macro_overlay()`) in a `cautious`/
+`defensive` regime uniformly dampens every ticker's already-capped weight
+by its `exposure_multiplier` before the liquidity/country hard overrides
+apply — the same market-wide throttle `PortfolioConstructor`'s autonomous
+model portfolio already applies, now also here.
+
 ## 1. What Qualifies as **Buy**
 
 Requires **all** of the following, simultaneously:

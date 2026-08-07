@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased — TopBar status label: "Data as of" instead of "Last cycle"
+
+Found while verifying the AD-67 fix live: on 2026-08-07 (a Friday, EGX
+non-trading day) the pipeline ran and published successfully, but the
+TopBar's global status strip still read "Last cycle: yesterday" — reading
+exactly like a stalled/broken automation, when in fact the automation ran
+today and honestly reported that there's no new trading session to
+reflect (`status.pipeline_run_date` is the research/decision data's
+as-of date, `_latest_successful_as_of()` on the backend — distinct from
+`status.generated_at`, the actual execution timestamp, which the label
+was never wired to). Relabeled `topbar.lastCycle` → `topbar.dataAsOf`
+("Data as of {{time}}" / "البيانات حتى {{time}}") — no backend or data
+change, the underlying value is unchanged and still correct; only the
+label now says what it actually shows. `web` typecheck, tests (68), and
+build all pass.
+
 ## Unreleased — Fix a real publish-blocking bug: weekend/holiday runs were rejected as "inconsistent" (AD-67)
 
 Every GitHub Pages deploy on 2026-08-07 (a Friday, EGX non-trading day)

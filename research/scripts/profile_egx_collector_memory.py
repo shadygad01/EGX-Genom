@@ -350,8 +350,12 @@ def run_single(args: argparse.Namespace) -> dict:
 
 
 def run_growth(args: argparse.Namespace) -> dict:
+    import time as _time
+
     symbols = build_universe(args.universe_size)
     end = date(2026, 8, 6)
+    last_day_allocations: list[dict] | None = None
+    last_day_tracemalloc_peak_kb: float | None = None
 
     with __import__("tempfile").TemporaryDirectory() as tmp:
         data_dir = Path(tmp)
@@ -396,7 +400,20 @@ def run_growth(args: argparse.Namespace) -> dict:
                 fetcher=fetcher,
                 now=lambda de=day_end: datetime(de.year, de.month, de.day, 11, tzinfo=CAIRO),
             )
+
+            is_last = args.profile_last and day_offset == args.days - 1
+            if is_last:
+                tracemalloc.start(10)
+                snap_before = tracemalloc.take_snapshot()
+            started_at = _time.perf_counter()
             service.run(collector, expected_records=100)
+            elapsed_seconds = _time.perf_counter() - started_at
+            if is_last:
+                _current, peak = tracemalloc.get_traced_memory()
+                snap_after = tracemalloc.take_snapshot()
+                last_day_tracemalloc_peak_kb = round(peak / 1024, 1)
+                last_day_allocations = top_allocations(snap_before, snap_after, args.top)
+                tracemalloc.stop()
 
             raw_doc_revisions = sum(len(v) for v in raw_documents._revisions.values())
             raw_doc_bytes = sum(
@@ -412,6 +429,7 @@ def run_growth(args: argparse.Namespace) -> dict:
                     "raw_document_content_text_bytes": raw_doc_bytes,
                     "provenance_records_in_memory": provenance_records,
                     "rss_kb": _current_rss_kb(),
+                    "elapsed_seconds": round(elapsed_seconds, 2),
                 }
             )
 
@@ -421,6 +439,8 @@ def run_growth(args: argparse.Namespace) -> dict:
         "history_days_start": args.history_days,
         "simulated_days": args.days,
         "days": days,
+        "last_day_tracemalloc_peak_kb": last_day_tracemalloc_peak_kb,
+        "last_day_top_allocations_by_site": last_day_allocations,
     }
 
 
@@ -446,6 +466,14 @@ def main() -> None:
         "growing history_days -- models egx-collector.timer's *:* cadence "
         "polling between two calendar trading days.",
     )
+    growth.add_argument(
+        "--profile-last",
+        action="store_true",
+        help="Wrap tracemalloc around the final iteration only, to identify "
+        "the dominant allocation sites at steady state (after any growth "
+        "defect has had every earlier iteration to manifest).",
+    )
+    growth.add_argument("--top", type=int, default=15)
 
     args = parser.parse_args()
     if args.scenario == "single":

@@ -47,6 +47,20 @@ the fix that was applied to #2 (verified before/after), plus a set of
 smaller, VPS-coexistence-oriented changes made once the leak was confirmed
 fixed.
 
+**Direct confirmation against the real incident (§5.1):** this repo's
+maintainer independently observed a 1.7 GB steady-state RSS peak on the
+real VPS after `egx-collector.timer` had been running for days/weeks.
+Reproducing the same production-scale workload (101 tickers, 5 repeated
+runs against an accumulating store) got the pre-fix code to **1.37 GB and
+still climbing linearly** — within ~20% of the real number after just 5
+runs, with production's real run count far higher by the time it was
+observed. The identical scenario against the fix **plateaus at 344 MB from
+the second run onward, regardless of run count** — a 75.6% reduction at
+the same run count, widening indefinitely beyond it. Steady-state
+allocation profiling of the fully-repeated (no new data) case confirms no
+other significant memory consumer remains: marginal per-run allocation
+dropped from ~254 MB to ~4 MB.
+
 ---
 
 ## 1. Methodology
@@ -262,6 +276,118 @@ unchanged, plus four new regression tests
 `test_record_step_records_a_genuinely_different_outcome`) that lock in
 both halves of the behavior: unchanged data doesn't grow the store, and
 genuinely changed data still does.
+
+### 5.1 Production-scale verification against the real 1.7 GB incident
+
+This repo's own maintainer independently observed a **1.7 GB steady-state
+RSS peak** on the real VPS, after `egx-collector.timer` had been running
+every minute for days/weeks against an already-accumulated `research/data`
+— i.e. exactly the cross-run leak diagnosed above, not a cold-start run.
+This section reproduces that specific failure mode at production scale
+(101 tickers, the real universe size) and proves it's gone.
+
+**Setup:** `growth --static --universe-size 101 --history-days 1500
+--sa-days 250 --days 5`, run twice — once against the pre-fix code
+(`git checkout HEAD~2 -- collectors/service.py collectors/raw.py`, i.e.
+the commit before the fix), once against the fix as shipped — with the
+*same* corrected, wire-format-realistic synthetic payloads both times.
+1,500 days is this report's best available stand-in for real Yahoo
+`range=max` depth (still unverified without live access — see §1); five
+repeated runs against byte-identical content stands in for
+`egx-collector.timer` polling between two calendar trading days, which is
+most of its 1,440 firings/day.
+
+**A methodology correction, made honestly:** the first pass at this used
+`--profile-last` (deep, 10-frame `tracemalloc` stack capture) on every
+run, which showed the 5th iteration taking 244–261 seconds — dangerously
+close to `egx-collector.service`'s `TimeoutStartSec=120`. That reading is
+**not real** — it's `tracemalloc`'s own well-known per-allocation overhead
+at that stack depth. Re-run without any profiling instrumentation, the
+same 5th iteration takes 5–11 seconds in both the before and after case.
+Flagging this explicitly rather than quietly using the corrected number:
+the instrumented run's *memory* readings are also inflated by
+`tracemalloc`'s own bookkeeping, so peak-RSS figures below use the
+**uninstrumented** runs; the instrumented run is used only for its actual
+purpose — identifying top allocation *sites*, where relative ranking
+between sites isn't affected by the constant overhead.
+
+**Peak RSS, same 5-run scenario, uninstrumented:**
+
+| Run # | RSS — before fix | RSS — after fix |
+|---:|---:|---:|
+| 1 (cold start) | 355.8 MB | 319.9 MB |
+| 2 | 622.7 MB | 331.7 MB |
+| 3 | 889.8 MB | 342.8 MB |
+| 4 | 1,145.8 MB | 343.4 MB |
+| **5** | **1,407.2 MB** | **344.1 MB** |
+
+Before-fix RSS at run 5 is **1.37 GB and still climbing linearly** with no
+sign of plateauing — five identical re-fetches were enough to get within
+~20% of the real 1.7 GB incident; production's actual run count by the
+time it was observed (days/weeks × 1,440 firings/day, most between
+trading days) is vastly higher than 5, so the real ceiling being ~1.7 GB
+rather than far higher is itself consistent with an incident caught and
+investigated well before the number grew arbitrarily large. After-fix RSS
+plateaus at **344 MB from run 2 onward** — a **75.6% reduction at the same
+5-run mark**, and critically, one that holds at *any* run count, not just
+5, since the underlying growth mechanism is gone rather than merely slowed.
+
+**Steady-state RSS:** before the fix, there is no steady state — RSS never
+stops climbing. After the fix, steady state is **~320–350 MB**, reached by
+run 2 and flat thereafter (5 runs measured; the mechanism has no
+dependency on run count, matching §3's `--static` finding at smaller
+scale).
+
+**Execution time, same runs, uninstrumented (real, not the profiling
+artifact above):**
+
+| Run # | Time — before fix | Time — after fix |
+|---:|---:|---:|
+| 1 | 6.5s | 6.2s |
+| 2 | 7.4s | 5.1s |
+| 3 | 10.6s | 5.3s |
+| 4 | 10.0s | 5.1s |
+| 5 | 9.6s | 5.3s |
+
+Before the fix, wall-clock time shows a real but modest increase (6.5s →
+~10s, roughly +50%) over 5 runs — consistent with GC/heap-management
+overhead scaling with the growing in-memory store, not a cliff. Whether
+this keeps growing at much larger real run counts wasn't tested (it would
+require reproducing thousands of iterations); nothing in this data
+suggests it does anything close to what the `--profile-last` artifact
+implied. After the fix, execution time is flat at ~5–6 seconds — if
+anything marginally faster from run 2 onward, since most of the per-run
+provenance-recording work is now skipped entirely once nothing has
+changed.
+
+**Does the fix comfortably fit the shared-VPS memory budget?** Yes.
+Steady-state RSS (~320–350 MB) uses under 12% of the `MemoryHigh=3G`/
+`MemoryMax=4G` ceiling set on `egx-collector.service` (§7) — comfortable
+margin for the timer's dominant real-world case (repeated polling with no
+new data). The remaining, separate cost this fix does *not* touch is the
+one-time, cold-start cost of a genuinely deep first-time history ingest
+(§2's 2.45 GB at 101×5,500 days) — unaffected by this fix by design (there
+is nothing to deduplicate against on an empty store), and already why that
+ceiling has real headroom above the steady-state number rather than being
+sized tightly to it.
+
+**Is the 1.7 GB peak eliminated, or does another major consumer remain?**
+Eliminated, confirmed two ways:
+1. The reproduction above: same scale, same workload, before climbs
+   unboundedly past what would reach and exceed 1.7 GB with more runs;
+   after plateaus at 344 MB regardless of run count.
+2. Steady-state allocation profiling (`--profile-last` on the 5th,
+   fully-repeated iteration — reading its *ranking*, not its inflated
+   absolute numbers, per the correction above): before the fix, that one
+   iteration's traced allocations totaled **259,960 KB** (~254 MB, almost
+   entirely `pydantic/main.py` object construction + the four
+   `provenance_index.py` sites from §2). After the fix, the same iteration
+   totals **4,081 KB** (~4 MB) — a **98.4% reduction in marginal per-run
+   allocation**, and what remains is unremarkable: small, expected
+   per-request object churn (`copy.py`, `urllib/parse.py`, a handful of
+   `pydantic` constructions in the low single-digit KB each), nothing
+   resembling a new dominant consumer. No further profiling target is
+   indicated.
 
 ## 6. Production deployment context (why this matters this much)
 

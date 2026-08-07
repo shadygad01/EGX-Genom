@@ -136,6 +136,29 @@ def test_regime_never_looks_past_a_declared_lookback_window():
     assert report.trading_days_observed == 5
 
 
+def test_regime_window_is_shared_across_tickers_not_summed_per_ticker():
+    # Real production incident (2026-08-07): the CIO Desk showed "(33d)"
+    # for a REGIME_LOOKBACK_DAYS=20 window. Reproduced here with two
+    # tickers whose own trailing-20 date ranges don't overlap at all (a
+    # gapped/shorter history is a real, common case -- different sources
+    # implemented on different dates, a later IPO) -- slicing per ticker
+    # before combining let the union of two non-overlapping 20-day slices
+    # report as a fabricated ~40-day trend.
+    as_of = date(2026, 7, 1)
+    closes_a = [100.0 * (1.001**i) for i in range(40)]
+    bars_a = make_bars("AAA", closes_a, as_of - timedelta(days=39))
+    # BBB's history ends 20 days before as_of -- e.g. a real data gap --
+    # so its own trailing-20 window is entirely earlier than AAA's.
+    closes_b = [50.0 * (1.002**i) for i in range(40)]
+    bars_b = make_bars("BBB", closes_b, as_of - timedelta(days=59))
+
+    state = make_state({"AAA": bars_a, "BBB": bars_b}, as_of)
+    report = compute_market_regime(state)
+
+    assert report.trading_days_observed <= report.lookback_days
+    assert report.tickers_with_sufficient_data == 2
+
+
 def test_regime_end_to_end_against_real_mock_data_runs_without_error():
     memory = MarketMemory(
         MockDataProvider(MOCK_ROOT),

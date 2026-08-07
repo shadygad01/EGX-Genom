@@ -74,10 +74,20 @@ def compute_market_regime(
     deviation of that same daily series. Both derive from
     `data.adjustments.adjusted_dated_returns()`, never a raw close-to-close
     calculation.
+
+    The window is one shared set of trailing dates across the whole
+    universe, not `lookback_days` computed independently per ticker: a
+    ticker whose own history is shorter or gapped (a real, common case --
+    different sources implemented on different dates, a real collection
+    gap, a later IPO) has its own last-N dates that may not overlap at
+    all with a fully-covered ticker's, and slicing before combining let
+    the union of two non-overlapping 20-day slices silently report as a
+    "40-day" trend -- neither a real 20-day nor a real 40-day reading,
+    and not what `lookback_days` promises the reader.
     """
     tickers = sorted(state.constituents) or sorted(state.dataset_snapshot.price_history)
 
-    returns_by_date: dict[date, list[float]] = {}
+    per_ticker_returns: dict[str, dict[date, float]] = {}
     tickers_with_sufficient_data = 0
     for ticker in tickers:
         bars = sorted(
@@ -95,8 +105,16 @@ def compute_market_regime(
         if not dated_returns:
             continue
         tickers_with_sufficient_data += 1
-        for trade_date, ticker_return in sorted(dated_returns.items())[-lookback_days:]:
-            returns_by_date.setdefault(trade_date, []).append(ticker_return)
+        per_ticker_returns[ticker] = dated_returns
+
+    all_observed_dates = sorted({d for returns in per_ticker_returns.values() for d in returns})
+    window_dates = set(all_observed_dates[-lookback_days:])
+
+    returns_by_date: dict[date, list[float]] = {}
+    for dated_returns in per_ticker_returns.values():
+        for trade_date, ticker_return in dated_returns.items():
+            if trade_date in window_dates:
+                returns_by_date.setdefault(trade_date, []).append(ticker_return)
 
     trading_days = sorted(returns_by_date)
     daily_market_returns = [

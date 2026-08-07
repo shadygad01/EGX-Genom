@@ -135,7 +135,7 @@
       "type": "object"
     }
   },
-  "description": "One ticker's position-aware decision. Never constructed without an\n`Explanation` (Principle 3, same rule every other recommendation-like\nobject in this codebase follows).\n\nFields cover the full institutional decision memo the mission requires\n(decision, target weight, horizon, confidence, thesis, supporting and\ncontradicting evidence, key risks, active catalysts, monitoring events,\ninvalidation conditions -- on `explanation` -- and expected review\ndate), each derived from data this service already computes or is\nhanded, never fabricated.\n\n`opportunity_score`/`expected_return`/`expected_risk` (Capital\nAllocation Intelligence mission) expose the same\n`HorizonDecision.risk_adjusted_score`/`expected_return`/`expected_risk`\nthis method already computes internally as first-class fields, not\njust prose -- `capital_allocation.CapitalAllocationEngine` (and any\nfuture consumer needing to rank tickers against each other) reads\nthese directly instead of re-deriving the eligibility/scoring rule a\nsecond time. `opportunity_score` is the pre-cap, pre-normalization\nscore (0.0 when ineligible/abstained/not publication-ready), exactly\nthe `score` this method already used to compute `target_weight`.",
+  "description": "One ticker's position-aware decision. Never constructed without an\n`Explanation` (Principle 3, same rule every other recommendation-like\nobject in this codebase follows).\n\nFields cover the full institutional decision memo the mission requires\n(decision, target weight, horizon, confidence, thesis, supporting and\ncontradicting evidence, key risks, active catalysts, monitoring events,\ninvalidation conditions -- on `explanation` -- and expected review\ndate), each derived from data this service already computes or is\nhanded, never fabricated.\n\n`opportunity_score`/`expected_return`/`expected_risk` (Capital\nAllocation Intelligence mission) expose the same\n`HorizonDecision.risk_adjusted_score`/`expected_return`/`expected_risk`\nthis method already computes internally as first-class fields, not\njust prose -- `capital_allocation.CapitalAllocationEngine` (and any\nfuture consumer needing to rank tickers against each other) reads\nthese directly instead of re-deriving the eligibility/scoring rule a\nsecond time. `opportunity_score` is the pre-cap, pre-normalization\nscore (0.0 when ineligible/abstained/not publication-ready), exactly\nthe `score` this method already used to compute `target_weight`.\n\n`sector` (AD-66) is whatever `sectors` mapping the caller supplied for\nthis ticker, or `None` if none was supplied or the ticker is\nunclassified -- a passthrough, never independently looked up here, so\n`capital_allocation.CapitalAllocationEngine` can display/group by it\nwithout a second sector lookup.",
   "properties": {
     "abstained": {
       "title": "Abstained",
@@ -246,6 +246,18 @@
       },
       "title": "Reasons",
       "type": "array"
+    },
+    "sector": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sector"
     },
     "target_weight": {
       "title": "Target Weight",

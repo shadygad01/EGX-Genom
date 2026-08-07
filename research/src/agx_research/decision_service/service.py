@@ -36,10 +36,14 @@ from pydantic import BaseModel, Field
 
 from agx_research.config import Horizon
 from agx_research.data.schemas import CorporateEvent
+from agx_research.data.snapshot import DatasetSnapshot
+from agx_research.decision_service.concentration import compute_concentration_caps
 from agx_research.decision_service.country_risk import CountryRiskAssessment, CountryRiskSeverity
+from agx_research.decision_service.macro_overlay import MacroDecisionOverlay
 from agx_research.decision_service.position import PositionState
 from agx_research.domain.provenance import Provenance, ProvenanceRef
-from agx_research.explainability import Explanation
+from agx_research.events.service import EventPlatform
+from agx_research.explainability import Explanation, find_similar_cases
 from agx_research.knowledge.lifecycle import KnowledgeStatus
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.meta.decision_engine import DecisionAction, HorizonDecision, PublicationStatus, Recommendation
@@ -78,6 +82,12 @@ class PositionAwareDecision(BaseModel):
     second time. `opportunity_score` is the pre-cap, pre-normalization
     score (0.0 when ineligible/abstained/not publication-ready), exactly
     the `score` this method already used to compute `target_weight`.
+
+    `sector` (AD-66) is whatever `sectors` mapping the caller supplied for
+    this ticker, or `None` if none was supplied or the ticker is
+    unclassified -- a passthrough, never independently looked up here, so
+    `capital_allocation.CapitalAllocationEngine` can display/group by it
+    without a second sector lookup.
     """
 
     ticker: str
@@ -90,6 +100,7 @@ class PositionAwareDecision(BaseModel):
     opportunity_score: float = 0.0
     expected_return: float | None = None
     expected_risk: float | None = None
+    sector: str | None = None
     investment_thesis: str
     key_risks: list[str] = Field(default_factory=list)
     contradicting_evidence: list[str] = Field(default_factory=list)
@@ -121,6 +132,10 @@ class DecisionService:
         illiquid_tickers: set[str] | None = None,
         corporate_events: dict[str, list[CorporateEvent]] | None = None,
         knowledge_store: KnowledgeStore | None = None,
+        snapshot: DatasetSnapshot | None = None,
+        sectors: dict[str, str] | None = None,
+        macro_overlay: MacroDecisionOverlay | None = None,
+        event_platform: EventPlatform | None = None,
     ) -> list[PositionAwareDecision]:
         """Evaluate every ticker with either a fresh recommendation or an
         existing position, together, since portfolio weights must be
@@ -135,6 +150,19 @@ class DecisionService:
         evidence references are currently `KnowledgeStatus.MONITORING`.
         Neither is fabricated if omitted -- the corresponding field is
         simply empty, an honest gap rather than an invented one.
+
+        Four more optional inputs (AD-66), each degrading the same honest
+        way when omitted -- the corresponding check simply does not run,
+        never fabricating a pass: `snapshot` (real adjusted price history)
+        and `sectors` feed `decision_service.concentration
+        .compute_concentration_caps()`'s sector/correlation-cluster hard
+        overrides; `macro_overlay` (`decision_service.macro_overlay
+        .assess_macro_overlay()`'s output) applies the same market-wide
+        exposure dampener `PortfolioConstructor.construct()` already
+        applies to the autonomous model portfolio, now also to this
+        position-aware path; `event_platform` populates
+        `Explanation.similar_historical_cases` from real prior events for
+        the same entity instead of leaving it permanently empty.
         """
         illiquid_tickers = illiquid_tickers or set()
         corporate_events = corporate_events or {}
@@ -154,13 +182,9 @@ class DecisionService:
         total_positive_score = sum(max(score, 0.0) for score, _, _ in scored.values())
 
         all_tickers = sorted(set(scored) | {t for t, p in positions.items() if p.held})
-        decisions: list[PositionAwareDecision] = []
-        for ticker in all_tickers:
-            score, decision, rec = scored.get(ticker, (0.0, None, None))
-            position = positions.get(ticker, PositionState(ticker=ticker, held=False))
-            reasons: list[str] = []
 
-            target_weight = (
+        base_targets = {
+            ticker: (
                 min(
                     max(score, 0.0) / total_positive_score,
                     self.max_position_weight,
@@ -169,6 +193,30 @@ class DecisionService:
                 if total_positive_score > 0 and score > 0
                 else 0.0
             )
+            for ticker, (score, decision, _rec) in (
+                (t, scored.get(t, (0.0, None, None))) for t in all_tickers
+            )
+        }
+        concentration_caps = compute_concentration_caps(base_targets, snapshot=snapshot, sectors=sectors)
+
+        decisions: list[PositionAwareDecision] = []
+        for ticker in all_tickers:
+            score, decision, rec = scored.get(ticker, (0.0, None, None))
+            position = positions.get(ticker, PositionState(ticker=ticker, held=False))
+            reasons: list[str] = []
+
+            target_weight, concentration_reasons = concentration_caps.get(ticker, (0.0, []))
+            reasons.extend(concentration_reasons)
+
+            if macro_overlay is not None and target_weight > _EPS:
+                dampened = target_weight * macro_overlay.exposure_multiplier
+                if dampened < target_weight - _EPS:
+                    reasons.append(
+                        f"Macro overlay ({macro_overlay.decision}): equity exposure capped at "
+                        f"{macro_overlay.exposure_multiplier:.0%} of score-derived weight; "
+                        f"{ticker} reduced to {dampened:.2%} instead of {target_weight:.2%}."
+                    )
+                target_weight = dampened
 
             if ticker in illiquid_tickers:
                 target_weight = 0.0
@@ -225,6 +273,7 @@ class DecisionService:
                     opportunity_score=max(score, 0.0),
                     expected_return=decision.expected_return if decision is not None else None,
                     expected_risk=decision.expected_risk if decision is not None else None,
+                    sector=sectors.get(ticker) if sectors else None,
                     investment_thesis=self._investment_thesis(
                         ticker, action, target_weight, position, decision
                     ),
@@ -236,7 +285,12 @@ class DecisionService:
                     abstained=abstained,
                     reasons=reasons,
                     explanation=self._explanation(
-                        ticker, action, target_weight, position, reasons, decision
+                        ticker, action, target_weight, position, reasons, decision,
+                        similar_historical_cases=(
+                            find_similar_cases(event_platform, ticker, before=as_of)
+                            if event_platform is not None
+                            else []
+                        ),
                     ),
                     provenance=Provenance(
                         produced_by="decision_service@1.0.0",
@@ -278,6 +332,7 @@ class DecisionService:
         position: PositionState,
         reasons: list[str],
         decision: HorizonDecision | None,
+        similar_historical_cases: list[str] | None = None,
     ) -> Explanation:
         supporting_evidence = list(reasons)
         if decision is not None:
@@ -300,7 +355,7 @@ class DecisionService:
             ),
             supporting_evidence=supporting_evidence,
             evidence_refs=list(decision.evidence_refs) if decision is not None else [],
-            similar_historical_cases=[],
+            similar_historical_cases=similar_historical_cases or [],
             invalidation_conditions=(
                 list(decision.invalidation_conditions) if decision is not None else []
             ),

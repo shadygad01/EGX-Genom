@@ -148,6 +148,7 @@ class CapitalAllocationEngine:
                 confidence=d.confidence,
                 expected_return=d.expected_return,
                 expected_risk=d.expected_risk,
+                sector=d.sector,
                 is_new_position=d.current_weight <= _EPS and d.target_weight > _EPS,
             )
             for i, d in enumerate(ordered, start=1)
@@ -250,10 +251,37 @@ class CapitalAllocationEngine:
             expected_contribution=expected_contribution,
             marginal_benefit=decision.opportunity_score,
             marginal_risk=decision.expected_risk,
+            confidence=decision.confidence,
+            sector=decision.sector,
             capital_sources=sources,
             required_action=required_action,
             opportunity_cost_note=opportunity_cost_note,
+            reasoning=CapitalAllocationEngine._reasoning(decision, rank, sources),
         )
+
+    @staticmethod
+    def _reasoning(
+        decision: PositionAwareDecision, rank: int, sources: list[CapitalSource]
+    ) -> list[str]:
+        """Full transparent explanation for one queue entry -- built only
+        from fields `DecisionService.decide_portfolio()` already computed
+        (expected return/risk/confidence, and any liquidity/country/
+        sector/correlation/macro override reason it recorded), never a
+        fresh scoring judgment made in this engine."""
+        parts = [
+            f"Rank {rank}: opportunity_score={decision.opportunity_score:.4f}, "
+            f"confidence={decision.confidence:.2f}.",
+        ]
+        if decision.expected_return is not None:
+            parts.append(f"Expected return: {decision.expected_return:+.2%}.")
+        if decision.expected_risk is not None:
+            parts.append(f"Expected risk: {decision.expected_risk:.2%}.")
+        if decision.sector is not None:
+            parts.append(f"Sector: {decision.sector}.")
+        parts.extend(decision.reasons)
+        if not sources and decision.target_weight - decision.current_weight > _EPS:
+            parts.append("No capital was drawn despite a positive target -- see reasons above.")
+        return parts
 
     @staticmethod
     def _releases(

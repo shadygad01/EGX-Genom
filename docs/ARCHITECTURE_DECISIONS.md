@@ -4,6 +4,97 @@ Compact ledger of load-bearing decisions and their reasoning. Full context
 for the early ones lives in `docs/ARCHITECTURE_AUDIT.md` (Epoch I) and
 `docs/EPOCH_II_DESIGN.md`; entries here are the ongoing record.
 
+## AD-66 — Sector concentration, return correlation, and the market-wide macro overlay become real, enforced inputs to `DecisionService.decide_portfolio()`, not just post-hoc validation or an autonomous-portfolio-only dampener
+
+**Decision.** Four additions close a real gap the Capital Allocation
+Intelligence mission's own research surfaced: `capital_allocation
+.CapitalAllocationEngine` ranked, funded, and recycled capital purely off
+`opportunity_score`, with sector exposure checked only *after the fact*
+(`investment_proof.portfolio_validation.PortfolioValidationEngine`, never
+consulted by the engine itself), correlation not computed anywhere in the
+position-aware path, and the market-wide macro exposure dampener
+(`decision_service.macro_overlay.assess_macro_overlay`) wired only into
+`PortfolioConstructor.construct()`'s autonomous, position-unaware model
+portfolio — never into `DecisionService.decide_portfolio()`, so every real
+`agx allocate-capital`/`POST /capital-allocation` call ran with no macro
+dampening at all. (1) New `decision_service.concentration
+.compute_concentration_caps()` adds two hard, pre-emptive overrides,
+applied in the same best-score-first order `CapitalAllocationEngine`
+already ranks by: a **sector cap** reusing `portfolio.concentration_limits
+.MAX_SECTOR_CONCENTRATION` (0.40) verbatim -- the exact number
+`PortfolioValidationEngine` already validated but never enforced -- and a
+new **correlation-cluster cap** (`CORRELATION_CONCENTRATION_THRESHOLD =
+0.70`, `MAX_CORRELATED_CLUSTER_WEIGHT = 0.40`, both declared, uncalibrated)
+using the already-existing `features.correlation
+.compute_pairwise_return_correlation()` (real, split/dividend-adjusted
+Pearson correlation -- never a fabricated covariance matrix; a full
+mean-variance optimizer stays explicitly out of scope per `portfolio
+/constructor.py`'s own docstring). Weight trimmed by either cap returns to
+cash, never redistributed to another ticker, matching Article VII's "no
+capital movement is fabricated" rule. (2) `HERFINDAHL_CONCENTRATED_THRESHOLD`
+and `MAX_SECTOR_CONCENTRATION` move to a new dependency-free leaf module,
+`portfolio.concentration_limits`, imported by both
+`investment_proof.portfolio_validation` and `decision_service.concentration`
+-- `portfolio_validation` already imports `decision_service.service
+.PositionAwareDecision`, so `decision_service.concentration` importing
+`portfolio_validation` back would have been circular; the shared constant
+now has exactly one source of truth reachable from both directions
+without that cycle. (3) `decide_portfolio()` gains four new optional
+kwargs -- `snapshot`, `sectors`, `macro_overlay`, `event_platform` -- each
+degrading the same honest way every other optional input in this service
+already does: omitted means the corresponding check simply does not run,
+never a fabricated pass. `macro_overlay.exposure_multiplier` now dampens
+the position-aware path exactly the way it already dampened the
+autonomous one. `event_platform` closes a real, previously-permanent gap:
+`Explanation.similar_historical_cases` was hardcoded `[]` in
+`DecisionService._explanation()` even though `explainability
+.find_similar_cases()` existed and was wired everywhere else; it is now
+populated from real prior `Event`s for the same entity when a platform is
+supplied. `cli.py`'s `build_position_aware_decisions()` (shared by `decide`
+and `allocate-capital`) now supplies all four real inputs it already had
+in scope (`snapshot`, a `sectors` map built from `CollectedSectorProvider`,
+`assess_macro_overlay(snapshot.macro_series, as_of)`, and
+`market_memory.event_platform`) rather than leaving them unset. (4)
+`PositionAwareDecision.sector` and `RankedOpportunity.sector` /
+`CapitalQueueEntry.sector`/`confidence`/`reasoning` are new passthrough
+fields -- `CapitalAllocationEngine` still never rescoring or reweighing
+anything `decide_portfolio()` computed (unchanged architectural
+invariant); `CapitalQueueEntry.reasoning` is assembled entirely from
+`PositionAwareDecision`'s own already-computed fields (expected
+return/risk/confidence/sector and the `reasons` list, which now includes
+any sector/correlation/macro override that applied) -- the platform's
+answer to "explain every recommendation with transparent reasoning and a
+confidence score," never a fresh judgment made in the allocation engine.
+
+**Rationale.** A project-owner mission asked for "a complete
+institutional-grade Capital Allocation Engine" determining allocation
+"based on expected return, conviction score, risk, correlation,
+liquidity, portfolio concentration limits, sector exposure, and available
+buying power," with "every recommendation" explained "with transparent
+reasoning and confidence scores." Direct research against this codebase
+found expected return, risk, liquidity, and buying power (idle-cash-first
+recycling) already real and correctly implemented, but sector/Herfindahl
+concentration real-and-declared-yet-never-enforced, correlation entirely
+absent, and the macro overlay real but scoped only to the autonomous
+model portfolio -- a genuine gap, not a fabricated one, and one this
+platform's own doctrine (`docs/PORTFOLIO_STANDARDS.md` §1-§2) already
+described as permanent law without the code actually blocking on it. The
+fix follows the same "declared -> enforced" trajectory `liquidity_floor.py`
+and `country_risk.py` already took for their own thresholds (both cited
+directly as the template in `concentration.py`'s own docstring), lives in
+`decision_service` rather than `capital_allocation` specifically *because*
+`capital_allocation/__init__.py`'s existing architectural rule forbids
+that package from rescoring/reweighing anything `decide_portfolio()`
+already computed -- a portfolio-level constraint like "cap this sector's
+cumulative weight" is a ranking/target-weight concern, not a capital-flow-
+bookkeeping one, and belongs upstream. `Article VIII`'s explicit rule that
+confidence is "not a portfolio-weight substitute" ruled out inventing a
+separate "conviction score" field distinct from the already-real
+`confidence`; the mission's ask is met instead by making `confidence` (and
+every other already-computed number) visibly, transparently part of every
+queue entry's `reasoning`, not by adding a second, ungrounded number next
+to it.
+
 ## AD-65 — Canonical publication is atomic, exclusive, and re-validated at the point of publish, not trusted from the caller
 
 **Decision.** AD-64 made every bundle carry a manifest and gated *commits*

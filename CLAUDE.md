@@ -345,7 +345,9 @@ Layout:
   ranking/opportunity-cost/recycling layer *on top of*
   `decision_service.DecisionService.decide_portfolio()`'s output — it
   never rescoring or reweighs anything `decide_portfolio()` already
-  computed, only attributes each unit of requested capital to a source
+  computed (including the sector/correlation concentration caps below,
+  AD-66 — those live in `decision_service`, never here), only attributes
+  each unit of requested capital to a source
   (idle cash, or a specific lower-ranked holding whose reduction/exit
   released it) and each unit of released capital to a destination (a
   specific higher-ranked demander, or back to cash). Idle cash is always
@@ -404,6 +406,27 @@ Layout:
   reused as-is by `meta.readiness.assess_decision_readiness`'s gate
   extension; do not build a second, parallel readiness/gate mechanism
   alongside the existing one.
+- `decision_service.concentration.compute_concentration_caps()` (AD-66)
+  adds two more hard, pre-emptive overrides inside `decide_portfolio()`,
+  walked best-opportunity-score-first: a sector cap (reusing
+  `portfolio.concentration_limits.MAX_SECTOR_CONCENTRATION = 0.40`, the
+  same constant `investment_proof.portfolio_validation
+  .PortfolioValidationEngine` already validated post-hoc — imported from
+  that shared, dependency-free module by both, never redeclared in
+  either, to avoid the circular import `portfolio_validation` importing
+  `decision_service.service.PositionAwareDecision` would otherwise cause)
+  and a correlation-cluster cap (real, adjusted-return Pearson
+  correlation via `features.correlation`, never a fabricated covariance
+  matrix). Weight either cap trims returns to cash, never to another
+  ticker. `decide_portfolio()` also now accepts `macro_overlay` (the same
+  `MacroDecisionOverlay` `PortfolioConstructor.construct()` already
+  applied, now dampening this position-aware path too) and
+  `event_platform` (populates `Explanation.similar_historical_cases` via
+  `explainability.find_similar_cases()`, previously always empty here) —
+  both optional, both degrading honestly (check skipped, never fabricated)
+  when omitted. `cli.py`'s shared `build_position_aware_decisions()`
+  supplies all of `snapshot`/`sectors`/`macro_overlay`/`event_platform`
+  for both `decide` and `allocate-capital`.
 - `data.snapshot.DatasetSnapshot.financial_statements` (populated only
   when `build_snapshot()` is given a `financials_provider`) is how
   `agents.financial_performance.FinancialPerformanceAgent` sees financial

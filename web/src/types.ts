@@ -1044,6 +1044,7 @@ export interface PositionAwareDecision {
   opportunity_score: number;
   expected_return: number | null;
   expected_risk: number | null;
+  sector: string | null;
   investment_thesis: string;
   key_risks: string[];
   contradicting_evidence: string[];
@@ -1145,6 +1146,7 @@ export interface RankedOpportunity {
   confidence: number;
   expected_return: number | null;
   expected_risk: number | null;
+  sector: string | null;
   is_new_position: boolean;
 }
 
@@ -1169,9 +1171,12 @@ export interface CapitalQueueEntry {
   expected_contribution: number | null;
   marginal_benefit: number;
   marginal_risk: number | null;
+  confidence: number;
+  sector: string | null;
   capital_sources: CapitalSource[];
   required_action: string;
   opportunity_cost_note: string;
+  reasoning: string[];
 }
 
 export interface CapitalRelease {

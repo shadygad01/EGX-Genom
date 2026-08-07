@@ -18,15 +18,12 @@ from datetime import date
 from pydantic import BaseModel, Field
 
 from agx_research.decision_service.service import PositionAwareDecision
+from agx_research.portfolio.concentration_limits import (
+    HERFINDAHL_CONCENTRATED_THRESHOLD,
+    MAX_SECTOR_CONCENTRATION,
+)
 from agx_research.portfolio.constructor import PortfolioPosition
 
-#: Declared, uncalibrated -- same posture as every other declared-not-
-#: measured constant in this codebase (docs/TECHNICAL_DEBT.md). No real
-#: multi-year EGX portfolio history exists yet to test whether these are
-#: the thresholds that actually separate healthy diversification from a
-#: real concentration risk.
-HERFINDAHL_CONCENTRATED_THRESHOLD = 0.25
-MAX_SECTOR_CONCENTRATION = 0.40
 WEIGHT_CONSISTENCY_TOLERANCE = 0.01
 
 

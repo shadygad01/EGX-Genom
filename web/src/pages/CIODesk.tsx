@@ -235,7 +235,10 @@ export function CIODesk() {
                   render: (row) => (
                     <div className={styles.tickerCell}>
                       <span className={`${styles.tickerCode} num`}>{row.ticker}</span>
-                      <span className={styles.tickerCompany}>{companyNames[row.ticker] ?? ""}</span>
+                      <span className={styles.tickerCompany}>
+                        {companyNames[row.ticker] ?? ""}
+                        {row.sector ? ` · ${row.sector}` : ""}
+                      </span>
                     </div>
                   ),
                 },
@@ -243,6 +246,11 @@ export function CIODesk() {
                   key: "decision",
                   header: tCommon("table.decision"),
                   render: (row) => <Badge variant={ACTION_VARIANT[row.action] ?? "default"}>{titleCase(row.action)}</Badge>,
+                },
+                {
+                  key: "confidence",
+                  header: t("capitalAllocation.queue.confidence"),
+                  render: (row) => <Meter value={row.confidence} label={formatPercent(row.confidence)} />,
                 },
                 {
                   key: "weight",
@@ -288,6 +296,20 @@ export function CIODesk() {
                   key: "opportunityCost",
                   header: t("capitalAllocation.queue.opportunityCost"),
                   render: (row) => <span className={styles.riskCell}>{row.opportunity_cost_note}</span>,
+                },
+                {
+                  key: "reasoning",
+                  header: t("capitalAllocation.queue.reasoning"),
+                  render: (row) =>
+                    row.reasoning.length === 0 ? (
+                      <span className={styles.riskCell}>—</span>
+                    ) : (
+                      <ul className={styles.reasonsList}>
+                        {row.reasoning.map((reason, i) => (
+                          <li key={i}>{reason}</li>
+                        ))}
+                      </ul>
+                    ),
                 },
               ]}
             />

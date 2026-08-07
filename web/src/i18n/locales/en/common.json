@@ -29,7 +29,7 @@
   "topbar": {
     "nominal": "Nominal",
     "degraded": "Degraded",
-    "lastCycle": "Last cycle {{time}}"
+    "dataAsOf": "Data as of {{time}}"
   },
   "language": {
     "toggleLabel": "Language",

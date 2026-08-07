@@ -29,7 +29,7 @@
   "topbar": {
     "nominal": "طبيعي",
     "degraded": "متدهور",
-    "lastCycle": "آخر دورة {{time}}"
+    "dataAsOf": "البيانات حتى {{time}}"
   },
   "language": {
     "toggleLabel": "اللغة",

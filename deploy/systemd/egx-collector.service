@@ -20,6 +20,20 @@ PrivateTmp=true
 ProtectSystem=full
 ProtectHome=read-only
 ReadWritePaths=/opt/egx-genom/research/data /opt/egx-genom/web/public/data
+# This box hosts other independent services -- this unit fires every
+# minute (see egx-collector.timer) and, unbounded, a single full-universe/
+# full-history collection run measured up to ~2.5GB peak RSS in this
+# repo's own profiling harness (scripts/profile_egx_collector_memory.py;
+# see the memory report this ships with). That harness's own fix
+# (research/src/agx_research/collectors/service.py's `_row_changed` guard)
+# already stops steady-state growth across repeated runs; this ceiling is
+# the remaining safety net for the standing cost of one large ingest (a
+# cold start, or a real Yahoo history deeper than this repo has verified)
+# so a worst-case run degrades this one Type=oneshot unit -- next
+# minute's timer simply retries -- instead of taking down every other
+# tenant on the host. MemoryHigh throttles before MemoryMax's hard kill.
+MemoryHigh=3G
+MemoryMax=4G
 
 [Install]
 WantedBy=multi-user.target

@@ -100,14 +100,25 @@ def real_universe_tickers() -> list[str]:
     return tickers
 
 
-def _deterministic_walk(ticker: str, salt: str, num_days: int, base: float) -> list[float]:
-    price = base
-    values = []
-    for i in range(num_days):
-        step = (hash((ticker, salt, i)) % 21 - 10) / 2000  # +/-0.5% deterministic daily drift
-        price *= 1 + step
-        values.append(round(price, 2))
-    return values
+def _close_for(ticker: str, day: date) -> float:
+    """Deterministic close, keyed by *calendar date* rather than a walk
+    index. Two real quote providers (Yahoo, StockAnalysis) report the same
+    close for the same historical trading day; keying off the date instead
+    of "the i-th element of this particular fetch's window" is what makes
+    that true here too -- Yahoo's `range=max` window and StockAnalysis's
+    shorter "recent overlap" window cover the same calendar dates
+    differently indexed, and re-fetching an unchanged date range must
+    reproduce the exact same byte output run over run (a walk that
+    multiplies cumulatively from each call's own start index would not
+    satisfy either property).
+    """
+    base = 20.0 + (hash(ticker) % 300)
+    offset = (hash((ticker, day.toordinal())) % 2001 - 1000) / 10000  # deterministic +/-10%
+    return round(base * (1 + offset), 2)
+
+
+def _volume_for(ticker: str, day: date) -> int:
+    return 50_000 + (hash((ticker, day.toordinal(), "vol")) % 950_000)
 
 
 def build_yahoo_payload(ticker: str, num_days: int, end: date) -> str:
@@ -123,12 +134,11 @@ def build_yahoo_payload(ticker: str, num_days: int, end: date) -> str:
     """
     dates = [end - timedelta(days=num_days - 1 - i) for i in range(num_days)]
     timestamps = [int(datetime(d.year, d.month, d.day, 12, tzinfo=UTC).timestamp()) for d in dates]
-    base = 20.0 + (hash(ticker) % 300)
-    closes = _deterministic_walk(ticker, "close", num_days, base)
+    closes = [_close_for(ticker, d) for d in dates]
     opens = [round(c * 0.995, 2) for c in closes]
     highs = [round(c * 1.012, 2) for c in closes]
     lows = [round(c * 0.988, 2) for c in closes]
-    volumes = [50_000 + (hash((ticker, i, "vol")) % 950_000) for i in range(num_days)]
+    volumes = [_volume_for(ticker, d) for d in dates]
     dividends = {
         str(timestamps[i]): {"amount": 1.0, "date": timestamps[i]}
         for i in range(0, num_days, 250)
@@ -181,13 +191,11 @@ def build_stockanalysis_payload(ticker: str, num_days: int, end: date, boilerpla
     reports the consequence explicitly rather than presenting a guess --
     pass `--sa-boilerplate-kb` to stress-test a specific assumption.
     """
-    price = 20.0 + (hash(ticker) % 300)
     rows = []
     for i in range(num_days):
         d = end - timedelta(days=num_days - 1 - i)
-        step = (hash((ticker, "sa", i)) % 21 - 10) / 2000
-        price *= 1 + step
-        vol = 50_000 + (hash((ticker, i, "savol")) % 950_000)
+        price = _close_for(ticker, d)
+        vol = _volume_for(ticker, d)
         rows.append(
             f'{{a:{price * 0.999:.2f},c:{price:.2f},h:{price * 1.012:.2f},'
             f'l:{price * 0.988:.2f},o:{price * 0.995:.2f},t:"{d.isoformat()}",'
@@ -359,14 +367,24 @@ def run_growth(args: argparse.Namespace) -> dict:
         )
 
         days: list[dict] = []
+        # `--static` fixes history_days and end date across every iteration,
+        # so every re-fetch returns byte-identical payloads -- the shape of
+        # `egx-collector.timer`'s real OnCalendar=*:* cadence (deploy/systemd/
+        # egx-collector.timer) between two calendar trading days, when
+        # nothing about the underlying prices has actually changed. Growth
+        # under `--static` isolates the "re-observed unchanged value" defect
+        # from ordinary new-data accumulation, which non-static already
+        # covers.
         for day_offset in range(args.days):
-            day_end = end + timedelta(days=day_offset)
+            day_end = end if args.static else end + timedelta(days=day_offset)
+            history_days = args.history_days if args.static else args.history_days + day_offset
             # A real `range=max` Yahoo fetch returns the full series again,
             # one trading day longer -- not just the new day's bar. This
-            # mirrors that shape exactly rather than only appending one row.
+            # mirrors that shape exactly rather than only appending one row
+            # (unless --static, which mirrors an intra-day re-poll instead).
             content = build_content_for_day(
                 symbols,
-                history_days=args.history_days + day_offset,
+                history_days=history_days,
                 sa_days=args.sa_days,
                 sa_boilerplate_kb=args.sa_boilerplate_kb,
                 end=day_end,
@@ -421,6 +439,13 @@ def main() -> None:
 
     growth = sub.add_parser("growth", parents=[common])
     growth.add_argument("--days", type=int, default=10)
+    growth.add_argument(
+        "--static",
+        action="store_true",
+        help="Re-fetch byte-identical payloads every iteration instead of "
+        "growing history_days -- models egx-collector.timer's *:* cadence "
+        "polling between two calendar trading days.",
+    )
 
     args = parser.parse_args()
     if args.scenario == "single":

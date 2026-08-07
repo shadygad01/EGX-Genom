@@ -135,6 +135,50 @@ def test_reingesting_same_price_data_is_idempotent_by_date(tmp_path):
     assert len(bars) == 1  # merged by date, not duplicated
 
 
+def test_reingesting_identical_price_data_does_not_regrow_provenance_index(tmp_path):
+    """A full-history source (e.g. Yahoo's `range=max` leg inside
+    `EgxCompositePriceCollector`) re-sends every historical bar on every
+    run, and `egx-collector.timer` fires every minute -- without this
+    unchanged-value guard, `ProvenanceIndexRepository` grew by one new
+    version per historical bar on every single run regardless of whether
+    anything actually changed (a real, measured unbounded-growth defect;
+    see `scripts/profile_egx_collector_memory.py`'s `growth --static`
+    scenario)."""
+    from agx_research.collectors.provenance_index import ProvenanceIndexRepository
+
+    provenance_index = ProvenanceIndexRepository()
+    service = CollectionService(tmp_path, provenance_index=provenance_index, min_confidence=0.5)
+    collector = StubCollector(make_spec(), {"https://x/1": good_batch()})
+    service.run(collector, expected_records=1)
+    service.run(collector, expected_records=1)  # re-collect byte-identical data
+
+    record = provenance_index.trace("price", "COMI", date(2026, 6, 1))
+    assert record.version == 1  # unchanged value, never re-traced
+    assert len(provenance_index.history(record.id)) == 1
+
+
+def test_reingesting_changed_price_data_is_still_traced(tmp_path):
+    """The guard above must only suppress *identical* re-materialization --
+    a genuinely corrected/changed value must still get a new provenance
+    version, same as before this change."""
+    from agx_research.collectors.provenance_index import ProvenanceIndexRepository
+
+    provenance_index = ProvenanceIndexRepository()
+    service = CollectionService(tmp_path, provenance_index=provenance_index, min_confidence=0.5)
+    collector = StubCollector(make_spec(), {"https://x/1": good_batch()})
+    service.run(collector, expected_records=1)
+
+    corrected = StubCollector(make_spec(), {"https://x/1": good_batch(
+        price_bars=[
+            PriceBar(ticker="COMI", trade_date=date(2026, 6, 1), open=10, high=11, low=9, close=11.0, volume=100)
+        ],
+    )})
+    service.run(corrected, expected_records=1)
+
+    record = provenance_index.trace("price", "COMI", date(2026, 6, 1))
+    assert record.version == 2  # close actually changed (10.5 -> 11.0)
+
+
 def test_macro_observations_materialized_to_series_csv(tmp_path):
     service = CollectionService(tmp_path, min_confidence=0.5)
     batch = good_batch(

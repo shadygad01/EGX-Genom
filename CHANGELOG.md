@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased — EGX collector memory profiling: found and fixed unbounded provenance growth
+
+Instrumented `EgxCompositePriceCollector`/`CollectionService` with a
+non-invasive tracemalloc/RSS profiling harness
+(`research/scripts/profile_egx_collector_memory.py`, no network calls, no
+edits to collector/service source) to identify top memory consumers,
+peak allocations, and whether the collector leaks or merely batches.
+Full report: `docs/EGX_COLLECTOR_MEMORY_REPORT.md`.
+
+Finding: not primarily in-memory batching (a single cold-start run's peak
+is real but one-shot and expected of a full-history first ingest) — the
+dominant cost is a genuine unbounded-growth defect, corroborating and
+correcting TD-63's root-cause diagnosis. `CollectionService`'s six
+`_write_*` materialization functions traced every parsed record as
+newly-written on *every* run, not just changed ones; a full-history
+source (Yahoo's `range=max` leg) re-sends its entire history on every
+fetch, so every historical bar was re-traced as a new
+`ProvenanceIndexRepository` version on every single run regardless of
+whether the value changed. `RawDocumentRepository.record_step()` had the
+same defect one level up. At `deploy/systemd/egx-collector.timer`'s
+every-minute cadence, this made steady-state memory/disk grow without
+bound purely from run *count*. Fixed with an unchanged-value guard in
+both places; verified empirically (`growth --static` scenario: identical
+re-fetches went from unbounded linear growth to a flat plateau after the
+first run) and with the full test suite (1041 passed, plus new
+regression tests locking in both the dedup and the "still traces a
+genuine change" cases).
+
+Also added `MemoryHigh`/`MemoryMax` cgroup ceilings to
+`deploy/systemd/egx-api.service`/`egx-collector.service` (sized from this
+mission's own measured peaks) so a worst-case run or request pattern
+degrades one unit instead of starving the other independent services this
+VPS hosts.
+
 ## Unreleased — Automatic VPS deployment: pull-based, no credentials
 
 Superseded this mission's first attempt (a GitHub-Actions-SSHes-into-the-VPS

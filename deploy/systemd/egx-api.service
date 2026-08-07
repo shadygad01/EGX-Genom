@@ -38,6 +38,17 @@ PrivateTmp=true
 ProtectSystem=full
 ProtectHome=read-only
 ReadWritePaths=/opt/egx-genom/research/data
+# This box hosts other independent services -- an unbounded Node process
+# must never be able to starve them. 768M/512M is a generous starting
+# ceiling for a Fastify service that only reads modest per-route JSON
+# artifacts (see api/src/artifactsStore.ts, api/src/knowledgeStore.ts);
+# it has not been load-tested, so treat it as a safety net against a
+# runaway request pattern, not a precisely measured floor -- tighten it
+# once real production RSS under load is known. MemoryHigh throttles
+# (cgroup memory pressure/reclaim) before MemoryMax's hard OOM-kill, so a
+# brief spike degrades gracefully instead of killing the service outright.
+MemoryHigh=512M
+MemoryMax=768M
 
 [Install]
 WantedBy=multi-user.target

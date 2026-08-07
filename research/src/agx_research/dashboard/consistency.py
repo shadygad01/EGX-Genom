@@ -8,12 +8,28 @@ third, distinct one: do the artifacts *agree with each other* about which
 execution produced them -- the same `as_of`, the same pipeline mode, a
 generation timestamp within the same run -- rather than some file being a
 stale leftover a partial/failed run never overwrote.
+
+`source_data_as_of` vs. `execution_report.json`'s `run_dates` is checked
+as a one-sided bound (`source_data_as_of` may never be *later* than the
+run's own requested range), not exact membership -- a real production
+incident (2026-08-07, a run requested for a Friday, an EGX non-trading
+day) proved exact membership was wrong: `production.pipeline
+.ProductionPipeline._latest_successful_as_of()` deliberately falls back
+to the newest *successful trading* run when the requested date is a
+weekend/holiday, so `source_data_as_of` legitimately lags `run_dates` on
+those days -- an honest data lag, not a staleness bug, and rejecting it
+made every weekend/holiday rebuild fail publication outright. What this
+check still catches -- `git_commit`/`workflow_run_id` equality and the
+`generated_at`/`completed_at` skew bound, both still exact -- already
+proves the bundle came from this one execution; the individual-artifact
+`as_of` cross-checks below still catch every artifact disagreeing with
+`source_data_as_of` regardless of this change.
 """
 
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from agx_research.dashboard.manifest import ArtifactPublicationManifest
@@ -66,11 +82,27 @@ def validate_bundle_consistency(bundle_dir: Path) -> list[str]:
 
         if manifest.source_data_as_of is not None:
             run_dates = execution_report.get("run_dates", [])
-            if manifest.source_data_as_of.isoformat() not in run_dates:
-                problems.append(
-                    f"manifest.json source_data_as_of={manifest.source_data_as_of.isoformat()!r} "
-                    f"is not among execution_report.json run_dates={run_dates!r}"
-                )
+            if run_dates:
+                # `run_dates` is the raw calendar range run() was invoked
+                # for, unaware of `_latest_successful_as_of()`'s deliberate
+                # fallback to the newest *successful trading* run when the
+                # requested date is itself a weekend/holiday (see that
+                # method's own docstring: "Pages can be rebuilt on any
+                # calendar day, for example after a UI push on Friday").
+                # On EGX's real Friday/Saturday non-trading days this
+                # correctly makes source_data_as_of an earlier date than
+                # any entry in run_dates -- an honest data lag, not a
+                # staleness bug -- so exact membership would reject every
+                # legitimate weekend/holiday rebuild. What this check must
+                # still catch is source_data_as_of being *later* than the
+                # run was even asked to cover, which is never legitimate.
+                latest_requested = max(date.fromisoformat(d) for d in run_dates)
+                if manifest.source_data_as_of > latest_requested:
+                    problems.append(
+                        f"manifest.json source_data_as_of={manifest.source_data_as_of.isoformat()!r} "
+                        f"is later than every date execution_report.json run_dates={run_dates!r} "
+                        "covers -- published data cannot be newer than what this run was asked to produce."
+                    )
 
         completed_at_raw = execution_report.get("completed_at")
         if completed_at_raw:

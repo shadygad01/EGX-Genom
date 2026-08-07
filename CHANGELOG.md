@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased — Fix a real Market Regime bug: mismatched ticker histories inflated the trading-day window and the reported return
+
+Reported by the project owner from the live site: CIO Desk's Market
+Regime card showed "+30.47% (33d)" against a declared 20-trading-day
+(`REGIME_LOOKBACK_DAYS`) window -- 33 > 20 should never happen.
+`market_memory.regime.compute_market_regime()` sliced each ticker's own
+trailing `lookback_days` dated returns *independently*, then unioned
+those per-ticker slices by date. A ticker whose own history is shorter or
+gapped (a real, common case -- different sources implemented on
+different dates, a real collection gap, a later IPO) has its own last-N
+dates that may not overlap at all with a fully-covered ticker's; the
+union of two non-overlapping 20-day slices reported as an inflated,
+fabricated multi-week trend instead of a real 20-trading-day one.
+Fixed by computing one shared trailing window (from the union of *all*
+tickers' observed dates, sliced once) and only including a ticker's
+per-date return when its date falls inside that shared window --
+`trading_days_observed` can now never exceed `lookback_days`. Reproduced
+directly (two tickers with non-overlapping trailing-20 date ranges) both
+as a standalone repro script and as a new regression test before the fix
+(33-40 days observed, inflated return), confirmed fixed after (capped at
+20 days, real return). `market_memory.breadth.compute_market_breadth()`
+checked and confirmed *not* affected -- it only compares each ticker's
+volume against its own trailing average, never aggregates by date across
+tickers. Full suite (1063), ruff check pass.
+
 ## Unreleased — TopBar status label: "Data as of" instead of "Last cycle"
 
 Found while verifying the AD-67 fix live: on 2026-08-07 (a Friday, EGX

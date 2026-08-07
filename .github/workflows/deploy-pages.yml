@@ -10,12 +10,22 @@ on:
       - "package-lock.json"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
-  # Free daily refresh (no deployment target/scheduler required -- GitHub
-  # Actions cron is free for a public repo): 15:30 UTC is after EGX's
-  # Sun-Thu close (Africa/Cairo, UTC+2/+3) so each day's run picks up that
-  # session's close before the next one opens, without waiting on a push.
+  # Free twice-daily refresh (no deployment target/scheduler required --
+  # GitHub Actions cron is free for a public repo), matching the
+  # self-hosted VPS collector's own 07:00/16:00 Africa/Cairo cadence
+  # (deploy/systemd/egx-collector.timer): 05:00 and 14:00 UTC are
+  # 07:00/16:00 Egypt Standard Time (UTC+2). GitHub Actions' schedule
+  # trigger is strictly UTC with no timezone/DST support (unlike the VPS
+  # timer, which resolves the real Africa/Cairo zoneinfo) -- during
+  # Egypt's DST window (EEST, UTC+3, roughly late April-late October)
+  # these two runs land at 08:00/17:00 local instead of 07:00/16:00 one
+  # hour later, a known, declared imprecision, not a fabricated
+  # guarantee of exact local time. 14:00 UTC (16:00/17:00 local) is still
+  # after EGX's Sun-Thu close either way, so each day's afternoon run
+  # still picks up that session's close.
   schedule:
-    - cron: "30 15 * * 0-4"
+    - cron: "0 5 * * 0-4"
+    - cron: "0 14 * * 0-4"
 
 permissions:
   contents: write

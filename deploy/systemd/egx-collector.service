@@ -20,16 +20,17 @@ PrivateTmp=true
 ProtectSystem=full
 ProtectHome=read-only
 ReadWritePaths=/opt/egx-genom/research/data /opt/egx-genom/web/public/data
-# This box hosts other independent services, and this unit fires every
-# minute (see egx-collector.timer) -- coexistence, not accommodating this
-# unit's own worst case, is the policy these limits enforce. Sized from
-# this repo's own measured *steady-state* production usage (docs/
-# EGX_COLLECTOR_MEMORY_REPORT.md §5.1, commit ee32e1f vs. c345691's fix
-# for `_row_changed`/`record_step`'s growth guard): 101 tickers x 5
-# repeated runs against an accumulating store plateaus at 320-344MB RSS
-# from the second run onward (this is what >99% of this unit's firings
-# actually are -- egx-collector.timer's *:* cadence means most runs see no
-# new trading data at all). MemoryHigh=512M is ~1.5x that measured peak,
+# This box hosts other independent services, and this unit fires twice a
+# day, 07:00/16:00 Africa/Cairo (see egx-collector.timer; previously every
+# minute -- these limits were sized under that earlier every-minute
+# cadence and are kept as a safe, if now more conservative, ceiling
+# rather than re-profiled for the lower frequency) -- coexistence, not
+# accommodating this unit's own worst case, is the policy these limits
+# enforce. Sized from this repo's own measured *steady-state* production
+# usage (docs/EGX_COLLECTOR_MEMORY_REPORT.md §5.1, commit ee32e1f vs.
+# c345691's fix for `_row_changed`/`record_step`'s growth guard): 101
+# tickers x 5 repeated runs against an accumulating store plateaus at
+# 320-344MB RSS from the second run onward. MemoryHigh=512M is ~1.5x that measured peak,
 # comfortable headroom for ordinary run-to-run variance (a genuine new
 # trading day, a heavier corporate-actions day) without ever throttling
 # steady-state operation; MemoryMax=768M is ~2.2x the measured peak, giving

@@ -378,6 +378,23 @@ def _run_research_command(args: argparse.Namespace) -> int:
         _print_json([profile.model_dump(mode="json") for profile in profiles])
         return 0
 
+    if args.research_command == "cost-sensitivity":
+        from agx_research.patterns.transaction_costs import analyze_transaction_cost_sensitivity
+
+        panel = _panel(args.as_of, args.tickers, args.source)
+        registry = PatternRegistry(patterns_dir / "registry.json")
+        if args.pattern_id:
+            pattern = registry.latest(args.pattern_id)
+            patterns = [pattern] if pattern else []
+        else:
+            patterns = [
+                *registry.by_status(PatternStatus.VALIDATED),
+                *registry.by_status(PatternStatus.ACTIVE),
+            ]
+        results = [analyze_transaction_cost_sensitivity(p, panel) for p in patterns]
+        _print_json([r.model_dump(mode="json") for r in results])
+        return 0
+
     if args.research_command == "evaluate":
         panel = _panel(args.as_of, args.tickers, args.source)
         outcome_repository = OutcomeRepository(patterns_dir / "outcomes.json")
@@ -793,6 +810,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     _add_research_args(failure_profile_parser)
     failure_profile_parser.add_argument(
+        "--pattern-id", default=None, help="Analyze only this pattern id (default: every VALIDATED/ACTIVE pattern)"
+    )
+
+    cost_sensitivity_parser = research_sub.add_parser(
+        "cost-sensitivity",
+        help="Mission Phase 15: for every VALIDATED/ACTIVE pattern (or one given by --pattern-id), "
+        "reports gross vs net expectancy across a declared round-trip transaction-cost grid "
+        "(0/5/10/20/50/100 bps) and the exact breakeven cost -- the single-cost-level "
+        "robustness.py gate this reuses (DEFAULT_TRANSACTION_COST_BPS=20) stays unchanged; this "
+        "only reports the fuller picture.",
+    )
+    _add_research_args(cost_sensitivity_parser)
+    cost_sensitivity_parser.add_argument(
         "--pattern-id", default=None, help="Analyze only this pattern id (default: every VALIDATED/ACTIVE pattern)"
     )
 

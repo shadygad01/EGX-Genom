@@ -361,6 +361,23 @@ def _run_research_command(args: argparse.Namespace) -> int:
         _print_json(report.model_dump(mode="json"))
         return 0
 
+    if args.research_command == "failure-profile":
+        from agx_research.patterns.regimes import analyze_pattern_failure_conditions
+
+        panel = _panel(args.as_of, args.tickers, args.source)
+        registry = PatternRegistry(patterns_dir / "registry.json")
+        if args.pattern_id:
+            pattern = registry.latest(args.pattern_id)
+            patterns = [pattern] if pattern else []
+        else:
+            patterns = [
+                *registry.by_status(PatternStatus.VALIDATED),
+                *registry.by_status(PatternStatus.ACTIVE),
+            ]
+        profiles = [analyze_pattern_failure_conditions(p, panel) for p in patterns]
+        _print_json([profile.model_dump(mode="json") for profile in profiles])
+        return 0
+
     if args.research_command == "evaluate":
         panel = _panel(args.as_of, args.tickers, args.source)
         outcome_repository = OutcomeRepository(patterns_dir / "outcomes.json")
@@ -763,6 +780,20 @@ def main(argv: list[str] | None = None) -> int:
     control_suite_parser.add_argument(
         "--negative-seeds", type=lambda s: [int(x) for x in s.split(",")], default=[1, 2],
         help="Comma-separated seeds for negative controls (default: 1,2)",
+    )
+
+    failure_profile_parser = research_sub.add_parser(
+        "failure-profile",
+        help="Mission Phases 11+13: for every VALIDATED/ACTIVE pattern (or one given by "
+        "--pattern-id), classifies its own matched outcomes by real market regime (volatility/"
+        "breadth/dispersion/trend/correlation/turnover, each re-checked at bucket counts 2/3/4 "
+        "for sensitivity) and tags it unconditional/regime_specific/sensitive/unstable/"
+        "insufficient_data -- a post-hoc read of an already-VALIDATED pattern's own full history, "
+        "not a new discovery decision.",
+    )
+    _add_research_args(failure_profile_parser)
+    failure_profile_parser.add_argument(
+        "--pattern-id", default=None, help="Analyze only this pattern id (default: every VALIDATED/ACTIVE pattern)"
     )
 
     args = parser.parse_args(argv)

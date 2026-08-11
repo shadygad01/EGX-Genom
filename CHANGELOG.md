@@ -1,5 +1,36 @@
 # Changelog
 
+## Unreleased — Add the EGX30 Autonomous Pattern Discovery Engine
+
+New `research/src/agx_research/patterns/` package (16 modules, 3,411
+lines; 86 new tests, 1,468 lines): a point-in-time canonical research
+panel, a programmatic Feature Factory (price/volume/cross-sectional/
+fundamental/macro transforms), a Target Factory (forward returns/MFE/
+MAE/drawdown/probability/relative-outcome targets), a controlled
+candidate generator, discovery statistics, this codebase's first purged/
+embargoed walk-forward out-of-sample validator, Benjamini-Hochberg
+multiple-testing control with a persisted testing ledger, robustness
+testing, a versioned `Pattern` lifecycle registry, live pattern
+activation, outcome tracking, and pattern decay monitoring. New `agx
+research {audit-data,build-features,discover,validate,patterns,active,
+evaluate}` CLI subcommand group. Deliberately separate from `agents.
+historical_patterns.HistoricalPatternsAgent`.
+
+Run against this repository's actual data, the engine discovers and
+validates **zero patterns** — the only real EGX price data here is a
+10-trading-day, 2-ticker synthetic fixture, and outbound network access
+to the real price-vendor collector (`egx_price_composite`) is denied by
+this environment's policy. `test_pattern_engine.py`'s positive-control
+test proves this is a real, falsifiable result (the engine does validate
+a planted relationship in synthetic data with real depth), not an
+engine that trivially always reports zero. A secondary finding —
+Benjamini-Hochberg FDR control weakening against correlated engineered
+features on short synthetic samples — is documented, partially
+addressed (match-set redundancy pruning, tightened defaults), and left
+as TD-70/71 for when real data depth exists. See `docs/
+PATTERN_DISCOVERY_DATA_AUDIT.md` and `docs/PATTERN_DISCOVERY_REPORT.md`.
+Full suite: 1149 tests pass (up from 1063), zero regressions.
+
 ## Unreleased — Fix a real Market Regime bug: mismatched ticker histories inflated the trading-day window and the reported return
 
 Reported by the project owner from the live site: CIO Desk's Market

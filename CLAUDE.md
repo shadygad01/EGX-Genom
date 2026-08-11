@@ -141,7 +141,16 @@ Layout:
   portfolio state, deliberately distinct from `meta.decision_ledger`
   (why decisions were made) and `investment_cases`/`investment_proof`
   (reasoning/validation): the Shadow Fund owns portfolio state, nothing
-  else does. See the `shadow_fund/` working-conventions bullet below).
+  else does. See the `shadow_fund/` working-conventions bullet below);
+  the EGX30 Autonomous Pattern Discovery Engine mission (2026-08-11) adds
+  `patterns/` — a systematic, multi-feature/cross-sectional/regime-
+  conditioned pattern search with purged walk-forward validation and its
+  own lifecycle registry, deliberately separate from `agents.
+  historical_patterns.HistoricalPatternsAgent` (single-ticker nearest-
+  neighbor analog matching feeding one `ResearchFinding` into the normal
+  hypothesis pipeline). See the `patterns/` working-conventions bullet
+  below, `docs/PATTERN_DISCOVERY_DATA_AUDIT.md`, and `docs/
+  PATTERN_DISCOVERY_REPORT.md`.
 - `api/` — TypeScript (Fastify) service exposing the knowledge base and
   dashboard artifacts over HTTP; almost every route only reads a
   pre-produced JSON artifact. The one exception is `POST /decisions`
@@ -442,6 +451,49 @@ Layout:
   bespoke shape) plus a matching route in `api/src/routes/dashboard.ts` —
   never a one-off fetch wired straight into a component. See
   `docs/ARCHITECTURE.md`'s "Dashboard data providers" section.
+- `patterns/` (`panel.py`, `features.py`, `targets.py`, `candidates.py`,
+  `evaluation.py`, `validation.py`, `multiple_testing.py`, `robustness.py`,
+  `registry.py`, `live.py`, `outcomes.py`, `decay.py`, `baselines.py`,
+  `engine.py`) is the EGX30 Autonomous Pattern Discovery Engine. Every
+  feature/target read must go through `FeatureSeries.as_of_value(t)` /
+  `TargetSeries.value_at(t)` — never index a `.values` list directly by
+  position from outside those classes, or the point-in-time guarantee
+  those methods enforce (never read a date after `t`) is bypassed.
+  `panel.build_research_panel()` is a thin materialization over
+  `market_memory.MarketMemory.reconstruct()`, following that module's own
+  "backtesting must never touch a `DataProvider` directly" rule — do not
+  add a path that builds a `ResearchPanel` from a live provider or raw
+  CSV directly. `engine.PatternDiscoveryEngine.discover()` (candidate
+  generation → discovery-sample screening → Benjamini-Hochberg FDR
+  control, persisting `DISCOVERED` patterns) and `.validate()` (purged
+  walk-forward OOS validation → robustness testing → baseline comparison,
+  transitioning to `VALIDATED`/`REJECTED`) are deliberately two separate
+  phases/CLI verbs, matching `registry.PatternStatus`'s lifecycle — do
+  not collapse them back into one call. A candidate that never clears the
+  discovery floor or FDR control is not persisted at all (cataloging
+  every one of possibly thousands of raw candidates would make the
+  registry's "never silently disappear" guarantee — which is about a
+  `DISCOVERED`/`VALIDATED`/`REJECTED` pattern worth remembering — into
+  noise instead); once a pattern reaches `DISCOVERED`, it is never
+  deleted, only transitioned (`PatternRegistry.transition()`), including
+  a `REJECTED` verdict from `validate()`. `validation.py`'s
+  `purge_and_embargo()` is this codebase's only purged/embargoed
+  walk-forward implementation — reuse it rather than adding a second one
+  if another package ever needs the same discipline.
+  `candidates.CandidateGeneratorConfig.match_overlap_prune_threshold`
+  (Jaccard similarity of matched trigger-date sets) exists because
+  feature-level correlation pruning alone was empirically shown
+  insufficient against Benjamini-Hochberg's independence assumption
+  breaking down over correlated engineered features (see
+  `docs/PATTERN_DISCOVERY_REPORT.md`'s findings section) — do not remove
+  it as redundant with `correlation_prune_threshold` without re-reading
+  that finding. `live.LiveActivationEngine` output is never a BUY/SELL
+  label (`PatternActivation.label` is always `"ACTIVE_PATTERN"`) —
+  preserve that vocabulary boundary in any consumer. This package ran
+  against this repository's actual data and correctly discovered/
+  validated zero patterns (`docs/PATTERN_DISCOVERY_REPORT.md`) — that is
+  not a bug to "fix" by loosening thresholds; real EGX price history
+  (TD-71) is what's missing, not a more permissive engine.
 
 ## What NOT to do
 

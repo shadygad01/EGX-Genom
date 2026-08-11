@@ -63,12 +63,14 @@ from agx_research.meta.decision_quality import apply_decision_quality_gate
 from agx_research.meta.publication_gate import LegalPublicationApproval
 from agx_research.meta.system_maturity import SystemMaturityReport, compute_system_maturity
 from agx_research.meta.recommendation_service import RecommendationService
+from agx_research.patterns.registry import PatternStatus
 from agx_research.production import ExecutionMode, ProductionPipeline, StageStatus
 from agx_research.runtime.engine import RunRecordRepository
 from agx_research.sources.catalog import seed_registry
 from agx_research.sources.registry import SourceRegistry
 from agx_research.universe.bootstrap import materialize_universe_seed
 from agx_research.universe.collected import CollectedUniverseProvider
+from agx_research.universe.provider import MappingUniverseProvider
 from agx_research.universe.sector import CollectedSectorProvider, StaticSectorProvider
 
 _DEFAULT_MOCK_DATA = Path(__file__).resolve().parents[2] / "data" / "mock"
@@ -186,6 +188,250 @@ def build_position_aware_decisions(
         macro_overlay=macro_overlay,
         event_platform=market_memory.event_platform,
     )
+
+
+def _build_pattern_market_memory(
+    data_dir: Path, mock_data: Path, *, source: str, tickers: list[str] | None
+) -> MarketMemory:
+    """Shared setup for every `agx research ...` subcommand. `tickers`, when
+    given, resolves the universe via `MappingUniverseProvider` instead of
+    the real, point-in-time `CollectedUniverseProvider` -- needed for any
+    `--as-of` before this repository's one dated EGX30/EGX70 snapshot (see
+    `docs/PATTERN_DISCOVERY_DATA_AUDIT.md`'s universe-snapshot limitation),
+    and the only way to exercise the mock fixture's June-2026 price window
+    at all today.
+    """
+    provider = MockDataProvider(mock_data) if source == "mock" else LocalCsvDataProvider(data_dir)
+    universe_provider = (
+        MappingUniverseProvider({ticker: ticker for ticker in tickers})
+        if tickers
+        else CollectedUniverseProvider(data_dir)
+    )
+    return MarketMemory(
+        provider,
+        universe_provider,
+        CollectedSectorProvider(data_dir),
+        macro_series_ids=MACRO_SERIES_IDS,
+        macro_series_sources={"BRENT_USD": "fred", "EGP_USD": "fred"},
+        lookback_days=30,
+        macro_lookback_days=3650,
+        pattern_lookback_days=3650,
+        event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
+        financials_provider=CollectedFinancialStatementProvider(data_dir),
+    )
+
+
+_COMMUNITY_PRICE_SEED_DIR = Path(__file__).resolve().parents[2] / "data" / "community_prices_seed"
+_REAL_MACRO_SEED_DIR = Path(__file__).resolve().parents[2] / "data" / "macro"
+
+
+def _materialize_real_macro_seed(data_dir: Path) -> None:
+    """Copies the real, committed FRED macro CSVs (`research/data/macro/`,
+    collected in a prior session with network egress this one lacks) into
+    `--data-dir/macro/` -- the same "committed snapshot materialized into
+    the runtime data dir" posture `materialize_universe_seed()` and
+    `materialize_community_price_seed()` already use. Static source data,
+    always safe to overwrite the target copy."""
+    if not _REAL_MACRO_SEED_DIR.is_dir():
+        return
+    target = data_dir / "macro"
+    target.mkdir(parents=True, exist_ok=True)
+    for seed_path in _REAL_MACRO_SEED_DIR.glob("*.csv"):
+        (target / seed_path.name).write_text(seed_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+
+def _dataset_version_for_source(source: str) -> str | None:
+    """The community price seed's own `source_commit` (mission Phase 19
+    reproducibility) when `--source collected` is in use; honestly `None`
+    for `mock` (no external dataset) or if the provenance file is
+    missing/unreadable -- never guessed."""
+    if source != "collected":
+        return None
+    provenance_path = _COMMUNITY_PRICE_SEED_DIR / "PROVENANCE.json"
+    if not provenance_path.is_file():
+        return None
+    try:
+        return json.loads(provenance_path.read_text(encoding="utf-8")).get("source_commit")
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _run_research_command(args: argparse.Namespace) -> int:
+    from agx_research.patterns.candidates import CandidateGeneratorConfig
+    from agx_research.patterns.community_price_seed import materialize_community_price_seed
+    from agx_research.patterns.engine import PatternDiscoveryEngine, PatternDiscoveryEngineConfig
+    from agx_research.patterns.features import FeatureFactory
+    from agx_research.patterns.multiple_testing import TestingLedgerRepository
+    from agx_research.patterns.outcomes import OutcomeRepository
+    from agx_research.patterns.panel import build_research_panel
+    from agx_research.patterns.registry import PatternRegistry
+
+    patterns_dir = args.data_dir / "patterns"
+    if getattr(args, "source", None) == "collected" and _COMMUNITY_PRICE_SEED_DIR.is_dir():
+        args.data_dir.mkdir(parents=True, exist_ok=True)
+        materialize_community_price_seed(_COMMUNITY_PRICE_SEED_DIR, args.data_dir)
+        _materialize_real_macro_seed(args.data_dir)
+
+    def _panel(as_of_arg: str, tickers_arg: str | None, source: str):
+        as_of = date.fromisoformat(as_of_arg)
+        tickers = tickers_arg.split(",") if tickers_arg else None
+        memory = _build_pattern_market_memory(args.data_dir, args.mock_data, source=source, tickers=tickers)
+        return build_research_panel(memory, as_of=as_of, tickers=tickers)
+
+    def _engine(config=None) -> "PatternDiscoveryEngine":
+        return PatternDiscoveryEngine(
+            pattern_registry=PatternRegistry(patterns_dir / "registry.json"),
+            testing_ledger_repository=TestingLedgerRepository(patterns_dir / "testing_ledger.json"),
+            config=config,
+        )
+
+    if args.research_command == "audit-data":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        _print_json(
+            {
+                "as_of": panel.as_of.isoformat(),
+                "source": args.source,
+                "universe_limitation_note": panel.universe_limitation_note,
+                "tickers": {
+                    ticker: {
+                        "observations": len(series.dates),
+                        "first_date": series.dates[0].isoformat() if series.dates else None,
+                        "last_date": series.dates[-1].isoformat() if series.dates else None,
+                        "sector": series.sector,
+                    }
+                    for ticker, series in panel.series.items()
+                },
+                "macro_series_observations": {sid: len(obs) for sid, obs in panel.macro_series.items()},
+                "financial_statement_tickers_with_data": [
+                    ticker for ticker, items in panel.financial_statements.items() if items
+                ],
+            }
+        )
+        return 0
+
+    if args.research_command == "build-features":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        features = FeatureFactory(panel).build_all()
+        by_category: dict[str, int] = {}
+        for feature in features:
+            by_category[feature.spec.category.value] = by_category.get(feature.spec.category.value, 0) + 1
+        feature_rows = [
+            {"id": feature.id, "category": feature.spec.category.value, "non_null_count": feature.non_null_count()}
+            for feature in features
+        ]
+        if args.out is not None:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(
+                json.dumps([f.model_dump(mode="json") for f in features], indent=2), encoding="utf-8"
+            )
+        _print_json(
+            {
+                "as_of": panel.as_of.isoformat(),
+                "total_features": len(features),
+                "by_category": by_category,
+                "features": feature_rows,
+            }
+        )
+        return 0
+
+    if args.research_command == "discover":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        candidate_config = CandidateGeneratorConfig()
+        if args.min_sample_size is not None:
+            candidate_config = candidate_config.model_copy(update={"min_sample_size": args.min_sample_size})
+        engine_config = PatternDiscoveryEngineConfig(candidate_config=candidate_config)
+        if args.fdr_alpha is not None:
+            engine_config = engine_config.model_copy(update={"fdr_alpha": args.fdr_alpha})
+        report = _engine(engine_config).discover(
+            panel, dataset_source=args.source, dataset_version=_dataset_version_for_source(args.source)
+        )
+        _print_json(report.model_dump(mode="json"))
+        return 0
+
+    if args.research_command == "validate":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        report = _engine().validate(
+            panel, dataset_source=args.source, dataset_version=_dataset_version_for_source(args.source)
+        )
+        _print_json(report.model_dump(mode="json"))
+        return 0
+
+    if args.research_command == "final-holdout":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        report = _engine().final_holdout(
+            panel, dataset_source=args.source, dataset_version=_dataset_version_for_source(args.source)
+        )
+        _print_json(report.model_dump(mode="json"))
+        return 0
+
+    if args.research_command == "patterns":
+        registry = PatternRegistry(patterns_dir / "registry.json")
+        patterns = registry.by_status(PatternStatus(args.status)) if args.status else registry.all_latest()
+        _print_json([p.model_dump(mode="json") for p in patterns])
+        return 0
+
+    if args.research_command == "active":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        activations = _engine().activate(panel)
+        _print_json([a.model_dump(mode="json") for a in activations])
+        return 0
+
+    if args.research_command == "control-suite":
+        from agx_research.patterns.control_suite import run_suite
+
+        report = run_suite(positive_seeds=args.positive_seeds, negative_seeds=args.negative_seeds)
+        _print_json(report.model_dump(mode="json"))
+        return 0
+
+    if args.research_command == "failure-profile":
+        from agx_research.patterns.regimes import analyze_pattern_failure_conditions
+
+        panel = _panel(args.as_of, args.tickers, args.source)
+        registry = PatternRegistry(patterns_dir / "registry.json")
+        if args.pattern_id:
+            pattern = registry.latest(args.pattern_id)
+            patterns = [pattern] if pattern else []
+        else:
+            patterns = [
+                *registry.by_status(PatternStatus.VALIDATED),
+                *registry.by_status(PatternStatus.ACTIVE),
+            ]
+        profiles = [analyze_pattern_failure_conditions(p, panel) for p in patterns]
+        _print_json([profile.model_dump(mode="json") for profile in profiles])
+        return 0
+
+    if args.research_command == "cost-sensitivity":
+        from agx_research.patterns.transaction_costs import analyze_transaction_cost_sensitivity
+
+        panel = _panel(args.as_of, args.tickers, args.source)
+        registry = PatternRegistry(patterns_dir / "registry.json")
+        if args.pattern_id:
+            pattern = registry.latest(args.pattern_id)
+            patterns = [pattern] if pattern else []
+        else:
+            patterns = [
+                *registry.by_status(PatternStatus.VALIDATED),
+                *registry.by_status(PatternStatus.ACTIVE),
+            ]
+        results = [analyze_transaction_cost_sensitivity(p, panel) for p in patterns]
+        _print_json([r.model_dump(mode="json") for r in results])
+        return 0
+
+    if args.research_command == "evaluate":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        outcome_repository = OutcomeRepository(patterns_dir / "outcomes.json")
+        engine = _engine()
+        updated = engine.track_outcomes(panel, outcome_repository)
+        decay_checks = engine.check_decay(as_of=panel.as_of, outcome_repository=outcome_repository)
+        _print_json(
+            {
+                "outcomes_updated": [o.model_dump(mode="json") for o in updated],
+                "decay_checks": [d.model_dump(mode="json") for d in decay_checks],
+            }
+        )
+        return 0
+
+    return 1
 
 
 def _print_json(payload_obj: object) -> None:
@@ -463,6 +709,143 @@ def main(argv: list[str] | None = None) -> int:
     )
     investment_proof_parser.add_argument(
         "--markdown-out", type=Path, default=None, help="Also write a human-readable Markdown Capital Trust Report."
+    )
+
+    research_parser = sub.add_parser(
+        "research",
+        help="EGX30 Autonomous Pattern Discovery Engine: searches point-in-time-safe market/"
+        "company/macro data for repeatable relationships with future outcomes and validates "
+        "them out-of-sample, never assuming alpha exists. See docs/"
+        "PATTERN_DISCOVERY_DATA_AUDIT.md and docs/PATTERN_DISCOVERY_REPORT.md.",
+    )
+    research_sub = research_parser.add_subparsers(dest="research_command", required=True)
+
+    def _add_research_args(p: argparse.ArgumentParser) -> None:
+        p.add_argument("--as-of", required=True, help="ISO date, e.g. 2026-06-14")
+        p.add_argument(
+            "--tickers",
+            help="Comma-separated tickers, overriding universe resolution for this run "
+            "(needed for any --as-of before the one dated EGX30/EGX70 snapshot this "
+            "repository has -- see docs/PATTERN_DISCOVERY_DATA_AUDIT.md's universe-"
+            "snapshot limitation). Without this, universe membership comes from the "
+            "real, point-in-time CollectedUniverseProvider.",
+        )
+        p.add_argument(
+            "--source",
+            choices=["mock", "collected"],
+            default="mock",
+            help="mock: research/data/mock's synthetic fixture CSVs (10 days, 2 tickers) -- "
+            "mechanics-testing only. collected (recommended for real research): --data-dir's "
+            "collected CSVs (LocalCsvDataProvider); this command automatically materializes "
+            "the real, third-party, MIT-licensed EGX community price seed "
+            "(research/data/community_prices_seed/, 75 tickers, ~4.6 years) into --data-dir "
+            "first -- see docs/EGX30_DATA_SOURCE_QUALIFICATION.md for its full provenance and "
+            "docs/EGX30_DATA_QUALITY_REPORT.md for its quality gates. Not an official/licensed "
+            "EGX vendor feed.",
+        )
+
+    audit_data_parser = research_sub.add_parser(
+        "audit-data", help="Report actual dataset coverage for a given as-of/source/tickers"
+    )
+    _add_research_args(audit_data_parser)
+
+    build_features_parser = research_sub.add_parser(
+        "build-features", help="Build the Feature Factory's output and report coverage by category"
+    )
+    _add_research_args(build_features_parser)
+    build_features_parser.add_argument(
+        "--out", type=Path, default=None, help="Write the full feature series JSON to this path"
+    )
+
+    discover_parser = research_sub.add_parser(
+        "discover",
+        help="Phase 1: generate candidates, screen on the discovery sample, apply FDR control, "
+        "persist DISCOVERED patterns to --data-dir/patterns/registry.json",
+    )
+    _add_research_args(discover_parser)
+    discover_parser.add_argument(
+        "--min-sample-size", type=int, default=None,
+        help="Override CandidateGeneratorConfig.min_sample_size (declared default: 30)",
+    )
+    discover_parser.add_argument("--fdr-alpha", type=float, default=None)
+
+    validate_parser = research_sub.add_parser(
+        "validate",
+        help="Phase 2: purged walk-forward out-of-sample validation, robustness testing, and "
+        "baseline comparison for every DISCOVERED pattern in the registry -- promotes to "
+        "VALIDATING, not VALIDATED (see final-holdout)",
+    )
+    _add_research_args(validate_parser)
+
+    final_holdout_parser = research_sub.add_parser(
+        "final-holdout",
+        help="Phase 3: the three-way split's frozen final check -- every VALIDATING pattern is "
+        "evaluated exactly once against the chronologically last, never-before-read slice of its "
+        "own ticker's dates. Promotes VALIDATING -> VALIDATED or REJECTED.",
+    )
+    _add_research_args(final_holdout_parser)
+
+    patterns_list_parser = research_sub.add_parser(
+        "patterns", help="List every pattern in the registry (read-only, no as-of needed)"
+    )
+    patterns_list_parser.add_argument(
+        "--status", choices=[s.value for s in PatternStatus], default=None
+    )
+
+    active_parser = research_sub.add_parser(
+        "active", help="Evaluate every VALIDATED/ACTIVE pattern against today's features"
+    )
+    _add_research_args(active_parser)
+
+    evaluate_parser = research_sub.add_parser(
+        "evaluate",
+        help="Update outcome tracking for past live activations and run pattern-decay checks",
+    )
+    _add_research_args(evaluate_parser)
+
+    control_suite_parser = research_sub.add_parser(
+        "control-suite",
+        help="Mission Phase 8: positive/negative control suite. Self-contained synthetic data, "
+        "no --as-of/--data-dir needed. Runs the FULL discover -> validate -> final_holdout "
+        "pipeline (real safety gates enabled) against planted-relationship panels (must be "
+        "recovered) and corrupted/noise panels (must not consistently validate). Prefer "
+        "`scripts/run_pattern_control_suite.py` for the persisted docs/PATTERN_DISCOVERY_"
+        "CONTROL_SUITE.md artifact; this command is for ad hoc/CI-sized runs.",
+    )
+    control_suite_parser.add_argument(
+        "--positive-seeds", type=lambda s: [int(x) for x in s.split(",")], default=[1, 2],
+        help="Comma-separated seeds for positive controls (default: 1,2)",
+    )
+    control_suite_parser.add_argument(
+        "--negative-seeds", type=lambda s: [int(x) for x in s.split(",")], default=[1, 2],
+        help="Comma-separated seeds for negative controls (default: 1,2)",
+    )
+
+    failure_profile_parser = research_sub.add_parser(
+        "failure-profile",
+        help="Mission Phases 11+13: for every VALIDATED/ACTIVE pattern (or one given by "
+        "--pattern-id), classifies its own matched outcomes by real market regime (volatility/"
+        "breadth/dispersion/trend/correlation/turnover, each re-checked at bucket counts 2/3/4 "
+        "for sensitivity) and tags it unconditional/regime_specific/sensitive/unstable/"
+        "insufficient_data -- a post-hoc read of an already-VALIDATED pattern's own full history, "
+        "not a new discovery decision.",
+    )
+    _add_research_args(failure_profile_parser)
+    failure_profile_parser.add_argument(
+        "--pattern-id", default=None, help="Analyze only this pattern id (default: every VALIDATED/ACTIVE pattern)"
+    )
+
+    cost_sensitivity_parser = research_sub.add_parser(
+        "cost-sensitivity",
+        help="Mission Phase 15: for every VALIDATED/ACTIVE pattern (or one given by --pattern-id), "
+        "reports gross vs net expectancy across a declared round-trip transaction-cost grid "
+        "(0/5/10/20/50/100 bps) and the exact breakeven cost -- the single-cost-level "
+        "robustness.py gate this reuses (DEFAULT_TRANSACTION_COST_BPS=20) stays unchanged; this "
+        "only reports the fuller picture.",
+    )
+    _add_research_args(cost_sensitivity_parser)
+    cost_sensitivity_parser.add_argument(
+        "--pattern-id", default=None, help="Analyze only this pattern id (default: every VALIDATED/ACTIVE pattern)"
     )
 
     args = parser.parse_args(argv)
@@ -860,6 +1243,9 @@ def main(argv: list[str] | None = None) -> int:
         plan = CapitalAllocationEngine().build(decisions, as_of)
         _print_json(plan.model_dump(mode="json"))
         return 0
+
+    if args.command == "research":
+        return _run_research_command(args)
 
     return 1
 

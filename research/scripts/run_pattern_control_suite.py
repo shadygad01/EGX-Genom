@@ -140,13 +140,35 @@ def main() -> int:
 
     any_negative_failed = any(not s.passed for s in negatives)
     any_positive_failed = any(not s.passed for s in positives)
+    # A negative control clearing its declared ceiling is not automatically
+    # "clean" -- close to the ceiling (here: within 10 points) is flagged
+    # honestly rather than folded into the same blanket "all clear" line a
+    # comfortably-low rate would get. Mirrors the real 40%-at-the-ceiling
+    # finding TD-72 records from the run that first produced this report;
+    # keep this logic in sync if TD-72 is ever superseded by a fix.
+    near_ceiling = [s for s in negatives if s.passed and s.rate >= 0.4]
     lines += [
         "## Interpretation",
         "",
         f"Positive controls: {'all recovered a majority of the time' if not any_positive_failed else 'at least one control failed to reliably recover its planted relationship — see table above'}.",
-        f"Negative controls: {'none consistently manufactured a false VALIDATED pattern' if not any_negative_failed else 'at least one control exceeded its declared false-positive ceiling — see TD-72 and the per-seed detail above; this is a disclosed, real limitation, not hidden or patched away by loosening the acceptance rule after the fact'}.",
-        "",
     ]
+    if any_negative_failed:
+        lines.append(
+            "Negative controls: at least one control exceeded its declared false-positive ceiling — "
+            "see TD-72 and the per-seed detail above; this is a disclosed, real limitation, not hidden "
+            "or patched away by loosening the acceptance rule after the fact."
+        )
+    elif near_ceiling:
+        names = ", ".join(f"`{s.control_name}` ({s.rate:.0%})" for s in near_ceiling)
+        lines.append(
+            f"Negative controls: all cleared this suite's declared ceiling, but {names} sat at or near "
+            "it rather than comfortably below — see TD-72 for the exact numbers, root-cause diagnosis, "
+            "and why a VALIDATED pattern (especially several VALIDATED together for the same ticker) "
+            "still deserves real skepticism, not a clean bill of health, until that debt is repaid."
+        )
+    else:
+        lines.append("Negative controls: none consistently manufactured a false VALIDATED pattern.")
+    lines.append("")
 
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"Wrote {REPORT_PATH}")

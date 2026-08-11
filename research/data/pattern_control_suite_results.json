@@ -1,0 +1,565 @@
+{
+  "generated_at": "2026-08-11T13:27:36.373381+00:00",
+  "elapsed_seconds": 516.4,
+  "positive_seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "negative_seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "report": {
+    "control_suite_version": "1.0.0",
+    "summaries": [
+      {
+        "control_name": "momentum",
+        "kind": "positive",
+        "description": "Alternating-block momentum: yesterday's return sign genuinely predicts today's.",
+        "seeds_run": 5,
+        "seeds_with_at_least_one_validated": 5,
+        "rate": 1.0,
+        "acceptance_rule": "recovered (>=1 VALIDATED pattern) in a majority (>50%) of seeds",
+        "passed": true,
+        "per_seed": [
+          {
+            "seed": 1,
+            "candidates_generated": 150,
+            "patterns_discovered": 40,
+            "patterns_surviving_to_validating": 4,
+            "patterns_validated": 4,
+            "validated_definitions": [
+              "return_10d:A < -0.0389 -> forward_return_5d:A",
+              "return_10d:A < 0.0408 -> forward_return_5d:A",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 2,
+            "candidates_generated": 150,
+            "patterns_discovered": 43,
+            "patterns_surviving_to_validating": 6,
+            "patterns_validated": 6,
+            "validated_definitions": [
+              "return_10d:A < -0.0400 -> forward_return_5d:A",
+              "return_10d:A < 0.0403 -> forward_return_5d:A",
+              "distance_from_high_20d:B < -0.0715 -> forward_return_5d:B",
+              "distance_from_high_20d:B < -0.0533 -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 3,
+            "candidates_generated": 150,
+            "patterns_discovered": 40,
+            "patterns_surviving_to_validating": 6,
+            "patterns_validated": 6,
+            "validated_definitions": [
+              "return_10d:A < -0.0399 -> forward_return_5d:A",
+              "return_10d:A < 0.0397 -> forward_return_5d:A",
+              "distance_from_high_20d:B < -0.0706 -> forward_return_5d:B",
+              "distance_from_high_20d:B < -0.0520 -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 4,
+            "candidates_generated": 150,
+            "patterns_discovered": 44,
+            "patterns_surviving_to_validating": 6,
+            "patterns_validated": 6,
+            "validated_definitions": [
+              "return_10d:A < -0.0403 -> forward_return_5d:A",
+              "return_10d:A < 0.0403 -> forward_return_5d:A",
+              "distance_from_high_20d:B < -0.0715 -> forward_return_5d:B",
+              "distance_from_high_20d:B < -0.0532 -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 5,
+            "candidates_generated": 150,
+            "patterns_discovered": 41,
+            "patterns_surviving_to_validating": 6,
+            "patterns_validated": 6,
+            "validated_definitions": [
+              "return_10d:A < -0.0396 -> forward_return_5d:A",
+              "return_10d:A < 0.0395 -> forward_return_5d:A",
+              "distance_from_high_20d:B < -0.0732 -> forward_return_5d:B",
+              "distance_from_high_20d:B < -0.0535 -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:B",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:B"
+            ]
+          }
+        ],
+        "notes": []
+      },
+      {
+        "control_name": "mean_reversion",
+        "kind": "positive",
+        "description": "Daily-alternating drift: today's return genuinely anti-predicts tomorrow's.",
+        "seeds_run": 5,
+        "seeds_with_at_least_one_validated": 5,
+        "rate": 1.0,
+        "acceptance_rule": "recovered (>=1 VALIDATED pattern) in a majority (>50%) of seeds",
+        "passed": true,
+        "per_seed": [
+          {
+            "seed": 1,
+            "candidates_generated": 146,
+            "patterns_discovered": 25,
+            "patterns_surviving_to_validating": 4,
+            "patterns_validated": 4,
+            "validated_definitions": [
+              "return_1d:A < -0.0098 -> forward_return_5d:A",
+              "return_1d:A < -0.0082 -> forward_return_5d:A",
+              "return_1d:A < 0.0100 -> forward_return_5d:A",
+              "return_1d:B < -0.0079 -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 2,
+            "candidates_generated": 146,
+            "patterns_discovered": 24,
+            "patterns_surviving_to_validating": 4,
+            "patterns_validated": 4,
+            "validated_definitions": [
+              "return_1d:A < -0.0099 -> forward_return_5d:A",
+              "return_1d:A < -0.0087 -> forward_return_5d:A",
+              "return_1d:B < -0.0078 -> forward_return_5d:B",
+              "return_1d:B < -0.0061 -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 3,
+            "candidates_generated": 146,
+            "patterns_discovered": 28,
+            "patterns_surviving_to_validating": 6,
+            "patterns_validated": 5,
+            "validated_definitions": [
+              "return_1d:A < -0.0099 -> forward_return_5d:A",
+              "return_1d:B < -0.0078 -> forward_return_5d:B",
+              "return_1d:B < -0.0059 -> forward_return_5d:B",
+              "return_1d:B < 0.0080 -> forward_return_5d:B",
+              "cross_sectional_dispersion_5d:MARKET > 0.0011 [lag=20d] -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 4,
+            "candidates_generated": 146,
+            "patterns_discovered": 24,
+            "patterns_surviving_to_validating": 4,
+            "patterns_validated": 4,
+            "validated_definitions": [
+              "return_1d:A < -0.0100 -> forward_return_5d:A",
+              "return_1d:A < -0.0091 -> forward_return_5d:A",
+              "return_1d:B < -0.0079 -> forward_return_5d:B",
+              "return_1d:B < -0.0061 -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 5,
+            "candidates_generated": 146,
+            "patterns_discovered": 24,
+            "patterns_surviving_to_validating": 2,
+            "patterns_validated": 2,
+            "validated_definitions": [
+              "return_1d:A < -0.0098 -> forward_return_5d:A",
+              "return_1d:A < -0.0088 -> forward_return_5d:A"
+            ]
+          }
+        ],
+        "notes": []
+      },
+      {
+        "control_name": "lead_lag",
+        "kind": "positive",
+        "description": "FOLLOWER's return is literally LEADER's lagged return plus tiny noise.",
+        "seeds_run": 5,
+        "seeds_with_at_least_one_validated": 5,
+        "rate": 1.0,
+        "acceptance_rule": "recovered (>=1 VALIDATED pattern) in a majority (>50%) of seeds",
+        "passed": true,
+        "per_seed": [
+          {
+            "seed": 1,
+            "candidates_generated": 196,
+            "patterns_discovered": 75,
+            "patterns_surviving_to_validating": 13,
+            "patterns_validated": 13,
+            "validated_definitions": [
+              "return_10d:LEADER < -0.0479 -> forward_return_5d:LEADER",
+              "distance_from_high_10d:LEADER < -0.0709 -> forward_return_5d:LEADER",
+              "distance_from_high_10d:FOLLOWER < -0.0618 -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=3d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0107 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0107 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0107 [lag=60d] -> forward_return_5d:FOLLOWER"
+            ]
+          },
+          {
+            "seed": 2,
+            "candidates_generated": 196,
+            "patterns_discovered": 76,
+            "patterns_surviving_to_validating": 14,
+            "patterns_validated": 14,
+            "validated_definitions": [
+              "return_10d:LEADER < -0.0476 -> forward_return_5d:LEADER",
+              "distance_from_high_10d:LEADER < -0.0710 -> forward_return_5d:LEADER",
+              "return_10d:FOLLOWER < 0.0491 -> forward_return_5d:FOLLOWER",
+              "distance_from_high_10d:FOLLOWER < -0.0618 -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=3d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0114 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0114 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0114 [lag=60d] -> forward_return_5d:FOLLOWER"
+            ]
+          },
+          {
+            "seed": 3,
+            "candidates_generated": 196,
+            "patterns_discovered": 79,
+            "patterns_surviving_to_validating": 13,
+            "patterns_validated": 13,
+            "validated_definitions": [
+              "return_10d:LEADER < -0.0479 -> forward_return_5d:LEADER",
+              "distance_from_high_10d:LEADER < -0.0709 -> forward_return_5d:LEADER",
+              "distance_from_high_10d:FOLLOWER < -0.0618 -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=3d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0105 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0105 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0105 [lag=60d] -> forward_return_5d:FOLLOWER"
+            ]
+          },
+          {
+            "seed": 4,
+            "candidates_generated": 196,
+            "patterns_discovered": 78,
+            "patterns_surviving_to_validating": 15,
+            "patterns_validated": 15,
+            "validated_definitions": [
+              "return_10d:LEADER < -0.0472 -> forward_return_5d:LEADER",
+              "return_10d:LEADER < 0.0486 -> forward_return_5d:LEADER",
+              "distance_from_high_10d:LEADER < -0.0711 -> forward_return_5d:LEADER",
+              "return_10d:FOLLOWER < 0.0487 -> forward_return_5d:FOLLOWER",
+              "distance_from_high_10d:FOLLOWER < -0.0614 -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=3d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0110 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0110 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0110 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0110 [lag=60d] -> forward_return_5d:FOLLOWER"
+            ]
+          },
+          {
+            "seed": 5,
+            "candidates_generated": 196,
+            "patterns_discovered": 76,
+            "patterns_surviving_to_validating": 15,
+            "patterns_validated": 15,
+            "validated_definitions": [
+              "return_10d:LEADER < -0.0471 -> forward_return_5d:LEADER",
+              "return_10d:LEADER < 0.0488 -> forward_return_5d:LEADER",
+              "distance_from_high_10d:LEADER < -0.0707 -> forward_return_5d:LEADER",
+              "return_10d:FOLLOWER < 0.0490 -> forward_return_5d:FOLLOWER",
+              "distance_from_high_10d:FOLLOWER < -0.0616 -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "market_breadth:MARKET > 0.5000 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=3d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_1d:LEADER > -0.0113 [lag=60d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0110 [lag=1d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0110 [lag=20d] -> forward_return_5d:FOLLOWER",
+              "return_5d:LEADER > -0.0110 [lag=60d] -> forward_return_5d:FOLLOWER"
+            ]
+          }
+        ],
+        "notes": []
+      },
+      {
+        "control_name": "pure_noise",
+        "kind": "negative",
+        "description": "Two independent zero-drift-in-expectation random walks.",
+        "seeds_run": 5,
+        "seeds_with_at_least_one_validated": 2,
+        "rate": 0.4,
+        "acceptance_rule": "false VALIDATED rate <= 40% of seeds (declared, not measured-optimal -- see module docstring)",
+        "passed": true,
+        "per_seed": [
+          {
+            "seed": 1,
+            "candidates_generated": 150,
+            "patterns_discovered": 93,
+            "patterns_surviving_to_validating": 43,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 2,
+            "candidates_generated": 150,
+            "patterns_discovered": 1,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 3,
+            "candidates_generated": 150,
+            "patterns_discovered": 11,
+            "patterns_surviving_to_validating": 4,
+            "patterns_validated": 4,
+            "validated_definitions": [
+              "cross_sectional_dispersion_10d:MARKET > 0.0139 [lag=60d] -> forward_return_5d:A",
+              "return_3d:B < -0.0048 -> forward_return_5d:B",
+              "return_3d:B < 0.0012 -> forward_return_5d:B",
+              "distance_from_low_3d:B < 0.0020 -> forward_return_5d:B"
+            ]
+          },
+          {
+            "seed": 4,
+            "candidates_generated": 150,
+            "patterns_discovered": 27,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 5,
+            "candidates_generated": 150,
+            "patterns_discovered": 92,
+            "patterns_surviving_to_validating": 52,
+            "patterns_validated": 27,
+            "validated_definitions": [
+              "return_1d:A < -0.0029 -> forward_return_5d:A",
+              "return_1d:A < 0.0014 -> forward_return_5d:A",
+              "return_1d:A < 0.0056 -> forward_return_5d:A",
+              "acceleration_1d:A > -0.0061 -> forward_return_5d:A",
+              "return_3d:A < -0.0050 -> forward_return_5d:A",
+              "return_3d:A < 0.0043 -> forward_return_5d:A",
+              "return_3d:A < 0.0133 -> forward_return_5d:A",
+              "distance_from_high_3d:A < -0.0093 -> forward_return_5d:A",
+              "distance_from_high_3d:A < -0.0027 -> forward_return_5d:A",
+              "distance_from_low_3d:A < 0.0074 -> forward_return_5d:A",
+              "distance_from_low_3d:A < 0.0123 -> forward_return_5d:A",
+              "return_5d:A < -0.0020 -> forward_return_5d:A",
+              "return_5d:A < 0.0077 -> forward_return_5d:A",
+              "return_5d:A < 0.0172 -> forward_return_5d:A",
+              "cross_sectional_dispersion_5d:MARKET > 0.0090 [lag=1d] -> forward_return_5d:A",
+              "cross_sectional_dispersion_5d:MARKET > 0.0090 [lag=3d] -> forward_return_5d:A",
+              "cross_sectional_dispersion_5d:MARKET > 0.0090 [lag=60d] -> forward_return_5d:A",
+              "cross_sectional_dispersion_10d:MARKET > 0.0133 [lag=5d] -> forward_return_5d:A",
+              "cross_sectional_dispersion_20d:MARKET > 0.0221 [lag=60d] -> forward_return_5d:A",
+              "market_breadth:MARKET > 0.5000 [lag=10d] -> forward_return_5d:A",
+              "market_breadth:MARKET > 0.5000 [lag=20d] -> forward_return_5d:A",
+              "volume_concentration_hhi:MARKET > 0.5001 [lag=10d] -> forward_return_5d:A",
+              "return_1d:B > 0.0009 [lag=1d] -> forward_return_5d:A",
+              "return_1d:B > 0.0009 [lag=3d] -> forward_return_5d:A",
+              "return_5d:B > 0.0041 [lag=1d] -> forward_return_5d:A",
+              "return_5d:B > 0.0041 [lag=3d] -> forward_return_5d:A",
+              "return_5d:B > 0.0041 [lag=10d] -> forward_return_5d:A"
+            ]
+          }
+        ],
+        "notes": []
+      },
+      {
+        "control_name": "shuffled_returns",
+        "kind": "negative",
+        "description": "The real momentum series with its daily returns fully permuted.",
+        "seeds_run": 5,
+        "seeds_with_at_least_one_validated": 1,
+        "rate": 0.2,
+        "acceptance_rule": "false VALIDATED rate <= 40% of seeds (declared, not measured-optimal -- see module docstring)",
+        "passed": true,
+        "per_seed": [
+          {
+            "seed": 1,
+            "candidates_generated": 150,
+            "patterns_discovered": 17,
+            "patterns_surviving_to_validating": 12,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 2,
+            "candidates_generated": 150,
+            "patterns_discovered": 6,
+            "patterns_surviving_to_validating": 5,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 3,
+            "candidates_generated": 150,
+            "patterns_discovered": 0,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 4,
+            "candidates_generated": 150,
+            "patterns_discovered": 4,
+            "patterns_surviving_to_validating": 1,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 5,
+            "candidates_generated": 150,
+            "patterns_discovered": 4,
+            "patterns_surviving_to_validating": 4,
+            "patterns_validated": 1,
+            "validated_definitions": [
+              "cross_sectional_dispersion_10d:MARKET > 0.0179 [lag=60d] -> forward_return_5d:B"
+            ]
+          }
+        ],
+        "notes": []
+      },
+      {
+        "control_name": "shuffled_timestamps",
+        "kind": "negative",
+        "description": "The real momentum series, chunk-shuffled at 2-day granularity.",
+        "seeds_run": 5,
+        "seeds_with_at_least_one_validated": 0,
+        "rate": 0.0,
+        "acceptance_rule": "false VALIDATED rate <= 40% of seeds (declared, not measured-optimal -- see module docstring)",
+        "passed": true,
+        "per_seed": [
+          {
+            "seed": 1,
+            "candidates_generated": 150,
+            "patterns_discovered": 1,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 2,
+            "candidates_generated": 150,
+            "patterns_discovered": 1,
+            "patterns_surviving_to_validating": 1,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 3,
+            "candidates_generated": 150,
+            "patterns_discovered": 6,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 4,
+            "candidates_generated": 150,
+            "patterns_discovered": 2,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 5,
+            "candidates_generated": 150,
+            "patterns_discovered": 1,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          }
+        ],
+        "notes": []
+      },
+      {
+        "control_name": "independent_random_predictor",
+        "kind": "negative",
+        "description": "Two independent random-walk tickers sharing a sector -- no real lead/lag relationship.",
+        "seeds_run": 5,
+        "seeds_with_at_least_one_validated": 2,
+        "rate": 0.4,
+        "acceptance_rule": "false VALIDATED rate <= 40% of seeds (declared, not measured-optimal -- see module docstring)",
+        "passed": true,
+        "per_seed": [
+          {
+            "seed": 1,
+            "candidates_generated": 198,
+            "patterns_discovered": 1,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 2,
+            "candidates_generated": 198,
+            "patterns_discovered": 3,
+            "patterns_surviving_to_validating": 1,
+            "patterns_validated": 1,
+            "validated_definitions": [
+              "cross_sectional_dispersion_20d:MARKET > 0.0206 [lag=60d] -> forward_return_5d:FOLLOWER2"
+            ]
+          },
+          {
+            "seed": 3,
+            "candidates_generated": 198,
+            "patterns_discovered": 14,
+            "patterns_surviving_to_validating": 0,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          },
+          {
+            "seed": 4,
+            "candidates_generated": 198,
+            "patterns_discovered": 5,
+            "patterns_surviving_to_validating": 3,
+            "patterns_validated": 1,
+            "validated_definitions": [
+              "return_5d:LEADER2 > -0.0006 [lag=60d] -> forward_return_5d:FOLLOWER2"
+            ]
+          },
+          {
+            "seed": 5,
+            "candidates_generated": 198,
+            "patterns_discovered": 1,
+            "patterns_surviving_to_validating": 1,
+            "patterns_validated": 0,
+            "validated_definitions": []
+          }
+        ],
+        "notes": []
+      }
+    ]
+  }
+}

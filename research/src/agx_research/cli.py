@@ -214,14 +214,35 @@ def _build_pattern_market_memory(
         macro_series_ids=MACRO_SERIES_IDS,
         macro_series_sources={"BRENT_USD": "fred", "EGP_USD": "fred"},
         lookback_days=30,
+        macro_lookback_days=3650,
         pattern_lookback_days=3650,
         event_platform=EventPlatform(repository=EventRepository(data_dir / "events.json")),
         financials_provider=CollectedFinancialStatementProvider(data_dir),
     )
 
 
+_COMMUNITY_PRICE_SEED_DIR = Path(__file__).resolve().parents[2] / "data" / "community_prices_seed"
+_REAL_MACRO_SEED_DIR = Path(__file__).resolve().parents[2] / "data" / "macro"
+
+
+def _materialize_real_macro_seed(data_dir: Path) -> None:
+    """Copies the real, committed FRED macro CSVs (`research/data/macro/`,
+    collected in a prior session with network egress this one lacks) into
+    `--data-dir/macro/` -- the same "committed snapshot materialized into
+    the runtime data dir" posture `materialize_universe_seed()` and
+    `materialize_community_price_seed()` already use. Static source data,
+    always safe to overwrite the target copy."""
+    if not _REAL_MACRO_SEED_DIR.is_dir():
+        return
+    target = data_dir / "macro"
+    target.mkdir(parents=True, exist_ok=True)
+    for seed_path in _REAL_MACRO_SEED_DIR.glob("*.csv"):
+        (target / seed_path.name).write_text(seed_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+
 def _run_research_command(args: argparse.Namespace) -> int:
     from agx_research.patterns.candidates import CandidateGeneratorConfig
+    from agx_research.patterns.community_price_seed import materialize_community_price_seed
     from agx_research.patterns.engine import PatternDiscoveryEngine, PatternDiscoveryEngineConfig
     from agx_research.patterns.features import FeatureFactory
     from agx_research.patterns.multiple_testing import TestingLedgerRepository
@@ -230,6 +251,10 @@ def _run_research_command(args: argparse.Namespace) -> int:
     from agx_research.patterns.registry import PatternRegistry
 
     patterns_dir = args.data_dir / "patterns"
+    if getattr(args, "source", None) == "collected" and _COMMUNITY_PRICE_SEED_DIR.is_dir():
+        args.data_dir.mkdir(parents=True, exist_ok=True)
+        materialize_community_price_seed(_COMMUNITY_PRICE_SEED_DIR, args.data_dir)
+        _materialize_real_macro_seed(args.data_dir)
 
     def _panel(as_of_arg: str, tickers_arg: str | None, source: str):
         as_of = date.fromisoformat(as_of_arg)
@@ -311,6 +336,12 @@ def _run_research_command(args: argparse.Namespace) -> int:
         _print_json(report.model_dump(mode="json"))
         return 0
 
+    if args.research_command == "final-holdout":
+        panel = _panel(args.as_of, args.tickers, args.source)
+        report = _engine().final_holdout(panel)
+        _print_json(report.model_dump(mode="json"))
+        return 0
+
     if args.research_command == "patterns":
         registry = PatternRegistry(patterns_dir / "registry.json")
         patterns = registry.by_status(PatternStatus(args.status)) if args.status else registry.all_latest()
@@ -321,6 +352,13 @@ def _run_research_command(args: argparse.Namespace) -> int:
         panel = _panel(args.as_of, args.tickers, args.source)
         activations = _engine().activate(panel)
         _print_json([a.model_dump(mode="json") for a in activations])
+        return 0
+
+    if args.research_command == "control-suite":
+        from agx_research.patterns.control_suite import run_suite
+
+        report = run_suite(positive_seeds=args.positive_seeds, negative_seeds=args.negative_seeds)
+        _print_json(report.model_dump(mode="json"))
         return 0
 
     if args.research_command == "evaluate":
@@ -640,10 +678,14 @@ def main(argv: list[str] | None = None) -> int:
             "--source",
             choices=["mock", "collected"],
             default="mock",
-            help="mock (default): research/data/mock's fixture CSVs -- the only price source "
-            "with real row depth today. collected: --data-dir's collected CSVs "
-            "(LocalCsvDataProvider) -- currently empty for prices, see docs/"
-            "PATTERN_DISCOVERY_DATA_AUDIT.md.",
+            help="mock: research/data/mock's synthetic fixture CSVs (10 days, 2 tickers) -- "
+            "mechanics-testing only. collected (recommended for real research): --data-dir's "
+            "collected CSVs (LocalCsvDataProvider); this command automatically materializes "
+            "the real, third-party, MIT-licensed EGX community price seed "
+            "(research/data/community_prices_seed/, 75 tickers, ~4.6 years) into --data-dir "
+            "first -- see docs/EGX30_DATA_SOURCE_QUALIFICATION.md for its full provenance and "
+            "docs/EGX30_DATA_QUALITY_REPORT.md for its quality gates. Not an official/licensed "
+            "EGX vendor feed.",
         )
 
     audit_data_parser = research_sub.add_parser(
@@ -674,9 +716,18 @@ def main(argv: list[str] | None = None) -> int:
     validate_parser = research_sub.add_parser(
         "validate",
         help="Phase 2: purged walk-forward out-of-sample validation, robustness testing, and "
-        "baseline comparison for every DISCOVERED pattern in the registry",
+        "baseline comparison for every DISCOVERED pattern in the registry -- promotes to "
+        "VALIDATING, not VALIDATED (see final-holdout)",
     )
     _add_research_args(validate_parser)
+
+    final_holdout_parser = research_sub.add_parser(
+        "final-holdout",
+        help="Phase 3: the three-way split's frozen final check -- every VALIDATING pattern is "
+        "evaluated exactly once against the chronologically last, never-before-read slice of its "
+        "own ticker's dates. Promotes VALIDATING -> VALIDATED or REJECTED.",
+    )
+    _add_research_args(final_holdout_parser)
 
     patterns_list_parser = research_sub.add_parser(
         "patterns", help="List every pattern in the registry (read-only, no as-of needed)"
@@ -695,6 +746,24 @@ def main(argv: list[str] | None = None) -> int:
         help="Update outcome tracking for past live activations and run pattern-decay checks",
     )
     _add_research_args(evaluate_parser)
+
+    control_suite_parser = research_sub.add_parser(
+        "control-suite",
+        help="Mission Phase 8: positive/negative control suite. Self-contained synthetic data, "
+        "no --as-of/--data-dir needed. Runs the FULL discover -> validate -> final_holdout "
+        "pipeline (real safety gates enabled) against planted-relationship panels (must be "
+        "recovered) and corrupted/noise panels (must not consistently validate). Prefer "
+        "`scripts/run_pattern_control_suite.py` for the persisted docs/PATTERN_DISCOVERY_"
+        "CONTROL_SUITE.md artifact; this command is for ad hoc/CI-sized runs.",
+    )
+    control_suite_parser.add_argument(
+        "--positive-seeds", type=lambda s: [int(x) for x in s.split(",")], default=[1, 2],
+        help="Comma-separated seeds for positive controls (default: 1,2)",
+    )
+    control_suite_parser.add_argument(
+        "--negative-seeds", type=lambda s: [int(x) for x in s.split(",")], default=[1, 2],
+        help="Comma-separated seeds for negative controls (default: 1,2)",
+    )
 
     args = parser.parse_args(argv)
 

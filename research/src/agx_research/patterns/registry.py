@@ -46,6 +46,9 @@ class Pattern(BaseModel):
     horizon_days: int
     discovery_period: tuple[date, date]
     validation_period: tuple[date, date] | None = None
+    holdout_period: tuple[date, date] | None = None
+    holdout_sample_size: int = 0
+    holdout_expectancy: float | None = None
     sample_size: int
     oos_sample_size: int
     expectancy: float
@@ -58,6 +61,11 @@ class Pattern(BaseModel):
     complexity: int
     regime_dependency: str | None = None
     number_of_tests: int
+    is_lead_lag: bool = False
+    family_size: int = 1
+    family_corrected_p_value: float | None = None
+    block_bootstrap_p_value: float | None = None
+    deflated_sharpe_ratio: float | None = None
     validation_status: PatternStatus
     confidence: float | None = None
     created_at: datetime = Field(default_factory=datetime.now)
@@ -109,6 +117,13 @@ def build_pattern(
     status: PatternStatus,
     produced_by: str,
     rejection_reason: str | None = None,
+    holdout_period: tuple[date, date] | None = None,
+    holdout_sample_size: int = 0,
+    holdout_expectancy: float | None = None,
+    family_size: int = 1,
+    family_corrected_p_value: float | None = None,
+    block_bootstrap_p_value: float | None = None,
+    deflated_sharpe_ratio: float | None = None,
 ) -> Pattern:
     """Assembles a `Pattern` from one pipeline run's outputs — the sole
     factory `engine.py` uses, so every field's provenance is traceable to
@@ -129,6 +144,9 @@ def build_pattern(
         horizon_days=horizon_days,
         discovery_period=discovery_period,
         validation_period=validation_period,
+        holdout_period=holdout_period,
+        holdout_sample_size=holdout_sample_size,
+        holdout_expectancy=holdout_expectancy,
         sample_size=(walk_forward.discovery_distribution.sample_count if walk_forward.discovery_distribution else 0),
         oos_sample_size=walk_forward.oos_sample_size,
         expectancy=distribution.expectancy if distribution else 0.0,
@@ -141,6 +159,11 @@ def build_pattern(
         complexity=candidate.complexity,
         regime_dependency=(candidate.regime_filter.describe() if candidate.regime_filter else None),
         number_of_tests=number_of_tests,
+        is_lead_lag=candidate.is_lead_lag,
+        family_size=family_size,
+        family_corrected_p_value=family_corrected_p_value,
+        block_bootstrap_p_value=block_bootstrap_p_value,
+        deflated_sharpe_ratio=deflated_sharpe_ratio,
         validation_status=status,
         confidence=confidence,
         rejection_reason=rejection_reason,

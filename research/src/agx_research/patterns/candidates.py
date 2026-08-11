@@ -32,6 +32,10 @@ DEFAULT_REGIME_FEATURE_IDS: tuple[str, ...] = (
     "market_breadth:MARKET",
     "cross_sectional_dispersion_20d:MARKET",
 )
+# k = 1...60 trading days, per the mission's own range, sampled at a
+# declared, bounded grid rather than every integer lag (computational
+# budget, same posture as the quantile-threshold grid above).
+DEFAULT_LAG_GRID_DAYS: tuple[int, ...] = (1, 3, 5, 10, 20, 60)
 
 
 class ConditionOperator(str, Enum):
@@ -46,10 +50,20 @@ class FeatureCondition(BaseModel):
     feature_id: str
     operator: ConditionOperator
     threshold: float
+    # 0 = read the feature as of the anchor date (the default, ordinary
+    # condition). > 0 = read it `lag_days` positions further back in the
+    # feature's own date sequence -- the lead/lag discovery primitive
+    # (`candidates.py`'s `generate_lead_lag`), e.g. "Brent crude 5 days
+    # ago predicts this ticker's forward return today".
+    lag_days: int = 0
 
     def describe(self) -> str:
         symbol = ">" if self.operator is ConditionOperator.GT else "<"
-        return f"{self.feature_id} {symbol} {self.threshold:.4f}"
+        lag_suffix = f" [lag={self.lag_days}d]" if self.lag_days else ""
+        return f"{self.feature_id} {symbol} {self.threshold:.4f}{lag_suffix}"
+
+    def read(self, series: FeatureSeries, as_of: date) -> float | None:
+        return series.lagged_as_of_value(as_of, self.lag_days) if self.lag_days else series.as_of_value(as_of)
 
 
 class PatternCandidate(BaseModel):
@@ -61,6 +75,7 @@ class PatternCandidate(BaseModel):
     complexity: int
     is_regime_conditioned: bool = False
     is_cross_sectional: bool = False
+    is_lead_lag: bool = False
 
     def all_conditions(self) -> list[FeatureCondition]:
         return self.conditions + ([self.regime_filter] if self.regime_filter else [])
@@ -78,7 +93,7 @@ class PatternCandidate(BaseModel):
             series = feature_lookup.get(condition.feature_id)
             if series is None:
                 return None
-            value = series.as_of_value(as_of)
+            value = condition.read(series, as_of)
             if value is None:
                 return None
             if not condition.operator.evaluate(value, condition.threshold):
@@ -199,7 +214,7 @@ class PatternCandidateGenerator:
             ok = True
             for condition in conditions:
                 series = feature_lookup.get(condition.feature_id)
-                value = series.as_of_value(anchor) if series else None
+                value = condition.read(series, anchor) if series else None
                 if value is None or not condition.operator.evaluate(value, condition.threshold):
                     ok = False
                     break
@@ -338,6 +353,65 @@ class PatternCandidateGenerator:
                         candidate.id = new_id("pattern_candidate")
                         candidates.append(candidate)
 
+        return candidates
+
+    def generate_lead_lag(
+        self,
+        *,
+        ticker: str,
+        anchor_dates: list[date],
+        target: TargetSeries,
+        predictor_features: list[FeatureSeries],
+        lag_grid: tuple[int, ...] = DEFAULT_LAG_GRID_DAYS,
+    ) -> list[PatternCandidate]:
+        """Dedicated lead/lag search: `X(t-k) -> Y(t)` for every
+        `predictor_features` entry across `lag_grid`. `predictor_features`
+        is caller-supplied on purpose (mission Phase 10 examples: macro
+        level/change series, market breadth/dispersion, a designated peer
+        ticker's own return/volume features) — this method is agnostic to
+        *whose* features they are, it only tests them lagged. Each
+        predictor contributes one condition per lag (its own median
+        threshold, held fixed across lags so the search compares "when"
+        the same signal level mattered, not a re-optimized threshold per
+        lag) — a real relationship must survive at its matched sample
+        size at that specific lag, never assumed. A bare correlation is
+        not treated as a discovery here: this only *generates* candidates;
+        `validation.WalkForwardValidator` still has to confirm each one
+        out-of-sample before it is ever trusted, identically to every
+        other candidate this generator produces.
+        """
+        feature_lookup = {f.id: f for f in predictor_features}
+        candidates: list[PatternCandidate] = []
+        for feature in predictor_features:
+            if len(candidates) >= self.config.max_candidates_per_ticker:
+                break
+            base_condition = self._median_condition(feature)
+            if base_condition is None:
+                continue
+            kept_triggers: list[frozenset[date]] = []
+            for lag in lag_grid:
+                if len(candidates) >= self.config.max_candidates_per_ticker:
+                    break
+                lagged_condition = FeatureCondition(
+                    feature_id=feature.id, operator=base_condition.operator,
+                    threshold=base_condition.threshold, lag_days=lag,
+                )
+                count, trigger_dates = self._match_stats([lagged_condition], anchor_dates, feature_lookup, target)
+                if count < self.config.min_sample_size:
+                    continue
+                if self._is_redundant_match(trigger_dates, kept_triggers):
+                    continue
+                kept_triggers.append(trigger_dates)
+                candidates.append(
+                    PatternCandidate(
+                        id=new_id("pattern_candidate"),
+                        ticker=ticker,
+                        conditions=[lagged_condition],
+                        target_id=target.id,
+                        complexity=1,
+                        is_lead_lag=True,
+                    )
+                )
         return candidates
 
     def _build(

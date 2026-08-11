@@ -70,7 +70,11 @@ def test_engine_end_to_end_validates_a_real_planted_pattern():
     assert discover_report.patterns_discovered > 0
 
     validate_report = engine.validate(panel)
-    assert validate_report.patterns_validated >= 1
+    assert validate_report.patterns_surviving_to_validating >= 1
+    assert registry.by_status(PatternStatus.VALIDATED) == []  # not yet -- final holdout still pending
+
+    holdout_report = engine.final_holdout(panel)
+    assert holdout_report.patterns_validated >= 1
 
     validated = registry.by_status(PatternStatus.VALIDATED)
     assert validated
@@ -80,6 +84,8 @@ def test_engine_end_to_end_validates_a_real_planted_pattern():
     assert pattern.hit_rate > 0.5
     assert pattern.expectancy > 0
     assert pattern.number_of_tests == discover_report.candidates_generated  # multiple-testing burden is honestly cited
+    assert pattern.holdout_period is not None
+    assert pattern.holdout_sample_size > 0
 
 
 def test_engine_generates_nothing_below_the_sample_size_floor():
@@ -119,8 +125,18 @@ def test_validate_with_no_discovered_patterns_is_a_clean_no_op():
     engine = PatternDiscoveryEngine(pattern_registry=PatternRegistry(), testing_ledger_repository=TestingLedgerRepository())
     report = engine.validate(panel)
     assert report.patterns_considered == 0
-    assert report.patterns_validated == 0
+    assert report.patterns_surviving_to_validating == 0
     assert "discover" in report.notes[0].lower()
+
+
+def test_final_holdout_with_no_validating_patterns_is_a_clean_no_op():
+    a = make_deterministic_ticker_series("A", n_days=15, seed=1)
+    panel = make_panel(series={"A": a})
+    engine = PatternDiscoveryEngine(pattern_registry=PatternRegistry(), testing_ledger_repository=TestingLedgerRepository())
+    report = engine.final_holdout(panel)
+    assert report.patterns_considered == 0
+    assert report.patterns_validated == 0
+    assert "validate" in report.notes[0].lower()
 
 
 def test_activate_and_track_outcomes_after_validation():
@@ -146,6 +162,7 @@ def test_activate_and_track_outcomes_after_validation():
     )
     engine.discover(panel)
     engine.validate(panel)
+    engine.final_holdout(panel)
     assert registry.by_status(PatternStatus.VALIDATED)
 
     activations = engine.activate(panel)

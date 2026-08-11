@@ -54,11 +54,13 @@ class TestingLedger(BaseModel):
     run_id: str
     as_of: date
     hypotheses_tested: int
+    hypothesis_families: int = 0
     discovery_sample_size: int
     validation_sample_size: int
     alpha: float = 0.05
     fdr_alpha: float = 0.10
     surviving_after_fdr: int = 0
+    surviving_after_family_correction: int = 0
     created_at: datetime = Field(default_factory=datetime.now)
 
 

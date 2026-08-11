@@ -42,6 +42,7 @@ from agx_research.data.adjustments import compute_adjusted_closes
 from agx_research.data.schemas import CorporateEvent, MacroObservation, PriceBar
 from agx_research.financials.schema import FinancialStatementLineItem
 from agx_research.market_memory.memory import MarketMemory
+from agx_research.patterns.universe_confidence import UniverseConfidence, assess_universe_confidence
 
 UNIVERSE_LIMITATION_NOTE = (
     "Universe/sector membership reflects a single fixed snapshot (the "
@@ -92,6 +93,7 @@ class ResearchPanel(BaseModel):
     macro_series_sources: dict[str, str] = Field(default_factory=dict)
     financial_statements: dict[str, list[FinancialStatementLineItem]] = Field(default_factory=dict)
     universe_limitation_note: str = UNIVERSE_LIMITATION_NOTE
+    universe_confidence: UniverseConfidence = UniverseConfidence.NONE
 
     def all_dates(self) -> list[date]:
         """The sorted union of every trading date any ticker has a bar for —
@@ -165,6 +167,7 @@ def build_research_panel(
         macro_series=dict(snapshot.macro_series),
         macro_series_sources=dict(memory.macro_series_sources or {}),
         financial_statements=dict(snapshot.financial_statements),
+        universe_confidence=assess_universe_confidence(as_of),
     )
 
 

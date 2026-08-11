@@ -78,3 +78,46 @@ def test_target_value_at_returns_none_for_unknown_date():
     from datetime import date
 
     assert forward.value_at(date(1999, 1, 1)) is None
+
+
+def test_barrier_target_hits_upper_barrier_first():
+    from agx_research.patterns.targets import TargetKind
+
+    series = make_deterministic_ticker_series("T", n_days=40, seed=1, block_length=40, daily_drift=0.02, noise_stdev=0.0001)
+    panel = make_panel(series={"T": series})
+    targets = {t.id: t for t in TargetFactory(panel).build_barrier_targets("T", barriers=((0.05, -0.03),), max_horizon_days=15)}
+    barrier = next(t for t in targets.values() if t.spec.kind == TargetKind.BARRIER_OUTCOME)
+    # A strongly, steadily rising series should hit the upper barrier (+5%) well before -3%.
+    positive_hits = sum(1 for v in barrier.values if v == 1.0)
+    negative_hits = sum(1 for v in barrier.values if v == -1.0)
+    assert positive_hits > negative_hits
+    assert positive_hits > 0
+
+
+def test_barrier_target_hits_lower_barrier_first_in_a_falling_series():
+    from agx_research.patterns.targets import TargetKind
+
+    series = make_deterministic_ticker_series("T", n_days=40, seed=1, block_length=40, daily_drift=-0.02, noise_stdev=0.0001)
+    panel = make_panel(series={"T": series})
+    targets = {t.id: t for t in TargetFactory(panel).build_barrier_targets("T", barriers=((0.05, -0.03),), max_horizon_days=15)}
+    barrier = next(t for t in targets.values() if t.spec.kind == TargetKind.BARRIER_OUTCOME)
+    negative_hits = sum(1 for v in barrier.values if v == -1.0)
+    positive_hits = sum(1 for v in barrier.values if v == 1.0)
+    assert negative_hits > positive_hits
+    assert negative_hits > 0
+
+
+def test_barrier_target_only_reads_strictly_forward_bars():
+    from agx_research.patterns.targets import TargetKind
+
+    series = make_deterministic_ticker_series("T", n_days=40, seed=7)
+    panel = make_panel(series={"T": series})
+    before = {t.id: t for t in TargetFactory(panel).build_barrier_targets("T", max_horizon_days=10)}
+
+    mutated = series.model_copy(deep=True)
+    mutated.high[0] *= 3  # a massive spike strictly before every later anchor
+    panel_mutated = make_panel(series={"T": mutated})
+    after = {t.id: t for t in TargetFactory(panel_mutated).build_barrier_targets("T", max_horizon_days=10)}
+
+    key = next(k for k, v in before.items() if v.spec.kind == TargetKind.BARRIER_OUTCOME)
+    assert before[key].values[1:] == after[key].values[1:]

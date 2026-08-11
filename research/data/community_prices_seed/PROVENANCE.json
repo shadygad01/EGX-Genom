@@ -1,0 +1,30 @@
+{
+  "source_repo_url": "https://github.com/abdulrahman-mahmoud/egxstock-analysis",
+  "source_commit": "555fb77e290738f3ff97dd4db65791457ec1e90c",
+  "source_license": "MIT",
+  "retrieved_at": "2026-08-11T09:06:20.556342",
+  "sqlite_table": "raw_prices",
+  "raw_rows_total": 83540,
+  "distinct_symbols_total": 78,
+  "usable_tickers": 75,
+  "excluded_tickers_below_min_observations": [
+    {
+      "ticker": "ADRI",
+      "observations": 1
+    },
+    {
+      "ticker": "ARVA",
+      "observations": 15
+    },
+    {
+      "ticker": "SIMO",
+      "observations": 1
+    }
+  ],
+  "min_observations_threshold": 250,
+  "derived_adjustment_events": 128,
+  "transformations": [
+    "trading_date = raw_utc_date + 1 day (Cairo local-day correction; verified 100% of 83,540 rows land on Sun-Thu after correction, 0% before)",
+    "corporate-action events reverse-engineered from Adj Close / Close divergence steps; verified to reconstruct source Adj Close within ~0.5% relative error on a spot-checked ticker (COMI, 5 derived events, all in April across consecutive years)"
+  ]
+}

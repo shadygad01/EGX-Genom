@@ -92,6 +92,23 @@ class FeatureSeries(BaseModel):
             idx -= 1
         return None
 
+    def lagged_as_of_value(self, t: date, lag: int) -> float | None:
+        """The value exactly `lag` positions before the as-of index for
+        `t`, in this series' own date sequence -- the point-in-time-safe
+        primitive lead/lag candidate generation (`candidates.py`) uses to
+        test "X lagged by `lag` periods predicts Y anchored at `t`".
+        `lag=0` is exactly `as_of_value(t)`. Unlike `as_of_value`, this
+        does *not* skip nulls looking further back -- a lead/lag claim
+        about "the value exactly `lag` periods ago" should honestly read
+        as unavailable (`None`) if that specific position has no
+        observation, not silently substitute an even-older one."""
+        if lag <= 0:
+            return self.as_of_value(t)
+        idx = bisect_right(self.dates, t) - 1 - lag
+        if idx < 0:
+            return None
+        return self.values[idx]
+
     def non_null_count(self) -> int:
         return sum(1 for v in self.values if v is not None)
 

@@ -38,6 +38,14 @@ class TargetKind(str, Enum):
     PROB_EXCEEDS = "prob_exceeds"
     RELATIVE_RETURN_MARKET = "relative_return_market"
     RELATIVE_RETURN_SECTOR = "relative_return_sector"
+    BARRIER_OUTCOME = "barrier_outcome"
+
+
+# (upper_pct, lower_pct) pairs, e.g. (0.05, -0.03) = "+5% before -3%".
+# Declared, uncalibrated starting grid -- same posture as every other
+# declared constant in this package.
+DEFAULT_BARRIERS: tuple[tuple[float, float], ...] = ((0.05, -0.03), (0.10, -0.05))
+DEFAULT_BARRIER_MAX_HORIZON_DAYS = 20
 
 
 class TargetSpec(BaseModel):
@@ -45,6 +53,7 @@ class TargetSpec(BaseModel):
     kind: TargetKind
     horizon_days: int
     threshold: float | None = None
+    threshold_lower: float | None = None
 
 
 class TargetSeries(BaseModel):
@@ -233,15 +242,78 @@ class TargetFactory:
         ticker: str,
         dates: list[date],
         values: list[float | None],
+        threshold_lower: float | None = None,
     ) -> TargetSeries:
         target_id = f"{target_key}:{ticker}"
         return TargetSeries(
             id=target_id,
-            spec=TargetSpec(id=target_key, kind=kind, horizon_days=horizon_days, threshold=threshold),
+            spec=TargetSpec(
+                id=target_key, kind=kind, horizon_days=horizon_days,
+                threshold=threshold, threshold_lower=threshold_lower,
+            ),
             ticker=ticker,
             dates=list(dates),
             values=list(values),
         )
+
+    def build_barrier_targets(
+        self,
+        ticker: str,
+        *,
+        barriers: tuple[tuple[float, float], ...] = DEFAULT_BARRIERS,
+        max_horizon_days: int = DEFAULT_BARRIER_MAX_HORIZON_DAYS,
+    ) -> list[TargetSeries]:
+        """`+upper_pct before -lower_pct` (or vice versa), first-touch,
+        walking `closes[i+1:i+1+max_horizon_days]` day by day using that
+        day's High for the upper barrier and Low for the lower barrier
+        (the same "read High/Low for path-dependent outcomes, never just
+        Close" discipline `build_mfe_mae` already uses) -- strictly
+        forward-looking, identical leakage posture to every other target
+        this factory builds. `+1.0` = upper touched first, `-1.0` = lower
+        touched first, `0.0` = neither touched within `max_horizon_days`
+        (a real "no-touch" outcome, not a fabricated breakeven)."""
+        s = self.panel.series[ticker]
+        closes, highs, lows = s.adjusted_close, s.high, s.low
+        n = len(closes)
+        out = []
+        for upper_pct, lower_pct in barriers:
+            values: list[float | None] = []
+            for i in range(n):
+                if i + 1 >= n or closes[i] == 0:
+                    values.append(None)
+                    continue
+                entry = closes[i]
+                upper_price = entry * (1 + upper_pct)
+                lower_price = entry * (1 + lower_pct)
+                window_end = min(n, i + 1 + max_horizon_days)
+                outcome = 0.0
+                for j in range(i + 1, window_end):
+                    upper_hit = highs[j] >= upper_price
+                    lower_hit = lows[j] <= lower_price
+                    if upper_hit and lower_hit:
+                        # Both touched the same bar -- can't tell which came
+                        # first from daily OHLC alone; report as a tie
+                        # (0.0) rather than fabricate an intrabar order.
+                        outcome = 0.0
+                        break
+                    if upper_hit:
+                        outcome = 1.0
+                        break
+                    if lower_hit:
+                        outcome = -1.0
+                        break
+                if window_end <= i + 1:
+                    values.append(None)
+                else:
+                    values.append(outcome)
+            label = f"barrier_+{upper_pct:.0%}_{lower_pct:.0%}_{max_horizon_days}d"
+            out.append(
+                self._series(
+                    label, TargetKind.BARRIER_OUTCOME, max_horizon_days, upper_pct, ticker, s.dates, values,
+                    threshold_lower=lower_pct,
+                )
+            )
+        return out
 
 
 __all__ = [

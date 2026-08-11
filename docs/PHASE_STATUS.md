@@ -2989,3 +2989,66 @@ tested against real network egress via `.github/workflows
 `company_ir` target, read-only, never auto-writes to the catalog) — see
 the tracker doc for the run URL and, once it completes, real per-target
 results.
+
+## EGX30 Autonomous Pattern Discovery Engine (2026-08-11)
+
+A new subsystem, `research/src/agx_research/patterns/` (16 modules, 3,411
+lines; tests: 14 files, 1,468 lines, 86 cases), deliberately separate from
+`agents.historical_patterns.HistoricalPatternsAgent` (single-ticker
+nearest-neighbor analog matching that feeds one `ResearchFinding` into the
+normal hypothesis/knowledge pipeline). This is the broader, systematic
+search the mission specified: a point-in-time canonical research panel
+(`panel.py`, built on `market_memory.MarketMemory.reconstruct()`), a
+programmatic Feature Factory (`features.py` — price/volume/cross-
+sectional/fundamental/macro transforms, 127 features generated against
+today's real+mock data), a Target Factory (`targets.py` — forward
+returns/MFE/MAE/max-drawdown/probability/relative-outcome targets, all
+strictly forward-looking), a controlled candidate generator
+(`candidates.py` — eligibility floor, correlation pruning, match-set
+redundancy pruning, computational budget), discovery statistics
+(`evaluation.py`), purged/embargoed walk-forward out-of-sample validation
+(`validation.py` — this repository's first purge/embargo implementation;
+`grep purg|embargo` was previously empty), Benjamini-Hochberg multiple-
+testing control with a persisted `TestingLedger` (`multiple_testing.py`),
+robustness testing (`robustness.py`), a versioned lifecycle
+`PatternRegistry` (`registry.py`, composing `storage.JsonFileRepository`
+per the established convention), live pattern activation
+(`live.py` — never a BUY/SELL label), outcome tracking and pattern decay
+monitoring (`outcomes.py`/`decay.py`), and baseline models
+(`baselines.py`). `cli.py` gained a new `agx research
+{audit-data,build-features,discover,validate,patterns,active,evaluate}`
+subcommand group following the existing flat-subparser convention.
+
+**Real result, not simulated**: run against this repository's actual
+data (`docs/PATTERN_DISCOVERY_DATA_AUDIT.md`'s inventory), the engine
+discovers and validates **zero patterns** — the only real EGX price data
+in this repository is a 10-trading-day, 2-ticker synthetic mock fixture,
+far below every stage's declared `min_sample_size` floor, so zero
+candidates are ever generated. This is the mission's own explicitly
+legitimate outcome, not a defect: `research/tests/test_pattern_engine.py`
+proves the engine *can* discover and validate a real relationship
+(a positive-control test against deterministic synthetic data with a
+planted momentum pattern), and separately proves it generates nothing
+below the sample-size floor — so the real-data zero is falsifiable
+evidence of correct behavior, not an unfalsifiable default.
+
+A mid-mission finding worth flagging for future work on this subsystem:
+testing against synthetic *pure-noise* data showed Benjamini-Hochberg FDR
+control, applied to a candidate pool of many correlated derived features
+over a short sample, can let more nominal "discoveries" through than its
+independence-based guarantee suggests (a known data-mining-bias property,
+not a hypothetical). Addressed with match-set redundancy pruning and
+tightened declared-conservative defaults (`correlation_prune_threshold`
+0.9→0.8, `fdr_alpha` 0.10→0.05), but not eliminated — full details and
+the reasoning for why purged walk-forward validation, robustness testing,
+and baseline-beating are treated as load-bearing rather than optional
+downstream of FDR control are in `docs/PATTERN_DISCOVERY_REPORT.md`'s
+dedicated section. Live outbound network access to the `egx_price_composite`
+collector's vendors (Yahoo/StockAnalysis/Mubasher) is denied by this
+session's environment policy — collecting real depth requires running
+from an environment with that access, a separate, later step.
+
+Full data audit: `docs/PATTERN_DISCOVERY_DATA_AUDIT.md`. Full report,
+methodology, and reproduction commands: `docs/PATTERN_DISCOVERY_REPORT.md`.
+1149 backend tests pass (up from 1063 before this mission; every
+pre-existing test still passes unchanged).

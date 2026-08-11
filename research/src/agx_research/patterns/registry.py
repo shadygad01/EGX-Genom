@@ -35,6 +35,37 @@ class PatternStatus(str, Enum):
     RETIRED = "retired"
 
 
+# Mission Phase 17 (registry lifecycle tightening): the only status
+# changes `PatternRegistry.transition()` will perform -- enforced there,
+# not just documented, so a future caller cannot accidentally skip a
+# gate (e.g. DISCOVERED -> VALIDATED directly, bypassing VALIDATING and
+# therefore the entire purged-walk-forward/robustness/baseline gate the
+# three-way split exists to enforce). `REJECTED` is reachable from any
+# non-terminal status -- a manual/system override ("this pattern turned
+# out to be wrong after all") is legitimate at any stage, not just during
+# discovery/validation. `RETIRED` is the other terminal status (aging out
+# a pattern that isn't necessarily wrong, just no longer worth tracking
+# live). Neither is ever revived: a genuinely-recovered pattern is a NEW
+# discovery, not a resurrection of an old verdict. `WEAKENING` can return
+# to `VALIDATED`/`ACTIVE` because decay monitoring's own contract is
+# "trigger revalidation, never silent removal" (`decay.py`'s docstring).
+_ALLOWED_TRANSITIONS: dict[PatternStatus, frozenset[PatternStatus]] = {
+    PatternStatus.DISCOVERED: frozenset({PatternStatus.VALIDATING, PatternStatus.REJECTED}),
+    PatternStatus.VALIDATING: frozenset({PatternStatus.VALIDATED, PatternStatus.REJECTED}),
+    PatternStatus.VALIDATED: frozenset(
+        {PatternStatus.ACTIVE, PatternStatus.WEAKENING, PatternStatus.RETIRED, PatternStatus.REJECTED}
+    ),
+    PatternStatus.ACTIVE: frozenset(
+        {PatternStatus.WEAKENING, PatternStatus.RETIRED, PatternStatus.REJECTED}
+    ),
+    PatternStatus.WEAKENING: frozenset(
+        {PatternStatus.VALIDATED, PatternStatus.ACTIVE, PatternStatus.RETIRED, PatternStatus.REJECTED}
+    ),
+    PatternStatus.REJECTED: frozenset(),
+    PatternStatus.RETIRED: frozenset(),
+}
+
+
 class Pattern(BaseModel):
     id: str
     version: int = 1
@@ -73,6 +104,15 @@ class Pattern(BaseModel):
     rejection_reason: str | None = None
     robustness_passed: bool | None = None
     provenance: Provenance
+    # Mission Phase 19 (reproducibility): the `ReproducibilityManifest.
+    # experiment_id` that first discovered this pattern, and the one that
+    # most recently touched it (validate()/final_holdout() each stamp a
+    # fresh manifest per run) -- together, every version of a pattern
+    # traces back to the exact run, config, git commit, and dataset that
+    # produced it. Never overwritten on `discovery_experiment_id`; always
+    # overwritten on `last_experiment_id`.
+    discovery_experiment_id: str | None = None
+    last_experiment_id: str | None = None
 
 
 class PatternRegistry(JsonFileRepository[Pattern]):
@@ -93,6 +133,14 @@ class PatternRegistry(JsonFileRepository[Pattern]):
         current = self.latest(pattern_id)
         if current is None:
             raise KeyError(f"No pattern {pattern_id!r} in registry")
+        allowed = _ALLOWED_TRANSITIONS[current.validation_status]
+        if new_status not in allowed:
+            raise ValueError(
+                f"Illegal transition for pattern {pattern_id!r}: "
+                f"{current.validation_status.value} -> {new_status.value} "
+                f"(allowed from {current.validation_status.value}: "
+                f"{sorted(s.value for s in allowed) or 'none (terminal status)'})"
+            )
         updated = current.model_copy(
             update={
                 "version": current.version + 1,
@@ -124,11 +172,20 @@ def build_pattern(
     family_corrected_p_value: float | None = None,
     block_bootstrap_p_value: float | None = None,
     deflated_sharpe_ratio: float | None = None,
+    discovery_experiment_id: str | None = None,
+    last_experiment_id: str | None = None,
 ) -> Pattern:
     """Assembles a `Pattern` from one pipeline run's outputs — the sole
     factory `engine.py` uses, so every field's provenance is traceable to
     exactly the objects that produced it (walk-forward result, robustness
-    result, the candidate itself) rather than re-derived ad hoc."""
+    result, the candidate itself) rather than re-derived ad hoc.
+
+    `discovery_experiment_id`/`last_experiment_id` are the caller's
+    responsibility to get right (mission Phase 19): `discover()` passes
+    the same fresh experiment id for both; `validate()`/`final_holdout()`
+    must pass the ORIGINAL pattern's own `discovery_experiment_id`
+    forward unchanged and only the new run's id as `last_experiment_id` —
+    this factory does not know which case it's in and will not guess."""
     distribution = walk_forward.oos_distribution or walk_forward.discovery_distribution
     confidence = None
     if distribution is not None and distribution.p_value_bootstrap is not None:
@@ -168,6 +225,8 @@ def build_pattern(
         confidence=confidence,
         rejection_reason=rejection_reason,
         robustness_passed=robustness.passed if robustness else None,
+        discovery_experiment_id=discovery_experiment_id,
+        last_experiment_id=last_experiment_id,
         provenance=Provenance(
             produced_by=produced_by,
             produced_at=datetime.now(),

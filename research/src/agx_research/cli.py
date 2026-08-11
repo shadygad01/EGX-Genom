@@ -240,6 +240,22 @@ def _materialize_real_macro_seed(data_dir: Path) -> None:
         (target / seed_path.name).write_text(seed_path.read_text(encoding="utf-8"), encoding="utf-8")
 
 
+def _dataset_version_for_source(source: str) -> str | None:
+    """The community price seed's own `source_commit` (mission Phase 19
+    reproducibility) when `--source collected` is in use; honestly `None`
+    for `mock` (no external dataset) or if the provenance file is
+    missing/unreadable -- never guessed."""
+    if source != "collected":
+        return None
+    provenance_path = _COMMUNITY_PRICE_SEED_DIR / "PROVENANCE.json"
+    if not provenance_path.is_file():
+        return None
+    try:
+        return json.loads(provenance_path.read_text(encoding="utf-8")).get("source_commit")
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
 def _run_research_command(args: argparse.Namespace) -> int:
     from agx_research.patterns.candidates import CandidateGeneratorConfig
     from agx_research.patterns.community_price_seed import materialize_community_price_seed
@@ -326,19 +342,25 @@ def _run_research_command(args: argparse.Namespace) -> int:
         engine_config = PatternDiscoveryEngineConfig(candidate_config=candidate_config)
         if args.fdr_alpha is not None:
             engine_config = engine_config.model_copy(update={"fdr_alpha": args.fdr_alpha})
-        report = _engine(engine_config).discover(panel)
+        report = _engine(engine_config).discover(
+            panel, dataset_source=args.source, dataset_version=_dataset_version_for_source(args.source)
+        )
         _print_json(report.model_dump(mode="json"))
         return 0
 
     if args.research_command == "validate":
         panel = _panel(args.as_of, args.tickers, args.source)
-        report = _engine().validate(panel)
+        report = _engine().validate(
+            panel, dataset_source=args.source, dataset_version=_dataset_version_for_source(args.source)
+        )
         _print_json(report.model_dump(mode="json"))
         return 0
 
     if args.research_command == "final-holdout":
         panel = _panel(args.as_of, args.tickers, args.source)
-        report = _engine().final_holdout(panel)
+        report = _engine().final_holdout(
+            panel, dataset_source=args.source, dataset_version=_dataset_version_for_source(args.source)
+        )
         _print_json(report.model_dump(mode="json"))
         return 0
 

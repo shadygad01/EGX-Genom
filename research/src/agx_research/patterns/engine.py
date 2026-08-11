@@ -58,6 +58,7 @@ from agx_research.patterns.multiple_testing_family import (
 from agx_research.patterns.outcomes import ActivationOutcome, OutcomeRepository, OutcomeTracker
 from agx_research.patterns.panel import ResearchPanel
 from agx_research.patterns.registry import Pattern, PatternRegistry, PatternStatus, build_pattern
+from agx_research.patterns.reproducibility import ReproducibilityManifest, build_reproducibility_manifest
 from agx_research.patterns.robustness import RobustnessTester
 from agx_research.patterns.targets import TARGET_HORIZONS, TargetFactory
 from agx_research.patterns.validation import (
@@ -93,6 +94,7 @@ class DiscoveryRunReport(BaseModel):
     candidates_surviving_fdr: int
     patterns_discovered: int
     testing_ledger_id: str
+    reproducibility: ReproducibilityManifest | None = None
     notes: list[str] = Field(default_factory=list)
 
 
@@ -107,6 +109,7 @@ class ValidationRunReport(BaseModel):
     patterns_surviving_to_validating: int
     patterns_rejected: int
     patterns_skipped: int
+    reproducibility: ReproducibilityManifest | None = None
     notes: list[str] = Field(default_factory=list)
 
 
@@ -130,6 +133,7 @@ class FinalHoldoutReport(BaseModel):
     patterns_validated: int
     patterns_rejected: int
     results: list[HoldoutPatternResult] = Field(default_factory=list)
+    reproducibility: ReproducibilityManifest | None = None
     notes: list[str] = Field(default_factory=list)
 
 
@@ -255,8 +259,14 @@ class PatternDiscoveryEngine:
 
     # ---- phase 1: candidate generation + discovery-sample screening ----
 
-    def discover(self, panel: ResearchPanel) -> DiscoveryRunReport:
+    def discover(
+        self, panel: ResearchPanel, *, dataset_source: str = "unknown", dataset_version: str | None = None
+    ) -> DiscoveryRunReport:
         run_id = new_id("discovery_run")
+        manifest = build_reproducibility_manifest(
+            engine_name=ENGINE_NAME, engine_version=ENGINE_VERSION, dataset_source=dataset_source,
+            dataset_version=dataset_version, config=self.config.model_dump(mode="json"),
+        )
         notes: list[str] = []
         generator = PatternCandidateGenerator(self.config.candidate_config)
         all_features, market_features, targets_by_ticker = _build_context(panel, self.config.horizons, enable_barrier_targets=self.config.enable_barrier_targets)
@@ -392,6 +402,8 @@ class PatternDiscoveryEngine:
                 ),
                 block_bootstrap_p_value=block_bootstrap_p,
                 deflated_sharpe_ratio=dsr,
+                discovery_experiment_id=manifest.experiment_id,
+                last_experiment_id=manifest.experiment_id,
             )
             self.pattern_registry.add(pattern)
 
@@ -430,19 +442,26 @@ class PatternDiscoveryEngine:
             candidates_surviving_fdr=len(surviving),
             patterns_discovered=len(surviving),
             testing_ledger_id=ledger.id,
+            reproducibility=manifest,
             notes=notes,
         )
 
     # ---- phase 2: purged walk-forward validation + robustness + baselines ----
 
-    def validate(self, panel: ResearchPanel) -> ValidationRunReport:
+    def validate(
+        self, panel: ResearchPanel, *, dataset_source: str = "unknown", dataset_version: str | None = None
+    ) -> ValidationRunReport:
+        manifest = build_reproducibility_manifest(
+            engine_name=ENGINE_NAME, engine_version=ENGINE_VERSION, dataset_source=dataset_source,
+            dataset_version=dataset_version, config=self.config.model_dump(mode="json"),
+        )
         discovered = self.pattern_registry.by_status(PatternStatus.DISCOVERED)
         notes: list[str] = []
         if not discovered:
             notes.append("No DISCOVERED patterns in the registry to validate — run `agx research discover` first.")
             return ValidationRunReport(
                 as_of=panel.as_of.isoformat(), patterns_considered=0, patterns_surviving_to_validating=0,
-                patterns_rejected=0, patterns_skipped=0, notes=notes,
+                patterns_rejected=0, patterns_skipped=0, reproducibility=manifest, notes=notes,
             )
 
         all_features, market_features, targets_by_ticker = _build_context(panel, self.config.horizons, enable_barrier_targets=self.config.enable_barrier_targets)
@@ -543,6 +562,8 @@ class PatternDiscoveryEngine:
                 status=status,
                 produced_by=f"{ENGINE_NAME}@{ENGINE_VERSION}",
                 rejection_reason=reason,
+                discovery_experiment_id=pattern.discovery_experiment_id,
+                last_experiment_id=manifest.experiment_id,
             )
             revised = revised.model_copy(update={"version": pattern.version + 1, "created_at": pattern.created_at})
             self.pattern_registry.add(revised)
@@ -567,12 +588,15 @@ class PatternDiscoveryEngine:
             patterns_surviving_to_validating=validated_count,
             patterns_rejected=rejected_count,
             patterns_skipped=skipped_count,
+            reproducibility=manifest,
             notes=notes,
         )
 
     # ---- phase 3: final holdout (run once, never iterated on) ----
 
-    def final_holdout(self, panel: ResearchPanel) -> FinalHoldoutReport:
+    def final_holdout(
+        self, panel: ResearchPanel, *, dataset_source: str = "unknown", dataset_version: str | None = None
+    ) -> FinalHoldoutReport:
         """Every `VALIDATING` pattern is checked exactly once against the
         chronologically last `holdout_fraction` slice of its own ticker's
         dates — the slice `discover()`/`validate()` never touched. A
@@ -587,6 +611,10 @@ class PatternDiscoveryEngine:
         that would let a second holdout look change an already-recorded
         verdict.
         """
+        manifest = build_reproducibility_manifest(
+            engine_name=ENGINE_NAME, engine_version=ENGINE_VERSION, dataset_source=dataset_source,
+            dataset_version=dataset_version, config=self.config.model_dump(mode="json"),
+        )
         validating = self.pattern_registry.by_status(PatternStatus.VALIDATING)
         notes: list[str] = []
         if not validating:
@@ -595,7 +623,8 @@ class PatternDiscoveryEngine:
             )
             return FinalHoldoutReport(
                 as_of=panel.as_of.isoformat(), holdout_fraction=self.config.holdout_fraction,
-                patterns_considered=0, patterns_validated=0, patterns_rejected=0, notes=notes,
+                patterns_considered=0, patterns_validated=0, patterns_rejected=0,
+                reproducibility=manifest, notes=notes,
             )
 
         all_features, market_features, targets_by_ticker = _build_context(panel, self.config.horizons, enable_barrier_targets=self.config.enable_barrier_targets)
@@ -673,6 +702,8 @@ class PatternDiscoveryEngine:
                 holdout_period=holdout_period,
                 holdout_sample_size=holdout_distribution.sample_count if holdout_distribution else 0,
                 holdout_expectancy=holdout_distribution.expectancy if holdout_distribution else None,
+                discovery_experiment_id=pattern.discovery_experiment_id,
+                last_experiment_id=manifest.experiment_id,
             )
             # Preserve the research-period statistics (expectancy/hit_rate/etc.) this
             # pattern already earned in VALIDATING -- final_holdout only adds the
@@ -717,7 +748,7 @@ class PatternDiscoveryEngine:
         return FinalHoldoutReport(
             as_of=panel.as_of.isoformat(), holdout_fraction=self.config.holdout_fraction,
             patterns_considered=len(validating), patterns_validated=validated_count,
-            patterns_rejected=rejected_count, results=results, notes=notes,
+            patterns_rejected=rejected_count, results=results, reproducibility=manifest, notes=notes,
         )
 
     # ---- later stages ----

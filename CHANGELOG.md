@@ -1,5 +1,47 @@
 # Changelog
 
+## Unreleased — EGX30 Pattern Discovery Mission 2: Data Unlock + Scientific Hardening
+
+Real (not mock) EGX price data unlocked: a third-party, MIT-licensed,
+Yahoo-sourced community dataset (`research/data/community_prices_seed/`,
+75 tickers, ~4.6 years) ingested and quality-gated (`docs/
+EGX30_DATA_QUALITY_REPORT.md`: 75/75 pass every critical check), with
+128 corporate-action events reverse-engineered from Close/AdjClose
+divergence and point-in-time-aware universe-confidence tagging
+(`universe_confidence.py`).
+
+Engine hardened: a three-way discovery/validation/final-holdout split
+(new `PatternStatus.VALIDATING` stage, `engine.final_holdout()`);
+family-corrected p-values stacked before Benjamini-Hochberg
+(`multiple_testing_family.py`); barrier-style path-dependent targets;
+lead/lag candidate generation across a declared lag grid with sector-
+leader cross-ticker predictors; regime classification along six real
+dimensions plus per-pattern failure-condition characterization
+(`regimes.py`); transaction-cost sensitivity across a declared cost grid
+(`transaction_costs.py`); a `ReproducibilityManifest` stamped on every
+run (`reproducibility.py`); and a positive/negative control suite
+(`control_suite.py`, `docs/PATTERN_DISCOVERY_CONTROL_SUITE.md`) proving
+recovery of real planted relationships (5/5 seeds each for momentum/
+mean-reversion/lead-lag) and a measured, disclosed (not hidden) 0–40%
+false-VALIDATED rate on synthetic noise. New `agx research
+{final-holdout,failure-profile,cost-sensitivity,control-suite}` CLI
+verbs.
+
+The real, un-repeated run this all built toward
+(`docs/PATTERN_DISCOVERY_FINAL_HOLDOUT.md`, `docs/VALIDATED_PATTERNS.md`):
+14 real EGX30 tickers, unmodified production defaults, 7,899 candidates
+→ 3,398 `DISCOVERED` (43.0% FDR survival) → 1,880 `VALIDATING` → **1,773
+`VALIDATED`** (94.3% holdout survival). Reported as a disclosed
+methodology gap, not a success — that volume is real-data confirmation
+of the correlated-candidate-pool multiple-testing risk the control suite
+first surfaced synthetically (TD-70/TD-72/TD-74), concretely illustrated
+by one ticker's 354 `VALIDATED` patterns collapsing to 19 distinct
+underlying signals. No pattern from this run is wired into any
+capital-facing consumer. Full pattern test suite: all Mission 2 modules
+have dedicated coverage (`community_price_seed.py`, `universe_confidence.py`,
+`regimes.py`, `transaction_costs.py`, `reproducibility.py`,
+`control_suite.py`, plus a new `agx research` CLI-level test file).
+
 ## Unreleased — Add the EGX30 Autonomous Pattern Discovery Engine
 
 New `research/src/agx_research/patterns/` package (16 modules, 3,411

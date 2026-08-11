@@ -3052,3 +3052,81 @@ Full data audit: `docs/PATTERN_DISCOVERY_DATA_AUDIT.md`. Full report,
 methodology, and reproduction commands: `docs/PATTERN_DISCOVERY_REPORT.md`.
 1149 backend tests pass (up from 1063 before this mission; every
 pre-existing test still passes unchanged).
+
+## EGX30 Pattern Discovery — Mission 2: Data Unlock + Scientific Hardening (2026-08-11)
+
+Mission 1 (above) ran the engine against a 10-day, 2-ticker synthetic
+fixture and correctly discovered/validated zero patterns — the honest
+result given no real EGX price depth existed anywhere in this repository.
+Mission 2's explicit charge was to unlock real data and scientifically
+harden the pipeline (three-way split, stronger multiple-testing control,
+lead/lag, regime discovery, transaction costs, reproducibility metadata,
+a positive/negative control suite) and then run the real thing — with the
+explicit instruction that the correct outcome might still be zero, or
+might reveal the pipeline isn't yet trustworthy at real-data scale. It
+revealed the latter.
+
+**Data unlock**: no free/public source of historical EGX30/EGX70
+reconstitution history exists (`docs/EGX30_DATA_SOURCE_QUALIFICATION.md`),
+but a real, third-party, MIT-licensed, Yahoo-Finance-sourced community
+price dataset was found and ingested (`research/data/community_prices_seed/`,
+75 tickers, ~4.6 years, 2022-01-02 to 2026-08-06; 128 corporate-action
+events reverse-engineered from Close/AdjClose divergence;
+`docs/EGX30_DATA_QUALITY_REPORT.md`: 75/75 tickers pass every critical
+quality gate). `universe_confidence.py` tags every panel with an honest
+`UniverseConfidence` (real membership data is `CURRENT_SNAPSHOT_ONLY`,
+dated 2026-07-26 — never fabricated as `HISTORICAL`).
+
+**Scientific hardening** (all shipped, all tested — see
+`research/tests/test_pattern_*.py`): a three-way discovery/validation/
+final-holdout chronological split (`engine.final_holdout()`, a new
+`PatternStatus.VALIDATING` stage between `DISCOVERED` and `VALIDATED`);
+family-corrected p-values stacked before Benjamini-Hochberg
+(`multiple_testing_family.py`); barrier-style path-dependent targets;
+lead/lag candidate generation (`X(t-k) -> Y(t)` across a declared lag
+grid, sector-leader cross-ticker predictors); regime classification along
+six dimensions with per-pattern failure-condition characterization
+(`regimes.py`); transaction-cost sensitivity across a declared cost grid
+(`transaction_costs.py`); a `ReproducibilityManifest` stamped on every run
+(`reproducibility.py`); and a positive/negative control suite
+(`control_suite.py`, `docs/PATTERN_DISCOVERY_CONTROL_SUITE.md`) proving
+the full pipeline recovers real planted relationships (momentum,
+mean-reversion, lead/lag — 5/5 seeds each) and does not *consistently*
+manufacture false `VALIDATED` patterns from noise (0–40% false-positive
+rate across four negative-control constructions, two of which sit right
+at the suite's own declared 40% ceiling rather than comfortably below it
+— TD-72).
+
+**The real run** (`docs/PATTERN_DISCOVERY_FINAL_HOLDOUT.md`, `docs/
+VALIDATED_PATTERNS.md`): 14 tickers (the intersection of real, current
+EGX30 constituents and community-seed coverage), unmodified production
+defaults, one un-repeated `discover -> validate -> final_holdout` chain.
+7,899 candidates → 3,398 `DISCOVERED` (43.0% FDR survival) → 1,880
+`VALIDATING` → **1,773 `VALIDATED`** (94.3% holdout survival). **This is
+not reported as a success.** The volume itself — illustrated concretely by
+EGAL's 354 `VALIDATED` patterns collapsing to 19 distinct base-feature
+groups, 131 of them window/threshold variants of one underlying tendency
+— is read as confirmation, at real-data scale, of the correlated-
+candidate-pool multiple-testing risk the control suite first surfaced
+synthetically (TD-70/TD-72/TD-74). The mission's own explicit acceptance
+criteria allow this kind of outcome: a real, non-fabricated, non-zero
+result that does not answer "yes, EGX30 contains real tradeable patterns"
+in the affirmative, because the result cannot yet be trusted at face
+value. No pattern from this run is wired into `live.LiveActivationEngine`
+or any capital-facing consumer.
+
+**What's still open**: TD-72/TD-74's remediation (a per-ticker VALIDATED
+cap, a dependence-robust multiple-testing correction, or cross-instrument
+corroboration for lead/lag) is not implemented — this mission's job was to
+measure and disclose the gap, not close it. The `regime_conditioned`
+positive control is verified at the candidate-generation level only, not
+end-to-end (TD-73). `failure-profile`/`cost-sensitivity` (Phases 11+13/15)
+were run against the real `VALIDATED` set as a supplementary analysis but
+are secondary to the headline finding above, since a pattern that
+shouldn't be trusted doesn't become trustworthy by also having a computed
+regime/cost profile.
+
+Per-phase detail, exact commands, and full statistics: `docs/
+PATTERN_DISCOVERY_FINAL_HOLDOUT.md`, `docs/VALIDATED_PATTERNS.md`, `docs/
+PATTERN_DISCOVERY_CONTROL_SUITE.md`, `docs/EGX30_DATA_SOURCE_QUALIFICATION.md`,
+`docs/EGX30_DATA_QUALITY_REPORT.md`.

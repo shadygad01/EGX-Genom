@@ -184,6 +184,50 @@ where future remediation work should look first.
   plausible-looking numbers, which is exactly why the *volume* (not any
   one pattern's own statistics) is the tell here.
 
+## Supplementary: bounded regime-sensitivity check on the top 20 patterns
+
+A follow-up, strictly supplementary analysis ran `agx research
+failure-profile` — unmodified, one `--pattern-id` invocation per pattern,
+no code or methodology changes — against the 20 `VALIDATED` patterns with
+the largest `holdout_sample_size` (the same ranking already shown in
+`docs/VALIDATED_PATTERNS.md`'s illustrative table; not re-selected using
+any `failure-profile` output). A full run across all 1,773 patterns was
+attempted twice and both times either exceeded a practical time budget or
+was terminated before completion in this environment; this 20-pattern,
+time-bounded run was chosen instead as a tractable substitute.
+
+**Results**: 20/20 patterns completed successfully, 0 failures, 0
+timeouts, ~41.5 minutes total runtime (~124–130s/pattern, dominated by
+panel reconstruction). Regime classification along the engine's six
+existing dimensions (volatility/breadth/dispersion/trend/correlation/
+turnover) at bucket counts k=2/3/4:
+
+- **113/120 (94.2%) dimension-checks preserved the same expectancy sign**
+  across k=2/3/4.
+- **13/20 patterns were fully stable across all 6 regime dimensions.**
+- `overall_tag` distribution: **8 `unconditional`, 5 `sensitive`, 4
+  `regime_specific`, 3 `unstable`, 0 `insufficient_data`.**
+- The three `unstable` patterns (one sign flip each, out of 6 dimensions):
+  `pattern_4a5b3f7cef56`, `pattern_7d427a69ac3b`, `pattern_00714f4f042b`.
+
+**Methodological limitation, stated explicitly**: regime-slicing
+stability is descriptive robustness evidence only. It does **not**
+establish pattern validity, a causal mechanism, out-of-sample
+reliability, or deployability. A persistent ticker-specific historical
+drift — the exact mechanism this report's own illustrative-evidence and
+TD-72/TD-74 sections already describe — can remain perfectly stable under
+regime re-bucketing while still being spurious; sign-stability across k
+cannot distinguish a real effect from that kind of artifact.
+
+**What this supplementary result does and does not mean**: it does
+**not** overturn this run's core conclusion, does **not** validate the
+1,773 `VALIDATED` patterns (or even the 20 checked here), and does
+**not** justify promoting, deploying, or trading on any of them. It does
+**not** require or imply that `failure-profile` should now be run on the
+remaining 1,753 patterns. TD-72/TD-74's findings, every pattern's
+`validation_status`, and this codebase's production decision logic are
+all unchanged by this analysis.
+
 ## What would make this run's `VALIDATED` set trustworthy
 
 Per TD-72: a per-ticker cap on how many patterns may reach `VALIDATED`

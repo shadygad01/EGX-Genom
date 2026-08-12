@@ -148,9 +148,25 @@ Layout:
   own lifecycle registry, deliberately separate from `agents.
   historical_patterns.HistoricalPatternsAgent` (single-ticker nearest-
   neighbor analog matching feeding one `ResearchFinding` into the normal
-  hypothesis pipeline). See the `patterns/` working-conventions bullet
-  below, `docs/PATTERN_DISCOVERY_DATA_AUDIT.md`, and `docs/
-  PATTERN_DISCOVERY_REPORT.md`.
+  hypothesis pipeline). Mission 2 (Data Unlock + Scientific Hardening,
+  2026-08-11) extended it with real (not mock) EGX price data
+  (`community_price_seed.py`, `universe_confidence.py`), a three-way
+  discovery/validation/holdout split, strengthened multiple-testing
+  control (`multiple_testing_family.py`), lead/lag discovery, a
+  positive/negative control suite (`control_suite.py`), regime/failure
+  characterization (`regimes.py`), transaction-cost sensitivity
+  (`transaction_costs.py`), and run reproducibility metadata
+  (`reproducibility.py`) — see the `patterns/` working-conventions bullet
+  below, `docs/PATTERN_DISCOVERY_DATA_AUDIT.md`, `docs/
+  PATTERN_DISCOVERY_REPORT.md` (Mission 1), and `docs/
+  PATTERN_DISCOVERY_FINAL_HOLDOUT.md`/`docs/VALIDATED_PATTERNS.md`/`docs/
+  PATTERN_DISCOVERY_CONTROL_SUITE.md`/`docs/EGX30_DATA_SOURCE_QUALIFICATION.md`
+  (Mission 2). Mission 2's real-data run is not a success story: it
+  promoted 1,773 patterns to `VALIDATED` from a 14-ticker universe, which
+  the report itself documents as strong evidence of an unresolved
+  multiple-testing gap (TD-72/TD-74), not 1,773 real market
+  inefficiencies — no pattern from that run should be treated as
+  trustworthy until TD-72's remediation lands.
 - `api/` — TypeScript (Fastify) service exposing the knowledge base and
   dashboard artifacts over HTTP; almost every route only reads a
   pre-produced JSON artifact. The one exception is `POST /decisions`
@@ -452,31 +468,43 @@ Layout:
   never a one-off fetch wired straight into a component. See
   `docs/ARCHITECTURE.md`'s "Dashboard data providers" section.
 - `patterns/` (`panel.py`, `features.py`, `targets.py`, `candidates.py`,
-  `evaluation.py`, `validation.py`, `multiple_testing.py`, `robustness.py`,
-  `registry.py`, `live.py`, `outcomes.py`, `decay.py`, `baselines.py`,
-  `engine.py`) is the EGX30 Autonomous Pattern Discovery Engine. Every
-  feature/target read must go through `FeatureSeries.as_of_value(t)` /
-  `TargetSeries.value_at(t)` — never index a `.values` list directly by
-  position from outside those classes, or the point-in-time guarantee
-  those methods enforce (never read a date after `t`) is bypassed.
+  `evaluation.py`, `validation.py`, `multiple_testing.py`,
+  `multiple_testing_family.py`, `robustness.py`, `registry.py`, `live.py`,
+  `outcomes.py`, `decay.py`, `baselines.py`, `engine.py`,
+  `community_price_seed.py`, `universe_confidence.py`, `regimes.py`,
+  `transaction_costs.py`, `reproducibility.py`, `control_suite.py`) is the
+  EGX30 Autonomous Pattern Discovery Engine. Every feature/target read
+  must go through `FeatureSeries.as_of_value(t)` / `TargetSeries.value_at
+  (t)` — never index a `.values` list directly by position from outside
+  those classes, or the point-in-time guarantee those methods enforce
+  (never read a date after `t`) is bypassed.
   `panel.build_research_panel()` is a thin materialization over
   `market_memory.MarketMemory.reconstruct()`, following that module's own
   "backtesting must never touch a `DataProvider` directly" rule — do not
   add a path that builds a `ResearchPanel` from a live provider or raw
   CSV directly. `engine.PatternDiscoveryEngine.discover()` (candidate
-  generation → discovery-sample screening → Benjamini-Hochberg FDR
-  control, persisting `DISCOVERED` patterns) and `.validate()` (purged
-  walk-forward OOS validation → robustness testing → baseline comparison,
-  transitioning to `VALIDATED`/`REJECTED`) are deliberately two separate
-  phases/CLI verbs, matching `registry.PatternStatus`'s lifecycle — do
-  not collapse them back into one call. A candidate that never clears the
-  discovery floor or FDR control is not persisted at all (cataloging
-  every one of possibly thousands of raw candidates would make the
-  registry's "never silently disappear" guarantee — which is about a
-  `DISCOVERED`/`VALIDATED`/`REJECTED` pattern worth remembering — into
+  generation → discovery-sample screening → family-corrected
+  Benjamini-Hochberg FDR control, persisting `DISCOVERED` patterns),
+  `.validate()` (purged walk-forward OOS validation → robustness testing
+  → baseline comparison, transitioning `DISCOVERED` → `VALIDATING`/
+  `REJECTED`), and `.final_holdout()` (Mission 2's three-way split: the
+  chronologically last `holdout_fraction` slice of each ticker's own
+  dates, never read by `discover()`/`validate()`, checked exactly once,
+  transitioning `VALIDATING` → `VALIDATED`/`REJECTED`) are deliberately
+  three separate phases/CLI verbs, matching `registry.PatternStatus`'s
+  lifecycle — do not collapse them back into fewer calls, and never treat
+  `VALIDATING` as equivalent to `VALIDATED`: only `final_holdout()` may
+  promote to `VALIDATED`. A candidate that never clears the discovery
+  floor or FDR control is not persisted at all (cataloging every one of
+  possibly thousands of raw candidates would make the registry's "never
+  silently disappear" guarantee — which is about a `DISCOVERED`/
+  `VALIDATING`/`VALIDATED`/`REJECTED` pattern worth remembering — into
   noise instead); once a pattern reaches `DISCOVERED`, it is never
-  deleted, only transitioned (`PatternRegistry.transition()`), including
-  a `REJECTED` verdict from `validate()`. `validation.py`'s
+  deleted, only transitioned (`PatternRegistry.transition()`, which
+  enforces a real lifecycle graph — REJECTED/RETIRED are terminal,
+  WEAKENING can return to VALIDATED/ACTIVE per `decay.py`'s "revalidate,
+  never silently remove" contract), including a `REJECTED` verdict from
+  either `validate()` or `final_holdout()`. `validation.py`'s
   `purge_and_embargo()` is this codebase's only purged/embargoed
   walk-forward implementation — reuse it rather than adding a second one
   if another package ever needs the same discipline.
@@ -487,13 +515,39 @@ Layout:
   breaking down over correlated engineered features (see
   `docs/PATTERN_DISCOVERY_REPORT.md`'s findings section) — do not remove
   it as redundant with `correlation_prune_threshold` without re-reading
-  that finding. `live.LiveActivationEngine` output is never a BUY/SELL
-  label (`PatternActivation.label` is always `"ACTIVE_PATTERN"`) —
-  preserve that vocabulary boundary in any consumer. This package ran
-  against this repository's actual data and correctly discovered/
-  validated zero patterns (`docs/PATTERN_DISCOVERY_REPORT.md`) — that is
-  not a bug to "fix" by loosening thresholds; real EGX price history
-  (TD-71) is what's missing, not a more permissive engine.
+  that finding. `multiple_testing_family.py`'s `family_corrected_p_value()`
+  (Mission 2) applies a further Bonferroni-style penalty scaled by how
+  many near-duplicate candidates within the same `candidate_family_key()`
+  family were tried, stacked *before* the global BH-FDR pass, not a
+  replacement for it. `live.LiveActivationEngine` output is never a
+  BUY/SELL label (`PatternActivation.label` is always
+  `"ACTIVE_PATTERN"`) — preserve that vocabulary boundary in any
+  consumer. Mission 1 ran this package against this repository's actual
+  data (a 10-day, 2-ticker synthetic fixture) and correctly discovered/
+  validated zero patterns (`docs/PATTERN_DISCOVERY_REPORT.md`) — that was
+  not a bug to "fix" by loosening thresholds, only a data-depth gap.
+  Mission 2 unlocked real, multi-year EGX price data
+  (`community_price_seed.py`, 75 tickers, ~4.6 years, third-party
+  MIT-licensed — see `docs/EGX30_DATA_SOURCE_QUALIFICATION.md`) and ran
+  the full pipeline against the 14 tickers that are both real, current
+  EGX30 constituents and covered by that seed: the result was **1,773
+  `VALIDATED` patterns**, which `docs/PATTERN_DISCOVERY_FINAL_HOLDOUT.md`
+  and TD-72/TD-74 document as strong evidence of an *unresolved*
+  correlated-candidate-pool multiple-testing gap (BH-FDR's
+  independence-based guarantee weakening under this engine's necessarily
+  correlated feature/candidate pool), not evidence of 1,773 real market
+  inefficiencies — do not cite that count as a success metric, and do
+  not wire any pattern from that run into `live.LiveActivationEngine` or
+  any capital-facing consumer until TD-72's remediation (a per-ticker
+  VALIDATED cap, a dependence-robust correction such as
+  Benjamini-Yekutieli, or cross-instrument corroboration for lead/lag)
+  lands and the run is repeated. `control_suite.py`'s positive/negative
+  control suite (`docs/PATTERN_DISCOVERY_CONTROL_SUITE.md`) is what first
+  surfaced this risk empirically, on synthetic data, before the real run
+  confirmed it at scale — rerun it (`agx research control-suite`) after
+  any change to the multiple-testing machinery to confirm the
+  false-VALIDATED rate actually improved, not just that the change
+  compiles.
 
 ## What NOT to do
 

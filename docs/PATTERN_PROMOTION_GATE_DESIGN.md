@@ -1800,3 +1800,451 @@ instruction. Implementation of the approved components may begin only
 once the six disabled-until-resolved items are tracked as explicit,
 visible prerequisites — not implemented, not decided unilaterally by this
 review.*
+
+---
+
+# Mission 3 Design Readiness Review — v2.1
+
+**Status: REVIEW ONLY.** No code, tests, thresholds, Mission 2 artifacts,
+production logic, the registry, any `validation_status`, or any
+`PromotionCase` record is changed by this section. This is a
+pressure-test of Part 2 (v2) itself — including of the prior "Design
+Readiness Review — v2" section above — not a restatement of it. Part 1,
+Part 2, and the v2 Readiness Review remain unmodified above this point.
+
+## Issue 1 — Redundancy aggregation
+
+**Question: can the eight redundancy dimensions be scientifically
+combined without arbitrary weighting or double-counting correlated
+evidence?**
+
+**No — not with any methodology that exists in this codebase today, and
+this review does not invent one.**
+
+First, a precision correction to Part 2 §5.2/§5.7 itself: §5.2 states
+"only the aggregate provisional scoring in §5.7 feeds a decision," but
+direct re-read of §5.7 shows it specifies **only** a Jaccard-overlap
+clustering methodology (pairwise overlap → threshold → connected
+components) — a single-dimension procedure, not a weighted combination of
+all eight named dimensions. **§5.2's own text overstates what §5.7
+delivers.** This review flags this as a wording correction Part 2 needs
+(not made here, since this is review-only): there is no "aggregate
+redundancy score" specified anywhere in v2, only a proposal to cluster on
+*one* of the eight dimensions.
+
+**Per-dimension classification:**
+
+| Dimension | Classification | Why |
+|---|---|---|
+| Exact duplicates | **HARD EXCLUSION** | The one dimension resting on logical identity, not statistical estimation: an identical `(ticker, conditions, target_id, regime_filter)` tuple is, by definition, zero incremental information — no calibration is needed to know that two byte-identical inputs produce identical evidence. Expected near-zero in practice (generation-time pruning already prevents most cases), but the exclusion rule itself requires no arbitrary judgment. |
+| Same-feature, different-window variants | **PROVISIONAL** | Strong domain prior (shared underlying series ⇒ serial correlation) that these are *not* independent, but the exact discount/collapse rule (count as 1? weight by 1/N? something else?) is undefined and would need calibration. The *qualitative* conclusion is close to hard; the *quantitative* treatment is not. |
+| Same-feature, different-threshold variants | **PROVISIONAL** | Same reasoning as above — near-certainly correlated (same series, same window, different cut point), exact discount undefined. |
+| Same-target variants | **INFORMATIONAL** | Predicting the same target with a *different* feature is not, on its own, evidence of redundancy — it could equally indicate genuinely complementary evidence. Its redundancy status is only resolvable via the Jaccard overlap check (below), so on its own it describes structure without gating anything. |
+| Cross-ticker variants, Variant A (ticker+window stripped) | **PROVISIONAL** | Step 1.5 already proved this specific granularity's count (22 families) swings 27.5× relative to Variant D on the identical data — a real signal, but one whose magnitude is highly sensitive to an arbitrary normalization choice, so it cannot be used as a bare number without that caveat attached every time. |
+| Cross-ticker variants, Variant B (window preserved) | **PROVISIONAL** | Same reasoning, different granularity (62 families, 2.8× vs. Variant A) — Step 1.5's own finding. |
+| Trigger-date Jaccard overlap | **PROVISIONAL** | Per the prior "Design Readiness Review — v2" §1: currently descriptive-only; the clustering threshold that would turn it into a decision is explicitly uncalibrated. |
+| Ticker concentration (HHI) | **PROVISIONAL** | Part 2 §5.3 itself declines to set a ceiling. The concept (concentration matters) is sound; the threshold is unset. |
+
+**Why a composite score cannot be defended today.** Several of these eight
+dimensions are not statistically independent measurements of different
+things — they are different lenses on the *same* underlying phenomena:
+
+- Same-feature/window variants, same-feature/threshold variants, and
+  Jaccard overlap are, for a single ticker's near-duplicate
+  parameterizations, measuring the **same** root cause (near-identical
+  candidates sharing serial correlation) from three different angles.
+  `candidates.py`'s own `match_overlap_prune_threshold` was built
+  specifically because feature-level correlation pruning alone proved
+  insufficient against exactly this kind of redundancy (Part 2 §5.6's own
+  citation) — i.e., this codebase's own history already demonstrates these
+  are entangled, not orthogonal, signals.
+- Cross-ticker Variant A and Variant B are two different-resolution
+  compressions of the *same* underlying question ("does this idea appear
+  on other tickers"), not two independent measurements — Step 1.5
+  characterized this explicitly as sensitivity to *one* choice, not two
+  separate facts.
+- Ticker concentration (HHI) is *computed from* the same family-membership
+  assignment that Variant A/B already use — it is a different statistic
+  over the same underlying data, not a new data source.
+
+**Combining these into one weighted score would therefore either (a)
+require an explicit model of the covariance between the dimensions
+themselves — which does not exist and is not proposed anywhere in this
+codebase — or (b) implicitly assign relative weights that, absent such a
+model, double- and triple-count the same underlying redundancy phenomenon
+under different names.** No defensible aggregation methodology exists in
+this repository (`patterns/`, `features/`, and every other package
+examined for this mission were checked; the closest analog, HHI itself, is
+a single-dimension statistic, not a multi-dimension aggregator).
+
+**Conclusion, stated explicitly per instruction: NO COMPOSITE REDUNDANCY
+SCORE is defensible today. A score cannot be implemented merely because
+multiple redundancy fields exist — the fields' inter-correlation must
+first be modeled, and no such model exists.** The `RedundancyReport`
+remains valid and useful as a **reporting layer** (each dimension surfaced
+separately, per Part 2 §5.2's original design), but any future work that
+turns it into one number requires either (a) an explicit statistical
+treatment of the cross-dimension correlation structure identified above,
+or (b) a design that uses the dimensions as independent, separately-gated
+checks (never summed/weighted together) — a materially different, safer
+approach this review recommends considering, but does not adopt here.
+
+## Issue 2 — Economic rationale
+
+**Question: hard promotion gate (A), mandatory-but-not-sufficient (B), or
+informational only (C)?**
+
+**Answer: B — mandatory review/evidence field, not sufficient for
+promotion, by itself.**
+
+Evidence reviewed, precisely:
+
+- **`causal.reasoner.EconomicRationaleGate`**: requires a stated candidate
+  cause *and* rationale, but **caps confidence at 0.5 even on a full
+  pass**, and never claims causal truth. This is the load-bearing
+  precedent: the *existing* system's own analogous gate is architected so
+  that passing it can never, by itself, push a claim's confidence past the
+  halfway point — i.e., the existing precedent already treats economic
+  rationale as necessary, never sufficient, by design, not by accident.
+- **`review.reviewers.EconomistReviewer`**: a *mechanical* check
+  (length/engagement heuristics, does the rationale engage the specific
+  claim) that explicitly "never judges economic truth." This is a
+  hygiene/completeness check — it can detect an *absent* or *vacuous*
+  rationale, but it structurally **cannot** distinguish a compelling,
+  well-written, but *wrong* economic story from a compelling, well-written,
+  *correct* one. A check that cannot detect wrongness cannot be a
+  sufficient gate on its own.
+- **`hypotheses.pipeline`** (`GateSpec`/`StageName`): economic-rationale-
+  adjacent review is one stage in a configurable, multi-stage, *required-
+  sequence* pipeline (`Observation → Hypothesis → Experiment → Statistical
+  Validation → Stress Test → Backtest → Peer Validation → Promotion`) — it
+  never substitutes for the statistical/backtest/peer-validation stages;
+  a hypothesis cannot skip them because its rationale is compelling.
+
+**Per instruction, A is not chosen merely because an analogous mechanism
+exists** — the analogous mechanisms were examined specifically to check
+whether they were ever used as a *sufficient* gate anywhere in this
+codebase, and none of the three is. That absence, not the mere existence
+of the mechanisms, is the basis for classification B.
+
+**The gate must never allow economic storytelling to compensate for
+failure of statistical, OOS, robustness, or redundancy evidence — and v2's
+own state-machine ordering already enforces this structurally, provided it
+is implemented exactly as sequenced.** The economic-rationale check gates
+entry to `PROMOTION_ELIGIBLE`, which is only reachable *after* `ROBUST`
+(itself only reachable after `OOS_VALIDATED`). A pattern that fails any
+hard statistical/OOS/robustness criterion never reaches the rationale
+check at all — rationale can only ever be an **additional** requirement
+layered on top of already-passed statistical gates, never a substitute
+path around them, as currently sequenced. **This is a genuinely reassuring
+finding, but it is an emergent property of the current ordering, not a
+separately stated invariant in Part 2's text.** This review recommends
+that a future revision state explicitly, as its own numbered rule: *"The
+economic-rationale gate may never be evaluated before, or used to
+compensate for, any hard statistical/OOS/robustness criterion"* — so the
+guarantee survives a future reordering rather than depending on an
+implementer noticing the current sequence's implicit property.
+
+## Issue 3 — Multiple-testing / promotion cohort
+
+**Six-stage decomposition, explicitly distinguished (not conflated):**
+
+1. **Original candidate-generation multiplicity** — the ~7,899 candidates
+   `PatternCandidateGenerator` actually produced. This is the true
+   hypothesis universe the original discovery-stage correction was
+   supposed to control against.
+2. **Discovery-stage selection** — `discover()`'s family-corrected-p-value
+   + BH-FDR pass, 7,899 → 3,398 `DISCOVERED`. Per Step 1.6 §7, **~4,501 of
+   the 7,899 (57%) were never persisted anywhere** — not the registry, not
+   the `TestingLedger`, no recoverable artifact. The exact
+   `len(discovery_ok)` intermediate count (how many even had an evaluable
+   distribution before correction) was never persisted either.
+3. **Validation selection** — `validate()`'s further 3,398 → 1,880
+   `VALIDATING` filter (walk-forward sign-agreement + robustness +
+   baseline-beat). This is a **further, separate selection process on an
+   already-selected population**, applying hard pass/fail thresholds, not
+   a rank-based multiple-testing correction — whatever false-discovery
+   risk survives stage 2 propagates through stage 3 unaudited by any
+   FDR-style procedure specific to this stage.
+4. **Family/redundancy dependence** — the correlation structure among
+   candidates (near-duplicate parameterizations, shared tickers, shared
+   market-wide factors) that makes BH's independence/PRDS assumption
+   questionable (TD-70/TD-72's own diagnosis, reused verbatim by Part 1
+   §7.2). `family_corrected_p_value()` addresses only the **same-ticker**
+   component of this (it groups via `candidate_family_key()`, which
+   includes ticker) — it was never designed to, and does not, address
+   **cross-ticker** common-factor dependence (e.g., the broad positive
+   EGX market drift Step 1.6 independently confirmed). This dependence was
+   never fully modeled at *any* stage, past or proposed.
+5. **Promotion-cohort selection (v2's new proposal, §6.4)** — a BH/BY pass
+   over whichever `PromotionCase`s are simultaneously open at a given
+   moment, a much smaller and much later population than stage 1's 7,899.
+6. **Paper-validation selection** — the final `PAPER_VALIDATED → PROMOTED`
+   gate, per-pattern (sign-agreement + floor), not itself a multiple-
+   testing-corrected procedure. **If multiple patterns are simultaneously
+   in paper validation at once, the same multi-comparisons concern applies
+   here too, and v2 does not currently address it** — a real gap this
+   review surfaces (Part 2's §6.4 is scoped to the `PROMOTION_ELIGIBLE`
+   cohort only, with no analogous mechanism proposed for a simultaneously-
+   running paper-validation cohort).
+
+**Would applying BH/BY only at stage 5 (the promotion cohort) actually
+control the relevant false-discovery process? No — and this must be
+stated precisely, not glossed over:**
+
+A promotion-cohort-level correction controls **only the new
+multiple-comparisons problem introduced by simultaneously considering N
+patterns for promotion at one moment (stage 5 itself).** It cannot, and
+does not, reach back and correct:
+
+- **Stage 1/2's original selection** — its true denominator (how many
+  candidates were genuinely tested, under what dependence structure) is
+  **permanently and irrecoverably unknown** for this specific Mission 2
+  run, per Step 1.6 §7's confirmed 4,501-candidate persistence gap. A
+  later correction step operating on the *surviving* population's
+  statistics has no way to reconstruct information that was never written
+  down about the population that did *not* survive.
+- **Stage 3's post-selection-inference (winner's-curse) bias** — already
+  named in Part 2 §6.2 as an unresolved gap; a cohort-level correction
+  over already-selected statistics does not correct for those statistics
+  being optimistically biased by the very process that selected them.
+- **Stage 4's cross-ticker dependence** — never modeled by
+  `family_corrected_p_value()` at any point; a cohort-level BH/BY pass
+  uses the earlier stages' p-values as its *input*, and inherits whatever
+  miscalibration those inputs carry from the unmodeled dependence
+  structure. Garbage-in-garbage-out with respect to this specific
+  problem.
+
+**Per the explicit instruction: this review does not claim a later BH/BY
+pass repairs this historical information loss. The correct statistical
+answer is that the original selection process (stages 1–2, and stage 4's
+dependence structure) cannot be fully corrected from the persisted data —
+this is a permanent limitation of any analysis built on this specific
+historical Mission 2 run, not a problem a later correction step can fix.**
+A promotion-cohort-level correction (§6.4) remains worth doing — it
+controls a real, distinct, *later* multiplicity problem — but it must
+never be described, in any future documentation, as "controlling
+false discoveries end-to-end" or as making the original run's
+statistics newly trustworthy. This caveat should accompany every citation
+of the cohort-level correction in any future revision.
+
+## Issue 4 — Gate classification audit
+
+Every proposed v2 criterion, reclassified into the five-way scheme.
+"Empirical calibration?" answers whether a real, measured (not merely
+declared) value exists. "Can it leak information?" flags any pathway by
+which evaluating the gate could let information flow backward into an
+earlier decision or let the gate's own outcome be influenced by having
+been observed before being finalized.
+
+| Criterion | Evidence required | Why it belongs | Inherited / new | Empirical calibration? | Can it leak information? | Failure state | Classification |
+|---|---|---|---|---|---|---|---|
+| Direction scope | `expectancy > 0` at frozen v1 intake | Scope boundary (Step 1.7) | New gate, inherited field | N/A — policy, not statistic | No — reads only the pattern's own already-frozen, pre-existing value | `OUT_OF_SCOPE_FOR_PROMOTION` | **HARD** |
+| OOS sign agreement | Sign of fresh, post-`as_of` matched observations vs. frozen discovery/validation sign | The one evidence source in the whole pipeline guaranteed leak-free by construction (postdates the original run) | Inherited rule (`WalkForwardValidator`/`final_holdout()`'s own construction) | N/A — a logical test, not a tunable number | **Yes, if window re-checking is not disciplined** — see the new finding below | `REJECTED` (disagreement) | **HARD**, contingent on strict pre-registration of the window (an implementation-fidelity dependency, not a design gap) |
+| OOS sample floor | Matched-observation count ≥ declared floor (currently 10, inherited) | Statistical power floor | Inherited | No — explicitly flagged provisional/uncalibrated by the prior review | **Yes — see new finding below (repeated-peeking risk)** | `INSUFFICIENT_EVIDENCE` | **PROVISIONAL** |
+| Bootstrap CI lower bound `> 0` | Fresh bootstrap CI on OOS-window expectancy, 1,000 iterations, α=0.05 | Effect-size/uncertainty floor beyond a point-estimate sign check | New gate, reuses existing bootstrap machinery | No — 95% coverage untested for this purpose | Same repeated-peeking risk as the OOS floor if not disciplined | `REJECTED` | **PROVISIONAL** |
+| Net-of-cost expectancy `> 0` | `RobustnessResult.net_of_cost_expectancy > 0` | Baseline economic viability (20bps floor) | Inherited rule; **but the number is not persisted** (prior review) | The 20bps constant itself is a declared, uncalibrated figure, never validated against real EGX execution costs | No inherent leak, provided recomputation always uses the frozen intake snapshot, never a re-derived one | `REJECTED` | **HARD** (the rule) / **BLOCKING DEPENDENCY** (the implementation — must recompute fresh, per prior review) |
+| Baseline comparison | `beats_baseline()` result | Economic significance vs. passive benchmark | Inherited rule; **number not persisted** (prior review) | Same 20bps caveat | Same as above | `REJECTED` | **HARD** (rule) / **BLOCKING DEPENDENCY** (implementation) |
+| Robustness perturbations | `RobustnessResult.passed` (all perturbations agree in sign) | Overfitting/parameter-sensitivity check | Inherited rule; **full object not persisted, only the boolean summary** | N/A — a logical test | No inherent leak | `REJECTED` | **HARD** (rule) / **BLOCKING DEPENDENCY**, with a genuinely open design choice flagged below (trust the persisted boolean vs. recompute the full object) |
+| Regime stability | `PatternFailureProfile.overall_tag != unstable` | Avoid promoting a pattern whose evidence is entirely regime-specific | Inherited machinery (`regimes.py`), **new as a gate** | N/A | No inherent leak | `INSUFFICIENT_EVIDENCE` (if not computable) / `REJECTED` | **BLOCKING DEPENDENCY** — confirmed via direct code re-read this review (`cli.py:387-399`) that `analyze_pattern_failure_conditions()` is invoked only via CLI, on demand, and per this codebase's own documented Mission 2 history was run for only a bounded top-20 subset — **not** "already computed per-pattern" for the real 1,773-pattern population, as Part 2 §5.5 currently implies |
+| Redundancy (`RedundancyReport`, 6 dims + correlation + regime-independence + Jaccard) | See Issue 1's per-dimension table | Detect non-independent "corroboration" | Mixed inherited/new, per dimension | Mixed, per dimension | Low, by construction (input-side, not outcome-side) — see Issue 1's population-level caveat | `INSUFFICIENT_EVIDENCE` if not computable | **INFORMATIONAL** overall today — v2 §8 itself already states dimension C is "reported only, not yet a pass/fail" |
+| Economic rationale | Non-empty, minimum-substance `economic_rationale` + passing `CausalAssessment` | Catches the complete-absence-of-mechanism case; never sufficient alone (Issue 2) | Inherited structurally (`EconomicRationaleGate`/`EconomistReviewer`) | Providing-a-rationale: no calibration needed. Substance bar: untested transfer to this context | No — evaluated on the pattern's own already-frozen definition | `REJECTED` (empty/placeholder) | **HARD** (must be non-empty) + **PROVISIONAL** (substance bar) — never sufficient alone by design (Issue 2) |
+| Multiple testing | See Issue 3's six-stage table | Controls false-discovery risk at whichever stage is being evaluated | Mixed — see Issue 3 | Stage 1–2: permanently unrecoverable (Issue 3). Stage 5: no history yet | Not a leak risk in the input-corruption sense, but see Issue 3's inheritance-of-bias finding | `REJECTED` once cohort correction is resolved | Stage 1–2/4: **HARD-INHERITED-BUT-PERMANENTLY-INCOMPLETE**. Stage 5: **BLOCKING DEPENDENCY** (BH-vs-BY undecided). Stage 6: **OUT OF SCOPE** — not addressed by v2 at all (new finding, Issue 3) |
+| Provenance (data-window integrity) | Non-overlapping, chronologically ordered evidence windows, append-only ledger | Prevents evidence-window reuse/leakage across stages | New entity, structural pattern inherited from `genome.mutate()`/`PatternRegistry` | N/A — structural, not a statistic | This check **is** the anti-leak mechanism itself; its own correct implementation is what prevents leaks elsewhere | Hard integrity error (not a graceful failure state) | **HARD** |
+| Paper validation | `PaperValidationRun` pre-registered window/criteria met, frozen definition, zero capital | Final, live-forward confirmation | Criterion shape inherited (`final_holdout()`); window/criteria parameters new | Window length: needs ≥1 full real cycle to calibrate (sequential bootstrapping, same as BH-vs-BY) | **Yes — see new finding below (mid-window peeking not explicitly forbidden)** | `REJECTED` (criteria not met at close) | **HARD** (structure) / **PROVISIONAL** (window/criteria parameters) |
+
+**New leak-risk finding, not previously surfaced**: v2's text specifies
+*that* the OOS window and the paper-validation window are each pre-
+registered before evaluation, but does **not** explicitly forbid
+**repeated peeking** during an open `INSUFFICIENT_EVIDENCE` or open
+`PaperValidationRun` state — i.e., nothing in the current text prevents a
+human or automation from checking the running status daily and effectively
+choosing *when* to declare the window closed based on how the evidence is
+trending, which would reintroduce exactly the "repeated holdout testing"
+risk Part 1 §6 already lists as a forbidden practice, just via a different
+mechanism (peek-and-stop instead of retest-with-a-new-window). **This
+review recommends a future revision add an explicit rule: a window's
+status may be evaluated only at its pre-registered close condition (fixed
+date, or fixed observation count reached), never checked and acted upon
+mid-window.**
+
+## Issue 5 — Detect redundant gates
+
+Named criteria assessed: positive expectancy, net expectancy `> 0`,
+baseline beat, bootstrap CI `> 0`, robustness sign agreement.
+
+| Pair | Relationship |
+|---|---|
+| Positive expectancy vs. net expectancy `> 0` | **Essentially redundant.** Net expectancy is literally `expectancy − 0.002`; requiring `net expectancy > 0` is requiring `expectancy > 0.002` — the same underlying quantity, evaluated at a shifted constant threshold, not new information. |
+| Net expectancy `> 0` vs. baseline beat | **Partially overlapping.** Same numerator (net expectancy) compared against a *different*, data-dependent reference point (the ticker's own baseline mean) rather than a fixed constant. Adds real information (does the pattern beat a market-specific bar, not just an arbitrary zero-plus-cost bar) — Step 1.6 §4 already showed this is the single largest real rejection category (62% of all rejections), i.e., it *does* discriminate beyond the net-expectancy-alone test — but it is still built from the same core statistic. |
+| {Net expectancy, baseline beat} vs. bootstrap CI `> 0` | **Partially overlapping.** The CI is built from the exact same sample of matched outcomes used for the point-estimate tests above — highly correlated with them, but adds genuinely distinct information (uncertainty/precision, not just point value): a pattern can have positive net expectancy on a small, noisy sample and still fail a CI lower-bound test. Not fully redundant, not fully independent. |
+| Robustness sign-agreement vs. the rest | **Partially overlapping — the closest to independent of the five, but not fully.** Genuinely distinct information in principle (specification stability across parameter perturbations, not magnitude/significance of one specific parameterization). But per Step 1.6's own confirmed finding of a broad, common positive market-drift factor across the real universe, a shared root cause could simultaneously make the point estimate positive *and* make perturbations agree in sign, for the same underlying reason — meaning even this dimension is not cleanly orthogonal to the others on this specific real dataset. |
+
+**No pair among these five is fully independent evidence.** The finding
+required by the instruction: **v2, as currently specified across
+Dimensions E/F/G/H (Part 2 §8), risks presenting what is substantially
+*one* underlying signal — the pattern's historical expectancy and its
+statistical/economic significance, evaluated against progressively
+stricter bars — as if it were four or five separately corroborating
+pieces of evidence.** This is exactly the "counting the same historical
+evidence multiple times under different names" risk the instruction warns
+against.
+
+**Recommended regrouping (a recommendation for a future revision, not an
+edit made here):** treat "expectancy magnitude/significance" — raw
+expectancy, net-of-cost expectancy, baseline-beat, and CI-lower-bound —
+as **one evidentiary family** (progressively stricter tests of the same
+underlying question: is there a real, economically meaningful effect),
+and treat robustness/perturbation-stability as a **second, more
+genuinely distinct family**. This yields roughly two largely-independent
+evidentiary families instead of five nominally-independent ones, and
+directly prevents inflating the gate's apparent evidentiary weight.
+
+## Issue 6 — Critical OOS question
+
+**Should genuinely-post-original-run data be a prerequisite for
+`OOS_VALIDATED`, `ROBUST`, `PROMOTION_ELIGIBLE`, or all of them?**
+
+**Nuanced answer, not a single blanket "all of them":**
+
+- **`OOS_VALIDATED`: required, mandatory.** This is the gate's entire
+  purpose. Confirmed by re-checking Part 2 §9's exact definition
+  ("strictly after the original run's `as_of` date... data that did not
+  exist, in any form, at any point during discovery, feature selection,
+  threshold selection, or pattern selection"): this correctly and
+  precisely **excludes** Mission 2's own already-spent `final_holdout()`
+  slice, since that slice's dates are all historical (before `as_of`),
+  never future relative to it. **This review confirms the existing
+  definition is airtight on this specific point** — a pattern cannot
+  satisfy `OOS_VALIDATED` using data that influenced any previous
+  selection, exactly as required.
+- **By transitivity, required for everything downstream** — `ROBUST`,
+  `PROMOTION_ELIGIBLE`, `PAPER_VALIDATED`, and `PROMOTED` are all only
+  reachable *through* `OOS_VALIDATED` in the state machine, so none of
+  them can be reached without the pattern first having satisfied the
+  freshness requirement once.
+- **`ROBUST`'s own internal checks do *not* independently require fresh
+  data, and this is correct, not a gap** — direct re-check of Part 2 §3/§8
+  confirms Dimensions F/G/H (net-of-cost expectancy, baseline-beat,
+  robustness perturbations) and the `RedundancyReport` are computed from
+  the pattern's **original, Mission-2-era discovery/validation-period
+  data** (the frozen intake snapshot's own `anchor_dates`), not the fresh
+  OOS window. This is legitimate: these checks test a conceptually
+  *different* property — was the original finding well-specified and not
+  overfit to one arbitrary parameter — which is inherently a question
+  about the *original* specification, not about forward generalization
+  (which `OOS_VALIDATED` already tests separately). Testing perturbation
+  robustness against the fresh OOS window alone would in fact be
+  *worse* — that window is deliberately small (a sample-floor discussion
+  already flags this), and running many perturbation variants against a
+  small fresh sample would be underpowered. **This review recommends this
+  division of labor be stated as an explicit, numbered invariant in a
+  future revision** — it is currently correct but only implicit, and a
+  future implementer could plausibly (and wrongly) "fix" it by trying to
+  make `ROBUST` also use fresh-only data.
+- **`PAPER_VALIDATED` introduces its own, still-later window, correctly
+  guaranteed non-overlapping by v2's own existing provenance-integrity
+  check** ("no stage's window may overlap any earlier stage's window for
+  the same pattern," Part 2 §8) — confirmed this already covers the
+  `OOS_VALIDATED`-window-vs-`PAPER_VALIDATED`-window case without
+  needing a new rule.
+
+**One genuine ambiguity surfaced by this review**: the provenance-
+integrity rule's scope — "for the same pattern" — is not explicit about
+whether it applies **within one `PromotionCase`** only, or **across every
+`PromotionCase` ever opened for the same underlying `Pattern` id** (e.g.,
+after a failed `PaperValidationRun` closes and a brand-new
+`PromotionCase` opens for the same, unchanged pattern, per Part 2 §6/§9's
+restart rule). **The stricter, cross-case reading is the one this review
+recommends**: if a new case for the same pattern could reuse the *prior*
+case's already-spent `OOS_VALIDATED` window, that would create exactly
+the repeated-paper-validation "keep retrying until it works" loophole the
+frozen-snapshot discipline exists to prevent. This should be made
+explicit in a future revision, not left to interpretation.
+
+## Issue 7 — Final state-machine audit
+
+| Question | Finding |
+|---|---|
+| Is `INSUFFICIENT_EVIDENCE` terminal or resumable? | **Explicitly resumable** (Part 2 §2/§3, carried from Part 1 §4) — a case re-enters the *same* stage once more evidence exists. Unambiguous in text. **New gap**: no maximum retry count or staleness/abandonment path exists — a case could sit at `INSUFFICIENT_EVIDENCE` indefinitely (e.g., a ticker that gets delisted, or a condition that essentially never triggers again) with no terminal "abandoned" classification distinct from an active, still-waiting case. |
+| Can a pattern move backward? | **No** — confirmed by re-reading the full state diagram; the only "backward-like" motion is `INSUFFICIENT_EVIDENCE`'s same-stage retry, which is not a demotion to an earlier stage. Monotonic forward progression is preserved, matching the "no repeated holdout testing" anti-leakage rule. **One related gap**: unlike `decay.DecayMonitor`'s existing `VALIDATED → WEAKENING → VALIDATED` precedent for the research pipeline, the Promotion Gate's own state machine has **no analogous revocation/decay path for an already-`PROMOTED` pattern** — `PROMOTED` is a genuine dead end within this gate's own machinery. Confirmed this is the *same*, already-acknowledged "output destination" open question (Part 2 §13.5), not a new discovery — restated here because Issue 7 specifically asks about it. |
+| Does changing a frozen definition create a new identity? | **Yes, unambiguously** — confirmed via Part 2 §6/§10 (carried from Part 1): a mismatch between the frozen snapshot and the live `Pattern` is a hard integrity error; any material change requires a brand-new `PromotionCase` against a brand-new `Pattern` id. The comparison is precisely scoped to the frozen fields (`conditions`, `regime_filter`, `target_id`, `ticker`) — well-specified, not ambiguous. |
+| Can paper validation be restarted without contamination? | **Yes, structurally** — a restart requires closing the current run and opening a brand-new `PaperValidationRun` under a brand-new `PromotionCase`, never an in-place edit (Part 2 §9, carried from Part 1 §10). **But see Issue 6's flagged ambiguity**: whether the new case's `OOS_VALIDATED` window may reuse the prior case's window is not explicit, and the stricter (non-reuse) reading is the one this review recommends to prevent a repeated-retry loophole. |
+| Does `PROMOTED` have any meaning while `patterns/` has no production consumer? | **Yes, a narrow, factual one, and this review states it precisely**: today, `PROMOTED` means only "this `PromotionCase`'s evidence bundle is complete and internally consistent" — it carries **no operational consequence** anywhere in this codebase, confirmed by Step 1.7's grep-verified finding that nothing outside `patterns/` (and its own tests/`cli.py`) imports the package. This is a known, deliberate, unchanged limitation (Part 2 §13.5's "output destination" question, still explicitly out of scope) — not a defect this review is newly discovering, but worth restating precisely since Issue 7 asks directly: `PROMOTED` is an evidentiary milestone, not a decision-relevant state, until and unless a future mission answers the output-destination question. |
+
+## Required conclusion
+
+**READY_WITH_REQUIRED_DESIGN_CHANGES.**
+
+**Not `NOT_READY`**: none of the findings above involve contaminated or
+unrecoverable evidence for the gate's core hard criteria. The direction-
+scope gate remains fully sound (confirmed safe at every `Pattern` revision
+by the prior readiness review). The state machine's core forward-only
+structure, frozen-snapshot discipline, and v1-only-read rule for the
+corrupted statistical fields are all correctly specified. The three major
+issues this review was specifically required to resolve before
+`READY_FOR_IMPLEMENTATION` could even be considered — redundancy
+aggregation, economic rationale, and multiple testing — **all now have
+defensible, evidence-grounded answers**: no composite redundancy score
+(defaulting to a reporting-only layer); economic rationale classified B
+(mandatory, never sufficient, structurally incapable of compensating for
+statistical failure as currently sequenced); and multiple testing's
+central limitation stated plainly (the original candidate-generation
+selection process cannot be fully corrected from the persisted data, and
+a promotion-cohort correction must never be described as if it repairs
+that).
+
+**Not `READY_FOR_IMPLEMENTATION`**: per instruction, that classification
+requires all three major issues to have defensible answers — they do, but
+those defensible answers **themselves mandate specific corrections to how
+v2 is worded and structured**, which is precisely why "defensible answer"
+is not the same as "implement as currently written." This review
+identified, beyond the three major issues, a materially long list of
+concrete, nameable design-text issues that would mislead a literal
+implementer if v2 were handed over unchanged:
+
+1. §5.2's "aggregate provisional scoring in §5.7" overstates what §5.7
+   actually specifies (Issue 1).
+2. The economic-rationale-cannot-compensate guarantee is currently an
+   emergent property of gate ordering, not a stated invariant (Issue 2).
+3. Every citation of the promotion-cohort multiple-testing correction
+   needs the explicit caveat that it does not, and cannot, repair the
+   original selection process (Issue 3).
+4. Dimensions F/G/H's "re-assert, does not recompute" framing is
+   inaccurate for the real registry — `RobustnessResult`,
+   `PatternFailureProfile`, and `TransactionCostSensitivity` are not
+   persisted at the granularity v2 assumes, confirmed by fresh code
+   re-read this review (`registry.py`, `cli.py:387-404`) (Issue 4).
+5. No re-check-cadence rule exists to prevent repeated-peeking leakage at
+   `OOS_VALIDATED`/`PaperValidationRun` (Issue 4).
+6. Dimensions E/F/G/H risk being counted as five independent pieces of
+   evidence when they substantially reduce to roughly two evidentiary
+   families (Issue 5).
+7. The division of labor between `OOS_VALIDATED` (fresh data) and
+   `ROBUST` (original-era data, correctly) is currently correct but
+   implicit, not a stated invariant (Issue 6).
+8. The provenance-integrity rule's scope across multiple `PromotionCase`s
+   for the same pattern is ambiguous and should be resolved toward the
+   stricter, cross-case reading (Issue 6/7).
+9. `INSUFFICIENT_EVIDENCE` has no staleness/abandonment path (Issue 7).
+10. A genuinely open design choice — trust the persisted
+    `robustness_passed` boolean vs. recompute the full `RobustnessResult`
+    — is currently unresolved and unflagged in v2's own text (Issue 4).
+
+None of these ten items are fundamental or unfixable; each is a specific,
+correctable revision to the specification's wording or an explicit
+decision to record. But implementing v2 literally as currently written,
+without addressing them, would produce a Promotion Gate that is more
+permissive, more leak-prone, and more likely to over-count evidence than
+the design's own stated intent — which is the precise failure mode this
+readiness review exists to catch before implementation begins.
+
+---
+
+*End of v2.1 Design Readiness Review. No code, tests, registry data,
+validation statuses, or `PromotionCase` records were created or modified
+to produce this section. No threshold was invented, chosen, or finalized.
+Part 1, Part 2, and the prior "Design Readiness Review — v2" section
+remain unmodified above this point. Implementation does not begin until
+the ten items listed above are addressed in a future revision of the
+specification.*

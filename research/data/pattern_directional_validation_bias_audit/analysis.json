@@ -1,0 +1,397 @@
+{
+  "audit": "Mission 3 Step 1.6: Directional Validation-Bias Audit",
+  "category_v1_expectancy_stats": {
+    "BASELINE_failure": {
+      "max": 0.01826215602395322,
+      "mean": 0.01106998967360158,
+      "median": 0.010975464280754698,
+      "min": 0.004604034852821045,
+      "n": 1007,
+      "n_negative_or_zero": 0,
+      "n_positive": 1007
+    },
+    "HOLDOUT_sample_floor": {
+      "max": 0.02014697043618062,
+      "mean": 0.014543154261059829,
+      "median": 0.014126220003363046,
+      "min": 0.010825950210239401,
+      "n": 16,
+      "n_negative_or_zero": 0,
+      "n_positive": 16
+    },
+    "HOLDOUT_sign_disagreement": {
+      "max": 0.028995690896919807,
+      "mean": 0.01619795324426792,
+      "median": 0.015243804062680583,
+      "min": 0.009721963113614117,
+      "n": 91,
+      "n_negative_or_zero": 0,
+      "n_positive": 91
+    },
+    "ROBUSTNESS_ambiguous": {
+      "max": 0.026379068662104183,
+      "mean": 0.002930224791816777,
+      "median": 0.00012248183764382433,
+      "min": -0.03962553558897468,
+      "n": 511,
+      "n_negative_or_zero": 196,
+      "n_positive": 315
+    }
+  },
+  "classification": {
+    "category": "E",
+    "components": [
+      {
+        "evidence": [
+          "94.3% (3,202/3,398) of DISCOVERED (v1) patterns already have positive expectancy BEFORE any validate()-stage gate runs, despite discover()'s significance test (evaluation.py's bootstrap p-value) being genuinely two-sided/sign-neutral.",
+          "Independent, registry-free computation of unconditional mean forward returns directly from the real EGX price seed data across the same 14-ticker universe (see market_drift below) shows a strong positive nominal drift (+0.83%/5 trading days, +1.68%/10 trading days, pooled across tickers) despite a near-coin-flip 49.2% unconditional up-day rate -- i.e. up moves are larger than down moves on average, consistent with a nominal-currency-inflation-driven upward-biased market over this real sample window (2022-2025-ish), not a code artifact.",
+          "Both GT- and LT-conditioned survivors are overwhelmingly positive (92.9% and 98.6% respectively -- LT is if anything MORE positive), which rules out a simple 'one operator direction is coded wrong' explanation and is consistent with both directions inheriting the same underlying positive market drift.",
+          "1,007 of 1,625 rejections (62%) were BASELINE_failure: patterns with genuinely positive expectancy (mean +1.11%, range +0.46% to +1.83%) that still failed to beat their own ticker's buy-and-hold baseline -- direct evidence the baseline itself (a real per-ticker market-drift measurement) was high enough to eliminate even solidly positive candidates, which is only possible if the underlying market drift is itself strongly positive."
+        ],
+        "id": "C",
+        "label": "Statistical/data-generating asymmetry"
+      },
+      {
+        "evidence": [
+          "robustness.py:126's 'transaction_cost_survival = net_expectancy > 0' is a hard, absolute (not sign-relative, not abs()-based) positive-only test that would reject ANY negative-expectancy pattern outright, in ANY market regime -- this is a real, independent, additive source of directional selection, not merely a restatement of the market-drift finding above.",
+          "The identical 'net_expectancy > 0' pattern recurs verbatim in transaction_costs.py:83, a separate module -- suggesting the long-only framing (never modeling a short/inverse position for a negative-expectancy signal) is a consistent, if never explicitly documented, design assumption across the patterns package, not a one-off typo.",
+          "511 rejections were categorized ROBUSTNESS_ambiguous; of these, 400 are deterministically explained by the transaction-cost floor alone (v1.expectancy - 0.002 <= 0), independent of any perturbation-sign-flip evidence -- a directly quantified lower bound on how many rejections this one code-level gate alone caused.",
+          "No docstring, comment, or design doc anywhere in patterns/ (all read fresh for this audit) frames this as a deliberate 'long-only, positive-expectancy patterns only' design decision -- live.py's own docstring instead frames the package as deliberately direction-agnostic ('never a BUY/SELL label'), which is in tension with a gate that hard-codes long-only economics."
+        ],
+        "id": "B",
+        "label": "Accidental implementation bias (long-only assumption baked into two independent gates)"
+      }
+    ],
+    "label": "Mixed explanation with two independently-evidenced components",
+    "why_not_A": "No code, docstring, or doc anywhere in patterns/ states 'reject negative-expectancy patterns because only long signals are tradeable' or equivalent -- robustness.py's own docstring frames transaction_cost_survival purely in terms of realistic cost modeling, not directional intent. Absence of any such statement across every file read for this audit is the basis for ruling out full intentionality.",
+    "why_not_D": "Sufficient evidence was directly recoverable from the persisted registry, testing ledger, and (independently) the raw real price data to support both components above with specific counts and code citations -- this is not a case where the decisive evidence is unrecoverable. (The upstream ~4,501-candidate discovery-pool loss IS a genuine, separately-flagged unrecoverable gap -- see discovery_pool_loss above -- but it does not block this classification, since the 94.3%-positive-at-DISCOVERED finding and the code-level gate citations are both independent of that unrecoverable pool.)",
+    "why_not_pure_B": "The code-level transaction-cost gate alone does not explain why 94.3% of patterns were ALREADY positive at the DISCOVERED stage, before that gate ever runs -- discover()'s own significance test is genuinely two-sided and sign-neutral (verified by direct code reading), so the pre-gate skew must trace to the data itself, not to engine code.",
+    "why_not_pure_C": "The market-drift explanation alone does not account for the 400 ROBUSTNESS_ambiguous rejections deterministically caused by the fixed 20bps floor regardless of regime, nor for the fact that the SAME 'net_expectancy > 0' (not baseline-relative) code pattern recurs in a second, independent module (transaction_costs.py) -- a code-level mechanism exists that would reproduce (part of) this bias even in a flat or negative-drift market."
+  },
+  "code_audit": [
+    {
+      "file": "research/src/agx_research/patterns/evaluation.py",
+      "finding": "_bootstrap()'s p-value is two-sided: 'opposite_side = sum(1 for m in means if (m <= 0) != (observed_mean <= 0))', p_value = min(1, 2*min(opposite_side, iterations-opposite_side)/iterations). This treats a strongly negative mean exactly as significant as a strongly positive one of the same magnitude. No sign preference anywhere in this stage.",
+      "gate": "discover() discovery-sample significance (BH-FDR over family-corrected bootstrap p-values)",
+      "lines": "43-63 (_bootstrap), 85-125 (evaluate_outcomes)",
+      "sign_relative_or_positive_only": "sign_neutral"
+    },
+    {
+      "file": "research/src/agx_research/patterns/multiple_testing.py, multiple_testing_family.py",
+      "finding": "Both operate purely on p-value magnitude and family/complexity size. Neither reads expectancy or sign at all.",
+      "gate": "multiple_testing.benjamini_hochberg() / multiple_testing_family.family_corrected_p_value()",
+      "lines": "multiple_testing.py:21-37, multiple_testing_family.py:76-77",
+      "sign_relative_or_positive_only": "sign_neutral"
+    },
+    {
+      "file": "research/src/agx_research/patterns/validation.py",
+      "finding": "'(oos_distribution.expectancy > 0) != (discovery_distribution.expectancy > 0)' rejects on DISAGREEMENT, not on negativity. A candidate whose discovery-sample AND out-of-sample expectancy are both consistently negative passes this gate.",
+      "gate": "validation.WalkForwardValidator.validate() -- OOS-vs-discovery sign agreement",
+      "lines": "170-174",
+      "sign_relative_or_positive_only": "sign_relative (agreement), not positive-only"
+    },
+    {
+      "file": "research/src/agx_research/patterns/robustness.py",
+      "finding": "'net_expectancy = base_dist.expectancy - (transaction_cost_bps / 10_000)'; 'result.transaction_cost_survival = net_expectancy > 0'; 'result.passed = (agreeing == len(executed)) and bool(result.transaction_cost_survival)'. This tests raw net_expectancy > 0, never abs(net_expectancy) > cost, and never considers the candidate's signal as a short/inverse position. Any candidate with expectancy <= 0.002 (20bps) -- negative, zero, or weakly positive -- fails transaction_cost_survival and therefore fails result.passed unconditionally, regardless of how consistent its perturbation sign-agreement was.",
+      "gate": "robustness.RobustnessTester.run() -- transaction_cost_survival",
+      "lines": "124-126, 142-143",
+      "sign_relative_or_positive_only": "POSITIVE_ONLY (hard, absolute)"
+    },
+    {
+      "file": "research/src/agx_research/patterns/engine.py",
+      "finding": "'elif robustness_result is not None and not robustness_result.passed: reason = ...' -- status defaults to PatternStatus.REJECTED whenever this branch is taken. This is the exact point where the robustness gate's positive-only transaction_cost_survival check becomes a hard registry-level REJECTED verdict.",
+      "gate": "engine.validate() -- robustness_result.passed gates REJECTED",
+      "lines": "512-533",
+      "sign_relative_or_positive_only": "inherits robustness.py's positive-only behavior"
+    },
+    {
+      "file": "research/src/agx_research/patterns/baselines.py",
+      "finding": "'net_expectancy = distribution.expectancy - (transaction_cost_bps / 10_000); return net_expectancy > baseline.mean_outcome'. Not hard-coded positive-only, but empirically becomes an anti-negative filter given this run's real data: buy_and_hold_baseline().mean_outcome was positive for every one of the 14 tickers used (see market_drift.per_ticker_mean_5d below), so any negative or weakly-positive candidate expectancy fails this comparison too, independently of the robustness gate above.",
+      "gate": "baselines.beats_baseline() -- net expectancy vs buy-and-hold baseline",
+      "lines": "156-162",
+      "sign_relative_or_positive_only": "sign_relative in code (compares to baseline.mean_outcome, not to zero)"
+    },
+    {
+      "file": "research/src/agx_research/patterns/engine.py",
+      "finding": "'(holdout_distribution.expectancy > 0) != (pattern.expectancy > 0)' -- same agreement pattern as validation.py:170-174. Never independently positive-only, but only ever operates on an already-100%-positive input population (see holdout_sign_disagreement_check above).",
+      "gate": "engine.final_holdout() -- holdout-vs-validation sign agreement",
+      "lines": "673",
+      "sign_relative_or_positive_only": "sign_relative (agreement), not positive-only"
+    },
+    {
+      "file": "research/src/agx_research/patterns/decay.py",
+      "finding": "Out of scope for this audit's lifecycle (applies post-VALIDATED, in live monitoring), included only for completeness of the sign-logic search requested in Step 1.6 section 6.",
+      "gate": "decay.DecayMonitor.check() -- live-vs-historical sign flip (not part of discover/validate/final_holdout; live-monitoring only)",
+      "lines": "88-92",
+      "sign_relative_or_positive_only": "sign_relative (agreement), not positive-only"
+    },
+    {
+      "file": "research/src/agx_research/patterns/candidates.py",
+      "finding": "_single_conditions() generates BOTH GT and LT at every quantile threshold (line 186: 'for op in (ConditionOperator.GT, ConditionOperator.LT)'). _median_condition() (used for two/three-feature interactions and regime filters) generates ONLY GT (line 194: 'operator=ConditionOperator.GT'). This is a real asymmetry in candidate GENERATION (more GT candidates exist overall than LT), but it is an asymmetry in which FEATURE CONDITION is tested, not in the sign of the resulting outcome/expectancy -- see operator_stage_table below, where LT-conditioned survivors are, if anything, MORE likely to have positive expectancy than GT-conditioned ones, ruling this out as the explanation for the zero-negative finding.",
+      "gate": "candidates.ConditionOperator.GT/LT and _single_conditions()/_median_condition()",
+      "lines": "41-46, 178-194",
+      "sign_relative_or_positive_only": "N/A -- feature-threshold direction, not outcome-expectancy sign"
+    },
+    {
+      "file": "research/src/agx_research/patterns/transaction_costs.py",
+      "finding": "'survives_default_cost = (gross_expectancy - DEFAULT_TRANSACTION_COST_BPS / 10_000) > 0' -- confirms the same long-only 'net expectancy must be positive' assumption recurs in a second, independent module. Not imported by engine.py (verified: engine.py's import block does not include transaction_costs), so it does not itself gate any pattern's registry status -- it is a separate, CLI-driven sensitivity-sweep report. Included here because it shows the long-only assumption is a recurring pattern across the package, not a one-off accident in a single function.",
+      "gate": "transaction_costs.py -- separate diagnostic module (Phase 15 cost-sensitivity sweep)",
+      "lines": "83",
+      "sign_relative_or_positive_only": "POSITIVE_ONLY (same pattern as robustness.py, but NOT wired into discover()/validate()/final_holdout())"
+    }
+  ],
+  "discovery_pool_loss": {
+    "candidates_generated": 7899,
+    "candidates_surviving_family_correction_alone": 3550,
+    "candidates_surviving_fdr_and_persisted_as_DISCOVERED": 3398,
+    "epistemic_gap_statement": "4501 of 7899 candidates (57.0%) generated during the real Mission 2 run were never written to any artifact -- not the PatternRegistry (only FDR survivors are persisted, by design: see patterns/engine.py's discover() and CLAUDE.md's own 'never catalog every raw candidate' rule), not the TestingLedger (which records only aggregate counts, not per-candidate records), and not any log, cache, test fixture, or intermediate file this audit could locate under /tmp/agx_real_run or the repository. Their expectancy sign, operator, and every other per-candidate attribute are permanently unrecoverable for this specific run. This is a real, structural gap, not an oversight of this audit: closing it would require re-running discover() with candidate-level logging that does not currently exist, and even that would produce a NEW run, not a reconstruction of this one (discover() is not seeded for candidate-order determinism across re-runs beyond what the bootstrap p-value's own seed=42 covers).",
+    "recoverable_fields_for_unpersisted_candidates": [],
+    "unpersisted_candidates": 4501,
+    "unpersisted_candidates_pct_of_generated": 0.5698189644258767,
+    "unrecoverable_fields_for_unpersisted_candidates": [
+      "expectancy sign/value",
+      "operator (GT/LT)",
+      "ticker",
+      "feature/target identity",
+      "raw or family-corrected p-value",
+      "whether it had ANY evaluable discovery-sample distribution (matched-sample-size floor may have excluded it before a p-value was ever computed -- discover()'s own discovery_ok/evaluate_outcomes step, which would separate 'never evaluable' from 'evaluable but lost family+BH-FDR', has no persisted counterpart anywhere: only the final surviving_after_fdr and surviving_after_family_correction totals were written to TestingLedger, not the len(discovery_ok) intermediate count)"
+    ]
+  },
+  "holdout_sign_disagreement_check": {
+    "note": "This gate (engine.py final_holdout(), line ~673) is sign-AGREEMENT (holdout sign must match the validation-period sign), not positive-only in code -- it would equally reject a would-be-negative pattern whose holdout flipped positive. But by the time final_holdout() runs, every VALIDATING pattern already has positive expectancy (enforced upstream by the robustness gate), so in practice every rejection here is 'positive flipped to negative at holdout', never the reverse -- a consequence of the upstream population already being 100% positive, not an independent source of directional bias.",
+    "pre_holdout_expectancy_positive": 91,
+    "total": 91
+  },
+  "lifecycle_directional_trace": {
+    "interpretation": "Of 3,398 DISCOVERED patterns, 3,202 (94.3%) already had positive expectancy, 192 (5.6%) exactly zero, and only 4 (0.1%) negative -- BEFORE validate() ever runs. 100% of the negative group and 100% of the zero group ended REJECTED; 1,773/3,202 (55.4%) of the positive group reached VALIDATED, the remaining 1,429 positive patterns were REJECTED by later gates (see rejection_reason_categories below).",
+    "sign_to_final_status": {
+      "negative": {
+        "rejected": 4
+      },
+      "positive": {
+        "rejected": 1429,
+        "validated": 1773
+      },
+      "zero": {
+        "rejected": 192
+      }
+    },
+    "v1_discovered_expectancy_sign_counts": {
+      "negative": 4,
+      "positive": 3202,
+      "zero": 192
+    }
+  },
+  "limitations": [
+    "The exact discovery-floor intermediate count (len(discovery_ok) inside discover(), i.e. candidates with an evaluable distribution before family-correction/BH-FDR) was never persisted for this run and cannot be reconstructed -- see discovery_pool_loss.epistemic_gap_statement.",
+    "The per-candidate operator/sign/ticker identity of the 4,501 candidates that never reached DISCOVERED is permanently unrecoverable for this specific run.",
+    "The market-drift corroborating check uses raw, unadjusted close prices, not the platform's own corporate-action-adjusted return pipeline (data.adjustments) -- reported as directional/order-of-magnitude corroborating evidence only, per its own caveat field above, not as a recomputation of any registry field.",
+    "beats_baseline()'s exact baseline.mean_outcome value used for each individual BASELINE_failure rejection was never persisted on the Pattern record (it is computed ephemerally inside validate() and not stored) -- this audit infers the mechanism from (a) the code (baselines.py:156-162) and (b) the independently-computed per-ticker drift in market_drift_independent_check, not from a stored per-pattern baseline value."
+  ],
+  "market_drift_independent_check": {
+    "caveat": "Computed from raw, unadjusted community-seed close prices, NOT the platform's own data.adjustments-adjusted return pipeline. Corroborating evidence for a real positive nominal price drift over the sample window, not a recomputation of any registry field.",
+    "per_ticker_mean_5d": {
+      "ADIB": 0.009190133043900298,
+      "COMI": 0.007381009390590417,
+      "EFIH": 0.003924455486914844,
+      "EGAL": 0.01444683252782965,
+      "EMFD": 0.008041448409853571,
+      "ETEL": 0.009602255697525423,
+      "FWRY": 0.006573748088917512,
+      "GBCO": 0.010553841428017642,
+      "HELI": 0.004955371417282106,
+      "ORAS": 0.0,
+      "ORHD": 0.010845199463904663,
+      "ORWE": 0.006503596526432286,
+      "PHDC": 0.011511373998928204,
+      "TMGH": 0.013102486916439587
+    },
+    "tickers_missing_price_file": [],
+    "tickers_used": [
+      "ADIB",
+      "COMI",
+      "EFIH",
+      "EGAL",
+      "EMFD",
+      "ETEL",
+      "FWRY",
+      "GBCO",
+      "HELI",
+      "ORAS",
+      "ORHD",
+      "ORWE",
+      "PHDC",
+      "TMGH"
+    ],
+    "unconditional_10d": {
+      "hit_rate_positive": 0.5183147812580896,
+      "mean": 0.01680651491622844,
+      "median": 0.003909734599741704,
+      "n": 15452
+    },
+    "unconditional_5d": {
+      "hit_rate_positive": 0.49188248936992657,
+      "mean": 0.008327754217592298,
+      "median": 0.0,
+      "n": 15522
+    }
+  },
+  "operator_parity": {
+    "interpretation": "GT and LT survivors are both overwhelmingly positive-expectancy (92.9% and 98.6% of each operator's v1 population respectively), and LT's validation rate (discovered->validated) is comparable to GT's -- see operator_stage_table. This rules out 'one specific operator direction is structurally blocked' as an explanation; the bias is not operator-specific.",
+    "operator_by_lead_lag": {
+      "gt|is_lead_lag=False": {
+        "discovered": 2175,
+        "validated": 1306,
+        "validation_rate": 0.6004597701149426
+      },
+      "gt|is_lead_lag=True": {
+        "discovered": 415,
+        "validated": 207,
+        "validation_rate": 0.4987951807228916
+      },
+      "lt|is_lead_lag=False": {
+        "discovered": 808,
+        "validated": 260,
+        "validation_rate": 0.3217821782178218
+      }
+    },
+    "operator_stage_table": {
+      "gt": {
+        "discovered": 2590,
+        "rejected": 1077,
+        "validated": 1513,
+        "validation_rate_of_discovered": 0.5841698841698841
+      },
+      "lt": {
+        "discovered": 808,
+        "rejected": 548,
+        "validated": 260,
+        "validation_rate_of_discovered": 0.3217821782178218
+      }
+    },
+    "operator_x_expectancy_sign_at_v1": {
+      "gt": {
+        "negative": 3,
+        "positive": 2405,
+        "zero": 182
+      },
+      "lt": {
+        "negative": 1,
+        "positive": 797,
+        "zero": 10
+      }
+    },
+    "v1_operator_counts": {
+      "gt": 2590,
+      "lt": 808
+    }
+  },
+  "primary_question": "Why does the VALIDATED population (1,773/1,773) contain zero negative-expectancy and zero zero-expectancy patterns?",
+  "registry_summary": {
+    "latest_status_counts": {
+      "rejected": 1625,
+      "validated": 1773
+    },
+    "tickers_in_run": [
+      "ADIB",
+      "COMI",
+      "EFIH",
+      "EGAL",
+      "EMFD",
+      "ETEL",
+      "FWRY",
+      "GBCO",
+      "HELI",
+      "ORAS",
+      "ORHD",
+      "ORWE",
+      "PHDC",
+      "TMGH"
+    ],
+    "total_patterns": 3398,
+    "v1_status_counts": {
+      "discovered": 3398
+    }
+  },
+  "rejection_reason_categories": {
+    "BASELINE_failure": 1007,
+    "HOLDOUT_sample_floor": 16,
+    "HOLDOUT_sign_disagreement": 91,
+    "ROBUSTNESS_ambiguous": 511
+  },
+  "robustness_ambiguous_decomposition": {
+    "method": "For each ROBUSTNESS_ambiguous-rejected pattern, computed net_of_cost = v1.expectancy - 0.002 (0.002 = 20bps, matching patterns.robustness.DEFAULT_TRANSACTION_COST_BPS) independently of the registry's own stored net_of_cost_expectancy (which is not persisted on Pattern). net_of_cost <= 0 means transaction_cost_survival = net_expectancy > 0 (robustness.py line 126) was False by construction, and alone is sufficient to fail robustness.py line 143's result.passed = agreeing_all AND transaction_cost_survival, regardless of perturbation outcomes.",
+    "must_involve_perturbation_sign_instability": 111,
+    "total": 511,
+    "transaction_cost_floor_alone_deterministically_explains": 400
+  },
+  "scope_note": "Family-collapse grouping (Step 1's 22 families; Step 1.5's 22/62/605 variants) is explicitly out of scope -- this analysis never reads Step 1/1.5 artifacts and never groups patterns by family. All findings below are at the individual-pattern / pipeline-gate level, per the Step 1.6 instructions.",
+  "zero_expectancy_diagnostic": {
+    "all_rejected": true,
+    "count": 192,
+    "hit_rate_all_zero": true,
+    "interpretation": "Every one of these has expectancy=0.0, median_outcome=0.0, hit_rate=0.0 exactly -- consistent with a degenerate match where every anchor date the candidate triggered on had a forward_return of exactly 0.0 for that (thin/illiquid) ticker-window combination, not a genuine 'no edge' discovery. All were rejected (via the same net_expectancy>0 robustness gate: 0.0 - 0.002 < 0), so this degenerate group never reached VALIDATING/VALIDATED and does not change this audit's conclusion, but it is a distinct, separately-flagged data-quality artifact, not evidence of a directional selection mechanism.",
+    "sample_record": {
+      "pattern_id": "pattern_bb4c6c919b9a",
+      "v1_record": {
+        "block_bootstrap_p_value": 0.0,
+        "complexity": 1,
+        "conditions": [
+          {
+            "feature_id": "acceleration_5d:ORAS",
+            "lag_days": 0,
+            "operator": "lt",
+            "threshold": 0.0
+          }
+        ],
+        "confidence": 1.0,
+        "created_at": "2026-08-11T15:07:21.796710",
+        "definition": "acceleration_5d:ORAS < 0.0000 -> forward_return_5d:ORAS",
+        "deflated_sharpe_ratio": 0.0,
+        "discovery_experiment_id": "experiment_0e0ca6fdb941",
+        "discovery_period": [
+          "2022-01-02",
+          "2025-12-03"
+        ],
+        "expectancy": 0.0,
+        "family_corrected_p_value": 1.0,
+        "family_size": 11,
+        "hit_rate": 0.0,
+        "holdout_expectancy": null,
+        "holdout_period": null,
+        "holdout_sample_size": 0,
+        "horizon_days": 5,
+        "id": "pattern_bb4c6c919b9a",
+        "is_lead_lag": false,
+        "last_experiment_id": "experiment_0e0ca6fdb941",
+        "last_validated_at": null,
+        "mae": null,
+        "max_drawdown": null,
+        "median_outcome": 0.0,
+        "mfe": null,
+        "number_of_tests": 7899,
+        "oos_sample_size": 0,
+        "provenance": {
+          "inputs": [],
+          "produced_at": "2026-08-11T15:07:21.796667",
+          "produced_by": "pattern_discovery_engine@1.0.0"
+        },
+        "regime_dependency": null,
+        "regime_filter": null,
+        "rejection_reason": null,
+        "robustness_passed": null,
+        "sample_size": 42,
+        "stability": null,
+        "target_id": "forward_return_5d:ORAS",
+        "ticker": "ORAS",
+        "validation_period": null,
+        "validation_status": "discovered",
+        "version": 1
+      }
+    },
+    "target_kinds": {
+      "forward_return_10d": 6,
+      "forward_return_5d": 186
+    }
+  }
+}

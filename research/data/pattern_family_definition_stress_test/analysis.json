@@ -1,0 +1,226 @@
+{
+  "ambiguous_lead_lag_diagnostic": {
+    "count": 36,
+    "feature_type_counts": {
+      "relative_volume": 17,
+      "return": 19
+    },
+    "note": "Not forced into any family above. A deterministic schema-extension fix exists (explicit outcome_ticker/predictor_ticker fields on the Pattern/candidate schema) without inventing a similarity metric -- noted here as a possibility, not implemented, per the hard boundary against modifying production code/schema in this step.",
+    "predictor_outcome_pair_counts": {
+      "COMI->ADIB": 1,
+      "ORWE->EGAL": 10,
+      "PHDC->EMFD": 5,
+      "PHDC->ORHD": 8,
+      "PHDC->TMGH": 12
+    },
+    "unique_feature_types": 2,
+    "unique_predictor_outcome_pairs": 5
+  },
+  "analysis": "Mission 3 Step 1.5: Family Definition Stress Test",
+  "anti_selection_discipline": "No variant is chosen as 'correct,' 'best,' or used to rank/select families by outcome anywhere in this script. The only conclusion drawn is a sensitivity classification of the baseline (Variant A / Step 1's own) family count.",
+  "reproduction_notice": {
+    "is_reproduction": true,
+    "reason": "The original Step 1.5 script/report/JSON were never committed and were lost when this environment's working tree reset between conversation turns. This is a same-session reconstruction from the documented methodology, not a byte-identical retrieval of the original file. No threshold, variant definition, or scope decision was altered relative to that documented methodology."
+  },
+  "required_conclusion_sensitivity_classification": {
+    "justification": "Family count moved 22 (A, baseline) -> 62 (B, window-preserving, 2.8x) -> 605 (D, exact-condition, 27.5x). Multi-ticker breadth (>=3 tickers/family) moved from 100.0% of families under A to 5.6% under D, a 94.4%-point collapse. Given the family COUNT swings by an order of magnitude and breadth collapses this far under equally mechanical, equally legitimate normalization choices, the baseline '22 families' headline figure is classified HIGHLY_SENSITIVE to the exact stripping rule chosen -- this is a characterization of sensitivity, not a selection of which variant is 'correct.'",
+    "verdict": "HIGHLY_SENSITIVE"
+  },
+  "same_sign_concentration_across_variants": {
+    "A": {
+      "mixed_sign": 0,
+      "same_sign": 22
+    },
+    "B": {
+      "mixed_sign": 0,
+      "same_sign": 62
+    },
+    "D": {
+      "mixed_sign": 0,
+      "same_sign": 605
+    },
+    "note": "100% same-sign is expected under every variant, since the underlying population (VALIDATED patterns) is itself 100% positive-expectancy in this real run (Step 1.6) -- this is not new corroboration evidence, it is a mechanical consequence, consistently across all three variants."
+  },
+  "table_e_family_size_comparison": {
+    "A_baseline": {
+      "max_size": 468,
+      "median_size": 27.0,
+      "n_families": 22,
+      "singletons": 0
+    },
+    "B_window_preserving": {
+      "max_size": 137,
+      "median_size": 17.0,
+      "n_families": 62,
+      "singletons": 2
+    },
+    "C_regime_preserving": {
+      "note": "N/A -- see result_c; 0 regime-bearing patterns makes this variant identical to A/B by definition"
+    },
+    "D_exact_condition": {
+      "max_size": 119,
+      "median_size": 1,
+      "n_families": 605,
+      "singletons": 494
+    }
+  },
+  "ticker_independence_across_variants": {
+    "A": {
+      "combined_share_of_total_population": 0.5210132412204951,
+      "mean_per_family_dominant_share": 0.2520950582189339,
+      "median_per_family_dominant_share": 0.2208672086720867,
+      "top3": [
+        [
+          "EGAL",
+          344
+        ],
+        [
+          "TMGH",
+          296
+        ],
+        [
+          "PHDC",
+          265
+        ]
+      ]
+    },
+    "B": {
+      "combined_share_of_total_population": 0.5210132412204951,
+      "mean_per_family_dominant_share": 0.36729417397120445,
+      "median_per_family_dominant_share": 0.256578947368421,
+      "top3": [
+        [
+          "EGAL",
+          344
+        ],
+        [
+          "TMGH",
+          296
+        ],
+        [
+          "PHDC",
+          265
+        ]
+      ]
+    },
+    "D": {
+      "combined_share_of_total_population": 0.5210132412204951,
+      "mean_per_family_dominant_share": 0.9451799465879729,
+      "median_per_family_dominant_share": 1.0,
+      "top3": [
+        [
+          "EGAL",
+          344
+        ],
+        [
+          "TMGH",
+          296
+        ],
+        [
+          "PHDC",
+          265
+        ]
+      ]
+    },
+    "note": "Two distinct quantifications, both descriptive only (WHY certain tickers recur as dominant contributors -- liquidity/data-depth/volatility causality -- is explicitly out of scope). 'combined_share_of_total_population' names the top-3 recurring tickers (EGAL/TMGH/PHDC) but is mathematically identical across every variant by construction, since it only depends on which 1,737 patterns were keyed, not on how they were grouped -- included for the ticker identities, not as a variant-sensitive measure. 'mean/median_per_family_dominant_share' (the same construction as Step 1's Table 4 concentration metric) IS variant-sensitive, since family composition changes across A/B/D."
+  },
+  "variant_a_baseline": {
+    "families_with_3_plus_tickers": 22,
+    "families_with_3_plus_tickers_pct": 1.0,
+    "max_family_size": 468,
+    "mean_family_size": 78.95454545454545,
+    "median_family_size": 27.0,
+    "mixed_sign_families": 0,
+    "n_families": 22,
+    "same_sign_families": 22,
+    "singleton_families": 0,
+    "ticker_independence_mean_per_family_dominant_share": 0.2520950582189339,
+    "ticker_independence_median_per_family_dominant_share": 0.2208672086720867,
+    "ticker_independence_top3_combined_share_of_total_population": 0.5210132412204951,
+    "ticker_independence_top3_dominant_tickers": [
+      [
+        "EGAL",
+        344
+      ],
+      [
+        "TMGH",
+        296
+      ],
+      [
+        "PHDC",
+        265
+      ]
+    ],
+    "total_keyed_patterns": 1737,
+    "unkeyable": 0,
+    "variant": "A_baseline_ticker_and_window_stripped"
+  },
+  "variant_b_window_preserving": {
+    "families_with_3_plus_tickers": 53,
+    "families_with_3_plus_tickers_pct": 0.8548387096774194,
+    "max_family_size": 137,
+    "mean_family_size": 28.016129032258064,
+    "median_family_size": 17.0,
+    "mixed_sign_families": 0,
+    "n_families": 62,
+    "same_sign_families": 62,
+    "singleton_families": 2,
+    "ticker_independence_mean_per_family_dominant_share": 0.36729417397120445,
+    "ticker_independence_median_per_family_dominant_share": 0.256578947368421,
+    "ticker_independence_top3_combined_share_of_total_population": 0.5210132412204951,
+    "ticker_independence_top3_dominant_tickers": [
+      [
+        "EGAL",
+        344
+      ],
+      [
+        "TMGH",
+        296
+      ],
+      [
+        "PHDC",
+        265
+      ]
+    ],
+    "total_keyed_patterns": 1737,
+    "unkeyable": 0,
+    "variant": "B_window_preserving_ticker_stripped_only"
+  },
+  "variant_c_regime_preserving": {
+    "note": "Not computed as a separate family set: if zero analyzed patterns carry a regime_filter, a regime-preserving variant is definitionally identical to Variant A/B (there is nothing for it to distinguish), and computing it separately would misrepresent a null result as new information. This count is the entire finding for Variant C.",
+    "regime_bearing_pattern_count": 0,
+    "total_analyzed": 1737,
+    "variant": "C_regime_preserving_confirmation_count_only"
+  },
+  "variant_d_exact_condition": {
+    "families_with_3_plus_tickers": 34,
+    "families_with_3_plus_tickers_pct": 0.05619834710743802,
+    "max_family_size": 119,
+    "mean_family_size": 2.871074380165289,
+    "median_family_size": 1,
+    "mixed_sign_families": 0,
+    "n_families": 605,
+    "same_sign_families": 605,
+    "singleton_families": 494,
+    "ticker_independence_mean_per_family_dominant_share": 0.9451799465879729,
+    "ticker_independence_median_per_family_dominant_share": 1.0,
+    "ticker_independence_top3_combined_share_of_total_population": 0.5210132412204951,
+    "ticker_independence_top3_dominant_tickers": [
+      [
+        "EGAL",
+        344
+      ],
+      [
+        "TMGH",
+        296
+      ],
+      [
+        "PHDC",
+        265
+      ]
+    ],
+    "total_keyed_patterns": 1737,
+    "unkeyable": 0,
+    "variant": "D_exact_condition_ticker_only_stripped"
+  }
+}

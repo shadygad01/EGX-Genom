@@ -57,9 +57,22 @@ export function Monitoring() {
     .sort((a, b) => (a.discovery_date < b.discovery_date ? 1 : -1))
     .slice(0, 15);
 
-  const recentDecisions = [...(decisionHistory.data ?? [])]
-    .sort((a, b) => (a.as_of < b.as_of ? 1 : -1))
-    .slice(0, 20);
+  const decisionRecords = [...(decisionHistory.data ?? [])].sort((a, b) =>
+    a.as_of === b.as_of ? b.version - a.version : b.as_of.localeCompare(a.as_of),
+  );
+  const recentDecisions = decisionRecords.slice(0, 20).map((decision) => {
+    const previous = decisionRecords.find(
+      (candidate) =>
+        candidate.ticker === decision.ticker &&
+        candidate.horizon === decision.horizon &&
+        candidate.as_of < decision.as_of,
+    );
+    return {
+      ...decision,
+      expected_return_delta: previous ? decision.expected_return - previous.expected_return : null,
+      confidence_delta: previous ? decision.confidence - previous.confidence : null,
+    };
+  });
 
   const recentTransactions = [...(shadowFundHistory.data?.transactions ?? [])]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -315,6 +328,24 @@ export function Monitoring() {
                 { key: "asOf", header: t("decisionChanges.asOf"), render: (d) => formatDate(d.as_of) },
                 { key: "horizon", header: t("decisionChanges.horizon"), render: (d) => label("horizon", d.horizon) },
                 { key: "action", header: tCommon("table.decision"), render: (d) => label("decision", d.action) },
+                {
+                  key: "expectedReturn",
+                  header: "Expected return",
+                  align: "right",
+                  render: (d) => formatSignedPercent(d.expected_return),
+                },
+                {
+                  key: "returnDelta",
+                  header: "Δ vs prior",
+                  align: "right",
+                  render: (d) => d.expected_return_delta != null ? formatSignedPercent(d.expected_return_delta) : "new",
+                },
+                {
+                  key: "confidence",
+                  header: "Confidence",
+                  align: "right",
+                  render: (d) => formatPercent(d.confidence),
+                },
                 {
                   key: "realized",
                   header: t("decisionChanges.realizedReturn"),

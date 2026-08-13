@@ -626,11 +626,15 @@ export function CIODesk() {
         {macroSnapshot.error && <ErrorState detail={macroSnapshot.error.message} onRetry={macroSnapshot.reload} />}
         {!macroSnapshot.loading && !macroSnapshot.error && !macroSnapshot.data && (
           <EmptyState
-            title="بيانات الاقتصاد الكلي غير متاحة"
-            detail="شغّل research/scripts/fetch_macro_data.py لجلب البيانات الحقيقية"
+            title="بيانات الاقتصاد الكلي غير متاحة حاليًا"
+            detail="يتم تحديث بيانات Yahoo Finance وWorld Bank تلقائيًا مع كل تشغيل إنتاجي. لن تُستخدم قيم تقديرية؛ أعد المحاولة بعد اكتمال التحديث أو راجع صحة المصادر في Source Intelligence."
           />
         )}
         {macroSnapshot.data && (
+          <>
+          <div className={styles.macroCardSrc} style={{ marginBottom: "var(--space-3)" }}>
+            آخر snapshot موثّق: {macroSnapshot.data.as_of} · المصادر: Yahoo Finance وWorld Bank
+          </div>
           <div className={styles.macroGrid}>
             {/* EGP/USD */}
             <div className={styles.macroCard}>
@@ -713,6 +717,7 @@ export function CIODesk() {
               </div>
             )}
           </div>
+          </>
         )}
 
         {/* Decision Implications */}

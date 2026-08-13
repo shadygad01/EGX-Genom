@@ -28,7 +28,16 @@ function priceProximity(ticker: string, marketState: MarketState | null | undefi
   if (window.length === 0) return null;
   const latest = [...window].sort((a: { trade_date: string }, b: { trade_date: string }) => b.trade_date.localeCompare(a.trade_date))[0];
   const low = Math.min(...window.map((bar: { low: number; close: number }) => bar.low ?? bar.close));
-  return { current: latest.close, low, distance: latest.close > 0 ? latest.close / low - 1 : null, observations: window.length };
+  const observations = window.length;
+  return {
+    current: latest.close,
+    low,
+    distance: latest.close > 0 ? latest.close / low - 1 : null,
+    observations,
+    // A six-month alert is only decision-useful with enough trading sessions
+    // to represent the window; otherwise surface coverage risk, never an alert.
+    eligible: observations >= 60,
+  };
 }
 
 /** Investment Cases -- "why should I own this company?" answered for
@@ -73,10 +82,12 @@ export function InvestmentCases() {
     };
     const requestPermission = Notification.permission === "default" ? Notification.requestPermission() : Promise.resolve(Notification.permission);
     requestPermission.then((permission) => {
-      if (permission !== "granted") return;
+        if (permission !== "granted") return;
       Object.keys(companyNames).forEach((ticker) => {
         const proximity = priceProximity(ticker, marketSnapshot);
-        if (proximity?.distance != null && proximity.distance <= 0.08) notify(ticker, companyNames[ticker] ?? "", proximity.distance);
+        if (proximity?.eligible && proximity.distance != null && proximity.distance <= 0.08) {
+          notify(ticker, companyNames[ticker] ?? "", proximity.distance);
+        }
       });
     }).catch(() => undefined);
   }, [marketSnapshot, companyNames]);
@@ -188,11 +199,14 @@ export function InvestmentCases() {
                   render: (r) => {
                     const proximity = priceProximity(r.ticker, marketSnapshot);
                     if (!proximity) return <span className="num">—</span>;
+                    if (!proximity.eligible) {
+                      return <span className="num" title="At least 60 trading sessions are required for a six-month alert.">Coverage: {proximity.observations} sessions</span>;
+                    }
                     return (
                       <div>
                         <span className="num">{proximity.current.toFixed(2)} / {proximity.low.toFixed(2)}</span>
                         <div style={{ fontSize: "0.72rem", color: proximity.distance != null && proximity.distance <= 0.08 ? "var(--warning)" : "var(--text-muted)" }}>
-                          {proximity.distance == null ? "—" : `${(proximity.distance * 100).toFixed(1)}% above low`}
+                          {proximity.distance == null ? "—" : `${(proximity.distance * 100).toFixed(1)}% above low · ${proximity.observations} sessions`}
                         </div>
                       </div>
                     );

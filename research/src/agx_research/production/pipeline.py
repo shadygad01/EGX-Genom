@@ -151,6 +151,10 @@ from agx_research.universe.sector import CollectedSectorProvider
 from agx_research.valuation import FairValueEngine
 
 _DEFAULT_MACRO_SERIES = ["BRENT_USD", "EGP_USD", "egypt_cpi_inflation"]
+# A bounded live timeout prevents one unreachable free endpoint from consuming
+# the entire Pages job. The collector layer still records the failure and
+# routes to the next verified source; mock/replay paths keep their own defaults.
+LIVE_HTTP_TIMEOUT_SECONDS = 15.0
 
 # Egyptian Live Data Sprint (original): fresh discovery started restricted
 # to exactly the project owner's first named priority order (EGX official ->
@@ -517,7 +521,7 @@ class ProductionPipeline:
                 [],
             )
 
-        fetcher = HttpFetcher()
+        fetcher = HttpFetcher(timeout_seconds=LIVE_HTTP_TIMEOUT_SECONDS)
         engine = AcquisitionIntelligenceEngine(
             prober=build_live_prober(fetcher),
             fetch_text=build_live_fetch_text(fetcher),
@@ -671,7 +675,7 @@ class ProductionPipeline:
             registry=self.registry,
             min_confidence=0.5,
         )
-        fetcher = HttpFetcher()
+        fetcher = HttpFetcher(timeout_seconds=LIVE_HTTP_TIMEOUT_SECONDS)
         raw_archive = RawArchive(self.data_dir / "raw_archive")
 
         def factory(source_id: str, spec):

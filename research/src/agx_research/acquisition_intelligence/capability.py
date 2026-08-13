@@ -69,7 +69,7 @@ class Capability(str, Enum):
 # ids here would double-attempt price collectors for no new information.
 CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     Capability.PRICE_DATA: [
-        "egxbot_prices",
+        "egx_official_prices",
         "egx_price_composite",
         "stooq",
         "egx_official",

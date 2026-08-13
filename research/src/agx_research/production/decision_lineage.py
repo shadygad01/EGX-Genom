@@ -23,6 +23,16 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
             "meta_decision_engine",
         ],
     },
+    "egx_official_prices": {
+        "records": ["price_bars"],
+        "consumers": [
+            "market_structure_agent",
+            "liquidity_agent",
+            "technical_structure_agent",
+            "validation",
+            "meta_decision_engine",
+        ],
+    },
     "egx_price_composite": {
         "records": ["price_bars", "corporate_events"],
         "providers": ["yahoo_finance", "stockanalysis", "mubasher"],

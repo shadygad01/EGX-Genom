@@ -31,10 +31,15 @@ The refactor was checked with the following gates:
 | TypeScript compilation | Passed |
 | Web provider tests | Passed |
 | End-to-end mock pipeline | Passed; produced and validated `research_candidates.json` |
+| Production pipeline regression tests | Passed after the final routing fix: 5/5 targeted tests |
+| Full research suite | Passed: **1,229 tests**, 7 non-blocking pytest collection warnings |
+| GitHub Actions CI | Passed on `main` at commit `cb07c8e` (`preserve mock fixtures while retiring live sources`), including Truth Preservation, schema freshness, provenance, API, and web checks |
 | Local visual review | Passed; EXPA and ARCC appeared in ranked candidate table and EXPA detail card |
 
 ## Current evidence boundary
 
-The latest replay bundle contains two valuation-led candidates: EXPA and ARCC. They remain watchlist items because the bundle has insufficient macro coverage and exchange-rate evidence; ARCC also lacks a linked news/corporate-event confirmation. This is not a software failure. It is the intended decision-quality behavior, and the dashboard displays the reason rather than promoting the securities to executable buys.
+The latest validated replay bundle contains two valuation-led candidates: EXPA and ARCC. They remain watchlist items because the bundle has insufficient macro coverage and exchange-rate evidence; ARCC also lacks a linked news/corporate-event confirmation. This is not a software failure. It is the intended decision-quality behavior, and the dashboard displays the reason rather than promoting the securities to executable buys.
+
+The final Pages deployment for `cb07c8e` was still running its live public-data pipeline at handover time. The previously published site was reachable and showed the executable Investment Cases page, but its public artifact set predated the final candidate-artifact publication (`research_candidates.json` returned HTTP 404). Therefore the deployment should be treated as **pending final refresh**, not as evidence that the candidate table is live. CI and the local research suite are complete and green; the remaining operational check is to let the Pages workflow finish successfully and then verify the public candidate artifact and Source Intelligence page.
 
 The free-source production pipeline must continue to refresh prices intraday while allowing macro and fundamental sources to refresh at their natural publication frequency. The dashboard can refresh every minute without pretending that annual GDP or quarterly financial statements changed every minute.

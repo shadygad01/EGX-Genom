@@ -341,3 +341,24 @@ def test_sector_membership_is_satisfied_by_chief_egx_financials_without_a_second
     )
     assert sector_attempt.outcome == "reused"
     assert service.calls.count("chief_egx_financials") == 1
+
+
+def test_rank_capability_strategies_marks_uncatalogued_source_not_ready():
+    registry = SourceRegistry()
+    ranked = rank_capability_strategies(Capability.CORPORATE_DISCLOSURES, registry)
+
+    fra = next(row for row in ranked if row.source_id == "fra_egypt")
+    assert fra.spec is None
+    assert fra.ready is False
+    assert "not catalogued" in fra.reason.lower()
+
+
+def test_rank_capability_strategies_orders_by_composite_and_marks_ready():
+    registry = SourceRegistry()
+    registry.add(_spec("egx_price_composite", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
+
+    ranked = rank_capability_strategies(Capability.PRICE_DATA, registry)
+
+    assert [row.source_id for row in ranked] == ["egx_price_composite"]
+    assert ranked[0].ready is True
+    assert ranked[0].composite_score > 0

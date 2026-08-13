@@ -33,24 +33,27 @@ from agx_research.acquisition_intelligence.target import (
     generate_company_ir_targets,
     seed_target_organizations,
 )
+from agx_research.capital_allocation import CapitalAllocationEngine
+from agx_research.collectors.discovery_reconciliation import reconcile_discovery_news
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
 from agx_research.collectors.rss import RssNewsCollector
-from agx_research.collectors.discovery_reconciliation import reconcile_discovery_news
 from agx_research.collectors.service import CollectionService
 from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.dashboard import validate_dashboard_artifacts, write_dashboard_artifacts
 from agx_research.dashboard.validate import DashboardArtifactError
-from agx_research.capital_allocation import CapitalAllocationEngine
+from agx_research.data.mock_provider import LocalCsvDataProvider, MockDataProvider
 from agx_research.decision_service.country_risk import assess_country_risk
 from agx_research.decision_service.liquidity_floor import compute_illiquid_tickers
 from agx_research.decision_service.macro_overlay import assess_macro_overlay
 from agx_research.decision_service.position import PositionState
 from agx_research.decision_service.service import DecisionService, PositionAwareDecision
 from agx_research.discovery.company_entity_resolution import EntityResolutionEngine
-from agx_research.discovery.web_search_hints import WebSearchHintStrategy, load_web_search_domain_hints
-from agx_research.data.mock_provider import LocalCsvDataProvider, MockDataProvider
+from agx_research.discovery.web_search_hints import (
+    WebSearchHintStrategy,
+    load_web_search_domain_hints,
+)
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
 from agx_research.financials.collected import CollectedFinancialStatementProvider
@@ -61,8 +64,8 @@ from agx_research.market_memory.memory import MarketMemory
 from agx_research.meta.decision_ledger import DecisionLedger
 from agx_research.meta.decision_quality import apply_decision_quality_gate
 from agx_research.meta.publication_gate import LegalPublicationApproval
-from agx_research.meta.system_maturity import SystemMaturityReport, compute_system_maturity
 from agx_research.meta.recommendation_service import RecommendationService
+from agx_research.meta.system_maturity import SystemMaturityReport, compute_system_maturity
 from agx_research.patterns.registry import PatternStatus
 from agx_research.production import ExecutionMode, ProductionPipeline, StageStatus
 from agx_research.runtime.engine import RunRecordRepository
@@ -89,8 +92,18 @@ def build_market_memory(data_dir: Path, mock_data: Path) -> MarketMemory:
     actually reads, which this narrower helper's fixed `mock_data` source
     can't provide.
     """
+    # Production exports must read the collected CSVs from --data-dir. The
+    # previous helper always used the mock fixture, which made
+    # export-dashboard produce an empty price_history/market_state even when
+    # production/state-latest contained fresh price bars. Keep the fixture
+    # fallback for local mechanics tests that have no collected prices.
+    price_provider = (
+        LocalCsvDataProvider(data_dir)
+        if any((data_dir / "prices").glob("*.csv"))
+        else MockDataProvider(mock_data)
+    )
     return MarketMemory(
-        MockDataProvider(mock_data),
+        price_provider,
         CollectedUniverseProvider(data_dir),
         StaticSectorProvider(),
         macro_series_ids=MACRO_SERIES_IDS,
@@ -278,7 +291,7 @@ def _run_research_command(args: argparse.Namespace) -> int:
         memory = _build_pattern_market_memory(args.data_dir, args.mock_data, source=source, tickers=tickers)
         return build_research_panel(memory, as_of=as_of, tickers=tickers)
 
-    def _engine(config=None) -> "PatternDiscoveryEngine":
+    def _engine(config=None) -> PatternDiscoveryEngine:
         return PatternDiscoveryEngine(
             pattern_registry=PatternRegistry(patterns_dir / "registry.json"),
             testing_ledger_repository=TestingLedgerRepository(patterns_dir / "testing_ledger.json"),
@@ -1046,7 +1059,7 @@ def main(argv: list[str] | None = None) -> int:
                     ]
                 }
             )
-            if t.company_ticker in website_candidates and website_candidates[t.company_ticker]
+            if website_candidates.get(t.company_ticker)
             else t
             for t in company_ir_targets
         ]

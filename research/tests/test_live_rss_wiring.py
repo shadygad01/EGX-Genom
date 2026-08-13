@@ -37,9 +37,9 @@ def test_masrawy_economy_is_promoted_and_uses_the_same_generic_wiring():
     )
 
 
-def test_live_wiring_topology_includes_stooq_even_before_it_is_selected():
+def test_live_wiring_topology_excludes_retired_stooq_and_keeps_verified_price_source():
     wired = live_wired_source_ids(seed_registry())
 
     assert "egx_price_composite" in wired
-    assert "stooq" in wired
+    assert "stooq" not in wired
     assert "rss_generic" not in wired

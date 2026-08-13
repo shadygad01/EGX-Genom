@@ -4,6 +4,7 @@ from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.browser import BrowserAutomationCollector
 from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
+from agx_research.collectors.egx_official_prices import EgxOfficialPriceCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.egypt_nsdp import EgyptNsdpCollector
 from agx_research.collectors.excel import ExcelSeriesCollector
@@ -38,6 +39,7 @@ __all__ = [
     "CollectionRunResult",
     "CollectionService",
     "Collector",
+    "EgxOfficialPriceCollector",
     "EgxCompositePriceCollector",
     "EgxDisclosureCollector",
     "EgyptNsdpCollector",

@@ -47,6 +47,7 @@ from agx_research.collectors.capmas import CapmasIndicatorCollector
 from agx_research.collectors.chief_financials import ChiefFinancialsCollector
 from agx_research.collectors.company_earnings_table import CompanyEarningsTablePdfCollector
 from agx_research.collectors.egx_disclosures import EgxDisclosureCollector
+from agx_research.collectors.egx_official_prices import EgxOfficialPriceCollector
 from agx_research.collectors.egx_prices import EgxCompositePriceCollector
 from agx_research.collectors.egxpilot_fundamentals import EgxPilotFundamentalsCollector
 from agx_research.collectors.egypt_nsdp import EgyptNsdpCollector
@@ -448,6 +449,8 @@ def build_live_collector(
     matching, no company-name match) for any caller that hasn't looked one
     up.
     """
+    if source_id == "egx_official_prices":
+        return EgxOfficialPriceCollector(spec, symbols=tickers, fetcher=fetcher)
     if source_id == "egx_price_composite":
         return EgxCompositePriceCollector(spec, symbols=tickers, fetcher=fetcher)
     if source_id == "eac_egx_disclosures":

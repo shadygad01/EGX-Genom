@@ -96,6 +96,44 @@ def seed_sources() -> list[SourceSpec]:
             ),
         ),
         _spec(
+            id="egx_official_prices",
+            name="Egyptian Exchange official market-watch prices",
+            category=SourceCategory.MARKET_DATA,
+            country="EG",
+            access_method=AccessMethod.HTML_SCRAPE,
+            status=SourceStatus.IMPLEMENTED,
+            legal_use_status=LegalUseStatus.CLEARED,
+            base_url="https://www.egx.com.eg/en/prices.aspx",
+            reliability_score=0.92,
+            freshness_score=0.9,
+            historical_coverage="current official market-watch OHLCV rows for listed securities",
+            expected_latency="intraday or end-of-day, page-dependent",
+            update_frequency="intraday",
+            collector="EgxOfficialPriceCollector",
+            collector_version="1.0.0",
+            retry_policy=RetryPolicy(max_attempts=2, backoff_seconds=1.0, backoff_multiplier=2.0),
+            rate_limit=RateLimit(requests_per_minute=2, min_seconds_between_requests=30.0),
+            license="Official public EGX market data; preserve source attribution and verify exchange terms before external redistribution.",
+            terms_of_use_url="https://www.egx.com.eg/en/Disclaimer.aspx",
+            validation_rules=["data.quality.validate_price_bars", "complete OHLCV row required"],
+            normalization_rules=[
+                "official EGX code -> uppercase ticker",
+                "numeric separators normalized",
+                "only complete OHLCV rows materialized",
+                "trade date taken from row when present, otherwise collection date",
+            ],
+            conflict_priority=95,
+            priority=80,
+            supported_entities=["EGX tickers"],
+            supported_event_types=["market"],
+            notes=(
+                "A new parser was added for the public official market-watch page. The sandbox "
+                "network could not verify the live HTML table, so production should record an "
+                "honest unavailable/failed status until the VPS confirms the endpoint; fixtures "
+                "cover the expected complete OHLCV table shape."
+            ),
+        ),
+        _spec(
             id="stooq",
             name="Stooq",
             category=SourceCategory.MARKET_DATA,

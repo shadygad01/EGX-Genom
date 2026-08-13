@@ -316,7 +316,7 @@ jobs:
               print(' -', w)
           "
       - name: Show acquisition decisions (every capability, ranked strategies, outcome)
-        if: steps.check_run.outputs.already_ran != 'true'
+        if: steps.check_run.outputs.already_ran != 'true' && github.event_name != 'push'
         run: |
           uv run python -c "
           import json

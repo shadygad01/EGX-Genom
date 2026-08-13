@@ -164,7 +164,9 @@ jobs:
             cp -f data/production/macro/macro_snapshot.json ../web/public/data/macro_snapshot.json
           fi
           if [ -f data/production/knowledge.json ]; then
-            cp -f data/production/knowledge.json ../web/public/data/knowledge.json
+            # Production storage is keyed by hypothesis for version history;
+            # the dashboard contract intentionally consumes a flat list.
+            jq '[.[] | .[]]' data/production/knowledge.json > ../web/public/data/knowledge.json
           fi
 
       # Today already has a SUCCEEDED run in the persisted state (see the

@@ -184,6 +184,11 @@ jobs:
                 "$snapshot_base/$artifact" -o "../web/public/data/$artifact"
             fi
           done
+          if [ ! -f ../web/public/data/research_candidates.json ]; then
+            # No historical candidate artifact is available on the current
+            # public snapshot; publish an honest empty research-only table.
+            printf '[]\n' > ../web/public/data/research_candidates.json
+          fi
 
       # Today already has a SUCCEEDED run in the persisted state (see the
       # check above, e.g. this workflow's own `schedule` trigger and a

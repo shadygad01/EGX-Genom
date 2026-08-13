@@ -152,17 +152,17 @@ jobs:
           uv run python -m agx_research.cli --data-dir data/production \
             run --date "$(date -u +%F)" --mode live --dashboard-out ../web/public/data
 
-      - name: Rebuild dashboard from persisted state (code push)
+      - name: Preserve current dashboard snapshot (code push)
         if: steps.check_run.outputs.already_ran != 'true' && github.event_name == 'push'
         run: |
-          # AD-64 forbids replay from writing directly to the canonical public
-          # path. Generate into an isolated directory, then promote only after
-          # the replay pipeline exits successfully.
-          rm -rf ../web/public/data-replay
-          uv run python -m agx_research.cli --data-dir data/production \
-            run --date "$(date -u +%F)" --mode replay --dashboard-out ../web/public/data-replay
-          rm -rf ../web/public/data
-          mv ../web/public/data-replay ../web/public/data
+          # Code pushes deploy the already-validated snapshot tracked on main.
+          # Full live collection and research remain scheduled responsibilities;
+          # this keeps UI/backend fixes deployable even when historical replay
+          # is expensive. Macro data is restored from production/state-latest.
+          mkdir -p ../web/public/data
+          if [ -f data/production/macro/macro_snapshot.json ]; then
+            cp -f data/production/macro/macro_snapshot.json ../web/public/data/macro_snapshot.json
+          fi
 
       # Today already has a SUCCEEDED run in the persisted state (see the
       # check above, e.g. this workflow's own `schedule` trigger and a

@@ -157,6 +157,7 @@ export function InvestmentCases() {
                 { key: "return", header: "Expected return", align: "right", render: (row) => <span className="num" style={{ color: "var(--positive)", fontWeight: 700 }}>{formatSignedPercent(row.expected_return)}</span> },
                 { key: "time", header: "Target horizon", align: "right", render: (row) => <span className="num">{row.time_to_target_days}d</span> },
                 { key: "confidence", header: "Evidence completeness", align: "right", render: (row) => <Meter value={row.confidence} label={formatPercent(row.confidence)} /> },
+                { key: "models", header: "Models", align: "right", render: (row) => <span title={row.included_models.join(", ")}>{row.included_models.length} · {row.included_models.join(", ")}</span> },
                 { key: "status", header: "Decision status", render: (row) => <Badge variant="neutral" title={row.primary_blockers.join(" ")}>WATCHLIST — gated</Badge> },
               ]}
             />

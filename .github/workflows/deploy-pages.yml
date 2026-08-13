@@ -163,6 +163,9 @@ jobs:
           if [ -f data/production/macro/macro_snapshot.json ]; then
             cp -f data/production/macro/macro_snapshot.json ../web/public/data/macro_snapshot.json
           fi
+          if [ -f data/production/knowledge.json ]; then
+            cp -f data/production/knowledge.json ../web/public/data/knowledge.json
+          fi
 
       # Today already has a SUCCEEDED run in the persisted state (see the
       # check above, e.g. this workflow's own `schedule` trigger and a

@@ -1280,10 +1280,14 @@ appended:
    into hard pass/fail thresholds — how much correlation or temporal
    clustering is "too much" is genuinely unknown and requires real
    calibration evidence this mission does not yet have.
-9. **(New)** BH vs. BY for the promotion-cohort-level correction (§6.4)
+9. ~~**(New)** BH vs. BY for the promotion-cohort-level correction (§6.4)
    remains explicitly unresolved — this is now a required decision before
    `PROMOTION_ELIGIBLE` can be implemented, not a preference stated in
-   passing.
+   passing.~~ **RESOLVED, 2026-08-13**: the user/product owner has decided
+   dual-track (both BH and BY computed and required to agree; disagreement
+   labeled `CORRECTION_SENSITIVE`, never silently promoted or rejected).
+   See v2.2 §4/§12/§14 for the full decision. The computation
+   infrastructure itself is still not built.
 10. **(New)** The post-selection-inference discount question (§6.2): should
     discovery/validation-period statistics (DSR, block-bootstrap p-value)
     be down-weighted relative to fresh `OOS_VALIDATED` evidence in any
@@ -1315,9 +1319,12 @@ appended:
    workaround (always read from `Pattern` v1) is a valid stopgap, but the
    underlying production bug is a real, separate fix this mission does not
    make (out of scope: production code).
-2. **BH-vs-BY for the promotion-cohort correction** (§6.4, §13.9) —
+2. ~~**BH-vs-BY for the promotion-cohort correction** (§6.4, §13.9) —
    required before `PROMOTION_ELIGIBLE` can be implemented, currently
-   unresolved.
+   unresolved.~~ **RESOLVED, 2026-08-13** (dual-track policy — see v2.2
+   §4/§12/§14). Still blocking in practice until the dual-track
+   computation is actually implemented; the open item is now
+   infrastructure, not policy.
 3. **The Redundancy Report's aggregate scoring methodology** (§5.7) —
    specified conceptually, not implemented; the six-dimension report can
    be built and populated before this is resolved, but converting it into
@@ -2399,12 +2406,33 @@ underlying pattern (per §11's extended trial-counting rule)** — not the
 original 7,899-candidate pool (permanently unrecoverable, stage 1–2), and
 not merely the *first* attempt at promoting each pattern (stage 6 closes
 that gap). **Defining this universe is a prerequisite this specification
-now satisfies. Choosing BH or BY over it remains explicitly undecided** —
-per instruction, this specification does not declare either final. Step
-1's descriptive comparison (BH: 1,683/1,773 pass; BY: 657/1,773 pass, at
-α=0.05, on the *original* discovery-stage population — not directly
-transferable to the cohort-level universe just defined) remains context
-only, never a recommendation.
+now satisfies. The choice between BH and BY over it is now RESOLVED
+(user/product-owner decision, 2026-08-13): dual-track — both are computed
+and reported over the promotion-cohort universe defined above, never only
+one.** A `PromotionCase` only clears this stage when **both** BH and BY
+agree it survives correction. When they disagree (survives BH, fails BY,
+or vice versa), the case is **not** silently promoted or silently
+rejected — it is labeled `CORRECTION_SENSITIVE` and held at its current
+stage pending additional evidence, following the same "never conflate an
+evidence gap with a rejection" discipline this specification already
+applies to `OUT_OF_SCOPE_FOR_PROMOTION` (§12) and `INSUFFICIENT_EVIDENCE`
+(§9). This mirrors Manus AI's calibration-research recommendation
+(`docs/PATTERN_PROMOTION_GATE_CALIBRATION_RESEARCH.md` Part 1 §2.3,
+"Two-track BH/BY reporting... makes dependence sensitivity visible") and
+is chosen explicitly because Step 1's descriptive comparison (BH:
+1,683/1,773 pass; BY: 657/1,773 pass, at α=0.05, on the *original*
+discovery-stage population — not directly transferable to the
+cohort-level universe just defined) shows too large a swing (2.6×) to
+trust either correction alone without real dependence-preserving
+calibration evidence, which does not exist yet (§14).
+
+**What is decided vs. what is still not built, stated precisely:** the
+*policy* (dual-track, agreement-required, disagreement labeled not
+guessed) is now final. The *infrastructure* to compute BY over the
+promotion-cohort universe, and the `CORRECTION_SENSITIVE` label itself,
+are not implemented anywhere — this remains design only, same as every
+other component in this document. Nothing here creates a `PromotionCase`,
+modifies `validation_status`, or changes any persisted pattern.
 
 ## 5. Persisted-evidence audit — gates classified `BLOCKING DEPENDENCY`, with concrete resolution paths (never fabricated evidence)
 
@@ -2579,8 +2607,12 @@ underlying pattern must never create hidden multiple-testing freedom.**
 - The 22-family baseline result is not hardcoded anywhere in this
   specification (§2).
 - No HHI cutoff is chosen without calibration (§2).
-- BH vs. BY is not declared final; the relevant statistical universe is
-  now defined (§4), but the choice between them remains open.
+- BH vs. BY: **RESOLVED, 2026-08-13** — dual-track (both computed and
+  reported over the promotion-cohort universe defined in §4; a case
+  advances only when both agree, disagreement is labeled
+  `CORRECTION_SENSITIVE` rather than promoted or rejected). This is a
+  policy decision, not a calibration; the infrastructure to compute it is
+  still not built (§4, §14).
 
 ## 13. Hard-gate table
 
@@ -2619,7 +2651,7 @@ repeated here, to avoid implying they are ready as-is.
 | OOS matched-observation floor | PROVISIONAL | Same — real decision-ledger/paper-validation outcome history (does not exist yet) |
 | Paper-validation window (N days / M observations) | PROVISIONAL | At least one full completed real paper-validation cycle (sequential; the first cohort must use a declared, uncalibrated default) |
 | Economic-rationale substance bar | PROVISIONAL | Human-reviewer agreement study (zero contamination risk, achievable independently — §3) |
-| Promotion-cohort correction: BH vs. BY | PROVISIONAL / open policy decision | The universe is now defined (§4); the choice itself is a decision for the user/product owner, not a calibration this specification performs |
+| Promotion-cohort correction: BH vs. BY | **DECIDED (dual-track), 2026-08-13 — infrastructure not built** | The universe is defined and the policy is decided (§4): compute both, require agreement, label disagreement `CORRECTION_SENSITIVE`. What remains is building that computation and the label itself — no code exists yet. |
 | `INSUFFICIENT_EVIDENCE` staleness/abandonment limit | PROVISIONAL (new, §9) | A declared maximum dwell-time or retry count — none proposed yet |
 | `PROMOTED` revalidation cadence | PROVISIONAL (new, §10) | A declared periodic re-check interval — none proposed yet |
 
@@ -2647,9 +2679,12 @@ implementation path **and** required data artifact **already resolved**,
 not merely pathed. Several genuinely remain open, unresolved decisions or
 unbuilt infrastructure, not merely uncalibrated numbers:
 
-1. **BH vs. BY** (§4, §14) — the universe is now defined, but the choice
-   itself is an explicit, undecided policy question for the user/product
-   owner. This alone is sufficient to withhold `READY_FOR_IMPLEMENTATION`.
+1. **BH vs. BY** (§4, §14) — **RESOLVED, 2026-08-13**: the universe is
+   defined and the policy is decided (dual-track, agreement-required,
+   `CORRECTION_SENSITIVE` on disagreement). This no longer withholds
+   `READY_FOR_IMPLEMENTATION` on policy grounds — but the computation
+   infrastructure itself does not exist yet (§14), which independently
+   still withholds it under item 5 below.
 2. **The `RobustnessResult`/`PatternFailureProfile`/baseline
    fresh-recomputation infrastructure** (§5) does not exist yet — a
    concrete path is specified, but no code implementing it exists.

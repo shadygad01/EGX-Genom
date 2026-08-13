@@ -15,7 +15,11 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def stooq_spec():
-    return next(s for s in seed_sources() if s.id == "stooq")
+    # Stooq is retired from live routing after robots-policy blocking, but
+    # parser behavior remains covered against recorded wire-format fixtures.
+    return next(s for s in seed_sources() if s.id == "stooq").model_copy(
+        update={"status": SourceStatus.IMPLEMENTED}
+    )
 
 
 class FakeFetcher:

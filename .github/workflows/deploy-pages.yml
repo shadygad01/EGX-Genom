@@ -168,6 +168,9 @@ jobs:
             # the dashboard contract intentionally consumes a flat list.
             jq '[.[] | .[]]' data/production/knowledge.json > ../web/public/data/knowledge.json
           fi
+          if [ -f ../web/public/data/investment_cases.json ]; then
+            jq '.recommendations // []' ../web/public/data/investment_cases.json > ../web/public/data/recommendations.json
+          fi
 
       # Today already has a SUCCEEDED run in the persisted state (see the
       # check above, e.g. this workflow's own `schedule` trigger and a

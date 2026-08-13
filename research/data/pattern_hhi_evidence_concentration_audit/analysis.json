@@ -1,0 +1,214 @@
+{
+  "analysis": "Mission 3 -- HHI Evidence-Concentration Audit",
+  "hhi_bands_used": {
+    "diffuse (<0.15)": [
+      0.0,
+      0.15
+    ],
+    "high (0.25-0.40)": [
+      0.25,
+      0.4
+    ],
+    "moderate (0.15-0.25)": [
+      0.15,
+      0.25
+    ],
+    "very_concentrated (>0.40)": [
+      0.4,
+      Infinity
+    ]
+  },
+  "matched_observations_hhi": {
+    "band_summary": {
+      "diffuse (<0.15)": {
+        "family_count": 11,
+        "family_pct": 0.5,
+        "pattern_count": 967,
+        "pattern_pct": 0.5567069660333909
+      },
+      "high (0.25-0.40)": {
+        "family_count": 4,
+        "family_pct": 0.18181818181818182,
+        "pattern_count": 33,
+        "pattern_pct": 0.018998272884283247
+      },
+      "moderate (0.15-0.25)": {
+        "family_count": 7,
+        "family_pct": 0.3181818181818182,
+        "pattern_count": 737,
+        "pattern_pct": 0.42429476108232583
+      },
+      "very_concentrated (>0.40)": {
+        "family_count": 0,
+        "family_pct": 0.0,
+        "pattern_count": 0,
+        "pattern_pct": 0.0
+      }
+    },
+    "mean": 0.17016333989373503,
+    "median": 0.14573735561578954,
+    "note": "Weighted by each pattern's own sample_size (matched observations), not member count. A family where one ticker's patterns matched far more observations than others is more concentrated under this denominator, even if member counts are balanced. This is a NEW metric -- Step 1 did not compute this variant."
+  },
+  "member_count_hhi": {
+    "band_summary": {
+      "diffuse (<0.15)": {
+        "family_count": 11,
+        "family_pct": 0.5,
+        "pattern_count": 712,
+        "pattern_pct": 0.409902130109384
+      },
+      "high (0.25-0.40)": {
+        "family_count": 3,
+        "family_pct": 0.13636363636363635,
+        "pattern_count": 24,
+        "pattern_pct": 0.013816925734024179
+      },
+      "moderate (0.15-0.25)": {
+        "family_count": 8,
+        "family_pct": 0.36363636363636365,
+        "pattern_count": 1001,
+        "pattern_pct": 0.5762809441565918
+      },
+      "very_concentrated (>0.40)": {
+        "family_count": 0,
+        "family_pct": 0.0,
+        "pattern_count": 0,
+        "pattern_pct": 0.0
+      }
+    },
+    "mean": 0.16941421253130656,
+    "median": 0.15049898014522803,
+    "note": "One vote per family member (pattern), regardless of how many observations that pattern individually matched. Identical methodology and denominator to Step 1's Table 4 (median 0.150, mean 0.169 there) -- this section's median/mean should reproduce those values exactly; the band breakdown here is new."
+  },
+  "most_concentrated_families_by_matched_observations": [
+    {
+      "dominant_ticker_by_observations": "COMI",
+      "dominant_ticker_observation_share": 0.5106382978723404,
+      "family_key": "EGP_USD_acceleration|forward_return|no_regime",
+      "matched_observations_band": "high (0.25-0.40)",
+      "matched_observations_hhi": 0.3949751018560434,
+      "member_count": 6,
+      "member_count_band": "high (0.25-0.40)",
+      "member_count_hhi": 0.3888888888888889,
+      "total_matched_observations": 188,
+      "unique_tickers": 3
+    },
+    {
+      "dominant_ticker_by_observations": "ORWE",
+      "dominant_ticker_observation_share": 0.45615982241953384,
+      "family_key": "sector_percentile|forward_return|no_regime",
+      "matched_observations_band": "high (0.25-0.40)",
+      "matched_observations_hhi": 0.30666943691317894,
+      "member_count": 6,
+      "member_count_band": "high (0.25-0.40)",
+      "member_count_hhi": 0.3333333333333333,
+      "total_matched_observations": 2703,
+      "unique_tickers": 4
+    },
+    {
+      "dominant_ticker_by_observations": "ETEL",
+      "dominant_ticker_observation_share": 0.4236111111111111,
+      "family_key": "BRENT_USD_acceleration|forward_return|no_regime",
+      "matched_observations_band": "high (0.25-0.40)",
+      "matched_observations_hhi": 0.26747564621913583,
+      "member_count": 12,
+      "member_count_band": "high (0.25-0.40)",
+      "member_count_hhi": 0.26388888888888895,
+      "total_matched_observations": 576,
+      "unique_tickers": 5
+    },
+    {
+      "dominant_ticker_by_observations": "PHDC",
+      "dominant_ticker_observation_share": 0.36803936803936804,
+      "family_key": "turnover_anomaly|forward_return|no_regime",
+      "matched_observations_band": "high (0.25-0.40)",
+      "matched_observations_hhi": 0.2673330104047535,
+      "member_count": 9,
+      "member_count_band": "moderate (0.15-0.25)",
+      "member_count_hhi": 0.2345679012345679,
+      "total_matched_observations": 3861,
+      "unique_tickers": 5
+    },
+    {
+      "dominant_ticker_by_observations": "ETEL",
+      "dominant_ticker_observation_share": 0.34293948126801155,
+      "family_key": "BRENT_USD_change|forward_return|no_regime",
+      "matched_observations_band": "moderate (0.15-0.25)",
+      "matched_observations_hhi": 0.21358038020413758,
+      "member_count": 9,
+      "member_count_band": "moderate (0.15-0.25)",
+      "member_count_hhi": 0.20987654320987653,
+      "total_matched_observations": 347,
+      "unique_tickers": 6
+    },
+    {
+      "dominant_ticker_by_observations": "ETEL",
+      "dominant_ticker_observation_share": 0.25909428359317,
+      "family_key": "EGP_USD_rolling_percentile|forward_return|no_regime",
+      "matched_observations_band": "moderate (0.15-0.25)",
+      "matched_observations_hhi": 0.20053196385159022,
+      "member_count": 19,
+      "member_count_band": "moderate (0.15-0.25)",
+      "member_count_hhi": 0.1966759002770083,
+      "total_matched_observations": 1347,
+      "unique_tickers": 6
+    },
+    {
+      "dominant_ticker_by_observations": "EGAL",
+      "dominant_ticker_observation_share": 0.2728864553874803,
+      "family_key": "return|forward_return|no_regime",
+      "matched_observations_band": "moderate (0.15-0.25)",
+      "matched_observations_hhi": 0.16626806671711492,
+      "member_count": 468,
+      "member_count_band": "moderate (0.15-0.25)",
+      "member_count_hhi": 0.17457447585652716,
+      "total_matched_observations": 143917,
+      "unique_tickers": 12
+    },
+    {
+      "dominant_ticker_by_observations": "ETEL",
+      "dominant_ticker_observation_share": 0.2120211360634082,
+      "family_key": "EGP_USD_level|forward_return|no_regime",
+      "matched_observations_band": "moderate (0.15-0.25)",
+      "matched_observations_hhi": 0.1654099387661439,
+      "member_count": 23,
+      "member_count_band": "moderate (0.15-0.25)",
+      "member_count_hhi": 0.16824196597353497,
+      "total_matched_observations": 1514,
+      "unique_tickers": 7
+    },
+    {
+      "dominant_ticker_by_observations": "EGAL",
+      "dominant_ticker_observation_share": 0.21827489916227116,
+      "family_key": "relative_volume|forward_return|no_regime",
+      "matched_observations_band": "moderate (0.15-0.25)",
+      "matched_observations_hhi": 0.15678655555993037,
+      "member_count": 27,
+      "member_count_band": "moderate (0.15-0.25)",
+      "member_count_hhi": 0.1522633744855967,
+      "total_matched_observations": 12892,
+      "unique_tickers": 8
+    },
+    {
+      "dominant_ticker_by_observations": "EGAL",
+      "dominant_ticker_observation_share": 0.22524249943604782,
+      "family_key": "market_breadth|forward_return|no_regime",
+      "matched_observations_band": "moderate (0.15-0.25)",
+      "matched_observations_hhi": 0.15488737265659613,
+      "member_count": 18,
+      "member_count_band": "moderate (0.15-0.25)",
+      "member_count_hhi": 0.154320987654321,
+      "total_matched_observations": 8866,
+      "unique_tickers": 8
+    }
+  ],
+  "non_decisions": "This audit selects no HHI ceiling, computes no promotion/rejection verdict, creates no PromotionCase, and modifies no persisted registry data. It is evidence for a future product-owner calibration decision (PATTERN_PROMOTION_GATE_DESIGN.md v2.2 Section 14's HHI ceiling row), not a decision itself.",
+  "purpose": "Descriptive only. Buckets the real Mission 2 registry's cross-ticker families into Manus AI's proposed diagnostic HHI bands (PATTERN_PROMOTION_GATE_CALIBRATION_RESEARCH_PART2.md Part 1 Section 5.2). Does not adopt, calibrate, or select any HHI ceiling. Does not compute a pass/fail verdict for any pattern or family. Does not modify the registry.",
+  "scope": {
+    "excluded_ambiguous_or_unkeyable": 36,
+    "family_construction": "Identical cross_ticker_family_key methodology as analyze_cross_ticker_family_collapse.py (Step 1): strip ticker + window suffix from the primary feature and target, keep regime-filter presence as a component. Ambiguous lead/lag patterns (primary condition references a peer ticker) are excluded from family construction, same as Step 1.",
+    "n_families_analyzed": 22,
+    "n_patterns_analyzed": 1737,
+    "population": "The 1,773 real PatternStatus.VALIDATED patterns in the Mission 2 registry."
+  }
+}

@@ -331,25 +331,35 @@ decision-relevant use, which is exactly why this question needed answering
    short-signal support at all — that is a product/scope decision, not
    something this audit can determine from the code alone.
 
-## 11. Required architectural decision
+## 11. Architectural decision — RESOLVED
 
-Before any pattern can be economically interpreted when its expectancy is
-negative, an explicit decision is needed on:
+**Decision (2026-08-13, user/product owner): AGX/the Promotion Gate is
+long-only, permanently, by explicit product decision.** Short-selling is
+cancelled as a topic for this project in its entirety — not deferred, not
+left open pending a future data/infrastructure investment.
 
-1. **Whether AGX/the Promotion Gate is long-only by design** — in which
-   case negative-expectancy patterns should be explicitly and permanently
-   out of scope for promotion, documented as such, rather than silently
-   rejected by an incidental cost gate the way they are today; **or**
-2. **Whether short/inverse signals are ever in scope** — which would
-   require adding a direction/side field to the `Pattern` schema, building
-   a real short-side cost/availability/financing model (and the data
-   source(s) to feed it), and independently re-running the full
-   `discover()` → `validate()` → `final_holdout()` pipeline against a
-   properly-defined short target — never retroactively negating existing
-   statistics.
+Consequently:
 
-**This decision belongs to the user/product owner, not to this audit or to
-the Promotion Gate design.**
+- Negative-expectancy patterns are explicitly and permanently out of scope
+  for promotion (`OUT_OF_SCOPE_FOR_PROMOTION`), documented as such, rather
+  than silently rejected by an incidental cost gate the way they were
+  before this decision.
+- The short/inverse option that was previously listed as a live
+  alternative — adding a direction/side field to the `Pattern` schema,
+  building a real short-side cost/availability/financing model, and
+  independently re-running `discover()` → `validate()` → `final_holdout()`
+  against a properly-defined short target — is **not going to happen**. It
+  is recorded here only as historical context for why this audit initially
+  framed the question as open; it is not a live option and must not be
+  re-opened without a new, equally explicit product decision reversing this
+  one.
+- No re-entry path, extension point, or "if short is decided later" design
+  hook should be built anywhere in the Promotion Gate for this. Any such
+  hook that predates this decision should be treated as dead scope, not as
+  a pending TODO.
+
+This decision was made by the user/product owner, as this audit and the
+Promotion Gate design always required.
 
 ## 12. Impact on Step 1.6 interpretation
 

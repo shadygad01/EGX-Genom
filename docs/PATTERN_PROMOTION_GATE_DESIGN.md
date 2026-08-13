@@ -814,7 +814,7 @@ reasonable."
 | Net-of-cost expectancy `> 0` | `robustness.py:124-126` (unchanged production code) | Already a precondition for reaching `PatternStatus.VALIDATED` at all (Step 1.6 §4) — every pattern this gate ever sees already cleared this; the gate re-asserts it for defense-in-depth, it does not recompute a new number. |
 | All `RobustnessTester` perturbations agree in sign | `robustness.py:142-143` (unchanged production code) | Same reasoning — already enforced upstream of `VALIDATED`. |
 | `beats_baseline()` result | `baselines.py:156-162` (unchanged production code) | Same reasoning. |
-| Direction scope: `expectancy > 0` required for promotion eligibility | Step 1.7's classification (C) plus the AD-42 precedent against synthetic-position fabrication | This is a **scope boundary**, not a statistical threshold subject to calibration — it does not become "more correct" with more data. It changes only if the architectural decision in Step 1.7 §11 (build real short-side infrastructure) is made explicitly by the user/product owner. |
+| Direction scope: `expectancy > 0` required for promotion eligibility | Step 1.7's classification (C) plus the AD-42 precedent against synthetic-position fabrication; **permanently resolved long-only, 2026-08-13** | This is a **scope boundary**, not a statistical threshold subject to calibration — it does not become "more correct" with more data. Step 1.7 §11's decision is now final: AGX is long-only permanently, short-selling is out of scope for the project, and this row is not subject to future revision. |
 | Frozen-snapshot / no-post-hoc-tuning discipline | `genome.AlphaGenome.mutate()`'s "new child, parent `REPLACED`" precedent, `sources.qualification`'s pure-function-then-persist pattern | Structural anti-leakage requirement, not a number — cannot be "miscalibrated," only present or absent. |
 | Zero capital deployment during paper validation | Explicit mission boundary (`decision_service`/`shadow_fund` untouched) | A structural/architectural constraint, not a statistical threshold. |
 | Same-sign family results are never cited as corroboration | Step 1.6 (94.3% pre-gate positive) + Step 1.5 (100% same-sign under every variant, mechanical) | A methodological rule directly required by evidence already gathered, not a number to tune. |
@@ -1085,16 +1085,15 @@ Promotion Gate.**
   `robustness.py`/`baselines.py` outside this design's scope) could
   produce a `VALIDATED` pattern with non-positive expectancy, and this gate
   must not silently mishandle that case when it happens.
-- **Re-entry path if the architecture changes later**: if the
-  user/product owner makes the architectural decision Step 1.7 §11
-  describes (building real short-side cost/availability/financing
-  infrastructure and independently re-validating a short target through
-  the full `discover()`→`validate()`→`final_holdout()` pipeline), an
-  `OUT_OF_SCOPE_FOR_PROMOTION` case does **not** automatically become
-  eligible — a **new** `PromotionCase` against a **new**, independently
-  re-validated `Pattern` would be required, mirroring the "new child, old
-  terminal" discipline already used for `REJECTED` (§2). This is noted as
-  a future extension point, not decided or built now (§13).
+- **Permanent, no re-entry path (2026-08-13 decision).** The user/product
+  owner has resolved Step 1.7 §11: AGX/the Promotion Gate is long-only,
+  permanently. Short-selling is cancelled as a topic for this project in
+  its entirety. There is no scenario under which an `OUT_OF_SCOPE_FOR_PROMOTION`
+  case becomes eligible via a short-side pathway — no new `PromotionCase`
+  against a re-validated short target, no direction/side field, no
+  short-side cost/availability/financing model. This gate's directional
+  scope is not an interim state awaiting a future decision; it is the
+  permanent design.
 
 ---
 
@@ -1295,9 +1294,14 @@ appended:
     calibrated for a different use case (within-run generation-time
     pruning) — whether it transfers to cross-pattern, cross-run redundancy
     reporting is untested.
-12. **(New)** The `OUT_OF_SCOPE_FOR_PROMOTION` re-entry path (§7) if
+12. ~~**(New)** The `OUT_OF_SCOPE_FOR_PROMOTION` re-entry path (§7) if
     short-side infrastructure is ever built is noted as a future extension
-    point but not designed in any detail here — deferred entirely.
+    point but not designed in any detail here — deferred entirely.~~
+    **RESOLVED, 2026-08-13**: this is no longer an open question. The
+    user/product owner has permanently decided AGX is long-only;
+    short-selling is cancelled as a topic for this project. There is no
+    re-entry path to design — §7 now states this as a permanent rule, not
+    a deferred extension point.
 
 ---
 
@@ -2561,12 +2565,15 @@ underlying pattern must never create hidden multiple-testing freedom.**
   as cases enter or leave that span, never a one-time snapshot taken only
   at `PROMOTION_ELIGIBLE`.
 
-## 12. Directional scope, hard non-decisions (reaffirmed unchanged)
+## 12. Directional scope, hard non-decisions (reaffirmed unchanged; long-only now permanent)
 
-- **Scope remains long, positive-expectancy candidates only.** A pattern
-  with `expectancy <= 0` at frozen intake is `OUT_OF_SCOPE_FOR_PROMOTION`
-  — never `REJECTED`, never reinterpreted via `short_return =
-  -forward_return` or any equivalent relabeling (Part 2 §7, unchanged).
+- **Scope is long, positive-expectancy candidates only — permanently
+  (user/product-owner decision, 2026-08-13).** A pattern with
+  `expectancy <= 0` at frozen intake is `OUT_OF_SCOPE_FOR_PROMOTION` —
+  never `REJECTED`, never reinterpreted via `short_return =
+  -forward_return` or any equivalent relabeling (Part 2 §7). Short-selling
+  is cancelled as a topic for this project in its entirety; there is no
+  re-entry path and none is to be designed.
 - `robustness.py` is not modified by this specification, at any version.
 - `K ≥ 3` is not adopted as a hard gate (§2).
 - The 22-family baseline result is not hardcoded anywhere in this

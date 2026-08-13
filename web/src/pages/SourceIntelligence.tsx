@@ -68,24 +68,42 @@ export function SourceIntelligence() {
   const sourceRegistry = useArtifact((p) => p.getSourceRegistry());
   const sourceMetrics = useArtifact((p) => p.getSourceMetrics());
   const collectorStatus = useArtifact((p) => p.getCollectorStatus());
+  const sourceTruth = useArtifact((p) => p.getSourceTruth());
   const discoveryReport = useArtifact((p) => p.getDiscoveryReport());
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const metricsById = new Map((sourceMetrics.data ?? []).map((m) => [m.source_id, m]));
   const collectorById = new Map((collectorStatus.data ?? []).map((c) => [c.source_id, c]));
+  const truthById = new Map((sourceTruth.data ?? []).map((s) => [s.source_id, s]));
   const discoveryById = new Map((discoveryReport.data ?? []).map((d) => [d.source_id, d]));
 
   // Disabled/retired tombstones remain in the internal registry so a dead or
   // legally blocked source is not accidentally rediscovered. They are not an
   // investable-data source and therefore do not belong on the CIO workspace.
   const sorted = [...(sourceRegistry.data ?? [])]
-    .filter((source) => source.status !== "disabled" && source.activation_status !== "retired")
+    .filter((source) => {
+      if (source.status === "disabled" || source.activation_status === "retired") return false;
+      const truth = truthById.get(source.id);
+      // The CIO workspace shows operational evidence only. Planned,
+      // unavailable, and never-run catalog rows remain available through the
+      // raw source registry/provenance artifacts, but cannot masquerade as
+      // live decision inputs.
+      return truth != null && ["COLLECTED", "DEGRADED", "FAILED", "STANDBY"].includes(truth.collector_status);
+    })
     .sort((a, b) => a.priority - b.priority);
   const selected = sorted.find((s) => s.id === selectedId) ?? sorted[0] ?? null;
   const selectedMetrics = selected ? metricsById.get(selected.id) : undefined;
   const selectedCollector = selected ? collectorById.get(selected.id) : undefined;
   const selectedDiscovery = selected ? discoveryById.get(selected.id) : undefined;
   const effectiveCollected = selectedCollector?.status === "COLLECTED" || selectedCollector?.status === "DEGRADED" || selectedCollector?.status === "STANDBY";
+  const truthRows = sourceTruth.data ?? [];
+  const sourceSummary = {
+    collected: truthRows.filter((row) => row.collector_status === "COLLECTED").length,
+    decisionPath: truthRows.filter((row) => row.reached_decision_path).length,
+    failed: truthRows.filter((row) => row.collector_status === "FAILED").length,
+    unavailable: truthRows.filter((row) => row.collector_status === "UNAVAILABLE").length,
+    corroborated: truthRows.filter((row) => row.corroborated).length,
+  };
 
   return (
     <Section title={t("title")} description={t("description")}>
@@ -93,7 +111,15 @@ export function SourceIntelligence() {
       {sourceRegistry.error && <ErrorState detail={sourceRegistry.error.message} onRetry={sourceRegistry.reload} />}
 
       {!sourceRegistry.loading && !sourceRegistry.error && (
-        <div className={styles.layout}>
+        <>
+          <div className={styles.grid}>
+            <StatTile label="Sources collected" value={sourceSummary.collected} />
+            <StatTile label="Reached decision path" value={sourceSummary.decisionPath} />
+            <StatTile label="Corroborated" value={sourceSummary.corroborated} />
+            <StatTile label="Failed" value={sourceSummary.failed} />
+            <StatTile label="Unavailable" value={sourceSummary.unavailable} />
+          </div>
+          <div className={styles.layout}>
           <Card dense>
             <DataTable
               rows={sorted}
@@ -126,6 +152,15 @@ export function SourceIntelligence() {
                     ) : (
                       <Badge variant={HEALTH_VARIANT[s.health_status]}>{label("healthStatus", s.health_status)}</Badge>
                     ),
+                },
+                {
+                  key: "decisionPath",
+                  header: "Decision path",
+                  render: (s) => {
+                    const truth = truthById.get(s.id);
+                    if (!truth) return "—";
+                    return <Badge variant={truth.reached_decision_path ? "positive" : "neutral"}>{truth.reached_decision_path ? "Used" : "Not used"}</Badge>;
+                  },
                 },
                 {
                   key: "quality",
@@ -164,6 +199,9 @@ export function SourceIntelligence() {
                   <StatTile label={t("detail.lastRun")} value={selectedMetrics?.last_run_at ? formatDate(selectedMetrics.last_run_at) : "—"} />
                   <StatTile label={t("detail.totalRuns")} value={selectedMetrics?.runs_total ?? 0} />
                   <StatTile label={t("detail.documentsLastRun")} value={selectedCollector?.documents_fetched ?? "—"} />
+                  <StatTile label="Records this run" value={truthById.get(selected.id)?.produced_records ?? "—"} />
+                  <StatTile label="Decision path" value={truthById.get(selected.id)?.reached_decision_path ? "Used" : "Not used"} />
+                  <StatTile label="Corroborated" value={truthById.get(selected.id)?.corroborated ? "Yes" : "No"} />
                   <StatTile label={t("detail.integratedVia")} value={selected.integrated_via ?? selected.collector ?? "—"} />
                   <StatTile label={t("detail.decisionCapabilities")} value={selected.integrated_capabilities.length ? selected.integrated_capabilities.map((c) => label("capability", c)).join(", ") : "—"} />
                   <StatTile label={t("detail.expectedLatency")} value={selected.expected_latency || "—"} />
@@ -225,7 +263,8 @@ export function SourceIntelligence() {
               </div>
             )}
           </Card>
-        </div>
+          </div>
+        </>
       )}
     </Section>
   );

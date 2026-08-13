@@ -9,11 +9,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 70,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9513044554455445,
     "evidence_tier": "primary",
     "expected_latency": "end-of-day",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "Yahoo maximum daily history plus StockAnalysis recent daily overlap; Mubasher post-close snapshot fallback",
     "id": "egx_price_composite",
     "integrated_capabilities": [],
@@ -60,7 +60,69 @@
     "validation_rules": [
       "data.quality.validate_price_bars"
     ],
-    "version": 1
+    "version": 203
+  },
+  {
+    "access_method": "html_scrape",
+    "activation_status": "active",
+    "authentication": "none",
+    "base_url": "https://www.egx.com.eg/en/prices.aspx",
+    "category": "market_data",
+    "collector": "EgxOfficialPriceCollector",
+    "collector_version": "1.0.0",
+    "conflict_priority": 95,
+    "country": "EG",
+    "data_quality_score": null,
+    "evidence_tier": "primary",
+    "expected_latency": "intraday or end-of-day, page-dependent",
+    "freshness_score": 0.9,
+    "health_status": "degraded",
+    "historical_coverage": "current official market-watch OHLCV rows for listed securities",
+    "id": "egx_official_prices",
+    "integrated_capabilities": [],
+    "integrated_via": null,
+    "legal_use_status": "cleared",
+    "license": "Official public EGX market data; preserve source attribution and verify exchange terms before external redistribution.",
+    "lifecycle_state": "trusted",
+    "name": "Egyptian Exchange official market-watch prices",
+    "normalization_rules": [
+      "official EGX code -> uppercase ticker",
+      "numeric separators normalized",
+      "only complete OHLCV rows materialized",
+      "trade date taken from row when present, otherwise collection date"
+    ],
+    "notes": "A new parser was added for the public official market-watch page. The sandbox network could not verify the live HTML table, so production should record an honest unavailable/failed status until the VPS confirms the endpoint; fixtures cover the expected complete OHLCV table shape.",
+    "priority": 80,
+    "provenance_policy": "raw_document_envelope",
+    "rate_limit": {
+      "min_seconds_between_requests": 30.0,
+      "requests_per_minute": 2
+    },
+    "reliability_score": 0.92,
+    "reputation_score": null,
+    "retry_policy": {
+      "backoff_multiplier": 2.0,
+      "backoff_seconds": 1.0,
+      "max_attempts": 2
+    },
+    "schema_version": "1.0",
+    "status": "implemented",
+    "supported_entities": [
+      "EGX tickers"
+    ],
+    "supported_event_types": [
+      "market"
+    ],
+    "supported_languages": [
+      "en"
+    ],
+    "terms_of_use_url": "https://www.egx.com.eg/en/Disclaimer.aspx",
+    "update_frequency": "intraday",
+    "validation_rules": [
+      "data.quality.validate_price_bars",
+      "complete OHLCV row required"
+    ],
+    "version": 2
   },
   {
     "access_method": "csv_download",
@@ -72,11 +134,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 60,
     "country": "EG",
-    "data_quality_score": 0.8542857142857143,
+    "data_quality_score": null,
     "evidence_tier": "primary",
     "expected_latency": "end-of-day",
     "freshness_score": 0.7,
-    "health_status": "healthy",
+    "health_status": "unknown",
     "historical_coverage": "multi-year daily OHLCV; EGX symbols suffixed .eg; global indices/commodities/FX",
     "id": "stooq",
     "integrated_capabilities": [],
@@ -123,7 +185,7 @@
     "validation_rules": [
       "data.quality.validate_price_bars"
     ],
-    "version": 17
+    "version": 1
   },
   {
     "access_method": "csv_download",
@@ -135,11 +197,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 85,
     "country": "EG",
-    "data_quality_score": 0.8771428571428571,
+    "data_quality_score": null,
     "evidence_tier": "primary",
     "expected_latency": "days (series-dependent)",
     "freshness_score": 0.8,
-    "health_status": "healthy",
+    "health_status": "unknown",
     "historical_coverage": "decades, series-dependent",
     "id": "fred",
     "integrated_capabilities": [],
@@ -185,7 +247,7 @@
     "validation_rules": [
       "numeric values; '.' means missing and is dropped"
     ],
-    "version": 17
+    "version": 1
   },
   {
     "access_method": "rss_feed",
@@ -197,11 +259,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 40,
     "country": "EG",
-    "data_quality_score": 0.9725,
+    "data_quality_score": null,
     "evidence_tier": "primary",
     "expected_latency": "minutes to hours",
     "freshness_score": 0.9,
-    "health_status": "healthy",
+    "health_status": "unknown",
     "historical_coverage": "feed window only (typically days)",
     "id": "rss_generic",
     "integrated_capabilities": [],
@@ -244,7 +306,7 @@
       "title+date required",
       "entry link preserved as original URL"
     ],
-    "version": 9
+    "version": 1
   },
   {
     "access_method": "json_api",
@@ -256,7 +318,7 @@
     "collector_version": "1.0.0",
     "conflict_priority": 85,
     "country": "EG",
-    "data_quality_score": 0.9114285714285714,
+    "data_quality_score": 0.9195041322314049,
     "evidence_tier": "primary",
     "expected_latency": "annual (some indicators lag a year or more)",
     "freshness_score": 0.5,
@@ -302,7 +364,7 @@
     "validation_rules": [
       "value present (null years dropped, never imputed)"
     ],
-    "version": 9
+    "version": 23
   },
   {
     "access_method": "csv_download",
@@ -646,11 +708,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 90,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9675,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.8,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "capmas",
     "integrated_capabilities": [],
@@ -686,7 +748,7 @@
     "terms_of_use_url": "https://www.capmas.gov.eg:8080/api/UsageRightAndTerm",
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
+    "version": 7
   },
   {
     "access_method": "json_api",
@@ -751,11 +813,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 95,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.80875,
     "evidence_tier": "primary",
     "expected_latency": "issuer publication",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "degraded",
     "historical_coverage": "Latest issuer-published quarterly financial highlights",
     "id": "telecom_egypt_ir",
     "integrated_capabilities": [],
@@ -799,7 +861,7 @@
       "FinancialStatementLineItem schema",
       "explicit EGP-labelled values"
     ],
-    "version": 1
+    "version": 3
   },
   {
     "access_method": "html_scrape",
@@ -811,11 +873,11 @@
     "collector_version": "1.1.0",
     "conflict_priority": 95,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.98375,
     "evidence_tier": "primary",
     "expected_latency": "issuer publication",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "Latest issuer-published quarterly or annual result highlights",
     "id": "orascom_ir",
     "integrated_capabilities": [],
@@ -859,7 +921,7 @@
       "FinancialStatementLineItem schema",
       "explicit USD-labelled values"
     ],
-    "version": 2
+    "version": 3
   },
   {
     "access_method": "csv_download",
@@ -871,11 +933,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 80,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.958,
     "evidence_tier": "primary",
     "expected_latency": "after annual filing normalisation",
     "freshness_score": 0.75,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "Up to eight annual periods for each currently published company",
     "id": "chief_egx_financials",
     "integrated_capabilities": [],
@@ -917,7 +979,129 @@
       "ticker must belong to the declared universe",
       "explicit Year column and recognised numeric financial headers"
     ],
-    "version": 1
+    "version": 11
+  },
+  {
+    "access_method": "pdf_download",
+    "activation_status": "active",
+    "authentication": "none",
+    "base_url": "https://ramedapharma-ir.com/wp-content/uploads/2026/05/Rameda-1Q26-Earnings-Release.pdf",
+    "category": "company",
+    "collector": "CompanyEarningsTablePdfCollector",
+    "collector_version": "1.0.0",
+    "conflict_priority": 90,
+    "country": "EG",
+    "data_quality_score": 0.975,
+    "evidence_tier": "primary",
+    "expected_latency": "issuer publication",
+    "freshness_score": 0.85,
+    "health_status": "healthy",
+    "historical_coverage": "Latest issuer-published quarterly earnings-release summary table",
+    "id": "rmda_ir",
+    "integrated_capabilities": [],
+    "integrated_via": null,
+    "legal_use_status": "research_only",
+    "license": "Public primary issuer investor-relations release; research use with source attribution. Raw PDF content is not redistributed.",
+    "lifecycle_state": "trusted",
+    "name": "Rameda Pharmaceuticals Investor Relations (quarterly earnings-release PDF)",
+    "normalization_rules": [
+      "EGP mn to EGP units",
+      "NQYY quarter label to ISO period end"
+    ],
+    "notes": "Live-verified via a real GitHub Actions fetch (run 30810863486, 2026-08-03) -- robots.txt allows it per the discovery/latest company_financial_sources.json record. URL is the company's current 1Q26 release; a maintainer updates it to the newest release when the weekly discovery workflow finds one, same as AD-53/AD-54's catalog-sync precedent. The collector only reads the structured summary table, never prose, and fails closed (empty + warning) if the table shape isn't found.",
+    "priority": 88,
+    "provenance_policy": "raw_document_envelope",
+    "rate_limit": {
+      "min_seconds_between_requests": 1.0,
+      "requests_per_minute": 10
+    },
+    "reliability_score": 0.9,
+    "reputation_score": null,
+    "retry_policy": {
+      "backoff_multiplier": 2.0,
+      "backoff_seconds": 2.0,
+      "max_attempts": 3
+    },
+    "schema_version": "1.0",
+    "status": "implemented",
+    "supported_entities": [
+      "RMDA"
+    ],
+    "supported_event_types": [
+      "corporate"
+    ],
+    "supported_languages": [
+      "en"
+    ],
+    "terms_of_use_url": null,
+    "update_frequency": "quarterly",
+    "validation_rules": [
+      "FinancialStatementLineItem schema",
+      "explicit 'EGP mn <period> <period> ...' summary table header",
+      "whitelisted line-item label"
+    ],
+    "version": 3
+  },
+  {
+    "access_method": "pdf_download",
+    "activation_status": "active",
+    "authentication": "none",
+    "base_url": "https://talaatmoustafa.com/upload/TMG%20Holding%201Q26%20ER%20-%20EN.pdf",
+    "category": "company",
+    "collector": "CompanyEarningsTablePdfCollector",
+    "collector_version": "1.0.0",
+    "conflict_priority": 90,
+    "country": "EG",
+    "data_quality_score": 0.9717718385250009,
+    "evidence_tier": "primary",
+    "expected_latency": "issuer publication",
+    "freshness_score": 0.85,
+    "health_status": "healthy",
+    "historical_coverage": "Latest issuer-published quarterly earnings-release summary table",
+    "id": "tmgh_ir",
+    "integrated_capabilities": [],
+    "integrated_via": null,
+    "legal_use_status": "research_only",
+    "license": "Public primary issuer investor-relations release; research use with source attribution. Raw PDF content is not redistributed.",
+    "lifecycle_state": "trusted",
+    "name": "TMG Holding Investor Relations (quarterly earnings-release PDF)",
+    "normalization_rules": [
+      "EGP mn to EGP units",
+      "NQYY quarter label to ISO period end"
+    ],
+    "notes": "Live-verified via a real GitHub Actions fetch (run 30810863486, 2026-08-03) -- robots.txt allows it per the discovery/latest company_financial_sources.json record. TMG Holding also publishes a 64-document PDF archive (docs/COLLECTOR_TEMPLATE_TAXONOMY.md Family B) including full audited separate/consolidated financial statements; only the quarterly earnings-release summary table is wired today, not that larger archive. The collector only reads the structured summary table, never prose, and fails closed (empty + warning) if the table shape isn't found.",
+    "priority": 88,
+    "provenance_policy": "raw_document_envelope",
+    "rate_limit": {
+      "min_seconds_between_requests": 1.0,
+      "requests_per_minute": 10
+    },
+    "reliability_score": 0.9,
+    "reputation_score": null,
+    "retry_policy": {
+      "backoff_multiplier": 2.0,
+      "backoff_seconds": 2.0,
+      "max_attempts": 3
+    },
+    "schema_version": "1.0",
+    "status": "implemented",
+    "supported_entities": [
+      "TMGH"
+    ],
+    "supported_event_types": [
+      "corporate"
+    ],
+    "supported_languages": [
+      "en"
+    ],
+    "terms_of_use_url": null,
+    "update_frequency": "quarterly",
+    "validation_rules": [
+      "FinancialStatementLineItem schema",
+      "explicit 'EGP mn <period> <period> ...' summary table header",
+      "whitelisted line-item label"
+    ],
+    "version": 3
   },
   {
     "access_method": "json_api",
@@ -929,11 +1113,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 70,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9768080357142853,
     "evidence_tier": "primary",
     "expected_latency": "intraday",
     "freshness_score": 0.95,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "Current fundamentals plus 252-session OHLCV history",
     "id": "egxpilot_fundamentals",
     "integrated_capabilities": [],
@@ -976,7 +1160,7 @@
       "numeric facts only",
       "dated OHLCV rows only; opaque analysis signals ignored"
     ],
-    "version": 1
+    "version": 401
   },
   {
     "access_method": "pdf_download",
@@ -1096,11 +1280,11 @@
     "collector_version": null,
     "conflict_priority": 60,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.95375,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "stockanalysis",
     "integrated_capabilities": [
@@ -1138,7 +1322,7 @@
     "terms_of_use_url": null,
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
+    "version": 199
   },
   {
     "access_method": "html_scrape",
@@ -1200,11 +1384,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 55,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9744444444444444,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "enterprise_press",
     "integrated_capabilities": [],
@@ -1241,7 +1425,7 @@
     "terms_of_use_url": null,
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
+    "version": 3
   },
   {
     "access_method": "html_scrape",
@@ -1253,11 +1437,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 96,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9732986032083277,
     "evidence_tier": "primary",
     "expected_latency": "monthly or quarterly, depending on series",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "current and previous official SDDS observations",
     "id": "egypt_nsdp",
     "integrated_capabilities": [],
@@ -1301,7 +1485,7 @@
       "exact row label and unit match",
       "period and value parseable"
     ],
-    "version": 1
+    "version": 3
   },
   {
     "access_method": "html_scrape",
@@ -1313,11 +1497,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 75,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9928888888888889,
     "evidence_tier": "primary",
     "expected_latency": "same trading day",
     "freshness_score": 0.98,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "paginated EGX market-announcement archive",
     "id": "eac_egx_disclosures",
     "integrated_capabilities": [],
@@ -1356,7 +1540,7 @@
     "terms_of_use_url": "https://www.eac-finance.com/robots.txt",
     "update_frequency": "intraday",
     "validation_rules": [],
-    "version": 1
+    "version": 11
   },
   {
     "access_method": "json_api",
@@ -1372,7 +1556,7 @@
     "evidence_tier": "discovery",
     "expected_latency": "minutes",
     "freshness_score": 0.95,
-    "health_status": "unknown",
+    "health_status": "degraded",
     "historical_coverage": "rolling global multilingual news window",
     "id": "gdelt",
     "integrated_capabilities": [],
@@ -1409,7 +1593,7 @@
     "terms_of_use_url": "https://www.gdeltproject.org/about.html",
     "update_frequency": "continuous",
     "validation_rules": [],
-    "version": 1
+    "version": 2
   },
   {
     "access_method": "rss_feed",
@@ -1421,11 +1605,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 40,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9755555555555555,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "alborsa",
     "integrated_capabilities": [],
@@ -1461,7 +1645,7 @@
     "terms_of_use_url": null,
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
+    "version": 3
   },
   {
     "access_method": "rss_feed",
@@ -1473,11 +1657,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 40,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9755555555555555,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "masrawy_economy",
     "integrated_capabilities": [],
@@ -1513,7 +1697,7 @@
     "terms_of_use_url": null,
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
+    "version": 3
   },
   {
     "access_method": "rss_feed",
@@ -1889,11 +2073,11 @@
     "collector_version": null,
     "conflict_priority": 55,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.83025,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "mubasher",
     "integrated_capabilities": [
@@ -1932,7 +2116,7 @@
     "terms_of_use_url": null,
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
+    "version": 5
   },
   {
     "access_method": "rss_feed",
@@ -2256,11 +2440,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 85,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9225,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.5,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "undata",
     "integrated_capabilities": [],
@@ -2296,7 +2480,7 @@
     "terms_of_use_url": "https://unstats.un.org/SDGAPI/swagger/",
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
+    "version": 11
   },
   {
     "access_method": "json_api",
@@ -2640,11 +2824,11 @@
     "collector_version": "1.0.0",
     "conflict_priority": 40,
     "country": "EG",
-    "data_quality_score": null,
+    "data_quality_score": 0.9755555555555555,
     "evidence_tier": "primary",
     "expected_latency": "unknown",
     "freshness_score": 0.9,
-    "health_status": "unknown",
+    "health_status": "healthy",
     "historical_coverage": "unknown",
     "id": "amwal_alghad",
     "integrated_capabilities": [],
@@ -2680,128 +2864,6 @@
     "terms_of_use_url": null,
     "update_frequency": "unknown",
     "validation_rules": [],
-    "version": 1
-  },
-  {
-    "access_method": "pdf_download",
-    "activation_status": "active",
-    "authentication": "none",
-    "base_url": "https://ramedapharma-ir.com/wp-content/uploads/2026/05/Rameda-1Q26-Earnings-Release.pdf",
-    "category": "company",
-    "collector": "CompanyEarningsTablePdfCollector",
-    "collector_version": "1.0.0",
-    "conflict_priority": 90,
-    "country": "EG",
-    "data_quality_score": null,
-    "evidence_tier": "primary",
-    "expected_latency": "issuer publication",
-    "freshness_score": 0.85,
-    "health_status": "unknown",
-    "historical_coverage": "Latest issuer-published quarterly earnings-release summary table",
-    "id": "rmda_ir",
-    "integrated_capabilities": [],
-    "integrated_via": null,
-    "legal_use_status": "research_only",
-    "license": "Public primary issuer investor-relations release; research use with source attribution. Raw PDF content is not redistributed.",
-    "lifecycle_state": "trusted",
-    "name": "Rameda Pharmaceuticals Investor Relations (quarterly earnings-release PDF)",
-    "normalization_rules": [
-      "EGP mn to EGP units",
-      "NQYY quarter label to ISO period end"
-    ],
-    "notes": "Live-verified via a real GitHub Actions fetch (run 30810863486, 2026-08-03) -- robots.txt allows it per the discovery/latest company_financial_sources.json record. URL is the company's current 1Q26 release; a maintainer updates it to the newest release when the weekly discovery workflow finds one, same as AD-53/AD-54's catalog-sync precedent. The collector only reads the structured summary table, never prose, and fails closed (empty + warning) if the table shape isn't found.",
-    "priority": 88,
-    "provenance_policy": "raw_document_envelope",
-    "rate_limit": {
-      "min_seconds_between_requests": 1.0,
-      "requests_per_minute": 10
-    },
-    "reliability_score": 0.9,
-    "reputation_score": null,
-    "retry_policy": {
-      "backoff_multiplier": 2.0,
-      "backoff_seconds": 2.0,
-      "max_attempts": 3
-    },
-    "schema_version": "1.0",
-    "status": "implemented",
-    "supported_entities": [
-      "RMDA"
-    ],
-    "supported_event_types": [
-      "corporate"
-    ],
-    "supported_languages": [
-      "en"
-    ],
-    "terms_of_use_url": null,
-    "update_frequency": "quarterly",
-    "validation_rules": [
-      "FinancialStatementLineItem schema",
-      "explicit 'EGP mn <period> <period> ...' summary table header",
-      "whitelisted line-item label"
-    ],
-    "version": 1
-  },
-  {
-    "access_method": "pdf_download",
-    "activation_status": "active",
-    "authentication": "none",
-    "base_url": "https://talaatmoustafa.com/upload/TMG%20Holding%201Q26%20ER%20-%20EN.pdf",
-    "category": "company",
-    "collector": "CompanyEarningsTablePdfCollector",
-    "collector_version": "1.0.0",
-    "conflict_priority": 90,
-    "country": "EG",
-    "data_quality_score": null,
-    "evidence_tier": "primary",
-    "expected_latency": "issuer publication",
-    "freshness_score": 0.85,
-    "health_status": "unknown",
-    "historical_coverage": "Latest issuer-published quarterly earnings-release summary table",
-    "id": "tmgh_ir",
-    "integrated_capabilities": [],
-    "integrated_via": null,
-    "legal_use_status": "research_only",
-    "license": "Public primary issuer investor-relations release; research use with source attribution. Raw PDF content is not redistributed.",
-    "lifecycle_state": "trusted",
-    "name": "TMG Holding Investor Relations (quarterly earnings-release PDF)",
-    "normalization_rules": [
-      "EGP mn to EGP units",
-      "NQYY quarter label to ISO period end"
-    ],
-    "notes": "Live-verified via a real GitHub Actions fetch (run 30810863486, 2026-08-03) -- robots.txt allows it per the discovery/latest company_financial_sources.json record. TMG Holding also publishes a 64-document PDF archive (docs/COLLECTOR_TEMPLATE_TAXONOMY.md Family B) including full audited separate/consolidated financial statements; only the quarterly earnings-release summary table is wired today, not that larger archive. The collector only reads the structured summary table, never prose, and fails closed (empty + warning) if the table shape isn't found.",
-    "priority": 88,
-    "provenance_policy": "raw_document_envelope",
-    "rate_limit": {
-      "min_seconds_between_requests": 1.0,
-      "requests_per_minute": 10
-    },
-    "reliability_score": 0.9,
-    "reputation_score": null,
-    "retry_policy": {
-      "backoff_multiplier": 2.0,
-      "backoff_seconds": 2.0,
-      "max_attempts": 3
-    },
-    "schema_version": "1.0",
-    "status": "implemented",
-    "supported_entities": [
-      "TMGH"
-    ],
-    "supported_event_types": [
-      "corporate"
-    ],
-    "supported_languages": [
-      "en"
-    ],
-    "terms_of_use_url": null,
-    "update_frequency": "quarterly",
-    "validation_rules": [
-      "FinancialStatementLineItem schema",
-      "explicit 'EGP mn <period> <period> ...' summary table header",
-      "whitelisted line-item label"
-    ],
-    "version": 1
+    "version": 3
   }
 ]

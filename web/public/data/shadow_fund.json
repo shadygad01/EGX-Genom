@@ -3,21 +3,155 @@
   "benchmark_cumulative_return_pct": 0.0,
   "benchmark_nav": 100.0,
   "benchmark_ticker": "EGX30",
-  "capital_allocation_plan": null,
+  "capital_allocation_plan": {
+    "allocation_changes": [],
+    "as_of": "2026-08-13",
+    "best_new_opportunities": [],
+    "capital_recycled": [],
+    "capital_released_today": [],
+    "cash_waiting": {
+      "idle_cash_after": 1.0,
+      "idle_cash_before": 1.0,
+      "reason": "No additional ticker currently clears a positive, publication-ready risk-adjusted score large enough to absorb this capital -- it stays in cash rather than being forced into a weaker idea."
+    },
+    "explanation": {
+      "evidence_refs": [
+        {
+          "kind": "decision",
+          "ref_id": "ARCC",
+          "ref_version": null
+        },
+        {
+          "kind": "decision",
+          "ref_id": "EXPA",
+          "ref_version": null
+        }
+      ],
+      "invalidation_conditions": [
+        "Any underlying PositionAwareDecision changes (new evidence, publication gate status, or position state)."
+      ],
+      "similar_historical_cases": [],
+      "supporting_evidence": [
+        "EXPA: rank 1/2, opportunity_score=0.0722",
+        "ARCC: rank 2/2, opportunity_score=0.0445"
+      ],
+      "why_not_others": "Every ticker with a Recommendation or an existing position competes for the same capital in one pass; a ticker is funded only if it outranks every lower-scoring alternative and idle cash under the current budget.",
+      "why_now": "Computed as of 2026-08-13 from the same jointly-normalized, position-aware decisions DecisionService already produced -- no independent scoring happens here.",
+      "why_this_stock": "2 ticker(s) evaluated together for the same capital budget: 0 funded (buy/increase), 0 releasing capital (reduce/exit), 100.00% of the portfolio left in cash."
+    },
+    "highest_opportunity_cost": [
+      {
+        "opportunity_score": 0.0722462473379597,
+        "reason": "Positive, publication-ready risk-adjusted evidence exists but no capital was allocated -- outranked by higher-scoring ideas under today's capital budget.",
+        "ticker": "EXPA"
+      },
+      {
+        "opportunity_score": 0.04450731760992846,
+        "reason": "Positive, publication-ready risk-adjusted evidence exists but no capital was allocated -- outranked by higher-scoring ideas under today's capital budget.",
+        "ticker": "ARCC"
+      }
+    ],
+    "provenance": {
+      "inputs": [
+        {
+          "kind": "decision",
+          "ref_id": "ARCC",
+          "ref_version": null
+        },
+        {
+          "kind": "decision",
+          "ref_id": "EXPA",
+          "ref_version": null
+        }
+      ],
+      "produced_at": "2026-08-13T12:41:24.350278",
+      "produced_by": "capital_allocation_engine@1.0.0"
+    },
+    "queue": [],
+    "ranking": [
+      {
+        "action": "no_action",
+        "confidence": 0.7000000000000001,
+        "current_weight": 0.0,
+        "expected_return": 0.05160446238425693,
+        "expected_risk": 0.5,
+        "is_new_position": false,
+        "opportunity_score": 0.0722462473379597,
+        "rank": 1,
+        "sector": null,
+        "target_weight": 0.0,
+        "ticker": "EXPA"
+      },
+      {
+        "action": "no_action",
+        "confidence": 0.7000000000000001,
+        "current_weight": 0.0,
+        "expected_return": 0.0201638068441065,
+        "expected_risk": 0.31713132915756587,
+        "is_new_position": false,
+        "opportunity_score": 0.04450731760992846,
+        "rank": 2,
+        "sector": null,
+        "target_weight": 0.0,
+        "ticker": "ARCC"
+      }
+    ]
+  },
   "cash": 100.0,
   "cash_pct": 1.0,
   "closed_positions": [],
   "cumulative_return_pct": 0.0,
   "daily_return_pct": null,
-  "date": "2026-07-26",
+  "date": "2026-08-13",
   "excess_return_pct": 0.0,
-  "inception_date": "2026-07-26",
+  "inception_date": "2026-08-13",
   "invested_pct": 0.0,
   "nav": 100.0,
   "open_positions": [],
   "provenance": {
-    "inputs": [],
-    "produced_at": "2026-08-03T09:31:00.648732",
+    "inputs": [
+      {
+        "kind": "recommendation",
+        "ref_id": "AIHC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "ARCC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "DSCW",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "EMFD",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "EXPA",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "MEPA",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "TANM",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "UNIP",
+        "ref_version": null
+      }
+    ],
+    "produced_at": "2026-08-13T12:41:24.350336",
     "produced_by": "shadow_fund.engine@1.0.0"
   },
   "risk": {

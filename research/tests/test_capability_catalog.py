@@ -16,28 +16,21 @@ def test_economic_releases_capability_no_longer_exists():
     assert "economic_releases" not in {c.value for c in Capability}
 
 
-def test_macroeconomic_pool_absorbs_former_economic_releases_sources():
+def test_macroeconomic_pool_contains_only_verified_free_sources():
     pool = CAPABILITY_STRATEGIES[Capability.MACROECONOMIC]
-    for source_id in ("trading_economics", "cbe", "capmas", "mof_egypt"):
-        assert source_id in pool
-
-
-def test_macroeconomic_pool_includes_new_sovereign_credit_sources():
-    pool = CAPABILITY_STRATEGIES[Capability.MACROECONOMIC]
-    for source_id in ("moodys_ratings", "sp_global_ratings", "fitch_ratings"):
-        assert source_id in pool
+    assert pool == ["egypt_nsdp", "worldbank", "undata", "capmas"]
+    for source_id in ("fred", "cbe", "trading_economics", "mof_egypt", "imf", "oecd"):
+        assert source_id not in pool
 
 
 def test_news_pool_includes_amwal_alghad():
     assert "amwal_alghad" in CAPABILITY_STRATEGIES[Capability.NEWS]
 
 
-def test_macroeconomic_pool_includes_previously_unmapped_gov_and_external_sector_sources():
-    # Mission Completion Review finding: egypt_open_data/suez_canal_stats
-    # were catalogued but had zero capability mapping at all.
+def test_unverified_government_placeholders_do_not_enter_live_routing():
     pool = CAPABILITY_STRATEGIES[Capability.MACROECONOMIC]
-    assert "egypt_open_data" in pool
-    assert "suez_canal_stats" in pool
+    assert "egypt_open_data" not in pool
+    assert "suez_canal_stats" not in pool
 
 
 def test_every_capability_strategy_id_exists_in_the_source_catalog():

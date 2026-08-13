@@ -1,16 +1,89 @@
 {
-  "as_of": "2026-07-26",
+  "as_of": "2026-08-13",
   "macro_overlay": {
-    "as_of": "2026-07-26",
-    "available_weight": 0.0,
-    "contributions": [],
-    "decision": "insufficient_data",
-    "exposure_multiplier": 1.0,
-    "rationale": "No factor had two comparable observations; portfolio exposure was not adjusted.",
-    "score": 0.0
+    "as_of": "2026-08-13",
+    "available_weight": 0.85,
+    "contributions": [
+      {
+        "change_pct": 0.08672317899527059,
+        "effective_weight": 0.23529411764705885,
+        "factor": "currency",
+        "impact": "adverse",
+        "importance_weight": 0.2,
+        "latest_date": "2025-12-31",
+        "latest_value": 49.2277558333333,
+        "previous_value": 45.29926,
+        "series_id": "egypt_official_fx_egp_per_usd",
+        "signal": -1
+      },
+      {
+        "change_pct": -0.06153846153846159,
+        "effective_weight": 0.23529411764705885,
+        "factor": "inflation",
+        "impact": "supportive",
+        "importance_weight": 0.2,
+        "latest_date": "2026-06-30",
+        "latest_value": 12.2,
+        "previous_value": 13.0,
+        "series_id": "egypt_total_cpi_yoy",
+        "signal": 1
+      },
+      {
+        "change_pct": 0.08802394209864883,
+        "effective_weight": 0.17647058823529413,
+        "factor": "fx_reserves",
+        "impact": "supportive",
+        "importance_weight": 0.15,
+        "latest_date": "2025-12-31",
+        "latest_value": 48875494539.269,
+        "previous_value": 44921341018.4659,
+        "series_id": "egypt_total_reserves_usd",
+        "signal": 1
+      },
+      {
+        "change_pct": 0.05644117902040613,
+        "effective_weight": 0.17647058823529413,
+        "factor": "external_debt",
+        "impact": "adverse",
+        "importance_weight": 0.15,
+        "latest_date": "2026-03-31",
+        "latest_value": 164776000000.0,
+        "previous_value": 155972716013.2,
+        "series_id": "egypt_external_debt_usd",
+        "signal": -1
+      },
+      {
+        "change_pct": 0.3289656074423522,
+        "effective_weight": 0.11764705882352942,
+        "factor": "current_account",
+        "impact": "supportive",
+        "importance_weight": 0.1,
+        "latest_date": "2025-12-31",
+        "latest_value": -3.81547628555514,
+        "previous_value": -5.68596234093524,
+        "series_id": "egypt_current_account_pct_gdp",
+        "signal": 1
+      },
+      {
+        "change_pct": 0.8306381065323227,
+        "effective_weight": 0.05882352941176471,
+        "factor": "real_growth",
+        "impact": "supportive",
+        "importance_weight": 0.05,
+        "latest_date": "2025-12-31",
+        "latest_value": 4.39201068570188,
+        "previous_value": 2.3991692678251,
+        "series_id": "egypt_real_gdp_growth",
+        "signal": 1
+      }
+    ],
+    "decision": "cautious",
+    "exposure_multiplier": 0.75,
+    "rationale": "Macro score +0.18; equity exposure is capped at 75% and the remainder stays cash.",
+    "score": 0.17647058823529413
   },
   "portfolio": {
-    "as_of": "2026-07-26",
+    "as_of": "2026-08-13",
     "cash_weight": 1.0,
     "explanation": {
       "evidence_refs": [],
@@ -19,20 +92,1672 @@
       ],
       "similar_historical_cases": [],
       "supporting_evidence": [
-        "No factor had two comparable observations; portfolio exposure was not adjusted."
+        "Macro score +0.18; equity exposure is capped at 75% and the remainder stays cash."
       ],
       "why_not_others": "Tickers absent here either produced no evidence-backed recommendation at all, or scored non-positive after risk and confidence discounting.",
-      "why_now": "Constructed from recommendations as of 2026-07-26.",
+      "why_now": "Constructed from recommendations as of 2026-08-13.",
       "why_this_stock": "No recommendation carried positive risk-adjusted expectancy; the portfolio holds cash rather than forcing positions."
     },
-    "id": "portfolio_d96fe335da17",
+    "id": "portfolio_29d4d24111b8",
     "positions": [],
     "provenance": {
       "inputs": [],
-      "produced_at": "2026-08-03T09:42:02.940414",
+      "produced_at": "2026-08-13T12:41:21.922381",
       "produced_by": "portfolio_constructor@1.0.0"
     },
     "version": 1
   },
-  "recommendations": []
+  "recommendations": [
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.01522578986996949,
+      "combined_expected_risk": 0.09599303915931895,
+      "confidence": 0.2851866379310345,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_49e285e49a37",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_777c3eb78a3f",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_7945834abed0",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_e8e5de9a90ed",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_a0f6f7716ed378c3e5d8",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "invalidation_conditions": [
+          "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+          "A new high-severity source event can raise expected risk and reduce confidence.",
+          "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Micro: expected_return=0.0152, expected_risk=0.0960, confidence=0.29",
+          "hyp_7945834abed0 v1: confidence=0.20, expected_return=0.0152, p_value=0",
+          "hyp_777c3eb78a3f v1: confidence=0.35, expected_return=0.0152, p_value=0",
+          "hyp_e8e5de9a90ed v1: confidence=0.36, expected_return=0.0152, p_value=0",
+          "hyp_49e285e49a37 v1: confidence=0.40, expected_return=0.0152, p_value=0",
+          "event event_a0f6f7716ed378c3e5d8: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+          "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Micro) found supporting evidence for AIHC."
+      },
+      "horizon_decisions": {
+        "micro": {
+          "abstention_reasons": [
+            "Confidence is below the research threshold of 60%."
+          ],
+          "action": "abstain",
+          "confidence": 0.2851866379310345,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_7945834abed0",
+              "ref_version": 1
+            },
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_777c3eb78a3f",
+              "ref_version": 1
+            },
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_e8e5de9a90ed",
+              "ref_version": 1
+            },
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_49e285e49a37",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_a0f6f7716ed378c3e5d8",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_e8640d104e8f50ed156b",
+              "ref_version": 1
+            }
+          ],
+          "expected_return": 0.01522578986996949,
+          "expected_risk": 0.09599303915931895,
+          "horizon": "micro",
+          "horizon_window": "1-3 trading days",
+          "invalidation_conditions": [
+            "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+            "A new high-severity source event can raise expected risk and reduce confidence."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "research_only",
+          "reference_price": 0.514,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.04523444471483289,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2026-08-16"
+        }
+      },
+      "horizon_predictions": {
+        "micro": {
+          "as_of": "2026-08-13",
+          "confidence": 0.2851866379310345,
+          "expected_return": 0.01522578986996949,
+          "expected_risk": 0.09599303915931895,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_7945834abed0",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_777c3eb78a3f",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_e8e5de9a90ed",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_49e285e49a37",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_a0f6f7716ed378c3e5d8",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "invalidation_conditions": [
+              "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+              "A new high-severity source event can raise expected risk and reduce confidence."
+            ],
+            "similar_historical_cases": [
+              "2026-08-12: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-08-11: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-08-06: market/large_price_move (severity high, confidence 1.00)",
+              "2026-08-05: market/large_price_move (severity high, confidence 1.00)",
+              "2026-08-04: market/large_price_move (severity medium, confidence 1.00)"
+            ],
+            "supporting_evidence": [
+              "hyp_7945834abed0 v1: confidence=0.20, expected_return=0.0152, p_value=0",
+              "hyp_777c3eb78a3f v1: confidence=0.35, expected_return=0.0152, p_value=0",
+              "hyp_e8e5de9a90ed v1: confidence=0.36, expected_return=0.0152, p_value=0",
+              "hyp_49e285e49a37 v1: confidence=0.40, expected_return=0.0152, p_value=0",
+              "event event_a0f6f7716ed378c3e5d8: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+              "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+            ],
+            "why_not_others": "This model only aggregates promoted knowledge; tickers without surviving knowledge get no prediction at all rather than a weaker one.",
+            "why_now": "Knowledge active and unretired as of 2026-08-13.",
+            "why_this_stock": "4 validated knowledge object(s) cover AIHC on the micro horizon: AIHC and MEPA are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement.; AIHC and DSCW are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement.; AIHC and EMFD are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement.; AIHC and UNIP are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement."
+          },
+          "horizon": "micro",
+          "model_id": "knowledge_weighted",
+          "model_version": "1.0.0",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_7945834abed0",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_777c3eb78a3f",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_e8e5de9a90ed",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_49e285e49a37",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_a0f6f7716ed378c3e5d8",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.267919",
+            "produced_by": "knowledge_weighted@1.0.0"
+          },
+          "reference_price": 0.514,
+          "supporting_knowledge_ids": [
+            "hyp_7945834abed0",
+            "hyp_777c3eb78a3f",
+            "hyp_e8e5de9a90ed",
+            "hyp_49e285e49a37"
+          ],
+          "ticker": "AIHC"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "knowledge_weighted@1.0.0:micro",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_49e285e49a37",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_777c3eb78a3f",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_7945834abed0",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_e8e5de9a90ed",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_a0f6f7716ed378c3e5d8",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.268098",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [
+        "hyp_49e285e49a37",
+        "hyp_777c3eb78a3f",
+        "hyp_7945834abed0",
+        "hyp_e8e5de9a90ed"
+      ],
+      "ticker": "AIHC"
+    },
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.0201638068441065,
+      "combined_expected_risk": 0.31713132915756587,
+      "confidence": 0.7000000000000001,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "calculated_fair_value",
+            "ref_id": "ARCC:2026-08-13:smartlist-ive-v2.2",
+            "ref_version": null
+          },
+          {
+            "kind": "market_fundamental_snapshot",
+            "ref_id": "ARCC:2026-08-13:market_pe",
+            "ref_version": null
+          }
+        ],
+        "invalidation_conditions": [
+          "A new filing changes the reported cash flow, earnings, equity, debt, or share count."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Investment: expected_return=0.0202, expected_risk=0.3171, confidence=0.70",
+          "fair_value=76.1377",
+          "bear_case=45.6826",
+          "bull_case=93.9739",
+          "models=dcf,pe,residual_income",
+          "Market P/E=5.26; earnings-yield spread=+6.5%; market-multiple weight in expected return=10%"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Investment) found supporting evidence for ARCC."
+      },
+      "horizon_decisions": {
+        "investment": {
+          "abstention_reasons": [],
+          "action": "watch",
+          "confidence": 0.7000000000000001,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "calculated_fair_value",
+              "ref_id": "ARCC:2026-08-13:smartlist-ive-v2.2",
+              "ref_version": null
+            },
+            {
+              "kind": "market_fundamental_snapshot",
+              "ref_id": "ARCC:2026-08-13:market_pe",
+              "ref_version": null
+            }
+          ],
+          "expected_return": 0.0201638068441065,
+          "expected_risk": 0.31713132915756587,
+          "horizon": "investment",
+          "horizon_window": "1-6 months",
+          "invalidation_conditions": [
+            "A new filing changes the reported cash flow, earnings, equity, debt, or share count."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "publication_ready",
+          "reference_price": 75.0,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.04450731760992846,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2027-02-12"
+        }
+      },
+      "horizon_predictions": {
+        "investment": {
+          "as_of": "2026-08-13",
+          "confidence": 0.7000000000000001,
+          "expected_return": 0.0201638068441065,
+          "expected_risk": 0.31713132915756587,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "calculated_fair_value",
+                "ref_id": "ARCC:2026-08-13:smartlist-ive-v2.2",
+                "ref_version": null
+              },
+              {
+                "kind": "market_fundamental_snapshot",
+                "ref_id": "ARCC:2026-08-13:market_pe",
+                "ref_version": null
+              }
+            ],
+            "invalidation_conditions": [
+              "A new filing changes the reported cash flow, earnings, equity, debt, or share count."
+            ],
+            "similar_historical_cases": [],
+            "supporting_evidence": [
+              "fair_value=76.1377",
+              "bear_case=45.6826",
+              "bull_case=93.9739",
+              "models=dcf,pe,residual_income",
+              "Market P/E=5.26; earnings-yield spread=+6.5%; market-multiple weight in expected return=10%"
+            ],
+            "why_not_others": "Tickers without at least three valid valuation models are withheld.",
+            "why_now": "Current price 75.00 can be compared with fair value 76.14.",
+            "why_this_stock": "ARCC has a point-in-time fair value supported by 3 mutually checked models."
+          },
+          "horizon": "investment",
+          "model_id": "multi_model_fair_value",
+          "model_version": "smartlist-ive-v2.2",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "calculated_fair_value",
+                "ref_id": "ARCC:2026-08-13:smartlist-ive-v2.2",
+                "ref_version": null
+              },
+              {
+                "kind": "market_fundamental_snapshot",
+                "ref_id": "ARCC:2026-08-13:market_pe",
+                "ref_version": null
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.268904Z",
+            "produced_by": "multi_model_fair_value@smartlist-ive-v2.2"
+          },
+          "reference_price": 75.0,
+          "supporting_knowledge_ids": [],
+          "ticker": "ARCC"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "multi_model_fair_value@smartlist-ive-v2.2:investment",
+            "ref_version": null
+          },
+          {
+            "kind": "calculated_fair_value",
+            "ref_id": "ARCC:2026-08-13:smartlist-ive-v2.2",
+            "ref_version": null
+          },
+          {
+            "kind": "market_fundamental_snapshot",
+            "ref_id": "ARCC:2026-08-13:market_pe",
+            "ref_version": null
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.271397",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [],
+      "ticker": "ARCC"
+    },
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.01522578986996949,
+      "combined_expected_risk": 0.09005707384027979,
+      "confidence": 0.32991724137931033,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_777c3eb78a3f",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e275f42e1ea7759c1348",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "invalidation_conditions": [
+          "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+          "A new high-severity source event can raise expected risk and reduce confidence.",
+          "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Micro: expected_return=0.0152, expected_risk=0.0901, confidence=0.33",
+          "hyp_777c3eb78a3f v1: confidence=0.35, expected_return=0.0152, p_value=0",
+          "event event_e275f42e1ea7759c1348: large_price_move, severity=medium, confidence=1.00, sources=dataset_snapshot.price_history",
+          "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Micro) found supporting evidence for DSCW."
+      },
+      "horizon_decisions": {
+        "micro": {
+          "abstention_reasons": [
+            "Confidence is below the research threshold of 60%."
+          ],
+          "action": "abstain",
+          "confidence": 0.32991724137931033,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_777c3eb78a3f",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_e275f42e1ea7759c1348",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_e8640d104e8f50ed156b",
+              "ref_version": 1
+            }
+          ],
+          "expected_return": 0.015225789869969492,
+          "expected_risk": 0.09005707384027979,
+          "horizon": "micro",
+          "horizon_window": "1-3 trading days",
+          "invalidation_conditions": [
+            "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+            "A new high-severity source event can raise expected risk and reduce confidence."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "research_only",
+          "reference_price": 2.19,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.055778523302126605,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2026-08-16"
+        }
+      },
+      "horizon_predictions": {
+        "micro": {
+          "as_of": "2026-08-13",
+          "confidence": 0.32991724137931033,
+          "expected_return": 0.015225789869969492,
+          "expected_risk": 0.09005707384027979,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_777c3eb78a3f",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e275f42e1ea7759c1348",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "invalidation_conditions": [
+              "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+              "A new high-severity source event can raise expected risk and reduce confidence."
+            ],
+            "similar_historical_cases": [
+              "2026-08-06: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-08-03: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-16: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-13: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-06-16: market/large_price_move (severity medium, confidence 1.00)"
+            ],
+            "supporting_evidence": [
+              "hyp_777c3eb78a3f v1: confidence=0.35, expected_return=0.0152, p_value=0",
+              "event event_e275f42e1ea7759c1348: large_price_move, severity=medium, confidence=1.00, sources=dataset_snapshot.price_history",
+              "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+            ],
+            "why_not_others": "This model only aggregates promoted knowledge; tickers without surviving knowledge get no prediction at all rather than a weaker one.",
+            "why_now": "Knowledge active and unretired as of 2026-08-13.",
+            "why_this_stock": "1 validated knowledge object(s) cover DSCW on the micro horizon: AIHC and DSCW are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement."
+          },
+          "horizon": "micro",
+          "model_id": "knowledge_weighted",
+          "model_version": "1.0.0",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_777c3eb78a3f",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e275f42e1ea7759c1348",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.280848",
+            "produced_by": "knowledge_weighted@1.0.0"
+          },
+          "reference_price": 2.19,
+          "supporting_knowledge_ids": [
+            "hyp_777c3eb78a3f"
+          ],
+          "ticker": "DSCW"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "knowledge_weighted@1.0.0:micro",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_777c3eb78a3f",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e275f42e1ea7759c1348",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.280945",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [
+        "hyp_777c3eb78a3f"
+      ],
+      "ticker": "DSCW"
+    },
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.015225789869969492,
+      "combined_expected_risk": 0.09005707384027979,
+      "confidence": 0.34002499999999997,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_e8e5de9a90ed",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_81fe8eba72fa76d1ace0",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "invalidation_conditions": [
+          "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+          "A new high-severity source event can raise expected risk and reduce confidence.",
+          "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Micro: expected_return=0.0152, expected_risk=0.0901, confidence=0.34",
+          "hyp_e8e5de9a90ed v1: confidence=0.36, expected_return=0.0152, p_value=0",
+          "event event_81fe8eba72fa76d1ace0: large_price_move, severity=medium, confidence=1.00, sources=dataset_snapshot.price_history",
+          "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Micro) found supporting evidence for EMFD."
+      },
+      "horizon_decisions": {
+        "micro": {
+          "abstention_reasons": [
+            "Confidence is below the research threshold of 60%."
+          ],
+          "action": "abstain",
+          "confidence": 0.34002499999999997,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_e8e5de9a90ed",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_81fe8eba72fa76d1ace0",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_e8640d104e8f50ed156b",
+              "ref_version": 1
+            }
+          ],
+          "expected_return": 0.015225789869969492,
+          "expected_risk": 0.09005707384027979,
+          "horizon": "micro",
+          "horizon_window": "1-3 trading days",
+          "invalidation_conditions": [
+            "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+            "A new high-severity source event can raise expected risk and reduce confidence."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "research_only",
+          "reference_price": 11.77,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.05748742413858882,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2026-08-16"
+        }
+      },
+      "horizon_predictions": {
+        "micro": {
+          "as_of": "2026-08-13",
+          "confidence": 0.34002499999999997,
+          "expected_return": 0.015225789869969492,
+          "expected_risk": 0.09005707384027979,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_e8e5de9a90ed",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_81fe8eba72fa76d1ace0",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "invalidation_conditions": [
+              "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+              "A new high-severity source event can raise expected risk and reduce confidence."
+            ],
+            "similar_historical_cases": [
+              "2026-08-06: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-06-28: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-06-14: market/large_price_move (severity high, confidence 1.00)",
+              "2026-06-10: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-06-04: market/large_price_move (severity medium, confidence 1.00)"
+            ],
+            "supporting_evidence": [
+              "hyp_e8e5de9a90ed v1: confidence=0.36, expected_return=0.0152, p_value=0",
+              "event event_81fe8eba72fa76d1ace0: large_price_move, severity=medium, confidence=1.00, sources=dataset_snapshot.price_history",
+              "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+            ],
+            "why_not_others": "This model only aggregates promoted knowledge; tickers without surviving knowledge get no prediction at all rather than a weaker one.",
+            "why_now": "Knowledge active and unretired as of 2026-08-13.",
+            "why_this_stock": "1 validated knowledge object(s) cover EMFD on the micro horizon: AIHC and EMFD are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement."
+          },
+          "horizon": "micro",
+          "model_id": "knowledge_weighted",
+          "model_version": "1.0.0",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_e8e5de9a90ed",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_81fe8eba72fa76d1ace0",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.290043",
+            "produced_by": "knowledge_weighted@1.0.0"
+          },
+          "reference_price": 11.77,
+          "supporting_knowledge_ids": [
+            "hyp_e8e5de9a90ed"
+          ],
+          "ticker": "EMFD"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "knowledge_weighted@1.0.0:micro",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_e8e5de9a90ed",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_81fe8eba72fa76d1ace0",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.290135",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [
+        "hyp_e8e5de9a90ed"
+      ],
+      "ticker": "EMFD"
+    },
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.05160446238425692,
+      "combined_expected_risk": 0.5,
+      "confidence": 0.7000000000000001,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "calculated_fair_value",
+            "ref_id": "EXPA:2026-08-13:smartlist-ive-v2.2",
+            "ref_version": null
+          },
+          {
+            "kind": "market_fundamental_snapshot",
+            "ref_id": "EXPA:2026-08-13:market_pe",
+            "ref_version": null
+          }
+        ],
+        "invalidation_conditions": [
+          "A new filing changes the reported cash flow, earnings, equity, debt, or share count."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Investment: expected_return=0.0516, expected_risk=0.5000, confidence=0.70",
+          "fair_value=21.5512",
+          "bear_case=12.9307",
+          "bull_case=34.4819",
+          "models=pb,pe,residual_income",
+          "Market P/E=3.63; earnings-yield spread=+15.0%; market-multiple weight in expected return=10%"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Investment) found supporting evidence for EXPA."
+      },
+      "horizon_decisions": {
+        "investment": {
+          "abstention_reasons": [],
+          "action": "watch",
+          "confidence": 0.7000000000000001,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "calculated_fair_value",
+              "ref_id": "EXPA:2026-08-13:smartlist-ive-v2.2",
+              "ref_version": null
+            },
+            {
+              "kind": "market_fundamental_snapshot",
+              "ref_id": "EXPA:2026-08-13:market_pe",
+              "ref_version": null
+            }
+          ],
+          "expected_return": 0.05160446238425693,
+          "expected_risk": 0.5,
+          "horizon": "investment",
+          "horizon_window": "1-6 months",
+          "invalidation_conditions": [
+            "A new filing changes the reported cash flow, earnings, equity, debt, or share count."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "publication_ready",
+          "reference_price": 20.71,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.0722462473379597,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2027-02-12"
+        }
+      },
+      "horizon_predictions": {
+        "investment": {
+          "as_of": "2026-08-13",
+          "confidence": 0.7000000000000001,
+          "expected_return": 0.05160446238425693,
+          "expected_risk": 0.5,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "calculated_fair_value",
+                "ref_id": "EXPA:2026-08-13:smartlist-ive-v2.2",
+                "ref_version": null
+              },
+              {
+                "kind": "market_fundamental_snapshot",
+                "ref_id": "EXPA:2026-08-13:market_pe",
+                "ref_version": null
+              }
+            ],
+            "invalidation_conditions": [
+              "A new filing changes the reported cash flow, earnings, equity, debt, or share count."
+            ],
+            "similar_historical_cases": [],
+            "supporting_evidence": [
+              "fair_value=21.5512",
+              "bear_case=12.9307",
+              "bull_case=34.4819",
+              "models=pb,pe,residual_income",
+              "Market P/E=3.63; earnings-yield spread=+15.0%; market-multiple weight in expected return=10%"
+            ],
+            "why_not_others": "Tickers without at least three valid valuation models are withheld.",
+            "why_now": "Current price 20.71 can be compared with fair value 21.55.",
+            "why_this_stock": "EXPA has a point-in-time fair value supported by 3 mutually checked models."
+          },
+          "horizon": "investment",
+          "model_id": "multi_model_fair_value",
+          "model_version": "smartlist-ive-v2.2",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "calculated_fair_value",
+                "ref_id": "EXPA:2026-08-13:smartlist-ive-v2.2",
+                "ref_version": null
+              },
+              {
+                "kind": "market_fundamental_snapshot",
+                "ref_id": "EXPA:2026-08-13:market_pe",
+                "ref_version": null
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.290808Z",
+            "produced_by": "multi_model_fair_value@smartlist-ive-v2.2"
+          },
+          "reference_price": 20.71,
+          "supporting_knowledge_ids": [],
+          "ticker": "EXPA"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "multi_model_fair_value@smartlist-ive-v2.2:investment",
+            "ref_version": null
+          },
+          {
+            "kind": "calculated_fair_value",
+            "ref_id": "EXPA:2026-08-13:smartlist-ive-v2.2",
+            "ref_version": null
+          },
+          {
+            "kind": "market_fundamental_snapshot",
+            "ref_id": "EXPA:2026-08-13:market_pe",
+            "ref_version": null
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.292714",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [],
+      "ticker": "EXPA"
+    },
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.015225789869969494,
+      "combined_expected_risk": 0.09734983123224217,
+      "confidence": 0.17039999999999997,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_7945834abed0",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_dab40ed4bf8bfed1d508",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_6910e0c4d8342aa8ca73",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "invalidation_conditions": [
+          "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+          "A new high-severity source event can raise expected risk and reduce confidence.",
+          "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Micro: expected_return=0.0152, expected_risk=0.0973, confidence=0.17",
+          "hyp_7945834abed0 v1: confidence=0.20, expected_return=0.0152, p_value=0",
+          "event event_dab40ed4bf8bfed1d508: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+          "event event_6910e0c4d8342aa8ca73: \"\u0627\u0644\u0639\u0628\u0648\u0627\u062a \u0627\u0644\u0637\u0628\u064a\u0629 (MEPA.CA) - \u0645\u0644\u062e\u0635 \u0642\u0631\u0627\u0631\u0627\u062a \u0645\u062c\u0644\u0633 \u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0631\u0643\u0629\" company_news, severity=low, confidence=0.80, sources=eac_egx_disclosures",
+          "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Micro) found supporting evidence for MEPA."
+      },
+      "horizon_decisions": {
+        "micro": {
+          "abstention_reasons": [
+            "Confidence is below the research threshold of 60%."
+          ],
+          "action": "abstain",
+          "confidence": 0.17039999999999997,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_7945834abed0",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_dab40ed4bf8bfed1d508",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_6910e0c4d8342aa8ca73",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_e8640d104e8f50ed156b",
+              "ref_version": 1
+            }
+          ],
+          "expected_return": 0.015225789869969492,
+          "expected_risk": 0.09734983123224218,
+          "horizon": "micro",
+          "horizon_window": "1-3 trading days",
+          "invalidation_conditions": [
+            "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+            "A new high-severity source event can raise expected risk and reduce confidence."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "research_only",
+          "reference_price": 1.87,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.02665104357143984,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2026-08-16"
+        }
+      },
+      "horizon_predictions": {
+        "micro": {
+          "as_of": "2026-08-13",
+          "confidence": 0.17039999999999997,
+          "expected_return": 0.015225789869969492,
+          "expected_risk": 0.09734983123224218,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_7945834abed0",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_dab40ed4bf8bfed1d508",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_6910e0c4d8342aa8ca73",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "invalidation_conditions": [
+              "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+              "A new high-severity source event can raise expected risk and reduce confidence."
+            ],
+            "similar_historical_cases": [
+              "2026-08-10: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-08-04: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-08-02: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-30: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-22: market/large_price_move (severity medium, confidence 1.00)"
+            ],
+            "supporting_evidence": [
+              "hyp_7945834abed0 v1: confidence=0.20, expected_return=0.0152, p_value=0",
+              "event event_dab40ed4bf8bfed1d508: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+              "event event_6910e0c4d8342aa8ca73: \"\u0627\u0644\u0639\u0628\u0648\u0627\u062a \u0627\u0644\u0637\u0628\u064a\u0629 (MEPA.CA) - \u0645\u0644\u062e\u0635 \u0642\u0631\u0627\u0631\u0627\u062a \u0645\u062c\u0644\u0633 \u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0631\u0643\u0629\" company_news, severity=low, confidence=0.80, sources=eac_egx_disclosures",
+              "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+            ],
+            "why_not_others": "This model only aggregates promoted knowledge; tickers without surviving knowledge get no prediction at all rather than a weaker one.",
+            "why_now": "Knowledge active and unretired as of 2026-08-13.",
+            "why_this_stock": "1 validated knowledge object(s) cover MEPA on the micro horizon: AIHC and MEPA are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement."
+          },
+          "horizon": "micro",
+          "model_id": "knowledge_weighted",
+          "model_version": "1.0.0",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_7945834abed0",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_dab40ed4bf8bfed1d508",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_6910e0c4d8342aa8ca73",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.301830",
+            "produced_by": "knowledge_weighted@1.0.0"
+          },
+          "reference_price": 1.87,
+          "supporting_knowledge_ids": [
+            "hyp_7945834abed0"
+          ],
+          "ticker": "MEPA"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "knowledge_weighted@1.0.0:micro",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_7945834abed0",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_dab40ed4bf8bfed1d508",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_6910e0c4d8342aa8ca73",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.301909",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [
+        "hyp_7945834abed0"
+      ],
+      "ticker": "MEPA"
+    },
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.009892021399801014,
+      "combined_expected_risk": 0.08536877380930487,
+      "confidence": 0.3692,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_bd00d1b6591a",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_77c0a9c274a0a45eaf05",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_129f6d4c068c96a92f63",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "invalidation_conditions": [
+          "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+          "A new high-severity source event can raise expected risk and reduce confidence.",
+          "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Micro: expected_return=0.0099, expected_risk=0.0854, confidence=0.37",
+          "hyp_bd00d1b6591a v1: confidence=0.43, expected_return=0.0099, p_value=0",
+          "event event_77c0a9c274a0a45eaf05: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+          "event event_129f6d4c068c96a92f63: \"\u062a\u0646\u0645\u064a\u0629 \u0644\u0644\u0627\u0633\u062a\u062b\u0645\u0627\u0631 \u0627\u0644\u0639\u0642\u0627\u0631\u064a (TANM.CA) - \u0642\u0631\u0627\u0631\u0627\u062a \u0645\u062c\u0644\u0633 \u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0631\u0643\u0629\" company_news, severity=low, confidence=0.80, sources=eac_egx_disclosures",
+          "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Micro) found supporting evidence for TANM."
+      },
+      "horizon_decisions": {
+        "micro": {
+          "abstention_reasons": [
+            "Confidence is below the research threshold of 60%."
+          ],
+          "action": "abstain",
+          "confidence": 0.3692,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_bd00d1b6591a",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_77c0a9c274a0a45eaf05",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_129f6d4c068c96a92f63",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_e8640d104e8f50ed156b",
+              "ref_version": 1
+            }
+          ],
+          "expected_return": 0.009892021399801014,
+          "expected_risk": 0.08536877380930487,
+          "horizon": "micro",
+          "horizon_window": "1-3 trading days",
+          "invalidation_conditions": [
+            "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+            "A new high-severity source event can raise expected risk and reduce confidence."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "research_only",
+          "reference_price": 6.66,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.04278068124727435,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2026-08-16"
+        }
+      },
+      "horizon_predictions": {
+        "micro": {
+          "as_of": "2026-08-13",
+          "confidence": 0.3692,
+          "expected_return": 0.009892021399801014,
+          "expected_risk": 0.08536877380930487,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_bd00d1b6591a",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_77c0a9c274a0a45eaf05",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_129f6d4c068c96a92f63",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "invalidation_conditions": [
+              "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+              "A new high-severity source event can raise expected risk and reduce confidence."
+            ],
+            "similar_historical_cases": [
+              "2026-08-06: market/large_price_move (severity high, confidence 1.00)",
+              "2026-08-05: market/large_price_move (severity high, confidence 1.00)",
+              "2026-08-02: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-30: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-26: market/large_price_move (severity high, confidence 1.00)"
+            ],
+            "supporting_evidence": [
+              "hyp_bd00d1b6591a v1: confidence=0.43, expected_return=0.0099, p_value=0",
+              "event event_77c0a9c274a0a45eaf05: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+              "event event_129f6d4c068c96a92f63: \"\u062a\u0646\u0645\u064a\u0629 \u0644\u0644\u0627\u0633\u062a\u062b\u0645\u0627\u0631 \u0627\u0644\u0639\u0642\u0627\u0631\u064a (TANM.CA) - \u0642\u0631\u0627\u0631\u0627\u062a \u0645\u062c\u0644\u0633 \u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0631\u0643\u0629\" company_news, severity=low, confidence=0.80, sources=eac_egx_disclosures",
+              "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+            ],
+            "why_not_others": "This model only aggregates promoted knowledge; tickers without surviving knowledge get no prediction at all rather than a weaker one.",
+            "why_now": "Knowledge active and unretired as of 2026-08-13.",
+            "why_this_stock": "1 validated knowledge object(s) cover TANM on the micro horizon: TANM and UNIP are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement."
+          },
+          "horizon": "micro",
+          "model_id": "knowledge_weighted",
+          "model_version": "1.0.0",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_bd00d1b6591a",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_77c0a9c274a0a45eaf05",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_129f6d4c068c96a92f63",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.310967",
+            "produced_by": "knowledge_weighted@1.0.0"
+          },
+          "reference_price": 6.66,
+          "supporting_knowledge_ids": [
+            "hyp_bd00d1b6591a"
+          ],
+          "ticker": "TANM"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "knowledge_weighted@1.0.0:micro",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_bd00d1b6591a",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_77c0a9c274a0a45eaf05",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_129f6d4c068c96a92f63",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.311046",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [
+        "hyp_bd00d1b6591a"
+      ],
+      "ticker": "TANM"
+    },
+    {
+      "as_of": "2026-08-13",
+      "combined_expected_return": 0.012452230265481883,
+      "combined_expected_risk": 0.09111968137231478,
+      "confidence": 0.35500000000000004,
+      "explanation": {
+        "evidence_refs": [
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_49e285e49a37",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_bd00d1b6591a",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_9ea40aecc56810f4a5c1",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_f3c288e8c0240ea37979",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "invalidation_conditions": [
+          "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+          "A new high-severity source event can raise expected risk and reduce confidence.",
+          "The underlying knowledge is retired, or its performance record falls below the acceptance threshold."
+        ],
+        "similar_historical_cases": [],
+        "supporting_evidence": [
+          "Micro: expected_return=0.0125, expected_risk=0.0911, confidence=0.35",
+          "hyp_49e285e49a37 v1: confidence=0.40, expected_return=0.0152, p_value=0",
+          "hyp_bd00d1b6591a v1: confidence=0.43, expected_return=0.0099, p_value=0",
+          "event event_9ea40aecc56810f4a5c1: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+          "event event_f3c288e8c0240ea37979: \"\u064a\u0648\u0646\u064a\u0641\u0631\u0633\u0627\u0644 \u0644\u0635\u0646\u0627\u0639\u0629 \u0645\u0648\u0627\u062f \u0627\u0644\u062a\u0639\u0628\u0626\u0629 \u0648 \u0627\u0644\u062a\u063a\u0644\u064a\u0641 \u0648 \u0627\u0644\u0648\u0631\u0642 - \u064a\u0648\u0646\u064a\u0628\u0627\u0643 (UNIP.CA) - \u0642\u0631\u0627\u0631\u0627\u062a \u0645\u062c\u0644\u0633 \u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0631\u0643\u0629\" company_news, severity=low, confidence=0.80, sources=eac_egx_disclosures",
+          "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+        ],
+        "why_not_others": "This engine only combines available predictions; comparison against other stocks happens at the market-wide ranking stage.",
+        "why_now": "Based on knowledge and market data available through 2026-08-13.",
+        "why_this_stock": "Models across 1 horizon(s) (Micro) found supporting evidence for UNIP."
+      },
+      "horizon_decisions": {
+        "micro": {
+          "abstention_reasons": [
+            "Confidence is below the research threshold of 60%."
+          ],
+          "action": "abstain",
+          "confidence": 0.355,
+          "entry_condition": "No executable entry while the decision is not a buy candidate.",
+          "entry_operator": "not_applicable",
+          "entry_value": null,
+          "evidence_refs": [
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_49e285e49a37",
+              "ref_version": 1
+            },
+            {
+              "kind": "knowledge",
+              "ref_id": "hyp_bd00d1b6591a",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_9ea40aecc56810f4a5c1",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_f3c288e8c0240ea37979",
+              "ref_version": 1
+            },
+            {
+              "kind": "event",
+              "ref_id": "event_e8640d104e8f50ed156b",
+              "ref_version": 1
+            }
+          ],
+          "expected_return": 0.012452230265481885,
+          "expected_risk": 0.09111968137231478,
+          "horizon": "micro",
+          "horizon_window": "1-3 trading days",
+          "invalidation_conditions": [
+            "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+            "A new high-severity source event can raise expected risk and reduce confidence."
+          ],
+          "invalidation_operator": "not_applicable",
+          "invalidation_value": null,
+          "max_position_pct": 0.0,
+          "publication_status": "research_only",
+          "reference_price": 0.414,
+          "review_condition": "Reviewed when new evidence emerges or upon expiry.",
+          "risk_adjusted_score": 0.04851357772185074,
+          "risk_metric": "model_expected_risk_for_horizon",
+          "valid_until": "2026-08-16"
+        }
+      },
+      "horizon_predictions": {
+        "micro": {
+          "as_of": "2026-08-13",
+          "confidence": 0.355,
+          "expected_return": 0.012452230265481885,
+          "expected_risk": 0.09111968137231478,
+          "explanation": {
+            "evidence_refs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_49e285e49a37",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_bd00d1b6591a",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_9ea40aecc56810f4a5c1",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_f3c288e8c0240ea37979",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "invalidation_conditions": [
+              "Any supporting knowledge object is retired or its monitored performance degrades below its retirement threshold.",
+              "A new high-severity source event can raise expected risk and reduce confidence."
+            ],
+            "similar_historical_cases": [
+              "2026-08-12: news/company_news (severity low, confidence 0.80)",
+              "2026-08-12: news/company_news (severity low, confidence 0.80)",
+              "2026-08-06: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-29: market/large_price_move (severity medium, confidence 1.00)",
+              "2026-07-22: market/large_price_move (severity medium, confidence 1.00)"
+            ],
+            "supporting_evidence": [
+              "hyp_49e285e49a37 v1: confidence=0.40, expected_return=0.0152, p_value=0",
+              "hyp_bd00d1b6591a v1: confidence=0.43, expected_return=0.0099, p_value=0",
+              "event event_9ea40aecc56810f4a5c1: large_price_move, severity=high, confidence=1.00, sources=dataset_snapshot.price_history",
+              "event event_f3c288e8c0240ea37979: \"\u064a\u0648\u0646\u064a\u0641\u0631\u0633\u0627\u0644 \u0644\u0635\u0646\u0627\u0639\u0629 \u0645\u0648\u0627\u062f \u0627\u0644\u062a\u0639\u0628\u0626\u0629 \u0648 \u0627\u0644\u062a\u063a\u0644\u064a\u0641 \u0648 \u0627\u0644\u0648\u0631\u0642 - \u064a\u0648\u0646\u064a\u0628\u0627\u0643 (UNIP.CA) - \u0642\u0631\u0627\u0631\u0627\u062a \u0645\u062c\u0644\u0633 \u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0631\u0643\u0629\" company_news, severity=low, confidence=0.80, sources=eac_egx_disclosures",
+              "event event_e8640d104e8f50ed156b: \"\u0648\u0632\u064a\u0631 \u0627\u0644\u0645\u0627\u0644\u064a\u0629: \u062a\u0636\u0627\u0641\u0631 \u062c\u0647\u0648\u062f\u0646\u0627 \u0645\u0639 \u0627\u0644\u0647\u0646\u062f \u0644\u062f\u0639\u0645 \u0635\u0648\u062a \u0627\u0644\u062c\u0646\u0648\u0628 \u0627\u0644\u0639\u0627\u0644\u0645\u0649 \u0648\u0628\u0646\u0627\u0621 \u0646\u0638\u0627\u0645 \u0627\u0642\u062a\u0635\u0627\u062f\u0649 \u0623\u0643\u062b\u0631 \u062a\u0648\u0627\u0632\u0646\u064b\u0627 \u0648\u0639\u062f\u0627\u0644\u0629\" macro_news, severity=low, confidence=0.60, sources=amwal_alghad"
+            ],
+            "why_not_others": "This model only aggregates promoted knowledge; tickers without surviving knowledge get no prediction at all rather than a weaker one.",
+            "why_now": "Knowledge active and unretired as of 2026-08-13.",
+            "why_this_stock": "2 validated knowledge object(s) cover UNIP on the micro horizon: AIHC and UNIP are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement.; TANM and UNIP are large-cap EGX names plausibly exposed to shared market-wide capital flows and index-tracking activity, which would produce genuine (not coincidental) return co-movement."
+          },
+          "horizon": "micro",
+          "model_id": "knowledge_weighted",
+          "model_version": "1.0.0",
+          "provenance": {
+            "inputs": [
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_49e285e49a37",
+                "ref_version": 1
+              },
+              {
+                "kind": "knowledge",
+                "ref_id": "hyp_bd00d1b6591a",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_9ea40aecc56810f4a5c1",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_f3c288e8c0240ea37979",
+                "ref_version": 1
+              },
+              {
+                "kind": "event",
+                "ref_id": "event_e8640d104e8f50ed156b",
+                "ref_version": 1
+              }
+            ],
+            "produced_at": "2026-08-13T12:41:16.320249",
+            "produced_by": "knowledge_weighted@1.0.0"
+          },
+          "reference_price": 0.414,
+          "supporting_knowledge_ids": [
+            "hyp_49e285e49a37",
+            "hyp_bd00d1b6591a"
+          ],
+          "ticker": "UNIP"
+        }
+      },
+      "provenance": {
+        "inputs": [
+          {
+            "kind": "prediction",
+            "ref_id": "knowledge_weighted@1.0.0:micro",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_49e285e49a37",
+            "ref_version": null
+          },
+          {
+            "kind": "knowledge",
+            "ref_id": "hyp_bd00d1b6591a",
+            "ref_version": null
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_9ea40aecc56810f4a5c1",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_f3c288e8c0240ea37979",
+            "ref_version": 1
+          },
+          {
+            "kind": "event",
+            "ref_id": "event_e8640d104e8f50ed156b",
+            "ref_version": 1
+          }
+        ],
+        "produced_at": "2026-08-13T12:41:16.320335",
+        "produced_by": "meta_decision_engine"
+      },
+      "supporting_knowledge_ids": [
+        "hyp_49e285e49a37",
+        "hyp_bd00d1b6591a"
+      ],
+      "ticker": "UNIP"
+    }
+  ]
 }

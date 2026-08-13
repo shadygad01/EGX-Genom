@@ -7,12 +7,17 @@ import pytest
 
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.sources.catalog import seed_sources
+from agx_research.sources.spec import SourceStatus
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def fred_spec():
-    return next(s for s in seed_sources() if s.id == "fred")
+    # FRED is disabled in live production after repeated endpoint timeouts,
+    # but its parser remains unit-tested against a real CSV wire shape.
+    return next(s for s in seed_sources() if s.id == "fred").model_copy(
+        update={"status": SourceStatus.IMPLEMENTED}
+    )
 
 
 class FakeFetcher:

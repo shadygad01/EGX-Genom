@@ -73,110 +73,89 @@ class _FakeCollectionService:
         return outcome
 
 
-def test_rank_capability_strategies_marks_uncatalogued_source_not_ready():
+def test_rank_capability_strategies_reports_no_active_trading_calendar_source():
     registry = SourceRegistry()
     ranked = rank_capability_strategies(Capability.TRADING_CALENDAR, registry)
-    assert len(ranked) == 1
-    assert ranked[0].source_id == "egx_official"
-    assert ranked[0].ready is False
-    assert "Not catalogued" in ranked[0].reason
+    assert ranked == []
 
 
-def test_rank_capability_strategies_orders_by_composite_and_marks_ready():
+def test_rank_capability_strategies_exposes_only_verified_price_source():
     registry = SourceRegistry()
-    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.7, freshness=0.7))
-    registry.add(_spec("egx_official", status=SourceStatus.NEEDS_KEY, reliability=0.9, freshness=0.9))
+    registry.add(_spec("egx_price_composite", status=SourceStatus.IMPLEMENTED, reliability=0.7, freshness=0.7))
+    registry.add(_spec("egx_official_prices", status=SourceStatus.NEEDS_KEY, reliability=0.9, freshness=0.9))
 
     ranked = rank_capability_strategies(Capability.PRICE_DATA, registry)
-    by_id = {r.source_id: r for r in ranked}
-    assert by_id["stooq"].ready is True
-    assert by_id["egx_official"].ready is False
-    assert "API key" in by_id["egx_official"].reason
-    # egx_official's declared priors score higher, but readiness is reported
-    # independently of score -- both facts are visible, not conflated.
-    assert by_id["egx_official"].composite_score > by_id["stooq"].composite_score
+    assert [row.source_id for row in ranked] == ["egx_price_composite"]
+    assert ranked[0].ready is True
 
 
 def test_rank_capability_strategies_uses_measured_reputation_when_available():
     registry = SourceRegistry()
-    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.5, freshness=0.5))
+    registry.add(_spec("egx_price_composite", status=SourceStatus.IMPLEMENTED, reliability=0.5, freshness=0.5))
     metrics = SourceMetricsRepository()
-    metrics.record_run("stooq", succeeded=True, records_expected=10, records_produced=10)
+    metrics.record_run("egx_price_composite", succeeded=True, records_expected=10, records_produced=10)
     for _ in range(5):
         metrics.record_run(
-            "stooq", succeeded=True, records_expected=10, records_produced=10, confidence_score=0.95,
+            "egx_price_composite", succeeded=True, records_expected=10, records_produced=10, confidence_score=0.95,
         )
 
     ranked_without = rank_capability_strategies(Capability.PRICE_DATA, registry)
     ranked_with = rank_capability_strategies(Capability.PRICE_DATA, registry, metrics)
-    without_score = next(r for r in ranked_without if r.source_id == "stooq").composite_score
-    with_score = next(r for r in ranked_with if r.source_id == "stooq").composite_score
+    without_score = next(r for r in ranked_without if r.source_id == "egx_price_composite").composite_score
+    with_score = next(r for r in ranked_with if r.source_id == "egx_price_composite").composite_score
     assert with_score != without_score
 
 
-def test_decide_and_execute_selects_first_ready_strategy_that_succeeds():
+def test_decide_and_execute_selects_verified_composite_price_source():
     registry = SourceRegistry()
-    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED))
-    registry.add(_spec("egx_official", status=SourceStatus.NEEDS_KEY))
+    registry.add(_spec("egx_price_composite", status=SourceStatus.IMPLEMENTED))
 
     def factory(source_id, spec):
         return _FakeCollector(source_id)
 
-    service = _FakeCollectionService({"stooq": _empty_result("stooq", price_bars=10)})
+    service = _FakeCollectionService({"egx_price_composite": _empty_result("egx_price_composite", price_bars=10)})
     engine = CapabilityDecisionEngine(registry, factory)
     decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
 
     assert decision.succeeded is True
-    assert decision.selected_source_ids == ["stooq"]
-    assert results["stooq"].price_bars_written == 10
+    assert decision.selected_source_ids == ["egx_price_composite"]
+    assert results["egx_price_composite"].price_bars_written == 10
     assert failures == {}
-    outcomes = {a.source_id: a.outcome for a in decision.attempts}
-    assert outcomes["stooq"] == "succeeded"
-    assert outcomes["egx_official"] == "skipped"
-    assert service.calls == ["stooq"]  # egx_official recorded but never fetched -- already satisfied
+    assert decision.attempts[0].outcome == "succeeded"
+    assert service.calls == ["egx_price_composite"]
 
 
-def test_decide_and_execute_falls_through_on_zero_yield():
+def test_decide_and_execute_reports_zero_yield_without_unverified_fallback():
     registry = SourceRegistry()
-    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
-    registry.add(_spec("egx_official", status=SourceStatus.IMPLEMENTED, reliability=0.1, freshness=0.1))
+    registry.add(_spec("egx_price_composite", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
 
     def factory(source_id, spec):
         return _FakeCollector(source_id)
 
-    service = _FakeCollectionService({
-        "stooq": _empty_result("stooq", price_bars=0),  # connected, nothing usable
-        "egx_official": _empty_result("egx_official", price_bars=5),
-    })
+    service = _FakeCollectionService({"egx_price_composite": _empty_result("egx_price_composite", price_bars=0)})
     engine = CapabilityDecisionEngine(registry, factory)
     decision, results, _failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
 
-    assert decision.selected_source_ids == ["egx_official"]
-    assert "stooq" in results and "egx_official" in results  # both attempts recorded
-    outcomes = {a.source_id: a.outcome for a in decision.attempts}
-    assert outcomes["stooq"] == "zero_yield"
-    assert outcomes["egx_official"] == "succeeded"
+    assert decision.succeeded is False
+    assert decision.selected_source_ids == []
+    assert results["egx_price_composite"].price_bars_written == 0
+    assert decision.attempts[0].outcome == "zero_yield"
 
 
-def test_decide_and_execute_falls_through_on_exception():
+def test_decide_and_execute_reports_exception_without_unverified_fallback():
     registry = SourceRegistry()
-    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
-    registry.add(_spec("egx_official", status=SourceStatus.IMPLEMENTED, reliability=0.1, freshness=0.1))
+    registry.add(_spec("egx_price_composite", status=SourceStatus.IMPLEMENTED, reliability=0.9, freshness=0.9))
 
     def factory(source_id, spec):
         return _FakeCollector(source_id)
 
-    service = _FakeCollectionService({
-        "stooq": RuntimeError("simulated fetch failure"),
-        "egx_official": _empty_result("egx_official", price_bars=3),
-    })
+    service = _FakeCollectionService({"egx_price_composite": RuntimeError("simulated fetch failure")})
     engine = CapabilityDecisionEngine(registry, factory)
     decision, results, failures = engine.decide_and_execute(Capability.PRICE_DATA, service)
 
-    assert decision.selected_source_ids == ["egx_official"]
-    assert failures == {"stooq": "RuntimeError: simulated fetch failure"}
-    assert "stooq" not in results
-    assert results["egx_official"].price_bars_written == 3
+    assert decision.selected_source_ids == []
+    assert failures == {"egx_price_composite": "RuntimeError: simulated fetch failure"}
+    assert results == {}
 
 
 def test_decide_and_execute_reports_failure_when_nothing_succeeds():
@@ -196,7 +175,7 @@ def test_decide_and_execute_reports_failure_when_nothing_succeeds():
 
 def test_decide_and_execute_skips_when_no_live_collector_wiring():
     registry = SourceRegistry()
-    registry.add(_spec("stooq", status=SourceStatus.IMPLEMENTED))
+    registry.add(_spec("egx_price_composite", status=SourceStatus.IMPLEMENTED))
 
     def factory(source_id, spec):
         return None  # this deployment has no live wiring for anything
@@ -311,7 +290,7 @@ def test_decide_and_execute_reuses_a_source_already_collected_for_another_capabi
     )
     engine = CapabilityDecisionEngine(registry, factory)
 
-    fs_decision, fs_results, _ = engine.decide_and_execute(Capability.FINANCIAL_STATEMENTS, service)
+    fs_decision, _fs_results, _ = engine.decide_and_execute(Capability.FINANCIAL_STATEMENTS, service)
     ir_decision, ir_results, _ = engine.decide_and_execute(Capability.INVESTOR_RELATIONS, service)
 
     # Each real, shared source was fetched exactly once total across both

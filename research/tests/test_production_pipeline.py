@@ -123,16 +123,18 @@ def test_discovery_stage_is_a_real_network_noop_in_mock_mode(tmp_path, monkeypat
     assert "not applicable in mock mode" in discovery_stage.detail
 
 
-def test_live_discovery_honors_acquisition_freeze_and_only_checks_recovery(tmp_path):
+def test_live_discovery_honors_acquisition_freeze_and_skips_recovery_by_default(tmp_path, monkeypatch):
     pipeline = make_pipeline(tmp_path / "data")
     pipeline.mode = ExecutionMode.LIVE
     pipeline._stage_source_registry()
+    monkeypatch.delenv("AGX_ENABLE_CONTINUITY_RECOVERY", raising=False)
 
     status, detail, warnings = pipeline._stage_discovery_engine()
 
     assert status == StageStatus.SUCCEEDED
     assert "Acquisition freeze active" in detail
-    assert "0 DOWN source(s)" in detail
+    assert "continuity recovery skipped" in detail
+    assert "approved live sources only" in detail
     assert warnings == []
 
 

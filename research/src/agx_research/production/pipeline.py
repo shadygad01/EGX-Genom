@@ -38,6 +38,7 @@ isolates one bad day from the rest of a range.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import tempfile
 from datetime import date, datetime, timedelta
@@ -531,11 +532,18 @@ class ProductionPipeline:
         )
 
         # Acquisition is frozen: routine Pages deployments must collect from
-        # already-approved sources, not spend ~57 minutes rediscovering every
-        # blocked/planned target. Continuity recovery remains live so an
-        # IMPLEMENTED source marked DOWN can still be repaired automatically.
-        # A future named acquisition sprint can call `discover-sources`
-        # explicitly and promote its verified result into the catalog.
+        # already-approved sources, not spend ~57 minutes probing every
+        # blocked/planned target. Recovery remains available, but is opt-in so
+        # a daily dashboard refresh cannot be held hostage by a large DOWN
+        # catalog; the weekly discovery workflow is the normal recovery path.
+        if os.getenv("AGX_ENABLE_CONTINUITY_RECOVERY", "0") != "1":
+            return (
+                StageStatus.SUCCEEDED,
+                "Acquisition freeze active: fresh discovery and continuity recovery "
+                "skipped; approved live sources only. Set AGX_ENABLE_CONTINUITY_RECOVERY=1 "
+                "for an explicit recovery run.",
+                [],
+            )
         monitor = AcquisitionContinuityMonitor(engine, seed_target_organizations())
         recovery_results = monitor.check_and_recover(self.registry)
         recovered = sum(1 for r in recovery_results if r.registered)

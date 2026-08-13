@@ -117,6 +117,13 @@ jobs:
           ")
           echo "already_ran=$ALREADY_RAN" >> "$GITHUB_OUTPUT"
 
+      - name: Refresh free macroeconomic data
+        if: steps.check_run.outputs.already_ran != 'true'
+        run: |
+          uv run python scripts/fetch_macro_data.py
+          mkdir -p data/production/macro
+          cp -f data/macro/*.csv data/macro/macro_snapshot.json data/production/macro/
+
       # Runs the complete production pipeline against REAL public market
       # data -- this is the single entry point (`agx run`), unchanged in
       # shape from every prior mock-mode run: Source Registry -> Discovery

@@ -228,6 +228,20 @@ def test_collector_execution_writes_data_dir_that_market_memory_reads(tmp_path):
     assert (data_dir / "news.csv").exists()
 
 
+def test_dashboard_publishes_runtime_macro_snapshot(tmp_path):
+    data_dir = tmp_path / "data"
+    dashboard_out = tmp_path / "dashboard"
+    macro_dir = data_dir / "macro"
+    macro_dir.mkdir(parents=True)
+    snapshot = {"as_of": RUN_DATE.isoformat(), "egp_usd": {"current": 0.0199}}
+    (macro_dir / "macro_snapshot.json").write_text(json.dumps(snapshot))
+
+    make_pipeline(data_dir).run(RUN_DATE, mode=ExecutionMode.MOCK, dashboard_out=dashboard_out)
+
+    published = json.loads((dashboard_out / "macro_snapshot.json").read_text())
+    assert published == snapshot
+
+
 def test_replay_mode_reproduces_the_same_research_outcome(tmp_path):
     """The pipeline must not know whether data is live or replayed: a mock
     run followed by a replay run over the same archive produces the same

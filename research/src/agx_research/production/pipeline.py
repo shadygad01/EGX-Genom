@@ -1025,6 +1025,16 @@ class ProductionPipeline:
         # any stage executes -- see AD-64. Not repeated here.
         dashboard_out.mkdir(parents=True, exist_ok=True)
 
+        # The dashboard reads this unified, provenance-carrying snapshot
+        # directly. Publish it whenever the live macro refresh materialized
+        # one in the runtime data directory; do not fabricate a fallback.
+        macro_snapshot = self.data_dir / "macro" / "macro_snapshot.json"
+        if macro_snapshot.is_file():
+            (dashboard_out / "macro_snapshot.json").write_text(
+                macro_snapshot.read_text(encoding="utf-8"), encoding="utf-8"
+            )
+            self.dashboard_counts["macro_snapshot.json"] = 1
+
         as_of = self._latest_successful_as_of()
 
         counts = write_dashboard_artifacts(

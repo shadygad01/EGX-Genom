@@ -162,6 +162,13 @@ jobs:
           mkdir -p ../web/public/data
           if [ -f data/production/macro/macro_snapshot.json ]; then
             cp -f data/production/macro/macro_snapshot.json ../web/public/data/macro_snapshot.json
+          elif [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            # The persisted state branch keeps the last macro refresh under
+            # research/data/macro; use that real snapshot rather than showing
+            # a manual-script instruction or publishing the SPA fallback HTML.
+            curl --fail --silent --show-error --location --retry 2 --connect-timeout 10 \
+              "https://raw.githubusercontent.com/shadygad01/EGX-Genom/production/state-latest/research/data/macro/macro_snapshot.json" \
+              -o ../web/public/data/macro_snapshot.json
           fi
           if [ -f data/production/knowledge.json ]; then
             # Production storage is keyed by hypothesis for version history;

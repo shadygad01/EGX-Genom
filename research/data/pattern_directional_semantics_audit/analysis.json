@@ -1,0 +1,208 @@
+{
+  "audit": "Mission 3 Step 1.7: Directional Semantics & Economic Validity Audit",
+  "classification": {
+    "category": "C",
+    "justification": "No authoritative doc declares an explicit long-only mandate (rules out A). No short-side economic infrastructure -- cost, availability, financing -- exists anywhere in the codebase, and this audit's own short-validity test found the naive short_return=-forward_return transform economically unvalidated (rules out B and D). The system's actual behavior is an UNDOCUMENTED, EMERGENT long-only assumption baked into two specific gates (robustness.py:126, baselines.py:161-162) that is in direct tension with live.py's own explicit 'direction-agnostic output' framing -- an unresolved internal inconsistency, not a deliberate design, which is the definition of 'missing/ambiguous' rather than 'other.'",
+    "label": "Direction semantics are missing/ambiguous"
+  },
+  "code_semantics_audit": {
+    "ad_42_precedent_text": "| AD-42 | Only an actually issued BUY candidate enters trade-performance evidence; WATCH/AVOID/ABSTAIN remain research outcomes, not synthetic long/short positions. | Counterfactual avoidance and observation are not executed portfolio returns and cannot support a publication edge claim. |",
+    "authoritative_doc_direction_mandate_search": {
+      "MASTER_PROMPT.md": {
+        "mentions_direction_agnostic": false,
+        "mentions_long_only": false,
+        "mentions_short_selling_or_short_signal": false
+      },
+      "docs/DECISION_STANDARDS.md": {
+        "mentions_direction_agnostic": false,
+        "mentions_long_only": false,
+        "mentions_short_selling_or_short_signal": false
+      },
+      "docs/INVESTMENT_CONSTITUTION.md": {
+        "mentions_direction_agnostic": false,
+        "mentions_long_only": false,
+        "mentions_short_selling_or_short_signal": false
+      },
+      "docs/PATTERN_DISCOVERY_DATA_AUDIT.md": {
+        "mentions_direction_agnostic": false,
+        "mentions_long_only": false,
+        "mentions_short_selling_or_short_signal": false
+      },
+      "docs/PORTFOLIO_STANDARDS.md": {
+        "mentions_direction_agnostic": false,
+        "mentions_long_only": false,
+        "mentions_short_selling_or_short_signal": false
+      },
+      "docs/VISION.md": {
+        "mentions_direction_agnostic": false,
+        "mentions_long_only": false,
+        "mentions_short_selling_or_short_signal": false
+      }
+    },
+    "decision_service_or_portfolio_short_position_mentions": [],
+    "files_importing_agx_research_patterns": [
+      "src/agx_research/cli.py",
+      "src/agx_research/patterns/baselines.py",
+      "src/agx_research/patterns/candidates.py",
+      "src/agx_research/patterns/control_suite.py",
+      "src/agx_research/patterns/decay.py",
+      "src/agx_research/patterns/engine.py",
+      "src/agx_research/patterns/features.py",
+      "src/agx_research/patterns/live.py",
+      "src/agx_research/patterns/multiple_testing_family.py",
+      "src/agx_research/patterns/outcomes.py",
+      "src/agx_research/patterns/panel.py",
+      "src/agx_research/patterns/regimes.py",
+      "src/agx_research/patterns/registry.py",
+      "src/agx_research/patterns/robustness.py",
+      "src/agx_research/patterns/targets.py",
+      "src/agx_research/patterns/transaction_costs.py",
+      "src/agx_research/patterns/validation.py",
+      "tests/pattern_test_helpers.py",
+      "tests/test_pattern_candidates.py",
+      "tests/test_pattern_community_price_seed.py",
+      "tests/test_pattern_control_suite.py",
+      "tests/test_pattern_engine.py",
+      "tests/test_pattern_evaluation.py",
+      "tests/test_pattern_features.py",
+      "tests/test_pattern_lead_lag.py",
+      "tests/test_pattern_leakage.py",
+      "tests/test_pattern_live.py",
+      "tests/test_pattern_multiple_testing.py",
+      "tests/test_pattern_multiple_testing_family.py",
+      "tests/test_pattern_outcomes_decay.py",
+      "tests/test_pattern_panel.py",
+      "tests/test_pattern_regimes.py",
+      "tests/test_pattern_registry.py",
+      "tests/test_pattern_reproducibility.py",
+      "tests/test_pattern_robustness.py",
+      "tests/test_pattern_targets.py",
+      "tests/test_pattern_transaction_costs.py",
+      "tests/test_pattern_universe_confidence.py",
+      "tests/test_pattern_validation.py"
+    ],
+    "live_py_contains_buy_sell_literal": true,
+    "live_py_label_is_always_ACTIVE_PATTERN": true,
+    "non_patterns_package_importers": [
+      "src/agx_research/cli.py"
+    ],
+    "only_cli_and_self_and_tests_import_patterns": true,
+    "pattern_schema_has_explicit_direction_field": false,
+    "position_action_has_short_variant": false,
+    "position_action_values": [
+      "BUY = \"buy\"",
+      "INCREASE_POSITION = \"increase_position\"",
+      "HOLD = \"hold\"",
+      "REDUCE_POSITION = \"reduce_position\"",
+      "EXIT = \"exit\"",
+      "NO_ACTION = \"no_action\"",
+      "return PositionAction.HOLD if position.held else PositionAction.NO_ACTION",
+      "return PositionAction.INCREASE_POSITION",
+      "return PositionAction.REDUCE_POSITION",
+      "return PositionAction.BUY if target_weight > _EPS else PositionAction.NO_ACTION"
+    ],
+    "robustness_py_has_net_expectancy_gt_zero_gate": true,
+    "transaction_costs_py_has_matching_gate": true,
+    "transaction_costs_py_models_borrow_or_short_cost": false
+  },
+  "downstream_directional_assumptions": {
+    "buy_sell_emitted_by_patterns_package": false,
+    "evidence": "Grep-confirmed (see code_semantics_audit.non_patterns_package_importers below): the only non-test, non-self file importing agx_research.patterns anywhere in the repository is cli.py. decision_service/, portfolio/, capital_allocation/, shadow_fund/, api/, and web/ contain zero references to the patterns package. Nothing today acts on Pattern/PatternActivation data for any real decision, ranking, or execution -- the directional-semantics ambiguity above currently has ZERO live consequence. It becomes load-bearing only once a Promotion Gate (Mission 3's actual objective) creates the first real bridge from patterns/ into decision-relevant use.",
+    "patterns_ranked_for_capital_allocation": false,
+    "portfolios_constructed_from_patterns": false,
+    "trades_executed_by_patterns_package": false
+  },
+  "impact_on_step_1_6_interpretation": "Step 1.6 correctly identified the code-level mechanism (robustness.py:126's net_expectancy>0 gate) and the data-level mechanism (positive market drift) that together explain why the VALIDATED population is 100% positive. Step 1.6 did NOT claim negative-expectancy patterns are short signals, and explicitly did not need to -- that question is precisely what Step 1.7 was scoped to answer. Step 1.7 does not overturn any Step 1.6 finding; it adds one clarification: Step 1.6's 'accidental implementation bias' component (Component B) can now be stated more precisely as 'the codebase assumes long-only economics without ever declaring that assumption explicitly, and provides no mechanism to evaluate a negative-expectancy candidate under any alternative economic interpretation' -- i.e. the bias is not merely an arbitrary implementation accident, it is a specific, identifiable GAP (missing direction semantics), consistent with this audit's own classification (C).",
+  "objective_answer": {
+    "answer": "C",
+    "justification": "Not (A) alone: nothing in the code declares a negative-expectancy candidate 'wrong' or 'noise' -- validation.py's sign-agreement gates would happily validate a consistently negative pattern if the robustness/baseline gates weren't independently long-only-coded; the negativity itself was never treated as evidence of failure by discover()'s sign-neutral significance test. Not (B): no economic infrastructure (cost, availability, financing) exists to support treating it as a valid short signal today -- see short_inverse_validity_test above. Not (D): no explicit long-only mandate exists in any authoritative doc (VISION.md, MASTER_PROMPT.md, the investment doctrine set, or patterns/'s own docstrings) -- the long-only behavior is implicit/emergent from robustness.py's and baselines.py's coded assumptions, never a stated design decision. (C) fits: the Pattern schema has no direction/side field, and interpreting a negative-expectancy pattern economically (long failure vs. short candidate vs. unsupported) requires information -- an explicit direction/side semantic, plus a short-cost model if shorts are ever meant to be in scope -- that does not currently exist anywhere in this system.",
+    "question": "Should a negative-expectancy pattern be interpreted as (A) failed long, (B) potentially valid short/inverse, (C) requires explicit directional metadata, or (D) intentionally unsupported under an explicit long-only mandate?"
+  },
+  "provenance": {
+    "file_existence": {
+      "step_1_5_stress_test_json": false,
+      "step_1_5_stress_test_report": false,
+      "step_1_5_stress_test_script": false,
+      "step_1_6_bias_audit_json": true,
+      "step_1_6_bias_audit_report": false,
+      "step_1_6_bias_audit_script": true,
+      "step_1_family_collapse_json": false,
+      "step_1_family_collapse_report": false,
+      "step_1_family_collapse_script": false
+    },
+    "statement": "This session's working tree does not persist uncommitted files across turns (confirmed: even Step 1.6's artifacts, produced and verified earlier in this SAME conversation, are absent from disk at the start of Step 1.7). Per the critical provenance requirement: Step 1 and Step 1.5 artifacts are reported here as MISSING, not silently regenerated. Step 1.7 does not require Step 1/1.5's family-collapse outputs (family analysis is out of scope for directional semantics, matching Step 1.6's own scope discipline), so no reproduction of them was attempted. Step 1.6's specific reconciliation FIGURES (not the file) are independently recomputed fresh in this script directly from the registry -- verified against the same unchanged registry state (3,398/1,773/1,625) Step 1.6 itself reported -- and are labeled below as 'recomputed_this_session', not claimed as byte-identical retrieval of the missing original file.",
+    "step_1_5_artifacts_missing": true,
+    "step_1_6_artifacts_missing": false,
+    "step_1_artifacts_missing": true
+  },
+  "recommendation_on_promotion_gate_work": {
+    "constraint": "Promotion Gate design/implementation MAY proceed for POSITIVE-expectancy patterns -- their economic interpretation (a long signal) is unambiguous under every gate traced in this audit, with no open architectural question blocking it. Promotion Gate design/implementation must NOT create any pathway that promotes, scores, or otherwise treats a negative-expectancy pattern as a tradeable (short/inverse) signal, and must not apply short_return=-forward_return or any equivalent relabeling anywhere, until the required_architectural_decision above is made explicitly by the user/product owner. Given only 4/3,398 DISCOVERED patterns are even negative (Step 1.6), this constraint is narrow in practical scope but must still be stated explicitly in the Gate's design, not left implicit the way it is in the current discover()/validate() pipeline.",
+    "may_promotion_gate_design_proceed": "YES, WITH AN EXPLICIT SCOPING CONSTRAINT"
+  },
+  "registry_verification": {
+    "expected": {
+      "rejected": 1625,
+      "total": 3398,
+      "validated": 1773
+    },
+    "matches_expected_step_1_6_counts": true,
+    "rejected": 1625,
+    "total_patterns": 3398,
+    "validated": 1773
+  },
+  "required_architectural_decision": "Before any pattern can be economically interpreted when its expectancy is negative, an explicit decision is needed on: (1) whether AGX/the Promotion Gate is long-only by design (in which case negative-expectancy patterns should be explicitly and permanently out of scope for promotion, not silently rejected by an incidental cost gate as they are today), or (2) whether short/inverse signals are ever in scope, which would require adding a direction/side field to the Pattern schema, building a real short-side cost/availability/financing model, and independently re-running the full discover()->validate()->final_holdout() pipeline against a properly-defined short target -- not retroactively negating existing statistics. This decision belongs to the user/product owner, not to this audit or to the Promotion Gate design.",
+  "semantics_trace": {
+    "GT_LT_meaning": "ConditionOperator.GT/LT (candidates.py:41-46) define the DIRECTION OF THE FEATURE THRESHOLD a candidate tests (e.g. 'RSI > 70' vs 'RSI < 30'), never the direction of a trade. FeatureCondition.evaluate() only returns whether the feature value satisfies the threshold comparison -- it has no relationship to how the resulting match should be traded.",
+    "baseline_comparison_meaning": "beats_baseline() (baselines.py:156-162) compares net_expectancy to buy_and_hold_baseline().mean_outcome -- also implicitly a LONG-vs-LONG comparison ('does this conditional long strategy beat unconditionally going long'), with no analogous 'does this conditional short strategy beat unconditionally going short' comparison anywhere in baselines.py's TargetKind/BaselineResult surface.",
+    "expectancy_meaning": "Pattern.expectancy / OutcomeDistribution.expectancy (evaluation.py:113) is always 'mean(matched forward_return)', and forward_return_series() (targets.py:76-85) is always '(closes[i+h] - closes[i]) / closes[i]' -- the arithmetic return of BUYING at close[i] and holding to close[i+h]. This is computed identically regardless of whether the triggering condition used GT or LT. There is no code path anywhere that inverts, relabels, or reinterprets this value based on the condition's operator.",
+    "forward_return_target_meaning": "A single, universal LONG-entry economic definition (targets.py:76-85), shared by every condition operator, every feature, and every baseline in baselines.py (which imports forward_return_series directly for buy_and_hold_baseline() etc.) -- there is no parallel 'short_return' target anywhere in TargetKind (targets.py:32-41's enum has 9 members, none short-specific).",
+    "pattern_activation_live_output": "live.py's PatternActivation.label is a fixed string, always 'ACTIVE_PATTERN' (confirmed: live_py_label_is_always_ACTIVE_PATTERN=True below), and the package docstring explicitly states output is 'deliberately never a BUY/SELL recommendation.' This is direction-agnostic OUTPUT VOCABULARY layered on top of an implicitly LONG-only ECONOMIC COMPUTATION underneath (expectancy/robustness/baseline all assume a long entry) -- an internal inconsistency, not a resolved design.",
+    "pattern_direction_field": "CONFIRMED ABSENT. Pattern (registry.py) has no side/direction/position_type/is_short field (grep-verified: pattern_schema_has_explicit_direction_field=False below). The only signal a downstream consumer has for 'which way to trade this' is the sign of expectancy itself -- which conflates 'statistically real effect' with 'implied trade direction,' two different claims that happen to have been collapsed into one field.",
+    "robustness_transaction_cost_survival_meaning": "RobustnessTester.run() (robustness.py:124-126) treats 'net_expectancy = expectancy - 0.002 > 0' as the pattern's economic viability test -- this ONLY makes sense as a viability test for a LONG position (buy at the cost, realize the raw forward return). It implicitly assumes every candidate, regardless of GT/LT or sign, would be traded long. A negative-expectancy candidate is therefore rejected not because it lacks a real effect, but because the pipeline never considers the alternative (shorting) that would make that same effect economically positive.",
+    "validation_sign_agreement_meaning": "WalkForwardValidator.validate() (validation.py:170-174) and engine.final_holdout() (engine.py:673) both test whether two independently-measured expectancy samples AGREE IN SIGN -- consistency of the LONG-return statistic across time periods, not a judgment about whether that sign implies a tradeable long or short position. Sign-neutral with respect to trade direction."
+  },
+  "short_inverse_validity_test": {
+    "arithmetic_validity": "Mechanically valid: negating a realized long return equals the frictionless, unconstrained P&L of an equal-and-opposite short position, ignoring financing, borrow cost, and availability.",
+    "conclusion": "The transform is mechanically well-defined but economically unvalidated. Using it to promote a negative-expectancy pattern would assert an executed short-trade edge that was never modeled, priced, or independently tested by any part of this system.",
+    "economic_validity": "INVALID as a promotion basis, for four independent reasons:",
+    "question": "Can short_return = -forward_return legitimately be used to reinterpret a negative-expectancy pattern as a valid short signal?",
+    "reasons": [
+      "No independent re-validation: the entire discover()->validate()->final_holdout() pipeline (bootstrap significance, walk-forward sign agreement, robustness perturbation-agreement, transaction-cost floor, baseline-beat) was computed and gated using forward_return, i.e. long economics, throughout. Retroactively negating already-computed statistics is not the same as running -forward_return through the same discovery/validation/holdout machinery independently -- e.g. a candidate whose sign flips under negation might fail perturbation-sign-agreement or baseline-beat under the negated series even though it passed under the original one; this was never tested.",
+      "No short-specific cost model exists anywhere: the ONLY cost model in this codebase (robustness.py's flat 20bps, transaction_costs.py's 0-100bps sensitivity grid) is a single symmetric round-trip figure applied identically regardless of direction. Real short economics require borrow fee, hard-to-borrow premium/availability, financing rate, and often asymmetric execution cost -- none of which exist in this codebase (grep-verified: transaction_costs_py_models_borrow_or_short_cost=False below).",
+      "No EGX-specific short-selling/securities-lending data source exists: this audit found zero references to short-selling, margin trading, or securities-lending availability anywhere in sources/, data/, or the documented Data Acquisition Program (docs/DATA_ACQUISITION.md was not found to model this) -- so even if a cost figure were assumed, no data exists to determine WHETHER a given EGX30 ticker is actually shortable at all.",
+      "Direct internal precedent against this move already exists in this codebase: AD-42 (docs/ARCHITECTURE_DECISIONS.md) explicitly rejects treating a non-executed, counterfactual outcome as a 'synthetic long/short position' elsewhere in this same platform, on the grounds that 'counterfactual avoidance and observation are not executed portfolio returns.' A negative-expectancy pattern's forward_return series was never executed as a short trade by anything in this system -- applying short_return = -forward_return and calling the result 'a valid short signal' is the same category of retrospective fabrication AD-42 already rules out."
+    ]
+  },
+  "step_1_6_reconciliation_figures": {
+    "gt_discovered": 2590,
+    "gt_validated": 1513,
+    "lt_discovered": 808,
+    "lt_validated": 260,
+    "note": "Not read from a Step 1.6 artifact file (none exist on disk this session) -- computed fresh from the same registry Step 1.6 used, which was independently verified unchanged.",
+    "robustness_ambiguous_total": 511,
+    "robustness_ambiguous_txn_cost_alone_explains": 400,
+    "source": "recomputed_this_session",
+    "total_discovered": 3398,
+    "v1_negative_count": 4,
+    "v1_positive_count": 3202,
+    "v1_positive_pct": 0.9423190111830488,
+    "v1_zero_count": 192
+  },
+  "what_is_not_proven": [
+    "Whether EGX30 tickers are, in reality, shortable at all, and at what cost -- this audit found no data source addressing this, but does not claim to have exhaustively searched every possible external source.",
+    "Whether a negative-expectancy pattern, if independently re-validated end-to-end against a properly-modeled short-return series (with real borrow/financing costs), would or would not survive -- this was never tested, and this audit deliberately does not test it (out of scope, and no short-cost data exists to test it with).",
+    "Whether the long-only behavior in robustness.py/baselines.py was a deliberate simplification the original implementer intended to revisit later, or a genuine oversight -- no comment, commit message, or doc found by this audit states either way.",
+    "Whether any future consumer of Pattern data (a not-yet-built Promotion Gate, or any other downstream system) would in practice need short-signal support at all -- that is a product/scope decision, not something this audit can determine from the code alone."
+  ],
+  "what_is_proven": [
+    "GT/LT operators define feature-threshold direction only, never trade direction (candidates.py, direct code read).",
+    "expectancy/forward_return are always computed as a long-entry return, identically regardless of operator or sign (targets.py, evaluation.py).",
+    "The Pattern schema has no direction/side field (registry.py, grep-verified).",
+    "PatternActivation never emits BUY/SELL (live.py, grep-verified and matches its own docstring).",
+    "robustness.py's transaction_cost_survival and baselines.py's beats_baseline() both implicitly assume long-only economics via their exact code construction (robustness.py:126, baselines.py:161-162).",
+    "No short-cost, borrow-fee, financing, or short-availability model exists anywhere in patterns/ (grep-verified against transaction_costs.py, the only cost-modeling module).",
+    "Nothing outside patterns/ (and its own tests/cli.py) currently imports or consumes Pattern data -- zero live downstream directional consequence today (grep-verified).",
+    "No authoritative doc (VISION.md, MASTER_PROMPT.md, patterns/'s own mission-derived docstrings, the investment doctrine set) states an explicit long-only or short-capable mandate for pattern discovery specifically.",
+    "This codebase has an internal precedent (AD-42) against fabricating synthetic long/short positions from non-executed outcomes, directly analogous to the short_return=-forward_return transform this audit tested."
+  ]
+}

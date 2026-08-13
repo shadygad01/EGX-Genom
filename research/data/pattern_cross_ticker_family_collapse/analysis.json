@@ -1,0 +1,213 @@
+{
+  "ambiguous_lead_lag_patterns": {
+    "count": 36,
+    "examples": {
+      "pattern_1b9302cb521d": "primary condition feature_id='relative_volume_5d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_252a1f44b420": "primary condition feature_id='return_1d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_424527428c0b": "primary condition feature_id='return_5d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_5d69473e2b3c": "primary condition feature_id='return_5d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_6d7ce1c68d53": "primary condition feature_id='return_5d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_9323416e2c83": "primary condition feature_id='return_5d:COMI' references peer ticker 'COMI', not self ('ADIB') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_c8dabff36654": "primary condition feature_id='relative_volume_5d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_e6b1aadb6a21": "primary condition feature_id='return_1d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_f0d70349efa8": "primary condition feature_id='return_1d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither",
+      "pattern_fe9d3aa60c3e": "primary condition feature_id='return_1d:ORWE' references peer ticker 'ORWE', not self ('EGAL') and not MARKET -- ambiguous whether to group by predictor ticker, outcome ticker, or neither"
+    }
+  },
+  "analysis": "Mission 3 Step 1: Cross-Ticker Family-Collapse Analysis",
+  "bh_vs_by_descriptive_comparison": {
+    "alpha": 0.05,
+    "bh_pass_rate": 0.949238578680203,
+    "bh_passes": 1683,
+    "by_pass_rate": 0.37055837563451777,
+    "by_passes": 657,
+    "n": 1773,
+    "note": "Purely descriptive comparison over v1's already-persisted block_bootstrap_p_value field -- this analysis does NOT choose BH or BY as the correction to use for any gate; that choice remains explicitly deferred to Promotion Gate design, per the hard boundary instruction."
+  },
+  "candidate_family_key_reconstruction_errors": [],
+  "family_size_1_diagnostic": {
+    "interpretation": "v1 (DISCOVERED) carries the real, varying family_size computed by discover()'s group_by_family()/family_corrected_p_value() (patterns/engine.py, patterns/multiple_testing_family.py). validate()/final_holdout() each call build_pattern() again without re-passing family_size/block_bootstrap_p_value/deflated_sharpe_ratio forward -- build_pattern()'s own defaults (family_size=1, the p-value/DSR fields None) silently overwrite the real v1 values on every later revision. This is a data-loss bug in how later revisions are built, not evidence that family correction was never applied -- it WAS applied once, correctly, at discover() time (see the v1 statistics above), and its record was simply not carried forward.",
+    "latest_block_bootstrap_p_null_count": 1773,
+    "latest_family_size_eq_1_count": 1773,
+    "latest_family_size_max": 1,
+    "latest_family_size_min": 1,
+    "v1_block_bootstrap_p_null_count": 0,
+    "v1_family_size_eq_1_count": 1,
+    "v1_family_size_max": 171,
+    "v1_family_size_mean": 85.46587704455725,
+    "v1_family_size_min": 1
+  },
+  "reproduction_notice": {
+    "is_reproduction": true,
+    "reason": "The original Step 1 script/report/JSON were never committed and were lost when this environment's working tree reset between conversation turns. This is a same-session reconstruction from the documented methodology (recorded in this conversation's own summary of what Step 1 computed), not a byte-identical retrieval of the original file. No threshold, family-key component, or scope decision was altered, tightened, loosened, or reinterpreted relative to that documented methodology."
+  },
+  "scope": {
+    "excludes": "Family analysis never selects/ranks by outcome -- every family above is reported regardless of its member patterns' expectancy magnitude or sign.",
+    "population": "The 1,773 real PatternStatus.VALIDATED patterns in the Mission 2 registry."
+  },
+  "table_1_universe_reduction": {
+    "analyzed": 1737,
+    "avg_family_size": 78.95454545454545,
+    "excluded_ambiguous_lead_lag": 36,
+    "excluded_unkeyable": 0,
+    "max_family_key": "return|forward_return|no_regime",
+    "max_family_size": 468,
+    "median_family_size": 27.0,
+    "min_family_size": 6,
+    "n_cross_ticker_families": 22,
+    "total_validated_patterns": 1773
+  },
+  "table_2_ticker_breadth": {
+    "breadth_histogram": {
+      "3": 1,
+      "4": 1,
+      "5": 2,
+      "6": 2,
+      "7": 1,
+      "8": 3,
+      "10": 2,
+      "11": 4,
+      "12": 4,
+      "13": 2
+    },
+    "families_with_1_to_2_tickers": 0,
+    "families_with_5_plus_tickers": 20
+  },
+  "table_3_same_sign_corroboration": {
+    "all_same_sign_families": 22,
+    "mixed_sign_families": 0,
+    "note": "Every family is composed exclusively of PatternStatus.VALIDATED patterns, which Step 1.6 (a later, independent step) established are 100% positive-expectancy at the individual-pattern level in this real run -- so 'all_same_sign' here is expected to be universal and is a consequence of that upstream fact, not new cross-ticker corroboration evidence by itself."
+  },
+  "table_4_concentration": {
+    "dominant_ticker_share_mean": 0.2520950582189339,
+    "dominant_ticker_share_median": 0.2208672086720867,
+    "hhi_mean": 0.16941421253130656,
+    "hhi_median": 0.15049898014522803
+  },
+  "table_5_top_corroborated_families": [
+    {
+      "family_key": "return|forward_return|no_regime",
+      "member_count": 468,
+      "total_matched_observations": 143917,
+      "unique_tickers": 12
+    },
+    {
+      "family_key": "acceleration|forward_return|no_regime",
+      "member_count": 428,
+      "total_matched_observations": 120260,
+      "unique_tickers": 13
+    },
+    {
+      "family_key": "distance_from_high|forward_return|no_regime",
+      "member_count": 173,
+      "total_matched_observations": 47227,
+      "unique_tickers": 12
+    },
+    {
+      "family_key": "distance_from_low|forward_return|no_regime",
+      "member_count": 149,
+      "total_matched_observations": 46180,
+      "unique_tickers": 11
+    },
+    {
+      "family_key": "cross_sectional_dispersion|forward_return|no_regime",
+      "member_count": 64,
+      "total_matched_observations": 29778,
+      "unique_tickers": 11
+    },
+    {
+      "family_key": "market_percentile|forward_return|no_regime",
+      "member_count": 62,
+      "total_matched_observations": 26893,
+      "unique_tickers": 13
+    },
+    {
+      "family_key": "volatility|forward_return|no_regime",
+      "member_count": 53,
+      "total_matched_observations": 23952,
+      "unique_tickers": 12
+    },
+    {
+      "family_key": "price_volume_correlation|forward_return|no_regime",
+      "member_count": 52,
+      "total_matched_observations": 22030,
+      "unique_tickers": 12
+    },
+    {
+      "family_key": "rank_change|forward_return|no_regime",
+      "member_count": 47,
+      "total_matched_observations": 21379,
+      "unique_tickers": 11
+    },
+    {
+      "family_key": "volume_acceleration|forward_return|no_regime",
+      "member_count": 41,
+      "total_matched_observations": 17749,
+      "unique_tickers": 8
+    },
+    {
+      "family_key": "relative_volume|forward_return|no_regime",
+      "member_count": 27,
+      "total_matched_observations": 12892,
+      "unique_tickers": 8
+    },
+    {
+      "family_key": "volatility_regime_pct|forward_return|no_regime",
+      "member_count": 27,
+      "total_matched_observations": 12476,
+      "unique_tickers": 10
+    },
+    {
+      "family_key": "market_breadth|forward_return|no_regime",
+      "member_count": 18,
+      "total_matched_observations": 8866,
+      "unique_tickers": 8
+    },
+    {
+      "family_key": "rolling_volume_percentile|forward_return|no_regime",
+      "member_count": 24,
+      "total_matched_observations": 8855,
+      "unique_tickers": 10
+    },
+    {
+      "family_key": "volume_concentration_hhi|forward_return|no_regime",
+      "member_count": 20,
+      "total_matched_observations": 8384,
+      "unique_tickers": 11
+    },
+    {
+      "family_key": "turnover_anomaly|forward_return|no_regime",
+      "member_count": 9,
+      "total_matched_observations": 3861,
+      "unique_tickers": 5
+    },
+    {
+      "family_key": "sector_percentile|forward_return|no_regime",
+      "member_count": 6,
+      "total_matched_observations": 2703,
+      "unique_tickers": 4
+    },
+    {
+      "family_key": "EGP_USD_level|forward_return|no_regime",
+      "member_count": 23,
+      "total_matched_observations": 1514,
+      "unique_tickers": 7
+    },
+    {
+      "family_key": "EGP_USD_rolling_percentile|forward_return|no_regime",
+      "member_count": 19,
+      "total_matched_observations": 1347,
+      "unique_tickers": 6
+    },
+    {
+      "family_key": "BRENT_USD_acceleration|forward_return|no_regime",
+      "member_count": 12,
+      "total_matched_observations": 576,
+      "unique_tickers": 5
+    }
+  ],
+  "unkeyable_patterns": {
+    "count": 0,
+    "examples": {}
+  }
+}

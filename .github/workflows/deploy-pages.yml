@@ -119,7 +119,7 @@ jobs:
           echo "already_ran=$ALREADY_RAN" >> "$GITHUB_OUTPUT"
 
       - name: Refresh free macroeconomic data
-        if: steps.check_run.outputs.already_ran != 'true'
+        if: steps.check_run.outputs.already_ran != 'true' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
         run: |
           uv run python scripts/fetch_macro_data.py
           mkdir -p data/production/macro
@@ -147,10 +147,16 @@ jobs:
       # honest "nothing promoted yet" from real data is an expected result,
       # not a failure.
       - name: Run the complete production pipeline (live data)
-        if: steps.check_run.outputs.already_ran != 'true'
+        if: steps.check_run.outputs.already_ran != 'true' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
         run: |
           uv run python -m agx_research.cli --data-dir data/production \
             run --date "$(date -u +%F)" --mode live --dashboard-out ../web/public/data
+
+      - name: Rebuild dashboard from persisted state (code push)
+        if: steps.check_run.outputs.already_ran != 'true' && github.event_name == 'push'
+        run: |
+          uv run python -m agx_research.cli --data-dir data/production \
+            run --date "$(date -u +%F)" --mode replay --dashboard-out ../web/public/data
 
       # Today already has a SUCCEEDED run in the persisted state (see the
       # check above, e.g. this workflow's own `schedule` trigger and a
@@ -209,7 +215,7 @@ jobs:
       # from, and a feature-branch test run overwriting it would corrupt
       # that continuity for everyone, not just the branch under test.
       - name: Persist updated production state to production/state-latest
-        if: steps.check_run.outputs.already_ran != 'true' && github.ref == 'refs/heads/main'
+        if: steps.check_run.outputs.already_ran != 'true' && github.event_name != 'push' && github.ref == 'refs/heads/main'
         working-directory: .
         run: |
           git config user.name "agx-production-bot"

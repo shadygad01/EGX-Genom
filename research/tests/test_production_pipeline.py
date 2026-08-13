@@ -649,14 +649,16 @@ def test_live_mode_collects_real_endpoints_and_reports_unavailable_sources(tmp_p
 
     assert report.execution_mode == "live"
     assert report.overall_status != StageStatus.FAILED
-    assert set(pipeline.collection_results) == {"stooq", "worldbank"}
+    assert set(pipeline.collection_results) == {"worldbank"}
 
     collector_status = json.loads(
         (tmp_path / "data" / "dashboard" / "collector_status.json").read_text()
     )
     by_id = {row["source_id"]: row for row in collector_status}
-    assert by_id["stooq"]["status"] == "COLLECTED"
-    assert by_id["stooq"]["documents_fetched"] == len(TICKERS)
+    # Stooq remains visible as an unavailable audit row for transparency, but
+    # it is not a collected production source or a decision-path input.
+    assert by_id["stooq"]["status"] == "UNAVAILABLE"
+    assert "disabled" in by_id["stooq"]["reason"].lower()
     # rss_generic is IMPLEMENTED but has no verified real feed URL yet --
     # must show up as UNAVAILABLE with a reason, never silently omitted.
     assert by_id["rss_generic"]["status"] == "UNAVAILABLE"

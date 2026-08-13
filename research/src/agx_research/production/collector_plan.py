@@ -559,6 +559,17 @@ def build_collector_plan(
     """
     wireable = {"stooq", "fred", "rss_generic", "worldbank", "enterprise_press"}
     collectable = {s.id: s for s in registry.collectable() if s.id in wireable}
+    # Retired/disabled live sources remain available only as deterministic
+    # parser fixtures for MOCK/REPLAY. They never re-enter LIVE routing or
+    # capability selection; this keeps regression tests honest without
+    # pretending a blocked endpoint is production-ready.
+    if mode in {ExecutionMode.MOCK, ExecutionMode.REPLAY}:
+        for source_id in ("stooq", "fred"):
+            spec = registry.latest(source_id)
+            if spec is not None and source_id not in collectable:
+                collectable[source_id] = spec.model_copy(
+                    update={"status": SourceStatus.IMPLEMENTED}
+                )
     tickers = tickers or list(_STOOQ_PRICES)
 
     plans: list[PlannedCollector] = []

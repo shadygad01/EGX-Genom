@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Badge } from "../components/primitives/Badge";
@@ -57,6 +57,29 @@ export function InvestmentCases() {
 
   const companyNames = marketState.data?.constituents ?? {};
   const marketSnapshot = marketState.data;
+
+  useEffect(() => {
+    if (!marketSnapshot || typeof window === "undefined" || typeof Notification === "undefined") return;
+    const notify = (ticker: string, companyName: string, distance: number) => {
+      if (Notification.permission !== "granted") return;
+      const key = `egx-low-alert:${ticker}:${new Date().toISOString().slice(0, 10)}`;
+      if (window.localStorage.getItem(key)) return;
+      window.localStorage.setItem(key, "1");
+      new Notification(`EGX opportunity: ${ticker}`, {
+        body: `${companyName || ticker} is ${formatPercent(distance)} above its six-month low.`,
+        tag: key,
+      });
+    };
+    const requestPermission = Notification.permission === "default" ? Notification.requestPermission() : Promise.resolve(Notification.permission);
+    requestPermission.then((permission) => {
+      if (permission !== "granted") return;
+      Object.keys(companyNames).forEach((ticker) => {
+        const proximity = priceProximity(ticker, marketSnapshot);
+        if (proximity?.distance != null && proximity.distance <= 0.08) notify(ticker, companyNames[ticker] ?? "", proximity.distance);
+      });
+    }).catch(() => undefined);
+  }, [marketSnapshot, companyNames]);
+
   const selected = ranked.find((r) => r.ticker === selectedTicker) ?? ranked[0] ?? null;
   const recommendationByTicker = new Map(ranked.map((row) => [row.ticker, row]));
   const readinessByTicker = new Map((readiness.data ?? []).map((row) => [row.ticker, row]));

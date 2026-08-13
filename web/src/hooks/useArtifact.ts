@@ -21,6 +21,13 @@ export function useArtifact<T>(
   const [error, setError] = useState<Error | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
+  // Keep every dashboard artifact fresh without requiring a full page reload.
+  // The production collector writes new artifacts on the same cadence.
+  useEffect(() => {
+    const timer = window.setInterval(() => setReloadToken((t) => t + 1), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);

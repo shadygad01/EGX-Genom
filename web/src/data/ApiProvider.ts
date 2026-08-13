@@ -13,6 +13,7 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  ResearchCandidate,
   DecisionPerformanceSummary,
   DecisionRecord,
   DiscoveryMetrics,
@@ -166,6 +167,10 @@ export class ApiProvider implements DashboardDataProvider {
 
   getDecisionReadiness(): Promise<DecisionReadiness[]> {
     return fetchJson<DecisionReadiness[]>("/decision-readiness");
+  }
+
+  getResearchCandidates(): Promise<ResearchCandidate[]> {
+    return fetchJson<ResearchCandidate[]>("/research-candidates");
   }
 
   getTickerDataGapReport(): Promise<TickerDataGapReport[]> {

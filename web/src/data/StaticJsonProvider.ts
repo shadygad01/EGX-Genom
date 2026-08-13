@@ -12,6 +12,7 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  ResearchCandidate,
   DecisionPerformanceSummary,
   DecisionRecord,
   DiscoveryMetrics,
@@ -176,6 +177,10 @@ export class StaticJsonProvider implements DashboardDataProvider {
 
   getDecisionReadiness(): Promise<DecisionReadiness[]> {
     return fetchList<DecisionReadiness>("decision_readiness.json");
+  }
+
+  getResearchCandidates(): Promise<ResearchCandidate[]> {
+    return fetchList<ResearchCandidate>("research_candidates.json");
   }
 
   getTickerDataGapReport(): Promise<TickerDataGapReport[]> {

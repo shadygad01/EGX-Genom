@@ -40,6 +40,7 @@ from agx_research.meta.decision_engine import (
 from agx_research.meta.decision_quality import evaluate_decision_quality
 from agx_research.meta.system_maturity import SystemMaturityReport
 from agx_research.meta.readiness import DecisionReadiness, TickerDataGapReport
+from agx_research.meta.research_candidates import ResearchCandidate
 from agx_research.papers.paper import ResearchPaper
 from agx_research.claims import Claim
 from agx_research.portfolio.constructor import PortfolioRecommendation
@@ -194,6 +195,14 @@ def validate_dashboard_artifacts(
         directory, "acquisition_decisions.json", CapabilityDecision, counts
     )
     _validate_optional_model_list(directory, "decision_readiness.json", DecisionReadiness, counts)
+    _validate_optional_model_list(directory, "research_candidates.json", ResearchCandidate, counts)
+    candidates_path = directory / "research_candidates.json"
+    if candidates_path.exists() and universe_payload is not None:
+        candidate_tickers = [row["ticker"] for row in json.loads(candidates_path.read_text())]
+        if not set(candidate_tickers).issubset(set(universe.tickers)):
+            raise DashboardArtifactError(
+                "research_candidates.json: membership contains a ticker outside universe.json"
+            )
     readiness_path = directory / "decision_readiness.json"
     if readiness_path.exists() and universe_payload is not None:
         readiness_tickers = sorted(row["ticker"] for row in json.loads(readiness_path.read_text()))

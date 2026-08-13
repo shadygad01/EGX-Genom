@@ -15,6 +15,7 @@ import type {
   DashboardMetrics,
   DashboardSystemStatus,
   DecisionReadiness,
+  ResearchCandidate,
   DecisionPerformanceSummary,
   DecisionRecord,
   DiscoveryMetrics,
@@ -138,6 +139,7 @@ export interface DashboardDataProvider {
   getMarketRegime(): Promise<MarketRegimeReport | null>;
   getAcquisitionDecisions(): Promise<AcquisitionDecision[]>;
   getDecisionReadiness(): Promise<DecisionReadiness[]>;
+  getResearchCandidates(): Promise<ResearchCandidate[]>;
   getTickerDataGapReport(): Promise<TickerDataGapReport[]>;
   getSourceTruth(): Promise<SourceTruthRow[]>;
   getDecisionHistory(): Promise<DecisionRecord[]>;

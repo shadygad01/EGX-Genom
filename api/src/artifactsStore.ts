@@ -132,6 +132,10 @@ export class ArtifactsReader {
     return readJsonOrDefault<T[]>(this.path("decision_readiness.json"), []);
   }
 
+  researchCandidates<T = unknown>(): Promise<T[]> {
+    return readJsonOrDefault<T[]>(this.path("research_candidates.json"), []);
+  }
+
   tickerDataGapReport<T = unknown>(): Promise<T[]> {
     return readJsonOrDefault<T[]>(this.path("ticker_data_gap_report.json"), []);
   }

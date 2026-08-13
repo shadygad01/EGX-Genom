@@ -13,6 +13,29 @@ export type Horizon = "micro" | "swing" | "investment";
 
 export type ReadinessStatus = "ready" | "degraded" | "blocked";
 
+export interface ResearchCandidate {
+  ticker: string;
+  as_of: string;
+  latest_price_date: string | null;
+  current_price: number;
+  target_price: number;
+  expected_return: number;
+  discount_pct: number;
+  time_to_target_days: number;
+  confidence: number;
+  decision: "watchlist";
+  status: "research_candidate";
+  included_models: string[];
+  market_pe: number | null;
+  price_to_book: number | null;
+  dcf_per_share: number | null;
+  price_observations: number;
+  financial_periods: number;
+  macro_series: number;
+  primary_blockers: string[];
+  next_actions: string[];
+}
+
 export interface DecisionReadiness {
   ticker: string;
   as_of: string;

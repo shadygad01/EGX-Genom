@@ -29,10 +29,14 @@ from typing import Any
 from agx_research.dashboard.schemas import DashboardSystemStatus
 from agx_research.events.repository import EventRepository
 from agx_research.events.service import EventPlatform
+from agx_research.financials.provider import FinancialStatementProvider
 from agx_research.knowledge.store import KnowledgeStore
 from agx_research.market_memory.memory import MarketMemory
 from agx_research.market_memory.state import MarketState
+from agx_research.meta.readiness import assess_decision_readiness
 from agx_research.meta.recommendation_service import RecommendationService
+from agx_research.meta.research_candidates import build_research_candidates
+from agx_research.valuation import FairValueEngine
 from agx_research.runtime.engine import RunRecordRepository, RunStatus
 from agx_research.sources.catalog import seed_sources
 from agx_research.sources.registry import SourceRegistry
@@ -48,6 +52,7 @@ ARTIFACT_FILENAMES = (
     "runtime_metrics.json",
     "system_status.json",
     "source_registry.json",
+    "research_candidates.json",
 )
 
 
@@ -146,6 +151,7 @@ def write_dashboard_artifacts(
     as_of: date | None,
     out_dir: Path,
     registry: SourceRegistry | None = None,
+    financials: FinancialStatementProvider | None = None,
 ) -> dict[str, int]:
     """Writes every artifact in `ARTIFACT_FILENAMES` to `out_dir` and
     returns a filename -> item-count map (1 for the two single-object
@@ -168,6 +174,21 @@ def write_dashboard_artifacts(
         "runtime_metrics.json": export_runtime_metrics(runs),
         "system_status.json": export_system_status(runs, knowledge_store, pipeline_run_date=as_of),
         "source_registry.json": export_source_registry(registry),
+        "research_candidates.json": (
+            [
+                candidate.model_dump(mode="json")
+                for candidate in build_research_candidates(
+                    assess_decision_readiness(
+                        memory.reconstruct(as_of),
+                        financials,
+                        knowledge_store.all_latest(),
+                        FairValueEngine(financials),
+                    )
+                )
+            ]
+            if as_of is not None and financials is not None
+            else []
+        ),
     }
 
     counts: dict[str, int] = {}

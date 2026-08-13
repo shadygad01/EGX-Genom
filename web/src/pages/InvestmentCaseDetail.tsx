@@ -11,7 +11,7 @@ import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { dedupeEvidence, formatCompactNumber, formatNumber, formatPercent, formatSignedPercent, humanizeEvidence, titleCase } from "../lib/format";
-import type { DecisionAction, GeneStatus, Horizon, KnowledgeStatus } from "../types";
+import type { DecisionAction, GeneStatus, Horizon, KnowledgeStatus, ResearchCandidate } from "../types";
 import styles from "./InvestmentCaseDetail.module.css";
 
 const KNOWLEDGE_VARIANT: Record<KnowledgeStatus, BadgeVariant> = {
@@ -72,6 +72,7 @@ export function InvestmentCaseDetail() {
   const genes = useArtifact((p) => p.getGenes());
   const investmentCases = useArtifact((p) => p.getInvestmentCases());
   const decisionReadiness = useArtifact((p) => p.getDecisionReadiness());
+  const researchCandidates = useArtifact((p) => p.getResearchCandidates());
   const decisionHistory = useArtifact((p) => p.getDecisionHistory());
 
   const companyName = marketState.data?.constituents[ticker];
@@ -82,6 +83,7 @@ export function InvestmentCaseDetail() {
   const investmentDecision = recommendation?.horizon_decisions.investment ?? null;
   const modelPosition = investmentCases.data?.portfolio?.positions.find((p) => p.ticker === ticker) ?? null;
   const readiness = decisionReadiness.data?.find((r) => r.ticker === ticker) ?? null;
+  const researchCandidate: ResearchCandidate | null = researchCandidates.data?.find((r) => r.ticker === ticker) ?? null;
   const tickerHistory = (decisionHistory.data ?? [])
     .filter((d) => d.ticker === ticker)
     .sort((a, b) => (a.as_of < b.as_of ? 1 : -1));
@@ -306,6 +308,23 @@ export function InvestmentCaseDetail() {
           )}
         </Card>
       </div>
+
+      {researchCandidate && (
+        <Card title="Quantitative watchlist candidate" subtitle="This is a valuation-led research candidate, not an executable buy decision.">
+          <div className={styles.grid}>
+            <StatTile label="Expected return to target" value={formatSignedPercent(researchCandidate.expected_return)} />
+            <StatTile label="Current / target price" value={`${formatNumber(researchCandidate.current_price, 2)} / ${formatNumber(researchCandidate.target_price, 2)}`} />
+            <StatTile label="Target horizon" value={`${researchCandidate.time_to_target_days} days`} />
+            <StatTile label="Evidence completeness" value={formatPercent(researchCandidate.confidence)} />
+          </div>
+          <div className={styles.block} style={{ marginTop: "var(--space-3)" }}>
+            <Badge variant="warning">WATCHLIST — execution gated</Badge>
+            <ul className={styles.bulletList}>
+              {researchCandidate.primary_blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}
+            </ul>
+          </div>
+        </Card>
+      )}
 
       <Section title={t("valuation.title")} description={t("valuation.description")}>
         {decisionReadiness.loading && <LoadingState rows={1} />}

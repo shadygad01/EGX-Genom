@@ -13,7 +13,7 @@ import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { dedupeEvidence, formatPercent, formatSignedPercent, humanizeEvidence } from "../lib/format";
-import type { CorporateEvent, DecisionReadiness, Horizon, MarketState, Recommendation } from "../types";
+import type { CorporateEvent, DecisionReadiness, Horizon, MarketState, Recommendation, ResearchCandidate } from "../types";
 import styles from "./InvestmentCases.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
@@ -43,6 +43,7 @@ export function InvestmentCases() {
   const { formatDate } = useFormatters();
   const recommendations = useArtifact((p) => p.getRecommendations());
   const readiness = useArtifact((p) => p.getDecisionReadiness());
+  const researchCandidates = useArtifact((p) => p.getResearchCandidates());
   const marketState = useArtifact((p) => p.getMarketState());
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [horizonFilter, setHorizonFilter] = useState<Horizon | "all">("all");
@@ -129,6 +130,28 @@ export function InvestmentCases() {
           </button>
         ))}
       </div>
+
+      <Section title="Quantitative research candidates" description="Multi-model fair-value candidates ranked by expected return. These are watchlist items until every execution gate passes.">
+        {researchCandidates.loading && <LoadingState rows={2} />}
+        {!researchCandidates.loading && (
+          <Card dense>
+            <DataTable<ResearchCandidate>
+              rows={researchCandidates.data ?? []}
+              getRowKey={(row) => row.ticker}
+              emptyTitle="No undervalued candidates"
+              emptyDetail="No stock currently has a populated multi-model fair value below its latest price."
+              columns={[
+                { key: "ticker", header: "Ticker", render: (row) => <Link className="num" to={`/cases/${row.ticker}`}>{row.ticker}</Link> },
+                { key: "price", header: "Price / Target", align: "right", render: (row) => <span className="num">{row.current_price.toFixed(2)} / {row.target_price.toFixed(2)}</span> },
+                { key: "return", header: "Expected return", align: "right", render: (row) => <span className="num" style={{ color: "var(--positive)", fontWeight: 700 }}>{formatSignedPercent(row.expected_return)}</span> },
+                { key: "time", header: "Target horizon", align: "right", render: (row) => <span className="num">{row.time_to_target_days}d</span> },
+                { key: "confidence", header: "Evidence completeness", align: "right", render: (row) => <Meter value={row.confidence} label={formatPercent(row.confidence)} /> },
+                { key: "status", header: "Decision status", render: (row) => <Badge variant="neutral" title={row.primary_blockers.join(" ")}>WATCHLIST — gated</Badge> },
+              ]}
+            />
+          </Card>
+        )}
+      </Section>
 
       {recommendations.loading && <LoadingState rows={4} />}
       {recommendations.error && <ErrorState detail={recommendations.error.message} onRetry={recommendations.reload} />}

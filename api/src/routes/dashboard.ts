@@ -35,6 +35,7 @@ export async function dashboardRoutes(
   app.get("/market-regime", async () => artifacts.marketRegime());
   app.get("/acquisition-decisions", async () => artifacts.acquisitionDecisions());
   app.get("/decision-readiness", async () => artifacts.decisionReadiness());
+  app.get("/research-candidates", async () => artifacts.researchCandidates());
   app.get("/ticker-data-gaps", async () => artifacts.tickerDataGapReport());
   app.get("/source-truth", async () => artifacts.sourceTruth());
   app.get("/decision-history", async () => artifacts.decisionHistory());

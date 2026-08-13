@@ -168,6 +168,13 @@ describe("dashboard artifact routes", () => {
     expect(response.json()).toEqual([]);
   });
 
+  it("GET /research-candidates returns an honest empty list when absent", async () => {
+    const app = testApp();
+    const response = await app.inject({ method: "GET", url: "/research-candidates" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual([]);
+  });
+
   it("GET /financial-coverage returns null when the report is absent", async () => {
     const app = testApp();
     const response = await app.inject({ method: "GET", url: "/financial-coverage" });

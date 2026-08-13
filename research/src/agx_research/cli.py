@@ -1147,6 +1147,7 @@ def main(argv: list[str] | None = None) -> int:
             as_of=as_of,
             out_dir=args.out,
             registry=registry,
+            financials=CollectedFinancialStatementProvider(args.data_dir),
         )
         print(
             json.dumps({"as_of": as_of.isoformat() if as_of else None, "counts": counts}, indent=2)

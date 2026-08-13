@@ -109,6 +109,7 @@ from agx_research.meta.publication_gate import (
     LegalPublicationApproval,
 )
 from agx_research.meta.readiness import assess_decision_readiness
+from agx_research.meta.research_candidates import build_research_candidates
 from agx_research.orchestration.pipeline import DailyResearchPipeline
 from agx_research.papers.repository import PaperRepository
 from agx_research.portfolio.constructor import PortfolioConstructor, PortfolioRecommendation
@@ -1266,6 +1267,12 @@ class ProductionPipeline:
             json.dumps(decision_readiness, indent=2, sort_keys=True) + "\n"
         )
         counts["decision_readiness.json"] = len(decision_readiness)
+
+        research_candidates = [candidate.model_dump(mode="json") for candidate in build_research_candidates(decision_readiness_rows)]
+        (dashboard_out / "research_candidates.json").write_text(
+            json.dumps(research_candidates, indent=2, sort_keys=True) + "\n"
+        )
+        counts["research_candidates.json"] = len(research_candidates)
 
         ticker_data_gap_report = production_artifacts.export_ticker_data_gap_report(
             decision_readiness_rows

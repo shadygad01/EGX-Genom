@@ -13,10 +13,23 @@ import { useArtifact } from "../hooks/useArtifact";
 import { useEnumLabel } from "../hooks/useEnumLabel";
 import { useFormatters } from "../hooks/useFormatters";
 import { dedupeEvidence, formatPercent, formatSignedPercent, humanizeEvidence } from "../lib/format";
-import type { CorporateEvent, DecisionReadiness, Horizon, Recommendation } from "../types";
+import type { CorporateEvent, DecisionReadiness, Horizon, MarketState, Recommendation } from "../types";
 import styles from "./InvestmentCases.module.css";
 
 const HORIZON_ORDER: Horizon[] = ["micro", "swing", "investment"];
+const SIX_MONTH_LOOKBACK_DAYS = 183;
+
+function priceProximity(ticker: string, marketState: MarketState | null | undefined) {
+  const history = marketState?.dataset_snapshot?.long_price_history?.[ticker] ?? marketState?.dataset_snapshot?.price_history?.[ticker] ?? [];
+  const asOf = marketState?.as_of ? new Date(marketState.as_of) : new Date();
+  const cutoff = new Date(asOf);
+  cutoff.setDate(cutoff.getDate() - SIX_MONTH_LOOKBACK_DAYS);
+  const window = history.filter((bar: { trade_date: string }) => new Date(bar.trade_date) >= cutoff && new Date(bar.trade_date) <= asOf);
+  if (window.length === 0) return null;
+  const latest = [...window].sort((a: { trade_date: string }, b: { trade_date: string }) => b.trade_date.localeCompare(a.trade_date))[0];
+  const low = Math.min(...window.map((bar: { low: number; close: number }) => bar.low ?? bar.close));
+  return { current: latest.close, low, distance: latest.close > 0 ? latest.close / low - 1 : null, observations: window.length };
+}
 
 /** Investment Cases -- "why should I own this company?" answered for
  * every ticker AGX currently sees, ranked by expected return. Selecting a
@@ -43,6 +56,7 @@ export function InvestmentCases() {
     });
 
   const companyNames = marketState.data?.constituents ?? {};
+  const marketSnapshot = marketState.data;
   const selected = ranked.find((r) => r.ticker === selectedTicker) ?? ranked[0] ?? null;
   const recommendationByTicker = new Map(ranked.map((row) => [row.ticker, row]));
   const readinessByTicker = new Map((readiness.data ?? []).map((row) => [row.ticker, row]));
@@ -120,6 +134,34 @@ export function InvestmentCases() {
                   key: "confidence",
                   header: tCommon("table.confidence"),
                   render: (r) => <Meter value={r.confidence} label={formatPercent(r.confidence)} />,
+                },
+                {
+                  key: "price",
+                  header: "Price / 6M low",
+                  align: "right",
+                  render: (r) => {
+                    const proximity = priceProximity(r.ticker, marketSnapshot);
+                    if (!proximity) return <span className="num">—</span>;
+                    return (
+                      <div>
+                        <span className="num">{proximity.current.toFixed(2)} / {proximity.low.toFixed(2)}</span>
+                        <div style={{ fontSize: "0.72rem", color: proximity.distance != null && proximity.distance <= 0.08 ? "var(--warning)" : "var(--text-muted)" }}>
+                          {proximity.distance == null ? "—" : `${(proximity.distance * 100).toFixed(1)}% above low`}
+                        </div>
+                      </div>
+                    );
+                  },
+                },
+                {
+                  key: "fairValueGap",
+                  header: "Fair value gap",
+                  align: "right",
+                  render: (r) => {
+                    const valuation = readinessByTicker.get(r.ticker);
+                    const gap = valuation?.price_vs_fair_value_pct;
+                    if (gap == null) return <span className="num">—</span>;
+                    return <span className="num" style={{ color: gap <= 0 ? "var(--positive)" : "var(--negative)", fontWeight: 700 }}>{formatSignedPercent(-gap)}</span>;
+                  },
                 },
                 {
                   key: "return",

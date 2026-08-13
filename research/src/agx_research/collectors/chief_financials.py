@@ -15,6 +15,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+from urllib.parse import urlsplit
 
 from agx_research.collectors.base import CollectionBatch, Collector
 from agx_research.collectors.fetcher import FetchDisallowed, FetchError
@@ -84,10 +85,38 @@ class ChiefFinancialsCollector(Collector):
     name = "ChiefFinancialsCollector"
     version = "1.0.0"
 
-    def __init__(self, spec, *, tickers: list[str], fetcher=None):
+    def __init__(self, spec, *, tickers: list[str], companies: dict[str, str] | None = None, fetcher=None):
         super().__init__(spec, fetcher)
         self.tickers = {ticker.upper() for ticker in tickers}
+        self.companies = {ticker.upper(): name for ticker, name in (companies or {}).items()}
         self.fetch_warnings: list[str] = []
+
+    def _target_company_urls(self, company_urls: set[str]) -> set[str]:
+        """Use the public slug as a pre-fetch universe filter when names exist.
+
+        Chief's index exposes many public company pages. Fetching every page and
+        only then reading its ticker turns an EGX30/70 run into an unnecessarily
+        large sequential crawl. Two meaningful name tokens (or a ticker token)
+        are enough to select likely pages; the page itself remains authoritative
+        because ticker/CSV parsing still happens after fetch.
+        """
+        if not self.companies:
+            return company_urls
+        selected: set[str] = set()
+        for url in company_urls:
+            slug = urlsplit(url).path.casefold().replace("-", " ")
+            for ticker, name in self.companies.items():
+                name_tokens = {
+                    token.casefold()
+                    for token in re.findall(r"[a-z0-9]+", name)
+                    if len(token) >= 4
+                }
+                slug_tokens = set(re.findall(r"[a-z0-9]+", slug))
+                overlap = name_tokens & slug_tokens
+                if ticker.casefold() in slug_tokens or len(overlap) >= 2:
+                    selected.add(url)
+                    break
+        return selected
 
     def fetch(self) -> list[RawDocument]:
         company_urls: set[str] = set()
@@ -117,8 +146,11 @@ class ChiefFinancialsCollector(Collector):
                 break
             company_urls.update(found)
 
+        target_urls = self._target_company_urls(company_urls)
+        if self.companies and not target_urls:
+            self.fetch_warnings.append("No Chief company URL matched the declared EGX30/EGX70 company names.")
         documents: list[RawDocument] = []
-        for company_url in sorted(company_urls):
+        for company_url in sorted(target_urls):
             html = self.fetcher.fetch_text(company_url, self.spec)
             ticker_match = _TICKER_RE.search(html)
             csv_match = _CSV_RE.search(html)

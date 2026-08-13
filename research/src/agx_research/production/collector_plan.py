@@ -496,7 +496,7 @@ def build_live_collector(
     if source_id == "orascom_ir":
         return OrascomFinancialHighlightsCollector(spec, fetcher=fetcher)
     if source_id == "chief_egx_financials":
-        return ChiefFinancialsCollector(spec, tickers=tickers, fetcher=fetcher)
+        return ChiefFinancialsCollector(spec, tickers=tickers, companies=companies, fetcher=fetcher)
     if source_id in ("rmda_ir", "tmgh_ir"):
         # Family B PDF earnings-release collector (docs/COLLECTOR_TEMPLATE_TAXONOMY.md).
         # Needs a RawArchive to store fetched PDF bytes -- if the caller hasn't

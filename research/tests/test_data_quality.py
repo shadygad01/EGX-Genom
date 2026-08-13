@@ -46,6 +46,18 @@ def test_zero_volume_is_a_warning_not_an_error():
     assert issues[0].severity == QualityIssueSeverity.WARNING
 
 
+def test_extreme_move_is_a_review_warning_for_corporate_actions():
+    issues = validate_price_bars(
+        "TEST",
+        [
+            bar(date(2026, 6, 1), close=10.0),
+            bar(date(2026, 6, 2), open_=16.0, high=16.5, low=15.5, close=16.0),
+        ],
+    )
+    assert any(i.severity == QualityIssueSeverity.WARNING for i in issues)
+    assert any("split" in i.description and "dividend" in i.description for i in issues)
+
+
 def test_duplicate_trade_date_is_an_error():
     issues = validate_price_bars("TEST", [bar(date(2026, 6, 1)), bar(date(2026, 6, 1))])
     assert any("Duplicate" in i.description for i in issues)

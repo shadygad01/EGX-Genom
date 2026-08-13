@@ -39,6 +39,7 @@ def validate_price_bars(ticker: str, bars: list[PriceBar]) -> list[QualityIssue]
     issues: list[QualityIssue] = []
     seen_dates: set = set()
     previous_date = None
+    previous_close: float | None = None
 
     for bar in bars:
         date_str = bar.trade_date.isoformat()
@@ -97,6 +98,20 @@ def validate_price_bars(ticker: str, bars: list[PriceBar]) -> list[QualityIssue]
                     description="Zero volume (possibly a halted or illiquid session).",
                 )
             )
+        if previous_close is not None and previous_close > 0:
+            session_return = abs(bar.close / previous_close - 1)
+            if session_return > 0.50:
+                issues.append(
+                    QualityIssue(
+                        ticker=ticker,
+                        trade_date=date_str,
+                        severity=QualityIssueSeverity.WARNING,
+                        description=(
+                            f"Extreme close-to-close move ({session_return:.1%}); "
+                            "review split, dividend, corporate action, or bad quote before valuation."
+                        ),
+                    )
+                )
         if bar.trade_date in seen_dates:
             issues.append(
                 QualityIssue(
@@ -117,5 +132,6 @@ def validate_price_bars(ticker: str, bars: list[PriceBar]) -> list[QualityIssue]
                 )
             )
         previous_date = bar.trade_date
+        previous_close = bar.close
 
     return issues

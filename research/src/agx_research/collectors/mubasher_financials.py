@@ -109,7 +109,8 @@ class MubasherFinancialsCollector(Collector):
             absolute_metrics={'total_assets','total_liabilities','total_equity','net_income','gross_profit','operating_cash_flow','cash_and_equivalents_change','investing_cash_flow','financing_cash_flow'}
             for key,group in grouped.items():
                 if len(group)==1:
-                    deduped.append(group[0]); continue
+                    deduped.append(group[0])
+                    continue
                 vals=[abs(float(x.value)) for x in group if x.value not in (None,0)]
                 if vals and max(vals)/min(vals)>=900 and max(vals)/min(vals)<=1100:
                     chosen=max(group,key=lambda x:abs(float(x.value))) if key[0] in absolute_metrics else min(group,key=lambda x:abs(float(x.value)))

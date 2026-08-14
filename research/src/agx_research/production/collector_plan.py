@@ -37,8 +37,10 @@ because nothing about the call site changes.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 
 from agx_research.collectors.archive import RawArchive
 from agx_research.collectors.archive_replay import ArchiveReplayCollector
@@ -54,6 +56,7 @@ from agx_research.collectors.egypt_nsdp import EgyptNsdpCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
+from agx_research.collectors.official_filings import OfficialFilingsCollector
 from agx_research.collectors.orascom_financials import OrascomFinancialHighlightsCollector
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.rss import RssNewsCollector
@@ -425,6 +428,20 @@ def _mock_url_map(spec_by_id: dict[str, SourceSpec]) -> dict[str, str]:
     return content_by_url
 
 
+def _verified_company_urls() -> dict[str, str]:
+    """Load only previously evidenced issuer domains; never synthesize URLs."""
+    path = Path(__file__).resolve().parents[3] / "data" / "universe" / "egx30_web_search_domain_hints.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {
+        ticker.upper(): ("https://" + value["hostname"]).rstrip("/")
+        for ticker, value in payload.get("hints", {}).items()
+        if isinstance(value, dict) and value.get("hostname")
+    }
+
+
 def build_live_collector(
     source_id: str,
     spec: SourceSpec,
@@ -497,6 +514,17 @@ def build_live_collector(
         return OrascomFinancialHighlightsCollector(spec, fetcher=fetcher)
     if source_id == "chief_egx_financials":
         return ChiefFinancialsCollector(spec, tickers=tickers, companies=companies, fetcher=fetcher)
+    if source_id in {"egx_financial_statements", "fra_financial_statements", "company_ir"}:
+        # URL maps are supplied by verified discovery/configuration. An empty map
+        # is a visible zero-yield run, never a fabricated company domain.
+        company_urls = (
+            _verified_company_urls()
+            if source_id == "company_ir"
+            else {"__official__": spec.base_url} if spec.base_url else {}
+        )
+        return OfficialFilingsCollector(
+            spec, company_urls=company_urls, fetcher=fetcher, archive=archive
+        )
     if source_id in ("rmda_ir", "tmgh_ir"):
         # Family B PDF earnings-release collector (docs/COLLECTOR_TEMPLATE_TAXONOMY.md).
         # Needs a RawArchive to store fetched PDF bytes -- if the caller hasn't

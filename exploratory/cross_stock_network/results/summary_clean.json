@@ -1,0 +1,322 @@
+[
+  {
+    "source": "shaban",
+    "metrics": {
+      "ret": {
+        "pairwise_lag_tests": 245153,
+        "raw_significant": 68688,
+        "fdr_significant": 40000,
+        "temporal_validated": 37714,
+        "validation_rows": 39776,
+        "top_leaders_by_all_tests": {
+          "ACGC": 996,
+          "AFDI": 996,
+          "AMOC": 996,
+          "AREH": 996,
+          "ASCM": 996,
+          "ASPI": 996,
+          "CCAP": 996,
+          "COMI": 996,
+          "COSG": 996,
+          "CSAG": 996
+        },
+        "top_leaders_by_fdr": {
+          "ROTO": 326,
+          "ZMID": 317,
+          "ELEC": 306,
+          "ATLC": 301,
+          "AREH": 300,
+          "ETRS": 289,
+          "CCRS": 279,
+          "GIHD": 274,
+          "IDRE": 273,
+          "WKOL": 268
+        }
+      },
+      "illiquidity": {
+        "pairwise_lag_tests": 245184,
+        "raw_significant": 149758,
+        "fdr_significant": 140351,
+        "temporal_validated": 130831,
+        "validation_rows": 139963,
+        "top_leaders_by_all_tests": {
+          "ACGC": 996,
+          "AFDI": 996,
+          "AMOC": 996,
+          "AREH": 996,
+          "ASCM": 996,
+          "ASPI": 996,
+          "CCAP": 996,
+          "COMI": 996,
+          "COSG": 996,
+          "CSAG": 996
+        },
+        "top_leaders_by_fdr": {
+          "MPCO": 825,
+          "AFDI": 793,
+          "ISMA": 788,
+          "ZMID": 777,
+          "ROTO": 776,
+          "ASCM": 771,
+          "EGAS": 770,
+          "CERA": 768,
+          "NCCW": 766,
+          "MCQE": 761
+        }
+      },
+      "volatility": {
+        "pairwise_lag_tests": 244871,
+        "raw_significant": 32158,
+        "fdr_significant": 3272,
+        "temporal_validated": 3200,
+        "validation_rows": 3241,
+        "top_leaders_by_all_tests": {
+          "ACGC": 996,
+          "AFDI": 996,
+          "AMOC": 996,
+          "AREH": 996,
+          "ASCM": 996,
+          "ASPI": 996,
+          "CCAP": 996,
+          "COMI": 996,
+          "COSG": 996,
+          "CSAG": 996
+        },
+        "top_leaders_by_fdr": {
+          "COPR": 95,
+          "NCCW": 80,
+          "ALUM": 70,
+          "ELEC": 52,
+          "SMPP": 48,
+          "DIFC": 46,
+          "EIUD": 46,
+          "MOED": 46,
+          "ISPH": 43,
+          "ABUK": 42
+        }
+      },
+      "abnormal_volume": {
+        "pairwise_lag_tests": 238387,
+        "raw_significant": 31961,
+        "fdr_significant": 4291,
+        "temporal_validated": 4200,
+        "validation_rows": 4284,
+        "top_leaders_by_all_tests": {
+          "COMI": 980,
+          "ELSH": 980,
+          "GGCC": 980,
+          "HDBK": 980,
+          "HRHO": 980,
+          "MASR": 980,
+          "MCQE": 980,
+          "SAUD": 980,
+          "SKPC": 980,
+          "COSG": 979
+        },
+        "top_leaders_by_fdr": {
+          "ODIN": 127,
+          "UEGC": 103,
+          "ZEOT": 98,
+          "UASG": 93,
+          "ENGC": 87,
+          "UNIP": 86,
+          "IFAP": 84,
+          "ACGC": 83,
+          "EHDR": 77,
+          "ALUM": 74
+        }
+      },
+      "range": {
+        "pairwise_lag_tests": 245199,
+        "raw_significant": 87386,
+        "fdr_significant": 63718,
+        "temporal_validated": 59093,
+        "validation_rows": 63552,
+        "top_leaders_by_all_tests": {
+          "ACGC": 996,
+          "AFDI": 996,
+          "AMOC": 996,
+          "AREH": 996,
+          "ASCM": 996,
+          "ASPI": 996,
+          "CCAP": 996,
+          "COMI": 996,
+          "COSG": 996,
+          "CSAG": 996
+        },
+        "top_leaders_by_fdr": {
+          "PRCL": 550,
+          "MCQE": 546,
+          "MBSC": 543,
+          "NCCW": 542,
+          "ODIN": 534,
+          "LCSW": 530,
+          "EPCO": 529,
+          "UNIT": 529,
+          "AMOC": 519,
+          "AFDI": 518
+        }
+      }
+    }
+  },
+  {
+    "source": "al_refaey",
+    "metrics": {
+      "ret": {
+        "pairwise_lag_tests": 153009,
+        "raw_significant": 9135,
+        "fdr_significant": 507,
+        "temporal_validated": 429,
+        "validation_rows": 507,
+        "top_leaders_by_all_tests": {
+          "ABUK": 784,
+          "ACAMD": 784,
+          "ACGC": 784,
+          "ACRO": 784,
+          "ADCI": 784,
+          "ADIB": 784,
+          "ADPC": 784,
+          "ADRI": 784,
+          "AFDI": 784,
+          "AFMC": 784
+        },
+        "top_leaders_by_fdr": {
+          "ORAS": 14,
+          "MFPC": 13,
+          "AIFI": 13,
+          "GPPL": 13,
+          "COSG": 13,
+          "OCDI": 10,
+          "MILS": 10,
+          "NIPH": 8,
+          "CCRS": 8,
+          "KWIN": 8
+        }
+      },
+      "illiquidity": {
+        "pairwise_lag_tests": 152418,
+        "raw_significant": 57275,
+        "fdr_significant": 43064,
+        "temporal_validated": 23659,
+        "validation_rows": 43055,
+        "top_leaders_by_all_tests": {
+          "ABUK": 784,
+          "ACAMD": 784,
+          "ACGC": 784,
+          "ACRO": 784,
+          "ADCI": 784,
+          "ADIB": 784,
+          "ADPC": 784,
+          "ADRI": 784,
+          "AFDI": 784,
+          "AFMC": 784
+        },
+        "top_leaders_by_fdr": {
+          "ATQA": 464,
+          "MCQE": 462,
+          "MPRC": 461,
+          "RAYA": 441,
+          "ATLC": 440,
+          "SVCE": 440,
+          "LCSW": 439,
+          "OIH": 437,
+          "PRCL": 434,
+          "IFAP": 431
+        }
+      },
+      "volatility": {
+        "pairwise_lag_tests": 153590,
+        "raw_significant": 16506,
+        "fdr_significant": 1807,
+        "temporal_validated": 1641,
+        "validation_rows": 1805,
+        "top_leaders_by_all_tests": {
+          "ABUK": 784,
+          "ACAMD": 784,
+          "ACGC": 784,
+          "ACRO": 784,
+          "ADCI": 784,
+          "ADIB": 784,
+          "ADPC": 784,
+          "ADRI": 784,
+          "AFDI": 784,
+          "AFMC": 784
+        },
+        "top_leaders_by_fdr": {
+          "MFPC": 59,
+          "OCDI": 58,
+          "AIH": 41,
+          "COSG": 41,
+          "ADRI": 40,
+          "MEGM": 37,
+          "MPCI": 32,
+          "ALCN": 31,
+          "GRCA": 30,
+          "MICH": 29
+        }
+      },
+      "abnormal_volume": {
+        "pairwise_lag_tests": 141925,
+        "raw_significant": 15028,
+        "fdr_significant": 152,
+        "temporal_validated": 137,
+        "validation_rows": 152,
+        "top_leaders_by_all_tests": {
+          "ABUK": 752,
+          "ACAMD": 752,
+          "ACGC": 752,
+          "ACRO": 752,
+          "ADCI": 752,
+          "ADIB": 752,
+          "ADPC": 752,
+          "ADRI": 752,
+          "AFDI": 752,
+          "AFMC": 752
+        },
+        "top_leaders_by_fdr": {
+          "AALR": 9,
+          "INFI": 6,
+          "AFMC": 5,
+          "NEDA": 4,
+          "ISMA": 4,
+          "CERA": 4,
+          "EGCH": 4,
+          "UEGC": 4,
+          "EPCO": 4,
+          "CAED": 4
+        }
+      },
+      "range": {
+        "pairwise_lag_tests": 152604,
+        "raw_significant": 42043,
+        "fdr_significant": 21862,
+        "temporal_validated": 17793,
+        "validation_rows": 21861,
+        "top_leaders_by_all_tests": {
+          "ABUK": 784,
+          "ACAMD": 784,
+          "ACGC": 784,
+          "ACRO": 784,
+          "ADCI": 784,
+          "ADIB": 784,
+          "ADPC": 784,
+          "ADRI": 784,
+          "AFDI": 784,
+          "AFMC": 784
+        },
+        "top_leaders_by_fdr": {
+          "SKPC": 351,
+          "TMGH": 338,
+          "SUGR": 328,
+          "MICH": 327,
+          "ELEC": 315,
+          "ORWE": 311,
+          "CIEB": 303,
+          "OCDI": 303,
+          "PHDC": 293,
+          "ECAP": 291
+        }
+      }
+    }
+  }
+]

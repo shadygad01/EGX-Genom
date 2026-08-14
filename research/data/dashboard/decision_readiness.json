@@ -71,7 +71,11 @@
       "free_cash_flow_latest": 3141000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ACTF",
@@ -121,7 +125,11 @@
       "free_cash_flow_latest": null
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ADIB",
@@ -171,7 +179,11 @@
       "free_cash_flow_latest": -57766000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AFDI",
@@ -223,7 +235,11 @@
       "free_cash_flow_latest": 614820000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AFMC",
@@ -294,7 +310,11 @@
       "free_cash_flow_latest": -37340000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AIDC",
@@ -346,7 +366,11 @@
       "free_cash_flow_latest": null
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AIHC",
@@ -398,7 +422,11 @@
       "free_cash_flow_latest": 813090000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ALCN",
@@ -472,7 +500,11 @@
       "free_cash_flow_latest": 4901000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AMER",
@@ -524,7 +556,11 @@
       "free_cash_flow_latest": 10040000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AMIA",
@@ -577,7 +613,11 @@
       "free_cash_flow_latest": -1859000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AMOC",
@@ -651,7 +691,11 @@
       "free_cash_flow_latest": 688730000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ARAB",
@@ -703,7 +747,11 @@
       "free_cash_flow_latest": -676760000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ARCC",
@@ -777,7 +825,11 @@
       "free_cash_flow_latest": 3022000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ASCM",
@@ -829,7 +881,11 @@
       "free_cash_flow_latest": -319340000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ASPI",
@@ -880,7 +936,11 @@
       "free_cash_flow_latest": -257390000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ATLC",
@@ -951,7 +1011,11 @@
       "free_cash_flow_latest": -1664000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ATQA",
@@ -1003,7 +1067,11 @@
       "free_cash_flow_latest": 1255000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "BIOC",
@@ -1077,7 +1145,11 @@
       "free_cash_flow_latest": 63550000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "BTFH",
@@ -1128,7 +1200,11 @@
       "free_cash_flow_latest": -11265000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "CCAP",
@@ -1180,7 +1256,11 @@
       "free_cash_flow_latest": 20372000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "CIEB",
@@ -1251,7 +1331,11 @@
       "free_cash_flow_latest": -6968000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "CNFN",
@@ -1303,7 +1387,11 @@
       "free_cash_flow_latest": 141790000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "COMI",
@@ -1373,7 +1461,11 @@
       "free_cash_flow_latest": -10695000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "COSG",
@@ -1425,7 +1517,11 @@
       "free_cash_flow_latest": -68040000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "CSAG",
@@ -1497,7 +1593,11 @@
       "free_cash_flow_latest": 26240000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "DAPH",
@@ -1549,7 +1649,11 @@
       "free_cash_flow_latest": -69010000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "DSCW",
@@ -1620,7 +1724,11 @@
       "free_cash_flow_latest": -1300000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EAST",
@@ -1693,7 +1801,11 @@
       "free_cash_flow_latest": -23677000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ECAP",
@@ -1746,7 +1858,11 @@
       "free_cash_flow_latest": -528490000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EFID",
@@ -1820,7 +1936,11 @@
       "free_cash_flow_latest": 3291000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EFIH",
@@ -1894,7 +2014,11 @@
       "free_cash_flow_latest": 2181000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EGAL",
@@ -1967,7 +2091,11 @@
       "free_cash_flow_latest": 3389000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EGCH",
@@ -2019,7 +2147,11 @@
       "free_cash_flow_latest": -104130000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EGTS",
@@ -2070,7 +2202,11 @@
       "free_cash_flow_latest": 303100000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EHDR",
@@ -2141,7 +2277,11 @@
       "free_cash_flow_latest": 94120000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ELSH",
@@ -2192,7 +2332,11 @@
       "free_cash_flow_latest": 46880000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EMFD",
@@ -2263,7 +2407,11 @@
       "free_cash_flow_latest": 8283000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ENGC",
@@ -2336,7 +2484,11 @@
       "free_cash_flow_latest": 277520000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ETEL",
@@ -2409,7 +2561,11 @@
       "free_cash_flow_latest": 9845000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ETRS",
@@ -2482,7 +2638,11 @@
       "free_cash_flow_latest": -59210000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "EXPA",
@@ -2532,7 +2692,11 @@
       "free_cash_flow_latest": -21556000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "FWRY",
@@ -2584,7 +2748,11 @@
       "free_cash_flow_latest": 2161000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "GBCO",
@@ -2637,7 +2805,11 @@
       "free_cash_flow_latest": -4666000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "GPIM",
@@ -2709,7 +2881,11 @@
       "free_cash_flow_latest": 6790000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "HDBK",
@@ -2760,7 +2936,11 @@
       "free_cash_flow_latest": 1313000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "HELI",
@@ -2833,7 +3013,11 @@
       "free_cash_flow_latest": -1355000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "HRHO",
@@ -2885,7 +3069,11 @@
       "free_cash_flow_latest": -23917000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ICFC",
@@ -2935,7 +3123,11 @@
       "free_cash_flow_latest": null
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "IDRE",
@@ -2985,7 +3177,11 @@
       "free_cash_flow_latest": -3760000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "IEEC",
@@ -3035,7 +3231,11 @@
       "free_cash_flow_latest": null
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "IFAP",
@@ -3062,7 +3262,11 @@
       "status": "unknown"
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ISMA",
@@ -3114,7 +3318,11 @@
       "free_cash_flow_latest": -8580000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ISMQ",
@@ -3187,7 +3395,11 @@
       "free_cash_flow_latest": 898020000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ISPH",
@@ -3240,7 +3452,11 @@
       "free_cash_flow_latest": -805660000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "JUFO",
@@ -3312,7 +3528,11 @@
       "free_cash_flow_latest": -2247000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "KABO",
@@ -3364,7 +3584,11 @@
       "free_cash_flow_latest": -118860000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "KRDI",
@@ -3416,7 +3640,11 @@
       "free_cash_flow_latest": -36270000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "LCSW",
@@ -3487,7 +3715,11 @@
       "free_cash_flow_latest": -662740000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MASR",
@@ -3540,7 +3772,11 @@
       "free_cash_flow_latest": 93140000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MCQE",
@@ -3612,7 +3848,11 @@
       "free_cash_flow_latest": 2687000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MCRO",
@@ -3684,7 +3924,11 @@
       "free_cash_flow_latest": 118510000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MEPA",
@@ -3755,7 +3999,11 @@
       "free_cash_flow_latest": -15250000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MFPC",
@@ -3829,7 +4077,11 @@
       "free_cash_flow_latest": 5383000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MOED",
@@ -3881,7 +4133,11 @@
       "free_cash_flow_latest": -1200000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MPCI",
@@ -3954,7 +4210,11 @@
       "free_cash_flow_latest": 65650000.00000001
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MPCO",
@@ -4006,7 +4266,11 @@
       "free_cash_flow_latest": -40660000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MPRC",
@@ -4079,7 +4343,11 @@
       "free_cash_flow_latest": 460910000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MTIE",
@@ -4151,7 +4419,11 @@
       "free_cash_flow_latest": 383890000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "NCCW",
@@ -4222,7 +4494,11 @@
       "free_cash_flow_latest": 49660000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "NIPH",
@@ -4249,7 +4525,11 @@
       "status": "unknown"
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "OBRI",
@@ -4320,7 +4600,11 @@
       "free_cash_flow_latest": 192910000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "OCDI",
@@ -4372,7 +4656,11 @@
       "free_cash_flow_latest": -5866000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "OFH",
@@ -4443,7 +4731,11 @@
       "free_cash_flow_latest": 560000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "OIH",
@@ -4495,7 +4787,11 @@
       "free_cash_flow_latest": -946200000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ORAS",
@@ -4545,7 +4841,11 @@
       "free_cash_flow_latest": null
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ORHD",
@@ -4617,7 +4917,11 @@
       "free_cash_flow_latest": 1893000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ORWE",
@@ -4690,7 +4994,11 @@
       "free_cash_flow_latest": 1313000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "PHAR",
@@ -4743,7 +5051,11 @@
       "free_cash_flow_latest": -261149999.99999997
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "PHDC",
@@ -4815,7 +5127,11 @@
       "free_cash_flow_latest": 451140000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "POUL",
@@ -4888,7 +5204,11 @@
       "free_cash_flow_latest": 1286000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "PRCL",
@@ -4940,7 +5260,11 @@
       "free_cash_flow_latest": -28620000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "RACC",
@@ -5012,7 +5336,11 @@
       "free_cash_flow_latest": 264209999.99999997
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "RAYA",
@@ -5065,7 +5393,11 @@
       "free_cash_flow_latest": -2878000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "RMDA",
@@ -5138,7 +5470,11 @@
       "free_cash_flow_latest": -199570000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "SCEM",
@@ -5210,7 +5546,11 @@
       "free_cash_flow_latest": 3049000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "SDTI",
@@ -5262,7 +5602,11 @@
       "free_cash_flow_latest": 101370000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "SIPC",
@@ -5333,7 +5677,11 @@
       "free_cash_flow_latest": 10760000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "SKPC",
@@ -5405,7 +5753,11 @@
       "free_cash_flow_latest": -172710000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "SVCE",
@@ -5457,7 +5809,11 @@
       "free_cash_flow_latest": 24340000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "SWDY",
@@ -5510,7 +5866,11 @@
       "free_cash_flow_latest": 2344000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "TALM",
@@ -5562,7 +5922,11 @@
       "free_cash_flow_latest": -540540000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "TANM",
@@ -5633,7 +5997,11 @@
       "free_cash_flow_latest": null
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-06-30",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "TAQA",
@@ -5702,7 +6070,11 @@
       "free_cash_flow_latest": 1783000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "TMGH",
@@ -5755,7 +6127,11 @@
       "free_cash_flow_latest": -2664000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "UEGC",
@@ -5807,7 +6183,11 @@
       "free_cash_flow_latest": 477690000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "UNIP",
@@ -5878,7 +6258,11 @@
       "free_cash_flow_latest": 159860000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "VALU",
@@ -5929,7 +6313,11 @@
       "free_cash_flow_latest": -8061000000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "VLMR",
@@ -5956,7 +6344,11 @@
       "status": "unknown"
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "VLMRA",
@@ -6006,7 +6398,11 @@
       "free_cash_flow_latest": null
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ZEOT",
@@ -6033,7 +6429,11 @@
       "status": "unknown"
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ZMID",
@@ -6106,6 +6506,10 @@
       "free_cash_flow_latest": -395030000.0
     },
     "event_status": "not_structured",
-    "event_flags": []
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2026-03-31",
+    "temporal_status": "period_end_only_not_point_in_time"
   }
 ]

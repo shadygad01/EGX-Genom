@@ -1,0 +1,32 @@
+{
+  "as_of": "2026-08-14",
+  "universe": 101,
+  "price_series": 101,
+  "published_at_records": 0,
+  "valuation_period_end_records": 48,
+  "historical_ranking_status": "blocked_insufficient_point_in_time_inputs",
+  "metrics": {
+    "top_1": null,
+    "top_3": null,
+    "top_5": null,
+    "top_10": null,
+    "rank_ic": null,
+    "mean_realized_return": null,
+    "mfe": null,
+    "mae": null,
+    "time_to_target": null
+  },
+  "required_inputs": [
+    "decision snapshots by as_of",
+    "published_at for each financial input",
+    "forward returns after each decision",
+    "frozen universe by as_of",
+    "corporate-action-adjusted prices"
+  ],
+  "available_price_window_summary": {
+    "series_with_60_bars": 99,
+    "latest_price_date_max": "2026-08-13",
+    "latest_price_date_min": "2026-08-12"
+  },
+  "note": "No Top-K or realized-return metric is produced because current Fair Value snapshots are not point-in-time and no joined forward-return ledger exists."
+}

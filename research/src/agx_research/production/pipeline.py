@@ -484,17 +484,37 @@ class ProductionPipeline:
                 shutil.rmtree(staging_dir, ignore_errors=True)
         return final_report
 
+    @staticmethod
+    def _has_material_collection_output(result: CollectionRunResult) -> bool:
+        return any(
+            getattr(result, field, 0) > 0
+            for field in (
+                "batches_materialized",
+                "price_bars_written",
+                "macro_observations_written",
+                "news_items_written",
+                "corporate_events_written",
+                "index_constituents_written",
+                "financial_statement_line_items_written",
+                "events_registered",
+            )
+        )
+
     def _overall_status(self, stages: list[StageResult]) -> StageStatus:
-        """`derive_overall_status`'s generic per-stage rule, plus the
-        mission's explicit LIVE-mode failure policy: never silently fall
-        back to mock, and if no live source succeeds at all, fail loudly
-        rather than report the milder PARTIAL a generic per-stage rule
-        would otherwise compute (most later stages "succeed" vacuously with
-        zero rows once collection produces nothing).
+        """Apply the live-mode no-fabrication gate after generic stage status.
+
+        A collector result object can exist even when its request failed or
+        parsed zero usable records. Dictionary presence is not evidence of a
+        successful live collection, so at least one material output is
+        required before a live run can be called anything other than failed.
         """
         status = derive_overall_status(stages)
-        if self.mode == ExecutionMode.LIVE and not self.collection_results:
-            return StageStatus.FAILED
+        if self.mode == ExecutionMode.LIVE:
+            if not any(
+                self._has_material_collection_output(result)
+                for result in self.collection_results.values()
+            ):
+                return StageStatus.FAILED
         return status
 
     # ---- individual stages ---------------------------------------------
@@ -707,7 +727,13 @@ class ProductionPipeline:
                 expected_records=EXPECTED_RECORDS_LIVE,
             )
             self.capability_decisions.append(decision)
-            self.collection_results.update(results)
+            for source_id, result in results.items():
+                if self._has_material_collection_output(result):
+                    self.collection_results[source_id] = result
+                else:
+                    reason = "collector returned zero usable records"
+                    self.collector_failures.setdefault(source_id, reason)
+                    failures.append(f"{source_id}: {reason}")
             self.collector_failures.update(capability_failures)
             for source_id, reason in capability_failures.items():
                 failures.append(f"{source_id}: {reason}")

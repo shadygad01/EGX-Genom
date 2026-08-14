@@ -104,6 +104,61 @@ DECISION_ROUTES: dict[str, dict[str, Any]] = {
             "meta_decision_engine",
         ],
     },
+    "egx_financial_statements": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_performance_agent",
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
+    "fra_financial_statements": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_performance_agent",
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
+    "mubasher_financials": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_performance_agent",
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
+    "stockanalysis_financials": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_performance_agent",
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
+    "company_ir": {
+        "records": ["financial_statement_line_items", "financial_decision_metrics"],
+        "consumers": [
+            "financial_performance_agent",
+            "fair_value_engine",
+            "financial_readiness",
+            "company_workspace",
+            "opportunity_center",
+            "meta_decision_engine",
+        ],
+    },
     "rmda_ir": {
         "records": ["financial_statement_line_items"],
         "consumers": [

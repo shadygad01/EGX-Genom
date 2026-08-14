@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import ssl
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -64,6 +65,7 @@ class HttpFetcher:
         self.respect_robots = respect_robots
         self.timeout_seconds = timeout_seconds
         self._last_request_at: dict[str, float] = {}
+        self._rate_lock = threading.Lock()
         self._robots_cache: dict[str, urllib.robotparser.RobotFileParser] = {}
         self._robots_unreachable: dict[str, bool] = {}
         # Real network round-trip time per successful request (urlopen+read
@@ -170,18 +172,23 @@ class HttpFetcher:
             raise FetchDisallowed(f"robots.txt disallows {url}")
 
         min_interval = spec.rate_limit.min_seconds_between_requests
-        last = self._last_request_at.get(spec.id)
-        if last is not None:
-            elapsed = time.monotonic() - last
-            if elapsed < min_interval:
-                time.sleep(min_interval - elapsed)
 
         attempts = 0
         delay = spec.retry_policy.backoff_seconds
         last_error: Exception | None = None
         while attempts < spec.retry_policy.max_attempts:
             attempts += 1
-            self._last_request_at[spec.id] = time.monotonic()
+            # Reserve the next *new request* slot atomically. Retries retain
+            # the existing exponential-backoff semantics; new ticker requests
+            # are serialized by the source's declared minimum interval.
+            if attempts == 1:
+                with self._rate_lock:
+                    now = time.monotonic()
+                    last = self._last_request_at.get(spec.id)
+                    next_allowed = now if last is None else max(now, last + min_interval)
+                    self._last_request_at[spec.id] = next_allowed
+                if next_allowed > now:
+                    time.sleep(next_allowed - now)
             try:
                 request = urllib.request.Request(
                     _encode_request_url(url), headers={"User-Agent": _USER_AGENT}

@@ -8,6 +8,7 @@ priority when both sources cover the same period.
 from __future__ import annotations
 
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from urllib.parse import urlsplit
 
@@ -49,21 +50,31 @@ class StockAnalysisFinancialsCollector(Collector):
         return f"https://stockanalysis.com/quote/egx/{ticker}/financials/"
 
     def fetch(self) -> list[RawDocument]:
-        documents = []
-        for ticker in self.tickers:
+        # Bounded fan-out overlaps slow public-page latency. HttpFetcher
+        # atomically reserves each source request slot, so policy compliance is
+        # retained and output order remains deterministic.
+        def fetch_one(ticker: str) -> RawDocument | None:
             url = self.url(ticker)
             try:
                 html = self.fetcher.fetch_text(url, self.spec)
             except (FetchDisallowed, FetchError, OSError, UnicodeError):
-                continue
+                return None
             if "Financials Overview" not in html and "financials" not in html.casefold():
-                continue
-            documents.append(build_raw_document(
+                return None
+            return build_raw_document(
                 source_id=self.spec.id, collector=self.name, collector_version=self.version,
                 original_url=url, content_text=html, schema_version=self.spec.schema_version,
                 license=self.spec.license,
-            ))
-        return documents
+            )
+
+        documents_by_ticker: dict[str, RawDocument] = {}
+        with ThreadPoolExecutor(max_workers=min(6, max(1, len(self.tickers)))) as executor:
+            futures = {executor.submit(fetch_one, ticker): ticker for ticker in self.tickers}
+            for future in as_completed(futures):
+                document = future.result()
+                if document is not None:
+                    documents_by_ticker[futures[future]] = document
+        return [documents_by_ticker[ticker] for ticker in self.tickers if ticker in documents_by_ticker]
 
     def parse(self, document: RawDocument) -> CollectionBatch:
         ticker = self._ticker_from_url(document.original_url)

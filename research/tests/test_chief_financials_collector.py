@@ -149,3 +149,16 @@ def test_discovers_public_csv_and_maps_only_explicit_financial_headers():
     assert latest["shares_outstanding"] == 50
     assert latest["historical_pe"] == 9
     assert latest["historical_pb"] == 2.3
+
+
+def test_company_name_filter_is_case_insensitive_and_selects_real_pages():
+    collector = ChiefFinancialsCollector.__new__(ChiefFinancialsCollector)
+    collector.companies = {
+        "ETEL": "Telecom Egypt",
+        "COMI": "Commercial International Bank-Egypt (CIB)",
+    }
+    urls = {
+        "https://chiefcapitalco.com/companies/telecom-egypt/",
+        "https://chiefcapitalco.com/companies/commercial-international-bank-egypt-cib/",
+    }
+    assert collector._target_company_urls(urls) == urls

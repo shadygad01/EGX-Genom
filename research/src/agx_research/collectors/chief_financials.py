@@ -108,7 +108,7 @@ class ChiefFinancialsCollector(Collector):
             for ticker, name in self.companies.items():
                 name_tokens = {
                     token.casefold()
-                    for token in re.findall(r"[a-z0-9]+", name)
+                    for token in re.findall(r"[a-z0-9]+", name.casefold())
                     if len(token) >= 4
                 }
                 slug_tokens = set(re.findall(r"[a-z0-9]+", slug))

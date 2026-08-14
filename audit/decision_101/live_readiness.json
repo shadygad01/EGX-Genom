@@ -8,6 +8,7 @@
       "source": "stockanalysis",
       "line_items": 51,
       "shares_outstanding": 1261875720.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ABUK",
         "as_of": "2026-08-14",
@@ -40,6 +41,7 @@
       "source": "mubasher",
       "line_items": 98,
       "shares_outstanding": null,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -48,6 +50,7 @@
       "source": "stockanalysis",
       "line_items": 36,
       "shares_outstanding": 1500000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -56,6 +59,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 18000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -64,6 +68,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 32891778.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -72,6 +77,7 @@
       "source": "mubasher",
       "line_items": 17,
       "shares_outstanding": 1558128698.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -80,6 +86,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 1558128698.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -88,6 +95,7 @@
       "source": "stockanalysis",
       "line_items": 42,
       "shares_outstanding": 2979506800.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ALCN",
         "as_of": "2026-08-14",
@@ -120,6 +128,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 902789840.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -128,6 +137,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 510570561.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -136,6 +146,7 @@
       "source": "stockanalysis",
       "line_items": 51,
       "shares_outstanding": 1291500000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "AMOC",
         "as_of": "2026-08-14",
@@ -168,6 +179,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 23902963390.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -176,6 +188,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 374867445.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ARCC",
         "as_of": "2026-08-14",
@@ -207,6 +220,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 48702431.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -215,6 +229,7 @@
       "source": "stockanalysis",
       "line_items": 41,
       "shares_outstanding": 2000000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -223,6 +238,7 @@
       "source": "stockanalysis",
       "line_items": 43,
       "shares_outstanding": 400000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -231,6 +247,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 1200000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -239,6 +256,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 83514200.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "BIOC",
         "as_of": "2026-08-14",
@@ -271,6 +289,7 @@
       "source": "stockanalysis",
       "line_items": 41,
       "shares_outstanding": 10718106944.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -279,6 +298,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 4226464000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -287,6 +307,7 @@
       "source": "stockanalysis",
       "line_items": 39,
       "shares_outstanding": 1250000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "CIEB",
         "as_of": "2026-08-14",
@@ -318,6 +339,7 @@
       "source": "stockanalysis",
       "line_items": 43,
       "shares_outstanding": 1196974000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -326,6 +348,7 @@
       "source": "stockanalysis",
       "line_items": 40,
       "shares_outstanding": 3405139100.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -334,6 +357,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 624000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -342,6 +366,7 @@
       "source": "stockanalysis",
       "line_items": 45,
       "shares_outstanding": 300000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "CSAG",
         "as_of": "2026-08-14",
@@ -374,6 +399,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 23522400.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -382,6 +408,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 2679967171.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -390,6 +417,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 3000000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "EAST",
         "as_of": "2026-08-14",
@@ -421,6 +449,7 @@
       "source": "stockanalysis",
       "line_items": 47,
       "shares_outstanding": 53342513.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -429,6 +458,7 @@
       "source": "stockanalysis",
       "line_items": 51,
       "shares_outstanding": 1389021139.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "EFID",
         "as_of": "2026-08-14",
@@ -461,6 +491,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 3447115516.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "EFIH",
         "as_of": "2026-08-14",
@@ -492,6 +523,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 412500000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "EGAL",
         "as_of": "2026-08-14",
@@ -524,6 +556,7 @@
       "source": "stockanalysis",
       "line_items": 45,
       "shares_outstanding": 1986578999.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -532,6 +565,7 @@
       "source": "stockanalysis",
       "line_items": 41,
       "shares_outstanding": 1050000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -540,6 +574,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 672000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "EHDR",
         "as_of": "2026-08-14",
@@ -571,6 +606,7 @@
       "source": "stockanalysis",
       "line_items": 39,
       "shares_outstanding": 226875000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -579,6 +615,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 5446929384.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "EMFD",
         "as_of": "2026-08-14",
@@ -610,6 +647,7 @@
       "source": "stockanalysis",
       "line_items": 48,
       "shares_outstanding": 145500000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -618,6 +656,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 1707071600.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ETEL",
         "as_of": "2026-08-14",
@@ -649,6 +688,7 @@
       "source": "stockanalysis",
       "line_items": 48,
       "shares_outstanding": 224949817.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ETRS",
         "as_of": "2026-08-14",
@@ -680,6 +720,7 @@
       "source": "stockanalysis",
       "line_items": 35,
       "shares_outstanding": 1360000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -688,6 +729,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 3406523244.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "FWRY",
         "as_of": "2026-08-14",
@@ -719,6 +761,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 1085500000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -727,6 +770,7 @@
       "source": "stockanalysis",
       "line_items": 44,
       "shares_outstanding": 1636363630.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "GPIM",
         "as_of": "2026-08-14",
@@ -758,6 +802,7 @@
       "source": "stockanalysis",
       "line_items": 40,
       "shares_outstanding": 1062600000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -766,6 +811,7 @@
       "source": "stockanalysis",
       "line_items": 47,
       "shares_outstanding": 4005255600.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "HELI",
         "as_of": "2026-08-14",
@@ -797,6 +843,7 @@
       "source": "stockanalysis",
       "line_items": 42,
       "shares_outstanding": 1435893008.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -805,6 +852,7 @@
       "source": "mubasher",
       "line_items": 179,
       "shares_outstanding": null,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -813,6 +861,7 @@
       "source": "stockanalysis",
       "line_items": 34,
       "shares_outstanding": 36838250.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -821,6 +870,7 @@
       "source": "mubasher",
       "line_items": 193,
       "shares_outstanding": null,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -829,6 +879,7 @@
       "source": "stockanalysis",
       "line_items": 47,
       "shares_outstanding": 497288366.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -837,6 +888,7 @@
       "source": "stockanalysis",
       "line_items": 45,
       "shares_outstanding": 89856499.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -845,6 +897,7 @@
       "source": "stockanalysis",
       "line_items": 36,
       "shares_outstanding": 976872278.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ISMQ",
         "as_of": "2026-08-14",
@@ -877,6 +930,7 @@
       "source": "stockanalysis",
       "line_items": 48,
       "shares_outstanding": 1008000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -885,6 +939,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 1470945441.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -893,6 +948,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 564693841.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -901,6 +957,7 @@
       "source": "stockanalysis",
       "line_items": 37,
       "shares_outstanding": 2000000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -909,6 +966,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 80000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -917,6 +975,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 2135000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -925,6 +984,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 96000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "MCQE",
         "as_of": "2026-08-14",
@@ -956,6 +1016,7 @@
       "source": "stockanalysis",
       "line_items": 48,
       "shares_outstanding": 570206456.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -964,6 +1025,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 655000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -972,6 +1034,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 2868140263.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "MFPC",
         "as_of": "2026-08-14",
@@ -1004,6 +1067,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 1005000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1012,6 +1076,7 @@
       "source": "stockanalysis",
       "line_items": 48,
       "shares_outstanding": 22750000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "MPCI",
         "as_of": "2026-08-14",
@@ -1044,6 +1109,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 1000000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1052,6 +1118,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 225000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "MPRC",
         "as_of": "2026-08-14",
@@ -1083,6 +1150,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 2265930177.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "MTIE",
         "as_of": "2026-08-14",
@@ -1114,6 +1182,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 252001008.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1122,6 +1191,7 @@
       "source": "stockanalysis",
       "line_items": 51,
       "shares_outstanding": 50000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1130,6 +1200,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 40000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1138,6 +1209,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 1289293586.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1146,6 +1218,7 @@
       "source": "stockanalysis",
       "line_items": 37,
       "shares_outstanding": 4626699188.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1154,6 +1227,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 5245690620.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1162,6 +1236,7 @@
       "source": "mubasher",
       "line_items": 203,
       "shares_outstanding": null,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1170,6 +1245,7 @@
       "source": "stockanalysis",
       "line_items": 47,
       "shares_outstanding": 1130473523.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ORHD",
         "as_of": "2026-08-14",
@@ -1201,6 +1277,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 665107268.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ORWE",
         "as_of": "2026-08-14",
@@ -1233,6 +1310,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 168755750.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1241,6 +1319,7 @@
       "source": "stockanalysis",
       "line_items": 47,
       "shares_outstanding": 2839980164.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1249,6 +1328,7 @@
       "source": "stockanalysis",
       "line_items": 48,
       "shares_outstanding": 479001600.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "POUL",
         "as_of": "2026-08-14",
@@ -1280,6 +1360,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 50365900.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1288,6 +1369,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 199206202.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "RACC",
         "as_of": "2026-08-14",
@@ -1319,6 +1401,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 4277797768.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1327,6 +1410,7 @@
       "source": "stockanalysis",
       "line_items": 48,
       "shares_outstanding": 2000000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "RMDA",
         "as_of": "2026-08-14",
@@ -1358,6 +1442,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 260812477.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "SCEM",
         "as_of": "2026-08-14",
@@ -1389,6 +1474,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 52985460.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1397,6 +1483,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 250000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1405,6 +1492,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 1134000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1413,6 +1501,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 482256840.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1421,6 +1510,7 @@
       "source": "stockanalysis",
       "line_items": 49,
       "shares_outstanding": 2139355716.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1429,6 +1519,7 @@
       "source": "stockanalysis",
       "line_items": 45,
       "shares_outstanding": 734037191.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1437,6 +1528,7 @@
       "source": "mubasher",
       "line_items": 208,
       "shares_outstanding": 145500000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "TANM",
         "as_of": "2026-08-14",
@@ -1468,6 +1560,7 @@
       "source": "stockanalysis",
       "line_items": 36,
       "shares_outstanding": 1334353800.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1476,6 +1569,7 @@
       "source": "stockanalysis",
       "line_items": 50,
       "shares_outstanding": 2060653786.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1484,6 +1578,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 725231685.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1492,6 +1587,7 @@
       "source": "stockanalysis",
       "line_items": 46,
       "shares_outstanding": 2291442606.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1500,6 +1596,7 @@
       "source": "stockanalysis",
       "line_items": 41,
       "shares_outstanding": 2106356523.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1508,6 +1605,7 @@
       "source": "stockanalysis",
       "line_items": 51,
       "shares_outstanding": 1174482138.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "VLMR",
         "as_of": "2026-08-14",
@@ -1540,6 +1638,7 @@
       "source": "mubasher",
       "line_items": 170,
       "shares_outstanding": null,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1548,6 +1647,7 @@
       "source": "stockanalysis",
       "line_items": 47,
       "shares_outstanding": 200000000.0,
+      "financial_validation": null,
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1556,6 +1656,7 @@
       "source": "stockanalysis",
       "line_items": 45,
       "shares_outstanding": 1000000000.0,
+      "financial_validation": null,
       "fair_value": {
         "ticker": "ZMID",
         "as_of": "2026-08-14",

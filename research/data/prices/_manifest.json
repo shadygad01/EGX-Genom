@@ -1,10 +1,10 @@
 {
   "fetched_at": "2026-08-14T11:24:17.779824+00:00",
-  "source": "Yahoo Finance (.CA / .EG / bare)",
+  "source": "Yahoo Finance chart endpoint + StockAnalysis history + Mubasher current stock pages",
   "universe_file": "universe.json",
   "total_universe": 101,
-  "success_count": 99,
-  "failed_count": 2,
+  "success_count": 101,
+  "failed_count": 0,
   "success": {
     "ABUK": {
       "bars": 272,
@@ -599,10 +599,23 @@
       "symbol": "ZMID.CA(cache)",
       "latest": "2026-08-13",
       "close": "7.68"
+    },
+    "ACTF": {
+      "bars": 22,
+      "symbol": "Mubasher:EGX:ACTF",
+      "latest": "2026-08-13",
+      "close": "2.76",
+      "source_url": "https://english.mubasher.info/markets/EGX/stocks/ACTF/",
+      "source_as_of": "2026-08-13"
+    },
+    "IEEC": {
+      "bars": 22,
+      "symbol": "Mubasher:EGX:IEEC",
+      "latest": "2026-08-13",
+      "close": "0.90",
+      "source_url": "https://english.mubasher.info/markets/EGX/stocks/IEEC/",
+      "source_as_of": "2026-08-13"
     }
   },
-  "failed": [
-    "ACTF",
-    "IEEC"
-  ]
+  "failed": []
 }

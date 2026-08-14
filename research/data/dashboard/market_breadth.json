@@ -1,13 +1,13 @@
 {
   "as_of": "2026-08-14",
   "universe_count": 101,
-  "tickers_with_price_data": 99,
-  "tickers_with_volume_data": 98,
+  "tickers_with_price_data": 101,
+  "tickers_with_volume_data": 100,
   "advancers": 73,
   "decliners": 4,
-  "unchanged": 22,
+  "unchanged": 24,
   "advance_decline_ratio": 18.25,
-  "average_daily_return_pct": 1.0822,
-  "tickers_above_average_volume": 98,
+  "average_daily_return_pct": 1.1114,
+  "tickers_above_average_volume": 100,
   "tickers_below_average_volume": 1
 }

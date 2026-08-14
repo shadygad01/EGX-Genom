@@ -2,6 +2,7 @@ from __future__ import annotations
 import json,re,urllib.request,csv,sys
 from concurrent.futures import ThreadPoolExecutor,as_completed
 from datetime import UTC,date,datetime
+import math
 from pathlib import Path
 sys.path[:0]=['/home/ubuntu/EGX-Genom/research/src','/home/ubuntu/EGX-Genom/research/scripts']
 from agx_research.collectors.raw import build_raw_document
@@ -24,6 +25,13 @@ def shares_from_stats(ticker):
 class InMemory(FinancialStatementProvider):
     def __init__(self,items):self.items=items
     def get_line_items(self,ticker,start,end,*,statement_type=None):return [x for x in self.items if x.ticker==ticker and start<=x.period_end_date<=end and (statement_type is None or x.statement_type==statement_type)]
+def validate_items(items):
+    if not items:return items,'missing_line_items'
+    currencies={('EGP' if 'EGP' in str(x.currency).upper() else str(x.currency).strip()) for x in items}
+    if len(currencies)>1:return [],'mixed_currency'
+    if any(not math.isfinite(float(x.value)) for x in items):return [],'non_finite_value'
+    if any(x.period_end_date>date.today() for x in items):return [],'future_period'
+    return items,None
 def main():
     specs=seed_registry(); spec=specs.latest('stockanalysis_financials'); mub_spec=specs.latest('mubasher_financials'); universe={}
     for p in (ROOT/'research'/'data'/'universe').glob('EGX*.csv'):
@@ -59,8 +67,9 @@ def main():
                 latest=max((x.period_end_date for x in batch.financial_statement_line_items),default=date.min)
                 from agx_research.financials.schema import FinancialStatementLineItem
                 batch.financial_statement_line_items.append(FinancialStatementLineItem(ticker=t,period_end_date=latest,period_type='ANNUAL',statement_type='BALANCE_SHEET',line_item='shares_outstanding',value=sh,currency='EGP'))
-            fv=FairValueEngine(InMemory(batch.financial_statement_line_items)).value(t,date.today(),sector=None)
-            return {'ticker':t,'source':source,'line_items':len(batch.financial_statement_line_items),'shares_outstanding':sh,'fair_value':fv.model_dump(mode='json') if fv else None,'warning':None if fv else 'valuation_engine_insufficient_models_or_stale_period'}
+            validated,validation_warning=validate_items(batch.financial_statement_line_items)
+            fv=FairValueEngine(InMemory(validated)).value(t,date.today(),sector=None) if not validation_warning else None
+            return {'ticker':t,'source':source,'line_items':len(validated),'shares_outstanding':sh,'financial_validation':validation_warning,'fair_value':fv.model_dump(mode='json') if fv else None,'warning':validation_warning or (None if fv else 'valuation_engine_insufficient_models_or_stale_period')}
         except Exception as e:return {'ticker':t,'source':'stockanalysis_then_mubasher','line_items':0,'shares_outstanding':None,'fair_value':None,'warning':f'{type(e).__name__}: {e}'}
     rows=[]; tickers=sorted(universe)
     with ThreadPoolExecutor(max_workers=16) as ex:

@@ -1078,6 +1078,33 @@
     }
   },
   {
+    "ticker": "ACTF",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.2559,
+    "current_price": 2.76,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ACTF: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 22,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
     "ticker": "ADIB",
     "as_of": "2026-08-14",
     "action": "abstain",
@@ -1949,6 +1976,35 @@
     },
     "data_quality": {
       "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "IEEC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 1.0641,
+    "current_price": 0.9,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "IEEC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+98.7%)",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+98.7%)"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 22,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
       "financial_periods": 5

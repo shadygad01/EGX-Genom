@@ -14,10 +14,9 @@
     },
     "reason_counts": {
       "engine_action": 33,
-      "missing_or_stale_price": 2,
-      "missing_fair_value": 66
+      "missing_fair_value": 68
     },
-    "usable_price_count": 99,
+    "usable_price_count": 101,
     "fair_value_count": 33,
     "note": "No fair values are fabricated; financial coverage alone does not create a valuation."
   },
@@ -48,12 +47,12 @@
       "coverage_source": "mubasher",
       "financial_line_items": 98,
       "financial_periods": 8,
-      "price_bars": 21,
-      "price_status": "missing_or_stale",
+      "price_bars": 22,
+      "price_status": "usable",
       "action": "abstain",
-      "reason": "missing_or_stale_price",
+      "reason": "missing_fair_value",
       "confidence": 0.0,
-      "current_price": null,
+      "current_price": 2.76,
       "fair_value": null,
       "upside_pct": null,
       "combined_expected_return": null
@@ -912,12 +911,12 @@
       "coverage_source": "mubasher",
       "financial_line_items": 193,
       "financial_periods": 20,
-      "price_bars": 21,
-      "price_status": "missing_or_stale",
+      "price_bars": 22,
+      "price_status": "usable",
       "action": "abstain",
-      "reason": "missing_or_stale_price",
+      "reason": "missing_fair_value",
       "confidence": 0.0,
-      "current_price": null,
+      "current_price": 0.9,
       "fair_value": null,
       "upside_pct": null,
       "combined_expected_return": null

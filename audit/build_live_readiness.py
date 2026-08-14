@@ -40,6 +40,19 @@ def classify_sector(company):
     if any(k in c for k in ('technology','software','informatics')): return 'Technology'
     if any(k in c for k in ('cement','fertilizer','steel','chem')): return 'Materials'
     return None
+def earnings_quality_snapshot(items):
+    by={}
+    for x in items: by.setdefault(x.line_item,[]).append((x.period_end_date,float(x.value)))
+    for k in by: by[k]=[v for _,v in sorted(by[k])]
+    ni=by.get('net_income',[]); cfo=by.get('operating_cash_flow',[]); fcf=by.get('free_cash_flow',[])
+    latest_ni=ni[-1] if ni else None; latest_cfo=cfo[-1] if cfo else None
+    ratio=(latest_cfo/latest_ni) if latest_ni not in (None,0) and latest_cfo is not None else None
+    positive_cfo=sum(v>0 for v in cfo[-3:])
+    quality='unknown'
+    if latest_ni is not None and latest_ni>0 and latest_cfo is not None and latest_cfo>0 and (ratio is None or ratio>=0.8): quality='cash_supported'
+    elif latest_ni is not None and latest_ni>0 and latest_cfo is not None and latest_cfo<=0: quality='cash_mismatch'
+    elif latest_ni is not None and latest_ni<=0: quality='loss'
+    return {'status':quality,'net_income_latest':latest_ni,'operating_cash_flow_latest':latest_cfo,'cash_to_net_income_ratio':round(ratio,3) if ratio is not None else None,'positive_cfo_periods_last_3':positive_cfo,'free_cash_flow_latest':fcf[-1] if fcf else None}
 def model_gate_snapshot(items, shares):
     latest={}
     for x in sorted(items,key=lambda z:z.period_end_date): latest[x.line_item]=x.value
@@ -107,8 +120,9 @@ def main():
             validated,validation_warning=validate_items(batch.financial_statement_line_items)
             sector=classify_sector(universe.get(t,''))
             diagnostics=model_gate_snapshot(validated,sh) if not validation_warning else {'available_fields':[],'model_gates':{}}
+            earnings_quality=earnings_quality_snapshot(validated) if not validation_warning else {'status':'unknown'}
             fv=FairValueEngine(InMemory(validated)).value(t,date.today(),sector=sector) if not validation_warning else None
-            return {'ticker':t,'company_name':universe.get(t,''),'sector':sector,'source':source,'line_items':len(validated),'shares_outstanding':sh,'financial_validation':validation_warning,'diagnostics':diagnostics,'fair_value':fv.model_dump(mode='json') if fv else None,'warning':validation_warning or (None if fv else 'valuation_engine_insufficient_models_or_stale_period')}
+            return {'ticker':t,'company_name':universe.get(t,''),'sector':sector,'source':source,'line_items':len(validated),'financial_periods':len({x.period_end_date for x in validated}),'shares_outstanding':sh,'financial_validation':validation_warning,'diagnostics':diagnostics,'earnings_quality':earnings_quality,'event_status':'not_structured','event_flags':[],'fair_value':fv.model_dump(mode='json') if fv else None,'warning':validation_warning or (None if fv else 'valuation_engine_insufficient_models_or_stale_period')}
         except Exception as e:return {'ticker':t,'source':'stockanalysis_then_mubasher','line_items':0,'shares_outstanding':None,'fair_value':None,'warning':f'{type(e).__name__}: {e}'}
     rows=[]; tickers=sorted(universe)
     with ThreadPoolExecutor(max_workers=16) as ex:

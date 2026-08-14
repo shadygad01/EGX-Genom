@@ -206,6 +206,42 @@ def score_ticker(
         if momentum is not None:
             combined_return += momentum * 0.2  # 20% weight on momentum
 
+    # ── Data quality, earnings quality, events and execution overlay ────
+    eq = readiness.get("earnings_quality") or {}
+    source = str(readiness.get("source") or "")
+    quality_score = 100
+    quality_notes = []
+    if source == "mubasher":
+        quality_score -= 10
+        quality_notes.append("Secondary financial source")
+    if readiness.get("financial_periods", 0) < 3:
+        quality_score -= 10
+        quality_notes.append("Fewer than 3 reporting periods")
+    if eq.get("status") == "cash_mismatch":
+        quality_score -= 20
+        quality_notes.append("Earnings are not supported by operating cash flow")
+    elif eq.get("status") == "loss":
+        quality_score -= 15
+        quality_notes.append("Latest net income is negative")
+    elif eq.get("status") == "unknown":
+        quality_score -= 10
+        quality_notes.append("Earnings quality is not fully observable")
+    if len((readiness.get("diagnostics") or {}).get("available_fields", [])) < 5:
+        quality_score -= 10
+        quality_notes.append("Limited financial fields")
+    quality_score = max(0, quality_score)
+    traded_value = (price_stats.get("avg_volume") or 0) * current_price
+    if traded_value >= 10_000_000:
+        liquidity_class, execution_risk = "high", "low"
+    elif traded_value >= 1_000_000:
+        liquidity_class, execution_risk = "medium", "moderate"
+    elif traded_value > 0:
+        liquidity_class, execution_risk = "low", "high"
+    else:
+        liquidity_class, execution_risk = "unknown", "high"
+    event_flags = readiness.get("event_flags") or []
+    event_risk = any(str(x.get("severity", "")).lower() in {"high", "critical"} for x in event_flags if isinstance(x, dict))
+
     # ── Decision logic ───────────────────────────────────────────────────
     action = "abstain"
     confidence = 0.0
@@ -239,6 +275,18 @@ def score_ticker(
         confidence = min(0.80, 0.55 + abs(combined_return) * 0.3)
         horizon = "investment"
 
+    # Quality gates cap overconfident actions; they never create a fair value.
+    if action == "strong_buy" and (quality_score < 75 or eq.get("status") == "cash_mismatch" or event_risk):
+        action = "buy"
+        confidence = min(confidence, 0.68)
+        quality_notes.append("Strong Buy capped by data/earnings/event risk")
+    if action == "buy" and quality_score < 55:
+        action = "hold"
+        confidence = min(confidence, 0.60)
+        quality_notes.append("Buy capped by low data quality")
+    if execution_risk == "high" and action in {"strong_buy", "buy"}:
+        quality_notes.append("High execution risk from low traded value")
+
     # ── Build supporting/invalidation evidence ───────────────────────────
     supporting = []
     invalidating = []
@@ -263,6 +311,18 @@ def score_ticker(
             invalidating.append(momentum_note)
 
     supporting.extend(macro_notes)
+    if eq.get("status") == "cash_supported":
+        supporting.append("Earnings are supported by positive operating cash flow")
+    elif eq.get("status") == "cash_mismatch":
+        invalidating.append("Operating cash flow does not support reported earnings")
+    if liquidity_class == "low":
+        invalidating.append("Low traded value increases execution risk")
+    elif liquidity_class == "high":
+        supporting.append("High average traded value supports execution")
+    if quality_notes:
+        invalidating.extend(quality_notes[:2])
+    if event_flags:
+        invalidating.append(f"{len(event_flags)} structured event flag(s) require review")
 
     if price_stats["trend"] == "bullish":
         supporting.append("Price above SMA-20 and SMA-50 — trend intact")
@@ -302,6 +362,15 @@ def score_ticker(
             "latest_price_date": price_stats["latest_date"],
             "has_fair_value": fair_value is not None,
             "financial_periods": financial_periods,
+            "quality_score": quality_score,
+            "quality_notes": quality_notes,
+            "earnings_quality": eq,
+            "source": source,
+            "event_status": readiness.get("event_status", "unknown"),
+            "event_flags": event_flags,
+            "liquidity_class": liquidity_class,
+            "average_traded_value": round(traded_value, 0),
+            "execution_risk": execution_risk,
         },
     }
 

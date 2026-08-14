@@ -8,7 +8,7 @@
     "fair_value": 18.4489,
     "current_price": 11.77,
     "upside_pct": 56.7,
-    "rationale": "EMFD: Fair value 18.45 EGP vs current 11.77 EGP Based on 5 financial reporting periods."
+    "rationale": "EMFD: Fair value 18.45 EGP vs current 11.77 EGP Based on 6 financial reporting periods."
   },
   {
     "ticker": "SCEM",
@@ -19,7 +19,7 @@
     "fair_value": 100.88,
     "current_price": 94.4,
     "upside_pct": 6.9,
-    "rationale": "SCEM: Fair value 100.88 EGP vs current 94.40 EGP Based on 5 financial reporting periods."
+    "rationale": "SCEM: Fair value 100.88 EGP vs current 94.40 EGP Based on 6 financial reporting periods."
   },
   {
     "ticker": "MCRO",

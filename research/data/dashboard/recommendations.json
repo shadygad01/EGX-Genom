@@ -11,16 +11,18 @@
     "fair_value": 0.0575,
     "upside_pct": -95.4,
     "explanation": {
-      "why_this_stock": "GPIM: Fair value 0.06 EGP vs current 1.24 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+10.7%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "GPIM: Fair value 0.06 EGP vs current 1.24 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+10.7%); High average traded value supports execution",
       "why_not_others": "Current price (1.24 EGP) is 95.4% above fair value (0.06 EGP); Price (1.24) significantly above bear-case (0.03) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+10.7%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (1.24 EGP) is 95.4% above fair value (0.06 EGP)",
-        "Price (1.24) significantly above bear-case (0.03) — limited downside protection"
+        "Price (1.24) significantly above bear-case (0.03) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -29,7 +31,25 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 13620000.0,
+        "operating_cash_flow_latest": 6900000.0,
+        "cash_to_net_income_ratio": 0.507,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 6790000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 23146963.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -44,11 +64,13 @@
     "fair_value": 0.3301,
     "upside_pct": -92.9,
     "explanation": {
-      "why_this_stock": "SIPC: Fair value 0.33 EGP vs current 4.68 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+28.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "SIPC: Fair value 0.33 EGP vs current 4.68 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+28.9%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (4.68 EGP) is 92.9% above fair value (0.33 EGP); Price (4.68) significantly above bear-case (0.20) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+28.9%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -62,7 +84,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 10080000.0,
+        "operating_cash_flow_latest": 10780000.0,
+        "cash_to_net_income_ratio": 1.069,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 10760000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 27355134.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -77,11 +115,13 @@
     "fair_value": 0.2341,
     "upside_pct": -87.5,
     "explanation": {
-      "why_this_stock": "MEPA: Fair value 0.23 EGP vs current 1.87 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+12.7%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "MEPA: Fair value 0.23 EGP vs current 1.87 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+12.7%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (1.87 EGP) is 87.5% above fair value (0.23 EGP); Price (1.87) significantly above bear-case (0.14) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+12.7%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -95,7 +135,23 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 24230000.0,
+        "operating_cash_flow_latest": 22760000.0,
+        "cash_to_net_income_ratio": 0.939,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -15250000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 33823737.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -110,16 +166,19 @@
     "fair_value": 0.7539,
     "upside_pct": -88.4,
     "explanation": {
-      "why_this_stock": "RMDA: Fair value 0.75 EGP vs current 6.49 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+31.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "RMDA: Fair value 0.75 EGP vs current 6.49 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+31.1%); High average traded value supports execution",
       "why_not_others": "Current price (6.49 EGP) is 88.4% above fair value (0.75 EGP); Price (6.49) significantly above bear-case (0.45) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+31.1%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (6.49 EGP) is 88.4% above fair value (0.75 EGP)",
-        "Price (6.49) significantly above bear-case (0.45) — limited downside protection"
+        "Price (6.49) significantly above bear-case (0.45) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -128,7 +187,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 268610000.0,
+        "operating_cash_flow_latest": -43670000.0,
+        "cash_to_net_income_ratio": -0.163,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -199570000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 81786649.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -144,10 +221,12 @@
     "upside_pct": -84.1,
     "explanation": {
       "why_this_stock": "UNIP: Fair value 0.06 EGP vs current 0.40 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+11.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+11.0%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (0.40 EGP) is 84.1% above fair value (0.06 EGP); Price (0.40) significantly above bear-case (0.04) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+11.0%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -161,7 +240,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 13050000.0,
+        "operating_cash_flow_latest": 202970000.0,
+        "cash_to_net_income_ratio": 15.553,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 159860000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 20086134.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -176,10 +271,13 @@
     "fair_value": 1.3422,
     "upside_pct": -77.6,
     "explanation": {
-      "why_this_stock": "NCCW: Fair value 1.34 EGP vs current 5.99 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
+      "why_this_stock": "NCCW: Fair value 1.34 EGP vs current 5.99 EGP Based on 6 financial reporting periods.",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
       "why_not_others": "Current price (5.99 EGP) is 77.6% above fair value (1.34 EGP); Price (5.99) significantly above bear-case (0.82) — limited downside protection",
-      "supporting_evidence": [],
+      "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
         "Current price (5.99 EGP) is 77.6% above fair value (1.34 EGP)",
         "Price (5.99) significantly above bear-case (0.82) — limited downside protection",
@@ -192,7 +290,74 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 60350000.0,
+        "operating_cash_flow_latest": 49680000.0,
+        "cash_to_net_income_ratio": 0.823,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 49660000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 17649493.0,
+      "execution_risk": "low"
+    }
+  },
+  {
+    "ticker": "EFIH",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.779,
+    "combined_expected_return": -0.7644,
+    "combined_expected_risk": 0.3669,
+    "current_price": 24.21,
+    "fair_value": 5.2166,
+    "upside_pct": -78.5,
+    "explanation": {
+      "why_this_stock": "EFIH: Fair value 5.22 EGP vs current 24.21 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+10.1%); Earnings are supported by positive operating cash flow",
+      "why_not_others": "Current price (24.21 EGP) is 78.5% above fair value (5.22 EGP); Price (24.21) significantly above bear-case (3.13) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+10.1%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (24.21 EGP) is 78.5% above fair value (5.22 EGP)",
+        "Price (24.21) significantly above bear-case (3.13) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 1943000000.0,
+        "operating_cash_flow_latest": 2342000000.0,
+        "cash_to_net_income_ratio": 1.205,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2181000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 77630914.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -208,15 +373,17 @@
     "upside_pct": -74.5,
     "explanation": {
       "why_this_stock": "EGAL: Fair value 84.88 EGP vs current 332.52 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+9.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+9.4%); High average traded value supports execution",
       "why_not_others": "Current price (332.52 EGP) is 74.5% above fair value (84.88 EGP); Price (332.52) significantly above bear-case (54.01) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+9.4%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (332.52 EGP) is 74.5% above fair value (84.88 EGP)",
-        "Price (332.52) significantly above bear-case (54.01) — limited downside protection"
+        "Price (332.52) significantly above bear-case (54.01) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -225,7 +392,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 10186000000.0,
+        "operating_cash_flow_latest": 4661000000.0,
+        "cash_to_net_income_ratio": 0.458,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3389000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 101403304.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -241,14 +426,16 @@
     "upside_pct": -74.9,
     "explanation": {
       "why_this_stock": "SKPC: Fair value 4.17 EGP vs current 16.60 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+11.5%)",
+      "why_now": "Strong 20-day momentum (+11.5%); High average traded value supports execution",
       "why_not_others": "Current price (16.60 EGP) is 74.9% above fair value (4.17 EGP); Price (16.60) significantly above bear-case (2.50) — limited downside protection",
       "supporting_evidence": [
-        "Strong 20-day momentum (+11.5%)"
+        "Strong 20-day momentum (+11.5%)",
+        "High average traded value supports execution"
       ],
       "invalidation_conditions": [
         "Current price (16.60 EGP) is 74.9% above fair value (4.17 EGP)",
-        "Price (16.60) significantly above bear-case (2.50) — limited downside protection"
+        "Price (16.60) significantly above bear-case (2.50) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -257,7 +444,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1001000000.0,
+        "operating_cash_flow_latest": 282550000.0,
+        "cash_to_net_income_ratio": 0.282,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -172710000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 45849632.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -272,16 +477,18 @@
     "fair_value": 0.1843,
     "upside_pct": -79.3,
     "explanation": {
-      "why_this_stock": "OFH: Fair value 0.18 EGP vs current 0.89 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+34.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "OFH: Fair value 0.18 EGP vs current 0.89 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+34.1%); High average traded value supports execution",
       "why_not_others": "Current price (0.89 EGP) is 79.3% above fair value (0.18 EGP); Price (0.89) significantly above bear-case (0.16) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+34.1%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (0.89 EGP) is 79.3% above fair value (0.18 EGP)",
-        "Price (0.89) significantly above bear-case (0.16) — limited downside protection"
+        "Price (0.89) significantly above bear-case (0.16) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -290,7 +497,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 586050000.0,
+        "operating_cash_flow_latest": 560000.0,
+        "cash_to_net_income_ratio": 0.001,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 560000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 54227025.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -305,10 +530,13 @@
     "fair_value": 9.7549,
     "upside_pct": -70.2,
     "explanation": {
-      "why_this_stock": "OBRI: Fair value 9.75 EGP vs current 32.70 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
+      "why_this_stock": "OBRI: Fair value 9.75 EGP vs current 32.70 EGP Based on 6 financial reporting periods.",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
       "why_not_others": "Current price (32.70 EGP) is 70.2% above fair value (9.75 EGP); Price (32.70) significantly above bear-case (5.85) — limited downside protection",
-      "supporting_evidence": [],
+      "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
         "Current price (32.70 EGP) is 70.2% above fair value (9.75 EGP)",
         "Price (32.70) significantly above bear-case (5.85) — limited downside protection",
@@ -322,7 +550,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 49320000.0,
+        "operating_cash_flow_latest": 266380000.0,
+        "cash_to_net_income_ratio": 5.401,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 192910000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 22962692.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -337,14 +581,17 @@
     "fair_value": 8.1805,
     "upside_pct": -69.9,
     "explanation": {
-      "why_this_stock": "JUFO: Fair value 8.18 EGP vs current 27.20 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
+      "why_this_stock": "JUFO: Fair value 8.18 EGP vs current 27.20 EGP Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
       "why_not_others": "Current price (27.20 EGP) is 69.9% above fair value (8.18 EGP); Price (27.20) significantly above bear-case (4.91) — limited downside protection",
-      "supporting_evidence": [],
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
         "Current price (27.20 EGP) is 69.9% above fair value (8.18 EGP)",
         "Price (27.20) significantly above bear-case (4.91) — limited downside protection",
-        "Weak 20-day momentum (-9.4%)"
+        "Weak 20-day momentum (-9.4%)",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -353,7 +600,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1632000000.0,
+        "operating_cash_flow_latest": 777590000.0,
+        "cash_to_net_income_ratio": 0.476,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -2247000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 36512546.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -368,15 +633,17 @@
     "fair_value": 2.6991,
     "upside_pct": -71.8,
     "explanation": {
-      "why_this_stock": "MTIE: Fair value 2.70 EGP vs current 9.57 EGP Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "MTIE: Fair value 2.70 EGP vs current 9.57 EGP Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution; Price above SMA-20 and SMA-50 — trend intact",
       "why_not_others": "Current price (9.57 EGP) is 71.8% above fair value (2.70 EGP); Price (9.57) significantly above bear-case (1.62) — limited downside protection",
       "supporting_evidence": [
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (9.57 EGP) is 71.8% above fair value (2.70 EGP)",
-        "Price (9.57) significantly above bear-case (1.62) — limited downside protection"
+        "Price (9.57) significantly above bear-case (1.62) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -385,7 +652,25 @@
       "price_bars": 273,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1026000000.0,
+        "operating_cash_flow_latest": 516620000.0,
+        "cash_to_net_income_ratio": 0.504,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 383890000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 26055148.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -401,15 +686,17 @@
     "upside_pct": -82.7,
     "explanation": {
       "why_this_stock": "MPCI: Fair value 64.71 EGP vs current 374.00 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+55.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+55.5%); High average traded value supports execution",
       "why_not_others": "Current price (374.00 EGP) is 82.7% above fair value (64.71 EGP); Price (374.00) significantly above bear-case (41.10) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+55.5%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (374.00 EGP) is 82.7% above fair value (64.71 EGP)",
-        "Price (374.00) significantly above bear-case (41.10) — limited downside protection"
+        "Price (374.00) significantly above bear-case (41.10) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -418,40 +705,25 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": true,
-      "financial_periods": 5
-    }
-  },
-  {
-    "ticker": "EFIH",
-    "as_of": "2026-08-14",
-    "action": "sell",
-    "horizon": "investment",
-    "confidence": 0.763,
-    "combined_expected_return": -0.7093,
-    "combined_expected_risk": 0.3669,
-    "current_price": 24.21,
-    "fair_value": 6.5501,
-    "upside_pct": -72.9,
-    "explanation": {
-      "why_this_stock": "EFIH: Fair value 6.55 EGP vs current 24.21 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+10.1%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "Current price (24.21 EGP) is 72.9% above fair value (6.55 EGP); Price (24.21) significantly above bear-case (3.93) — limited downside protection",
-      "supporting_evidence": [
-        "Strong 20-day momentum (+10.1%)",
-        "Price above SMA-20 and SMA-50 — trend intact"
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
       ],
-      "invalidation_conditions": [
-        "Current price (24.21 EGP) is 72.9% above fair value (6.55 EGP)",
-        "Price (24.21) significantly above bear-case (3.93) — limited downside protection"
-      ],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 272,
-      "latest_price_date": "2026-08-13",
-      "has_fair_value": true,
-      "financial_periods": 5
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 505280000.0,
+        "operating_cash_flow_latest": 86890000.0,
+        "cash_to_net_income_ratio": 0.172,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 65650000.00000001
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 135754520.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -467,15 +739,17 @@
     "upside_pct": -76.1,
     "explanation": {
       "why_this_stock": "CSAG: Fair value 10.04 EGP vs current 41.95 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+27.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+27.9%); High average traded value supports execution",
       "why_not_others": "Current price (41.95 EGP) is 76.1% above fair value (10.04 EGP); Price (41.95) significantly above bear-case (6.03) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+27.9%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (41.95 EGP) is 76.1% above fair value (10.04 EGP)",
-        "Price (41.95) significantly above bear-case (6.03) — limited downside protection"
+        "Price (41.95) significantly above bear-case (6.03) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -484,7 +758,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1025000000.0,
+        "operating_cash_flow_latest": 26240000.0,
+        "cash_to_net_income_ratio": 0.026,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 26240000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 26632041.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -499,11 +791,13 @@
     "fair_value": 30.1583,
     "upside_pct": -73.5,
     "explanation": {
-      "why_this_stock": "ETEL: Fair value 30.16 EGP vs current 114.00 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+16.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ETEL: Fair value 30.16 EGP vs current 114.00 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+16.1%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (114.00 EGP) is 73.5% above fair value (30.16 EGP); Price (114.00) significantly above bear-case (18.09) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+16.1%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -517,7 +811,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 20371000000.0,
+        "operating_cash_flow_latest": 37624000000.0,
+        "cash_to_net_income_ratio": 1.847,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 9845000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 115021554.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -532,16 +842,19 @@
     "fair_value": 1.8183,
     "upside_pct": -73.9,
     "explanation": {
-      "why_this_stock": "TANM: Fair value 1.82 EGP vs current 6.98 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+20.3%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "TANM: Fair value 1.82 EGP vs current 6.98 EGP Based on 19 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+20.3%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (6.98 EGP) is 73.9% above fair value (1.82 EGP); Price (6.98) significantly above bear-case (1.09) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+20.3%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (6.98 EGP) is 73.9% above fair value (1.82 EGP)",
-        "Price (6.98) significantly above bear-case (1.09) — limited downside protection"
+        "Price (6.98) significantly above bear-case (1.09) — limited downside protection",
+        "Secondary financial source"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -550,7 +863,25 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 19,
+      "quality_score": 90,
+      "quality_notes": [
+        "Secondary financial source"
+      ],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 34818.24,
+        "operating_cash_flow_latest": 40387.666,
+        "cash_to_net_income_ratio": 1.16,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": null
+      },
+      "source": "mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 11646200.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -565,15 +896,17 @@
     "fair_value": 3.6146,
     "upside_pct": -66.9,
     "explanation": {
-      "why_this_stock": "ETRS: Fair value 3.61 EGP vs current 10.91 EGP Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ETRS: Fair value 3.61 EGP vs current 10.91 EGP Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution; Price above SMA-20 and SMA-50 — trend intact",
       "why_not_others": "Current price (10.91 EGP) is 66.9% above fair value (3.61 EGP); Price (10.91) significantly above bear-case (2.17) — limited downside protection",
       "supporting_evidence": [
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (10.91 EGP) is 66.9% above fair value (3.61 EGP)",
-        "Price (10.91) significantly above bear-case (2.17) — limited downside protection"
+        "Price (10.91) significantly above bear-case (2.17) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -582,7 +915,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 112680000.0,
+        "operating_cash_flow_latest": 26970000.0,
+        "cash_to_net_income_ratio": 0.239,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -59210000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 47545245.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -597,12 +948,14 @@
     "fair_value": 18.4489,
     "upside_pct": 56.7,
     "explanation": {
-      "why_this_stock": "EMFD: Fair value 18.45 EGP vs current 11.77 EGP Based on 5 financial reporting periods.",
+      "why_this_stock": "EMFD: Fair value 18.45 EGP vs current 11.77 EGP Based on 6 financial reporting periods.",
       "why_now": "Current price (11.77 EGP) is 56.7% below fair value (18.45 EGP); Bull-case fair value 24.29 EGP implies 106% upside",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Current price (11.77 EGP) is 56.7% below fair value (18.45 EGP)",
-        "Bull-case fair value 24.29 EGP implies 106% upside"
+        "Bull-case fair value 24.29 EGP implies 106% upside",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution"
       ],
       "invalidation_conditions": [],
       "similar_historical_cases": [],
@@ -612,7 +965,23 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4968000000.0,
+        "operating_cash_flow_latest": 9343000000.0,
+        "cash_to_net_income_ratio": 1.881,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 8283000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 79116245.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -627,16 +996,19 @@
     "fair_value": 0.8054,
     "upside_pct": -62.0,
     "explanation": {
-      "why_this_stock": "DSCW: Fair value 0.81 EGP vs current 2.12 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+13.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "DSCW: Fair value 0.81 EGP vs current 2.12 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+13.4%); High average traded value supports execution",
       "why_not_others": "Current price (2.12 EGP) is 62.0% above fair value (0.81 EGP); Price (2.12) significantly above bear-case (0.48) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+13.4%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (2.12 EGP) is 62.0% above fair value (0.81 EGP)",
-        "Price (2.12) significantly above bear-case (0.48) — limited downside protection"
+        "Price (2.12) significantly above bear-case (0.48) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -645,7 +1017,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 366550000.0,
+        "operating_cash_flow_latest": -718910000.0,
+        "cash_to_net_income_ratio": -1.961,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -1300000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 51984242.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -660,11 +1050,13 @@
     "fair_value": 1.1941,
     "upside_pct": -60.6,
     "explanation": {
-      "why_this_stock": "EHDR: Fair value 1.19 EGP vs current 3.03 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+13.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "EHDR: Fair value 1.19 EGP vs current 3.03 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+13.5%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (3.03 EGP) is 60.6% above fair value (1.19 EGP); Price (3.03) significantly above bear-case (0.97) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+13.5%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -678,7 +1070,23 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 67150000.0,
+        "operating_cash_flow_latest": 131310000.0,
+        "cash_to_net_income_ratio": 1.955,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 94120000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 38851524.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -693,11 +1101,13 @@
     "fair_value": 11.1022,
     "upside_pct": -58.1,
     "explanation": {
-      "why_this_stock": "ORWE: Fair value 11.10 EGP vs current 26.50 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+17.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ORWE: Fair value 11.10 EGP vs current 26.50 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.0%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (26.50 EGP) is 58.1% above fair value (11.10 EGP); Price (26.50) significantly above bear-case (8.37) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+17.0%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -711,7 +1121,23 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2012000000.0,
+        "operating_cash_flow_latest": 3191000000.0,
+        "cash_to_net_income_ratio": 1.586,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1313000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 34991952.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -726,16 +1152,19 @@
     "fair_value": 3.4297,
     "upside_pct": -55.3,
     "explanation": {
-      "why_this_stock": "ZMID: Fair value 3.43 EGP vs current 7.68 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+5.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ZMID: Fair value 3.43 EGP vs current 7.68 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+5.5%); High average traded value supports execution",
       "why_not_others": "Current price (7.68 EGP) is 55.3% above fair value (3.43 EGP); Price (7.68) significantly above bear-case (2.06) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+5.5%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (7.68 EGP) is 55.3% above fair value (3.43 EGP)",
-        "Price (7.68) significantly above bear-case (2.06) — limited downside protection"
+        "Price (7.68) significantly above bear-case (2.06) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -744,7 +1173,78 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 585500000.0,
+        "operating_cash_flow_latest": -391100000.0,
+        "cash_to_net_income_ratio": -0.668,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -395030000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 191673969.0,
+      "execution_risk": "low"
+    }
+  },
+  {
+    "ticker": "EAST",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.709,
+    "combined_expected_return": -0.531,
+    "combined_expected_risk": 0.3577,
+    "current_price": 36.3,
+    "fair_value": 17.0583,
+    "upside_pct": -53.0,
+    "explanation": {
+      "why_this_stock": "EAST: Fair value 17.06 EGP vs current 36.30 EGP Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Current price (36.30 EGP) is 53.0% above fair value (17.06 EGP); Price (36.30) significantly above bear-case (10.23) — limited downside protection",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Current price (36.30 EGP) is 53.0% above fair value (17.06 EGP)",
+        "Price (36.30) significantly above bear-case (10.23) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow",
+        "Price below SMA-20 and SMA-50 — downtrend"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": true,
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 8662000000.0,
+        "operating_cash_flow_latest": -23645000000.0,
+        "cash_to_net_income_ratio": -2.73,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -23677000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 56140564.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -759,11 +1259,13 @@
     "fair_value": 19.8153,
     "upside_pct": -53.8,
     "explanation": {
-      "why_this_stock": "ORHD: Fair value 19.82 EGP vs current 42.89 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+8.6%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ORHD: Fair value 19.82 EGP vs current 42.89 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.6%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (42.89 EGP) is 53.8% above fair value (19.82 EGP); Price (42.89) significantly above bear-case (14.22) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+8.6%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -777,7 +1279,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 5550000000.0,
+        "operating_cash_flow_latest": 5020000000.0,
+        "cash_to_net_income_ratio": 0.905,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1893000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 162192266.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -792,16 +1310,19 @@
     "fair_value": 6.0039,
     "upside_pct": -97.6,
     "explanation": {
-      "why_this_stock": "AFMC: Fair value 6.00 EGP vs current 247.00 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+228.2%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "AFMC: Fair value 6.00 EGP vs current 247.00 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+228.2%); High average traded value supports execution",
       "why_not_others": "Current price (247.00 EGP) is 97.6% above fair value (6.00 EGP); Price (247.00) significantly above bear-case (4.97) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+228.2%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (247.00 EGP) is 97.6% above fair value (6.00 EGP)",
-        "Price (247.00) significantly above bear-case (4.97) — limited downside protection"
+        "Price (247.00) significantly above bear-case (4.97) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -810,38 +1331,25 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": true,
-      "financial_periods": 5
-    }
-  },
-  {
-    "ticker": "EAST",
-    "as_of": "2026-08-14",
-    "action": "sell",
-    "horizon": "investment",
-    "confidence": 0.697,
-    "combined_expected_return": -0.489,
-    "combined_expected_risk": 0.3577,
-    "current_price": 36.3,
-    "fair_value": 18.5825,
-    "upside_pct": -48.8,
-    "explanation": {
-      "why_this_stock": "EAST: Fair value 18.58 EGP vs current 36.30 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "Current price (36.30 EGP) is 48.8% above fair value (18.58 EGP); Price (36.30) significantly above bear-case (11.15) — limited downside protection",
-      "supporting_evidence": [],
-      "invalidation_conditions": [
-        "Current price (36.30 EGP) is 48.8% above fair value (18.58 EGP)",
-        "Price (36.30) significantly above bear-case (11.15) — limited downside protection",
-        "Price below SMA-20 and SMA-50 — downtrend"
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
       ],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 270,
-      "latest_price_date": "2026-08-12",
-      "has_fair_value": true,
-      "financial_periods": 5
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 54170000.0,
+        "operating_cash_flow_latest": -26570000.0,
+        "cash_to_net_income_ratio": -0.49,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -37340000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 66534637.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -857,15 +1365,17 @@
     "upside_pct": -49.9,
     "explanation": {
       "why_this_stock": "ALCN: Fair value 15.99 EGP vs current 31.90 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+8.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+8.0%); High average traded value supports execution",
       "why_not_others": "Current price (31.90 EGP) is 49.9% above fair value (15.99 EGP); Price (31.90) significantly above bear-case (9.59) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+8.0%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (31.90 EGP) is 49.9% above fair value (15.99 EGP)",
-        "Price (31.90) significantly above bear-case (9.59) — limited downside protection"
+        "Price (31.90) significantly above bear-case (9.59) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -874,7 +1384,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 6636000000.0,
+        "operating_cash_flow_latest": 4927000000.0,
+        "cash_to_net_income_ratio": 0.742,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 4901000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 42313851.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -890,12 +1418,16 @@
     "upside_pct": -47.0,
     "explanation": {
       "why_this_stock": "HELI: Fair value 4.16 EGP vs current 7.85 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
+      "why_now": "High average traded value supports execution",
       "why_not_others": "Current price (7.85 EGP) is 47.0% above fair value (4.16 EGP); Price (7.85) significantly above bear-case (2.49) — limited downside protection",
-      "supporting_evidence": [],
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
         "Current price (7.85 EGP) is 47.0% above fair value (4.16 EGP)",
-        "Price (7.85) significantly above bear-case (2.49) — limited downside protection"
+        "Price (7.85) significantly above bear-case (2.49) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -904,7 +1436,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 2705000000.0,
+        "operating_cash_flow_latest": -1339000000.0,
+        "cash_to_net_income_ratio": -0.495,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -1355000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 192912196.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -919,13 +1469,16 @@
     "fair_value": 8.3754,
     "upside_pct": -45.2,
     "explanation": {
-      "why_this_stock": "PHDC: Fair value 8.38 EGP vs current 15.29 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
+      "why_this_stock": "PHDC: Fair value 8.38 EGP vs current 15.29 EGP Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
       "why_not_others": "Current price (15.29 EGP) is 45.2% above fair value (8.38 EGP); Price (15.29) significantly above bear-case (5.03) — limited downside protection",
-      "supporting_evidence": [],
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
         "Current price (15.29 EGP) is 45.2% above fair value (8.38 EGP)",
-        "Price (15.29) significantly above bear-case (5.03) — limited downside protection"
+        "Price (15.29) significantly above bear-case (5.03) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -934,7 +1487,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 4217000000.0,
+        "operating_cash_flow_latest": 1424000000.0,
+        "cash_to_net_income_ratio": 0.338,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 451140000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 258536913.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -949,16 +1520,18 @@
     "fair_value": 42.5988,
     "upside_pct": -45.3,
     "explanation": {
-      "why_this_stock": "ABUK: Fair value 42.60 EGP vs current 77.90 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+8.2%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ABUK: Fair value 42.60 EGP vs current 77.90 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.2%); High average traded value supports execution",
       "why_not_others": "Current price (77.90 EGP) is 45.3% above fair value (42.60 EGP); Price (77.90) significantly above bear-case (25.56) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+8.2%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (77.90 EGP) is 45.3% above fair value (42.60 EGP)",
-        "Price (77.90) significantly above bear-case (25.56) — limited downside protection"
+        "Price (77.90) significantly above bear-case (25.56) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -967,7 +1540,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 7980000000.0,
+        "operating_cash_flow_latest": 3533000000.0,
+        "cash_to_net_income_ratio": 0.443,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3141000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 124374517.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -982,11 +1573,13 @@
     "fair_value": 120.8466,
     "upside_pct": -51.3,
     "explanation": {
-      "why_this_stock": "MCQE: Fair value 120.85 EGP vs current 248.11 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+41.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "MCQE: Fair value 120.85 EGP vs current 248.11 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+41.0%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (248.11 EGP) is 51.3% above fair value (120.85 EGP); Price (248.11) significantly above bear-case (74.62) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+41.0%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1000,7 +1593,74 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2033000000.0,
+        "operating_cash_flow_latest": 2900000000.0,
+        "cash_to_net_income_ratio": 1.426,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2687000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 48983117.0,
+      "execution_risk": "low"
+    }
+  },
+  {
+    "ticker": "EFID",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.676,
+    "combined_expected_return": -0.4204,
+    "combined_expected_risk": 0.372,
+    "current_price": 32.7,
+    "fair_value": 17.7944,
+    "upside_pct": -45.6,
+    "explanation": {
+      "why_this_stock": "EFID: Fair value 17.79 EGP vs current 32.70 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.7%); Earnings are supported by positive operating cash flow",
+      "why_not_others": "Current price (32.70 EGP) is 45.6% above fair value (17.79 EGP); Price (32.70) significantly above bear-case (10.68) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+17.7%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (32.70 EGP) is 45.6% above fair value (17.79 EGP)",
+        "Price (32.70) significantly above bear-case (10.68) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2521000000.0,
+        "operating_cash_flow_latest": 4311000000.0,
+        "cash_to_net_income_ratio": 1.71,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3291000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 53239491.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1015,11 +1675,13 @@
     "fair_value": 22.9725,
     "upside_pct": -42.4,
     "explanation": {
-      "why_this_stock": "MFPC: Fair value 22.97 EGP vs current 39.91 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+5.0%)",
+      "why_this_stock": "MFPC: Fair value 22.97 EGP vs current 39.91 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+5.0%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (39.91 EGP) is 42.4% above fair value (22.97 EGP); Price (39.91) significantly above bear-case (17.74) — limited downside protection",
       "supporting_evidence": [
-        "Strong 20-day momentum (+5.0%)"
+        "Strong 20-day momentum (+5.0%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution"
       ],
       "invalidation_conditions": [
         "Current price (39.91 EGP) is 42.4% above fair value (22.97 EGP)",
@@ -1032,7 +1694,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 11297000000.0,
+        "operating_cash_flow_latest": 11231000000.0,
+        "cash_to_net_income_ratio": 0.994,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 5383000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 72891305.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1047,11 +1725,13 @@
     "fair_value": 26.6642,
     "upside_pct": -42.2,
     "explanation": {
-      "why_this_stock": "MPRC: Fair value 26.66 EGP vs current 46.10 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+5.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "MPRC: Fair value 26.66 EGP vs current 46.10 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+5.1%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (46.10 EGP) is 42.2% above fair value (26.66 EGP); Price (46.10) significantly above bear-case (16.00) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+5.1%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1065,7 +1745,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 698450000.0,
+        "operating_cash_flow_latest": 657820000.0,
+        "cash_to_net_income_ratio": 0.942,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 460910000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 30591683.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1081,9 +1777,11 @@
     "upside_pct": -40.4,
     "explanation": {
       "why_this_stock": "ISMQ: Fair value 5.60 EGP vs current 9.40 EGP Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
       "why_not_others": "Current price (9.40 EGP) is 40.4% above fair value (5.60 EGP); Price (9.40) significantly above bear-case (3.36) — limited downside protection",
       "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1097,40 +1795,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
-    }
-  },
-  {
-    "ticker": "EFID",
-    "as_of": "2026-08-14",
-    "action": "sell",
-    "horizon": "investment",
-    "confidence": 0.661,
-    "combined_expected_return": -0.3685,
-    "combined_expected_risk": 0.372,
-    "current_price": 32.7,
-    "fair_value": 19.4924,
-    "upside_pct": -40.4,
-    "explanation": {
-      "why_this_stock": "EFID: Fair value 19.49 EGP vs current 32.70 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+17.7%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "Current price (32.70 EGP) is 40.4% above fair value (19.49 EGP); Price (32.70) significantly above bear-case (11.70) — limited downside protection",
-      "supporting_evidence": [
-        "Strong 20-day momentum (+17.7%)",
-        "Price above SMA-20 and SMA-50 — trend intact"
-      ],
-      "invalidation_conditions": [
-        "Current price (32.70 EGP) is 40.4% above fair value (19.49 EGP)",
-        "Price (32.70) significantly above bear-case (11.70) — limited downside protection"
-      ],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 272,
-      "latest_price_date": "2026-08-13",
-      "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 697990000.0,
+        "operating_cash_flow_latest": 985150000.0,
+        "cash_to_net_income_ratio": 1.411,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 898020000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 73508940.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1145,11 +1826,13 @@
     "fair_value": 30.577,
     "upside_pct": -39.1,
     "explanation": {
-      "why_this_stock": "ENGC: Fair value 30.58 EGP vs current 50.22 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+17.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ENGC: Fair value 30.58 EGP vs current 50.22 EGP Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.9%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (50.22 EGP) is 39.1% above fair value (30.58 EGP); Price (50.22) significantly above bear-case (18.35) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+17.9%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1163,7 +1846,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 728600000.0,
+        "operating_cash_flow_latest": 801310000.0,
+        "cash_to_net_income_ratio": 1.1,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 277520000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 20308365.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1178,15 +1877,18 @@
     "fair_value": 90.649,
     "upside_pct": -34.9,
     "explanation": {
-      "why_this_stock": "COMI: Fair value 90.65 EGP vs current 139.27 EGP Based on 5 financial reporting periods.",
-      "why_now": "Bull-case fair value 145.04 EGP implies 4% upside",
+      "why_this_stock": "COMI: Fair value 90.65 EGP vs current 139.27 EGP Based on 6 financial reporting periods.",
+      "why_now": "Bull-case fair value 145.04 EGP implies 4% upside; High average traded value supports execution",
       "why_not_others": "Current price (139.27 EGP) is 34.9% above fair value (90.65 EGP); Price (139.27) significantly above bear-case (54.39) — limited downside protection",
       "supporting_evidence": [
-        "Bull-case fair value 145.04 EGP implies 4% upside"
+        "Bull-case fair value 145.04 EGP implies 4% upside",
+        "High average traded value supports execution"
       ],
       "invalidation_conditions": [
         "Current price (139.27 EGP) is 34.9% above fair value (90.65 EGP)",
-        "Price (139.27) significantly above bear-case (54.39) — limited downside protection"
+        "Price (139.27) significantly above bear-case (54.39) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -1195,7 +1897,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 61634000000.0,
+        "operating_cash_flow_latest": -2765000000.0,
+        "cash_to_net_income_ratio": -0.045,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -10695000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 458893257.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1211,9 +1931,11 @@
     "upside_pct": -34.2,
     "explanation": {
       "why_this_stock": "TAQA: Fair value 10.14 EGP vs current 15.42 EGP Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
       "why_not_others": "Current price (15.42 EGP) is 34.2% above fair value (10.14 EGP); Price (15.42) significantly above bear-case (6.08) — limited downside protection",
       "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1227,7 +1949,23 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 1053000000.0,
+        "operating_cash_flow_latest": 2697000000.0,
+        "cash_to_net_income_ratio": 2.561,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1783000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 39607195.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1242,11 +1980,13 @@
     "fair_value": 7.5411,
     "upside_pct": -27.4,
     "explanation": {
-      "why_this_stock": "RACC: Fair value 7.54 EGP vs current 10.39 EGP Based on 5 financial reporting periods.",
-      "why_now": "Bull-case fair value 12.07 EGP implies 16% upside; Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "RACC: Fair value 7.54 EGP vs current 10.39 EGP Based on 6 financial reporting periods.",
+      "why_now": "Bull-case fair value 12.07 EGP implies 16% upside; Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (10.39 EGP) is 27.4% above fair value (7.54 EGP); Price (10.39) significantly above bear-case (4.52) — limited downside protection",
       "supporting_evidence": [
         "Bull-case fair value 12.07 EGP implies 16% upside",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1260,7 +2000,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 269340000.0,
+        "operating_cash_flow_latest": 402720000.0,
+        "cash_to_net_income_ratio": 1.495,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 264209999.99999997
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 23034630.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1275,13 +2031,15 @@
     "fair_value": 100.88,
     "upside_pct": 6.9,
     "explanation": {
-      "why_this_stock": "SCEM: Fair value 100.88 EGP vs current 94.40 EGP Based on 5 financial reporting periods.",
+      "why_this_stock": "SCEM: Fair value 100.88 EGP vs current 94.40 EGP Based on 6 financial reporting periods.",
       "why_now": "Current price (94.40 EGP) is 6.9% below fair value (100.88 EGP); Bull-case fair value 155.33 EGP implies 65% upside",
       "why_not_others": "Price (94.40) significantly above bear-case (60.53) — limited downside protection",
       "supporting_evidence": [
         "Current price (94.40 EGP) is 6.9% below fair value (100.88 EGP)",
         "Bull-case fair value 155.33 EGP implies 65% upside",
         "Strong 20-day momentum (+51.3%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1294,7 +2052,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2298000000.0,
+        "operating_cash_flow_latest": 3388000000.0,
+        "cash_to_net_income_ratio": 1.474,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 3049000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 71314669.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1316,6 +2090,8 @@
         "Current price (1.55 EGP) is 14.3% below fair value (1.77 EGP)",
         "Bull-case fair value 2.20 EGP implies 42% upside",
         "Strong 20-day momentum (+14.0%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1328,7 +2104,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 115730000.0,
+        "operating_cash_flow_latest": 160990000.0,
+        "cash_to_net_income_ratio": 1.391,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 118510000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 62083874.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1343,16 +2135,19 @@
     "fair_value": 20.2692,
     "upside_pct": -17.1,
     "explanation": {
-      "why_this_stock": "CIEB: Fair value 20.27 EGP vs current 24.46 EGP Based on 5 financial reporting periods.",
-      "why_now": "Bull-case fair value 32.43 EGP implies 33% upside; Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "CIEB: Fair value 20.27 EGP vs current 24.46 EGP Based on 6 financial reporting periods.",
+      "why_now": "Bull-case fair value 32.43 EGP implies 33% upside; High average traded value supports execution",
       "why_not_others": "Current price (24.46 EGP) is 17.1% above fair value (20.27 EGP); Price (24.46) significantly above bear-case (12.16) — limited downside protection",
       "supporting_evidence": [
         "Bull-case fair value 32.43 EGP implies 33% upside",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (24.46 EGP) is 17.1% above fair value (20.27 EGP)",
-        "Price (24.46) significantly above bear-case (12.16) — limited downside protection"
+        "Price (24.46) significantly above bear-case (12.16) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -1361,7 +2156,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 6197000000.0,
+        "operating_cash_flow_latest": -6244000000.0,
+        "cash_to_net_income_ratio": -1.008,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -6968000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 18144770.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1382,11 +2195,14 @@
       "supporting_evidence": [
         "Bull-case fair value 7.37 EGP implies 32% upside",
         "Strong 20-day momentum (+6.3%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (5.60 EGP) is 17.7% above fair value (4.61 EGP)",
-        "Price (5.60) significantly above bear-case (2.89) — limited downside protection"
+        "Price (5.60) significantly above bear-case (2.89) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -1395,7 +2211,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 226760000.0,
+        "operating_cash_flow_latest": -1656000000.0,
+        "cash_to_net_income_ratio": -7.303,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -1664000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 14973745.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1410,17 +2244,19 @@
     "fair_value": 8.1878,
     "upside_pct": -20.5,
     "explanation": {
-      "why_this_stock": "AMOC: Fair value 8.19 EGP vs current 10.30 EGP Based on 5 financial reporting periods.",
+      "why_this_stock": "AMOC: Fair value 8.19 EGP vs current 10.30 EGP Based on 6 financial reporting periods.",
       "why_now": "Bull-case fair value 12.65 EGP implies 23% upside; Strong 20-day momentum (+25.9%)",
       "why_not_others": "Current price (10.30 EGP) is 20.5% above fair value (8.19 EGP); Price (10.30) significantly above bear-case (5.54) — limited downside protection",
       "supporting_evidence": [
         "Bull-case fair value 12.65 EGP implies 23% upside",
         "Strong 20-day momentum (+25.9%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
         "Current price (10.30 EGP) is 20.5% above fair value (8.19 EGP)",
-        "Price (10.30) significantly above bear-case (5.54) — limited downside protection"
+        "Price (10.30) significantly above bear-case (5.54) — limited downside protection",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -1429,7 +2265,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1488000000.0,
+        "operating_cash_flow_latest": 1060000000.0,
+        "cash_to_net_income_ratio": 0.712,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 688730000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 85695526.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1444,15 +2298,18 @@
     "fair_value": 31.3733,
     "upside_pct": -6.3,
     "explanation": {
-      "why_this_stock": "LCSW: Fair value 31.37 EGP vs current 33.48 EGP Based on 5 financial reporting periods.",
-      "why_now": "Bull-case fair value 46.86 EGP implies 40% upside",
+      "why_this_stock": "LCSW: Fair value 31.37 EGP vs current 33.48 EGP Based on 6 financial reporting periods.",
+      "why_now": "Bull-case fair value 46.86 EGP implies 40% upside; High average traded value supports execution",
       "why_not_others": "Current price (33.48 EGP) is 6.3% above fair value (31.37 EGP); Price (33.48) significantly above bear-case (18.82) — limited downside protection",
       "supporting_evidence": [
-        "Bull-case fair value 46.86 EGP implies 40% upside"
+        "Bull-case fair value 46.86 EGP implies 40% upside",
+        "High average traded value supports execution"
       ],
       "invalidation_conditions": [
         "Current price (33.48 EGP) is 6.3% above fair value (31.37 EGP)",
-        "Price (33.48) significantly above bear-case (18.82) — limited downside protection"
+        "Price (33.48) significantly above bear-case (18.82) — limited downside protection",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -1461,7 +2318,25 @@
       "price_bars": 273,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 340890000.0,
+        "operating_cash_flow_latest": -195980000.0,
+        "cash_to_net_income_ratio": -0.575,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -662740000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 26486731.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1476,11 +2351,13 @@
     "fair_value": 37.5002,
     "upside_pct": -4.6,
     "explanation": {
-      "why_this_stock": "POUL: Fair value 37.50 EGP vs current 39.30 EGP Based on 5 financial reporting periods.",
-      "why_now": "Bull-case fair value 59.18 EGP implies 51% upside; Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "POUL: Fair value 37.50 EGP vs current 39.30 EGP Based on 6 financial reporting periods.",
+      "why_now": "Bull-case fair value 59.18 EGP implies 51% upside; Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (39.30 EGP) is 4.6% above fair value (37.50 EGP); Price (39.30) significantly above bear-case (22.50) — limited downside protection",
       "supporting_evidence": [
         "Bull-case fair value 59.18 EGP implies 51% upside",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1494,7 +2371,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2579000000.0,
+        "operating_cash_flow_latest": 2839000000.0,
+        "cash_to_net_income_ratio": 1.101,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1286000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 53694175.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1509,12 +2402,14 @@
     "fair_value": 67.3691,
     "upside_pct": -9.2,
     "explanation": {
-      "why_this_stock": "ARCC: Fair value 67.37 EGP vs current 74.20 EGP Based on 5 financial reporting periods.",
+      "why_this_stock": "ARCC: Fair value 67.37 EGP vs current 74.20 EGP Based on 6 financial reporting periods.",
       "why_now": "Bull-case fair value 101.15 EGP implies 36% upside; Strong 20-day momentum (+36.6%)",
       "why_not_others": "Current price (74.20 EGP) is 9.2% above fair value (67.37 EGP); Price (74.20) significantly above bear-case (40.42) — limited downside protection",
       "supporting_evidence": [
         "Bull-case fair value 101.15 EGP implies 36% upside",
         "Strong 20-day momentum (+36.6%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1528,7 +2423,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 3581000000.0,
+        "operating_cash_flow_latest": 3818000000.0,
+        "cash_to_net_income_ratio": 1.066,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3022000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 56019219.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1544,10 +2455,12 @@
     "upside_pct": -97.2,
     "explanation": {
       "why_this_stock": "BIOC: Fair value 14.60 EGP vs current 521.01 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+491.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+491.5%); Earnings are supported by positive operating cash flow",
       "why_not_others": "Current price (521.01 EGP) is 97.2% above fair value (14.60 EGP); Price (521.01) significantly above bear-case (8.76) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+491.5%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
@@ -1561,7 +2474,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 213230000.0,
+        "operating_cash_flow_latest": 240830000.0,
+        "cash_to_net_income_ratio": 1.129,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 63550000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 88776978.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1576,11 +2505,16 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ACTF: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_this_stock": "ACTF: technical analysis only (no fair value available) Based on 8 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Secondary financial source; Latest net income is negative",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Secondary financial source",
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1588,7 +2522,26 @@
       "price_bars": 22,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 8,
+      "quality_score": 75,
+      "quality_notes": [
+        "Secondary financial source",
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -513125.356,
+        "operating_cash_flow_latest": -106879.482,
+        "cash_to_net_income_ratio": 0.208,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": null
+      },
+      "source": "mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 51522863.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1603,14 +2556,18 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ADIB: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+18.0%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "ADIB: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+18.0%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+18.0%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1618,7 +2575,25 @@
       "price_bars": 273,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 12589000000.0,
+        "operating_cash_flow_latest": -57346000000.0,
+        "cash_to_net_income_ratio": -4.555,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -57766000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 115072777.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1634,10 +2609,12 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "AFDI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+42.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+42.8%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+42.8%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -1648,7 +2625,23 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4210000.0,
+        "operating_cash_flow_latest": 615570000.0,
+        "cash_to_net_income_ratio": 146.216,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 614820000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 21623760.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1663,11 +2656,16 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "AIDC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_this_stock": "AIDC: technical analysis only (no fair value available) Based on 2 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Secondary financial source; Fewer than 3 reporting periods",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Secondary financial source",
+        "Fewer than 3 reporting periods"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1675,7 +2673,27 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 2,
+      "quality_score": 65,
+      "quality_notes": [
+        "Secondary financial source",
+        "Fewer than 3 reporting periods",
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -8424.067,
+        "operating_cash_flow_latest": 27368.181,
+        "cash_to_net_income_ratio": -3.249,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": null
+      },
+      "source": "mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 19957842.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1690,14 +2708,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "AIHC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+6.9%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "AIHC: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+6.9%); High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
       "supporting_evidence": [
         "Strong 20-day momentum (+6.9%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1705,7 +2726,25 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -23590000.0,
+        "operating_cash_flow_latest": 824340000.0,
+        "cash_to_net_income_ratio": -34.944,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 813090000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 22065283.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1720,14 +2759,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "AMER: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+83.6%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "AMER: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+83.6%); High average traded value supports execution",
+      "why_not_others": "Earnings quality is not fully observable",
       "supporting_evidence": [
         "Strong 20-day momentum (+83.6%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1735,7 +2777,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 123100000.0,
+        "operating_cash_flow_latest": 49770000.0,
+        "cash_to_net_income_ratio": 0.404,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 10040000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 152032758.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1751,13 +2811,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "AMIA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+44.3%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+44.3%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+44.3%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1765,7 +2829,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 268530000.0,
+        "operating_cash_flow_latest": -1812000000.0,
+        "cash_to_net_income_ratio": -6.748,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -1859000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 43770935.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1781,12 +2863,16 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "ARAB: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "High average traded value supports execution; Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1794,7 +2880,25 @@
       "price_bars": 273,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 96910000.0,
+        "operating_cash_flow_latest": -639840000.0,
+        "cash_to_net_income_ratio": -6.602,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -676760000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 64499056.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1810,13 +2914,16 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "ASCM: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+5.1%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+5.1%); High average traded value supports execution",
+      "why_not_others": "Earnings quality is not fully observable",
       "supporting_evidence": [
         "Strong 20-day momentum (+5.1%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1824,7 +2931,25 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 320060000.0,
+        "operating_cash_flow_latest": 90150000.0,
+        "cash_to_net_income_ratio": 0.282,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -319340000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 35782644.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1840,13 +2965,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "ASPI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+57.5%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+57.5%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+57.5%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1854,7 +2983,25 @@
       "price_bars": 273,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 63260000.0,
+        "operating_cash_flow_latest": -239700000.0,
+        "cash_to_net_income_ratio": -3.789,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -257390000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 26462789.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1869,11 +3016,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ATQA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+14.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "ATQA: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+14.4%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+14.4%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -1884,7 +3033,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 30750000.0,
+        "operating_cash_flow_latest": 1277000000.0,
+        "cash_to_net_income_ratio": 41.528,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 1255000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 60082145.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1899,11 +3064,16 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "BTFH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_this_stock": "BTFH: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1911,7 +3081,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 1347000000.0,
+        "operating_cash_flow_latest": -10607000000.0,
+        "cash_to_net_income_ratio": -7.875,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -11265000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 169001759.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1927,10 +3115,14 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "CCAP: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1938,7 +3130,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -1249000000.0,
+        "operating_cash_flow_latest": 28341000000.0,
+        "cash_to_net_income_ratio": -22.691,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 20372000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 468851563.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1953,10 +3163,12 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "CNFN: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "CNFN: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -1967,7 +3179,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 345100000.0,
+        "operating_cash_flow_latest": 486480000.0,
+        "cash_to_net_income_ratio": 1.41,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 141790000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 14383251.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -1982,14 +3210,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "COSG: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+10.8%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "COSG: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+10.8%); High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
       "supporting_evidence": [
         "Strong 20-day momentum (+10.8%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -1997,7 +3228,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -75410000.0,
+        "operating_cash_flow_latest": -63690000.0,
+        "cash_to_net_income_ratio": 0.845,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -68040000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 62788223.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2013,13 +3262,16 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "DAPH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+42.5%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+42.5%); High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
       "supporting_evidence": [
         "Strong 20-day momentum (+42.5%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2027,7 +3279,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -138400000.0,
+        "operating_cash_flow_latest": -57980000.0,
+        "cash_to_net_income_ratio": 0.419,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -69010000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 28716091.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2042,14 +3312,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ECAP: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+17.5%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "ECAP: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.5%); High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
       "supporting_evidence": [
         "Strong 20-day momentum (+17.5%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2057,7 +3330,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -88790000.0,
+        "operating_cash_flow_latest": -491600000.0,
+        "cash_to_net_income_ratio": 5.537,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -528490000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 11828549.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2072,11 +3363,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "EGCH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+8.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "EGCH: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.4%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+8.4%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -2087,7 +3380,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2538000000.0,
+        "operating_cash_flow_latest": 2292000000.0,
+        "cash_to_net_income_ratio": 0.903,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -104130000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 74514759.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2102,11 +3411,15 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "EGTS: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_this_stock": "EGTS: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2114,7 +3427,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -119030000.0,
+        "operating_cash_flow_latest": 528549999.99999994,
+        "cash_to_net_income_ratio": -4.44,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 303100000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 49673951.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2129,11 +3460,15 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ELSH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_this_stock": "ELSH: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Earnings quality is not fully observable",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2141,7 +3476,25 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 162330000.0,
+        "operating_cash_flow_latest": 46880000.0,
+        "cash_to_net_income_ratio": 0.289,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 46880000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 56435614.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2157,13 +3510,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "EXPA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+9.5%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+9.5%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+9.5%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2171,7 +3528,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 6033000000.0,
+        "operating_cash_flow_latest": -21384000000.0,
+        "cash_to_net_income_ratio": -3.545,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -21556000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 33532313.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2186,10 +3561,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "FWRY: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
+      "why_this_stock": "FWRY: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
       "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
+      "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -2198,7 +3576,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2518000000.0,
+        "operating_cash_flow_latest": 2995000000.0,
+        "cash_to_net_income_ratio": 1.189,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2161000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 176380540.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2213,14 +3607,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "GBCO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "Weak 20-day momentum (-5.3%)",
+      "why_this_stock": "GBCO: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution; Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Weak 20-day momentum (-5.3%); Operating cash flow does not support reported earnings",
       "supporting_evidence": [
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
-        "Weak 20-day momentum (-5.3%)"
+        "Weak 20-day momentum (-5.3%)",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -2229,7 +3626,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 2861000000.0,
+        "operating_cash_flow_latest": -1002000000.0,
+        "cash_to_net_income_ratio": -0.35,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -4666000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 73618083.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2244,13 +3659,16 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "HDBK: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+11.0%)",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "HDBK: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+11.0%); High average traded value supports execution",
+      "why_not_others": "Earnings quality is not fully observable",
       "supporting_evidence": [
-        "Strong 20-day momentum (+11.0%)"
+        "Strong 20-day momentum (+11.0%)",
+        "High average traded value supports execution"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2258,7 +3676,25 @@
       "price_bars": 273,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 18681000000.0,
+        "operating_cash_flow_latest": 2186000000.0,
+        "cash_to_net_income_ratio": 0.117,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1313000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 22268968.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2273,11 +3709,16 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "HRHO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_this_stock": "HRHO: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2285,7 +3726,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 4058000000.0,
+        "operating_cash_flow_latest": -22986000000.0,
+        "cash_to_net_income_ratio": -5.664,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -23917000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 151170785.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2300,14 +3759,19 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ICFC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+12.8%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "ICFC: technical analysis only (no fair value available) Based on 17 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+12.8%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Secondary financial source",
       "supporting_evidence": [
         "Strong 20-day momentum (+12.8%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Secondary financial source",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2315,7 +3779,26 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 17,
+      "quality_score": 70,
+      "quality_notes": [
+        "Secondary financial source",
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 76901.346,
+        "operating_cash_flow_latest": -82152.374,
+        "cash_to_net_income_ratio": -1.068,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": null
+      },
+      "source": "mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 16185741.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2331,13 +3814,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "IDRE: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+19.9%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+19.9%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+19.9%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2345,7 +3832,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 1310000.0,
+        "operating_cash_flow_latest": -3760000.0,
+        "cash_to_net_income_ratio": -2.87,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -3760000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 25274425.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2360,13 +3865,18 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "IEEC: technical analysis only (no fair value available)",
-      "why_now": "Strong 20-day momentum (+98.7%)",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "IEEC: technical analysis only (no fair value available) Based on 20 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+98.7%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Secondary financial source",
       "supporting_evidence": [
-        "Strong 20-day momentum (+98.7%)"
+        "Strong 20-day momentum (+98.7%)",
+        "High average traded value supports execution"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Secondary financial source",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2374,7 +3884,26 @@
       "price_bars": 22,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 0
+      "financial_periods": 20,
+      "quality_score": 70,
+      "quality_notes": [
+        "Secondary financial source",
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 10885.386,
+        "operating_cash_flow_latest": -37864670.0,
+        "cash_to_net_income_ratio": -3478.487,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": null
+      },
+      "source": "mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 74141144.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2390,13 +3919,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "IFAP: technical analysis only (no fair value available)",
-      "why_now": "Strong 20-day momentum (+11.8%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+11.8%); High average traded value supports execution",
+      "why_not_others": "Fewer than 3 reporting periods; Earnings quality is not fully observable",
       "supporting_evidence": [
         "Strong 20-day momentum (+11.8%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2404,7 +3937,22 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 0
+      "financial_periods": 0,
+      "quality_score": 70,
+      "quality_notes": [
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable",
+        "Limited financial fields"
+      ],
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 16564852.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2420,13 +3968,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "ISMA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+27.6%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+27.6%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+27.6%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2434,7 +3986,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 45640000.0,
+        "operating_cash_flow_latest": -8230000.0,
+        "cash_to_net_income_ratio": -0.18,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -8580000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 48127590.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2450,13 +4020,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "ISPH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+19.1%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+19.1%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+19.1%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2464,7 +4038,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 771110000.0,
+        "operating_cash_flow_latest": -71060000.0,
+        "cash_to_net_income_ratio": -0.092,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -805660000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 89966783.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2479,14 +4071,18 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "KABO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+14.4%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "KABO: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+14.4%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+14.4%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2494,7 +4090,25 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 128930000.0,
+        "operating_cash_flow_latest": -21820000.0,
+        "cash_to_net_income_ratio": -0.169,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -118860000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 20551163.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2510,10 +4124,12 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "KRDI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+28.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_now": "Strong 20-day momentum (+28.4%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+28.4%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -2524,7 +4140,23 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 42620000.0,
+        "operating_cash_flow_latest": 85540000.0,
+        "cash_to_net_income_ratio": 2.007,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -36270000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 49414171.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2540,11 +4172,14 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "MASR: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "Weak 20-day momentum (-8.6%)",
-      "supporting_evidence": [],
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Weak 20-day momentum (-8.6%); Earnings quality is not fully observable",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
-        "Weak 20-day momentum (-8.6%)"
+        "Weak 20-day momentum (-8.6%)",
+        "Earnings quality is not fully observable"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -2553,7 +4188,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 3157000000.0,
+        "operating_cash_flow_latest": 460180000.0,
+        "cash_to_net_income_ratio": 0.146,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 93140000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 51268869.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2568,10 +4221,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "MOED: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
+      "why_this_stock": "MOED: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
       "why_not_others": "Weak 20-day momentum (-6.8%); Price below SMA-20 and SMA-50 — downtrend",
-      "supporting_evidence": [],
+      "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
         "Weak 20-day momentum (-6.8%)",
         "Price below SMA-20 and SMA-50 — downtrend"
@@ -2583,7 +4239,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4450000.0,
+        "operating_cash_flow_latest": 13370000.0,
+        "cash_to_net_income_ratio": 3.004,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -1200000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 18079676.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2598,11 +4270,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "MPCO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+16.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "MPCO: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+16.9%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+16.9%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -2613,7 +4287,23 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2049999.9999999998,
+        "operating_cash_flow_latest": 30280000.0,
+        "cash_to_net_income_ratio": 14.771,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -40660000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 73762180.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2629,13 +4319,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "NIPH: technical analysis only (no fair value available)",
-      "why_now": "Strong 20-day momentum (+113.5%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+113.5%); High average traded value supports execution",
+      "why_not_others": "Fewer than 3 reporting periods; Earnings quality is not fully observable",
       "supporting_evidence": [
         "Strong 20-day momentum (+113.5%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2643,7 +4337,22 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 0
+      "financial_periods": 0,
+      "quality_score": 70,
+      "quality_notes": [
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable",
+        "Limited financial fields"
+      ],
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 154847333.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2658,14 +4367,18 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "OCDI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+29.2%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "OCDI: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+29.2%); High average traded value supports execution",
+      "why_not_others": "Operating cash flow does not support reported earnings; Earnings are not supported by operating cash flow",
       "supporting_evidence": [
         "Strong 20-day momentum (+29.2%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2673,7 +4386,25 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 4480000000.0,
+        "operating_cash_flow_latest": -5089000000.0,
+        "cash_to_net_income_ratio": -1.136,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -5866000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 72925528.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2688,14 +4419,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "OIH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+28.9%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "OIH: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+28.9%); High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
       "supporting_evidence": [
         "Strong 20-day momentum (+28.9%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2703,7 +4437,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -533780000.0,
+        "operating_cash_flow_latest": -318480000.0,
+        "cash_to_net_income_ratio": 0.597,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -946200000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 185231857.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2718,11 +4470,15 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ORAS: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_this_stock": "ORAS: technical analysis only (no fair value available) Based on 19 financial reporting periods.",
+      "why_now": "Earnings are supported by positive operating cash flow",
+      "why_not_others": "Secondary financial source",
+      "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow"
+      ],
+      "invalidation_conditions": [
+        "Secondary financial source"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2730,7 +4486,25 @@
       "price_bars": 275,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 19,
+      "quality_score": 90,
+      "quality_notes": [
+        "Secondary financial source"
+      ],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4300000.0,
+        "operating_cash_flow_latest": 184900000.0,
+        "cash_to_net_income_ratio": 43.0,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": null
+      },
+      "source": "mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "unknown",
+      "average_traded_value": 0.0,
+      "execution_risk": "high"
     }
   },
   {
@@ -2746,13 +4520,16 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "PHAR: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+61.9%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+61.9%); High average traded value supports execution",
+      "why_not_others": "Earnings quality is not fully observable",
       "supporting_evidence": [
         "Strong 20-day momentum (+61.9%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2760,7 +4537,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1442000000.0,
+        "operating_cash_flow_latest": 1094000000.0,
+        "cash_to_net_income_ratio": 0.759,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -261149999.99999997
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 81967314.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2776,11 +4571,14 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "PRCL: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "Weak 20-day momentum (-5.5%)",
-      "supporting_evidence": [],
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Weak 20-day momentum (-5.5%); Latest net income is negative",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
-        "Weak 20-day momentum (-5.5%)"
+        "Weak 20-day momentum (-5.5%)",
+        "Latest net income is negative"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -2789,7 +4587,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -99220000.0,
+        "operating_cash_flow_latest": -28150000.0,
+        "cash_to_net_income_ratio": 0.284,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -28620000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 38706111.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2805,11 +4621,15 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "RAYA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "Weak 20-day momentum (-11.3%); Price below SMA-20 and SMA-50 — downtrend",
-      "supporting_evidence": [],
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Weak 20-day momentum (-11.3%); Operating cash flow does not support reported earnings",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
       "invalidation_conditions": [
         "Weak 20-day momentum (-11.3%)",
+        "Operating cash flow does not support reported earnings",
+        "Earnings are not supported by operating cash flow",
         "Price below SMA-20 and SMA-50 — downtrend"
       ],
       "similar_historical_cases": [],
@@ -2819,7 +4639,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 2588000000.0,
+        "operating_cash_flow_latest": -1354000000.0,
+        "cash_to_net_income_ratio": -0.523,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -2878000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 119059578.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2834,11 +4672,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "SDTI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+54.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "SDTI: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+54.8%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+54.8%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -2849,7 +4689,23 @@
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 201960000.0,
+        "operating_cash_flow_latest": 188440000.0,
+        "cash_to_net_income_ratio": 0.933,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 101370000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 69151843.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2864,14 +4720,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "SVCE: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+16.0%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "SVCE: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+16.0%); High average traded value supports execution",
+      "why_not_others": "Latest net income is negative",
       "supporting_evidence": [
         "Strong 20-day momentum (+16.0%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Latest net income is negative"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2879,7 +4738,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 85,
+      "quality_notes": [
+        "Latest net income is negative"
+      ],
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -382410000.0,
+        "operating_cash_flow_latest": 25560000.0,
+        "cash_to_net_income_ratio": -0.067,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 24340000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 87384668.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2894,11 +4771,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "SWDY: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+18.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "SWDY: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+18.8%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+18.8%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -2909,7 +4788,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 15257000000.0,
+        "operating_cash_flow_latest": 15456000000.0,
+        "cash_to_net_income_ratio": 1.013,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2344000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 32170610.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2924,11 +4819,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "TALM: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+20.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "TALM: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+20.5%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+20.5%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -2939,7 +4836,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 624320000.0,
+        "operating_cash_flow_latest": 887060000.0,
+        "cash_to_net_income_ratio": 1.421,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -540540000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 13825084.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2955,10 +4868,14 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "TMGH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [],
-      "invalidation_conditions": [],
+      "why_now": "High average traded value supports execution",
+      "why_not_others": "Earnings quality is not fully observable",
+      "supporting_evidence": [
+        "High average traded value supports execution"
+      ],
+      "invalidation_conditions": [
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -2966,7 +4883,25 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 90,
+      "quality_notes": [
+        "Earnings quality is not fully observable"
+      ],
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 14384000000.0,
+        "operating_cash_flow_latest": 8689000000.0,
+        "cash_to_net_income_ratio": 0.604,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -2664000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 294046360.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -2981,11 +4916,13 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "UEGC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+21.3%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_this_stock": "UEGC: technical analysis only (no fair value available) Based on 6 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+21.3%); Earnings are supported by positive operating cash flow",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
         "Strong 20-day momentum (+21.3%)",
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [],
@@ -2996,7 +4933,23 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 6,
+      "quality_score": 100,
+      "quality_notes": [],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 83880000.0,
+        "operating_cash_flow_latest": 547640000.0,
+        "cash_to_net_income_ratio": 6.529,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 477690000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 44507244.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -3013,10 +4966,13 @@
     "explanation": {
       "why_this_stock": "VALU: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
       "why_now": "No strong catalyst identified",
-      "why_not_others": "Weak 20-day momentum (-10.1%)",
+      "why_not_others": "Weak 20-day momentum (-10.1%); Operating cash flow does not support reported earnings",
       "supporting_evidence": [],
       "invalidation_conditions": [
-        "Weak 20-day momentum (-10.1%)"
+        "Weak 20-day momentum (-10.1%)",
+        "Operating cash flow does not support reported earnings",
+        "Low traded value increases execution risk",
+        "Earnings are not supported by operating cash flow"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -3025,7 +4981,25 @@
       "price_bars": 276,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 5,
+      "quality_score": 80,
+      "quality_notes": [
+        "Earnings are not supported by operating cash flow"
+      ],
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 764390000.0,
+        "operating_cash_flow_latest": -8004000000.0,
+        "cash_to_net_income_ratio": -10.471,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -8061000000.0
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "low",
+      "average_traded_value": 120176.0,
+      "execution_risk": "high"
     }
   },
   {
@@ -3042,12 +5016,16 @@
     "explanation": {
       "why_this_stock": "VLMR: technical analysis only (no fair value available)",
       "why_now": "Strong 20-day momentum (+7.1%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_not_others": "Low traded value increases execution risk; Fewer than 3 reporting periods",
       "supporting_evidence": [
         "Strong 20-day momentum (+7.1%)",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Low traded value increases execution risk",
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -3055,7 +5033,22 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 0
+      "financial_periods": 0,
+      "quality_score": 70,
+      "quality_notes": [
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable",
+        "Limited financial fields"
+      ],
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "low",
+      "average_traded_value": 225779.0,
+      "execution_risk": "high"
     }
   },
   {
@@ -3070,13 +5063,17 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "VLMRA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_this_stock": "VLMRA: technical analysis only (no fair value available) Based on 18 financial reporting periods.",
+      "why_now": "Earnings are supported by positive operating cash flow; High average traded value supports execution",
+      "why_not_others": "Secondary financial source",
       "supporting_evidence": [
+        "Earnings are supported by positive operating cash flow",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Secondary financial source"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -3084,7 +5081,25 @@
       "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 5
+      "financial_periods": 18,
+      "quality_score": 90,
+      "quality_notes": [
+        "Secondary financial source"
+      ],
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 34254.261,
+        "operating_cash_flow_latest": 37389.616,
+        "cash_to_net_income_ratio": 1.092,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": null
+      },
+      "source": "mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 95792139.0,
+      "execution_risk": "low"
     }
   },
   {
@@ -3100,13 +5115,17 @@
     "upside_pct": null,
     "explanation": {
       "why_this_stock": "ZEOT: technical analysis only (no fair value available)",
-      "why_now": "Strong 20-day momentum (+15.6%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "No major contrary indicator",
+      "why_now": "Strong 20-day momentum (+15.6%); High average traded value supports execution",
+      "why_not_others": "Fewer than 3 reporting periods; Earnings quality is not fully observable",
       "supporting_evidence": [
         "Strong 20-day momentum (+15.6%)",
+        "High average traded value supports execution",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
-      "invalidation_conditions": [],
+      "invalidation_conditions": [
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable"
+      ],
       "similar_historical_cases": [],
       "evidence_refs": []
     },
@@ -3114,7 +5133,22 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 0
+      "financial_periods": 0,
+      "quality_score": 70,
+      "quality_notes": [
+        "Fewer than 3 reporting periods",
+        "Earnings quality is not fully observable",
+        "Limited financial fields"
+      ],
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "source": "stockanalysis+mubasher",
+      "event_status": "not_structured",
+      "event_flags": [],
+      "liquidity_class": "high",
+      "average_traded_value": 40669974.0,
+      "execution_risk": "low"
     }
   }
 ]

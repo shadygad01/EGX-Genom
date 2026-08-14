@@ -518,11 +518,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.697,
+      "confidence": 0.709,
       "current_price": 36.3,
-      "fair_value": 18.5825,
-      "upside_pct": -48.8,
-      "combined_expected_return": -0.489
+      "fair_value": 17.0583,
+      "upside_pct": -53.0,
+      "combined_expected_return": -0.531
     },
     {
       "ticker": "ECAP",
@@ -554,11 +554,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.661,
+      "confidence": 0.676,
       "current_price": 32.7,
-      "fair_value": 19.4924,
-      "upside_pct": -40.4,
-      "combined_expected_return": -0.3685
+      "fair_value": 17.7944,
+      "upside_pct": -45.6,
+      "combined_expected_return": -0.4204
     },
     {
       "ticker": "EFIH",
@@ -572,11 +572,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.763,
+      "confidence": 0.779,
       "current_price": 24.21,
-      "fair_value": 6.5501,
-      "upside_pct": -72.9,
-      "combined_expected_return": -0.7093
+      "fair_value": 5.2166,
+      "upside_pct": -78.5,
+      "combined_expected_return": -0.7644
     },
     {
       "ticker": "EGAL",

@@ -9,6 +9,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 52,
+      "financial_periods": 6,
       "shares_outstanding": 1261875720.0,
       "financial_validation": null,
       "diagnostics": {
@@ -36,6 +37,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 7980000000.0,
+        "operating_cash_flow_latest": 3533000000.0,
+        "cash_to_net_income_ratio": 0.443,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3141000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ABUK",
         "as_of": "2026-08-14",
@@ -70,6 +81,7 @@
       "sector": null,
       "source": "mubasher",
       "line_items": 98,
+      "financial_periods": 8,
       "shares_outstanding": null,
       "financial_validation": null,
       "diagnostics": {
@@ -94,6 +106,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -513125.356,
+        "operating_cash_flow_latest": -106879.482,
+        "cash_to_net_income_ratio": 0.208,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": null
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -103,6 +125,7 @@
       "sector": "Banks",
       "source": "stockanalysis+mubasher",
       "line_items": 37,
+      "financial_periods": 6,
       "shares_outstanding": 1500000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -127,6 +150,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 12589000000.0,
+        "operating_cash_flow_latest": -57346000000.0,
+        "cash_to_net_income_ratio": -4.555,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -57766000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -136,6 +169,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 18000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -162,6 +196,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4210000.0,
+        "operating_cash_flow_latest": 615570000.0,
+        "cash_to_net_income_ratio": 146.216,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 614820000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -171,6 +215,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 32891778.0,
       "financial_validation": null,
       "diagnostics": {
@@ -197,6 +242,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 54170000.0,
+        "operating_cash_flow_latest": -26570000.0,
+        "cash_to_net_income_ratio": -0.49,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -37340000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "AFMC",
         "as_of": "2026-08-14",
@@ -229,6 +284,7 @@
       "sector": null,
       "source": "mubasher",
       "line_items": 17,
+      "financial_periods": 2,
       "shares_outstanding": 1558128698.0,
       "financial_validation": null,
       "diagnostics": {
@@ -255,6 +311,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -8424.067,
+        "operating_cash_flow_latest": 27368.181,
+        "cash_to_net_income_ratio": -3.249,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": null
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -264,6 +330,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 1558128698.0,
       "financial_validation": null,
       "diagnostics": {
@@ -290,6 +357,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -23590000.0,
+        "operating_cash_flow_latest": 824340000.0,
+        "cash_to_net_income_ratio": -34.944,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 813090000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -299,6 +376,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 43,
+      "financial_periods": 5,
       "shares_outstanding": 2979506800.0,
       "financial_validation": null,
       "diagnostics": {
@@ -326,6 +404,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 6636000000.0,
+        "operating_cash_flow_latest": 4927000000.0,
+        "cash_to_net_income_ratio": 0.742,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 4901000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ALCN",
         "as_of": "2026-08-14",
@@ -360,6 +448,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 902789840.0,
       "financial_validation": null,
       "diagnostics": {
@@ -386,6 +475,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 123100000.0,
+        "operating_cash_flow_latest": 49770000.0,
+        "cash_to_net_income_ratio": 0.404,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 10040000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -395,6 +494,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 5,
       "shares_outstanding": 510570561.0,
       "financial_validation": null,
       "diagnostics": {
@@ -422,6 +522,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 268530000.0,
+        "operating_cash_flow_latest": -1812000000.0,
+        "cash_to_net_income_ratio": -6.748,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -1859000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -431,6 +541,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 52,
+      "financial_periods": 6,
       "shares_outstanding": 1291500000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -458,6 +569,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1488000000.0,
+        "operating_cash_flow_latest": 1060000000.0,
+        "cash_to_net_income_ratio": 0.712,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 688730000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "AMOC",
         "as_of": "2026-08-14",
@@ -492,6 +613,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 23902963390.0,
       "financial_validation": null,
       "diagnostics": {
@@ -518,6 +640,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 96910000.0,
+        "operating_cash_flow_latest": -639840000.0,
+        "cash_to_net_income_ratio": -6.602,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -676760000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -527,6 +659,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 6,
       "shares_outstanding": 374867445.0,
       "financial_validation": null,
       "diagnostics": {
@@ -554,6 +687,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 3581000000.0,
+        "operating_cash_flow_latest": 3818000000.0,
+        "cash_to_net_income_ratio": 1.066,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3022000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ARCC",
         "as_of": "2026-08-14",
@@ -588,6 +731,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 48702431.0,
       "financial_validation": null,
       "diagnostics": {
@@ -614,6 +758,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 320060000.0,
+        "operating_cash_flow_latest": 90150000.0,
+        "cash_to_net_income_ratio": 0.282,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -319340000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -623,6 +777,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 42,
+      "financial_periods": 5,
       "shares_outstanding": 2000000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -648,6 +803,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 63260000.0,
+        "operating_cash_flow_latest": -239700000.0,
+        "cash_to_net_income_ratio": -3.789,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -257390000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -657,6 +822,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 44,
+      "financial_periods": 5,
       "shares_outstanding": 400000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -683,6 +849,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 226760000.0,
+        "operating_cash_flow_latest": -1656000000.0,
+        "cash_to_net_income_ratio": -7.303,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -1664000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ATLC",
         "as_of": "2026-08-14",
@@ -715,6 +891,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 1200000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -741,6 +918,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 30750000.0,
+        "operating_cash_flow_latest": 1277000000.0,
+        "cash_to_net_income_ratio": 41.528,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 1255000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -750,6 +937,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 5,
       "shares_outstanding": 83514200.0,
       "financial_validation": null,
       "diagnostics": {
@@ -777,6 +965,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 213230000.0,
+        "operating_cash_flow_latest": 240830000.0,
+        "cash_to_net_income_ratio": 1.129,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 63550000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "BIOC",
         "as_of": "2026-08-14",
@@ -811,6 +1009,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 42,
+      "financial_periods": 6,
       "shares_outstanding": 10718106944.0,
       "financial_validation": null,
       "diagnostics": {
@@ -836,6 +1035,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 1347000000.0,
+        "operating_cash_flow_latest": -10607000000.0,
+        "cash_to_net_income_ratio": -7.875,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -11265000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -845,6 +1054,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 4226464000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -871,6 +1081,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -1249000000.0,
+        "operating_cash_flow_latest": 28341000000.0,
+        "cash_to_net_income_ratio": -22.691,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 20372000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -880,6 +1100,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 40,
+      "financial_periods": 6,
       "shares_outstanding": 1250000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -905,6 +1126,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 6197000000.0,
+        "operating_cash_flow_latest": -6244000000.0,
+        "cash_to_net_income_ratio": -1.008,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -6968000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "CIEB",
         "as_of": "2026-08-14",
@@ -938,6 +1169,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 44,
+      "financial_periods": 6,
       "shares_outstanding": 1196974000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -964,6 +1196,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 345100000.0,
+        "operating_cash_flow_latest": 486480000.0,
+        "cash_to_net_income_ratio": 1.41,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 141790000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -973,6 +1215,7 @@
       "sector": "Banks",
       "source": "stockanalysis+mubasher",
       "line_items": 41,
+      "financial_periods": 6,
       "shares_outstanding": 3405139100.0,
       "financial_validation": null,
       "diagnostics": {
@@ -998,6 +1241,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 61634000000.0,
+        "operating_cash_flow_latest": -2765000000.0,
+        "cash_to_net_income_ratio": -0.045,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -10695000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "COMI",
         "as_of": "2026-08-14",
@@ -1030,6 +1283,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 624000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1056,6 +1310,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -75410000.0,
+        "operating_cash_flow_latest": -63690000.0,
+        "cash_to_net_income_ratio": 0.845,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -68040000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1065,6 +1329,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 46,
+      "financial_periods": 5,
       "shares_outstanding": 300000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1091,6 +1356,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1025000000.0,
+        "operating_cash_flow_latest": 26240000.0,
+        "cash_to_net_income_ratio": 0.026,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 26240000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "CSAG",
         "as_of": "2026-08-14",
@@ -1124,6 +1399,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 23522400.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1150,6 +1426,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -138400000.0,
+        "operating_cash_flow_latest": -57980000.0,
+        "cash_to_net_income_ratio": 0.419,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -69010000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1159,6 +1445,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 2679967171.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1185,6 +1472,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 366550000.0,
+        "operating_cash_flow_latest": -718910000.0,
+        "cash_to_net_income_ratio": -1.961,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -1300000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "DSCW",
         "as_of": "2026-08-14",
@@ -1215,8 +1512,9 @@
       "ticker": "EAST",
       "company_name": "Eastern Company",
       "sector": null,
-      "source": "stockanalysis",
-      "line_items": 50,
+      "source": "stockanalysis+mubasher",
+      "line_items": 51,
+      "financial_periods": 6,
       "shares_outstanding": 3000000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1231,38 +1529,50 @@
           "operating_income",
           "revenue",
           "shares_outstanding",
-          "total_debt"
+          "total_debt",
+          "total_equity"
         ],
         "model_gates": {
           "pe": "ready",
-          "pb": "missing_total_equity",
-          "residual_income": "missing_equity_eps_or_shares",
+          "pb": "ready",
+          "residual_income": "ready",
           "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
           "earnings_power": "ready",
           "dcf": "missing_or_non_positive_fcf_or_shares",
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 8662000000.0,
+        "operating_cash_flow_latest": -23645000000.0,
+        "cash_to_net_income_ratio": -2.73,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -23677000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "EAST",
         "as_of": "2026-08-14",
-        "weighted_fair_value": 18.5825,
-        "bear_case": 11.1495,
-        "base_case": 18.5825,
-        "bull_case": 29.7319,
+        "weighted_fair_value": 17.0583,
+        "bear_case": 10.235,
+        "base_case": 17.0583,
+        "bull_case": 27.2933,
         "models": {
-          "dcf": -45.9872,
-          "ddm": 19.0217,
-          "residual_income": null,
+          "dcf": -72.1632,
+          "ddm": 18.9019,
+          "residual_income": 13.5818,
           "earnings_power": 9.4846,
           "ev_ebitda": null,
           "pe": 31.79,
-          "pb": null
+          "pb": 0.0052
         },
         "included_models": [
           "ddm",
           "earnings_power",
-          "pe"
+          "pe",
+          "residual_income"
         ],
         "latest_period": "2025-06-30",
         "assumptions_version": "smartlist-ive-v2.2"
@@ -1273,8 +1583,9 @@
       "ticker": "ECAP",
       "company_name": "El Ezz Porcelain (Gemma)",
       "sector": null,
-      "source": "stockanalysis",
-      "line_items": 47,
+      "source": "stockanalysis+mubasher",
+      "line_items": 48,
+      "financial_periods": 6,
       "shares_outstanding": 53342513.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1289,11 +1600,12 @@
           "operating_income",
           "revenue",
           "shares_outstanding",
-          "total_debt"
+          "total_debt",
+          "total_equity"
         ],
         "model_gates": {
           "pe": "missing_or_non_positive_eps",
-          "pb": "missing_total_equity",
+          "pb": "ready",
           "residual_income": "missing_equity_eps_or_shares",
           "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
           "earnings_power": "ready",
@@ -1301,6 +1613,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -88790000.0,
+        "operating_cash_flow_latest": -491600000.0,
+        "cash_to_net_income_ratio": 5.537,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -528490000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1308,8 +1630,9 @@
       "ticker": "EFID",
       "company_name": "Edita Food Industries S.A.E",
       "sector": null,
-      "source": "stockanalysis",
-      "line_items": 51,
+      "source": "stockanalysis+mubasher",
+      "line_items": 52,
+      "financial_periods": 6,
       "shares_outstanding": 1389021139.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1324,41 +1647,53 @@
           "operating_income",
           "revenue",
           "shares_outstanding",
-          "total_debt"
+          "total_debt",
+          "total_equity"
         ],
         "model_gates": {
           "pe": "ready",
-          "pb": "missing_total_equity",
-          "residual_income": "missing_equity_eps_or_shares",
+          "pb": "ready",
+          "residual_income": "ready",
           "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
           "earnings_power": "ready",
           "dcf": "ready",
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2521000000.0,
+        "operating_cash_flow_latest": 4311000000.0,
+        "cash_to_net_income_ratio": 1.71,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3291000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "EFID",
         "as_of": "2026-08-14",
-        "weighted_fair_value": 19.4924,
-        "bear_case": 11.6954,
-        "base_case": 19.4924,
+        "weighted_fair_value": 17.7944,
+        "bear_case": 10.6766,
+        "base_case": 17.7944,
         "bull_case": 27.6915,
         "models": {
           "dcf": 27.6915,
           "ddm": 6.0424,
-          "residual_income": null,
-          "earnings_power": 9.069,
+          "residual_income": 9.4026,
+          "earnings_power": 10.103,
           "ev_ebitda": null,
           "pe": 23.98,
-          "pb": null
+          "pb": 0.0065
         },
         "included_models": [
           "dcf",
           "ddm",
           "earnings_power",
-          "pe"
+          "pe",
+          "residual_income"
         ],
-        "latest_period": "2025-12-31",
+        "latest_period": "2026-03-31",
         "assumptions_version": "smartlist-ive-v2.2"
       },
       "warning": null
@@ -1367,8 +1702,9 @@
       "ticker": "EFIH",
       "company_name": "E-finance For Digital and Financial Investments",
       "sector": null,
-      "source": "stockanalysis",
-      "line_items": 50,
+      "source": "stockanalysis+mubasher",
+      "line_items": 51,
+      "financial_periods": 6,
       "shares_outstanding": 3447115516.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1383,40 +1719,53 @@
           "operating_income",
           "revenue",
           "shares_outstanding",
-          "total_debt"
+          "total_debt",
+          "total_equity"
         ],
         "model_gates": {
           "pe": "ready",
-          "pb": "missing_total_equity",
-          "residual_income": "missing_equity_eps_or_shares",
+          "pb": "ready",
+          "residual_income": "ready",
           "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
           "earnings_power": "ready",
           "dcf": "ready",
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 1943000000.0,
+        "operating_cash_flow_latest": 2342000000.0,
+        "cash_to_net_income_ratio": 1.205,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2181000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "EFIH",
         "as_of": "2026-08-14",
-        "weighted_fair_value": 6.5501,
-        "bear_case": 3.9301,
-        "base_case": 6.5501,
+        "weighted_fair_value": 5.2166,
+        "bear_case": 3.1299,
+        "base_case": 5.2166,
         "bull_case": 8.2456,
         "models": {
           "dcf": 8.2456,
           "ddm": 1.4547,
-          "residual_income": null,
-          "earnings_power": 3.4194,
+          "residual_income": 2.384,
+          "earnings_power": 3.8702,
           "ev_ebitda": null,
           "pe": 6.16,
-          "pb": null
+          "pb": 0.0034
         },
         "included_models": [
           "dcf",
+          "ddm",
           "earnings_power",
-          "pe"
+          "pe",
+          "residual_income"
         ],
-        "latest_period": "2025-12-31",
+        "latest_period": "2026-03-31",
         "assumptions_version": "smartlist-ive-v2.2"
       },
       "warning": null
@@ -1427,6 +1776,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 5,
       "shares_outstanding": 412500000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1454,6 +1804,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 10186000000.0,
+        "operating_cash_flow_latest": 4661000000.0,
+        "cash_to_net_income_ratio": 0.458,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 3389000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "EGAL",
         "as_of": "2026-08-14",
@@ -1485,8 +1845,9 @@
       "ticker": "EGCH",
       "company_name": "Egyptian Chemical Industries (Kima)",
       "sector": "Materials",
-      "source": "stockanalysis",
-      "line_items": 45,
+      "source": "stockanalysis+mubasher",
+      "line_items": 46,
+      "financial_periods": 6,
       "shares_outstanding": 1986578999.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1500,18 +1861,29 @@
           "operating_income",
           "revenue",
           "shares_outstanding",
-          "total_debt"
+          "total_debt",
+          "total_equity"
         ],
         "model_gates": {
           "pe": "ready",
-          "pb": "missing_total_equity",
-          "residual_income": "missing_equity_eps_or_shares",
+          "pb": "ready",
+          "residual_income": "ready",
           "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
           "earnings_power": "ready",
           "dcf": "missing_or_non_positive_fcf_or_shares",
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2538000000.0,
+        "operating_cash_flow_latest": 2292000000.0,
+        "cash_to_net_income_ratio": 0.903,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -104130000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1519,8 +1891,9 @@
       "ticker": "EGTS",
       "company_name": "Egyptian for Tourism Resorts",
       "sector": null,
-      "source": "stockanalysis",
-      "line_items": 41,
+      "source": "stockanalysis+mubasher",
+      "line_items": 42,
+      "financial_periods": 6,
       "shares_outstanding": 1050000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1533,11 +1906,12 @@
           "operating_cash_flow",
           "operating_income",
           "revenue",
-          "shares_outstanding"
+          "shares_outstanding",
+          "total_equity"
         ],
         "model_gates": {
           "pe": "missing_or_non_positive_eps",
-          "pb": "missing_total_equity",
+          "pb": "ready",
           "residual_income": "missing_equity_eps_or_shares",
           "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
           "earnings_power": "missing_or_non_positive_operating_income_or_shares",
@@ -1545,6 +1919,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -119030000.0,
+        "operating_cash_flow_latest": 528549999.99999994,
+        "cash_to_net_income_ratio": -4.44,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 303100000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1554,6 +1938,7 @@
       "sector": "Real Estate",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 672000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1580,6 +1965,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 67150000.0,
+        "operating_cash_flow_latest": 131310000.0,
+        "cash_to_net_income_ratio": 1.955,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 94120000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "EHDR",
         "as_of": "2026-08-14",
@@ -1610,8 +2005,9 @@
       "ticker": "ELSH",
       "company_name": "El Shams Housing & Urbanization",
       "sector": "Real Estate",
-      "source": "stockanalysis",
-      "line_items": 39,
+      "source": "stockanalysis+mubasher",
+      "line_items": 40,
+      "financial_periods": 6,
       "shares_outstanding": 226875000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1624,18 +2020,29 @@
           "operating_cash_flow",
           "revenue",
           "shares_outstanding",
-          "total_debt"
+          "total_debt",
+          "total_equity"
         ],
         "model_gates": {
           "pe": "ready",
-          "pb": "missing_total_equity",
-          "residual_income": "missing_equity_eps_or_shares",
+          "pb": "ready",
+          "residual_income": "ready",
           "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
           "earnings_power": "missing_or_non_positive_operating_income_or_shares",
           "dcf": "ready",
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 162330000.0,
+        "operating_cash_flow_latest": 46880000.0,
+        "cash_to_net_income_ratio": 0.289,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 46880000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1645,6 +2052,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 5446929384.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1671,6 +2079,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4968000000.0,
+        "operating_cash_flow_latest": 9343000000.0,
+        "cash_to_net_income_ratio": 1.881,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 8283000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "EMFD",
         "as_of": "2026-08-14",
@@ -1703,6 +2121,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 49,
+      "financial_periods": 6,
       "shares_outstanding": 145500000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1730,6 +2149,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 728600000.0,
+        "operating_cash_flow_latest": 801310000.0,
+        "cash_to_net_income_ratio": 1.1,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 277520000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ENGC",
         "as_of": "2026-08-14",
@@ -1763,6 +2192,7 @@
       "sector": "Telecommunications",
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 6,
       "shares_outstanding": 1707071600.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1790,6 +2220,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 20371000000.0,
+        "operating_cash_flow_latest": 37624000000.0,
+        "cash_to_net_income_ratio": 1.847,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 9845000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ETEL",
         "as_of": "2026-08-14",
@@ -1823,6 +2263,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 49,
+      "financial_periods": 6,
       "shares_outstanding": 224949817.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1850,6 +2291,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 112680000.0,
+        "operating_cash_flow_latest": 26970000.0,
+        "cash_to_net_income_ratio": 0.239,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -59210000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ETRS",
         "as_of": "2026-08-14",
@@ -1883,6 +2334,7 @@
       "sector": "Banks",
       "source": "stockanalysis+mubasher",
       "line_items": 36,
+      "financial_periods": 5,
       "shares_outstanding": 1360000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1907,6 +2359,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 6033000000.0,
+        "operating_cash_flow_latest": -21384000000.0,
+        "cash_to_net_income_ratio": -3.545,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -21556000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1916,6 +2378,7 @@
       "sector": "Banks",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 3406523244.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1942,6 +2405,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2518000000.0,
+        "operating_cash_flow_latest": 2995000000.0,
+        "cash_to_net_income_ratio": 1.189,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2161000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1951,6 +2424,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 6,
       "shares_outstanding": 1085500000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -1978,6 +2452,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 2861000000.0,
+        "operating_cash_flow_latest": -1002000000.0,
+        "cash_to_net_income_ratio": -0.35,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -4666000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -1987,6 +2471,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 45,
+      "financial_periods": 6,
       "shares_outstanding": 1636363630.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2013,6 +2498,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 13620000.0,
+        "operating_cash_flow_latest": 6900000.0,
+        "cash_to_net_income_ratio": 0.507,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 6790000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "GPIM",
         "as_of": "2026-08-14",
@@ -2046,6 +2541,7 @@
       "sector": "Banks",
       "source": "stockanalysis+mubasher",
       "line_items": 41,
+      "financial_periods": 6,
       "shares_outstanding": 1062600000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2071,6 +2567,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 18681000000.0,
+        "operating_cash_flow_latest": 2186000000.0,
+        "cash_to_net_income_ratio": 0.117,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1313000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2080,6 +2586,7 @@
       "sector": "Real Estate",
       "source": "stockanalysis+mubasher",
       "line_items": 48,
+      "financial_periods": 5,
       "shares_outstanding": 4005255600.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2107,6 +2614,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 2705000000.0,
+        "operating_cash_flow_latest": -1339000000.0,
+        "cash_to_net_income_ratio": -0.495,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -1355000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "HELI",
         "as_of": "2026-08-14",
@@ -2140,6 +2657,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 43,
+      "financial_periods": 6,
       "shares_outstanding": 1435893008.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2166,6 +2684,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 4058000000.0,
+        "operating_cash_flow_latest": -22986000000.0,
+        "cash_to_net_income_ratio": -5.664,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -23917000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2175,6 +2703,7 @@
       "sector": "Materials",
       "source": "mubasher",
       "line_items": 179,
+      "financial_periods": 17,
       "shares_outstanding": null,
       "financial_validation": null,
       "diagnostics": {
@@ -2199,6 +2728,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 76901.346,
+        "operating_cash_flow_latest": -82152.374,
+        "cash_to_net_income_ratio": -1.068,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": null
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2208,6 +2747,7 @@
       "sector": "Real Estate",
       "source": "stockanalysis+mubasher",
       "line_items": 35,
+      "financial_periods": 5,
       "shares_outstanding": 36838250.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2232,16 +2772,62 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 1310000.0,
+        "operating_cash_flow_latest": -3760000.0,
+        "cash_to_net_income_ratio": -2.87,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -3760000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "IEEC",
-      "source": "stockanalysis_then_mubasher",
-      "line_items": 0,
+      "company_name": "Industrial & Engineering Projects",
+      "sector": null,
+      "source": "mubasher",
+      "line_items": 193,
+      "financial_periods": 20,
       "shares_outstanding": null,
+      "financial_validation": null,
+      "diagnostics": {
+        "available_fields": [
+          "cash_and_equivalents_change",
+          "financing_cash_flow",
+          "gross_profit",
+          "investing_cash_flow",
+          "net_income",
+          "operating_cash_flow",
+          "total_assets",
+          "total_equity",
+          "total_liabilities"
+        ],
+        "model_gates": {
+          "pe": "missing_or_non_positive_eps",
+          "pb": "missing_shares",
+          "residual_income": "missing_equity_eps_or_shares",
+          "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+          "earnings_power": "missing_or_non_positive_operating_income_or_shares",
+          "dcf": "missing_or_non_positive_fcf_or_shares",
+          "ddm": "missing_or_non_positive_dividend"
+        }
+      },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 10885.386,
+        "operating_cash_flow_latest": -37864670.0,
+        "cash_to_net_income_ratio": -3478.487,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": null
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
-      "warning": "URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
+      "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "IFAP",
@@ -2249,12 +2835,18 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 0,
+      "financial_periods": 0,
       "shares_outstanding": 497288366.0,
       "financial_validation": "future_period",
       "diagnostics": {
         "available_fields": [],
         "model_gates": {}
       },
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "future_period"
     },
@@ -2264,6 +2856,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 46,
+      "financial_periods": 5,
       "shares_outstanding": 89856499.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2290,6 +2883,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 45640000.0,
+        "operating_cash_flow_latest": -8230000.0,
+        "cash_to_net_income_ratio": -0.18,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -8580000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2299,6 +2902,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 37,
+      "financial_periods": 5,
       "shares_outstanding": 976872278.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2325,6 +2929,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 697990000.0,
+        "operating_cash_flow_latest": 985150000.0,
+        "cash_to_net_income_ratio": 1.411,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 898020000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ISMQ",
         "as_of": "2026-08-14",
@@ -2359,6 +2973,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 49,
+      "financial_periods": 5,
       "shares_outstanding": 1008000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2386,6 +3001,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 771110000.0,
+        "operating_cash_flow_latest": -71060000.0,
+        "cash_to_net_income_ratio": -0.092,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -805660000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2395,6 +3020,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 6,
       "shares_outstanding": 1470945441.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2422,6 +3048,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1632000000.0,
+        "operating_cash_flow_latest": 777590000.0,
+        "cash_to_net_income_ratio": 0.476,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -2247000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "JUFO",
         "as_of": "2026-08-14",
@@ -2454,6 +3090,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 564693841.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2480,6 +3117,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 128930000.0,
+        "operating_cash_flow_latest": -21820000.0,
+        "cash_to_net_income_ratio": -0.169,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -118860000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2489,6 +3136,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 38,
+      "financial_periods": 5,
       "shares_outstanding": 2000000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2515,6 +3163,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 42620000.0,
+        "operating_cash_flow_latest": 85540000.0,
+        "cash_to_net_income_ratio": 2.007,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -36270000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2524,6 +3182,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 80000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2550,6 +3209,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 340890000.0,
+        "operating_cash_flow_latest": -195980000.0,
+        "cash_to_net_income_ratio": -0.575,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -662740000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "LCSW",
         "as_of": "2026-08-14",
@@ -2582,6 +3251,7 @@
       "sector": "Real Estate",
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 5,
       "shares_outstanding": 2135000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2609,6 +3279,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 3157000000.0,
+        "operating_cash_flow_latest": 460180000.0,
+        "cash_to_net_income_ratio": 0.146,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 93140000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2618,6 +3298,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 6,
       "shares_outstanding": 96000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2645,6 +3326,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2033000000.0,
+        "operating_cash_flow_latest": 2900000000.0,
+        "cash_to_net_income_ratio": 1.426,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2687000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "MCQE",
         "as_of": "2026-08-14",
@@ -2677,6 +3368,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 49,
+      "financial_periods": 5,
       "shares_outstanding": 570206456.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2704,6 +3396,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 115730000.0,
+        "operating_cash_flow_latest": 160990000.0,
+        "cash_to_net_income_ratio": 1.391,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 118510000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "MCRO",
         "as_of": "2026-08-14",
@@ -2736,6 +3438,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 655000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2762,6 +3465,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 24230000.0,
+        "operating_cash_flow_latest": 22760000.0,
+        "cash_to_net_income_ratio": 0.939,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -15250000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "MEPA",
         "as_of": "2026-08-14",
@@ -2794,6 +3507,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 6,
       "shares_outstanding": 2868140263.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2821,6 +3535,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 11297000000.0,
+        "operating_cash_flow_latest": 11231000000.0,
+        "cash_to_net_income_ratio": 0.994,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 5383000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "MFPC",
         "as_of": "2026-08-14",
@@ -2855,6 +3579,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 1005000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2881,6 +3606,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4450000.0,
+        "operating_cash_flow_latest": 13370000.0,
+        "cash_to_net_income_ratio": 3.004,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -1200000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2890,6 +3625,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 49,
+      "financial_periods": 5,
       "shares_outstanding": 22750000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2917,6 +3653,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 505280000.0,
+        "operating_cash_flow_latest": 86890000.0,
+        "cash_to_net_income_ratio": 0.172,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 65650000.00000001
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "MPCI",
         "as_of": "2026-08-14",
@@ -2950,6 +3696,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 1000000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -2976,6 +3723,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2049999.9999999998,
+        "operating_cash_flow_latest": 30280000.0,
+        "cash_to_net_income_ratio": 14.771,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -40660000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -2985,6 +3742,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 6,
       "shares_outstanding": 225000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3012,6 +3770,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 698450000.0,
+        "operating_cash_flow_latest": 657820000.0,
+        "cash_to_net_income_ratio": 0.942,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 460910000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "MPRC",
         "as_of": "2026-08-14",
@@ -3045,6 +3813,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 2265930177.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3071,6 +3840,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1026000000.0,
+        "operating_cash_flow_latest": 516620000.0,
+        "cash_to_net_income_ratio": 0.504,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 383890000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "MTIE",
         "as_of": "2026-08-14",
@@ -3104,6 +3883,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 252001008.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3130,6 +3910,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 60350000.0,
+        "operating_cash_flow_latest": 49680000.0,
+        "cash_to_net_income_ratio": 0.823,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 49660000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "NCCW",
         "as_of": "2026-08-14",
@@ -3162,12 +3952,18 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 0,
+      "financial_periods": 0,
       "shares_outstanding": 50000000.0,
       "financial_validation": "future_period",
       "diagnostics": {
         "available_fields": [],
         "model_gates": {}
       },
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "future_period"
     },
@@ -3177,6 +3973,7 @@
       "sector": "Real Estate",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 40000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3203,6 +4000,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 49320000.0,
+        "operating_cash_flow_latest": 266380000.0,
+        "cash_to_net_income_ratio": 5.401,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 192910000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "OBRI",
         "as_of": "2026-08-14",
@@ -3235,6 +4042,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 1289293586.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3261,6 +4069,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 4480000000.0,
+        "operating_cash_flow_latest": -5089000000.0,
+        "cash_to_net_income_ratio": -1.136,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -5866000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -3270,6 +4088,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 38,
+      "financial_periods": 6,
       "shares_outstanding": 4626699188.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3296,6 +4115,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 586050000.0,
+        "operating_cash_flow_latest": 560000.0,
+        "cash_to_net_income_ratio": 0.001,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 560000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "OFH",
         "as_of": "2026-08-14",
@@ -3328,6 +4157,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 5245690620.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3354,6 +4184,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -533780000.0,
+        "operating_cash_flow_latest": -318480000.0,
+        "cash_to_net_income_ratio": 0.597,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": -946200000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -3363,6 +4203,7 @@
       "sector": null,
       "source": "mubasher",
       "line_items": 203,
+      "financial_periods": 19,
       "shares_outstanding": null,
       "financial_validation": null,
       "diagnostics": {
@@ -3387,6 +4228,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 4300000.0,
+        "operating_cash_flow_latest": 184900000.0,
+        "cash_to_net_income_ratio": 43.0,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": null
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -3396,6 +4247,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 48,
+      "financial_periods": 6,
       "shares_outstanding": 1130473523.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3423,6 +4275,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 5550000000.0,
+        "operating_cash_flow_latest": 5020000000.0,
+        "cash_to_net_income_ratio": 0.905,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1893000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ORHD",
         "as_of": "2026-08-14",
@@ -3455,6 +4317,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 6,
       "shares_outstanding": 665107268.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3482,6 +4345,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2012000000.0,
+        "operating_cash_flow_latest": 3191000000.0,
+        "cash_to_net_income_ratio": 1.586,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1313000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ORWE",
         "as_of": "2026-08-14",
@@ -3515,6 +4388,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 5,
       "shares_outstanding": 168755750.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3542,6 +4416,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1442000000.0,
+        "operating_cash_flow_latest": 1094000000.0,
+        "cash_to_net_income_ratio": 0.759,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -261149999.99999997
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -3551,6 +4435,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 48,
+      "financial_periods": 6,
       "shares_outstanding": 2839980164.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3578,6 +4463,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 4217000000.0,
+        "operating_cash_flow_latest": 1424000000.0,
+        "cash_to_net_income_ratio": 0.338,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 451140000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "PHDC",
         "as_of": "2026-08-14",
@@ -3610,6 +4505,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 49,
+      "financial_periods": 6,
       "shares_outstanding": 479001600.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3637,6 +4533,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2579000000.0,
+        "operating_cash_flow_latest": 2839000000.0,
+        "cash_to_net_income_ratio": 1.101,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1286000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "POUL",
         "as_of": "2026-08-14",
@@ -3670,6 +4576,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 50365900.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3696,6 +4603,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -99220000.0,
+        "operating_cash_flow_latest": -28150000.0,
+        "cash_to_net_income_ratio": 0.284,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -28620000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -3705,6 +4622,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 199206202.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3731,6 +4649,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 269340000.0,
+        "operating_cash_flow_latest": 402720000.0,
+        "cash_to_net_income_ratio": 1.495,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 264209999.99999997
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "RACC",
         "as_of": "2026-08-14",
@@ -3764,6 +4692,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 4277797768.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3791,6 +4720,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 2588000000.0,
+        "operating_cash_flow_latest": -1354000000.0,
+        "cash_to_net_income_ratio": -0.523,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -2878000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -3800,6 +4739,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 49,
+      "financial_periods": 6,
       "shares_outstanding": 2000000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3827,6 +4767,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 268610000.0,
+        "operating_cash_flow_latest": -43670000.0,
+        "cash_to_net_income_ratio": -0.163,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -199570000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "RMDA",
         "as_of": "2026-08-14",
@@ -3860,6 +4810,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 260812477.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3886,6 +4837,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 2298000000.0,
+        "operating_cash_flow_latest": 3388000000.0,
+        "cash_to_net_income_ratio": 1.474,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 3049000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "SCEM",
         "as_of": "2026-08-14",
@@ -3919,6 +4880,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 52985460.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3945,6 +4907,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 201960000.0,
+        "operating_cash_flow_latest": 188440000.0,
+        "cash_to_net_income_ratio": 0.933,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 101370000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -3954,6 +4926,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 250000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -3980,6 +4953,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 10080000.0,
+        "operating_cash_flow_latest": 10780000.0,
+        "cash_to_net_income_ratio": 1.069,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 10760000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "SIPC",
         "as_of": "2026-08-14",
@@ -4012,6 +4995,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 5,
       "shares_outstanding": 1134000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4039,6 +5023,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 1001000000.0,
+        "operating_cash_flow_latest": 282550000.0,
+        "cash_to_net_income_ratio": 0.282,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -172710000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "SKPC",
         "as_of": "2026-08-14",
@@ -4071,6 +5065,7 @@
       "sector": "Materials",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 482256840.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4097,6 +5092,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "loss",
+        "net_income_latest": -382410000.0,
+        "operating_cash_flow_latest": 25560000.0,
+        "cash_to_net_income_ratio": -0.067,
+        "positive_cfo_periods_last_3": 1,
+        "free_cash_flow_latest": 24340000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -4106,6 +5111,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 50,
+      "financial_periods": 6,
       "shares_outstanding": 2139355716.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4133,6 +5139,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 15257000000.0,
+        "operating_cash_flow_latest": 15456000000.0,
+        "cash_to_net_income_ratio": 1.013,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 2344000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -4142,6 +5158,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 46,
+      "financial_periods": 6,
       "shares_outstanding": 734037191.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4168,6 +5185,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 624320000.0,
+        "operating_cash_flow_latest": 887060000.0,
+        "cash_to_net_income_ratio": 1.421,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -540540000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -4177,6 +5204,7 @@
       "sector": "Real Estate",
       "source": "mubasher",
       "line_items": 208,
+      "financial_periods": 19,
       "shares_outstanding": 145500000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4203,6 +5231,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 34818.24,
+        "operating_cash_flow_latest": 40387.666,
+        "cash_to_net_income_ratio": 1.16,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": null
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "TANM",
         "as_of": "2026-08-14",
@@ -4235,6 +5273,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 37,
+      "financial_periods": 5,
       "shares_outstanding": 1334353800.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4259,6 +5298,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 1053000000.0,
+        "operating_cash_flow_latest": 2697000000.0,
+        "cash_to_net_income_ratio": 2.561,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": 1783000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "TAQA",
         "as_of": "2026-08-14",
@@ -4291,6 +5340,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 51,
+      "financial_periods": 5,
       "shares_outstanding": 2060653786.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4318,6 +5368,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "unknown",
+        "net_income_latest": 14384000000.0,
+        "operating_cash_flow_latest": 8689000000.0,
+        "cash_to_net_income_ratio": 0.604,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": -2664000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -4327,6 +5387,7 @@
       "sector": "Real Estate",
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 6,
       "shares_outstanding": 725231685.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4353,6 +5414,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 83880000.0,
+        "operating_cash_flow_latest": 547640000.0,
+        "cash_to_net_income_ratio": 6.529,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 477690000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -4362,6 +5433,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 47,
+      "financial_periods": 5,
       "shares_outstanding": 2291442606.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4388,6 +5460,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 13050000.0,
+        "operating_cash_flow_latest": 202970000.0,
+        "cash_to_net_income_ratio": 15.553,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": 159860000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "UNIP",
         "as_of": "2026-08-14",
@@ -4420,6 +5502,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 42,
+      "financial_periods": 5,
       "shares_outstanding": 2106356523.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4445,6 +5528,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 764390000.0,
+        "operating_cash_flow_latest": -8004000000.0,
+        "cash_to_net_income_ratio": -10.471,
+        "positive_cfo_periods_last_3": 0,
+        "free_cash_flow_latest": -8061000000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -4454,12 +5547,18 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 0,
+      "financial_periods": 0,
       "shares_outstanding": 1174482138.0,
       "financial_validation": "mixed_currency",
       "diagnostics": {
         "available_fields": [],
         "model_gates": {}
       },
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "mixed_currency"
     },
@@ -4469,6 +5568,7 @@
       "sector": null,
       "source": "mubasher",
       "line_items": 170,
+      "financial_periods": 18,
       "shares_outstanding": null,
       "financial_validation": null,
       "diagnostics": {
@@ -4493,6 +5593,16 @@
           "ddm": "missing_or_non_positive_dividend"
         }
       },
+      "earnings_quality": {
+        "status": "cash_supported",
+        "net_income_latest": 34254.261,
+        "operating_cash_flow_latest": 37389.616,
+        "cash_to_net_income_ratio": 1.092,
+        "positive_cfo_periods_last_3": 3,
+        "free_cash_flow_latest": null
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
@@ -4502,12 +5612,18 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 0,
+      "financial_periods": 0,
       "shares_outstanding": 200000000.0,
       "financial_validation": "future_period",
       "diagnostics": {
         "available_fields": [],
         "model_gates": {}
       },
+      "earnings_quality": {
+        "status": "unknown"
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": null,
       "warning": "future_period"
     },
@@ -4517,6 +5633,7 @@
       "sector": null,
       "source": "stockanalysis+mubasher",
       "line_items": 46,
+      "financial_periods": 6,
       "shares_outstanding": 1000000000.0,
       "financial_validation": null,
       "diagnostics": {
@@ -4544,6 +5661,16 @@
           "ddm": "ready"
         }
       },
+      "earnings_quality": {
+        "status": "cash_mismatch",
+        "net_income_latest": 585500000.0,
+        "operating_cash_flow_latest": -391100000.0,
+        "cash_to_net_income_ratio": -0.668,
+        "positive_cfo_periods_last_3": 2,
+        "free_cash_flow_latest": -395030000.0
+      },
+      "event_status": "not_structured",
+      "event_flags": [],
       "fair_value": {
         "ticker": "ZMID",
         "as_of": "2026-08-14",

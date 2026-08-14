@@ -1,0 +1,57 @@
+[
+  {
+    "ticker": "EMFD",
+    "as_of": "2026-08-14",
+    "action": "strong_buy",
+    "confidence": 0.85,
+    "expected_return": 0.5576,
+    "fair_value": 18.3188,
+    "current_price": 11.77,
+    "upside_pct": 55.6,
+    "rationale": "EMFD: Fair value 18.32 EGP vs current 11.77 EGP Based on 5 financial reporting periods."
+  },
+  {
+    "ticker": "SCEM",
+    "as_of": "2026-08-14",
+    "action": "strong_buy",
+    "confidence": 0.78,
+    "expected_return": 0.3604,
+    "fair_value": 118.7446,
+    "current_price": 94.4,
+    "upside_pct": 25.8,
+    "rationale": "SCEM: Fair value 118.74 EGP vs current 94.40 EGP Based on 5 financial reporting periods."
+  },
+  {
+    "ticker": "ARCC",
+    "as_of": "2026-08-14",
+    "action": "strong_buy",
+    "confidence": 0.707,
+    "expected_return": 0.213,
+    "fair_value": 84.5803,
+    "current_price": 74.2,
+    "upside_pct": 14.0,
+    "rationale": "ARCC: Fair value 84.58 EGP vs current 74.20 EGP Based on 5 financial reporting periods."
+  },
+  {
+    "ticker": "MCQE",
+    "as_of": "2026-08-14",
+    "action": "buy",
+    "confidence": 0.604,
+    "expected_return": 0.1348,
+    "fair_value": 261.2137,
+    "current_price": 248.11,
+    "upside_pct": 5.3,
+    "rationale": "MCQE: Fair value 261.21 EGP vs current 248.11 EGP Based on 5 financial reporting periods."
+  },
+  {
+    "ticker": "POUL",
+    "as_of": "2026-08-14",
+    "action": "accumulate",
+    "confidence": 0.55,
+    "expected_return": 0.0709,
+    "fair_value": 42.0389,
+    "current_price": 39.3,
+    "upside_pct": 7.0,
+    "rationale": "POUL: Fair value 42.04 EGP vs current 39.30 EGP Based on 5 financial reporting periods."
+  }
+]

@@ -1,0 +1,2752 @@
+[
+  {
+    "ticker": "ZEOT",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.8,
+    "combined_expected_return": -0.9581,
+    "combined_expected_risk": 0.5352,
+    "current_price": 13.61,
+    "fair_value": 0.1445,
+    "upside_pct": -98.9,
+    "explanation": {
+      "why_this_stock": "ZEOT: Fair value 0.14 EGP vs current 13.61 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+15.6%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (13.61 EGP) is 98.9% above fair value (0.14 EGP); Price (13.61) significantly above bear-case (0.09) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+15.6%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (13.61 EGP) is 98.9% above fair value (0.14 EGP)",
+        "Price (13.61) significantly above bear-case (0.09) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EFIH",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.763,
+    "combined_expected_return": -0.7093,
+    "combined_expected_risk": 0.3669,
+    "current_price": 24.21,
+    "fair_value": 6.5501,
+    "upside_pct": -72.9,
+    "explanation": {
+      "why_this_stock": "EFIH: Fair value 6.55 EGP vs current 24.21 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+10.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (24.21 EGP) is 72.9% above fair value (6.55 EGP); Price (24.21) significantly above bear-case (3.93) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+10.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (24.21 EGP) is 72.9% above fair value (6.55 EGP)",
+        "Price (24.21) significantly above bear-case (3.93) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MTIE",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.758,
+    "combined_expected_return": -0.6947,
+    "combined_expected_risk": 0.468,
+    "current_price": 9.57,
+    "fair_value": 2.9094,
+    "upside_pct": -69.6,
+    "explanation": {
+      "why_this_stock": "MTIE: Fair value 2.91 EGP vs current 9.57 EGP Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (9.57 EGP) is 69.6% above fair value (2.91 EGP); Price (9.57) significantly above bear-case (2.30) — limited downside protection",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (9.57 EGP) is 69.6% above fair value (2.91 EGP)",
+        "Price (9.57) significantly above bear-case (2.30) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 273,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EMFD",
+    "as_of": "2026-08-14",
+    "action": "strong_buy",
+    "horizon": "investment",
+    "confidence": 0.85,
+    "combined_expected_return": 0.5576,
+    "combined_expected_risk": 0.3247,
+    "current_price": 11.77,
+    "fair_value": 18.3188,
+    "upside_pct": 55.6,
+    "explanation": {
+      "why_this_stock": "EMFD: Fair value 18.32 EGP vs current 11.77 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (11.77 EGP) is 55.6% below fair value (18.32 EGP); Bull-case fair value 24.29 EGP implies 106% upside",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Current price (11.77 EGP) is 55.6% below fair value (18.32 EGP)",
+        "Bull-case fair value 24.29 EGP implies 106% upside"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MPCI",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.74,
+    "combined_expected_return": -0.6346,
+    "combined_expected_risk": 0.6026,
+    "current_price": 374.0,
+    "fair_value": 95.1365,
+    "upside_pct": -74.6,
+    "explanation": {
+      "why_this_stock": "MPCI: Fair value 95.14 EGP vs current 374.00 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+55.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (374.00 EGP) is 74.6% above fair value (95.14 EGP); Price (374.00) significantly above bear-case (57.08) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+55.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (374.00 EGP) is 74.6% above fair value (95.14 EGP)",
+        "Price (374.00) significantly above bear-case (57.08) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EGAL",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.732,
+    "combined_expected_return": -0.6079,
+    "combined_expected_risk": 0.4264,
+    "current_price": 332.52,
+    "fair_value": 124.1295,
+    "upside_pct": -62.7,
+    "explanation": {
+      "why_this_stock": "EGAL: Fair value 124.13 EGP vs current 332.52 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+9.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (332.52 EGP) is 62.7% above fair value (124.13 EGP); Price (332.52) significantly above bear-case (74.48) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+9.4%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (332.52 EGP) is 62.7% above fair value (124.13 EGP)",
+        "Price (332.52) significantly above bear-case (74.48) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "FWRY",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.729,
+    "combined_expected_return": -0.5973,
+    "combined_expected_risk": 0.3174,
+    "current_price": 19.01,
+    "fair_value": 7.5778,
+    "upside_pct": -60.1,
+    "explanation": {
+      "why_this_stock": "FWRY: Fair value 7.58 EGP vs current 19.01 EGP Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Current price (19.01 EGP) is 60.1% above fair value (7.58 EGP); Price (19.01) significantly above bear-case (4.55) — limited downside protection",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Current price (19.01 EGP) is 60.1% above fair value (7.58 EGP)",
+        "Price (19.01) significantly above bear-case (4.55) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EHDR",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.725,
+    "combined_expected_return": -0.585,
+    "combined_expected_risk": 3.8373,
+    "current_price": 3.03,
+    "fair_value": 1.1759,
+    "upside_pct": -61.2,
+    "explanation": {
+      "why_this_stock": "EHDR: Fair value 1.18 EGP vs current 3.03 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+13.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (3.03 EGP) is 61.2% above fair value (1.18 EGP); Price (3.03) significantly above bear-case (0.97) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+13.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (3.03 EGP) is 61.2% above fair value (1.18 EGP)",
+        "Price (3.03) significantly above bear-case (0.97) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SCEM",
+    "as_of": "2026-08-14",
+    "action": "strong_buy",
+    "horizon": "investment",
+    "confidence": 0.78,
+    "combined_expected_return": 0.3604,
+    "combined_expected_risk": 0.5891,
+    "current_price": 94.4,
+    "fair_value": 118.7446,
+    "upside_pct": 25.8,
+    "explanation": {
+      "why_this_stock": "SCEM: Fair value 118.74 EGP vs current 94.40 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (94.40 EGP) is 25.8% below fair value (118.74 EGP); Bull-case fair value 155.33 EGP implies 65% upside",
+      "why_not_others": "Price (94.40) significantly above bear-case (71.25) — limited downside protection",
+      "supporting_evidence": [
+        "Current price (94.40 EGP) is 25.8% below fair value (118.74 EGP)",
+        "Bull-case fair value 155.33 EGP implies 65% upside",
+        "Strong 20-day momentum (+51.3%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Price (94.40) significantly above bear-case (71.25) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ORWE",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.674,
+    "combined_expected_return": -0.4131,
+    "combined_expected_risk": 0.2243,
+    "current_price": 26.5,
+    "fair_value": 14.6507,
+    "upside_pct": -44.7,
+    "explanation": {
+      "why_this_stock": "ORWE: Fair value 14.65 EGP vs current 26.50 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (26.50 EGP) is 44.7% above fair value (14.65 EGP); Price (26.50) significantly above bear-case (8.79) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+17.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (26.50 EGP) is 44.7% above fair value (14.65 EGP)",
+        "Price (26.50) significantly above bear-case (8.79) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ALCN",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.671,
+    "combined_expected_return": -0.4026,
+    "combined_expected_risk": 0.3721,
+    "current_price": 31.9,
+    "fair_value": 18.545,
+    "upside_pct": -41.9,
+    "explanation": {
+      "why_this_stock": "ALCN: Fair value 18.55 EGP vs current 31.90 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (31.90 EGP) is 41.9% above fair value (18.55 EGP); Price (31.90) significantly above bear-case (11.65) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+8.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (31.90 EGP) is 41.9% above fair value (18.55 EGP)",
+        "Price (31.90) significantly above bear-case (11.65) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ORHD",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.659,
+    "combined_expected_return": -0.3643,
+    "combined_expected_risk": 0.3377,
+    "current_price": 42.89,
+    "fair_value": 26.5295,
+    "upside_pct": -38.1,
+    "explanation": {
+      "why_this_stock": "ORHD: Fair value 26.53 EGP vs current 42.89 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.6%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (42.89 EGP) is 38.1% above fair value (26.53 EGP); Price (42.89) significantly above bear-case (18.01) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+8.6%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (42.89 EGP) is 38.1% above fair value (26.53 EGP)",
+        "Price (42.89) significantly above bear-case (18.01) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MFPC",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.657,
+    "combined_expected_return": -0.3568,
+    "combined_expected_risk": 0.4372,
+    "current_price": 39.91,
+    "fair_value": 25.2689,
+    "upside_pct": -36.7,
+    "explanation": {
+      "why_this_stock": "MFPC: Fair value 25.27 EGP vs current 39.91 EGP Based on 5 financial reporting periods.",
+      "why_now": "Bull-case fair value 40.43 EGP implies 1% upside; Strong 20-day momentum (+5.0%)",
+      "why_not_others": "Current price (39.91 EGP) is 36.7% above fair value (25.27 EGP); Price (39.91) significantly above bear-case (15.28) — limited downside protection",
+      "supporting_evidence": [
+        "Bull-case fair value 40.43 EGP implies 1% upside",
+        "Strong 20-day momentum (+5.0%)"
+      ],
+      "invalidation_conditions": [
+        "Current price (39.91 EGP) is 36.7% above fair value (25.27 EGP)",
+        "Price (39.91) significantly above bear-case (15.28) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MPRC",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.652,
+    "combined_expected_return": -0.3411,
+    "combined_expected_risk": 0.3711,
+    "current_price": 46.1,
+    "fair_value": 29.909,
+    "upside_pct": -35.1,
+    "explanation": {
+      "why_this_stock": "MPRC: Fair value 29.91 EGP vs current 46.10 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+5.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (46.10 EGP) is 35.1% above fair value (29.91 EGP); Price (46.10) significantly above bear-case (18.81) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+5.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (46.10 EGP) is 35.1% above fair value (29.91 EGP)",
+        "Price (46.10) significantly above bear-case (18.81) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ABUK",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.647,
+    "combined_expected_return": -0.3241,
+    "combined_expected_risk": 0.3735,
+    "current_price": 77.9,
+    "fair_value": 51.3803,
+    "upside_pct": -34.0,
+    "explanation": {
+      "why_this_stock": "ABUK: Fair value 51.38 EGP vs current 77.90 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.2%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (77.90 EGP) is 34.0% above fair value (51.38 EGP); Price (77.90) significantly above bear-case (46.63) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+8.2%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (77.90 EGP) is 34.0% above fair value (51.38 EGP)",
+        "Price (77.90) significantly above bear-case (46.63) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EFID",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.638,
+    "combined_expected_return": -0.2937,
+    "combined_expected_risk": 0.372,
+    "current_price": 32.7,
+    "fair_value": 21.9378,
+    "upside_pct": -32.9,
+    "explanation": {
+      "why_this_stock": "EFID: Fair value 21.94 EGP vs current 32.70 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.7%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (32.70 EGP) is 32.9% above fair value (21.94 EGP); Price (32.70) significantly above bear-case (13.16) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+17.7%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (32.70 EGP) is 32.9% above fair value (21.94 EGP)",
+        "Price (32.70) significantly above bear-case (13.16) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ARCC",
+    "as_of": "2026-08-14",
+    "action": "strong_buy",
+    "horizon": "investment",
+    "confidence": 0.707,
+    "combined_expected_return": 0.213,
+    "combined_expected_risk": 0.4805,
+    "current_price": 74.2,
+    "fair_value": 84.5803,
+    "upside_pct": 14.0,
+    "explanation": {
+      "why_this_stock": "ARCC: Fair value 84.58 EGP vs current 74.20 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (74.20 EGP) is 14.0% below fair value (84.58 EGP); Bull-case fair value 104.39 EGP implies 41% upside",
+      "why_not_others": "Price (74.20) significantly above bear-case (50.75) — limited downside protection",
+      "supporting_evidence": [
+        "Current price (74.20 EGP) is 14.0% below fair value (84.58 EGP)",
+        "Bull-case fair value 104.39 EGP implies 41% upside",
+        "Strong 20-day momentum (+36.6%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Price (74.20) significantly above bear-case (50.75) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MCQE",
+    "as_of": "2026-08-14",
+    "action": "buy",
+    "horizon": "investment",
+    "confidence": 0.604,
+    "combined_expected_return": 0.1348,
+    "combined_expected_risk": 0.6022,
+    "current_price": 248.11,
+    "fair_value": 261.2137,
+    "upside_pct": 5.3,
+    "explanation": {
+      "why_this_stock": "MCQE: Fair value 261.21 EGP vs current 248.11 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (248.11 EGP) is 5.3% below fair value (261.21 EGP); Bull-case fair value 353.94 EGP implies 43% upside",
+      "why_not_others": "Price (248.11) significantly above bear-case (156.73) — limited downside protection",
+      "supporting_evidence": [
+        "Current price (248.11 EGP) is 5.3% below fair value (261.21 EGP)",
+        "Bull-case fair value 353.94 EGP implies 43% upside",
+        "Strong 20-day momentum (+41.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Price (248.11) significantly above bear-case (156.73) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "RACC",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.591,
+    "combined_expected_return": -0.1351,
+    "combined_expected_risk": 0.3739,
+    "current_price": 10.39,
+    "fair_value": 8.9822,
+    "upside_pct": -13.5,
+    "explanation": {
+      "why_this_stock": "RACC: Fair value 8.98 EGP vs current 10.39 EGP Based on 5 financial reporting periods.",
+      "why_now": "Bull-case fair value 14.37 EGP implies 38% upside; Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (10.39 EGP) is 13.5% above fair value (8.98 EGP); Price (10.39) significantly above bear-case (7.29) — limited downside protection",
+      "supporting_evidence": [
+        "Bull-case fair value 14.37 EGP implies 38% upside",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (10.39 EGP) is 13.5% above fair value (8.98 EGP)",
+        "Price (10.39) significantly above bear-case (7.29) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ISMQ",
+    "as_of": "2026-08-14",
+    "action": "reduce",
+    "horizon": "swing",
+    "confidence": 0.55,
+    "combined_expected_return": -0.075,
+    "combined_expected_risk": 0.3502,
+    "current_price": 9.4,
+    "fair_value": 8.7242,
+    "upside_pct": -7.2,
+    "explanation": {
+      "why_this_stock": "ISMQ: Fair value 8.72 EGP vs current 9.40 EGP Based on 5 financial reporting periods.",
+      "why_now": "Bull-case fair value 11.69 EGP implies 24% upside; Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (9.40 EGP) is 7.2% above fair value (8.72 EGP); Price (9.40) significantly above bear-case (5.23) — limited downside protection",
+      "supporting_evidence": [
+        "Bull-case fair value 11.69 EGP implies 24% upside",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (9.40 EGP) is 7.2% above fair value (8.72 EGP)",
+        "Price (9.40) significantly above bear-case (5.23) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "POUL",
+    "as_of": "2026-08-14",
+    "action": "accumulate",
+    "horizon": "swing",
+    "confidence": 0.55,
+    "combined_expected_return": 0.0709,
+    "combined_expected_risk": 0.4244,
+    "current_price": 39.3,
+    "fair_value": 42.0389,
+    "upside_pct": 7.0,
+    "explanation": {
+      "why_this_stock": "POUL: Fair value 42.04 EGP vs current 39.30 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (39.30 EGP) is 7.0% below fair value (42.04 EGP); Bull-case fair value 59.18 EGP implies 51% upside",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Current price (39.30 EGP) is 7.0% below fair value (42.04 EGP)",
+        "Bull-case fair value 59.18 EGP implies 51% upside",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "AMOC",
+    "as_of": "2026-08-14",
+    "action": "reduce",
+    "horizon": "swing",
+    "confidence": 0.55,
+    "combined_expected_return": -0.0364,
+    "combined_expected_risk": 0.3218,
+    "current_price": 10.3,
+    "fair_value": 9.3908,
+    "upside_pct": -8.8,
+    "explanation": {
+      "why_this_stock": "AMOC: Fair value 9.39 EGP vs current 10.30 EGP Based on 5 financial reporting periods.",
+      "why_now": "Bull-case fair value 12.65 EGP implies 23% upside; Strong 20-day momentum (+25.9%)",
+      "why_not_others": "Current price (10.30 EGP) is 8.8% above fair value (9.39 EGP); Price (10.30) significantly above bear-case (8.51) — limited downside protection",
+      "supporting_evidence": [
+        "Bull-case fair value 12.65 EGP implies 23% upside",
+        "Strong 20-day momentum (+25.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (10.30 EGP) is 8.8% above fair value (9.39 EGP)",
+        "Price (10.30) significantly above bear-case (8.51) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "BIOC",
+    "as_of": "2026-08-14",
+    "action": "hold",
+    "horizon": "investment",
+    "confidence": 0.6,
+    "combined_expected_return": 0.0155,
+    "combined_expected_risk": 0.8088,
+    "current_price": 521.01,
+    "fair_value": 16.9734,
+    "upside_pct": -96.7,
+    "explanation": {
+      "why_this_stock": "BIOC: Fair value 16.97 EGP vs current 521.01 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+491.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (521.01 EGP) is 96.7% above fair value (16.97 EGP); Price (521.01) significantly above bear-case (10.18) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+491.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (521.01 EGP) is 96.7% above fair value (16.97 EGP)",
+        "Price (521.01) significantly above bear-case (10.18) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ADIB",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3828,
+    "current_price": 54.85,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ADIB: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+18.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+18.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 273,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "AFDI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3666,
+    "current_price": 67.74,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "AFDI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+42.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+42.8%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "AFMC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.8039,
+    "current_price": 247.0,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "AFMC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+228.2%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+228.2%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "AMER",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.5871,
+    "current_price": 6.5,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "AMER: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+83.6%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+83.6%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "AMIA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4607,
+    "current_price": 12.99,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "AMIA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+44.3%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+44.3%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ARAB",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4478,
+    "current_price": 0.245,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ARAB: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 273,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ASCM",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3813,
+    "current_price": 65.28,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ASCM: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+5.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+5.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ASPI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4857,
+    "current_price": 0.496,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ASPI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+57.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+57.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 273,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ATLC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4397,
+    "current_price": 5.6,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ATLC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+6.3%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+6.3%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ATQA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3402,
+    "current_price": 10.89,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ATQA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+14.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+14.4%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "BTFH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3197,
+    "current_price": 3.08,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "BTFH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "CCAP",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4565,
+    "current_price": 5.29,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "CCAP: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "CIEB",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.2738,
+    "current_price": 24.46,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "CIEB: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "CNFN",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3676,
+    "current_price": 4.91,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "CNFN: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "COMI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3066,
+    "current_price": 139.27,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "COMI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "COSG",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 3.6067,
+    "current_price": 1.84,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "COSG: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+10.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+10.8%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "CSAG",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3479,
+    "current_price": 41.95,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "CSAG: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+27.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+27.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "DAPH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4906,
+    "current_price": 124.45,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "DAPH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+42.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+42.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "DSCW",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4568,
+    "current_price": 2.12,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "DSCW: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+13.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+13.4%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EAST",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3577,
+    "current_price": 36.3,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "EAST: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Price below SMA-20 and SMA-50 — downtrend",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Price below SMA-20 and SMA-50 — downtrend"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ECAP",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3876,
+    "current_price": 38.89,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ECAP: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+17.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EGCH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3906,
+    "current_price": 14.42,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "EGCH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+8.4%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EGTS",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.5218,
+    "current_price": 18.72,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "EGTS: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ELSH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4848,
+    "current_price": 14.07,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ELSH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ENGC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3954,
+    "current_price": 50.22,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ENGC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+17.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+17.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ETEL",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4342,
+    "current_price": 114.0,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ETEL: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+16.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+16.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ETRS",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3945,
+    "current_price": 10.91,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ETRS: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "EXPA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.393,
+    "current_price": 21.3,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "EXPA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+9.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+9.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "GBCO",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3496,
+    "current_price": 31.5,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "GBCO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Weak 20-day momentum (-5.3%)",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-5.3%)"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "HDBK",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.6007,
+    "current_price": 87.45,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "HDBK: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+11.0%)",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+11.0%)"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 273,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "HELI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.7462,
+    "current_price": 7.85,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "HELI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "HRHO",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.2663,
+    "current_price": 26.66,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "HRHO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ICFC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.5392,
+    "current_price": 17.4,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ICFC: technical analysis only (no fair value available)",
+      "why_now": "Strong 20-day momentum (+12.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+12.8%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 0
+    }
+  },
+  {
+    "ticker": "IDRE",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4746,
+    "current_price": 55.0,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "IDRE: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+19.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+19.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "IFAP",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3579,
+    "current_price": 21.86,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "IFAP: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+11.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+11.8%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ISMA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.5008,
+    "current_price": 35.0,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ISMA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+27.6%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+27.6%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ISPH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3885,
+    "current_price": 13.55,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ISPH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+19.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+19.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "JUFO",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.5973,
+    "current_price": 27.2,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "JUFO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-9.4%)",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-9.4%)"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "KABO",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.357,
+    "current_price": 8.59,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "KABO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+14.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+14.4%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "LCSW",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3144,
+    "current_price": 33.48,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "LCSW: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 273,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MASR",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3129,
+    "current_price": 7.62,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "MASR: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-8.6%)",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-8.6%)"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MCRO",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 1.0486,
+    "current_price": 1.55,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "MCRO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+14.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+14.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MEPA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4517,
+    "current_price": 1.87,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "MEPA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+12.7%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+12.7%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MOED",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3812,
+    "current_price": 0.683,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "MOED: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-6.8%); Price below SMA-20 and SMA-50 — downtrend",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-6.8%)",
+        "Price below SMA-20 and SMA-50 — downtrend"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MPCO",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.6173,
+    "current_price": 2.21,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "MPCO: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+16.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+16.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "NCCW",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.7102,
+    "current_price": 5.99,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "NCCW: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-7.1%)",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-7.1%)"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "NIPH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.8113,
+    "current_price": 410.02,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "NIPH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+113.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+113.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "OBRI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.6001,
+    "current_price": 32.7,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "OBRI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-9.2%); Price below SMA-20 and SMA-50 — downtrend",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-9.2%)",
+        "Price below SMA-20 and SMA-50 — downtrend"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "OCDI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.8231,
+    "current_price": 34.99,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "OCDI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+29.2%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+29.2%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "OFH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3672,
+    "current_price": 0.892,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "OFH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+34.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+34.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "OIH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3678,
+    "current_price": 1.83,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "OIH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+28.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+28.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ORAS",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.25,
+    "current_price": 71.05,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ORAS: technical analysis only (no fair value available)",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 275,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 0
+    }
+  },
+  {
+    "ticker": "PHAR",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4772,
+    "current_price": 143.0,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "PHAR: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+61.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+61.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "PHDC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3639,
+    "current_price": 15.29,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "PHDC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "PRCL",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.5351,
+    "current_price": 33.05,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "PRCL: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-5.5%)",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-5.5%)"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "RAYA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4609,
+    "current_price": 7.07,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "RAYA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-11.3%); Price below SMA-20 and SMA-50 — downtrend",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-11.3%)",
+        "Price below SMA-20 and SMA-50 — downtrend"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "RMDA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.419,
+    "current_price": 6.49,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "RMDA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+31.1%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+31.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SDTI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3952,
+    "current_price": 72.85,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "SDTI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+54.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+54.8%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 270,
+      "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SIPC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.6215,
+    "current_price": 4.68,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "SIPC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+28.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+28.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SKPC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3466,
+    "current_price": 16.6,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "SKPC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+11.5%)",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+11.5%)"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SVCE",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.5613,
+    "current_price": 10.9,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "SVCE: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+16.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+16.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SWDY",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3203,
+    "current_price": 107.53,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "SWDY: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+18.8%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+18.8%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "TALM",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3424,
+    "current_price": 19.0,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "TALM: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+20.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+20.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "TMGH",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3161,
+    "current_price": 97.8,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "TMGH: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "UEGC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4429,
+    "current_price": 2.56,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "UEGC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+21.3%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+21.3%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "UNIP",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.7505,
+    "current_price": 0.404,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "UNIP: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+11.0%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+11.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "VALU",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3362,
+    "current_price": 36.34,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "VALU: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "Weak 20-day momentum (-10.1%)",
+      "supporting_evidence": [],
+      "invalidation_conditions": [
+        "Weak 20-day momentum (-10.1%)"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 276,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "ZMID",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.304,
+    "current_price": 7.68,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "ZMID: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+5.5%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+5.5%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  }
+]

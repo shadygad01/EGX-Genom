@@ -25,6 +25,7 @@ from pathlib import Path
 ROOT        = Path(__file__).parent.parent
 PRICES_DIR  = ROOT / "data" / "prices"
 UNIVERSE    = ROOT / "data" / "dashboard" / "universe.json"
+UNIVERSE_DIR = ROOT / "data" / "universe"
 PRICES_DIR.mkdir(parents=True, exist_ok=True)
 
 HEADERS = {
@@ -112,9 +113,18 @@ def save_csv(ticker: str, bars: list[dict]) -> None:
 
 
 def load_universe() -> dict[str, str]:
-    with open(UNIVERSE, encoding="utf-8") as f:
-        data = json.load(f)
-    return data["constituents"]   # {ticker: company_name}
+    if UNIVERSE.exists():
+        with open(UNIVERSE, encoding="utf-8") as f:
+            data = json.load(f)
+        return data["constituents"]
+    constituents: dict[str, str] = {}
+    for path in sorted(UNIVERSE_DIR.glob("EGX*.csv")):
+        with open(path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                ticker = row.get("ticker", "").strip().upper()
+                if ticker:
+                    constituents[ticker] = row.get("company_name", ticker).strip()
+    return constituents
 
 
 def main():

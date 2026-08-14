@@ -1,0 +1,568 @@
+{
+  "fetched_at": "2026-08-14T10:34:04.939886+00:00",
+  "source": "Yahoo Finance (.CA / .EG / bare)",
+  "universe_file": "universe.json",
+  "total_universe": 101,
+  "success_count": 91,
+  "failed_count": 10,
+  "success": {
+    "ABUK": {
+      "bars": 272,
+      "symbol": "ABUK.CA",
+      "latest": "2026-08-13",
+      "close": 77.9
+    },
+    "ADIB": {
+      "bars": 273,
+      "symbol": "ADIB.CA",
+      "latest": "2026-08-13",
+      "close": 54.85
+    },
+    "AFDI": {
+      "bars": 270,
+      "symbol": "AFDI.CA",
+      "latest": "2026-08-12",
+      "close": 67.74
+    },
+    "AFMC": {
+      "bars": 270,
+      "symbol": "AFMC.CA",
+      "latest": "2026-08-12",
+      "close": 247.0
+    },
+    "ALCN": {
+      "bars": 272,
+      "symbol": "ALCN.CA",
+      "latest": "2026-08-13",
+      "close": 31.9
+    },
+    "AMER": {
+      "bars": 272,
+      "symbol": "AMER.CA",
+      "latest": "2026-08-13",
+      "close": 6.5
+    },
+    "AMIA": {
+      "bars": 272,
+      "symbol": "AMIA.CA",
+      "latest": "2026-08-13",
+      "close": 12.99
+    },
+    "AMOC": {
+      "bars": 272,
+      "symbol": "AMOC.CA",
+      "latest": "2026-08-13",
+      "close": 10.3
+    },
+    "ARAB": {
+      "bars": 273,
+      "symbol": "ARAB.CA",
+      "latest": "2026-08-13",
+      "close": 0.245
+    },
+    "ARCC": {
+      "bars": 272,
+      "symbol": "ARCC.CA",
+      "latest": "2026-08-13",
+      "close": 74.2
+    },
+    "ASCM": {
+      "bars": 270,
+      "symbol": "ASCM.CA",
+      "latest": "2026-08-12",
+      "close": 65.28
+    },
+    "ASPI": {
+      "bars": 273,
+      "symbol": "ASPI.CA",
+      "latest": "2026-08-13",
+      "close": 0.496
+    },
+    "ATLC": {
+      "bars": 272,
+      "symbol": "ATLC.CA",
+      "latest": "2026-08-13",
+      "close": 5.6
+    },
+    "ATQA": {
+      "bars": 272,
+      "symbol": "ATQA.CA",
+      "latest": "2026-08-13",
+      "close": 10.89
+    },
+    "BIOC": {
+      "bars": 272,
+      "symbol": "BIOC.CA",
+      "latest": "2026-08-13",
+      "close": 521.01
+    },
+    "BTFH": {
+      "bars": 272,
+      "symbol": "BTFH.CA",
+      "latest": "2026-08-13",
+      "close": 3.08
+    },
+    "CCAP": {
+      "bars": 272,
+      "symbol": "CCAP.CA",
+      "latest": "2026-08-13",
+      "close": 5.29
+    },
+    "CIEB": {
+      "bars": 272,
+      "symbol": "CIEB.CA",
+      "latest": "2026-08-13",
+      "close": 24.46
+    },
+    "CNFN": {
+      "bars": 272,
+      "symbol": "CNFN.CA",
+      "latest": "2026-08-13",
+      "close": 4.91
+    },
+    "COMI": {
+      "bars": 272,
+      "symbol": "COMI.CA",
+      "latest": "2026-08-13",
+      "close": 139.27
+    },
+    "COSG": {
+      "bars": 272,
+      "symbol": "COSG.CA",
+      "latest": "2026-08-13",
+      "close": 1.84
+    },
+    "CSAG": {
+      "bars": 272,
+      "symbol": "CSAG.CA",
+      "latest": "2026-08-13",
+      "close": 41.95
+    },
+    "DAPH": {
+      "bars": 272,
+      "symbol": "DAPH.CA",
+      "latest": "2026-08-13",
+      "close": 124.45
+    },
+    "DSCW": {
+      "bars": 272,
+      "symbol": "DSCW.CA",
+      "latest": "2026-08-13",
+      "close": 2.12
+    },
+    "EAST": {
+      "bars": 270,
+      "symbol": "EAST.CA",
+      "latest": "2026-08-12",
+      "close": 36.3
+    },
+    "ECAP": {
+      "bars": 272,
+      "symbol": "ECAP.CA",
+      "latest": "2026-08-13",
+      "close": 38.89
+    },
+    "EFID": {
+      "bars": 272,
+      "symbol": "EFID.CA",
+      "latest": "2026-08-13",
+      "close": 32.7
+    },
+    "EFIH": {
+      "bars": 272,
+      "symbol": "EFIH.CA",
+      "latest": "2026-08-13",
+      "close": 24.21
+    },
+    "EGAL": {
+      "bars": 272,
+      "symbol": "EGAL.CA",
+      "latest": "2026-08-13",
+      "close": 332.52
+    },
+    "EGCH": {
+      "bars": 272,
+      "symbol": "EGCH.CA",
+      "latest": "2026-08-13",
+      "close": 14.42
+    },
+    "EGTS": {
+      "bars": 272,
+      "symbol": "EGTS.CA",
+      "latest": "2026-08-13",
+      "close": 18.72
+    },
+    "EHDR": {
+      "bars": 270,
+      "symbol": "EHDR.CA",
+      "latest": "2026-08-12",
+      "close": 3.03
+    },
+    "ELSH": {
+      "bars": 270,
+      "symbol": "ELSH.CA",
+      "latest": "2026-08-12",
+      "close": 14.07
+    },
+    "EMFD": {
+      "bars": 270,
+      "symbol": "EMFD.CA",
+      "latest": "2026-08-12",
+      "close": 11.77
+    },
+    "ENGC": {
+      "bars": 272,
+      "symbol": "ENGC.CA",
+      "latest": "2026-08-13",
+      "close": 50.22
+    },
+    "ETEL": {
+      "bars": 272,
+      "symbol": "ETEL.CA",
+      "latest": "2026-08-13",
+      "close": 114.0
+    },
+    "ETRS": {
+      "bars": 272,
+      "symbol": "ETRS.CA",
+      "latest": "2026-08-13",
+      "close": 10.91
+    },
+    "EXPA": {
+      "bars": 272,
+      "symbol": "EXPA.CA",
+      "latest": "2026-08-13",
+      "close": 21.3
+    },
+    "FWRY": {
+      "bars": 272,
+      "symbol": "FWRY.CA",
+      "latest": "2026-08-13",
+      "close": 19.01
+    },
+    "GBCO": {
+      "bars": 272,
+      "symbol": "GBCO.CA",
+      "latest": "2026-08-13",
+      "close": 31.5
+    },
+    "HDBK": {
+      "bars": 273,
+      "symbol": "HDBK.CA",
+      "latest": "2026-08-13",
+      "close": 87.45
+    },
+    "HELI": {
+      "bars": 272,
+      "symbol": "HELI.CA",
+      "latest": "2026-08-13",
+      "close": 7.85
+    },
+    "HRHO": {
+      "bars": 272,
+      "symbol": "HRHO.CA",
+      "latest": "2026-08-13",
+      "close": 26.66
+    },
+    "ICFC": {
+      "bars": 272,
+      "symbol": "ICFC.CA",
+      "latest": "2026-08-13",
+      "close": 17.4
+    },
+    "IDRE": {
+      "bars": 272,
+      "symbol": "IDRE.CA",
+      "latest": "2026-08-13",
+      "close": 55.0
+    },
+    "IFAP": {
+      "bars": 272,
+      "symbol": "IFAP.CA",
+      "latest": "2026-08-13",
+      "close": 21.86
+    },
+    "ISMA": {
+      "bars": 272,
+      "symbol": "ISMA.CA",
+      "latest": "2026-08-13",
+      "close": 35.0
+    },
+    "ISMQ": {
+      "bars": 272,
+      "symbol": "ISMQ.CA",
+      "latest": "2026-08-13",
+      "close": 9.4
+    },
+    "ISPH": {
+      "bars": 272,
+      "symbol": "ISPH.CA",
+      "latest": "2026-08-13",
+      "close": 13.55
+    },
+    "JUFO": {
+      "bars": 272,
+      "symbol": "JUFO.CA",
+      "latest": "2026-08-13",
+      "close": 27.2
+    },
+    "KABO": {
+      "bars": 270,
+      "symbol": "KABO.CA",
+      "latest": "2026-08-12",
+      "close": 8.59
+    },
+    "LCSW": {
+      "bars": 273,
+      "symbol": "LCSW.CA",
+      "latest": "2026-08-13",
+      "close": 33.48
+    },
+    "MASR": {
+      "bars": 272,
+      "symbol": "MASR.CA",
+      "latest": "2026-08-13",
+      "close": 7.62
+    },
+    "MCQE": {
+      "bars": 272,
+      "symbol": "MCQE.CA",
+      "latest": "2026-08-13",
+      "close": 248.11
+    },
+    "MCRO": {
+      "bars": 272,
+      "symbol": "MCRO.CA",
+      "latest": "2026-08-13",
+      "close": 1.55
+    },
+    "MEPA": {
+      "bars": 270,
+      "symbol": "MEPA.CA",
+      "latest": "2026-08-12",
+      "close": 1.87
+    },
+    "MFPC": {
+      "bars": 272,
+      "symbol": "MFPC.CA",
+      "latest": "2026-08-13",
+      "close": 39.91
+    },
+    "MOED": {
+      "bars": 272,
+      "symbol": "MOED.CA",
+      "latest": "2026-08-13",
+      "close": 0.683
+    },
+    "MPCI": {
+      "bars": 270,
+      "symbol": "MPCI.CA",
+      "latest": "2026-08-12",
+      "close": 374.0
+    },
+    "MPCO": {
+      "bars": 270,
+      "symbol": "MPCO.CA",
+      "latest": "2026-08-12",
+      "close": 2.21
+    },
+    "MPRC": {
+      "bars": 272,
+      "symbol": "MPRC.CA",
+      "latest": "2026-08-13",
+      "close": 46.1
+    },
+    "MTIE": {
+      "bars": 273,
+      "symbol": "MTIE.CA",
+      "latest": "2026-08-13",
+      "close": 9.57
+    },
+    "NCCW": {
+      "bars": 272,
+      "symbol": "NCCW.CA",
+      "latest": "2026-08-13",
+      "close": 5.99
+    },
+    "NIPH": {
+      "bars": 272,
+      "symbol": "NIPH.CA",
+      "latest": "2026-08-13",
+      "close": 410.02
+    },
+    "OBRI": {
+      "bars": 272,
+      "symbol": "OBRI.CA",
+      "latest": "2026-08-13",
+      "close": 32.7
+    },
+    "OCDI": {
+      "bars": 270,
+      "symbol": "OCDI.CA",
+      "latest": "2026-08-12",
+      "close": 34.99
+    },
+    "OFH": {
+      "bars": 272,
+      "symbol": "OFH.CA",
+      "latest": "2026-08-13",
+      "close": 0.892
+    },
+    "OIH": {
+      "bars": 272,
+      "symbol": "OIH.CA",
+      "latest": "2026-08-13",
+      "close": 1.83
+    },
+    "ORAS": {
+      "bars": 275,
+      "symbol": "ORAS.CA",
+      "latest": "2026-08-13",
+      "close": 71.05
+    },
+    "ORHD": {
+      "bars": 272,
+      "symbol": "ORHD.CA",
+      "latest": "2026-08-13",
+      "close": 42.89
+    },
+    "ORWE": {
+      "bars": 270,
+      "symbol": "ORWE.CA",
+      "latest": "2026-08-12",
+      "close": 26.5
+    },
+    "PHAR": {
+      "bars": 272,
+      "symbol": "PHAR.CA",
+      "latest": "2026-08-13",
+      "close": 143.0
+    },
+    "PHDC": {
+      "bars": 272,
+      "symbol": "PHDC.CA",
+      "latest": "2026-08-13",
+      "close": 15.29
+    },
+    "POUL": {
+      "bars": 272,
+      "symbol": "POUL.CA",
+      "latest": "2026-08-13",
+      "close": 39.3
+    },
+    "PRCL": {
+      "bars": 272,
+      "symbol": "PRCL.CA",
+      "latest": "2026-08-13",
+      "close": 33.05
+    },
+    "RACC": {
+      "bars": 272,
+      "symbol": "RACC.CA",
+      "latest": "2026-08-13",
+      "close": 10.39
+    },
+    "RAYA": {
+      "bars": 272,
+      "symbol": "RAYA.CA",
+      "latest": "2026-08-13",
+      "close": 7.07
+    },
+    "RMDA": {
+      "bars": 272,
+      "symbol": "RMDA.CA",
+      "latest": "2026-08-13",
+      "close": 6.49
+    },
+    "SCEM": {
+      "bars": 272,
+      "symbol": "SCEM.CA",
+      "latest": "2026-08-13",
+      "close": 94.4
+    },
+    "SDTI": {
+      "bars": 270,
+      "symbol": "SDTI.CA",
+      "latest": "2026-08-12",
+      "close": 72.85
+    },
+    "SIPC": {
+      "bars": 272,
+      "symbol": "SIPC.CA",
+      "latest": "2026-08-13",
+      "close": 4.68
+    },
+    "SKPC": {
+      "bars": 272,
+      "symbol": "SKPC.CA",
+      "latest": "2026-08-13",
+      "close": 16.6
+    },
+    "SVCE": {
+      "bars": 272,
+      "symbol": "SVCE.CA",
+      "latest": "2026-08-13",
+      "close": 10.9
+    },
+    "SWDY": {
+      "bars": 272,
+      "symbol": "SWDY.CA",
+      "latest": "2026-08-13",
+      "close": 107.53
+    },
+    "TALM": {
+      "bars": 272,
+      "symbol": "TALM.CA",
+      "latest": "2026-08-13",
+      "close": 19.0
+    },
+    "TMGH": {
+      "bars": 272,
+      "symbol": "TMGH.CA",
+      "latest": "2026-08-13",
+      "close": 97.8
+    },
+    "UEGC": {
+      "bars": 272,
+      "symbol": "UEGC.CA",
+      "latest": "2026-08-13",
+      "close": 2.56
+    },
+    "UNIP": {
+      "bars": 272,
+      "symbol": "UNIP.CA",
+      "latest": "2026-08-13",
+      "close": 0.404
+    },
+    "VALU": {
+      "bars": 276,
+      "symbol": "VALU",
+      "latest": "2026-08-13",
+      "close": 36.34
+    },
+    "ZEOT": {
+      "bars": 272,
+      "symbol": "ZEOT.CA",
+      "latest": "2026-08-13",
+      "close": 13.61
+    },
+    "ZMID": {
+      "bars": 272,
+      "symbol": "ZMID.CA",
+      "latest": "2026-08-13",
+      "close": 7.68
+    }
+  },
+  "failed": [
+    "ACTF",
+    "AIDC",
+    "AIHC",
+    "GPIM",
+    "IEEC",
+    "KRDI",
+    "TANM",
+    "TAQA",
+    "VLMR",
+    "VLMRA"
+  ]
+}

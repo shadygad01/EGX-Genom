@@ -1,0 +1,1844 @@
+{
+  "summary": {
+    "as_of": "2026-08-14",
+    "universe": 101,
+    "coverage_101": 101,
+    "action_counts": {
+      "sell": 15,
+      "abstain": 78,
+      "reduce": 2,
+      "strong_buy": 3,
+      "hold": 1,
+      "buy": 1,
+      "accumulate": 1
+    },
+    "reason_counts": {
+      "engine_action": 23,
+      "missing_or_stale_price": 10,
+      "missing_fair_value": 68
+    },
+    "usable_price_count": 91,
+    "fair_value_count": 23,
+    "note": "No fair values are fabricated; financial coverage alone does not create a valuation."
+  },
+  "rows": [
+    {
+      "ticker": "ABUK",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.647,
+      "current_price": 77.9,
+      "fair_value": 51.3803,
+      "upside_pct": -34.0,
+      "combined_expected_return": -0.3241
+    },
+    {
+      "ticker": "ACTF",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "mubasher",
+      "financial_line_items": 98,
+      "financial_periods": 8,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ADIB",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 35,
+      "financial_periods": 5,
+      "price_bars": 273,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 54.85,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "AFDI",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 67.74,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "AFMC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 247.0,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "AIDC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "mubasher",
+      "financial_line_items": 14,
+      "financial_periods": 2,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "AIHC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ALCN",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 37,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.671,
+      "current_price": 31.9,
+      "fair_value": 18.545,
+      "upside_pct": -41.9,
+      "combined_expected_return": -0.4026
+    },
+    {
+      "ticker": "AMER",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 6.5,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "AMIA",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 12.99,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "AMOC",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "reduce",
+      "reason": "engine_action",
+      "confidence": 0.55,
+      "current_price": 10.3,
+      "fair_value": 9.3908,
+      "upside_pct": -8.8,
+      "combined_expected_return": -0.0364
+    },
+    {
+      "ticker": "ARAB",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 273,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 0.245,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ARCC",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "strong_buy",
+      "reason": "engine_action",
+      "confidence": 0.707,
+      "current_price": 74.2,
+      "fair_value": 84.5803,
+      "upside_pct": 14.0,
+      "combined_expected_return": 0.213
+    },
+    {
+      "ticker": "ASCM",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 65.28,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ASPI",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 273,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 0.496,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ATLC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 5.6,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ATQA",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 10.89,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "BIOC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "hold",
+      "reason": "engine_action",
+      "confidence": 0.6,
+      "current_price": 521.01,
+      "fair_value": 16.9734,
+      "upside_pct": -96.7,
+      "combined_expected_return": 0.0155
+    },
+    {
+      "ticker": "BTFH",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 3.08,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "CCAP",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 5.29,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "CIEB",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 35,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 24.46,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "CNFN",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 4.91,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "COMI",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 35,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 139.27,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "COSG",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 1.84,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "CSAG",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 41.95,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "DAPH",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 124.45,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "DSCW",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 2.12,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "EAST",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 44,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 36.3,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ECAP",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 38.89,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "EFID",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.638,
+      "current_price": 32.7,
+      "fair_value": 21.9378,
+      "upside_pct": -32.9,
+      "combined_expected_return": -0.2937
+    },
+    {
+      "ticker": "EFIH",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.763,
+      "current_price": 24.21,
+      "fair_value": 6.5501,
+      "upside_pct": -72.9,
+      "combined_expected_return": -0.7093
+    },
+    {
+      "ticker": "EGAL",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.732,
+      "current_price": 332.52,
+      "fair_value": 124.1295,
+      "upside_pct": -62.7,
+      "combined_expected_return": -0.6079
+    },
+    {
+      "ticker": "EGCH",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 44,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 14.42,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "EGTS",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 18.72,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "EHDR",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.725,
+      "current_price": 3.03,
+      "fair_value": 1.1759,
+      "upside_pct": -61.2,
+      "combined_expected_return": -0.585
+    },
+    {
+      "ticker": "ELSH",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 35,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 14.07,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "EMFD",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "strong_buy",
+      "reason": "engine_action",
+      "confidence": 0.85,
+      "current_price": 11.77,
+      "fair_value": 18.3188,
+      "upside_pct": 55.6,
+      "combined_expected_return": 0.5576
+    },
+    {
+      "ticker": "ENGC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 50.22,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ETEL",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 114.0,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ETRS",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 10.91,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "EXPA",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 34,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 21.3,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "FWRY",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.729,
+      "current_price": 19.01,
+      "fair_value": 7.5778,
+      "upside_pct": -60.1,
+      "combined_expected_return": -0.5973
+    },
+    {
+      "ticker": "GBCO",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 31.5,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "GPIM",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 43,
+      "financial_periods": 5,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "HDBK",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 35,
+      "financial_periods": 5,
+      "price_bars": 273,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 87.45,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "HELI",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 7.85,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "HRHO",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 26.66,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ICFC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "mubasher",
+      "financial_line_items": 179,
+      "financial_periods": 17,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 17.4,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "IDRE",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 33,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 55.0,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "IEEC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "mubasher",
+      "financial_line_items": 193,
+      "financial_periods": 20,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "IFAP",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 21.86,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ISMA",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 44,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 35.0,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ISMQ",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 32,
+      "financial_periods": 4,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "reduce",
+      "reason": "engine_action",
+      "confidence": 0.55,
+      "current_price": 9.4,
+      "fair_value": 8.7242,
+      "upside_pct": -7.2,
+      "combined_expected_return": -0.075
+    },
+    {
+      "ticker": "ISPH",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 13.55,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "JUFO",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 27.2,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "KABO",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 8.59,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "KRDI",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 36,
+      "financial_periods": 4,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "LCSW",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 273,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 33.48,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "MASR",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 7.62,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "MCQE",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "buy",
+      "reason": "engine_action",
+      "confidence": 0.604,
+      "current_price": 248.11,
+      "fair_value": 261.2137,
+      "upside_pct": 5.3,
+      "combined_expected_return": 0.1348
+    },
+    {
+      "ticker": "MCRO",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 1.55,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "MEPA",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 1.87,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "MFPC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.657,
+      "current_price": 39.91,
+      "fair_value": 25.2689,
+      "upside_pct": -36.7,
+      "combined_expected_return": -0.3568
+    },
+    {
+      "ticker": "MOED",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 0.683,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "MPCI",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 44,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.74,
+      "current_price": 374.0,
+      "fair_value": 95.1365,
+      "upside_pct": -74.6,
+      "combined_expected_return": -0.6346
+    },
+    {
+      "ticker": "MPCO",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 2.21,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "MPRC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.652,
+      "current_price": 46.1,
+      "fair_value": 29.909,
+      "upside_pct": -35.1,
+      "combined_expected_return": -0.3411
+    },
+    {
+      "ticker": "MTIE",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 273,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.758,
+      "current_price": 9.57,
+      "fair_value": 2.9094,
+      "upside_pct": -69.6,
+      "combined_expected_return": -0.6947
+    },
+    {
+      "ticker": "NCCW",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 5.99,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "NIPH",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 410.02,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "OBRI",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 32.7,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "OCDI",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 34.99,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "OFH",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 36,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 0.892,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "OIH",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 1.83,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ORAS",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "mubasher",
+      "financial_line_items": 203,
+      "financial_periods": 19,
+      "price_bars": 275,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 71.05,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ORHD",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.659,
+      "current_price": 42.89,
+      "fair_value": 26.5295,
+      "upside_pct": -38.1,
+      "combined_expected_return": -0.3643
+    },
+    {
+      "ticker": "ORWE",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.674,
+      "current_price": 26.5,
+      "fair_value": 14.6507,
+      "upside_pct": -44.7,
+      "combined_expected_return": -0.4131
+    },
+    {
+      "ticker": "PHAR",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 143.0,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "PHDC",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 15.29,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "POUL",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "accumulate",
+      "reason": "engine_action",
+      "confidence": 0.55,
+      "current_price": 39.3,
+      "fair_value": 42.0389,
+      "upside_pct": 7.0,
+      "combined_expected_return": 0.0709
+    },
+    {
+      "ticker": "PRCL",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 33.05,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "RACC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.591,
+      "current_price": 10.39,
+      "fair_value": 8.9822,
+      "upside_pct": -13.5,
+      "combined_expected_return": -0.1351
+    },
+    {
+      "ticker": "RAYA",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 43,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 7.07,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "RMDA",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 6.49,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "SCEM",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "strong_buy",
+      "reason": "engine_action",
+      "confidence": 0.78,
+      "current_price": 94.4,
+      "fair_value": 118.7446,
+      "upside_pct": 25.8,
+      "combined_expected_return": 0.3604
+    },
+    {
+      "ticker": "SDTI",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 270,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 72.85,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "SIPC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 4.68,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "SKPC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 16.6,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "SVCE",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 10.9,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "SWDY",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 107.53,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "TALM",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 44,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 19.0,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "TANM",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "mubasher",
+      "financial_line_items": 184,
+      "financial_periods": 19,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "TAQA",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 35,
+      "financial_periods": 5,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "TMGH",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 97.8,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "UEGC",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 2.56,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "UNIP",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 0.404,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "VALU",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 40,
+      "financial_periods": 5,
+      "price_bars": 276,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 36.34,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "VLMR",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 45,
+      "financial_periods": 5,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "VLMRA",
+      "indices": [
+        "EGX30"
+      ],
+      "coverage_source": "mubasher",
+      "financial_line_items": 170,
+      "financial_periods": 18,
+      "price_bars": 0,
+      "price_status": "missing_or_stale",
+      "action": "abstain",
+      "reason": "missing_or_stale_price",
+      "confidence": 0.0,
+      "current_price": null,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    },
+    {
+      "ticker": "ZEOT",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 44,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.8,
+      "current_price": 13.61,
+      "fair_value": 0.1445,
+      "upside_pct": -98.9,
+      "combined_expected_return": -0.9581
+    },
+    {
+      "ticker": "ZMID",
+      "indices": [
+        "EGX70"
+      ],
+      "coverage_source": "stockanalysis",
+      "financial_line_items": 41,
+      "financial_periods": 5,
+      "price_bars": 272,
+      "price_status": "usable",
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
+      "current_price": 7.68,
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
+    }
+  ]
+}

@@ -1,0 +1,1992 @@
+[
+  {
+    "ticker": "ABUK",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ABUK",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 51.3803,
+      "bear_case": 46.6274,
+      "base_case": 51.3803,
+      "bull_case": 69.52,
+      "models": {
+        "dcf": 47.7101,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 46.6274,
+        "ev_ebitda": null,
+        "pe": 69.52,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ACTF",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 404: Not Found"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ADIB",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "AFDI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "AFMC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "AIDC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 404: Not Found"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "AIHC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ALCN",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ALCN",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 18.545,
+      "bear_case": 11.6513,
+      "base_case": 18.545,
+      "bull_case": 21.89,
+      "models": {
+        "dcf": 20.8768,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 11.6513,
+        "ev_ebitda": null,
+        "pe": 21.89,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "AMER",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "AMIA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "AMOC",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "AMOC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 9.3908,
+      "bear_case": 8.5123,
+      "base_case": 9.3908,
+      "bull_case": 12.65,
+      "models": {
+        "dcf": 8.7437,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 8.5123,
+        "ev_ebitda": null,
+        "pe": 12.65,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ARAB",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ARCC",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ARCC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 84.5803,
+      "bear_case": 50.7482,
+      "base_case": 84.5803,
+      "bull_case": 104.39,
+      "models": {
+        "dcf": 101.1473,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 38.2399,
+        "ev_ebitda": null,
+        "pe": 104.39,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ASCM",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ASPI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ATLC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ATQA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "BIOC",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "BIOC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 16.9734,
+      "bear_case": 10.184,
+      "base_case": 16.9734,
+      "bull_case": 27.1574,
+      "models": {
+        "dcf": 8.8359,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 25.8639,
+        "ev_ebitda": null,
+        "pe": 28.05,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "BTFH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "CCAP",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "CIEB",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "CNFN",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "COMI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "COSG",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "CSAG",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "DAPH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "DSCW",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "EAST",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ECAP",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "EFID",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "EFID",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 21.9378,
+      "bear_case": 13.1627,
+      "base_case": 21.9378,
+      "bull_case": 27.6915,
+      "models": {
+        "dcf": 27.6915,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 9.069,
+        "ev_ebitda": null,
+        "pe": 23.98,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "EFIH",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "EFIH",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 6.5501,
+      "bear_case": 3.9301,
+      "base_case": 6.5501,
+      "bull_case": 8.2456,
+      "models": {
+        "dcf": 8.2456,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 3.4194,
+        "ev_ebitda": null,
+        "pe": 6.16,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "EGAL",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "EGAL",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 124.1295,
+      "bear_case": 74.4777,
+      "base_case": 124.1295,
+      "bull_case": 198.6072,
+      "models": {
+        "dcf": 57.5334,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 159.0147,
+        "ev_ebitda": null,
+        "pe": 271.59,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "EGCH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "EGTS",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "EHDR",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "EHDR",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 1.1759,
+      "bear_case": 0.9739,
+      "base_case": 1.1759,
+      "bull_case": 1.3022,
+      "models": {
+        "dcf": 1.3022,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 0.9739,
+        "ev_ebitda": null,
+        "pe": 1.1,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ELSH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "EMFD",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "EMFD",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 18.3188,
+      "bear_case": 10.9913,
+      "base_case": 18.3188,
+      "bull_case": 24.2894,
+      "models": {
+        "dcf": 24.2894,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 11.917,
+        "ev_ebitda": null,
+        "pe": 10.01,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ENGC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ETEL",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ETRS",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "EXPA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "FWRY",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "FWRY",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 7.5778,
+      "bear_case": 4.5467,
+      "base_case": 7.5778,
+      "bull_case": 9.1146,
+      "models": {
+        "dcf": 9.1146,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 4.1293,
+        "ev_ebitda": null,
+        "pe": 8.14,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "GBCO",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "GPIM",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "GPIM",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.0637,
+      "bear_case": 0.0525,
+      "base_case": 0.0637,
+      "bull_case": 0.102,
+      "models": {
+        "dcf": 0.0539,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 0.0525,
+        "ev_ebitda": null,
+        "pe": 0.11,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "HDBK",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "HELI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "HRHO",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ICFC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 404: Not Found"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "IDRE",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "IEEC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 404: Not Found"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "IFAP",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ISMA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ISMQ",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ISMQ",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 8.7242,
+      "bear_case": 5.2345,
+      "base_case": 8.7242,
+      "bull_case": 11.689,
+      "models": {
+        "dcf": 11.689,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 3.404,
+        "ev_ebitda": null,
+        "pe": 7.81,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ISPH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "JUFO",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "KABO",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "KRDI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "LCSW",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "MASR",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "MCQE",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "MCQE",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 261.2137,
+      "bear_case": 156.7282,
+      "base_case": 261.2137,
+      "bull_case": 353.9385,
+      "models": {
+        "dcf": 353.9385,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 94.5865,
+        "ev_ebitda": null,
+        "pe": 232.98,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "MCRO",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "MEPA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "MFPC",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "MFPC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 25.2689,
+      "bear_case": 15.2753,
+      "base_case": 25.2689,
+      "bull_case": 40.4303,
+      "models": {
+        "dcf": 24.242,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 15.2753,
+        "ev_ebitda": null,
+        "pe": 43.34,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "MOED",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "MPCI",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "MPCI",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 95.1365,
+      "bear_case": 57.0819,
+      "base_case": 95.1365,
+      "bull_case": 152.2184,
+      "models": {
+        "dcf": 41.0953,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 103.7699,
+        "ev_ebitda": null,
+        "pe": 244.31,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "MPCO",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "MPRC",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "MPRC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 29.909,
+      "bear_case": 18.8117,
+      "base_case": 29.909,
+      "bull_case": 40.48,
+      "models": {
+        "dcf": 31.934,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 18.8117,
+        "ev_ebitda": null,
+        "pe": 40.48,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "MTIE",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "MTIE",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 2.9094,
+      "bear_case": 2.2967,
+      "base_case": 2.9094,
+      "bull_case": 4.655,
+      "models": {
+        "dcf": 2.2967,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 2.7744,
+        "ev_ebitda": null,
+        "pe": 4.95,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "NCCW",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "NIPH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "OBRI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "OCDI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "OFH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "OIH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ORAS",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 404: Not Found"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ORHD",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ORHD",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 26.5295,
+      "bear_case": 18.0089,
+      "base_case": 26.5295,
+      "bull_case": 42.4471,
+      "models": {
+        "dcf": 18.0089,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 25.2502,
+        "ev_ebitda": null,
+        "pe": 54.01,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ORWE",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ORWE",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 14.6507,
+      "bear_case": 8.7904,
+      "base_case": 14.6507,
+      "bull_case": 23.4411,
+      "models": {
+        "dcf": 8.374,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 14.8247,
+        "ev_ebitda": null,
+        "pe": 33.22,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "PHAR",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "PHDC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "POUL",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "POUL",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 42.0389,
+      "bear_case": 33.4996,
+      "base_case": 42.0389,
+      "bull_case": 59.18,
+      "models": {
+        "dcf": 40.5949,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 33.4996,
+        "ev_ebitda": null,
+        "pe": 59.18,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "PRCL",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "RACC",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "RACC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 8.9822,
+      "bear_case": 7.2886,
+      "base_case": 8.9822,
+      "bull_case": 14.3714,
+      "models": {
+        "dcf": 7.2886,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 8.7506,
+        "ev_ebitda": null,
+        "pe": 14.41,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "RAYA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "RMDA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "SCEM",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "SCEM",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 118.7446,
+      "bear_case": 71.2468,
+      "base_case": 118.7446,
+      "bull_case": 155.3252,
+      "models": {
+        "dcf": 155.3252,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 48.8466,
+        "ev_ebitda": null,
+        "pe": 113.85,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "SDTI",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "SIPC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "SKPC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "SVCE",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "SWDY",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "TALM",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "TANM",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 404: Not Found"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "TAQA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "TMGH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "UEGC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "UNIP",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "VALU",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "VLMR",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "VLMR",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.6309,
+      "bear_case": 0.3801,
+      "base_case": 0.6309,
+      "bull_case": 1.0094,
+      "models": {
+        "dcf": 0.3801,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 0.7462,
+        "ev_ebitda": null,
+        "pe": 1.21,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "VLMRA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 404: Not Found"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  },
+  {
+    "ticker": "ZEOT",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ZEOT",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.1445,
+      "bear_case": 0.0867,
+      "base_case": 0.1445,
+      "bull_case": 0.2053,
+      "models": {
+        "dcf": 0.2053,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 0.0458,
+        "ev_ebitda": null,
+        "pe": 0.11,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
+  },
+  {
+    "ticker": "ZMID",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
+  }
+]

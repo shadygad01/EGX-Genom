@@ -8,17 +8,17 @@
     "valuation": {
       "ticker": "ABUK",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 49.0975,
+      "weighted_fair_value": 47.1528,
       "bear_case": 36.5419,
-      "base_case": 49.0975,
-      "bull_case": 69.52,
+      "base_case": 47.1528,
+      "bull_case": 56.88,
       "models": {
         "dcf": 47.7101,
         "ddm": 36.5419,
         "residual_income": null,
         "earnings_power": 46.6274,
         "ev_ebitda": null,
-        "pe": 69.52,
+        "pe": 56.88,
         "pb": null
       },
       "included_models": [
@@ -248,17 +248,17 @@
     "valuation": {
       "ticker": "ARCC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 84.5803,
-      "bear_case": 50.7482,
-      "base_case": 84.5803,
-      "bull_case": 104.39,
+      "weighted_fair_value": 81.1294,
+      "bear_case": 48.6776,
+      "base_case": 81.1294,
+      "bull_case": 101.1473,
       "models": {
         "dcf": 101.1473,
         "ddm": 20.561,
         "residual_income": null,
         "earnings_power": 38.2399,
         "ev_ebitda": null,
-        "pe": 104.39,
+        "pe": 85.41,
         "pb": null
       },
       "included_models": [
@@ -734,9 +734,9 @@
     "valuation": {
       "ticker": "EHDR",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 1.1759,
+      "weighted_fair_value": 1.1941,
       "bear_case": 0.9739,
-      "base_case": 1.1759,
+      "base_case": 1.1941,
       "bull_case": 1.3022,
       "models": {
         "dcf": 1.3022,
@@ -744,7 +744,7 @@
         "residual_income": null,
         "earnings_power": 0.9739,
         "ev_ebitda": null,
-        "pe": 1.1,
+        "pe": 1.2,
         "pb": null
       },
       "included_models": [
@@ -842,7 +842,7 @@
         "residual_income": null,
         "earnings_power": 18.3762,
         "ev_ebitda": null,
-        "pe": 131.23,
+        "pe": 119.3,
         "pb": null
       },
       "included_models": [
@@ -909,36 +909,17 @@
   {
     "ticker": "FWRY",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "FWRY",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 7.5778,
-      "bear_case": 4.5467,
-      "base_case": 7.5778,
-      "bull_case": 9.1146,
-      "models": {
-        "dcf": 9.1146,
-        "ddm": null,
-        "residual_income": null,
-        "earnings_power": 4.1293,
-        "ev_ebitda": null,
-        "pe": 8.14,
-        "pb": null
-      },
-      "included_models": [
-        "dcf",
-        "earnings_power",
-        "pe"
-      ],
-      "latest_period": "2025-12-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
     "financial_periods": 5,
-    "blockers": [],
-    "next_actions": []
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
   },
   {
     "ticker": "GBCO",
@@ -1013,17 +994,17 @@
     "valuation": {
       "ticker": "HELI",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 4.8835,
-      "bear_case": 2.9301,
-      "base_case": 4.8835,
-      "bull_case": 7.48,
+      "weighted_fair_value": 5.0778,
+      "bear_case": 3.0467,
+      "base_case": 5.0778,
+      "bull_case": 8.1245,
       "models": {
         "dcf": -2.9876,
         "ddm": 2.7224,
         "residual_income": null,
         "earnings_power": 4.5933,
         "ev_ebitda": null,
-        "pe": 7.48,
+        "pe": 8.16,
         "pb": null
       },
       "included_models": [
@@ -1137,9 +1118,9 @@
     "valuation": {
       "ticker": "ISMQ",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 7.8339,
-      "bear_case": 4.7003,
-      "base_case": 7.8339,
+      "weighted_fair_value": 7.6154,
+      "bear_case": 4.5693,
+      "base_case": 7.6154,
       "bull_case": 11.689,
       "models": {
         "dcf": 11.689,
@@ -1147,7 +1128,7 @@
         "residual_income": null,
         "earnings_power": 3.404,
         "ev_ebitda": null,
-        "pe": 7.81,
+        "pe": 6.39,
         "pb": null
       },
       "included_models": [
@@ -1262,9 +1243,9 @@
     "valuation": {
       "ticker": "MCQE",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 261.2137,
-      "bear_case": 156.7282,
-      "base_case": 261.2137,
+      "weighted_fair_value": 253.5118,
+      "bear_case": 152.1071,
+      "base_case": 253.5118,
       "bull_case": 353.9385,
       "models": {
         "dcf": 353.9385,
@@ -1272,7 +1253,7 @@
         "residual_income": null,
         "earnings_power": 94.5865,
         "ev_ebitda": null,
-        "pe": 232.98,
+        "pe": 190.62,
         "pb": null
       },
       "included_models": [
@@ -1326,17 +1307,17 @@
     "valuation": {
       "ticker": "MFPC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 24.111,
+      "weighted_fair_value": 22.8987,
       "bear_case": 15.2753,
-      "base_case": 24.111,
-      "bull_case": 38.5776,
+      "base_case": 22.8987,
+      "bull_case": 35.46,
       "models": {
         "dcf": 24.242,
         "ddm": 17.7426,
         "residual_income": null,
         "earnings_power": 15.2753,
         "ev_ebitda": null,
-        "pe": 43.34,
+        "pe": 35.46,
         "pb": null
       },
       "included_models": [
@@ -1830,9 +1811,9 @@
     "valuation": {
       "ticker": "SCEM",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 118.7446,
-      "bear_case": 71.2468,
-      "base_case": 118.7446,
+      "weighted_fair_value": 114.981,
+      "bear_case": 68.9886,
+      "base_case": 114.981,
       "bull_case": 155.3252,
       "models": {
         "dcf": 155.3252,
@@ -1840,7 +1821,7 @@
         "residual_income": null,
         "earnings_power": 48.8466,
         "ev_ebitda": null,
-        "pe": 113.85,
+        "pe": 93.15,
         "pb": null
       },
       "included_models": [
@@ -1888,17 +1869,36 @@
   {
     "ticker": "SKPC",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "SKPC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 7.1496,
+      "bear_case": 4.2898,
+      "base_case": 7.1496,
+      "bull_case": 9.3724,
+      "models": {
+        "dcf": -1.1129,
+        "ddm": 3.0452,
+        "residual_income": null,
+        "earnings_power": 9.3724,
+        "ev_ebitda": null,
+        "pe": 7.92,
+        "pb": null
+      },
+      "included_models": [
+        "ddm",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "SVCE",
@@ -1954,18 +1954,18 @@
     "valuation": {
       "ticker": "TANM",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 1.6648,
-      "bear_case": 0.9989,
-      "base_case": 1.6648,
-      "bull_case": 2.2315,
+      "weighted_fair_value": 1.8183,
+      "bear_case": 1.091,
+      "base_case": 1.8183,
+      "bull_case": 2.5084,
       "models": {
         "dcf": null,
         "ddm": null,
         "residual_income": 0.9475,
         "earnings_power": null,
         "ev_ebitda": null,
-        "pe": 2.2315,
-        "pb": 2.174
+        "pe": 2.4344,
+        "pb": 2.5084
       },
       "included_models": [
         "pb",

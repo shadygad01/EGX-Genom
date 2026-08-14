@@ -99,39 +99,6 @@
     }
   },
   {
-    "ticker": "TANM",
-    "as_of": "2026-08-14",
-    "action": "sell",
-    "horizon": "investment",
-    "confidence": 0.766,
-    "combined_expected_return": -0.7208,
-    "combined_expected_risk": 0.4231,
-    "current_price": 6.98,
-    "fair_value": 1.6648,
-    "upside_pct": -76.1,
-    "explanation": {
-      "why_this_stock": "TANM: Fair value 1.66 EGP vs current 6.98 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+20.3%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "Current price (6.98 EGP) is 76.1% above fair value (1.66 EGP); Price (6.98) significantly above bear-case (1.00) — limited downside protection",
-      "supporting_evidence": [
-        "Strong 20-day momentum (+20.3%)",
-        "Price above SMA-20 and SMA-50 — trend intact"
-      ],
-      "invalidation_conditions": [
-        "Current price (6.98 EGP) is 76.1% above fair value (1.66 EGP)",
-        "Price (6.98) significantly above bear-case (1.00) — limited downside protection"
-      ],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 117,
-      "latest_price_date": "2026-08-13",
-      "has_fair_value": true,
-      "financial_periods": 5
-    }
-  },
-  {
     "ticker": "EFIH",
     "as_of": "2026-08-14",
     "action": "sell",
@@ -159,6 +126,39 @@
     },
     "data_quality": {
       "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "TANM",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.76,
+    "combined_expected_return": -0.6988,
+    "combined_expected_risk": 0.4231,
+    "current_price": 6.98,
+    "fair_value": 1.8183,
+    "upside_pct": -73.9,
+    "explanation": {
+      "why_this_stock": "TANM: Fair value 1.82 EGP vs current 6.98 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+20.3%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (6.98 EGP) is 73.9% above fair value (1.82 EGP); Price (6.98) significantly above bear-case (1.09) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+20.3%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (6.98 EGP) is 73.9% above fair value (1.82 EGP)",
+        "Price (6.98) significantly above bear-case (1.09) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": true,
       "financial_periods": 5
@@ -358,56 +358,26 @@
     }
   },
   {
-    "ticker": "FWRY",
-    "as_of": "2026-08-14",
-    "action": "sell",
-    "horizon": "investment",
-    "confidence": 0.729,
-    "combined_expected_return": -0.5973,
-    "combined_expected_risk": 0.3174,
-    "current_price": 19.01,
-    "fair_value": 7.5778,
-    "upside_pct": -60.1,
-    "explanation": {
-      "why_this_stock": "FWRY: Fair value 7.58 EGP vs current 19.01 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "Current price (19.01 EGP) is 60.1% above fair value (7.58 EGP); Price (19.01) significantly above bear-case (4.55) — limited downside protection",
-      "supporting_evidence": [],
-      "invalidation_conditions": [
-        "Current price (19.01 EGP) is 60.1% above fair value (7.58 EGP)",
-        "Price (19.01) significantly above bear-case (4.55) — limited downside protection"
-      ],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 272,
-      "latest_price_date": "2026-08-13",
-      "has_fair_value": true,
-      "financial_periods": 5
-    }
-  },
-  {
     "ticker": "EHDR",
     "as_of": "2026-08-14",
     "action": "sell",
     "horizon": "investment",
-    "confidence": 0.725,
-    "combined_expected_return": -0.585,
+    "confidence": 0.724,
+    "combined_expected_return": -0.5789,
     "combined_expected_risk": 3.8373,
     "current_price": 3.03,
-    "fair_value": 1.1759,
-    "upside_pct": -61.2,
+    "fair_value": 1.1941,
+    "upside_pct": -60.6,
     "explanation": {
-      "why_this_stock": "EHDR: Fair value 1.18 EGP vs current 3.03 EGP Based on 5 financial reporting periods.",
+      "why_this_stock": "EHDR: Fair value 1.19 EGP vs current 3.03 EGP Based on 5 financial reporting periods.",
       "why_now": "Strong 20-day momentum (+13.5%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "Current price (3.03 EGP) is 61.2% above fair value (1.18 EGP); Price (3.03) significantly above bear-case (0.97) — limited downside protection",
+      "why_not_others": "Current price (3.03 EGP) is 60.6% above fair value (1.19 EGP); Price (3.03) significantly above bear-case (0.97) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+13.5%)",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
-        "Current price (3.03 EGP) is 61.2% above fair value (1.18 EGP)",
+        "Current price (3.03 EGP) is 60.6% above fair value (1.19 EGP)",
         "Price (3.03) significantly above bear-case (0.97) — limited downside protection"
       ],
       "similar_historical_cases": [],
@@ -416,6 +386,38 @@
     "data_quality": {
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SKPC",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.714,
+    "combined_expected_return": -0.5463,
+    "combined_expected_risk": 0.3466,
+    "current_price": 16.6,
+    "fair_value": 7.1496,
+    "upside_pct": -56.9,
+    "explanation": {
+      "why_this_stock": "SKPC: Fair value 7.15 EGP vs current 16.60 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+11.5%)",
+      "why_not_others": "Current price (16.60 EGP) is 56.9% above fair value (7.15 EGP); Price (16.60) significantly above bear-case (4.29) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+11.5%)"
+      ],
+      "invalidation_conditions": [
+        "Current price (16.60 EGP) is 56.9% above fair value (7.15 EGP)",
+        "Price (16.60) significantly above bear-case (4.29) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
       "has_fair_value": true,
       "financial_periods": 5
     }
@@ -551,59 +553,25 @@
     }
   },
   {
-    "ticker": "SCEM",
-    "as_of": "2026-08-14",
-    "action": "strong_buy",
-    "horizon": "investment",
-    "confidence": 0.78,
-    "combined_expected_return": 0.3604,
-    "combined_expected_risk": 0.5891,
-    "current_price": 94.4,
-    "fair_value": 118.7446,
-    "upside_pct": 25.8,
-    "explanation": {
-      "why_this_stock": "SCEM: Fair value 118.74 EGP vs current 94.40 EGP Based on 5 financial reporting periods.",
-      "why_now": "Current price (94.40 EGP) is 25.8% below fair value (118.74 EGP); Bull-case fair value 155.33 EGP implies 65% upside",
-      "why_not_others": "Price (94.40) significantly above bear-case (71.25) — limited downside protection",
-      "supporting_evidence": [
-        "Current price (94.40 EGP) is 25.8% below fair value (118.74 EGP)",
-        "Bull-case fair value 155.33 EGP implies 65% upside",
-        "Strong 20-day momentum (+51.3%)",
-        "Price above SMA-20 and SMA-50 — trend intact"
-      ],
-      "invalidation_conditions": [
-        "Price (94.40) significantly above bear-case (71.25) — limited downside protection"
-      ],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 272,
-      "latest_price_date": "2026-08-13",
-      "has_fair_value": true,
-      "financial_periods": 5
-    }
-  },
-  {
     "ticker": "MFPC",
     "as_of": "2026-08-14",
     "action": "sell",
     "horizon": "investment",
-    "confidence": 0.666,
-    "combined_expected_return": -0.3858,
+    "confidence": 0.675,
+    "combined_expected_return": -0.4162,
     "combined_expected_risk": 0.4372,
     "current_price": 39.91,
-    "fair_value": 24.111,
-    "upside_pct": -39.6,
+    "fair_value": 22.8987,
+    "upside_pct": -42.6,
     "explanation": {
-      "why_this_stock": "MFPC: Fair value 24.11 EGP vs current 39.91 EGP Based on 5 financial reporting periods.",
+      "why_this_stock": "MFPC: Fair value 22.90 EGP vs current 39.91 EGP Based on 5 financial reporting periods.",
       "why_now": "Strong 20-day momentum (+5.0%)",
-      "why_not_others": "Current price (39.91 EGP) is 39.6% above fair value (24.11 EGP); Price (39.91) significantly above bear-case (15.28) — limited downside protection",
+      "why_not_others": "Current price (39.91 EGP) is 42.6% above fair value (22.90 EGP); Price (39.91) significantly above bear-case (15.28) — limited downside protection",
       "supporting_evidence": [
         "Strong 20-day momentum (+5.0%)"
       ],
       "invalidation_conditions": [
-        "Current price (39.91 EGP) is 39.6% above fair value (24.11 EGP)",
+        "Current price (39.91 EGP) is 42.6% above fair value (22.90 EGP)",
         "Price (39.91) significantly above bear-case (15.28) — limited downside protection"
       ],
       "similar_historical_cases": [],
@@ -617,24 +585,61 @@
     }
   },
   {
-    "ticker": "HELI",
+    "ticker": "ABUK",
     "as_of": "2026-08-14",
     "action": "sell",
     "horizon": "investment",
     "confidence": 0.663,
-    "combined_expected_return": -0.3751,
-    "combined_expected_risk": 0.7462,
-    "current_price": 7.85,
-    "fair_value": 4.8835,
-    "upside_pct": -37.8,
+    "combined_expected_return": -0.3783,
+    "combined_expected_risk": 0.3735,
+    "current_price": 77.9,
+    "fair_value": 47.1528,
+    "upside_pct": -39.5,
     "explanation": {
-      "why_this_stock": "HELI: Fair value 4.88 EGP vs current 7.85 EGP Based on 5 financial reporting periods.",
-      "why_now": "No strong catalyst identified",
-      "why_not_others": "Current price (7.85 EGP) is 37.8% above fair value (4.88 EGP); Price (7.85) significantly above bear-case (2.93) — limited downside protection",
-      "supporting_evidence": [],
+      "why_this_stock": "ABUK: Fair value 47.15 EGP vs current 77.90 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+8.2%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (77.90 EGP) is 39.5% above fair value (47.15 EGP); Price (77.90) significantly above bear-case (36.54) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+8.2%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
       "invalidation_conditions": [
-        "Current price (7.85 EGP) is 37.8% above fair value (4.88 EGP)",
-        "Price (7.85) significantly above bear-case (2.93) — limited downside protection"
+        "Current price (77.90 EGP) is 39.5% above fair value (47.15 EGP)",
+        "Price (77.90) significantly above bear-case (36.54) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "SCEM",
+    "as_of": "2026-08-14",
+    "action": "strong_buy",
+    "horizon": "investment",
+    "confidence": 0.76,
+    "combined_expected_return": 0.3206,
+    "combined_expected_risk": 0.5891,
+    "current_price": 94.4,
+    "fair_value": 114.981,
+    "upside_pct": 21.8,
+    "explanation": {
+      "why_this_stock": "SCEM: Fair value 114.98 EGP vs current 94.40 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (94.40 EGP) is 21.8% below fair value (114.98 EGP); Bull-case fair value 155.33 EGP implies 65% upside",
+      "why_not_others": "Price (94.40) significantly above bear-case (68.99) — limited downside protection",
+      "supporting_evidence": [
+        "Current price (94.40 EGP) is 21.8% below fair value (114.98 EGP)",
+        "Bull-case fair value 155.33 EGP implies 65% upside",
+        "Strong 20-day momentum (+51.3%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Price (94.40) significantly above bear-case (68.99) — limited downside protection"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -713,27 +718,26 @@
     }
   },
   {
-    "ticker": "ABUK",
+    "ticker": "HELI",
     "as_of": "2026-08-14",
     "action": "sell",
     "horizon": "investment",
-    "confidence": 0.656,
-    "combined_expected_return": -0.3534,
-    "combined_expected_risk": 0.3735,
-    "current_price": 77.9,
-    "fair_value": 49.0975,
-    "upside_pct": -37.0,
+    "confidence": 0.655,
+    "combined_expected_return": -0.3503,
+    "combined_expected_risk": 0.7462,
+    "current_price": 7.85,
+    "fair_value": 5.0778,
+    "upside_pct": -35.3,
     "explanation": {
-      "why_this_stock": "ABUK: Fair value 49.10 EGP vs current 77.90 EGP Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+8.2%); Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "Current price (77.90 EGP) is 37.0% above fair value (49.10 EGP); Price (77.90) significantly above bear-case (36.54) — limited downside protection",
+      "why_this_stock": "HELI: Fair value 5.08 EGP vs current 7.85 EGP Based on 5 financial reporting periods.",
+      "why_now": "Bull-case fair value 8.12 EGP implies 3% upside",
+      "why_not_others": "Current price (7.85 EGP) is 35.3% above fair value (5.08 EGP); Price (7.85) significantly above bear-case (3.05) — limited downside protection",
       "supporting_evidence": [
-        "Strong 20-day momentum (+8.2%)",
-        "Price above SMA-20 and SMA-50 — trend intact"
+        "Bull-case fair value 8.12 EGP implies 3% upside"
       ],
       "invalidation_conditions": [
-        "Current price (77.90 EGP) is 37.0% above fair value (49.10 EGP)",
-        "Price (77.90) significantly above bear-case (36.54) — limited downside protection"
+        "Current price (7.85 EGP) is 35.3% above fair value (5.08 EGP)",
+        "Price (7.85) significantly above bear-case (3.05) — limited downside protection"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -779,28 +783,27 @@
     }
   },
   {
-    "ticker": "ARCC",
+    "ticker": "ISMQ",
     "as_of": "2026-08-14",
-    "action": "strong_buy",
+    "action": "sell",
     "horizon": "investment",
-    "confidence": 0.707,
-    "combined_expected_return": 0.213,
-    "combined_expected_risk": 0.4805,
-    "current_price": 74.2,
-    "fair_value": 84.5803,
-    "upside_pct": 14.0,
+    "confidence": 0.608,
+    "combined_expected_return": -0.193,
+    "combined_expected_risk": 0.3502,
+    "current_price": 9.4,
+    "fair_value": 7.6154,
+    "upside_pct": -19.0,
     "explanation": {
-      "why_this_stock": "ARCC: Fair value 84.58 EGP vs current 74.20 EGP Based on 5 financial reporting periods.",
-      "why_now": "Current price (74.20 EGP) is 14.0% below fair value (84.58 EGP); Bull-case fair value 104.39 EGP implies 41% upside",
-      "why_not_others": "Price (74.20) significantly above bear-case (50.75) — limited downside protection",
+      "why_this_stock": "ISMQ: Fair value 7.62 EGP vs current 9.40 EGP Based on 5 financial reporting periods.",
+      "why_now": "Bull-case fair value 11.69 EGP implies 24% upside; Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (9.40 EGP) is 19.0% above fair value (7.62 EGP); Price (9.40) significantly above bear-case (4.57) — limited downside protection",
       "supporting_evidence": [
-        "Current price (74.20 EGP) is 14.0% below fair value (84.58 EGP)",
-        "Bull-case fair value 104.39 EGP implies 41% upside",
-        "Strong 20-day momentum (+36.6%)",
+        "Bull-case fair value 11.69 EGP implies 24% upside",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
-        "Price (74.20) significantly above bear-case (50.75) — limited downside protection"
+        "Current price (9.40 EGP) is 19.0% above fair value (7.62 EGP)",
+        "Price (9.40) significantly above bear-case (4.57) — limited downside protection"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -846,27 +849,28 @@
     }
   },
   {
-    "ticker": "ISMQ",
+    "ticker": "ARCC",
     "as_of": "2026-08-14",
-    "action": "sell",
+    "action": "buy",
     "horizon": "investment",
-    "confidence": 0.601,
-    "combined_expected_return": -0.1697,
-    "combined_expected_risk": 0.3502,
-    "current_price": 9.4,
-    "fair_value": 7.8339,
-    "upside_pct": -16.7,
+    "confidence": 0.617,
+    "combined_expected_return": 0.1665,
+    "combined_expected_risk": 0.4805,
+    "current_price": 74.2,
+    "fair_value": 81.1294,
+    "upside_pct": 9.3,
     "explanation": {
-      "why_this_stock": "ISMQ: Fair value 7.83 EGP vs current 9.40 EGP Based on 5 financial reporting periods.",
-      "why_now": "Bull-case fair value 11.69 EGP implies 24% upside; Price above SMA-20 and SMA-50 — trend intact",
-      "why_not_others": "Current price (9.40 EGP) is 16.7% above fair value (7.83 EGP); Price (9.40) significantly above bear-case (4.70) — limited downside protection",
+      "why_this_stock": "ARCC: Fair value 81.13 EGP vs current 74.20 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (74.20 EGP) is 9.3% below fair value (81.13 EGP); Bull-case fair value 101.15 EGP implies 36% upside",
+      "why_not_others": "Price (74.20) significantly above bear-case (48.68) — limited downside protection",
       "supporting_evidence": [
-        "Bull-case fair value 11.69 EGP implies 24% upside",
+        "Current price (74.20 EGP) is 9.3% below fair value (81.13 EGP)",
+        "Bull-case fair value 101.15 EGP implies 36% upside",
+        "Strong 20-day momentum (+36.6%)",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
       "invalidation_conditions": [
-        "Current price (9.40 EGP) is 16.7% above fair value (7.83 EGP)",
-        "Price (9.40) significantly above bear-case (4.70) — limited downside protection"
+        "Price (74.20) significantly above bear-case (48.68) — limited downside protection"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -913,40 +917,6 @@
     }
   },
   {
-    "ticker": "MCQE",
-    "as_of": "2026-08-14",
-    "action": "buy",
-    "horizon": "investment",
-    "confidence": 0.604,
-    "combined_expected_return": 0.1348,
-    "combined_expected_risk": 0.6022,
-    "current_price": 248.11,
-    "fair_value": 261.2137,
-    "upside_pct": 5.3,
-    "explanation": {
-      "why_this_stock": "MCQE: Fair value 261.21 EGP vs current 248.11 EGP Based on 5 financial reporting periods.",
-      "why_now": "Current price (248.11 EGP) is 5.3% below fair value (261.21 EGP); Bull-case fair value 353.94 EGP implies 43% upside",
-      "why_not_others": "Price (248.11) significantly above bear-case (156.73) — limited downside protection",
-      "supporting_evidence": [
-        "Current price (248.11 EGP) is 5.3% below fair value (261.21 EGP)",
-        "Bull-case fair value 353.94 EGP implies 43% upside",
-        "Strong 20-day momentum (+41.0%)",
-        "Price above SMA-20 and SMA-50 — trend intact"
-      ],
-      "invalidation_conditions": [
-        "Price (248.11) significantly above bear-case (156.73) — limited downside protection"
-      ],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 272,
-      "latest_price_date": "2026-08-13",
-      "has_fair_value": true,
-      "financial_periods": 5
-    }
-  },
-  {
     "ticker": "RACC",
     "as_of": "2026-08-14",
     "action": "sell",
@@ -968,6 +938,40 @@
       "invalidation_conditions": [
         "Current price (10.39 EGP) is 13.5% above fair value (8.98 EGP)",
         "Price (10.39) significantly above bear-case (7.29) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "MCQE",
+    "as_of": "2026-08-14",
+    "action": "buy",
+    "horizon": "investment",
+    "confidence": 0.592,
+    "combined_expected_return": 0.1038,
+    "combined_expected_risk": 0.6022,
+    "current_price": 248.11,
+    "fair_value": 253.5118,
+    "upside_pct": 2.2,
+    "explanation": {
+      "why_this_stock": "MCQE: Fair value 253.51 EGP vs current 248.11 EGP Based on 5 financial reporting periods.",
+      "why_now": "Current price (248.11 EGP) is 2.2% below fair value (253.51 EGP); Bull-case fair value 353.94 EGP implies 43% upside",
+      "why_not_others": "Price (248.11) significantly above bear-case (152.11) — limited downside protection",
+      "supporting_evidence": [
+        "Current price (248.11 EGP) is 2.2% below fair value (253.51 EGP)",
+        "Bull-case fair value 353.94 EGP implies 43% upside",
+        "Strong 20-day momentum (+41.0%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Price (248.11) significantly above bear-case (152.11) — limited downside protection"
       ],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -1823,6 +1827,33 @@
         "Strong 20-day momentum (+9.5%)",
         "Price above SMA-20 and SMA-50 — trend intact"
       ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 272,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "FWRY",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3174,
+    "current_price": 19.01,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "FWRY: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
       "invalidation_conditions": [],
       "similar_historical_cases": [],
       "evidence_refs": []
@@ -2735,35 +2766,6 @@
       "supporting_evidence": [
         "Strong 20-day momentum (+28.9%)",
         "Price above SMA-20 and SMA-50 — trend intact"
-      ],
-      "invalidation_conditions": [],
-      "similar_historical_cases": [],
-      "evidence_refs": []
-    },
-    "data_quality": {
-      "price_bars": 272,
-      "latest_price_date": "2026-08-13",
-      "has_fair_value": false,
-      "financial_periods": 5
-    }
-  },
-  {
-    "ticker": "SKPC",
-    "as_of": "2026-08-14",
-    "action": "abstain",
-    "horizon": "investment",
-    "confidence": 0.0,
-    "combined_expected_return": null,
-    "combined_expected_risk": 0.3466,
-    "current_price": 16.6,
-    "fair_value": null,
-    "upside_pct": null,
-    "explanation": {
-      "why_this_stock": "SKPC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
-      "why_now": "Strong 20-day momentum (+11.5%)",
-      "why_not_others": "No major contrary indicator",
-      "supporting_evidence": [
-        "Strong 20-day momentum (+11.5%)"
       ],
       "invalidation_conditions": [],
       "similar_historical_cases": [],

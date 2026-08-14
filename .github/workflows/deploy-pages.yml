@@ -10,6 +10,12 @@ on:
       - "package-lock.json"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
+    inputs:
+      force_live:
+        description: "Run the live production pipeline even if today's run already exists"
+        required: false
+        default: "false"
+        type: boolean
   # Free twice-daily refresh (no deployment target/scheduler required --
   # GitHub Actions cron is free for a public repo), matching the
   # self-hosted VPS collector's own 07:00/16:00 Africa/Cairo cadence
@@ -106,7 +112,11 @@ jobs:
           # valid for the schedule trigger; applying it to pushes previously
           # left Pages serving old code and old recommendations indefinitely.
           if [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
-            echo "already_ran=false" >> "$GITHUB_OUTPUT"
+            if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.force_live || 'false' }}" = "true" ]; then
+              echo "already_ran=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "already_ran=true" >> "$GITHUB_OUTPUT"
+            fi
             exit 0
           fi
           ALREADY_RAN=$(uv run python -c "

@@ -89,6 +89,8 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     Capability.FINANCIAL_STATEMENTS: [
         "egxpilot_fundamentals",
         "chief_egx_financials",
+        "stockanalysis_financials",
+        "mubasher_financials",
         "telecom_egypt_ir",
         "orascom_ir",
         "rmda_ir",
@@ -96,6 +98,8 @@ CAPABILITY_STRATEGIES: dict[Capability, list[str]] = {
     ],
     Capability.INVESTOR_RELATIONS: [
         "chief_egx_financials",
+        "stockanalysis_financials",
+        "mubasher_financials",
         "telecom_egypt_ir",
         "orascom_ir",
         "rmda_ir",

@@ -56,10 +56,12 @@ from agx_research.collectors.egypt_nsdp import EgyptNsdpCollector
 from agx_research.collectors.fetcher import HttpFetcher
 from agx_research.collectors.fred import FredCsvCollector
 from agx_research.collectors.gdelt import GdeltDocCollector
+from agx_research.collectors.mubasher_financials import MubasherFinancialsCollector
 from agx_research.collectors.official_filings import OfficialFilingsCollector
 from agx_research.collectors.orascom_financials import OrascomFinancialHighlightsCollector
 from agx_research.collectors.raw import RawDocumentRepository
 from agx_research.collectors.rss import RssNewsCollector
+from agx_research.collectors.stockanalysis_financials import StockAnalysisFinancialsCollector
 from agx_research.collectors.stooq import StooqPriceCollector
 from agx_research.collectors.telecom_egypt_financials import (
     TelecomEgyptFinancialHighlightsCollector,
@@ -428,18 +430,37 @@ def _mock_url_map(spec_by_id: dict[str, SourceSpec]) -> dict[str, str]:
     return content_by_url
 
 
-def _verified_company_urls() -> dict[str, str]:
-    """Load only previously evidenced issuer domains; never synthesize URLs."""
-    path = Path(__file__).resolve().parents[3] / "data" / "universe" / "egx30_web_search_domain_hints.json"
+def _verified_company_urls() -> dict[str, list[str]]:
+    """Load evidenced issuer pages and discovered filing pages; never synthesize URLs."""
+    root = Path(__file__).resolve().parents[3] / "data"
+    hints_path = root / "universe" / "egx30_web_search_domain_hints.json"
+    registry_path = root / "registry" / "company_financial_sources.json"
+    fallback_path = root / "registry" / "financial_fallback_urls.json"
+    urls: dict[str, list[str]] = {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {}
-    return {
-        ticker.upper(): ("https://" + value["hostname"]).rstrip("/")
-        for ticker, value in payload.get("hints", {}).items()
-        if isinstance(value, dict) and value.get("hostname")
-    }
+        hints = json.loads(hints_path.read_text(encoding="utf-8")).get("hints", {})
+        for ticker, value in hints.items():
+            if isinstance(value, dict) and value.get("hostname"):
+                urls[ticker.upper()] = ["https://" + value["hostname"].rstrip("/")]
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        for ticker, entries in registry.items():
+            bucket = urls.setdefault(ticker.upper(), [])
+            for entry in entries:
+                if entry.get("homepage_url"):
+                    bucket.append(entry["homepage_url"])
+                for document in entry.get("documents", []):
+                    category = document.get("category", "")
+                    if category in {"financial_statements", "annual_report", "quarterly_report", "presentation"} and document.get("url"):
+                        bucket.append(document["url"])
+            urls[ticker.upper()] = list(dict.fromkeys(bucket))
+        fallback = json.loads(fallback_path.read_text(encoding="utf-8"))
+        for ticker, entry in fallback.items():
+            bucket = urls.setdefault(ticker.upper(), [])
+            bucket.extend(entry.get("urls", []))
+            urls[ticker.upper()] = list(dict.fromkeys(bucket))
+    except (OSError, ValueError, TypeError):
+        return urls
+    return urls
 
 
 def build_live_collector(
@@ -514,6 +535,10 @@ def build_live_collector(
         return OrascomFinancialHighlightsCollector(spec, fetcher=fetcher)
     if source_id == "chief_egx_financials":
         return ChiefFinancialsCollector(spec, tickers=tickers, companies=companies, fetcher=fetcher)
+    if source_id == "mubasher_financials":
+        return MubasherFinancialsCollector(spec, tickers=tickers, fetcher=fetcher)
+    if source_id == "stockanalysis_financials":
+        return StockAnalysisFinancialsCollector(spec, tickers=tickers, fetcher=fetcher)
     if source_id in {"egx_financial_statements", "fra_financial_statements", "company_ir"}:
         # URL maps are supplied by verified discovery/configuration. An empty map
         # is a visible zero-yield run, never a fabricated company domain.

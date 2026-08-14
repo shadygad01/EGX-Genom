@@ -1,0 +1,37 @@
+{
+  "ACTF": {
+    "urls": ["https://act-fin.com/financial-statements/"],
+    "source": "issuer_ir",
+    "evidence": "https://act-fin.com/financial-statements/"
+  },
+  "AIDC": {
+    "urls": ["https://aid-holding.com/financial-statement"],
+    "source": "issuer_ir",
+    "evidence": "https://aid-holding.com/financial-statement"
+  },
+  "ICFC": {
+    "urls": ["https://ir.egidegypt.com/en/financialstatement/"],
+    "source": "issuer_or_regulatory_ir",
+    "evidence": "https://ir.egidegypt.com/en/financialstatement/"
+  },
+  "IEEC": {
+    "urls": ["https://www.ieec-egypt.com/"],
+    "source": "issuer_ir",
+    "evidence": "https://www.ieec-egypt.com/"
+  },
+  "ORAS": {
+    "urls": ["https://orascom.com/investors-updates/"],
+    "source": "issuer_ir",
+    "evidence": "https://orascom.com/investors-updates/"
+  },
+  "TANM": {
+    "urls": ["https://english.mubasher.info/markets/EGX/stocks/TANM/financial-statements/"],
+    "source": "secondary_financial_data",
+    "evidence": "https://english.mubasher.info/markets/EGX/stocks/TANM/financial-statements/"
+  },
+  "VLMRA": {
+    "urls": ["https://ir.valmore.com/en/results-center"],
+    "source": "issuer_ir",
+    "evidence": "https://ir.valmore.com/en/results-center"
+  }
+}

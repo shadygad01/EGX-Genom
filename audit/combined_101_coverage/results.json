@@ -1,0 +1,6795 @@
+{
+  "summary": {
+    "universe": 101,
+    "covered": 101,
+    "coverage_percent": 100.0,
+    "selected_by_source": {
+      "stockanalysis": 94,
+      "mubasher": 7
+    },
+    "status_counts": {
+      "SUCCESS": 101
+    }
+  },
+  "selected": [
+    {
+      "ticker": "ABUK",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ABUK/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ACTF",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 98,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ACTF/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ADIB",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ADIB/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AFDI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AFDI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AFMC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AFMC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AIDC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 14,
+      "periods": [
+        "2025-09-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AIDC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AIHC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AIHC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ALCN",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 37,
+      "periods": [
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ALCN/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMER",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AMER/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMIA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AMIA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMOC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AMOC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ARAB",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ARAB/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ARCC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ARCC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ASCM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ASCM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ASPI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ASPI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ATLC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ATLC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ATQA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ATQA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "BIOC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/BIOC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "BTFH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/BTFH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CCAP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CCAP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CIEB",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CIEB/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CNFN",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CNFN/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "COMI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/COMI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "COSG",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/COSG/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CSAG",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CSAG/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "DAPH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/DAPH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "DSCW",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/DSCW/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EAST",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EAST/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ECAP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ECAP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EFID",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EFID/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EFIH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EFIH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGAL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EGAL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGCH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2020-06-30",
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EGCH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGTS",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EGTS/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EHDR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2019-12-31",
+        "2020-12-31",
+        "2021-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EHDR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ELSH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ELSH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EMFD",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EMFD/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ENGC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ENGC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ETEL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ETEL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ETRS",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ETRS/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EXPA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 34,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EXPA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "FWRY",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/FWRY/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "GBCO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/GBCO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "GPIM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 43,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/GPIM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "HDBK",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/HDBK/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "HELI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/HELI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "HRHO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/HRHO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ICFC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 179,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ICFC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "IDRE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 33,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/IDRE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "IEEC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 193,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/IEEC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "IFAP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/IFAP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISMA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ISMA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISMQ",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 32,
+      "periods": [
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ISMQ/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISPH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ISPH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "JUFO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/JUFO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "KABO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-06-30",
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/KABO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "KRDI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 36,
+      "periods": [
+        "2021-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/KRDI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "LCSW",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/LCSW/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MASR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MASR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MCQE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MCQE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MCRO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MCRO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MEPA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MEPA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MFPC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MFPC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MOED",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MOED/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPCI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MPCI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPCO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MPCO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPRC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MPRC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MTIE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MTIE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "NCCW",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/NCCW/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "NIPH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/NIPH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OBRI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OBRI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OCDI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OCDI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OFH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 36,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OFH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OIH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OIH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORAS",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 203,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "US Dollar(USD)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ORAS/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORHD",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ORHD/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORWE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ORWE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "PHAR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/PHAR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "PHDC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/PHDC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "POUL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/POUL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "PRCL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/PRCL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "RACC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/RACC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "RAYA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 43,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/RAYA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "RMDA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/RMDA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SCEM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SCEM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SDTI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SDTI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SIPC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SIPC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SKPC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SKPC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SVCE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SVCE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SWDY",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SWDY/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "TALM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-08-31",
+        "2022-08-31",
+        "2023-08-31",
+        "2024-08-31",
+        "2025-08-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/TALM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "TANM",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 184,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/TANM/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "TAQA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/TAQA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "TMGH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/TMGH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "UEGC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/UEGC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "UNIP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/UNIP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "VALU",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/VALU/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "VLMR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/VLMR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "VLMRA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 170,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "US Dollar(USD)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/VLMRA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ZEOT",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ZEOT/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ZMID",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 41,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ZMID/financials/",
+      "warnings": []
+    }
+  ],
+  "all_attempts": [
+    {
+      "ticker": "ABUK",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 187,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ABUK/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ABUK",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ABUK/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ACTF",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 98,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ACTF/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ACTF",
+      "source": "stockanalysis",
+      "status": "NO_PAGE",
+      "line_items": 0,
+      "url": "https://stockanalysis.com/quote/egx/ACTF/financials/",
+      "http_status": 404
+    },
+    {
+      "ticker": "ADIB",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 120,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ADIB/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ADIB",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ADIB/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AFDI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 168,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AFDI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AFDI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AFDI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AFMC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 214,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AFMC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AFMC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AFMC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AIDC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 14,
+      "periods": [
+        "2025-09-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AIDC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AIDC",
+      "source": "stockanalysis",
+      "status": "NO_PAGE",
+      "line_items": 0,
+      "url": "https://stockanalysis.com/quote/egx/AIDC/financials/",
+      "http_status": 404
+    },
+    {
+      "ticker": "AIHC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 198,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AIHC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AIHC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AIHC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ALCN",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 183,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ALCN/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ALCN",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 37,
+      "periods": [
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ALCN/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMER",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 180,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AMER/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMER",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AMER/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMIA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 216,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AMIA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMIA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AMIA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMOC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 186,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/AMOC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "AMOC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/AMOC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ARAB",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 206,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ARAB/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ARAB",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ARAB/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ARCC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 206,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ARCC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ARCC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ARCC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ASCM",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 219,
+      "periods": [
+        "2020-03-31",
+        "2020-06-30",
+        "2020-09-30",
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ASCM/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ASCM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ASCM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ASPI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 201,
+      "periods": [
+        "2020-03-31",
+        "2020-06-30",
+        "2020-09-30",
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ASPI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ASPI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ASPI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ATLC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 179,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ATLC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ATLC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ATLC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ATQA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 198,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ATQA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ATQA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ATQA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "BIOC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 216,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/BIOC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "BIOC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/BIOC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "BTFH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 161,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/BTFH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "BTFH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/BTFH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CCAP",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 195,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/CCAP/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "CCAP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CCAP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CIEB",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 147,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/CIEB/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "CIEB",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CIEB/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CNFN",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 196,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/CNFN/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "CNFN",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CNFN/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "COMI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 177,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/COMI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "COMI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/COMI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "COSG",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 181,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/COSG/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "COSG",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/COSG/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "CSAG",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 151,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/CSAG/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "CSAG",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/CSAG/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "DAPH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 210,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/DAPH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "DAPH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/DAPH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "DSCW",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 176,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/DSCW/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "DSCW",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/DSCW/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EAST",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 208,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EAST/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EAST",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EAST/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ECAP",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 163,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ECAP/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ECAP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ECAP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EFID",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 180,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EFID/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EFID",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EFID/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EFIH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 175,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EFIH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EFIH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EFIH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGAL",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 187,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EGAL/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGAL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EGAL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGCH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 210,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EGCH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGCH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2020-06-30",
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EGCH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGTS",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 193,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EGTS/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EGTS",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EGTS/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EHDR",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 195,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EHDR/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EHDR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2019-12-31",
+        "2020-12-31",
+        "2021-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EHDR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ELSH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 164,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ELSH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ELSH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ELSH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EMFD",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 179,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EMFD/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EMFD",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EMFD/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ENGC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 183,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ENGC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ENGC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ENGC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ETEL",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 180,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ETEL/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ETEL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ETEL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ETRS",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 153,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ETRS/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ETRS",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ETRS/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "EXPA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 180,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/EXPA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "EXPA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 34,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/EXPA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "FWRY",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 209,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/FWRY/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "FWRY",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/FWRY/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "GBCO",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 189,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/GBCO/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "GBCO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/GBCO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "GPIM",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 199,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/GPIM/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "GPIM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 43,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/GPIM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "HDBK",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 177,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/HDBK/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "HDBK",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/HDBK/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "HELI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 210,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/HELI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "HELI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/HELI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "HRHO",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 176,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/HRHO/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "HRHO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/HRHO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ICFC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 179,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ICFC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ICFC",
+      "source": "stockanalysis",
+      "status": "NO_PAGE",
+      "line_items": 0,
+      "url": "https://stockanalysis.com/quote/egx/ICFC/financials/",
+      "http_status": 404
+    },
+    {
+      "ticker": "IDRE",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 167,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/IDRE/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "IDRE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 33,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/IDRE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "IEEC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 193,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/IEEC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "IEEC",
+      "source": "stockanalysis",
+      "status": "NO_PAGE",
+      "line_items": 0,
+      "url": "https://stockanalysis.com/quote/egx/IEEC/financials/",
+      "http_status": 404
+    },
+    {
+      "ticker": "IFAP",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 186,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31",
+        "2026-06-30",
+        "2026-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/IFAP/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "IFAP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/IFAP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISMA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 215,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ISMA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISMA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ISMA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISMQ",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 181,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31",
+        "2026-03-31",
+        "2026-06-30",
+        "2026-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ISMQ/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISMQ",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 32,
+      "periods": [
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ISMQ/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISPH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 204,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ISPH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ISPH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ISPH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "JUFO",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 176,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-03-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/JUFO/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "JUFO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/JUFO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "KABO",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 185,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/KABO/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "KABO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-06-30",
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/KABO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "KRDI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 192,
+      "periods": [
+        "2020-12-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/KRDI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "KRDI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 36,
+      "periods": [
+        "2021-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/KRDI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "LCSW",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 204,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/LCSW/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "LCSW",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/LCSW/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MASR",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 203,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MASR/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MASR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MASR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MCQE",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 177,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-03-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MCQE/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MCQE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MCQE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MCRO",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 165,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MCRO/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MCRO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MCRO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MEPA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 189,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MEPA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MEPA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MEPA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MFPC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 180,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MFPC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MFPC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MFPC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MOED",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 173,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31",
+        "2026-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MOED/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MOED",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MOED/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPCI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 170,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MPCI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPCI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MPCI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPCO",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 177,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MPCO/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPCO",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MPCO/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPRC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 198,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MPRC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MPRC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MPRC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "MTIE",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 171,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/MTIE/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "MTIE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/MTIE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "NCCW",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 203,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/NCCW/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "NCCW",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/NCCW/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "NIPH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 173,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-06-30",
+        "2026-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/NIPH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "NIPH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/NIPH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OBRI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 174,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/OBRI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "OBRI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OBRI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OCDI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 188,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/OCDI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "OCDI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OCDI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OFH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 145,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/OFH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "OFH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 36,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OFH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "OIH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 189,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/OIH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "OIH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/OIH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORAS",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 203,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "US Dollar(USD)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ORAS/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORAS",
+      "source": "stockanalysis",
+      "status": "NO_PAGE",
+      "line_items": 0,
+      "url": "https://stockanalysis.com/quote/egx/ORAS/financials/",
+      "http_status": 404
+    },
+    {
+      "ticker": "ORHD",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 208,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ORHD/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORHD",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ORHD/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORWE",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 183,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ORWE/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ORWE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ORWE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "PHAR",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 216,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/PHAR/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "PHAR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/PHAR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "PHDC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 182,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/PHDC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "PHDC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/PHDC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "POUL",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 176,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/POUL/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "POUL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/POUL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "PRCL",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 151,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/PRCL/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "PRCL",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/PRCL/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "RACC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 167,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/RACC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "RACC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/RACC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "RAYA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 213,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/RAYA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "RAYA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 43,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/RAYA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "RMDA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 172,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/RMDA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "RMDA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/RMDA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SCEM",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 210,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/SCEM/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "SCEM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SCEM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SDTI",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 172,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/SDTI/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "SDTI",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SDTI/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SIPC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 167,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/SIPC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "SIPC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SIPC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SKPC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 214,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/SKPC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "SKPC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SKPC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SVCE",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 212,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/SVCE/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "SVCE",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SVCE/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "SWDY",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 189,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/SWDY/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "SWDY",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/SWDY/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "TALM",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 159,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/TALM/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "TALM",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-08-31",
+        "2022-08-31",
+        "2023-08-31",
+        "2024-08-31",
+        "2025-08-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/TALM/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "TANM",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 184,
+      "periods": [
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/TANM/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "TANM",
+      "source": "stockanalysis",
+      "status": "NO_PAGE",
+      "line_items": 0,
+      "url": "https://stockanalysis.com/quote/egx/TANM/financials/",
+      "http_status": 404
+    },
+    {
+      "ticker": "TAQA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 135,
+      "periods": [
+        "2020-12-31",
+        "2021-12-31",
+        "2022-12-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/TAQA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "TAQA",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 35,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/TAQA/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "TMGH",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 213,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/TMGH/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "TMGH",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/TMGH/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "UEGC",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 202,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/UEGC/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "UEGC",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/UEGC/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "UNIP",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 202,
+      "periods": [
+        "2020-12-31",
+        "2021-03-31",
+        "2021-06-30",
+        "2021-09-30",
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/UNIP/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "UNIP",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/UNIP/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "VALU",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 46,
+      "periods": [
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/VALU/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "VALU",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 40,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/VALU/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "VLMR",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 170,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "US Dollar(USD)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/VLMR/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "VLMR",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 45,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/VLMR/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "VLMRA",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 170,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "US Dollar(USD)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/VLMRA/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "VLMRA",
+      "source": "stockanalysis",
+      "status": "NO_PAGE",
+      "line_items": 0,
+      "url": "https://stockanalysis.com/quote/egx/VLMRA/financials/",
+      "http_status": 404
+    },
+    {
+      "ticker": "ZEOT",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 194,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-06-30",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-06-30",
+        "2026-09-30"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ZEOT/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ZEOT",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 44,
+      "periods": [
+        "2021-06-30",
+        "2022-06-30",
+        "2023-06-30",
+        "2024-06-30",
+        "2025-06-30"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ZEOT/financials/",
+      "warnings": []
+    },
+    {
+      "ticker": "ZMID",
+      "source": "mubasher",
+      "status": "SUCCESS",
+      "line_items": 174,
+      "periods": [
+        "2021-12-31",
+        "2022-03-31",
+        "2022-06-30",
+        "2022-09-30",
+        "2022-12-31",
+        "2023-03-31",
+        "2023-09-30",
+        "2023-12-31",
+        "2024-03-31",
+        "2024-06-30",
+        "2024-09-30",
+        "2024-12-31",
+        "2025-03-31",
+        "2025-06-30",
+        "2025-09-30",
+        "2025-12-31",
+        "2026-03-31"
+      ],
+      "currencies": [
+        "Egyptian Pound(EGP)"
+      ],
+      "url": "https://english.mubasher.info/markets/EGX/stocks/ZMID/financial-statements/",
+      "warnings": []
+    },
+    {
+      "ticker": "ZMID",
+      "source": "stockanalysis",
+      "status": "SUCCESS",
+      "line_items": 41,
+      "periods": [
+        "2021-12-31",
+        "2022-12-31",
+        "2023-12-31",
+        "2024-12-31",
+        "2025-12-31"
+      ],
+      "currencies": [
+        "EGP"
+      ],
+      "url": "https://stockanalysis.com/quote/egx/ZMID/financials/",
+      "warnings": []
+    }
+  ]
+}

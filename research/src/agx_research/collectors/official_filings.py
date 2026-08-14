@@ -37,9 +37,12 @@ class OfficialFilingsCollector(Collector):
     name = "OfficialFilingsCollector"
     version = "1.0.0"
 
-    def __init__(self, spec, *, company_urls: dict[str, str], fetcher=None, archive: RawArchive | None = None):
+    def __init__(self, spec, *, company_urls: dict[str, str | list[str]], fetcher=None, archive: RawArchive | None = None):
         super().__init__(spec, fetcher)
-        self.company_urls = {k.upper(): v for k, v in company_urls.items() if v}
+        self.company_urls: dict[str, list[str]] = {}
+        for ticker, urls in company_urls.items():
+            normalized = [urls] if isinstance(urls, str) else list(urls)
+            self.company_urls[ticker.upper()] = list(dict.fromkeys(u for u in normalized if u))
         self.archive = archive or RawArchive()
 
     def _candidate_links(self, html: str, page_url: str) -> list[str]:
@@ -58,39 +61,40 @@ class OfficialFilingsCollector(Collector):
     def fetch(self) -> list[RawDocument]:
         documents: list[RawDocument] = []
         seen: set[str] = set()
-        for ticker, homepage in sorted(self.company_urls.items()):
-            try:
-                landing = self.fetcher.fetch_bytes(homepage, self.spec)
-            except (FetchDisallowed, FetchError, OSError, UnicodeError):
-                continue
-            landing_text = landing.decode("utf-8", errors="replace")
-            landing_doc = build_raw_document(
-                source_id=self.spec.id, collector=self.name, collector_version=self.version,
-                original_url=homepage, content_text=landing_text,
-                schema_version=self.spec.schema_version, license=self.spec.license,
-            )
-            documents.append(landing_doc)
-            for url in self._candidate_links(landing_text, homepage):
-                if url in seen or url == homepage:
-                    continue
-                seen.add(url)
+        for ticker, homepages in sorted(self.company_urls.items()):
+            for homepage in homepages:
                 try:
-                    payload = self.fetcher.fetch_bytes(url, self.spec)
+                    landing = self.fetcher.fetch_bytes(homepage, self.spec)
                 except (FetchDisallowed, FetchError, OSError, UnicodeError):
                     continue
-                content_type = urlsplit(url).path.casefold()
-                if content_type.endswith((".pdf", ".xls", ".xlsx")):
-                    documents.append(build_binary_raw_document(
-                        source_id=self.spec.id, collector=self.name, collector_version=self.version,
-                        original_url=url, content=payload, schema_version=self.spec.schema_version,
-                        license=self.spec.license, archive=self.archive,
-                    ))
-                else:
-                    documents.append(build_raw_document(
-                        source_id=self.spec.id, collector=self.name, collector_version=self.version,
-                        original_url=url, content_text=payload.decode("utf-8", errors="replace"),
-                        schema_version=self.spec.schema_version, license=self.spec.license,
-                    ))
+                landing_text = landing.decode("utf-8", errors="replace")
+                landing_doc = build_raw_document(
+                    source_id=self.spec.id, collector=self.name, collector_version=self.version,
+                    original_url=homepage, content_text=landing_text,
+                    schema_version=self.spec.schema_version, license=self.spec.license,
+                )
+                documents.append(landing_doc)
+                for url in self._candidate_links(landing_text, homepage):
+                    if url in seen or url == homepage:
+                        continue
+                    seen.add(url)
+                    try:
+                        payload = self.fetcher.fetch_bytes(url, self.spec)
+                    except (FetchDisallowed, FetchError, OSError, UnicodeError):
+                        continue
+                    content_type = urlsplit(url).path.casefold()
+                    if content_type.endswith((".pdf", ".xls", ".xlsx")):
+                        documents.append(build_binary_raw_document(
+                            source_id=self.spec.id, collector=self.name, collector_version=self.version,
+                            original_url=url, content=payload, schema_version=self.spec.schema_version,
+                            license=self.spec.license, archive=self.archive,
+                        ))
+                    else:
+                        documents.append(build_raw_document(
+                            source_id=self.spec.id, collector=self.name, collector_version=self.version,
+                            original_url=url, content_text=payload.decode("utf-8", errors="replace"),
+                            schema_version=self.spec.schema_version, license=self.spec.license,
+                        ))
         return documents
 
     def parse(self, document: RawDocument) -> CollectionBatch:
@@ -136,8 +140,8 @@ class OfficialFilingsCollector(Collector):
         return batch
 
     def _ticker_for_url(self, url: str) -> str | None:
-        for ticker, homepage in self.company_urls.items():
-            if url == homepage or url.startswith(homepage.rstrip("/") + "/"):
+        for ticker, homepages in self.company_urls.items():
+            if any(url == homepage or url.startswith(homepage.rstrip("/") + "/") for homepage in homepages):
                 return ticker
         return None
 

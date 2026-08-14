@@ -338,7 +338,11 @@ def score_ticker(
     fin_note = f"Based on {financial_periods} financial reporting periods." if financial_periods else ""
 
     risk=(price_stats.get("annual_volatility") or 0.25)
-    model_values=[float(v) for v in (valuation.get("models") or {}).values() if isinstance(v,(int,float)) and v>0]
+    reported_models=valuation.get("models") or {}
+    included_names=valuation.get("included_models") or []
+    model_values=[float(reported_models[name]) for name in included_names if isinstance(reported_models.get(name),(int,float)) and reported_models[name]>0]
+    if len(model_values)<3:
+        model_values=[float(v) for v in reported_models.values() if isinstance(v,(int,float)) and v>0]
     model_cv=None
     if len(model_values)>=3:
         model_mean=sum(model_values)/len(model_values)
@@ -348,13 +352,14 @@ def score_ticker(
     opportunity_score=round(((combined_return or 0.0) * (quality_score/100.0) * (model_agreement_score/100.0) * risk_penalty), 6)
     if action in {"strong_buy", "buy", "accumulate"}: market_stance="attractive"
     elif action in {"reduce", "sell"}: market_stance="unattractive"
-    elif action == "hold": market_stance="neutral"
-    else: market_stance="insufficient_evidence"
+    else: market_stance="neutral"
+    evidence_status="sufficient" if combined_return is not None else "insufficient_evidence"
     return {
         "ticker": ticker,
         "as_of": TODAY,
         "action": action,
         "market_stance": market_stance,
+        "evidence_status": evidence_status,
         "portfolio_action": None,
         "portfolio_action_status": "requires_position_data",
         "opportunity_score": opportunity_score,

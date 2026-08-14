@@ -8,36 +8,34 @@
     "valuation": {
       "ticker": "ABUK",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 41.1127,
-      "bear_case": 29.3755,
-      "base_case": 41.1127,
+      "weighted_fair_value": 47.1528,
+      "bear_case": 36.5419,
+      "base_case": 47.1528,
       "bull_case": 56.88,
       "models": {
-        "dcf": 39.9658,
-        "ddm": 39.7935,
-        "residual_income": 32.9004,
-        "earnings_power": 49.8115,
+        "dcf": 47.7101,
+        "ddm": 36.5419,
+        "residual_income": null,
+        "earnings_power": 46.6274,
         "ev_ebitda": null,
         "pe": 56.88,
-        "pb": 29.3755
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Abou Kir Fertilizers",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -50,13 +48,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -75,7 +72,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-06-30",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -85,47 +82,19 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 8,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "HTTPError: HTTP Error 403: Forbidden"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
-    "company_name": "Act Financial",
+    "company_name": null,
     "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "missing_or_non_positive_eps",
-        "pb": "missing_shares",
-        "residual_income": "missing_equity_eps_or_shares",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "loss",
-      "net_income_latest": -513125.356,
-      "operating_cash_flow_latest": -106879.482,
-      "cash_to_net_income_ratio": 0.208,
-      "positive_cfo_periods_last_3": 2,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
+    "source": "stockanalysis_then_mubasher",
+    "diagnostics": {},
+    "earnings_quality": {},
+    "event_status": "unknown",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
@@ -139,7 +108,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 11,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -148,7 +117,7 @@
     ],
     "company_name": "Abu Dhabi Islamic Bank- Egypt",
     "sector": "Banks",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -158,13 +127,12 @@
         "operating_cash_flow",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -264,41 +232,20 @@
   {
     "ticker": "AFMC",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "AFMC",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 9.4084,
-      "bear_case": 5.645,
-      "base_case": 9.4084,
-      "bull_case": 15.0534,
-      "models": {
-        "dcf": -2.94,
-        "ddm": 4.9742,
-        "residual_income": 7.0411,
-        "earnings_power": 7.9354,
-        "ev_ebitda": null,
-        "pe": 18.15,
-        "pb": 10.8613
-      },
-      "included_models": [
-        "ddm",
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Alexandria Flour Mills",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -310,13 +257,12 @@
         "operating_cash_flow",
         "operating_income",
         "revenue",
-        "shares_outstanding",
-        "total_equity"
+        "shares_outstanding"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -335,7 +281,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -345,49 +291,19 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 2,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "HTTPError: HTTP Error 403: Forbidden"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
-    "company_name": "Arabia for Investment and Development",
+    "company_name": null,
     "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
-        "residual_income": "missing_equity_eps_or_shares",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "loss",
-      "net_income_latest": -8424.067,
-      "operating_cash_flow_latest": 27368.181,
-      "cash_to_net_income_ratio": -3.249,
-      "positive_cfo_periods_last_3": 1,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
+    "source": "stockanalysis_then_mubasher",
+    "diagnostics": {},
+    "earnings_quality": {},
+    "event_status": "unknown",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
@@ -401,7 +317,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -410,7 +326,7 @@
     ],
     "company_name": "Arabia Investments Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -422,12 +338,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
@@ -459,36 +374,34 @@
     "valuation": {
       "ticker": "ALCN",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 13.512,
-      "bear_case": 8.1072,
-      "base_case": 13.512,
-      "bull_case": 21.6192,
+      "weighted_fair_value": 17.5555,
+      "bear_case": 11.6513,
+      "base_case": 17.5555,
+      "bull_case": 21.89,
       "models": {
-        "dcf": 17.0081,
-        "ddm": 12.0375,
-        "residual_income": 9.5014,
-        "earnings_power": 12.1845,
+        "dcf": 20.8768,
+        "ddm": 12.1134,
+        "residual_income": null,
+        "earnings_power": 11.6513,
         "ev_ebitda": null,
         "pe": 21.89,
-        "pb": 4.1271
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Alexandria Containers and goods",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -501,13 +414,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -526,45 +438,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AMER",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "AMER",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 1.2067,
-      "bear_case": 0.724,
-      "base_case": 1.2067,
-      "bull_case": 1.6723,
-      "models": {
-        "dcf": -1.7877,
-        "ddm": null,
-        "residual_income": 0.6741,
-        "earnings_power": -0.0913,
-        "ev_ebitda": null,
-        "pe": 1.54,
-        "pb": 1.6723
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-06-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Amer Group Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -576,13 +469,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -601,46 +493,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "AMIA",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "AMIA",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 1.9968,
-      "bear_case": 1.1981,
-      "base_case": 1.9968,
-      "bull_case": 3.1948,
-      "models": {
-        "dcf": -22.8641,
-        "ddm": 0.8526,
-        "residual_income": 1.1196,
-        "earnings_power": -4.9395,
-        "ev_ebitda": null,
-        "pe": 2.86,
-        "pb": 3.5934
-      },
-      "included_models": [
-        "ddm",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Arab Moltaka Investments Co",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -653,13 +525,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -678,7 +549,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -690,36 +561,34 @@
     "valuation": {
       "ticker": "AMOC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 7.0789,
-      "bear_case": 4.9627,
-      "base_case": 7.0789,
-      "bull_case": 11.3263,
+      "weighted_fair_value": 8.7995,
+      "bear_case": 5.5469,
+      "base_case": 8.7995,
+      "bull_case": 12.65,
       "models": {
-        "dcf": 7.0845,
-        "ddm": 5.3058,
-        "residual_income": 5.2295,
-        "earnings_power": 7.796,
+        "dcf": 8.7437,
+        "ddm": 5.5469,
+        "residual_income": null,
+        "earnings_power": 8.5123,
         "ev_ebitda": null,
         "pe": 12.65,
-        "pb": 4.9627
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 20,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Alexandria Mineral Oils Company",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -732,13 +601,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -757,45 +625,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-06-30",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ARAB",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "ARAB",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 0.0865,
-      "bear_case": 0.0519,
-      "base_case": 0.0865,
-      "bull_case": 0.135,
-      "models": {
-        "dcf": -0.2479,
-        "ddm": null,
-        "residual_income": 0.0385,
-        "earnings_power": -0.0593,
-        "ev_ebitda": null,
-        "pe": 0.11,
-        "pb": 0.135
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Arab Developers Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -807,13 +656,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -832,7 +680,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -844,35 +692,33 @@
     "valuation": {
       "ticker": "ARCC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 67.5893,
-      "bear_case": 40.5536,
-      "base_case": 67.5893,
+      "weighted_fair_value": 81.1294,
+      "bear_case": 48.6776,
+      "base_case": 81.1294,
       "bull_case": 101.1473,
       "models": {
         "dcf": 101.1473,
         "ddm": 20.561,
-        "residual_income": 40.2453,
-        "earnings_power": 47.289,
+        "residual_income": null,
+        "earnings_power": 38.2399,
         "ev_ebitda": null,
         "pe": 85.41,
-        "pb": 9.2638
+        "pb": null
       },
       "included_models": [
         "dcf",
-        "ddm",
         "earnings_power",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-03-31",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Arabian Cement Company",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -885,13 +731,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -910,7 +755,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -920,7 +765,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 21,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -929,7 +774,7 @@
     ],
     "company_name": "ASEC Company For Mining - ASCOM",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -941,13 +786,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -976,7 +820,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 20,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -985,7 +829,7 @@
     ],
     "company_name": "Aspire Capital Holding For Financial Investments",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -996,13 +840,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -1027,39 +870,20 @@
   {
     "ticker": "ATLC",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "ATLC",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 5.8753,
-      "bear_case": 3.8039,
-      "base_case": 5.8753,
-      "bull_case": 9.4005,
-      "models": {
-        "dcf": -35.9147,
-        "ddm": null,
-        "residual_income": 3.8039,
-        "earnings_power": -8.9494,
-        "ev_ebitda": null,
-        "pe": 10.67,
-        "pb": 4.1877
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Al Tawfeek Leasing Company-A.T.LEASE",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1071,13 +895,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -1096,7 +919,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -1106,7 +929,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -1115,7 +938,7 @@
     ],
     "company_name": "Misr National Steel - Ataqa",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1127,13 +950,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -1164,35 +986,34 @@
     "valuation": {
       "ticker": "BIOC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 16.9224,
-      "bear_case": 10.1534,
-      "base_case": 16.9224,
-      "bull_case": 27.0758,
+      "weighted_fair_value": 15.438,
+      "bear_case": 9.2628,
+      "base_case": 15.438,
+      "bull_case": 24.7008,
       "models": {
-        "dcf": -34.3827,
-        "ddm": 6.1257,
-        "residual_income": 9.1358,
-        "earnings_power": 18.1058,
+        "dcf": 8.8359,
+        "ddm": 6.9935,
+        "residual_income": null,
+        "earnings_power": 25.8639,
         "ev_ebitda": null,
-        "pe": 22.88,
-        "pb": 31.666
+        "pe": 28.05,
+        "pb": null
       },
       "included_models": [
+        "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 20,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Glaxo Smith Kline",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1205,13 +1026,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -1230,7 +1050,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -1240,7 +1060,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -1249,7 +1069,7 @@
     ],
     "company_name": "Beltone Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1260,13 +1080,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -1295,7 +1114,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -1304,7 +1123,7 @@
     ],
     "company_name": "QALAA For Financial Investments",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1316,12 +1135,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
@@ -1353,35 +1171,33 @@
     "valuation": {
       "ticker": "CIEB",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 20.5787,
-      "bear_case": 12.3472,
-      "base_case": 20.5787,
-      "bull_case": 32.926,
+      "weighted_fair_value": 19.794,
+      "bear_case": 11.8764,
+      "base_case": 19.794,
+      "bull_case": 31.6704,
       "models": {
         "dcf": 7.5216,
         "ddm": 21.8451,
-        "residual_income": 24.1008,
+        "residual_income": null,
         "earnings_power": null,
         "ev_ebitda": null,
         "pe": 54.56,
-        "pb": 19.2193
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-03-31",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Credit Agricole Egypt",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1392,13 +1208,12 @@
         "operating_cash_flow",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -1417,7 +1232,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -1427,7 +1242,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -1436,7 +1251,7 @@
     ],
     "company_name": "Contact Financial Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1448,13 +1263,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -1479,40 +1293,20 @@
   {
     "ticker": "COMI",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "COMI",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 83.1861,
-      "bear_case": 49.9117,
-      "base_case": 83.1861,
-      "bull_case": 133.0978,
-      "models": {
-        "dcf": null,
-        "ddm": 41.9613,
-        "residual_income": 82.308,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 162.45,
-        "pb": 46.4643
-      },
-      "included_models": [
-        "ddm",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Commercial International Bank-Egypt (CIB)",
     "sector": "Banks",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1523,13 +1317,12 @@
         "operating_cash_flow",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -1548,7 +1341,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -1558,7 +1351,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -1567,7 +1360,7 @@
     ],
     "company_name": "Cairo Oils & Soap",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1579,12 +1372,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
@@ -1616,35 +1408,34 @@
     "valuation": {
       "ticker": "CSAG",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 9.1491,
-      "bear_case": 5.4895,
-      "base_case": 9.1491,
-      "bull_case": 14.6385,
+      "weighted_fair_value": 12.3941,
+      "bear_case": 7.4364,
+      "base_case": 12.3941,
+      "bull_case": 19.8305,
       "models": {
-        "dcf": 5.478,
-        "ddm": 19.2335,
-        "residual_income": 15.7003,
-        "earnings_power": 5.3431,
+        "dcf": 5.1879,
+        "ddm": 20.2813,
+        "residual_income": null,
+        "earnings_power": 4.7308,
         "ev_ebitda": null,
         "pe": 37.62,
-        "pb": 5.96
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "residual_income"
+        "pe"
       ],
       "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 16,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Canal Shipping Agencies",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1656,13 +1447,12 @@
         "operating_cash_flow",
         "operating_income",
         "revenue",
-        "shares_outstanding",
-        "total_equity"
+        "shares_outstanding"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -1687,39 +1477,20 @@
   {
     "ticker": "DAPH",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "DAPH",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 27.7306,
-      "bear_case": 16.6384,
-      "base_case": 27.7306,
-      "bull_case": 44.3689,
-      "models": {
-        "dcf": -79.2673,
-        "ddm": null,
-        "residual_income": 13.7578,
-        "earnings_power": -17.137,
-        "ev_ebitda": null,
-        "pe": 24.86,
-        "pb": 51.5603
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Development & Engineering Consultants",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1731,12 +1502,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
@@ -1756,45 +1526,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "DSCW",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "DSCW",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 0.8954,
-      "bear_case": 0.5655,
-      "base_case": 0.8954,
-      "bull_case": 1.4326,
-      "models": {
-        "dcf": -4.1202,
-        "ddm": null,
-        "residual_income": 0.5655,
-        "earnings_power": 0.1284,
-        "ev_ebitda": null,
-        "pe": 1.54,
-        "pb": 0.7454
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Dice Sport & Casual Wear",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1806,13 +1557,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -1831,7 +1581,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -1843,35 +1593,33 @@
     "valuation": {
       "ticker": "EAST",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 15.3408,
-      "bear_case": 9.2045,
-      "base_case": 15.3408,
-      "bull_case": 24.5453,
+      "weighted_fair_value": 18.5825,
+      "bear_case": 11.1495,
+      "base_case": 18.5825,
+      "bull_case": 29.7319,
       "models": {
-        "dcf": -72.1632,
-        "ddm": 18.9019,
-        "residual_income": 14.2151,
-        "earnings_power": 9.7446,
+        "dcf": -45.9872,
+        "ddm": 19.0217,
+        "residual_income": null,
+        "earnings_power": 9.4846,
         "ev_ebitda": null,
         "pe": 31.79,
-        "pb": 5.4134
+        "pb": null
       },
       "included_models": [
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
       "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Eastern Company",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1884,13 +1632,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -1919,7 +1666,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -1928,7 +1675,7 @@
     ],
     "company_name": "El Ezz Porcelain (Gemma)",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -1941,12 +1688,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
@@ -1978,36 +1724,34 @@
     "valuation": {
       "ticker": "EFID",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 16.7611,
-      "bear_case": 10.0567,
-      "base_case": 16.7611,
-      "bull_case": 26.8177,
+      "weighted_fair_value": 19.4924,
+      "bear_case": 11.6954,
+      "base_case": 19.4924,
+      "bull_case": 27.6915,
       "models": {
         "dcf": 27.6915,
         "ddm": 6.0424,
-        "residual_income": 9.8726,
-        "earnings_power": 12.6155,
+        "residual_income": null,
+        "earnings_power": 9.069,
         "ev_ebitda": null,
         "pe": 23.98,
-        "pb": 4.0206
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-06-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Edita Food Industries S.A.E",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -2020,13 +1764,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -2045,7 +1788,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -2057,36 +1800,33 @@
     "valuation": {
       "ticker": "EFIH",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 4.9737,
-      "bear_case": 2.9842,
-      "base_case": 4.9737,
-      "bull_case": 7.9579,
+      "weighted_fair_value": 6.5501,
+      "bear_case": 3.9301,
+      "base_case": 6.5501,
+      "bull_case": 8.2456,
       "models": {
         "dcf": 8.2456,
         "ddm": 1.4547,
-        "residual_income": 2.6855,
-        "earnings_power": 3.8702,
+        "residual_income": null,
+        "earnings_power": 3.4194,
         "ev_ebitda": null,
         "pe": 6.16,
-        "pb": 2.5783
+        "pb": null
       },
       "included_models": [
         "dcf",
-        "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 16,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "E-finance For Digital and Financial Investments",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -2099,13 +1839,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -2136,35 +1875,34 @@
     "valuation": {
       "ticker": "EGAL",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 93.905,
-      "bear_case": 56.343,
-      "base_case": 93.905,
-      "bull_case": 150.248,
+      "weighted_fair_value": 113.3413,
+      "bear_case": 68.0048,
+      "base_case": 113.3413,
+      "bull_case": 181.3461,
       "models": {
-        "dcf": 84.7822,
-        "ddm": 53.0581,
-        "residual_income": 87.1861,
-        "earnings_power": 162.3085,
+        "dcf": 57.5334,
+        "ddm": 54.0061,
+        "residual_income": null,
+        "earnings_power": 159.0147,
         "ev_ebitda": null,
         "pe": 271.59,
-        "pb": 69.5937
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Egypt Aluminum",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -2177,13 +1915,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -2202,7 +1939,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-06-30",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -2267,7 +2004,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 21,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -2276,7 +2013,7 @@
     ],
     "company_name": "Egyptian for Tourism Resorts",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -2287,12 +2024,11 @@
         "operating_cash_flow",
         "operating_income",
         "revenue",
-        "shares_outstanding",
-        "total_equity"
+        "shares_outstanding"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
@@ -2324,500 +2060,33 @@
     "valuation": {
       "ticker": "EHDR",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 0.7309,
-      "bear_case": 0.4385,
-      "base_case": 0.7309,
-      "bull_case": 1.1694,
+      "weighted_fair_value": 1.1941,
+      "bear_case": 0.9739,
+      "base_case": 1.1941,
+      "bull_case": 1.3022,
       "models": {
-        "dcf": null,
+        "dcf": 1.3022,
         "ddm": null,
-        "residual_income": 0.2913,
-        "earnings_power": null,
+        "residual_income": null,
+        "earnings_power": 0.9739,
         "ev_ebitda": null,
-        "pe": 0.7301,
-        "pb": 1.391
+        "pe": 1.2,
+        "pb": null
       },
       "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
+        "dcf",
+        "earnings_power",
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Egyptians Housing Development & Reconstruction",
     "sector": "Real Estate",
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 23203.593,
-      "operating_cash_flow_latest": 131309.286,
-      "cash_to_net_income_ratio": 5.659,
-      "positive_cfo_periods_last_3": 3,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
-    "event_flags": [],
-    "published_at": null,
-    "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
-    "temporal_status": "period_end_only_not_point_in_time"
-  },
-  {
-    "ticker": "ELSH",
-    "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
-    "financial_periods": 17,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ],
-    "company_name": "El Shams Housing & Urbanization",
-    "sector": "Real Estate",
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "unknown",
-      "net_income_latest": 48957.751,
-      "operating_cash_flow_latest": 29840.216,
-      "cash_to_net_income_ratio": 0.61,
-      "positive_cfo_periods_last_3": 2,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
-    "event_flags": [],
-    "published_at": null,
-    "publication_date_status": "missing",
-    "valuation_data_cutoff": null,
-    "temporal_status": "period_end_only_not_point_in_time"
-  },
-  {
-    "ticker": "EMFD",
-    "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
-    "financial_periods": 18,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ],
-    "company_name": "Emaar Misr for Development",
-    "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
-        "residual_income": "missing_equity_eps_or_shares",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "loss",
-      "net_income_latest": -2212957.406,
-      "operating_cash_flow_latest": 9343446.57,
-      "cash_to_net_income_ratio": -4.222,
-      "positive_cfo_periods_last_3": 3,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
-    "event_flags": [],
-    "published_at": null,
-    "publication_date_status": "missing",
-    "valuation_data_cutoff": null,
-    "temporal_status": "period_end_only_not_point_in_time"
-  },
-  {
-    "ticker": "ENGC",
-    "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "ENGC",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 14.7284,
-      "bear_case": 8.837,
-      "base_case": 14.7284,
-      "bull_case": 23.5654,
-      "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 7.4452,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 14.0431,
-        "pb": 26.3383
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
-    "company_name": "Engineering Industries (ICON)",
-    "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "unknown",
-      "net_income_latest": 249040.339,
-      "operating_cash_flow_latest": 142670.779,
-      "cash_to_net_income_ratio": 0.573,
-      "positive_cfo_periods_last_3": 2,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
-    "event_flags": [],
-    "published_at": null,
-    "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
-    "temporal_status": "period_end_only_not_point_in_time"
-  },
-  {
-    "ticker": "ETEL",
-    "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
-    "financial_periods": 18,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ],
-    "company_name": "Telecom Egypt",
-    "sector": "Telecommunications",
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 3572017.0,
-      "operating_cash_flow_latest": 13005506.0,
-      "cash_to_net_income_ratio": 3.641,
-      "positive_cfo_periods_last_3": 3,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
-    "event_flags": [],
-    "published_at": null,
-    "publication_date_status": "missing",
-    "valuation_data_cutoff": null,
-    "temporal_status": "period_end_only_not_point_in_time"
-  },
-  {
-    "ticker": "ETRS",
-    "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "ETRS",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 2.7198,
-      "bear_case": 1.6319,
-      "base_case": 2.7198,
-      "bull_case": 3.6582,
-      "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 1.534,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 3.5603,
-        "pb": 3.6582
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 15,
-    "blockers": [],
-    "next_actions": [],
-    "company_name": "Egyptian Transport & Commercial Services Co. -EGYTRANS NOSCO",
-    "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 70404.605,
-      "operating_cash_flow_latest": 137873.315,
-      "cash_to_net_income_ratio": 1.958,
-      "positive_cfo_periods_last_3": 3,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
-    "event_flags": [],
-    "published_at": null,
-    "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
-    "temporal_status": "period_end_only_not_point_in_time"
-  },
-  {
-    "ticker": "EXPA",
-    "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "EXPA",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 18.683,
-      "bear_case": 13.3827,
-      "base_case": 18.683,
-      "bull_case": 28.5241,
-      "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 13.3827,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 28.5241,
-        "pb": 16.7922
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
-    "company_name": "Export Development Bank of Egypt",
-    "sector": "Banks",
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 1727500.0,
-      "operating_cash_flow_latest": 4434527000.0,
-      "cash_to_net_income_ratio": 2567.02,
-      "positive_cfo_periods_last_3": 2,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
-    "event_flags": [],
-    "published_at": null,
-    "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
-    "temporal_status": "period_end_only_not_point_in_time"
-  },
-  {
-    "ticker": "FWRY",
-    "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "FWRY",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 3.5408,
-      "bear_case": 2.1245,
-      "base_case": 3.5408,
-      "bull_case": 5.6653,
-      "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 2.7684,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 6.66,
-        "pb": 1.5803
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-06-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
-    "company_name": "Fawry For Banking Technology And Electronic Payment",
-    "sector": "Banks",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -2829,13 +2098,473 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "ready",
+        "ddm": "missing_or_non_positive_dividend"
+      }
+    },
+    "earnings_quality": {
+      "status": "cash_supported",
+      "net_income_latest": 67150000.0,
+      "operating_cash_flow_latest": 131310000.0,
+      "cash_to_net_income_ratio": 1.955,
+      "positive_cfo_periods_last_3": 3,
+      "free_cash_flow_latest": 94120000.0
+    },
+    "event_status": "not_structured",
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
+  },
+  {
+    "ticker": "ELSH",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
+    "company_name": "El Shams Housing & Urbanization",
+    "sector": "Real Estate",
+    "source": "stockanalysis",
+    "diagnostics": {
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
+        "dcf": "ready",
+        "ddm": "ready"
+      }
+    },
+    "earnings_quality": {
+      "status": "unknown",
+      "net_income_latest": 162330000.0,
+      "operating_cash_flow_latest": 46880000.0,
+      "cash_to_net_income_ratio": 0.289,
+      "positive_cfo_periods_last_3": 3,
+      "free_cash_flow_latest": 46880000.0
+    },
+    "event_status": "not_structured",
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
+  },
+  {
+    "ticker": "EMFD",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "EMFD",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 18.3188,
+      "bear_case": 10.9913,
+      "base_case": 18.3188,
+      "bull_case": 24.2894,
+      "models": {
+        "dcf": 24.2894,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 11.917,
+        "ev_ebitda": null,
+        "pe": 10.01,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": [],
+    "company_name": "Emaar Misr for Development",
+    "sector": null,
+    "source": "stockanalysis",
+    "diagnostics": {
+      "available_fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "ready",
+        "ddm": "missing_or_non_positive_dividend"
+      }
+    },
+    "earnings_quality": {
+      "status": "cash_supported",
+      "net_income_latest": 4968000000.0,
+      "operating_cash_flow_latest": 9343000000.0,
+      "cash_to_net_income_ratio": 1.881,
+      "positive_cfo_periods_last_3": 2,
+      "free_cash_flow_latest": 8283000000.0
+    },
+    "event_status": "not_structured",
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
+  },
+  {
+    "ticker": "ENGC",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
+    "company_name": "Engineering Industries (ICON)",
+    "sector": null,
+    "source": "stockanalysis",
+    "diagnostics": {
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "ready",
+        "ddm": "ready"
+      }
+    },
+    "earnings_quality": {
+      "status": "cash_supported",
+      "net_income_latest": 728600000.0,
+      "operating_cash_flow_latest": 801310000.0,
+      "cash_to_net_income_ratio": 1.1,
+      "positive_cfo_periods_last_3": 2,
+      "free_cash_flow_latest": 277520000.0
+    },
+    "event_status": "not_structured",
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
+  },
+  {
+    "ticker": "ETEL",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ETEL",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 23.4528,
+      "bear_case": 14.0717,
+      "base_case": 23.4528,
+      "bull_case": 30.3118,
+      "models": {
+        "dcf": 30.3118,
+        "ddm": 10.4903,
+        "residual_income": null,
+        "earnings_power": 18.3762,
+        "ev_ebitda": null,
+        "pe": 119.3,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "ddm",
+        "earnings_power"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": [],
+    "company_name": "Telecom Egypt",
+    "sector": "Telecommunications",
+    "source": "stockanalysis",
+    "diagnostics": {
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "ready",
+        "ddm": "ready"
+      }
+    },
+    "earnings_quality": {
+      "status": "cash_supported",
+      "net_income_latest": 20371000000.0,
+      "operating_cash_flow_latest": 37624000000.0,
+      "cash_to_net_income_ratio": 1.847,
+      "positive_cfo_periods_last_3": 3,
+      "free_cash_flow_latest": 9845000000.0
+    },
+    "event_status": "not_structured",
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
+  },
+  {
+    "ticker": "ETRS",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ETRS",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 3.7023,
+      "bear_case": 2.2214,
+      "base_case": 3.7023,
+      "bull_case": 5.9237,
+      "models": {
+        "dcf": -1.9593,
+        "ddm": 1.7484,
+        "residual_income": null,
+        "earnings_power": 2.7064,
+        "ev_ebitda": null,
+        "pe": 7.15,
+        "pb": null
+      },
+      "included_models": [
+        "ddm",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": [],
+    "company_name": "Egyptian Transport & Commercial Services Co. -EGYTRANS NOSCO",
+    "sector": null,
+    "source": "stockanalysis",
+    "diagnostics": {
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "missing_or_non_positive_fcf_or_shares",
+        "ddm": "ready"
+      }
+    },
+    "earnings_quality": {
+      "status": "unknown",
+      "net_income_latest": 112680000.0,
+      "operating_cash_flow_latest": 26970000.0,
+      "cash_to_net_income_ratio": 0.239,
+      "positive_cfo_periods_last_3": 3,
+      "free_cash_flow_latest": -59210000.0
+    },
+    "event_status": "not_structured",
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": "2025-12-31",
+    "temporal_status": "period_end_only_not_point_in_time"
+  },
+  {
+    "ticker": "EXPA",
+    "as_of": "2026-08-14",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
+    "company_name": "Export Development Bank of Egypt",
+    "sector": "Banks",
+    "source": "stockanalysis",
+    "diagnostics": {
+      "available_fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
+        "dcf": "missing_or_non_positive_fcf_or_shares",
+        "ddm": "missing_or_non_positive_dividend"
+      }
+    },
+    "earnings_quality": {
+      "status": "cash_mismatch",
+      "net_income_latest": 6033000000.0,
+      "operating_cash_flow_latest": -21384000000.0,
+      "cash_to_net_income_ratio": -3.545,
+      "positive_cfo_periods_last_3": 1,
+      "free_cash_flow_latest": -21556000000.0
+    },
+    "event_status": "not_structured",
+    "event_flags": [],
+    "published_at": null,
+    "publication_date_status": "missing",
+    "valuation_data_cutoff": null,
+    "temporal_status": "period_end_only_not_point_in_time"
+  },
+  {
+    "ticker": "FWRY",
+    "as_of": "2026-08-14",
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "FWRY",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 8.7887,
+      "bear_case": 5.2732,
+      "base_case": 8.7887,
+      "bull_case": 14.0619,
+      "models": {
+        "dcf": 9.1146,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 4.1293,
+        "ev_ebitda": null,
+        "pe": 14.8,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": [],
+    "company_name": "Fawry For Banking Technology And Electronic Payment",
+    "sector": "Technology",
+    "source": "stockanalysis",
+    "diagnostics": {
+      "available_fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -2854,82 +2583,63 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "GBCO",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "GBCO",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 19.2982,
-      "bear_case": 11.5789,
-      "base_case": 19.2982,
-      "bull_case": 30.8772,
-      "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 9.7292,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 18.242,
-        "pb": 34.708
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "GB Corp",
     "sector": null,
-    "source": "mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
-        "cash_and_equivalents_change",
+        "cash_and_equivalents",
+        "dividend_per_share",
         "eps_diluted",
-        "financing_cash_flow",
+        "free_cash_flow",
         "gross_profit",
-        "investing_cash_flow",
         "net_income",
         "operating_cash_flow",
+        "operating_income",
+        "revenue",
         "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
+        "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
+        "ddm": "ready"
       }
     },
     "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 435747.0,
-      "operating_cash_flow_latest": 2382560.0,
-      "cash_to_net_income_ratio": 5.468,
+      "status": "cash_mismatch",
+      "net_income_latest": 2861000000.0,
+      "operating_cash_flow_latest": -1002000000.0,
+      "cash_to_net_income_ratio": -0.35,
       "positive_cfo_periods_last_3": 2,
-      "free_cash_flow_latest": null
+      "free_cash_flow_latest": -4666000000.0
     },
     "event_status": "not_structured",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -2941,35 +2651,33 @@
     "valuation": {
       "ticker": "GPIM",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 0.0706,
-      "bear_case": 0.0424,
-      "base_case": 0.0706,
-      "bull_case": 0.1129,
+      "weighted_fair_value": 0.0637,
+      "bear_case": 0.0525,
+      "base_case": 0.0637,
+      "bull_case": 0.102,
       "models": {
         "dcf": 0.0539,
         "ddm": null,
-        "residual_income": 0.0391,
-        "earnings_power": 0.0627,
+        "residual_income": null,
+        "earnings_power": 0.0525,
         "ev_ebitda": null,
         "pe": 0.11,
-        "pb": 0.1403
+        "pb": null
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 20,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "GPI For Urban Growth",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -2981,13 +2689,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -3006,81 +2713,61 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "HDBK",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "HDBK",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 22.723,
-      "bear_case": 15.2475,
-      "base_case": 22.723,
-      "bull_case": 29.1316,
-      "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 15.2475,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 29.1316,
-        "pb": 27.5275
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Housing & Development Bank",
     "sector": "Banks",
-    "source": "mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
-        "cash_and_equivalents_change",
+        "cash_and_equivalents",
+        "dividend_per_share",
         "eps_diluted",
-        "financing_cash_flow",
-        "investing_cash_flow",
+        "free_cash_flow",
         "net_income",
         "operating_cash_flow",
+        "revenue",
         "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
+        "dcf": "ready",
+        "ddm": "ready"
       }
     },
     "earnings_quality": {
-      "status": "cash_mismatch",
-      "net_income_latest": 9537526.038,
-      "operating_cash_flow_latest": -9553365176.0,
-      "cash_to_net_income_ratio": -1001.661,
-      "positive_cfo_periods_last_3": 2,
-      "free_cash_flow_latest": null
+      "status": "unknown",
+      "net_income_latest": 18681000000.0,
+      "operating_cash_flow_latest": 2186000000.0,
+      "cash_to_net_income_ratio": 0.117,
+      "positive_cfo_periods_last_3": 3,
+      "free_cash_flow_latest": 1313000000.0
     },
     "event_status": "not_structured",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -3092,70 +2779,70 @@
     "valuation": {
       "ticker": "HELI",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 2.5178,
-      "bear_case": 1.5107,
-      "base_case": 2.5178,
-      "bull_case": 3.6865,
+      "weighted_fair_value": 5.0778,
+      "bear_case": 3.0467,
+      "base_case": 5.0778,
+      "bull_case": 8.1245,
       "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 1.2847,
-        "earnings_power": null,
+        "dcf": -2.9876,
+        "ddm": 2.7224,
+        "residual_income": null,
+        "earnings_power": 4.5933,
         "ev_ebitda": null,
-        "pe": 3.1987,
-        "pb": 3.6865
+        "pe": 8.16,
+        "pb": null
       },
       "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
+        "ddm",
+        "earnings_power",
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 21,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Heliopolis Housing",
     "sector": "Real Estate",
-    "source": "mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
-        "cash_and_equivalents_change",
+        "cash_and_equivalents",
+        "dividend_per_share",
         "eps_diluted",
-        "financing_cash_flow",
+        "free_cash_flow",
         "gross_profit",
-        "investing_cash_flow",
         "net_income",
         "operating_cash_flow",
+        "operating_income",
+        "revenue",
         "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
+        "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
+        "ddm": "ready"
       }
     },
     "earnings_quality": {
       "status": "cash_mismatch",
-      "net_income_latest": 1640248.135,
-      "operating_cash_flow_latest": -622504153.0,
-      "cash_to_net_income_ratio": -379.518,
-      "positive_cfo_periods_last_3": 0,
-      "free_cash_flow_latest": null
+      "net_income_latest": 2705000000.0,
+      "operating_cash_flow_latest": -1339000000.0,
+      "cash_to_net_income_ratio": -0.495,
+      "positive_cfo_periods_last_3": 1,
+      "free_cash_flow_latest": -1355000000.0
     },
     "event_status": "not_structured",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -3165,7 +2852,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -3174,7 +2861,7 @@
     ],
     "company_name": "EFG Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3185,15 +2872,15 @@
         "operating_cash_flow",
         "operating_income",
         "revenue",
-        "total_debt",
-        "total_equity"
+        "shares_outstanding",
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "missing_shares",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
+        "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
         "ddm": "ready"
       }
@@ -3220,47 +2907,19 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 17,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "HTTPError: HTTP Error 403: Forbidden"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
-    "company_name": "International Company For Fertilizers & Chemicals",
-    "sector": "Materials",
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "missing_or_non_positive_eps",
-        "pb": "missing_shares",
-        "residual_income": "missing_equity_eps_or_shares",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_mismatch",
-      "net_income_latest": 76901.346,
-      "operating_cash_flow_latest": -82152.374,
-      "cash_to_net_income_ratio": -1.068,
-      "positive_cfo_periods_last_3": 0,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
+    "company_name": null,
+    "sector": null,
+    "source": "stockanalysis_then_mubasher",
+    "diagnostics": {},
+    "earnings_quality": {},
+    "event_status": "unknown",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
@@ -3270,40 +2929,20 @@
   {
     "ticker": "IDRE",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "IDRE",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 3.1823,
-      "bear_case": 1.9094,
-      "base_case": 3.1823,
-      "bull_case": 5.0917,
-      "models": {
-        "dcf": 2.7901,
-        "ddm": null,
-        "residual_income": 1.657,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 3.6,
-        "pb": 6.2294
-      },
-      "included_models": [
-        "dcf",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 21,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Ismailia Development and Real Estate Co",
     "sector": "Real Estate",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3313,13 +2952,12 @@
         "operating_cash_flow",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -3338,7 +2976,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -3348,47 +2986,19 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 20,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "HTTPError: HTTP Error 403: Forbidden"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
-    "company_name": "Industrial & Engineering Projects",
+    "company_name": null,
     "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "missing_or_non_positive_eps",
-        "pb": "missing_shares",
-        "residual_income": "missing_equity_eps_or_shares",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_mismatch",
-      "net_income_latest": 10885.386,
-      "operating_cash_flow_latest": -37864670.0,
-      "cash_to_net_income_ratio": -3478.487,
-      "positive_cfo_periods_last_3": 2,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
+    "source": "stockanalysis_then_mubasher",
+    "diagnostics": {},
+    "earnings_quality": {},
+    "event_status": "unknown",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
@@ -3402,22 +3012,47 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "future_period"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
     "company_name": "International Agricultural Products",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
-      "available_fields": [],
-      "model_gates": {}
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "missing_or_non_positive_fcf_or_shares",
+        "ddm": "ready"
+      }
     },
     "earnings_quality": {
-      "status": "unknown"
+      "status": "unknown",
+      "net_income_latest": 421540000.0,
+      "operating_cash_flow_latest": 46860000.0,
+      "cash_to_net_income_ratio": 0.111,
+      "positive_cfo_periods_last_3": 2,
+      "free_cash_flow_latest": -282270000.0
     },
     "event_status": "not_structured",
     "event_flags": [],
@@ -3429,40 +3064,20 @@
   {
     "ticker": "ISMA",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "ISMA",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 1.0281,
-      "bear_case": 0.6172,
-      "base_case": 1.0281,
-      "bull_case": 1.645,
-      "models": {
-        "dcf": 0.7685,
-        "ddm": null,
-        "residual_income": 0.9482,
-        "earnings_power": 0.6172,
-        "ev_ebitda": null,
-        "pe": 4.62,
-        "pb": 2.5433
-      },
-      "included_models": [
-        "dcf",
-        "earnings_power",
-        "pb",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Ismailia Misr Poultry",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3474,13 +3089,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -3499,7 +3113,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -3511,35 +3125,34 @@
     "valuation": {
       "ticker": "ISMQ",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 5.9609,
-      "bear_case": 3.5766,
-      "base_case": 5.9609,
-      "bull_case": 8.8289,
+      "weighted_fair_value": 7.6154,
+      "bear_case": 4.5693,
+      "base_case": 7.6154,
+      "bull_case": 11.689,
       "models": {
-        "dcf": 8.8289,
-        "ddm": 2.7855,
-        "residual_income": 2.7889,
-        "earnings_power": 5.228,
+        "dcf": 11.689,
+        "ddm": 2.9373,
+        "residual_income": null,
+        "earnings_power": 3.404,
         "ev_ebitda": null,
         "pe": 6.39,
-        "pb": 0.6802
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 17,
+    "financial_periods": 4,
     "blockers": [],
     "next_actions": [],
     "company_name": "Iron And Steel for Mines and Quarries",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3551,13 +3164,12 @@
         "operating_cash_flow",
         "operating_income",
         "revenue",
-        "shares_outstanding",
-        "total_equity"
+        "shares_outstanding"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -3576,46 +3188,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-12-31",
+    "valuation_data_cutoff": "2025-06-30",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "ISPH",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "ISPH",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 2.5086,
-      "bear_case": 1.5052,
-      "base_case": 2.5086,
-      "bull_case": 4.0137,
-      "models": {
-        "dcf": -25.5056,
-        "ddm": 0.9745,
-        "residual_income": 1.4108,
-        "earnings_power": -5.2701,
-        "ev_ebitda": null,
-        "pe": 5.39,
-        "pb": 2.808
-      },
-      "included_models": [
-        "ddm",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Ibnsina Pharma",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3628,13 +3220,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -3653,46 +3244,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "JUFO",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "JUFO",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 7.8797,
-      "bear_case": 5.0016,
-      "base_case": 7.8797,
-      "bull_case": 12.21,
-      "models": {
-        "dcf": -12.0008,
-        "ddm": 0.8952,
-        "residual_income": 5.0016,
-        "earnings_power": 7.8849,
-        "ev_ebitda": null,
-        "pe": 12.21,
-        "pb": 7.8589
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2026-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Juhayna Food Industries",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3705,13 +3276,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -3730,7 +3300,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2026-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -3740,7 +3310,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 20,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -3749,7 +3319,7 @@
     ],
     "company_name": "El Nasr Clothes & Textiles (Kabo)",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3761,13 +3331,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -3792,39 +3361,20 @@
   {
     "ticker": "KRDI",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "KRDI",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 0.1856,
-      "bear_case": 0.1114,
-      "base_case": 0.1856,
-      "bull_case": 0.2967,
-      "models": {
-        "dcf": -0.3914,
-        "ddm": null,
-        "residual_income": 0.0887,
-        "earnings_power": 0.0373,
-        "ev_ebitda": null,
-        "pe": 0.22,
-        "pb": 0.2967
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-06-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 4,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Al Khair River For Development Agricultural Investment&Envir",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3836,13 +3386,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -3861,46 +3410,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "LCSW",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "LCSW",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 40.4097,
-      "bear_case": 24.2458,
-      "base_case": 40.4097,
-      "bull_case": 64.6556,
-      "models": {
-        "dcf": -68.534,
-        "ddm": null,
-        "residual_income": 22.178,
-        "earnings_power": 37.8659,
-        "ev_ebitda": null,
-        "pe": 46.86,
-        "pb": 65.1228
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 21,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Lecico Egypt",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3912,13 +3441,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -3937,47 +3465,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "MASR",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "MASR",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 7.2175,
-      "bear_case": 4.3305,
-      "base_case": 7.2175,
-      "bull_case": 11.5481,
-      "models": {
-        "dcf": 5.9137,
-        "ddm": 1.4617,
-        "residual_income": 3.0127,
-        "earnings_power": 9.3131,
-        "ev_ebitda": null,
-        "pe": 13.68,
-        "pb": 7.8306
-      },
-      "included_models": [
-        "dcf",
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Madinet Masr For Housing and Development",
     "sector": "Real Estate",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -3990,13 +3497,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4015,7 +3521,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4027,35 +3533,33 @@
     "valuation": {
       "ticker": "MCQE",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 213.1957,
-      "bear_case": 127.9174,
-      "base_case": 213.1957,
-      "bull_case": 341.1132,
+      "weighted_fair_value": 253.5118,
+      "bear_case": 152.1071,
+      "base_case": 253.5118,
+      "bull_case": 353.9385,
       "models": {
         "dcf": 353.9385,
         "ddm": 6.9935,
-        "residual_income": 80.6564,
-        "earnings_power": 189.6737,
+        "residual_income": null,
+        "earnings_power": 94.5865,
         "ev_ebitda": null,
         "pe": 190.62,
-        "pb": 47.6353
+        "pb": null
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2026-03-31",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Misr Cement (Qena)",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4068,13 +3572,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4093,7 +3596,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2026-03-31",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4103,7 +3606,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 15,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -4112,7 +3615,7 @@
     ],
     "company_name": "Macro Group Pharmaceuticals -Macro Capital",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4125,13 +3628,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4156,40 +3658,20 @@
   {
     "ticker": "MEPA",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "MEPA",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 0.308,
-      "bear_case": 0.1851,
-      "base_case": 0.308,
-      "bull_case": 0.44,
-      "models": {
-        "dcf": -0.0494,
-        "ddm": null,
-        "residual_income": 0.1851,
-        "earnings_power": 0.272,
-        "ev_ebitda": null,
-        "pe": 0.44,
-        "pb": 0.4142
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Medical Packaging Company",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4201,13 +3683,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -4226,7 +3707,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4238,36 +3719,34 @@
     "valuation": {
       "ticker": "MFPC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 23.5136,
-      "bear_case": 17.7284,
-      "base_case": 23.5136,
+      "weighted_fair_value": 22.8987,
+      "bear_case": 15.2753,
+      "base_case": 22.8987,
       "bull_case": 35.46,
       "models": {
         "dcf": 24.242,
         "ddm": 17.7426,
-        "residual_income": 21.4484,
-        "earnings_power": 23.8618,
+        "residual_income": null,
+        "earnings_power": 15.2753,
         "ev_ebitda": null,
         "pe": 35.46,
-        "pb": 17.7284
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-06-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Misr Fertilizers Production Company - Mopco",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4280,13 +3759,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4305,7 +3783,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4315,7 +3793,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 19,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -4324,7 +3802,7 @@
     ],
     "company_name": "The Egyptian Modern Education Systems",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4336,12 +3814,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
@@ -4373,36 +3850,34 @@
     "valuation": {
       "ticker": "MPCI",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 95.6036,
-      "bear_case": 57.3621,
-      "base_case": 95.6036,
-      "bull_case": 152.9657,
+      "weighted_fair_value": 92.856,
+      "bear_case": 55.7136,
+      "base_case": 92.856,
+      "bull_case": 148.5696,
       "models": {
-        "dcf": 50.6662,
-        "ddm": 87.4596,
-        "residual_income": 89.0728,
-        "earnings_power": 136.8713,
+        "dcf": 41.0953,
+        "ddm": 80.3131,
+        "residual_income": null,
+        "earnings_power": 103.7699,
         "ev_ebitda": null,
         "pe": 244.31,
-        "pb": 37.7477
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Memphis Pharmaceuticals",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4415,13 +3890,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4440,7 +3914,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-06-30",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4450,7 +3924,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -4459,7 +3933,7 @@
     ],
     "company_name": "Mansourah Poultry",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4471,12 +3945,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
@@ -4508,35 +3981,33 @@
     "valuation": {
       "ticker": "MPRC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 27.061,
-      "bear_case": 16.3622,
-      "base_case": 27.061,
+      "weighted_fair_value": 29.909,
+      "bear_case": 18.8117,
+      "base_case": 29.909,
       "bull_case": 40.48,
       "models": {
         "dcf": 31.934,
         "ddm": 3.4968,
-        "residual_income": 16.3622,
-        "earnings_power": 21.9649,
+        "residual_income": null,
+        "earnings_power": 18.8117,
         "ev_ebitda": null,
         "pe": 40.48,
-        "pb": 22.7157
+        "pb": null
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Egyptian Media Production City",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4549,13 +4020,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4574,7 +4044,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4586,35 +4056,33 @@
     "valuation": {
       "ticker": "MTIE",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 2.2548,
-      "bear_case": 1.3529,
-      "base_case": 2.2548,
-      "bull_case": 3.6076,
+      "weighted_fair_value": 2.9094,
+      "bear_case": 2.2967,
+      "base_case": 2.9094,
+      "bull_case": 4.655,
       "models": {
-        "dcf": 1.2077,
+        "dcf": 2.2967,
         "ddm": null,
-        "residual_income": 1.7775,
-        "earnings_power": 3.1647,
+        "residual_income": null,
+        "earnings_power": 2.7744,
         "ev_ebitda": null,
         "pe": 4.95,
-        "pb": 2.0518
+        "pb": null
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 16,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "MM Group For Industry And International Trade",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4626,13 +4094,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4657,40 +4124,20 @@
   {
     "ticker": "NCCW",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "NCCW",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 1.9811,
-      "bear_case": 1.1887,
-      "base_case": 1.9811,
-      "bull_case": 2.64,
-      "models": {
-        "dcf": 2.4373,
-        "ddm": null,
-        "residual_income": 0.9887,
-        "earnings_power": -0.2275,
-        "ev_ebitda": null,
-        "pe": 2.64,
-        "pb": 1.4423
-      },
-      "included_models": [
-        "dcf",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 21,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Nasr Company for Civil Works",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4702,13 +4149,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "ready",
@@ -4727,7 +4173,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4737,22 +4183,47 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "future_period"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
     "company_name": "El-Nile Co. For Pharmaceuticals And Chemical Industries",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
-      "available_fields": [],
-      "model_gates": {}
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "missing_or_non_positive_fcf_or_shares",
+        "ddm": "ready"
+      }
     },
     "earnings_quality": {
-      "status": "unknown"
+      "status": "unknown",
+      "net_income_latest": 125730000.0,
+      "operating_cash_flow_latest": 930000.0,
+      "cash_to_net_income_ratio": 0.007,
+      "positive_cfo_periods_last_3": 2,
+      "free_cash_flow_latest": -472960000.0
     },
     "event_status": "not_structured",
     "event_flags": [],
@@ -4764,40 +4235,20 @@
   {
     "ticker": "OBRI",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "OBRI",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 10.6597,
-      "bear_case": 6.3958,
-      "base_case": 10.6597,
-      "bull_case": 14.76,
-      "models": {
-        "dcf": 65.1736,
-        "ddm": null,
-        "residual_income": 5.2761,
-        "earnings_power": 13.3584,
-        "ev_ebitda": null,
-        "pe": 14.76,
-        "pb": 10.5868
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "El Obour Real Estate Investment",
     "sector": "Real Estate",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4809,13 +4260,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -4834,7 +4284,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4916,40 +4366,20 @@
   {
     "ticker": "OFH",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "OFH",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 0.2714,
-      "bear_case": 0.1629,
-      "base_case": 0.2714,
-      "bull_case": 0.4342,
-      "models": {
-        "dcf": 0.1933,
-        "ddm": null,
-        "residual_income": 0.2696,
-        "earnings_power": 0.1629,
-        "ev_ebitda": null,
-        "pe": 1.43,
-        "pb": 0.6709
-      },
-      "included_models": [
-        "dcf",
-        "earnings_power",
-        "pb",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 16,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "O B Financial Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -4961,13 +4391,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "ready",
@@ -4986,7 +4415,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -4996,7 +4425,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -5005,7 +4434,7 @@
     ],
     "company_name": "Orascom Investment Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5017,12 +4446,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
@@ -5052,47 +4480,19 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 19,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "HTTPError: HTTP Error 403: Forbidden"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
-    "company_name": "Orascom Construction PLC",
+    "company_name": null,
     "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "missing_or_non_positive_eps",
-        "pb": "missing_shares",
-        "residual_income": "missing_equity_eps_or_shares",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 4300000.0,
-      "operating_cash_flow_latest": 184900000.0,
-      "cash_to_net_income_ratio": 43.0,
-      "positive_cfo_periods_last_3": 3,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
+    "source": "stockanalysis_then_mubasher",
+    "diagnostics": {},
+    "earnings_quality": {},
+    "event_status": "unknown",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
@@ -5108,33 +4508,33 @@
     "valuation": {
       "ticker": "ORHD",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 20.67,
-      "bear_case": 17.6436,
-      "base_case": 20.67,
-      "bull_case": 29.0186,
+      "weighted_fair_value": 26.5295,
+      "bear_case": 18.0089,
+      "base_case": 26.5295,
+      "bull_case": 42.4471,
       "models": {
         "dcf": 18.0089,
         "ddm": 2.6855,
-        "residual_income": 17.6436,
-        "earnings_power": 29.0186,
+        "residual_income": null,
+        "earnings_power": 25.2502,
         "ev_ebitda": null,
         "pe": 54.01,
-        "pb": 0.0187
+        "pb": null
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 21,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Orascom Development Egypt",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5147,13 +4547,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5172,7 +4571,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -5184,36 +4583,34 @@
     "valuation": {
       "ticker": "ORWE",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 17.3232,
-      "bear_case": 10.3939,
-      "base_case": 17.3232,
-      "bull_case": 27.7171,
+      "weighted_fair_value": 13.7417,
+      "bear_case": 8.374,
+      "base_case": 13.7417,
+      "bull_case": 21.9867,
       "models": {
         "dcf": 8.374,
         "ddm": 8.7419,
-        "residual_income": 17.7707,
-        "earnings_power": 15.1087,
+        "residual_income": null,
+        "earnings_power": 14.8247,
         "ev_ebitda": null,
         "pe": 33.22,
-        "pb": 39.5057
+        "pb": null
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-06-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Oriental Weavers",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5226,13 +4623,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5251,46 +4647,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "PHAR",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "PHAR",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 16.716,
-      "bear_case": 10.0296,
-      "base_case": 16.716,
-      "bull_case": 26.7455,
-      "models": {
-        "dcf": -177.6617,
-        "ddm": 9.2306,
-        "residual_income": 18.872,
-        "earnings_power": 8.2093,
-        "ev_ebitda": null,
-        "pe": 81.07,
-        "pb": 33.7272
-      },
-      "included_models": [
-        "ddm",
-        "earnings_power",
-        "pb",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Egyptian International Pharmaceuticals (EIPICO)",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5303,13 +4679,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -5328,46 +4703,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "PHDC",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "PHDC",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 9.2982,
-      "bear_case": 5.9616,
-      "base_case": 9.2982,
-      "bull_case": 14.8771,
-      "models": {
-        "dcf": -3.1991,
-        "ddm": null,
-        "residual_income": 5.9616,
-        "earnings_power": 8.779,
-        "ev_ebitda": null,
-        "pe": 16.06,
-        "pb": 8.32
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 18,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Palm Hills Development Company",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5380,13 +4735,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5405,7 +4759,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -5417,35 +4771,33 @@
     "valuation": {
       "ticker": "POUL",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 35.6663,
-      "bear_case": 21.3998,
-      "base_case": 35.6663,
-      "bull_case": 57.0661,
+      "weighted_fair_value": 42.0389,
+      "bear_case": 33.4996,
+      "base_case": 42.0389,
+      "bull_case": 59.18,
       "models": {
         "dcf": 40.5949,
         "ddm": 2.3079,
-        "residual_income": 21.291,
-        "earnings_power": 35.9535,
+        "residual_income": null,
+        "earnings_power": 33.4996,
         "ev_ebitda": null,
         "pe": 59.18,
-        "pb": 18.4989
+        "pb": null
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Cairo Poultry",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5458,13 +4810,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5483,7 +4834,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -5493,7 +4844,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -5502,7 +4853,7 @@
     ],
     "company_name": "Ceramic & Porcelain",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5514,8 +4865,7 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
@@ -5545,20 +4895,39 @@
   {
     "ticker": "RACC",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
-    "financial_periods": 15,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ],
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "RACC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 8.9822,
+      "bear_case": 7.2886,
+      "base_case": 8.9822,
+      "bull_case": 14.3714,
+      "models": {
+        "dcf": 7.2886,
+        "ddm": null,
+        "residual_income": null,
+        "earnings_power": 8.7506,
+        "ev_ebitda": null,
+        "pe": 14.41,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": [],
     "company_name": "Raya Customer Experience",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5570,13 +4939,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5595,47 +4963,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": null,
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "RAYA",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "RAYA",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 2.285,
-      "bear_case": 1.371,
-      "base_case": 2.285,
-      "bull_case": 3.6561,
-      "models": {
-        "dcf": 2.4538,
-        "ddm": 0.2436,
-        "residual_income": 0.8649,
-        "earnings_power": 2.4078,
-        "ev_ebitda": null,
-        "pe": 4.29,
-        "pb": 1.72
-      },
-      "included_models": [
-        "dcf",
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-06-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Raya Holding For Financial Investments",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5648,13 +4995,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -5673,7 +5019,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -5685,34 +5031,33 @@
     "valuation": {
       "ticker": "RMDA",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 1.1152,
-      "bear_case": 0.6814,
-      "base_case": 1.1152,
-      "bull_case": 1.43,
+      "weighted_fair_value": 0.7177,
+      "bear_case": 0.4306,
+      "base_case": 0.7177,
+      "bull_case": 1.1483,
       "models": {
         "dcf": -1.7203,
         "ddm": 0.2779,
-        "residual_income": 0.6814,
-        "earnings_power": 1.1445,
+        "residual_income": null,
+        "earnings_power": 0.5361,
         "ev_ebitda": null,
         "pe": 1.43,
-        "pb": 1.4071
+        "pb": null
       },
       "included_models": [
+        "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Tenth Of Ramadan Pharmaceutical Industries&Diagnostic-Rameda",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5725,13 +5070,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -5750,7 +5094,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -5762,34 +5106,33 @@
     "valuation": {
       "ticker": "SCEM",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 101.439,
-      "bear_case": 60.8634,
-      "base_case": 101.439,
+      "weighted_fair_value": 114.981,
+      "bear_case": 68.9886,
+      "base_case": 114.981,
       "bull_case": 155.3252,
       "models": {
         "dcf": 155.3252,
         "ddm": null,
-        "residual_income": 37.9673,
-        "earnings_power": 62.6641,
+        "residual_income": null,
+        "earnings_power": 48.8466,
         "ev_ebitda": null,
         "pe": 93.15,
-        "pb": 20.5882
+        "pb": null
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 21,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Sinai Cement",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5801,13 +5144,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5826,7 +5168,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -5836,7 +5178,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -5845,7 +5187,7 @@
     ],
     "company_name": "Sharm Dreams Co. for Tourism Investment",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5857,13 +5199,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5892,7 +5233,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 18,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -5901,7 +5242,7 @@
     ],
     "company_name": "Sabaa International Company for Pharmaceutical and Chemical",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5913,13 +5254,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -5950,36 +5290,33 @@
     "valuation": {
       "ticker": "SKPC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 12.1311,
-      "bear_case": 7.2786,
-      "base_case": 12.1311,
-      "bull_case": 18.0,
+      "weighted_fair_value": 7.1496,
+      "bear_case": 4.2898,
+      "base_case": 7.1496,
+      "bull_case": 9.3724,
       "models": {
-        "dcf": 16.7509,
-        "ddm": 5.5948,
-        "residual_income": 9.6673,
-        "earnings_power": 8.4997,
+        "dcf": -1.1129,
+        "ddm": 3.0452,
+        "residual_income": null,
+        "earnings_power": 9.3724,
         "ev_ebitda": null,
-        "pe": 18.0,
-        "pb": 8.0816
+        "pe": 7.92,
+        "pb": null
       },
       "included_models": [
-        "dcf",
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 20,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Sidi Kerir Petrochemicals - SIDPEC",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -5992,13 +5329,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -6017,7 +5353,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -6027,7 +5363,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 20,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -6036,7 +5372,7 @@
     ],
     "company_name": "South Valley Cement",
     "sector": "Materials",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6048,12 +5384,11 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "missing_or_non_positive_eps",
-        "pb": "ready",
+        "pb": "missing_total_equity",
         "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
@@ -6079,40 +5414,20 @@
   {
     "ticker": "SWDY",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "SWDY",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 48.0208,
-      "bear_case": 31.1641,
-      "base_case": 48.0208,
-      "bull_case": 76.8333,
-      "models": {
-        "dcf": -3.7519,
-        "ddm": 6.9935,
-        "residual_income": 31.1641,
-        "earnings_power": 50.7409,
-        "ev_ebitda": null,
-        "pe": 78.43,
-        "pb": 38.8166
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "ELSWEDY ELECTRIC",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6125,13 +5440,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -6150,46 +5464,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "TALM",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "TALM",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 4.3089,
-      "bear_case": 2.5853,
-      "base_case": 4.3089,
-      "bull_case": 6.8942,
-      "models": {
-        "dcf": -9.5176,
-        "ddm": null,
-        "residual_income": 2.6441,
-        "earnings_power": 2.3758,
-        "ev_ebitda": null,
-        "pe": 9.35,
-        "pb": 4.6648
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 20,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Taaleem Management Services",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6201,13 +5495,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -6226,82 +5519,33 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "TANM",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "TANM",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 1.8183,
-      "bear_case": 1.091,
-      "base_case": 1.8183,
-      "bull_case": 2.5084,
-      "models": {
-        "dcf": null,
-        "ddm": null,
-        "residual_income": 0.9475,
-        "earnings_power": null,
-        "ev_ebitda": null,
-        "pe": 2.4344,
-        "pb": 2.5084
-      },
-      "included_models": [
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-06-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
-    "company_name": "Tanmiya for Real Estate Investment",
-    "sector": "Real Estate",
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "eps_diluted",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "shares_outstanding",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 34818.24,
-      "operating_cash_flow_latest": 40387.666,
-      "cash_to_net_income_ratio": 1.16,
-      "positive_cfo_periods_last_3": 3,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "HTTPError: HTTP Error 403: Forbidden"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
+    "company_name": null,
+    "sector": null,
+    "source": "stockanalysis_then_mubasher",
+    "diagnostics": {},
+    "earnings_quality": {},
+    "event_status": "unknown",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-06-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -6311,7 +5555,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 12,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -6320,7 +5564,7 @@
     ],
     "company_name": "Taqa Arabia",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6330,13 +5574,12 @@
         "operating_cash_flow",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "missing_or_non_positive_operating_income_or_shares",
         "dcf": "ready",
@@ -6361,40 +5604,20 @@
   {
     "ticker": "TMGH",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "TMGH",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 45.7397,
-      "bear_case": 27.4438,
-      "base_case": 45.7397,
-      "bull_case": 73.1835,
-      "models": {
-        "dcf": -68.6755,
-        "ddm": 1.5226,
-        "residual_income": 17.9753,
-        "earnings_power": 39.892,
-        "ev_ebitda": null,
-        "pe": 48.18,
-        "pb": 93.7176
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-09-30",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 21,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "T M G Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6407,13 +5630,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -6432,46 +5654,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "UEGC",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "UEGC",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 1.2932,
-      "bear_case": 0.7759,
-      "base_case": 1.2932,
-      "bull_case": 2.0691,
-      "models": {
-        "dcf": 5.4844,
-        "ddm": null,
-        "residual_income": 0.4871,
-        "earnings_power": 1.0095,
-        "ev_ebitda": null,
-        "pe": 1.44,
-        "pb": 2.781
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Elsaeed Contracting& Real Estate Investment Company SCCD",
     "sector": "Real Estate",
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6483,13 +5685,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -6508,46 +5709,26 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
     "ticker": "UNIP",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "UNIP",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 0.2241,
-      "bear_case": 0.1344,
-      "base_case": 0.2241,
-      "bull_case": 0.3585,
-      "models": {
-        "dcf": -0.3663,
-        "ddm": null,
-        "residual_income": 0.1687,
-        "earnings_power": 0.1022,
-        "ev_ebitda": null,
-        "pe": 0.44,
-        "pb": 0.274
-      },
-      "included_models": [
-        "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
-      ],
-      "latest_period": "2025-03-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 19,
-    "blockers": [],
-    "next_actions": [],
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 5,
+    "blockers": [
+      "valuation_engine_insufficient_models_or_stale_period"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ],
     "company_name": "Universal For Paper and Packaging Materials (Unipack",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6559,13 +5740,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "ready",
@@ -6584,7 +5764,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-03-31",
+    "valuation_data_cutoff": null,
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -6594,7 +5774,7 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 6,
+    "financial_periods": 5,
     "blockers": [
       "valuation_engine_insufficient_models_or_stale_period"
     ],
@@ -6603,7 +5783,7 @@
     ],
     "company_name": "U Consumer Finance",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6614,13 +5794,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -6645,32 +5824,77 @@
   {
     "ticker": "VLMR",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
-    "financial_periods": 0,
-    "blockers": [
-      "mixed_currency"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ],
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "VLMR",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.5779,
+      "bear_case": 0.3467,
+      "base_case": 0.5779,
+      "bull_case": 0.9246,
+      "models": {
+        "dcf": 0.3801,
+        "ddm": 0.2866,
+        "residual_income": null,
+        "earnings_power": 0.7462,
+        "ev_ebitda": null,
+        "pe": 1.21,
+        "pb": null
+      },
+      "included_models": [
+        "dcf",
+        "ddm",
+        "earnings_power",
+        "pe"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": [],
     "company_name": "Valmore Holding",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
-      "available_fields": [],
-      "model_gates": {}
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "ready",
+        "dcf": "ready",
+        "ddm": "ready"
+      }
     },
     "earnings_quality": {
-      "status": "unknown"
+      "status": "unknown",
+      "net_income_latest": 133280000.0,
+      "operating_cash_flow_latest": 83610000.0,
+      "cash_to_net_income_ratio": 0.627,
+      "positive_cfo_periods_last_3": 3,
+      "free_cash_flow_latest": 38590000.0
     },
     "event_status": "not_structured",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": null,
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   },
   {
@@ -6680,47 +5904,19 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 18,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "HTTPError: HTTP Error 403: Forbidden"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
-    "company_name": "Valmore Holding-EGP",
+    "company_name": null,
     "sector": null,
-    "source": "mubasher",
-    "diagnostics": {
-      "available_fields": [
-        "cash_and_equivalents_change",
-        "financing_cash_flow",
-        "gross_profit",
-        "investing_cash_flow",
-        "net_income",
-        "operating_cash_flow",
-        "total_assets",
-        "total_equity",
-        "total_liabilities"
-      ],
-      "model_gates": {
-        "pe": "missing_or_non_positive_eps",
-        "pb": "missing_shares",
-        "residual_income": "missing_equity_eps_or_shares",
-        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
-        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
-        "dcf": "missing_or_non_positive_fcf_or_shares",
-        "ddm": "missing_or_non_positive_dividend"
-      }
-    },
-    "earnings_quality": {
-      "status": "cash_supported",
-      "net_income_latest": 34254.261,
-      "operating_cash_flow_latest": 37389.616,
-      "cash_to_net_income_ratio": 1.092,
-      "positive_cfo_periods_last_3": 3,
-      "free_cash_flow_latest": null
-    },
-    "event_status": "not_structured",
+    "source": "stockanalysis_then_mubasher",
+    "diagnostics": {},
+    "earnings_quality": {},
+    "event_status": "unknown",
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
@@ -6734,22 +5930,47 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "future_period"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
     ],
     "company_name": "Extracted Oils",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
-      "available_fields": [],
-      "model_gates": {}
+      "available_fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt"
+      ],
+      "model_gates": {
+        "pe": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
+        "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
+        "earnings_power": "missing_or_non_positive_operating_income_or_shares",
+        "dcf": "ready",
+        "ddm": "ready"
+      }
     },
     "earnings_quality": {
-      "status": "unknown"
+      "status": "cash_supported",
+      "net_income_latest": 2560000.0,
+      "operating_cash_flow_latest": 8500000.0,
+      "cash_to_net_income_ratio": 3.32,
+      "positive_cfo_periods_last_3": 1,
+      "free_cash_flow_latest": 2830000.0
     },
     "event_status": "not_structured",
     "event_flags": [],
@@ -6767,35 +5988,33 @@
     "valuation": {
       "ticker": "ZMID",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 3.5058,
-      "bear_case": 2.1035,
-      "base_case": 3.5058,
-      "bull_case": 5.6093,
+      "weighted_fair_value": 3.6112,
+      "bear_case": 2.1667,
+      "base_case": 3.6112,
+      "bull_case": 5.7778,
       "models": {
         "dcf": -1.9395,
         "ddm": 1.7484,
-        "residual_income": 2.9407,
-        "earnings_power": 3.5431,
+        "residual_income": null,
+        "earnings_power": 2.9338,
         "ev_ebitda": null,
         "pe": 6.49,
-        "pb": 3.0708
+        "pb": null
       },
       "included_models": [
         "ddm",
         "earnings_power",
-        "pb",
-        "pe",
-        "residual_income"
+        "pe"
       ],
-      "latest_period": "2025-09-30",
+      "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
-    "financial_periods": 17,
+    "financial_periods": 5,
     "blockers": [],
     "next_actions": [],
     "company_name": "Zahraa Maadi Investment & Development",
     "sector": null,
-    "source": "stockanalysis+mubasher",
+    "source": "stockanalysis",
     "diagnostics": {
       "available_fields": [
         "cash_and_equivalents",
@@ -6808,13 +6027,12 @@
         "operating_income",
         "revenue",
         "shares_outstanding",
-        "total_debt",
-        "total_equity"
+        "total_debt"
       ],
       "model_gates": {
         "pe": "ready",
-        "pb": "ready",
-        "residual_income": "ready",
+        "pb": "missing_total_equity",
+        "residual_income": "missing_equity_eps_or_shares",
         "ev_ebitda": "missing_or_non_positive_ebitda_or_shares",
         "earnings_power": "ready",
         "dcf": "missing_or_non_positive_fcf_or_shares",
@@ -6833,7 +6051,7 @@
     "event_flags": [],
     "published_at": null,
     "publication_date_status": "missing",
-    "valuation_data_cutoff": "2025-09-30",
+    "valuation_data_cutoff": "2025-12-31",
     "temporal_status": "period_end_only_not_point_in_time"
   }
 ]

@@ -4,22 +4,22 @@
   "rank_contract": "passed",
   "contract_issues": [],
   "actions": {
-    "strong_buy": 1,
+    "strong_buy": 2,
     "buy": 2,
-    "hold": 2,
-    "abstain": 53,
-    "reduce": 2,
-    "sell": 41
+    "accumulate": 1,
+    "hold": 1,
+    "abstain": 66,
+    "sell": 28,
+    "reduce": 1
   },
   "horizons": {
     "investment_term_unclassified": 99,
     "short_term": 2
   },
   "market_stances": {
-    "attractive": 3,
-    "neutral": 2,
-    "insufficient_evidence": 53,
-    "unattractive": 43
+    "attractive": 5,
+    "neutral": 67,
+    "unattractive": 29
   },
   "historical_metrics": {
     "top_1": null,

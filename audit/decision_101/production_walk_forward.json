@@ -3,7 +3,7 @@
   "universe": 101,
   "price_series": 101,
   "published_at_records": 0,
-  "valuation_period_end_records": 48,
+  "valuation_period_end_records": 35,
   "historical_ranking_status": "blocked_insufficient_point_in_time_inputs",
   "metrics": {
     "top_1": null,

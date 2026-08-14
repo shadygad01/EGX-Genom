@@ -1,35 +1,57 @@
 [
   {
-    "ticker": "LCSW",
+    "ticker": "EMFD",
     "as_of": "2026-08-14",
-    "action": "buy",
-    "confidence": 0.68,
-    "expected_return": 0.215,
-    "fair_value": 40.4097,
-    "current_price": 33.48,
-    "upside_pct": 20.7,
-    "rationale": "LCSW: Fair value 40.41 EGP vs current 33.48 EGP Based on 21 financial reporting periods."
+    "action": "strong_buy",
+    "confidence": 0.85,
+    "expected_return": 0.5576,
+    "fair_value": 18.3188,
+    "current_price": 11.77,
+    "upside_pct": 55.6,
+    "rationale": "EMFD: Fair value 18.32 EGP vs current 11.77 EGP Based on 5 financial reporting periods."
   },
   {
     "ticker": "SCEM",
     "as_of": "2026-08-14",
-    "action": "buy",
-    "confidence": 0.621,
-    "expected_return": 0.1771,
-    "fair_value": 101.439,
+    "action": "strong_buy",
+    "confidence": 0.76,
+    "expected_return": 0.3206,
+    "fair_value": 114.981,
     "current_price": 94.4,
-    "upside_pct": 7.5,
-    "rationale": "SCEM: Fair value 101.44 EGP vs current 94.40 EGP Based on 21 financial reporting periods."
+    "upside_pct": 21.8,
+    "rationale": "SCEM: Fair value 114.98 EGP vs current 94.40 EGP Based on 5 financial reporting periods."
   },
   {
-    "ticker": "ATLC",
+    "ticker": "ARCC",
+    "as_of": "2026-08-14",
+    "action": "buy",
+    "confidence": 0.617,
+    "expected_return": 0.1665,
+    "fair_value": 81.1294,
+    "current_price": 74.2,
+    "upside_pct": 9.3,
+    "rationale": "ARCC: Fair value 81.13 EGP vs current 74.20 EGP Based on 5 financial reporting periods."
+  },
+  {
+    "ticker": "POUL",
     "as_of": "2026-08-14",
     "action": "accumulate",
     "confidence": 0.55,
-    "expected_return": 0.0617,
-    "fair_value": 5.8753,
-    "current_price": 5.6,
-    "upside_pct": 4.9,
-    "rationale": "ATLC: Fair value 5.88 EGP vs current 5.60 EGP Based on 20 financial reporting periods."
+    "expected_return": 0.0709,
+    "fair_value": 42.0389,
+    "current_price": 39.3,
+    "upside_pct": 7.0,
+    "rationale": "POUL: Fair value 42.04 EGP vs current 39.30 EGP Based on 5 financial reporting periods."
+  },
+  {
+    "ticker": "MCQE",
+    "as_of": "2026-08-14",
+    "action": "buy",
+    "confidence": 0.592,
+    "expected_return": 0.1038,
+    "fair_value": 253.5118,
+    "current_price": 248.11,
+    "upside_pct": 2.2,
+    "rationale": "MCQE: Fair value 253.51 EGP vs current 248.11 EGP Based on 5 financial reporting periods."
   }
 ]

@@ -57,6 +57,7 @@ def validate_items(items):
     return items,None
 def classify_sector(company):
     c=(company or '').casefold()
+    if any(k in c for k in ('banking technology','electronic payment','payment technology')): return 'Technology'
     if any(k in c for k in ('bank','banking')): return 'Banks'
     if any(k in c for k in ('telecom','telecommunications','mobile')): return 'Telecommunications'
     if any(k in c for k in ('real estate','real-estate','housing','property')): return 'Real Estate'
@@ -136,12 +137,6 @@ def main():
                             present.add(item.line_item); source='stockanalysis+mubasher'
                 except Exception:
                     pass
-            elif sh and batch.financial_statement_line_items and all('EGP' in str(item.currency) for item in batch.financial_statement_line_items):
-                # Transparent derived EPS only from disclosed net income and shares.
-                from agx_research.financials.schema import FinancialStatementLineItem
-                for item in list(batch.financial_statement_line_items):
-                    if item.line_item=='net_income':
-                        batch.financial_statement_line_items.append(FinancialStatementLineItem(ticker=t,period_end_date=item.period_end_date,period_type=item.period_type,statement_type='INCOME_STATEMENT',line_item='eps_diluted',value=item.value/sh,currency='EGP'))
             if sh:
                 latest=max((x.period_end_date for x in batch.financial_statement_line_items),default=date.min)
                 from agx_research.financials.schema import FinancialStatementLineItem

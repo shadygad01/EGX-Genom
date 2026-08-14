@@ -45,7 +45,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Live collection covers 101 tickers across multiple verified financial
+    # sources. Keep the job bounded, but allow slow public endpoints to finish
+    # honestly instead of cancelling a valid run at the old 45-minute cap.
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: research

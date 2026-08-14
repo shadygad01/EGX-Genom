@@ -337,11 +337,25 @@ def score_ticker(
     financial_periods = readiness.get("financial_periods", 0)
     fin_note = f"Based on {financial_periods} financial reporting periods." if financial_periods else ""
 
+    risk=(price_stats.get("annual_volatility") or 0.25)
+    opportunity_score=round(((combined_return or 0.0) * quality_score / 100.0) / (1.0 + risk), 6)
+    if action in {"strong_buy", "buy", "accumulate"}: market_stance="attractive"
+    elif action in {"reduce", "sell"}: market_stance="unattractive"
+    elif action == "hold": market_stance="neutral"
+    else: market_stance="insufficient_evidence"
     return {
         "ticker": ticker,
         "as_of": TODAY,
         "action": action,
+        "market_stance": market_stance,
+        "portfolio_action": None,
+        "portfolio_action_status": "requires_position_data",
+        "opportunity_score": opportunity_score,
+        "opportunity_score_definition": "signed expected-return score adjusted by data quality and volatility; not a probability",
+        "expected_return_type": "fair_value_upside_plus_macro_momentum",
+        "confidence_type": "confidence_score_not_calibrated_probability",
         "horizon": horizon,
+        "horizon_label": "short_term" if horizon == "swing" else "investment_term_unclassified",
         "confidence": round(confidence, 3),
         "combined_expected_return": round(combined_return, 4) if combined_return is not None else None,
         "combined_expected_risk": round(price_stats.get("annual_volatility") or 0.25, 4),
@@ -548,10 +562,11 @@ def main():
 
     # ── Sort recommendations by confidence × |expected_return| ──────────
     def sort_key(r):
-        er = r.get("combined_expected_return") or 0
-        return -r["confidence"] * abs(er)
+        return -(r.get("opportunity_score") or 0.0)
 
     recommendations.sort(key=sort_key)
+    for rank, rec in enumerate(recommendations, 1):
+        rec["rank"] = rank
 
     # ── Build market breadth + regime ────────────────────────────────────
     breadth = build_market_breadth(all_price_stats)

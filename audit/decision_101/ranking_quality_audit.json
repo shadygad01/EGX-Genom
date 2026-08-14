@@ -1,0 +1,40 @@
+{
+  "as_of": "2026-08-14",
+  "recommendations": 101,
+  "rank_contract": "passed",
+  "contract_issues": [],
+  "actions": {
+    "strong_buy": 1,
+    "buy": 2,
+    "hold": 2,
+    "abstain": 53,
+    "reduce": 2,
+    "sell": 41
+  },
+  "horizons": {
+    "investment_term_unclassified": 99,
+    "short_term": 2
+  },
+  "market_stances": {
+    "attractive": 3,
+    "neutral": 2,
+    "insufficient_evidence": 53,
+    "unattractive": 43
+  },
+  "historical_metrics": {
+    "top_1": null,
+    "top_3": null,
+    "top_5": null,
+    "top_10": null,
+    "rank_ic": null,
+    "confidence_calibration": null,
+    "expected_vs_realized_return": null
+  },
+  "historical_status": "insufficient_data",
+  "historical_blockers": [
+    "No point-in-time publication_date for financial inputs",
+    "No realized forward-return ledger joined to this production ranking",
+    "Only current as-of recommendations are available"
+  ],
+  "note": "No historical ranking metric or calibration value is fabricated."
+}

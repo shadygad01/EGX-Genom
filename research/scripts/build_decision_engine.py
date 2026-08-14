@@ -338,7 +338,14 @@ def score_ticker(
     fin_note = f"Based on {financial_periods} financial reporting periods." if financial_periods else ""
 
     risk=(price_stats.get("annual_volatility") or 0.25)
-    opportunity_score=round(((combined_return or 0.0) * quality_score / 100.0) / (1.0 + risk), 6)
+    model_values=[float(v) for v in (valuation.get("models") or {}).values() if isinstance(v,(int,float)) and v>0]
+    model_cv=None
+    if len(model_values)>=3:
+        model_mean=sum(model_values)/len(model_values)
+        model_cv=(sum((v-model_mean)**2 for v in model_values)/len(model_values))**0.5/model_mean if model_mean else None
+    model_agreement_score=round(max(0.0,1.0-min(model_cv or 0.0,1.0))*100.0,1)
+    risk_penalty=1.0/(1.0+risk)
+    opportunity_score=round(((combined_return or 0.0) * (quality_score/100.0) * (model_agreement_score/100.0) * risk_penalty), 6)
     if action in {"strong_buy", "buy", "accumulate"}: market_stance="attractive"
     elif action in {"reduce", "sell"}: market_stance="unattractive"
     elif action == "hold": market_stance="neutral"
@@ -351,7 +358,14 @@ def score_ticker(
         "portfolio_action": None,
         "portfolio_action_status": "requires_position_data",
         "opportunity_score": opportunity_score,
-        "opportunity_score_definition": "signed expected-return score adjusted by data quality and volatility; not a probability",
+        "opportunity_score_components": {
+            "combined_expected_return": round(combined_return,4) if combined_return is not None else None,
+            "data_quality_score": quality_score,
+            "model_agreement_score": model_agreement_score,
+            "model_coefficient_of_variation": round(model_cv,4) if model_cv is not None else None,
+            "risk_penalty": round(risk_penalty,4),
+        },
+        "opportunity_score_definition": "signed fair-value-upside score adjusted by data quality, model agreement and volatility; not a probability",
         "expected_return_type": "fair_value_upside_plus_macro_momentum",
         "confidence_type": "confidence_score_not_calibrated_probability",
         "horizon": horizon,

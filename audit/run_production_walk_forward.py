@@ -13,6 +13,17 @@ for p in price_files:
  if dates:
   first,last=dates[0],dates[-1]
   windows.append({'ticker':p.stem,'first_price_date':first,'last_price_date':last,'bars':len(rows),'has_60_bar_window':len(rows)>=60})
+cutoffs=['2025-12-31','2026-03-31','2026-06-30','2026-08-14']
+price_window_checks=[]
+for cutoff in cutoffs:
+ eligible=[]; future_violations=0
+ for item,p in zip(windows,price_files):
+  rows=list(csv.DictReader(p.open()))
+  past=[r for r in rows if (r.get('date') or '')<=cutoff]
+  if past:
+   eligible.append({'ticker':p.stem,'bars_before_cutoff':len(past),'last_before_cutoff':past[-1].get('date')})
+   if any((r.get('date') or '')>cutoff for r in past): future_violations+=1
+ price_window_checks.append({'as_of':cutoff,'price_series_with_history':len(eligible),'series_with_60_bars':sum(x['bars_before_cutoff']>=60 for x in eligible),'future_price_violations':future_violations})
 published=sum(1 for r in readiness if r.get('published_at'))
 valuation_snapshots=sum(1 for r in readiness if r.get('valuation') and r['valuation'].get('latest_period'))
 # A production ranking walk-forward requires both point-in-time inputs and realized forward returns.
@@ -28,7 +39,9 @@ result={
  'available_price_window_summary':{
    'series_with_60_bars':sum(x['has_60_bar_window'] for x in windows),
    'latest_price_date_max':max((x['last_price_date'] for x in windows),default=None),
-   'latest_price_date_min':min((x['last_price_date'] for x in windows),default=None)
+   'latest_price_date_min':min((x['last_price_date'] for x in windows),default=None),
+   'price_window_checks':price_window_checks,
+   'future_price_violations':sum(x['future_price_violations'] for x in price_window_checks)
  },
  'note':'No Top-K or realized-return metric is produced because current Fair Value snapshots are not point-in-time and no joined forward-return ledger exists.'
 }

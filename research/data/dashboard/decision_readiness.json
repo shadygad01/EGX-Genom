@@ -8,26 +8,27 @@
     "valuation": {
       "ticker": "ABUK",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 47.1528,
-      "bear_case": 36.5419,
-      "base_case": 47.1528,
+      "weighted_fair_value": 42.5988,
+      "bear_case": 25.5593,
+      "base_case": 42.5988,
       "bull_case": 56.88,
       "models": {
         "dcf": 47.7101,
         "ddm": 36.5419,
-        "residual_income": null,
+        "residual_income": 22.8647,
         "earnings_power": 46.6274,
         "ev_ebitda": null,
         "pe": 56.88,
-        "pb": null
+        "pb": 0.0227
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-06-30",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -82,17 +83,36 @@
   {
     "ticker": "AFMC",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "AFMC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 6.0039,
+      "bear_case": 4.9742,
+      "base_case": 6.0039,
+      "bull_case": 6.9237,
+      "models": {
+        "dcf": -2.94,
+        "ddm": 4.9742,
+        "residual_income": 5.7705,
+        "earnings_power": 6.9237,
+        "ev_ebitda": null,
+        "pe": 18.15,
+        "pb": 0.0112
+      },
+      "included_models": [
+        "ddm",
+        "earnings_power",
+        "residual_income"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "AIDC",
@@ -133,24 +153,25 @@
     "valuation": {
       "ticker": "ALCN",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 17.5555,
-      "bear_case": 11.6513,
-      "base_case": 17.5555,
+      "weighted_fair_value": 15.9909,
+      "bear_case": 9.5945,
+      "base_case": 15.9909,
       "bull_case": 21.89,
       "models": {
         "dcf": 20.8768,
         "ddm": 12.1134,
-        "residual_income": null,
+        "residual_income": 9.211,
         "earnings_power": 11.6513,
         "ev_ebitda": null,
         "pe": 21.89,
-        "pb": null
+        "pb": 0.0033
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -198,26 +219,27 @@
     "valuation": {
       "ticker": "AMOC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 8.7995,
-      "bear_case": 5.5469,
-      "base_case": 8.7995,
+      "weighted_fair_value": 8.1878,
+      "bear_case": 5.5372,
+      "base_case": 8.1878,
       "bull_case": 12.65,
       "models": {
         "dcf": 8.7437,
         "ddm": 5.5469,
-        "residual_income": null,
+        "residual_income": 5.5372,
         "earnings_power": 8.5123,
         "ev_ebitda": null,
         "pe": 12.65,
-        "pb": null
+        "pb": 0.0049
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-06-30",
+      "latest_period": "2026-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -248,23 +270,25 @@
     "valuation": {
       "ticker": "ARCC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 81.1294,
-      "bear_case": 48.6776,
-      "base_case": 81.1294,
+      "weighted_fair_value": 67.3691,
+      "bear_case": 40.4215,
+      "base_case": 67.3691,
       "bull_case": 101.1473,
       "models": {
         "dcf": 101.1473,
         "ddm": 20.561,
-        "residual_income": null,
-        "earnings_power": 38.2399,
+        "residual_income": 39.0711,
+        "earnings_power": 47.289,
         "ev_ebitda": null,
         "pe": 85.41,
-        "pb": null
+        "pb": 0.0077
       },
       "included_models": [
         "dcf",
+        "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -306,17 +330,36 @@
   {
     "ticker": "ATLC",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ATLC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 4.6089,
+      "bear_case": 2.8888,
+      "base_case": 4.6089,
+      "bull_case": 7.3742,
+      "models": {
+        "dcf": -37.4619,
+        "ddm": 3.8779,
+        "residual_income": 2.8888,
+        "earnings_power": -12.3627,
+        "ev_ebitda": null,
+        "pe": 7.92,
+        "pb": 0.0028
+      },
+      "included_models": [
+        "ddm",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "ATQA",
@@ -342,24 +385,25 @@
     "valuation": {
       "ticker": "BIOC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 15.438,
-      "bear_case": 9.2628,
-      "base_case": 15.438,
-      "bull_case": 24.7008,
+      "weighted_fair_value": 14.6017,
+      "bear_case": 8.761,
+      "base_case": 14.6017,
+      "bull_case": 23.3627,
       "models": {
         "dcf": 8.8359,
         "ddm": 6.9935,
-        "residual_income": null,
+        "residual_income": 10.9775,
         "earnings_power": 25.8639,
         "ev_ebitda": null,
         "pe": 28.05,
-        "pb": null
+        "pb": 0.0345
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -407,25 +451,26 @@
     "valuation": {
       "ticker": "CIEB",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 19.794,
-      "bear_case": 11.8764,
-      "base_case": 19.794,
-      "bull_case": 31.6704,
+      "weighted_fair_value": 20.2692,
+      "bear_case": 12.1615,
+      "base_case": 20.2692,
+      "bull_case": 32.4306,
       "models": {
         "dcf": 7.5216,
         "ddm": 21.8451,
-        "residual_income": null,
+        "residual_income": 21.853,
         "earnings_power": null,
         "ev_ebitda": null,
         "pe": 54.56,
-        "pb": null
+        "pb": 0.0232
       },
       "included_models": [
         "dcf",
         "ddm",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -450,17 +495,36 @@
   {
     "ticker": "COMI",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "COMI",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 90.649,
+      "bear_case": 54.3894,
+      "base_case": 90.649,
+      "bull_case": 145.0384,
+      "models": {
+        "dcf": null,
+        "ddm": 41.9613,
+        "residual_income": 75.2401,
+        "earnings_power": null,
+        "ev_ebitda": null,
+        "pe": 162.45,
+        "pb": 0.0351
+      },
+      "included_models": [
+        "ddm",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "COSG",
@@ -486,24 +550,24 @@
     "valuation": {
       "ticker": "CSAG",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 12.3941,
-      "bear_case": 7.4364,
-      "base_case": 12.3941,
-      "bull_case": 19.8305,
+      "weighted_fair_value": 10.0442,
+      "bear_case": 6.0265,
+      "base_case": 10.0442,
+      "bull_case": 16.0707,
       "models": {
         "dcf": 5.1879,
         "ddm": 20.2813,
-        "residual_income": null,
+        "residual_income": 18.2453,
         "earnings_power": 4.7308,
         "ev_ebitda": null,
         "pe": 37.62,
-        "pb": null
+        "pb": 0.0067
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "residual_income"
       ],
       "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -530,17 +594,36 @@
   {
     "ticker": "DSCW",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "DSCW",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.8054,
+      "bear_case": 0.4832,
+      "base_case": 0.8054,
+      "bull_case": 1.2886,
+      "models": {
+        "dcf": -4.1202,
+        "ddm": null,
+        "residual_income": 0.4783,
+        "earnings_power": 0.6427,
+        "ev_ebitda": null,
+        "pe": 1.54,
+        "pb": 0.0007
+      },
+      "included_models": [
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2026-03-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "EAST",
@@ -669,24 +752,24 @@
     "valuation": {
       "ticker": "EGAL",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 113.3413,
-      "bear_case": 68.0048,
-      "base_case": 113.3413,
-      "bull_case": 181.3461,
+      "weighted_fair_value": 84.8801,
+      "bear_case": 54.0061,
+      "base_case": 84.8801,
+      "bull_case": 135.8082,
       "models": {
         "dcf": 57.5334,
         "ddm": 54.0061,
-        "residual_income": null,
+        "residual_income": 86.0217,
         "earnings_power": 159.0147,
         "ev_ebitda": null,
         "pe": 271.59,
-        "pb": null
+        "pb": 0.0616
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "residual_income"
       ],
       "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -741,11 +824,11 @@
       "models": {
         "dcf": 1.3022,
         "ddm": null,
-        "residual_income": null,
+        "residual_income": 0.2859,
         "earnings_power": 0.9739,
         "ev_ebitda": null,
         "pe": 1.2,
-        "pb": null
+        "pb": 0.0014
       },
       "included_models": [
         "dcf",
@@ -783,18 +866,18 @@
     "valuation": {
       "ticker": "EMFD",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 18.3188,
-      "bear_case": 10.9913,
-      "base_case": 18.3188,
+      "weighted_fair_value": 18.4489,
+      "bear_case": 11.0693,
+      "base_case": 18.4489,
       "bull_case": 24.2894,
       "models": {
         "dcf": 24.2894,
         "ddm": null,
-        "residual_income": null,
-        "earnings_power": 11.917,
+        "residual_income": 3.1104,
+        "earnings_power": 12.394,
         "ev_ebitda": null,
         "pe": 10.01,
-        "pb": null
+        "pb": 0.0154
       },
       "included_models": [
         "dcf",
@@ -811,17 +894,37 @@
   {
     "ticker": "ENGC",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "ENGC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 30.577,
+      "bear_case": 18.3462,
+      "base_case": 30.577,
+      "bull_case": 48.9232,
+      "models": {
+        "dcf": -2.3863,
+        "ddm": 8.7419,
+        "residual_income": 19.9464,
+        "earnings_power": 39.4088,
+        "ev_ebitda": null,
+        "pe": 55.11,
+        "pb": 0.0338
+      },
+      "included_models": [
+        "ddm",
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2026-03-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "ETEL",
@@ -832,25 +935,26 @@
     "valuation": {
       "ticker": "ETEL",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 23.4528,
-      "bear_case": 14.0717,
-      "base_case": 23.4528,
-      "bull_case": 30.3118,
+      "weighted_fair_value": 30.1583,
+      "bear_case": 18.095,
+      "base_case": 30.1583,
+      "bull_case": 44.1525,
       "models": {
         "dcf": 30.3118,
         "ddm": 10.4903,
-        "residual_income": null,
-        "earnings_power": 18.3762,
+        "residual_income": 44.1525,
+        "earnings_power": 28.9689,
         "ev_ebitda": null,
         "pe": 119.3,
-        "pb": null
+        "pb": 0.0552
       },
       "included_models": [
         "dcf",
         "ddm",
-        "earnings_power"
+        "earnings_power",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -866,25 +970,26 @@
     "valuation": {
       "ticker": "ETRS",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 3.7023,
-      "bear_case": 2.2214,
-      "base_case": 3.7023,
-      "bull_case": 5.9237,
+      "weighted_fair_value": 3.6146,
+      "bear_case": 2.1688,
+      "base_case": 3.6146,
+      "bull_case": 5.7834,
       "models": {
         "dcf": -1.9593,
         "ddm": 1.7484,
-        "residual_income": null,
-        "earnings_power": 2.7064,
+        "residual_income": 2.7869,
+        "earnings_power": 3.3296,
         "ev_ebitda": null,
         "pe": 7.15,
-        "pb": null
+        "pb": 0.007
       },
       "included_models": [
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -945,23 +1050,24 @@
     "valuation": {
       "ticker": "GPIM",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 0.0637,
-      "bear_case": 0.0525,
-      "base_case": 0.0637,
-      "bull_case": 0.102,
+      "weighted_fair_value": 0.0575,
+      "bear_case": 0.0345,
+      "base_case": 0.0575,
+      "bull_case": 0.0921,
       "models": {
         "dcf": 0.0539,
         "ddm": null,
-        "residual_income": null,
-        "earnings_power": 0.0525,
+        "residual_income": 0.0247,
+        "earnings_power": 0.0627,
         "ev_ebitda": null,
         "pe": 0.11,
-        "pb": null
+        "pb": 0.0001
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -994,23 +1100,24 @@
     "valuation": {
       "ticker": "HELI",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 5.0778,
-      "bear_case": 3.0467,
-      "base_case": 5.0778,
-      "bull_case": 8.1245,
+      "weighted_fair_value": 4.1577,
+      "bear_case": 2.4946,
+      "base_case": 4.1577,
+      "bull_case": 6.6524,
       "models": {
         "dcf": -2.9876,
         "ddm": 2.7224,
-        "residual_income": null,
+        "residual_income": 2.0109,
         "earnings_power": 4.5933,
         "ev_ebitda": null,
         "pe": 8.16,
-        "pb": null
+        "pb": 0.0035
       },
       "included_models": [
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -1071,9 +1178,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 5,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -1086,9 +1193,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 5,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "future_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -1118,24 +1225,25 @@
     "valuation": {
       "ticker": "ISMQ",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 7.6154,
-      "bear_case": 4.5693,
-      "base_case": 7.6154,
-      "bull_case": 11.689,
+      "weighted_fair_value": 5.6028,
+      "bear_case": 3.3617,
+      "base_case": 5.6028,
+      "bull_case": 8.8289,
       "models": {
-        "dcf": 11.689,
-        "ddm": 2.9373,
-        "residual_income": null,
+        "dcf": 8.8289,
+        "ddm": 2.7855,
+        "residual_income": 2.7027,
         "earnings_power": 3.404,
         "ev_ebitda": null,
         "pe": 6.39,
-        "pb": null
+        "pb": 0.0004
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -1162,17 +1270,36 @@
   {
     "ticker": "JUFO",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "JUFO",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 8.1805,
+      "bear_case": 4.9083,
+      "base_case": 8.1805,
+      "bull_case": 12.21,
+      "models": {
+        "dcf": -12.0008,
+        "ddm": 0.8952,
+        "residual_income": 4.0823,
+        "earnings_power": 9.5923,
+        "ev_ebitda": null,
+        "pe": 12.21,
+        "pb": 0.0077
+      },
+      "included_models": [
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2026-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "KABO",
@@ -1207,17 +1334,36 @@
   {
     "ticker": "LCSW",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "LCSW",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 31.3733,
+      "bear_case": 18.824,
+      "base_case": 31.3733,
+      "bull_case": 46.86,
+      "models": {
+        "dcf": -121.7842,
+        "ddm": null,
+        "residual_income": 14.5564,
+        "earnings_power": 37.8659,
+        "ev_ebitda": null,
+        "pe": 46.86,
+        "pb": 0.0361
+      },
+      "included_models": [
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "MASR",
@@ -1243,25 +1389,25 @@
     "valuation": {
       "ticker": "MCQE",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 253.5118,
-      "bear_case": 152.1071,
-      "base_case": 253.5118,
-      "bull_case": 353.9385,
+      "weighted_fair_value": 120.8466,
+      "bear_case": 74.6206,
+      "base_case": 120.8466,
+      "bull_case": 190.62,
       "models": {
         "dcf": 353.9385,
         "ddm": 6.9935,
-        "residual_income": null,
-        "earnings_power": 94.5865,
+        "residual_income": 74.6206,
+        "earnings_power": 120.5569,
         "ev_ebitda": null,
         "pe": 190.62,
-        "pb": null
+        "pb": 0.0562
       },
       "included_models": [
-        "dcf",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -1271,32 +1417,70 @@
   {
     "ticker": "MCRO",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "MCRO",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 1.771,
+      "bear_case": 1.0626,
+      "base_case": 1.771,
+      "bull_case": 2.2,
+      "models": {
+        "dcf": 2.1719,
+        "ddm": null,
+        "residual_income": 0.6832,
+        "earnings_power": -0.3749,
+        "ev_ebitda": null,
+        "pe": 2.2,
+        "pb": 0.0002
+      },
+      "included_models": [
+        "dcf",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "MEPA",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "MEPA",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.2341,
+      "bear_case": 0.1404,
+      "base_case": 0.2341,
+      "bull_case": 0.3745,
+      "models": {
+        "dcf": -0.0494,
+        "ddm": null,
+        "residual_income": 0.0588,
+        "earnings_power": 0.272,
+        "ev_ebitda": null,
+        "pe": 0.44,
+        "pb": 0.0004
+      },
+      "included_models": [
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "MFPC",
@@ -1307,26 +1491,27 @@
     "valuation": {
       "ticker": "MFPC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 22.8987,
-      "bear_case": 15.2753,
-      "base_case": 22.8987,
+      "weighted_fair_value": 22.9725,
+      "bear_case": 17.7426,
+      "base_case": 22.9725,
       "bull_case": 35.46,
       "models": {
         "dcf": 24.242,
         "ddm": 17.7426,
-        "residual_income": null,
-        "earnings_power": 15.2753,
+        "residual_income": 19.2022,
+        "earnings_power": 19.3654,
         "ev_ebitda": null,
         "pe": 35.46,
-        "pb": null
+        "pb": 0.0222
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -1357,24 +1542,24 @@
     "valuation": {
       "ticker": "MPCI",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 92.856,
-      "bear_case": 55.7136,
-      "base_case": 92.856,
-      "bull_case": 148.5696,
+      "weighted_fair_value": 64.709,
+      "bear_case": 41.0953,
+      "base_case": 64.709,
+      "bull_case": 103.5344,
       "models": {
         "dcf": 41.0953,
         "ddm": 80.3131,
-        "residual_income": null,
+        "residual_income": 62.4728,
         "earnings_power": 103.7699,
         "ev_ebitda": null,
         "pe": 244.31,
-        "pb": null
+        "pb": 0.0218
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "residual_income"
       ],
       "latest_period": "2025-06-30",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -1407,25 +1592,26 @@
     "valuation": {
       "ticker": "MPRC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 29.909,
-      "bear_case": 18.8117,
-      "base_case": 29.909,
+      "weighted_fair_value": 26.6642,
+      "bear_case": 15.9985,
+      "base_case": 26.6642,
       "bull_case": 40.48,
       "models": {
         "dcf": 31.934,
         "ddm": 3.4968,
-        "residual_income": null,
-        "earnings_power": 18.8117,
+        "residual_income": 13.7053,
+        "earnings_power": 19.873,
         "ev_ebitda": null,
         "pe": 40.48,
-        "pb": null
+        "pb": 0.0263
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -1441,25 +1627,26 @@
     "valuation": {
       "ticker": "MTIE",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 2.9094,
-      "bear_case": 2.2967,
-      "base_case": 2.9094,
-      "bull_case": 4.655,
+      "weighted_fair_value": 2.6991,
+      "bear_case": 1.6194,
+      "base_case": 2.6991,
+      "bull_case": 4.3185,
       "models": {
         "dcf": 2.2967,
         "ddm": null,
-        "residual_income": null,
-        "earnings_power": 2.7744,
+        "residual_income": 1.5376,
+        "earnings_power": 3.1647,
         "ev_ebitda": null,
         "pe": 4.95,
-        "pb": null
+        "pb": 0.0031
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -1469,17 +1656,36 @@
   {
     "ticker": "NCCW",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "NCCW",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 1.3422,
+      "bear_case": 0.82,
+      "base_case": 1.3422,
+      "bull_case": 2.1475,
+      "models": {
+        "dcf": 1.1706,
+        "ddm": null,
+        "residual_income": 0.82,
+        "earnings_power": -0.2275,
+        "ev_ebitda": null,
+        "pe": 2.64,
+        "pb": 0.0015
+      },
+      "included_models": [
+        "dcf",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "NIPH",
@@ -1488,9 +1694,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 5,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "future_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -1499,17 +1705,36 @@
   {
     "ticker": "OBRI",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "OBRI",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 9.7549,
+      "bear_case": 5.8529,
+      "base_case": 9.7549,
+      "bull_case": 14.76,
+      "models": {
+        "dcf": 65.1736,
+        "ddm": null,
+        "residual_income": 4.2029,
+        "earnings_power": 11.9701,
+        "ev_ebitda": null,
+        "pe": 14.76,
+        "pb": 0.0119
+      },
+      "included_models": [
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2026-03-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "OCDI",
@@ -1529,17 +1754,36 @@
   {
     "ticker": "OFH",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "OFH",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.1843,
+      "bear_case": 0.1595,
+      "base_case": 0.1843,
+      "bull_case": 0.1933,
+      "models": {
+        "dcf": 0.1933,
+        "ddm": null,
+        "residual_income": 0.1911,
+        "earnings_power": 0.1595,
+        "ev_ebitda": null,
+        "pe": 1.43,
+        "pb": 0.0009
+      },
+      "included_models": [
+        "dcf",
+        "earnings_power",
+        "residual_income"
+      ],
+      "latest_period": "2026-03-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "OIH",
@@ -1580,23 +1824,23 @@
     "valuation": {
       "ticker": "ORHD",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 26.5295,
-      "bear_case": 18.0089,
-      "base_case": 26.5295,
-      "bull_case": 42.4471,
+      "weighted_fair_value": 19.8153,
+      "bear_case": 14.2246,
+      "base_case": 19.8153,
+      "bull_case": 29.0186,
       "models": {
         "dcf": 18.0089,
-        "ddm": 2.6855,
-        "residual_income": null,
-        "earnings_power": 25.2502,
+        "ddm": 2.5875,
+        "residual_income": 14.2246,
+        "earnings_power": 29.0186,
         "ev_ebitda": null,
         "pe": 54.01,
-        "pb": null
+        "pb": 0.0187
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe"
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -1614,26 +1858,26 @@
     "valuation": {
       "ticker": "ORWE",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 13.7417,
+      "weighted_fair_value": 11.1022,
       "bear_case": 8.374,
-      "base_case": 13.7417,
-      "bull_case": 21.9867,
+      "base_case": 11.1022,
+      "bull_case": 16.0846,
       "models": {
         "dcf": 8.374,
         "ddm": 8.7419,
-        "residual_income": null,
-        "earnings_power": 14.8247,
+        "residual_income": 13.15,
+        "earnings_power": 16.0846,
         "ev_ebitda": null,
         "pe": 33.22,
-        "pb": null
+        "pb": 0.046
       },
       "included_models": [
         "dcf",
         "ddm",
         "earnings_power",
-        "pe"
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -1658,17 +1902,36 @@
   {
     "ticker": "PHDC",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "PHDC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 8.3754,
+      "bear_case": 5.0253,
+      "base_case": 8.3754,
+      "bull_case": 13.4007,
+      "models": {
+        "dcf": -3.1991,
+        "ddm": null,
+        "residual_income": 4.9884,
+        "earnings_power": 6.6394,
+        "ev_ebitda": null,
+        "pe": 16.06,
+        "pb": 0.0093
+      },
+      "included_models": [
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2026-03-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "POUL",
@@ -1679,25 +1942,26 @@
     "valuation": {
       "ticker": "POUL",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 42.0389,
-      "bear_case": 33.4996,
-      "base_case": 42.0389,
+      "weighted_fair_value": 37.5002,
+      "bear_case": 22.5001,
+      "base_case": 37.5002,
       "bull_case": 59.18,
       "models": {
         "dcf": 40.5949,
         "ddm": 2.3079,
-        "residual_income": null,
-        "earnings_power": 33.4996,
+        "residual_income": 19.1272,
+        "earnings_power": 35.2305,
         "ev_ebitda": null,
         "pe": 59.18,
-        "pb": null
+        "pb": 0.0209
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -1728,23 +1992,24 @@
     "valuation": {
       "ticker": "RACC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 8.9822,
-      "bear_case": 7.2886,
-      "base_case": 8.9822,
-      "bull_case": 14.3714,
+      "weighted_fair_value": 7.5411,
+      "bear_case": 4.5246,
+      "base_case": 7.5411,
+      "bull_case": 12.0657,
       "models": {
-        "dcf": 7.2886,
+        "dcf": 6.3754,
         "ddm": null,
-        "residual_income": null,
-        "earnings_power": 8.7506,
+        "residual_income": 2.9264,
+        "earnings_power": 9.9077,
         "ev_ebitda": null,
         "pe": 14.41,
-        "pb": null
+        "pb": 0.0043
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -1777,25 +2042,26 @@
     "valuation": {
       "ticker": "RMDA",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 0.7177,
-      "bear_case": 0.4306,
-      "base_case": 0.7177,
-      "bull_case": 1.1483,
+      "weighted_fair_value": 0.7539,
+      "bear_case": 0.4523,
+      "base_case": 0.7539,
+      "bull_case": 1.2062,
       "models": {
         "dcf": -1.7203,
         "ddm": 0.2779,
-        "residual_income": null,
-        "earnings_power": 0.5361,
+        "residual_income": 0.5169,
+        "earnings_power": 0.8575,
         "ev_ebitda": null,
         "pe": 1.43,
-        "pb": null
+        "pb": 0.0015
       },
       "included_models": [
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,
@@ -1811,23 +2077,24 @@
     "valuation": {
       "ticker": "SCEM",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 114.981,
-      "bear_case": 68.9886,
-      "base_case": 114.981,
+      "weighted_fair_value": 100.88,
+      "bear_case": 60.528,
+      "base_case": 100.88,
       "bull_case": 155.3252,
       "models": {
         "dcf": 155.3252,
         "ddm": null,
-        "residual_income": null,
-        "earnings_power": 48.8466,
+        "residual_income": 35.3586,
+        "earnings_power": 62.6641,
         "ev_ebitda": null,
         "pe": 93.15,
-        "pb": null
+        "pb": 0.0241
       },
       "included_models": [
         "dcf",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -1854,17 +2121,36 @@
   {
     "ticker": "SIPC",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "SIPC",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.3301,
+      "bear_case": 0.1981,
+      "base_case": 0.3301,
+      "bull_case": 0.4168,
+      "models": {
+        "dcf": 0.4168,
+        "ddm": null,
+        "residual_income": 0.1367,
+        "earnings_power": -0.0552,
+        "ev_ebitda": null,
+        "pe": 0.36,
+        "pb": 0.0005
+      },
+      "included_models": [
+        "dcf",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2026-03-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "SKPC",
@@ -1875,23 +2161,23 @@
     "valuation": {
       "ticker": "SKPC",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 7.1496,
-      "bear_case": 4.2898,
-      "base_case": 7.1496,
-      "bull_case": 9.3724,
+      "weighted_fair_value": 4.1723,
+      "bear_case": 2.5034,
+      "base_case": 4.1723,
+      "bull_case": 6.6757,
       "models": {
         "dcf": -1.1129,
         "ddm": 3.0452,
-        "residual_income": null,
+        "residual_income": 2.4252,
         "earnings_power": 9.3724,
         "ev_ebitda": null,
         "pe": 7.92,
-        "pb": null
+        "pb": 0.0074
       },
       "included_models": [
         "ddm",
-        "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
       "latest_period": "2025-12-31",
       "assumptions_version": "smartlist-ive-v2.2"
@@ -1982,17 +2268,36 @@
   {
     "ticker": "TAQA",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "TAQA",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 10.1411,
+      "bear_case": 6.0846,
+      "base_case": 10.1411,
+      "bull_case": 14.3995,
+      "models": {
+        "dcf": 14.3995,
+        "ddm": null,
+        "residual_income": 2.665,
+        "earnings_power": null,
+        "ev_ebitda": null,
+        "pe": 8.58,
+        "pb": 0.004
+      },
+      "included_models": [
+        "dcf",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "TMGH",
@@ -2027,17 +2332,36 @@
   {
     "ticker": "UNIP",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "UNIP",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 0.0644,
+      "bear_case": 0.0386,
+      "base_case": 0.0644,
+      "bull_case": 0.103,
+      "models": {
+        "dcf": 0.6088,
+        "ddm": null,
+        "residual_income": 0.0342,
+        "earnings_power": 0.0641,
+        "ev_ebitda": null,
+        "pe": 0.11,
+        "pb": 0.0002
+      },
+      "included_models": [
+        "earnings_power",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-12-31",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
     "financial_periods": 5,
-    "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "VALU",
@@ -2057,37 +2381,17 @@
   {
     "ticker": "VLMR",
     "as_of": "2026-08-14",
-    "status": "ready",
-    "decision": "invest",
-    "fair_value_available": true,
-    "valuation": {
-      "ticker": "VLMR",
-      "as_of": "2026-08-14",
-      "weighted_fair_value": 0.5779,
-      "bear_case": 0.3467,
-      "base_case": 0.5779,
-      "bull_case": 0.9246,
-      "models": {
-        "dcf": 0.3801,
-        "ddm": 0.2866,
-        "residual_income": null,
-        "earnings_power": 0.7462,
-        "ev_ebitda": null,
-        "pe": 1.21,
-        "pb": null
-      },
-      "included_models": [
-        "dcf",
-        "ddm",
-        "earnings_power",
-        "pe"
-      ],
-      "latest_period": "2025-12-31",
-      "assumptions_version": "smartlist-ive-v2.2"
-    },
-    "financial_periods": 5,
-    "blockers": [],
-    "next_actions": []
+    "status": "blocked",
+    "decision": "abstain",
+    "fair_value_available": false,
+    "valuation": null,
+    "financial_periods": 0,
+    "blockers": [
+      "mixed_currency"
+    ],
+    "next_actions": [
+      "Acquire/validate missing financial or price evidence"
+    ]
   },
   {
     "ticker": "VLMRA",
@@ -2111,9 +2415,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 5,
+    "financial_periods": 0,
     "blockers": [
-      "valuation_engine_insufficient_models_or_stale_period"
+      "future_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -2128,25 +2432,26 @@
     "valuation": {
       "ticker": "ZMID",
       "as_of": "2026-08-14",
-      "weighted_fair_value": 3.6112,
-      "bear_case": 2.1667,
-      "base_case": 3.6112,
-      "bull_case": 5.7778,
+      "weighted_fair_value": 3.4297,
+      "bear_case": 2.0578,
+      "base_case": 3.4297,
+      "bull_case": 5.4875,
       "models": {
         "dcf": -1.9395,
         "ddm": 1.7484,
-        "residual_income": null,
-        "earnings_power": 2.9338,
+        "residual_income": 2.5815,
+        "earnings_power": 3.3585,
         "ev_ebitda": null,
         "pe": 6.49,
-        "pb": null
+        "pb": 0.003
       },
       "included_models": [
         "ddm",
         "earnings_power",
-        "pe"
+        "pe",
+        "residual_income"
       ],
-      "latest_period": "2025-12-31",
+      "latest_period": "2026-03-31",
       "assumptions_version": "smartlist-ive-v2.2"
     },
     "financial_periods": 5,

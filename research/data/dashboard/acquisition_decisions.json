@@ -4,54 +4,32 @@
     "as_of": "2026-08-14",
     "action": "strong_buy",
     "confidence": 0.85,
-    "expected_return": 0.5576,
-    "fair_value": 18.3188,
+    "expected_return": 0.5687,
+    "fair_value": 18.4489,
     "current_price": 11.77,
-    "upside_pct": 55.6,
-    "rationale": "EMFD: Fair value 18.32 EGP vs current 11.77 EGP Based on 5 financial reporting periods."
+    "upside_pct": 56.7,
+    "rationale": "EMFD: Fair value 18.45 EGP vs current 11.77 EGP Based on 5 financial reporting periods."
   },
   {
     "ticker": "SCEM",
     "as_of": "2026-08-14",
-    "action": "strong_buy",
-    "confidence": 0.76,
-    "expected_return": 0.3206,
-    "fair_value": 114.981,
+    "action": "buy",
+    "confidence": 0.618,
+    "expected_return": 0.1712,
+    "fair_value": 100.88,
     "current_price": 94.4,
-    "upside_pct": 21.8,
-    "rationale": "SCEM: Fair value 114.98 EGP vs current 94.40 EGP Based on 5 financial reporting periods."
+    "upside_pct": 6.9,
+    "rationale": "SCEM: Fair value 100.88 EGP vs current 94.40 EGP Based on 5 financial reporting periods."
   },
   {
-    "ticker": "ARCC",
+    "ticker": "MCRO",
     "as_of": "2026-08-14",
     "action": "buy",
-    "confidence": 0.617,
-    "expected_return": 0.1665,
-    "fair_value": 81.1294,
-    "current_price": 74.2,
-    "upside_pct": 9.3,
-    "rationale": "ARCC: Fair value 81.13 EGP vs current 74.20 EGP Based on 5 financial reporting periods."
-  },
-  {
-    "ticker": "MCQE",
-    "as_of": "2026-08-14",
-    "action": "buy",
-    "confidence": 0.592,
-    "expected_return": 0.1038,
-    "fair_value": 253.5118,
-    "current_price": 248.11,
-    "upside_pct": 2.2,
-    "rationale": "MCQE: Fair value 253.51 EGP vs current 248.11 EGP Based on 5 financial reporting periods."
-  },
-  {
-    "ticker": "POUL",
-    "as_of": "2026-08-14",
-    "action": "accumulate",
-    "confidence": 0.55,
-    "expected_return": 0.0709,
-    "fair_value": 42.0389,
-    "current_price": 39.3,
-    "upside_pct": 7.0,
-    "rationale": "POUL: Fair value 42.04 EGP vs current 39.30 EGP Based on 5 financial reporting periods."
+    "confidence": 0.618,
+    "expected_return": 0.1705,
+    "fair_value": 1.771,
+    "current_price": 1.55,
+    "upside_pct": 14.3,
+    "rationale": "MCRO: Fair value 1.77 EGP vs current 1.55 EGP Based on 5 financial reporting periods."
   }
 ]

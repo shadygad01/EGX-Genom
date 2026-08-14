@@ -79,6 +79,21 @@ def main():
                     if item.line_item=='eps_basic': item.line_item='eps_diluted'
                     elif item.line_item in {'eps_diluted','dividend_per_share','shares_outstanding'}: pass
                     else: item.value*=1_000_000.0
+                # Enrich missing valuation fields from Mubasher without overwriting
+                # StockAnalysis values. Mubasher values are already absolute EGP.
+                try:
+                    mu_url=MubasherFinancialsCollector.url(t); mu_html=fetch(mu_url)
+                    mu_doc=build_raw_document(source_id=mub_spec.id,collector='LiveReadiness:MubasherEnrichment',collector_version='1',original_url=mu_url,content_text=mu_html,schema_version=mub_spec.schema_version,license=mub_spec.license)
+                    mu_batch=MubasherFinancialsCollector(mub_spec,tickers=[t]).parse(mu_doc)
+                    existing={(x.line_item,x.period_end_date) for x in batch.financial_statement_line_items}
+                    present={x.line_item for x in batch.financial_statement_line_items}
+                    enrich={'total_equity','ebitda','dividend_per_share'}
+                    for item in mu_batch.financial_statement_line_items:
+                        if item.line_item in enrich and item.line_item not in present and (item.line_item,item.period_end_date) not in existing:
+                            batch.financial_statement_line_items.append(item)
+                            present.add(item.line_item); source='stockanalysis+mubasher'
+                except Exception:
+                    pass
             elif sh and batch.financial_statement_line_items and all('EGP' in str(item.currency) for item in batch.financial_statement_line_items):
                 # Transparent derived EPS only from disclosed net income and shares.
                 from agx_research.financials.schema import FinancialStatementLineItem

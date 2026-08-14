@@ -25,6 +25,29 @@ def shares_from_stats(ticker):
 class InMemory(FinancialStatementProvider):
     def __init__(self,items):self.items=items
     def get_line_items(self,ticker,start,end,*,statement_type=None):return [x for x in self.items if x.ticker==ticker and start<=x.period_end_date<=end and (statement_type is None or x.statement_type==statement_type)]
+def reconcile_balance_sheet_units(items):
+    by={}
+    for x in items: by.setdefault(x.period_end_date,{})[x.line_item]=x
+    dates=sorted(by)
+    for period,fields in by.items():
+        e=fields.get('total_equity')
+        if not e: continue
+        pair=fields
+        if not (pair.get('total_assets') and pair.get('total_liabilities')):
+            nearest=min((d for d in dates if abs((d-period).days)<=370 and by[d].get('total_assets') and by[d].get('total_liabilities')),key=lambda d:abs((d-period).days),default=None)
+            pair=by.get(nearest,{}) if nearest else pair
+        a,l=pair.get('total_assets'),pair.get('total_liabilities')
+        if a and l:
+            residual=float(a.value)-float(l.value)
+            if residual>0 and (abs(float(e.value)-residual)/residual>0.5 or float(e.value)/residual<0.01):
+                e.value=residual
+        if abs(float(e.value))<10_000_000:
+            scale_peers=[(abs((d-period).days),float(other['total_equity'].value)) for d,other in by.items() if d!=period and other.get('total_equity') and abs((d-period).days)<=370 and abs(float(other['total_equity'].value))>100_000_000]
+            if scale_peers:
+                peer=min(scale_peers)[1]
+                if peer/abs(float(e.value))>=100:
+                    e.value=peer
+    return items
 def validate_items(items):
     if not items:return items,'missing_line_items'
     currencies={('EGP' if 'EGP' in str(x.currency).upper() else str(x.currency).strip()) for x in items}
@@ -102,7 +125,13 @@ def main():
                     present={x.line_item for x in batch.financial_statement_line_items}
                     enrich={'total_equity','ebitda','dividend_per_share'}
                     for item in mu_batch.financial_statement_line_items:
-                        if item.line_item in enrich and item.line_item not in present and (item.line_item,item.period_end_date) not in existing:
+                        if item.line_item not in enrich: continue
+                        same=[x for x in batch.financial_statement_line_items if x.line_item==item.line_item and x.period_end_date==item.period_end_date]
+                        replace=not same
+                        if same and item.line_item=='total_equity':
+                            replace=any(abs(float(x.value))<10_000_000 and abs(float(item.value))>100_000_000 and abs(float(item.value))/max(abs(float(x.value)),1)>=100 for x in same)
+                        if replace:
+                            batch.financial_statement_line_items=[x for x in batch.financial_statement_line_items if not (x.line_item==item.line_item and x.period_end_date==item.period_end_date)]
                             batch.financial_statement_line_items.append(item)
                             present.add(item.line_item); source='stockanalysis+mubasher'
                 except Exception:
@@ -117,7 +146,7 @@ def main():
                 latest=max((x.period_end_date for x in batch.financial_statement_line_items),default=date.min)
                 from agx_research.financials.schema import FinancialStatementLineItem
                 batch.financial_statement_line_items.append(FinancialStatementLineItem(ticker=t,period_end_date=latest,period_type='ANNUAL',statement_type='BALANCE_SHEET',line_item='shares_outstanding',value=sh,currency='EGP'))
-            validated,validation_warning=validate_items(batch.financial_statement_line_items)
+            validated,validation_warning=validate_items(reconcile_balance_sheet_units(batch.financial_statement_line_items))
             sector=classify_sector(universe.get(t,''))
             diagnostics=model_gate_snapshot(validated,sh) if not validation_warning else {'available_fields':[],'model_gates':{}}
             earnings_quality=earnings_quality_snapshot(validated) if not validation_warning else {'status':'unknown'}

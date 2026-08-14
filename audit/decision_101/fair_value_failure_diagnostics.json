@@ -1,0 +1,1264 @@
+{
+  "rows": [
+    {
+      "ticker": "CNFN",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf",
+        "ddm"
+      ],
+      "ready_count": 6,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "MASR",
+      "sector": "Real Estate",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf",
+        "ddm"
+      ],
+      "ready_count": 6,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "SWDY",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf",
+        "ddm"
+      ],
+      "ready_count": 6,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "AFDI",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "AMER",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "AMIA",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ATQA",
+      "sector": "Materials",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ELSH",
+      "sector": "Real Estate",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "dcf",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "FWRY",
+      "sector": "Banks",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "GBCO",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "HDBK",
+      "sector": "Banks",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "dcf",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "HRHO",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ISPH",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "PHAR",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "RAYA",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "SDTI",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "TMGH",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "UEGC",
+      "sector": "Real Estate",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 5,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ARAB",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ASCM",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "BTFH",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "EGCH",
+      "sector": "Materials",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ISMA",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "KABO",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "KRDI",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "OCDI",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "TALM",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "VALU",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income",
+        "earnings_power"
+      ],
+      "ready_count": 4,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ADIB",
+      "sector": "Banks",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income"
+      ],
+      "ready_count": 3,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "AIHC",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 3,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ASPI",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income"
+      ],
+      "ready_count": 3,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "CCAP",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb",
+        "earnings_power",
+        "dcf"
+      ],
+      "ready_count": 3,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ECAP",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb",
+        "earnings_power",
+        "ddm"
+      ],
+      "ready_count": 3,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "dividend_per_share",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "EXPA",
+      "sector": "Banks",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income"
+      ],
+      "ready_count": 3,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "IDRE",
+      "sector": "Real Estate",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pe",
+        "pb",
+        "residual_income"
+      ],
+      "ready_count": 3,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "EGTS",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb",
+        "dcf"
+      ],
+      "ready_count": 2,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "MOED",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb",
+        "earnings_power"
+      ],
+      "ready_count": 2,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "SVCE",
+      "sector": "Materials",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb",
+        "dcf"
+      ],
+      "ready_count": 2,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "AIDC",
+      "sector": null,
+      "source": "mubasher",
+      "ready_models": [
+        "pb"
+      ],
+      "ready_count": 1,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents_change",
+        "eps_diluted",
+        "financing_cash_flow",
+        "gross_profit",
+        "investing_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "shares_outstanding",
+        "total_assets",
+        "total_equity",
+        "total_liabilities"
+      ]
+    },
+    {
+      "ticker": "COSG",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb"
+      ],
+      "ready_count": 1,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "DAPH",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb"
+      ],
+      "ready_count": 1,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "MPCO",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb"
+      ],
+      "ready_count": 1,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "OIH",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [
+        "pb"
+      ],
+      "ready_count": 1,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "ACTF",
+      "sector": null,
+      "source": "mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents_change",
+        "financing_cash_flow",
+        "gross_profit",
+        "investing_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "total_assets",
+        "total_equity",
+        "total_liabilities"
+      ]
+    },
+    {
+      "ticker": "ICFC",
+      "sector": "Materials",
+      "source": "mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents_change",
+        "financing_cash_flow",
+        "gross_profit",
+        "investing_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "total_assets",
+        "total_equity",
+        "total_liabilities"
+      ]
+    },
+    {
+      "ticker": "IEEC",
+      "sector": null,
+      "source": "mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents_change",
+        "financing_cash_flow",
+        "gross_profit",
+        "investing_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "total_assets",
+        "total_equity",
+        "total_liabilities"
+      ]
+    },
+    {
+      "ticker": "IFAP",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "future_period",
+      "fields": []
+    },
+    {
+      "ticker": "NIPH",
+      "sector": "Materials",
+      "source": "stockanalysis+mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "future_period",
+      "fields": []
+    },
+    {
+      "ticker": "ORAS",
+      "sector": null,
+      "source": "mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents_change",
+        "financing_cash_flow",
+        "gross_profit",
+        "investing_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "total_assets",
+        "total_equity",
+        "total_liabilities"
+      ]
+    },
+    {
+      "ticker": "PRCL",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents",
+        "eps_diluted",
+        "free_cash_flow",
+        "gross_profit",
+        "net_income",
+        "operating_cash_flow",
+        "operating_income",
+        "revenue",
+        "shares_outstanding",
+        "total_debt",
+        "total_equity"
+      ]
+    },
+    {
+      "ticker": "VLMR",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "mixed_currency",
+      "fields": []
+    },
+    {
+      "ticker": "VLMRA",
+      "sector": null,
+      "source": "mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "valuation_engine_insufficient_models_or_stale_period",
+      "fields": [
+        "cash_and_equivalents_change",
+        "financing_cash_flow",
+        "gross_profit",
+        "investing_cash_flow",
+        "net_income",
+        "operating_cash_flow",
+        "total_assets",
+        "total_equity",
+        "total_liabilities"
+      ]
+    },
+    {
+      "ticker": "ZEOT",
+      "sector": null,
+      "source": "stockanalysis+mubasher",
+      "ready_models": [],
+      "ready_count": 0,
+      "warning": "future_period",
+      "fields": []
+    }
+  ]
+}

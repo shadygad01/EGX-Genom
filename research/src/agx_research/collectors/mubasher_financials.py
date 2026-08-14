@@ -94,6 +94,33 @@ class MubasherFinancialsCollector(Collector):
                             value=value,
                             currency=currency,
                         ))
+        if batch.financial_statement_line_items:
+            # Mubasher may expose the same statement value twice: once in
+            # absolute EGP and once in thousands. Collapse only exact
+            # ticker/period/metric duplicates and choose the absolute-scale
+            # value when the ratio is approximately 1,000. Do not average
+            # conflicting accounting values.
+            grouped={}
+            balance_metrics={'total_assets','total_liabilities','total_equity'}
+            for item in batch.financial_statement_line_items:
+                period_key=None if item.line_item in balance_metrics else item.period_type
+                grouped.setdefault((item.line_item,item.period_end_date,period_key),[]).append(item)
+            deduped=[]
+            absolute_metrics={'total_assets','total_liabilities','total_equity','net_income','gross_profit','operating_cash_flow','cash_and_equivalents_change','investing_cash_flow','financing_cash_flow'}
+            for key,group in grouped.items():
+                if len(group)==1:
+                    deduped.append(group[0]); continue
+                vals=[abs(float(x.value)) for x in group if x.value not in (None,0)]
+                if vals and max(vals)/min(vals)>=900 and max(vals)/min(vals)<=1100:
+                    chosen=max(group,key=lambda x:abs(float(x.value))) if key[0] in absolute_metrics else min(group,key=lambda x:abs(float(x.value)))
+                    batch.parse_warnings.append(f"Collapsed Mubasher scale duplicate for {key[0]} {key[1]} using absolute-scale value.")
+                    deduped.append(chosen)
+                else:
+                    # Preserve the last disclosed record but expose the
+                    # conflict; downstream validation can reject it.
+                    batch.parse_warnings.append(f"Conflicting duplicate Mubasher values for {key[0]} {key[1]}.")
+                    deduped.append(group[-1])
+            batch.financial_statement_line_items=deduped
         if not batch.financial_statement_line_items:
             batch.parse_warnings.append("No mapped financial statement records found.")
         return batch

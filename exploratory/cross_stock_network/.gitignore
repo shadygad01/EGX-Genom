@@ -1,0 +1,10 @@
+raw/
+*_run.log
+*_pids.txt
+results/*_relationships.csv
+results/*_validation.csv
+results/*_leaders.csv
+results/*_behavior_clusters.csv
+results/summary.json
+results/summary_all_metrics.json
+results/summary_all_metrics_final.json

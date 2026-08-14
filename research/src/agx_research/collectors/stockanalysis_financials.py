@@ -28,6 +28,9 @@ _LABELS = {
     "total_debt": ("total debt", "total debt total debt growth"),
     "operating_cash_flow": ("operating cash flow", "operating cash flow operating cash flow growth"),
     "free_cash_flow": ("free cash flow", "free cash flow free cash flow growth"),
+    "ebitda": ("ebitda", "ebitda ebitda growth"),
+    "total_equity": ("total equity", "total equity total equity growth", "shareholders equity", "total shareholders equity"),
+    "dividend_per_share": ("dividend per share", "dividend per share dividend growth", "dividends per share"),
 }
 
 _DATE_RE = re.compile(r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ['’]?\d{2}\s+(?:[A-Z][a-z]{2})?\s*(\d{1,2}),\s*(\d{4})")
@@ -134,7 +137,7 @@ class StockAnalysisFinancialsCollector(Collector):
 
     @staticmethod
     def _statement_type(metric: str) -> str:
-        if metric in {"cash_and_equivalents", "total_debt"}:
+        if metric in {"cash_and_equivalents", "total_debt", "total_equity"}:
             return "BALANCE_SHEET"
         if metric in {"operating_cash_flow", "free_cash_flow"}:
             return "CASH_FLOW"

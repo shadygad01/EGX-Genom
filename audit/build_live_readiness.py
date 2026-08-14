@@ -46,8 +46,9 @@ def main():
                 # StockAnalysis explicitly labels these tables "Financials in millions EGP".
                 # EPS is already per-share and is not scaled; absolute financial items are.
                 for item in batch.financial_statement_line_items:
-                    if item.line_item=='eps_basic':item.line_item='eps_diluted'
-                    else:item.value*=1_000_000.0
+                    if item.line_item=='eps_basic': item.line_item='eps_diluted'
+                    elif item.line_item in {'eps_diluted','dividend_per_share','shares_outstanding'}: pass
+                    else: item.value*=1_000_000.0
             elif sh and batch.financial_statement_line_items and all('EGP' in str(item.currency) for item in batch.financial_statement_line_items):
                 # Transparent derived EPS only from disclosed net income and shares.
                 from agx_research.financials.schema import FinancialStatementLineItem

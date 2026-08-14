@@ -4,21 +4,21 @@
     "universe": 101,
     "coverage_101": 101,
     "action_counts": {
-      "sell": 17,
-      "abstain": 75,
-      "reduce": 3,
+      "sell": 26,
+      "abstain": 68,
+      "reduce": 1,
       "strong_buy": 3,
       "hold": 1,
       "buy": 1,
       "accumulate": 1
     },
     "reason_counts": {
-      "engine_action": 26,
+      "engine_action": 33,
       "missing_or_stale_price": 2,
-      "missing_fair_value": 73
+      "missing_fair_value": 66
     },
     "usable_price_count": 99,
-    "fair_value_count": 26,
+    "fair_value_count": 33,
     "note": "No fair values are fabricated; financial coverage alone does not create a valuation."
   },
   "rows": [
@@ -34,11 +34,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.647,
+      "confidence": 0.656,
       "current_price": 77.9,
-      "fair_value": 51.3803,
-      "upside_pct": -34.0,
-      "combined_expected_return": -0.3241
+      "fair_value": 49.0975,
+      "upside_pct": -37.0,
+      "combined_expected_return": -0.3534
     },
     {
       "ticker": "ACTF",
@@ -48,7 +48,7 @@
       "coverage_source": "mubasher",
       "financial_line_items": 98,
       "financial_periods": 8,
-      "price_bars": 0,
+      "price_bars": 21,
       "price_status": "missing_or_stale",
       "action": "abstain",
       "reason": "missing_or_stale_price",
@@ -160,11 +160,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.671,
+      "confidence": 0.68,
       "current_price": 31.9,
-      "fair_value": 18.545,
-      "upside_pct": -41.9,
-      "combined_expected_return": -0.4026
+      "fair_value": 17.5555,
+      "upside_pct": -45.0,
+      "combined_expected_return": -0.4336
     },
     {
       "ticker": "AMER",
@@ -216,9 +216,9 @@
       "reason": "engine_action",
       "confidence": 0.55,
       "current_price": 10.3,
-      "fair_value": 9.3908,
-      "upside_pct": -8.8,
-      "combined_expected_return": -0.0364
+      "fair_value": 8.7995,
+      "upside_pct": -14.6,
+      "combined_expected_return": -0.0938
     },
     {
       "ticker": "ARAB",
@@ -342,9 +342,9 @@
       "reason": "engine_action",
       "confidence": 0.6,
       "current_price": 521.01,
-      "fair_value": 16.9734,
-      "upside_pct": -96.7,
-      "combined_expected_return": 0.0155
+      "fair_value": 15.438,
+      "upside_pct": -97.0,
+      "combined_expected_return": 0.0125
     },
     {
       "ticker": "BTFH",
@@ -392,13 +392,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.606,
       "current_price": 24.46,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 19.794,
+      "upside_pct": -19.1,
+      "combined_expected_return": -0.1878
     },
     {
       "ticker": "CNFN",
@@ -464,13 +464,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.745,
       "current_price": 41.95,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 12.3941,
+      "upside_pct": -70.5,
+      "combined_expected_return": -0.6488
     },
     {
       "ticker": "DAPH",
@@ -518,13 +518,13 @@
       "financial_periods": 5,
       "price_bars": 270,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.697,
       "current_price": 36.3,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 18.5825,
+      "upside_pct": -48.8,
+      "combined_expected_return": -0.489
     },
     {
       "ticker": "ECAP",
@@ -556,11 +556,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.638,
+      "confidence": 0.661,
       "current_price": 32.7,
-      "fair_value": 21.9378,
-      "upside_pct": -32.9,
-      "combined_expected_return": -0.2937
+      "fair_value": 19.4924,
+      "upside_pct": -40.4,
+      "combined_expected_return": -0.3685
     },
     {
       "ticker": "EFIH",
@@ -592,11 +592,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.732,
+      "confidence": 0.742,
       "current_price": 332.52,
-      "fair_value": 124.1295,
-      "upside_pct": -62.7,
-      "combined_expected_return": -0.6079
+      "fair_value": 113.3413,
+      "upside_pct": -65.9,
+      "combined_expected_return": -0.6404
     },
     {
       "ticker": "EGCH",
@@ -716,13 +716,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.779,
       "current_price": 114.0,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 23.4528,
+      "upside_pct": -79.4,
+      "combined_expected_return": -0.7621
     },
     {
       "ticker": "ETRS",
@@ -734,13 +734,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.749,
       "current_price": 10.91,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 3.7023,
+      "upside_pct": -66.1,
+      "combined_expected_return": -0.6618
     },
     {
       "ticker": "EXPA",
@@ -842,13 +842,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.663,
       "current_price": 7.85,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 4.8835,
+      "upside_pct": -37.8,
+      "combined_expected_return": -0.3751
     },
     {
       "ticker": "HRHO",
@@ -912,7 +912,7 @@
       "coverage_source": "mubasher",
       "financial_line_items": 193,
       "financial_periods": 20,
-      "price_bars": 0,
+      "price_bars": 21,
       "price_status": "missing_or_stale",
       "action": "abstain",
       "reason": "missing_or_stale_price",
@@ -968,13 +968,13 @@
       "financial_periods": 4,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "reduce",
+      "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.55,
+      "confidence": 0.601,
       "current_price": 9.4,
-      "fair_value": 8.7242,
-      "upside_pct": -7.2,
-      "combined_expected_return": -0.075
+      "fair_value": 7.8339,
+      "upside_pct": -16.7,
+      "combined_expected_return": -0.1697
     },
     {
       "ticker": "ISPH",
@@ -1150,11 +1150,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.657,
+      "confidence": 0.666,
       "current_price": 39.91,
-      "fair_value": 25.2689,
-      "upside_pct": -36.7,
-      "combined_expected_return": -0.3568
+      "fair_value": 24.111,
+      "upside_pct": -39.6,
+      "combined_expected_return": -0.3858
     },
     {
       "ticker": "MOED",
@@ -1186,11 +1186,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.74,
+      "confidence": 0.742,
       "current_price": 374.0,
-      "fair_value": 95.1365,
-      "upside_pct": -74.6,
-      "combined_expected_return": -0.6346
+      "fair_value": 92.856,
+      "upside_pct": -75.2,
+      "combined_expected_return": -0.6407
     },
     {
       "ticker": "MPCO",
@@ -1402,11 +1402,11 @@
       "price_status": "usable",
       "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.674,
+      "confidence": 0.684,
       "current_price": 26.5,
-      "fair_value": 14.6507,
-      "upside_pct": -44.7,
-      "combined_expected_return": -0.4131
+      "fair_value": 13.7417,
+      "upside_pct": -48.1,
+      "combined_expected_return": -0.4474
     },
     {
       "ticker": "PHAR",
@@ -1526,13 +1526,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.798,
       "current_price": 6.49,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 0.7177,
+      "upside_pct": -88.9,
+      "combined_expected_return": -0.8272
     },
     {
       "ticker": "SCEM",
@@ -1778,13 +1778,13 @@
       "financial_periods": 5,
       "price_bars": 117,
       "price_status": "usable",
-      "action": "reduce",
+      "action": "sell",
       "reason": "engine_action",
-      "confidence": 0.55,
+      "confidence": 0.601,
       "current_price": 0.708,
-      "fair_value": 0.6309,
-      "upside_pct": -10.9,
-      "combined_expected_return": -0.0947
+      "fair_value": 0.5779,
+      "upside_pct": -18.4,
+      "combined_expected_return": -0.1695
     },
     {
       "ticker": "VLMRA",
@@ -1814,13 +1814,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "sell",
-      "reason": "engine_action",
-      "confidence": 0.8,
+      "action": "abstain",
+      "reason": "missing_fair_value",
+      "confidence": 0.0,
       "current_price": 13.61,
-      "fair_value": 0.1445,
-      "upside_pct": -98.9,
-      "combined_expected_return": -0.9581
+      "fair_value": null,
+      "upside_pct": null,
+      "combined_expected_return": null
     },
     {
       "ticker": "ZMID",
@@ -1832,13 +1832,13 @@
       "financial_periods": 5,
       "price_bars": 272,
       "price_status": "usable",
-      "action": "abstain",
-      "reason": "missing_fair_value",
-      "confidence": 0.0,
+      "action": "sell",
+      "reason": "engine_action",
+      "confidence": 0.706,
       "current_price": 7.68,
-      "fair_value": null,
-      "upside_pct": null,
-      "combined_expected_return": null
+      "fair_value": 3.6112,
+      "upside_pct": -53.0,
+      "combined_expected_return": -0.5188
     }
   ]
 }

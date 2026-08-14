@@ -1,7 +1,7 @@
 {
   "as_of": "2026-08-14",
   "universe": 101,
-  "fair_value_ready": 25,
+  "fair_value_ready": 26,
   "rows": [
     {
       "ticker": "ABUK",
@@ -36,11 +36,11 @@
     },
     {
       "ticker": "ACTF",
-      "source": "stockanalysis",
-      "line_items": 0,
+      "source": "mubasher",
+      "line_items": 98,
       "shares_outstanding": null,
       "fair_value": null,
-      "warning": "HTTPError: HTTP Error 404: Not Found"
+      "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "ADIB",
@@ -68,11 +68,11 @@
     },
     {
       "ticker": "AIDC",
-      "source": "stockanalysis",
-      "line_items": 0,
-      "shares_outstanding": null,
+      "source": "mubasher",
+      "line_items": 17,
+      "shares_outstanding": 1558128698.0,
       "fair_value": null,
-      "warning": "HTTPError: HTTP Error 404: Not Found"
+      "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "AIHC",
@@ -657,11 +657,11 @@
     },
     {
       "ticker": "ICFC",
-      "source": "stockanalysis",
-      "line_items": 0,
+      "source": "mubasher",
+      "line_items": 179,
       "shares_outstanding": null,
       "fair_value": null,
-      "warning": "HTTPError: HTTP Error 404: Not Found"
+      "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "IDRE",
@@ -673,11 +673,11 @@
     },
     {
       "ticker": "IEEC",
-      "source": "stockanalysis",
-      "line_items": 0,
+      "source": "mubasher",
+      "line_items": 193,
       "shares_outstanding": null,
       "fair_value": null,
-      "warning": "HTTPError: HTTP Error 404: Not Found"
+      "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "IFAP",
@@ -1011,11 +1011,11 @@
     },
     {
       "ticker": "ORAS",
-      "source": "stockanalysis",
-      "line_items": 0,
+      "source": "mubasher",
+      "line_items": 203,
       "shares_outstanding": null,
       "fair_value": null,
-      "warning": "HTTPError: HTTP Error 404: Not Found"
+      "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "ORHD",
@@ -1262,11 +1262,34 @@
     },
     {
       "ticker": "TANM",
-      "source": "stockanalysis",
-      "line_items": 0,
-      "shares_outstanding": null,
-      "fair_value": null,
-      "warning": "HTTPError: HTTP Error 404: Not Found"
+      "source": "mubasher",
+      "line_items": 208,
+      "shares_outstanding": 145500000.0,
+      "fair_value": {
+        "ticker": "TANM",
+        "as_of": "2026-08-14",
+        "weighted_fair_value": 1.6648,
+        "bear_case": 0.9989,
+        "base_case": 1.6648,
+        "bull_case": 2.2315,
+        "models": {
+          "dcf": null,
+          "ddm": null,
+          "residual_income": 0.9475,
+          "earnings_power": null,
+          "ev_ebitda": null,
+          "pe": 2.2315,
+          "pb": 2.174
+        },
+        "included_models": [
+          "pb",
+          "pe",
+          "residual_income"
+        ],
+        "latest_period": "2025-06-30",
+        "assumptions_version": "smartlist-ive-v2.2"
+      },
+      "warning": null
     },
     {
       "ticker": "TAQA",
@@ -1341,11 +1364,11 @@
     },
     {
       "ticker": "VLMRA",
-      "source": "stockanalysis",
-      "line_items": 0,
+      "source": "mubasher",
+      "line_items": 170,
       "shares_outstanding": null,
       "fair_value": null,
-      "warning": "HTTPError: HTTP Error 404: Not Found"
+      "warning": "valuation_engine_insufficient_models_or_stale_period"
     },
     {
       "ticker": "ZEOT",
@@ -1387,5 +1410,5 @@
       "warning": "valuation_engine_insufficient_models_or_stale_period"
     }
   ],
-  "note": "Only computed FairValueEngine results are included; no fair value is derived from price."
+  "note": "StockAnalysis primary with Mubasher fallback; only computed FairValueEngine results are included; no fair value is derived from price."
 }

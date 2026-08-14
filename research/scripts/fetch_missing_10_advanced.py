@@ -137,34 +137,25 @@ def try_tradingview_udf(ticker):
 # SOURCE 2: StockAnalysis.com
 # ─────────────────────────────────────────────────────────────────
 def try_stockanalysis_com(ticker):
-    """StockAnalysis.com has EGX stocks."""
-    # Try their API endpoint
-    url = f"https://stockanalysis.com/stocks/egx/{ticker.lower()}/history/?p=annual"
+    """StockAnalysis daily history page; parse its embedded S&P data object."""
+    url = f"https://stockanalysis.com/quote/egx/{ticker}/history/"
     data, status = http_get(url)
     if data and status == 200:
         text = data.decode("utf-8", errors="ignore")
-        # Look for JSON data embedded in page
-        match = re.search(r'"historicalPrices":\s*(\[.*?\])', text, re.DOTALL)
-        if not match:
-            match = re.search(r'"data":\s*(\[.*?\])', text, re.DOTALL)
-        if match:
+        # The page embeds rows as {a:adjusted,c:close,h:high,l:low,o:open,t:"YYYY-MM-DD",v:volume}.
+        rows = re.findall(r'\{a:([^,]+),c:([^,]+),h:([^,]+),l:([^,]+),o:([^,]+),t:"(\d{4}-\d{2}-\d{2})",v:([^,}]+)', text)
+        bars=[]
+        for a,c,h,l,o,t,v in rows:
             try:
-                prices = json.loads(match.group(1))
-                bars = []
-                for item in prices:
-                    if isinstance(item, dict) and item.get("close"):
-                        bars.append({
-                            "date": str(item.get("date", ""))[:10],
-                            "open": item.get("open"), "high": item.get("high"),
-                            "low": item.get("low"), "close": round(float(item["close"]), 4),
-                            "volume": item.get("volume", 0)
-                        })
-                if bars:
-                    return bars, "StockAnalysis"
-            except Exception:
-                pass
+                bars.append({'date':t,'open':round(float(o),4),'high':round(float(h),4),'low':round(float(l),4),'close':round(float(c),4),'volume':int(float(v))})
+            except (TypeError,ValueError):
+                continue
+        if len(bars)>=3:
+            # embedded data is newest first; normalize chronological order and de-duplicate dates.
+            dedup={b['date']:b for b in bars}
+            return [dedup[k] for k in sorted(dedup)], 'StockAnalysisHistory'
     time.sleep(0.5)
-    return None, "StockAnalysis:FAIL"
+    return None, 'StockAnalysis:FAIL'
 
 # ─────────────────────────────────────────────────────────────────
 # SOURCE 3: Investing.com via their API (with proper headers)

@@ -3,13 +3,13 @@
   "trend": "bullish",
   "volatility": "high",
   "lookback_days": 20,
-  "trading_days_observed": 91,
-  "tickers_with_sufficient_data": 91,
-  "cumulative_return_pct": 22.59,
-  "daily_volatility_pct": 52.64,
+  "trading_days_observed": 99,
+  "tickers_with_sufficient_data": 99,
+  "cumulative_return_pct": 21.64,
+  "daily_volatility_pct": 51.55,
   "reasons": [
-    "69% of stocks with price data showing positive 20-day momentum",
-    "14% in downtrend",
-    "Average 20-day return: 22.6%"
+    "72% of stocks with price data showing positive 20-day momentum",
+    "13% in downtrend",
+    "Average 20-day return: 21.6%"
   ]
 }

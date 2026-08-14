@@ -33,6 +33,72 @@
     }
   },
   {
+    "ticker": "GPIM",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.8,
+    "combined_expected_return": -0.9272,
+    "combined_expected_risk": 0.3784,
+    "current_price": 1.24,
+    "fair_value": 0.0637,
+    "upside_pct": -94.9,
+    "explanation": {
+      "why_this_stock": "GPIM: Fair value 0.06 EGP vs current 1.24 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+10.7%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (1.24 EGP) is 94.9% above fair value (0.06 EGP); Price (1.24) significantly above bear-case (0.05) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+10.7%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (1.24 EGP) is 94.9% above fair value (0.06 EGP)",
+        "Price (1.24) significantly above bear-case (0.05) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "TANM",
+    "as_of": "2026-08-14",
+    "action": "sell",
+    "horizon": "investment",
+    "confidence": 0.766,
+    "combined_expected_return": -0.7208,
+    "combined_expected_risk": 0.4231,
+    "current_price": 6.98,
+    "fair_value": 1.6648,
+    "upside_pct": -76.1,
+    "explanation": {
+      "why_this_stock": "TANM: Fair value 1.66 EGP vs current 6.98 EGP Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+20.3%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "Current price (6.98 EGP) is 76.1% above fair value (1.66 EGP); Price (6.98) significantly above bear-case (1.00) — limited downside protection",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+20.3%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (6.98 EGP) is 76.1% above fair value (1.66 EGP)",
+        "Price (6.98) significantly above bear-case (1.00) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
     "ticker": "EFIH",
     "as_of": "2026-08-14",
     "action": "sell",
@@ -623,6 +689,40 @@
     }
   },
   {
+    "ticker": "VLMR",
+    "as_of": "2026-08-14",
+    "action": "reduce",
+    "horizon": "swing",
+    "confidence": 0.55,
+    "combined_expected_return": -0.0947,
+    "combined_expected_risk": 0.1395,
+    "current_price": 0.708,
+    "fair_value": 0.6309,
+    "upside_pct": -10.9,
+    "explanation": {
+      "why_this_stock": "VLMR: Fair value 0.63 EGP vs current 0.71 EGP Based on 5 financial reporting periods.",
+      "why_now": "Bull-case fair value 1.01 EGP implies 43% upside; Strong 20-day momentum (+7.1%)",
+      "why_not_others": "Current price (0.71 EGP) is 10.9% above fair value (0.63 EGP); Price (0.71) significantly above bear-case (0.38) — limited downside protection",
+      "supporting_evidence": [
+        "Bull-case fair value 1.01 EGP implies 43% upside",
+        "Strong 20-day momentum (+7.1%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [
+        "Current price (0.71 EGP) is 10.9% above fair value (0.63 EGP)",
+        "Price (0.71) significantly above bear-case (0.38) — limited downside protection"
+      ],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": true,
+      "financial_periods": 5
+    }
+  },
+  {
     "ticker": "ISMQ",
     "as_of": "2026-08-14",
     "action": "reduce",
@@ -839,6 +939,63 @@
     "data_quality": {
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "AIDC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.4462,
+    "current_price": 0.704,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "AIDC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "No strong catalyst identified",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "AIHC",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.479,
+    "current_price": 0.51,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "AIHC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+6.9%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+6.9%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
+      "latest_price_date": "2026-08-13",
       "has_fair_value": false,
       "financial_periods": 5
     }
@@ -1699,7 +1856,7 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ICFC: technical analysis only (no fair value available)",
+      "why_this_stock": "ICFC: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
       "why_now": "Strong 20-day momentum (+12.8%); Price above SMA-20 and SMA-50 — trend intact",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [
@@ -1714,7 +1871,7 @@
       "price_bars": 272,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 0
+      "financial_periods": 5
     }
   },
   {
@@ -1892,6 +2049,36 @@
     "data_quality": {
       "price_bars": 270,
       "latest_price_date": "2026-08-12",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "KRDI",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.6461,
+    "current_price": 0.457,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "KRDI: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Strong 20-day momentum (+28.4%); Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Strong 20-day momentum (+28.4%)",
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
+      "latest_price_date": "2026-08-13",
       "has_fair_value": false,
       "financial_periods": 5
     }
@@ -2263,7 +2450,7 @@
     "fair_value": null,
     "upside_pct": null,
     "explanation": {
-      "why_this_stock": "ORAS: technical analysis only (no fair value available)",
+      "why_this_stock": "ORAS: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
       "why_now": "No strong catalyst identified",
       "why_not_others": "No major contrary indicator",
       "supporting_evidence": [],
@@ -2275,7 +2462,7 @@
       "price_bars": 275,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
-      "financial_periods": 0
+      "financial_periods": 5
     }
   },
   {
@@ -2604,6 +2791,35 @@
     }
   },
   {
+    "ticker": "TAQA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.2416,
+    "current_price": 15.42,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "TAQA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
     "ticker": "TMGH",
     "as_of": "2026-08-14",
     "action": "abstain",
@@ -2714,6 +2930,35 @@
     },
     "data_quality": {
       "price_bars": 276,
+      "latest_price_date": "2026-08-13",
+      "has_fair_value": false,
+      "financial_periods": 5
+    }
+  },
+  {
+    "ticker": "VLMRA",
+    "as_of": "2026-08-14",
+    "action": "abstain",
+    "horizon": "investment",
+    "confidence": 0.0,
+    "combined_expected_return": null,
+    "combined_expected_risk": 0.3862,
+    "current_price": 31.11,
+    "fair_value": null,
+    "upside_pct": null,
+    "explanation": {
+      "why_this_stock": "VLMRA: technical analysis only (no fair value available) Based on 5 financial reporting periods.",
+      "why_now": "Price above SMA-20 and SMA-50 — trend intact",
+      "why_not_others": "No major contrary indicator",
+      "supporting_evidence": [
+        "Price above SMA-20 and SMA-50 — trend intact"
+      ],
+      "invalidation_conditions": [],
+      "similar_historical_cases": [],
+      "evidence_refs": []
+    },
+    "data_quality": {
+      "price_bars": 117,
       "latest_price_date": "2026-08-13",
       "has_fair_value": false,
       "financial_periods": 5

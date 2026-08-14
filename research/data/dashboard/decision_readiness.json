@@ -40,9 +40,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "HTTPError: HTTP Error 404: Not Found"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -100,9 +100,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "HTTPError: HTTP Error 404: Not Found"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -939,9 +939,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "HTTPError: HTTP Error 404: Not Found"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -969,9 +969,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "HTTPError: HTTP Error 404: Not Found"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -1458,9 +1458,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "HTTPError: HTTP Error 404: Not Found"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"
@@ -1804,17 +1804,36 @@
   {
     "ticker": "TANM",
     "as_of": "2026-08-14",
-    "status": "blocked",
-    "decision": "abstain",
-    "fair_value_available": false,
-    "valuation": null,
-    "financial_periods": 0,
-    "blockers": [
-      "HTTPError: HTTP Error 404: Not Found"
-    ],
-    "next_actions": [
-      "Acquire/validate missing financial or price evidence"
-    ]
+    "status": "ready",
+    "decision": "invest",
+    "fair_value_available": true,
+    "valuation": {
+      "ticker": "TANM",
+      "as_of": "2026-08-14",
+      "weighted_fair_value": 1.6648,
+      "bear_case": 0.9989,
+      "base_case": 1.6648,
+      "bull_case": 2.2315,
+      "models": {
+        "dcf": null,
+        "ddm": null,
+        "residual_income": 0.9475,
+        "earnings_power": null,
+        "ev_ebitda": null,
+        "pe": 2.2315,
+        "pb": 2.174
+      },
+      "included_models": [
+        "pb",
+        "pe",
+        "residual_income"
+      ],
+      "latest_period": "2025-06-30",
+      "assumptions_version": "smartlist-ive-v2.2"
+    },
+    "financial_periods": 5,
+    "blockers": [],
+    "next_actions": []
   },
   {
     "ticker": "TAQA",
@@ -1932,9 +1951,9 @@
     "decision": "abstain",
     "fair_value_available": false,
     "valuation": null,
-    "financial_periods": 0,
+    "financial_periods": 5,
     "blockers": [
-      "HTTPError: HTTP Error 404: Not Found"
+      "valuation_engine_insufficient_models_or_stale_period"
     ],
     "next_actions": [
       "Acquire/validate missing financial or price evidence"

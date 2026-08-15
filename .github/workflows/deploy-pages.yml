@@ -200,9 +200,15 @@ jobs:
           # publication on a code-only deploy; the next scheduled live run
           # replaces them with fresh market data.
           snapshot_base="https://shadygad01.github.io/EGX-Genom/data"
+          # Preserve every artifact consumed by StaticJsonProvider, not only
+          # the validator minimum. Missing files cause silent empty dashboard
+          # panels for warnings, committee, portfolio, breadth, and regime.
           for artifact in market_state.json universe.json patterns.json \
             decision_performance.json decision_history.json system_maturity.json \
-            financial_statements.json financial_coverage.json; do
+            financial_statements.json financial_coverage.json warnings.json \
+            committee_summary.json portfolio_summary.json shadow_fund.json \
+            shadow_fund_history.json market_breadth.json market_regime.json \
+            decision_readiness.json dashboard_metrics.json mission_status.json; do
             if [ ! -f "../web/public/data/$artifact" ]; then
               curl --fail --silent --show-error --location --retry 2 --connect-timeout 10 \
                 "$snapshot_base/$artifact" -o "../web/public/data/$artifact"

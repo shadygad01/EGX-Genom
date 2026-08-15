@@ -165,6 +165,27 @@ export function CIODesk() {
       }));
   }, [liveDecisions, investmentCases.data, companyNames]);
 
+  const executionCandidates = useMemo(() => {
+    const recommendations = investmentCases.data?.recommendations ?? [];
+    const prices = marketState.data?.dataset_snapshot.price_history ?? {};
+    return recommendations
+      .map((recommendation) => {
+        const decision = recommendation.horizon_decisions?.investment;
+        const latestBar = prices[recommendation.ticker]?.at(-1);
+        const actionable = decision?.action === "buy_candidate" && decision.publication_status === "publication_ready";
+        const blocker = decision?.abstention_reasons?.[0]
+          ?? (decision?.publication_status === "research_only" ? t("executionDesk.researchOnly") : decision?.action ?? t("executionDesk.whyNot"));
+        return { recommendation, decision, latestBar, actionable, blocker };
+      })
+      .sort((a, b) => {
+        if (a.actionable !== b.actionable) return a.actionable ? -1 : 1;
+        return (b.decision?.risk_adjusted_score ?? -Infinity) - (a.decision?.risk_adjusted_score ?? -Infinity);
+      });
+  }, [investmentCases.data, marketState.data, t]);
+
+  const actionableCandidates = executionCandidates.filter((candidate) => candidate.actionable).slice(0, 8);
+  const blockedCandidates = executionCandidates.filter((candidate) => !candidate.actionable).slice(0, 8);
+
   // Holdings were entered but the live backend itself is unavailable (the
   // static deployment) vs. no holdings entered yet -- two different blockers,
   // so the per-card empty state must say which one actually applies.
@@ -197,6 +218,92 @@ export function CIODesk() {
           </div>
         )}
       </Card>
+
+      <Section title={t("executionDesk.title")} description={t("executionDesk.description")}>
+        <Card title={t("executionDesk.actionable")} subtitle={t("executionDesk.staleData")}>
+          {actionableCandidates.length === 0 ? (
+            <EmptyState title={t("executionDesk.noActionable")} />
+          ) : (
+            <DataTable
+              rows={actionableCandidates}
+              getRowKey={(row) => row.recommendation.ticker}
+              onRowClick={(row) => navigate(`/cases/${row.recommendation.ticker}`)}
+              columns={[
+                {
+                  key: "ticker",
+                  header: tCommon("table.ticker"),
+                  render: (row) => <span className={`${styles.tickerCode} num`}>{row.recommendation.ticker}</span>,
+                },
+                {
+                  key: "action",
+                  header: tCommon("table.decision"),
+                  render: (row) => <Badge variant="positive">{titleCase(row.decision?.action ?? "buy_candidate")}</Badge>,
+                },
+                {
+                  key: "price",
+                  header: t("executionDesk.referencePrice"),
+                  align: "right",
+                  render: (row) => <span className="num">{row.latestBar?.close != null ? row.latestBar.close.toFixed(2) : "—"}</span>,
+                },
+                {
+                  key: "return",
+                  header: tCommon("table.expectedReturn"),
+                  align: "right",
+                  render: (row) => <span className="num">{formatSignedPercent(row.decision?.expected_return ?? 0)}</span>,
+                },
+                {
+                  key: "confidence",
+                  header: tCommon("table.confidence"),
+                  render: (row) => <Meter value={row.decision?.confidence ?? 0} label={formatPercent(row.decision?.confidence ?? 0)} />,
+                },
+                {
+                  key: "entry",
+                  header: t("executionDesk.entry"),
+                  render: (row) => <span className={styles.thesisCell}>{row.decision?.entry_condition ?? "—"}</span>,
+                },
+                {
+                  key: "review",
+                  header: t("executionDesk.review"),
+                  render: (row) => <span className="num">{row.decision?.valid_until ?? "—"}</span>,
+                },
+              ]}
+            />
+          )}
+        </Card>
+        <Card title={t("executionDesk.blocked")} subtitle={t("executionDesk.blockedDetail")}>
+          {blockedCandidates.length === 0 ? (
+            <EmptyState title={t("executionDesk.noBlockers")} />
+          ) : (
+            <DataTable
+              rows={blockedCandidates}
+              getRowKey={(row) => row.recommendation.ticker}
+              onRowClick={(row) => navigate(`/cases/${row.recommendation.ticker}`)}
+              columns={[
+                {
+                  key: "ticker",
+                  header: tCommon("table.ticker"),
+                  render: (row) => <span className={`${styles.tickerCode} num`}>{row.recommendation.ticker}</span>,
+                },
+                {
+                  key: "action",
+                  header: tCommon("table.decision"),
+                  render: (row) => <Badge variant="warning">{titleCase(row.decision?.action ?? "abstain")}</Badge>,
+                },
+                {
+                  key: "reason",
+                  header: t("executionDesk.whyNot"),
+                  render: (row) => <span className={styles.riskCell}>{row.blocker}</span>,
+                },
+                {
+                  key: "review",
+                  header: t("executionDesk.review"),
+                  render: (row) => <span className="num">{row.decision?.valid_until ?? "—"}</span>,
+                },
+              ]}
+            />
+          )}
+        </Card>
+      </Section>
 
       {!hasPositions && (
         <Card title={t("holdingsCta.title")} className={styles.holdingsCta}>

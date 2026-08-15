@@ -23,6 +23,22 @@
     "largestRisk": "Largest Risk",
     "notAssessed": "Not assessed"
   },
+  "executionDesk": {
+    "title": "Fund Manager Action Queue",
+    "description": "What is actionable, what is blocked, and what must be reviewed before capital is deployed.",
+    "actionable": "Actionable candidates",
+    "blocked": "Blocked candidates",
+    "referencePrice": "Reference",
+    "entry": "Entry condition",
+    "invalidation": "Invalidation",
+    "review": "Review",
+    "whyNot": "Why not execute",
+    "noActionable": "No candidate currently clears the execution gate.",
+    "blockedDetail": "Blocked decisions remain visible with their actual evidence or execution blocker.",
+    "noBlockers": "No blocked candidates in the published set.",
+    "staleData": "Data freshness must be checked before any live order.",
+    "researchOnly": "Research signal — not an executable order"
+  },
   "capitalAllocation": {
     "title": "Capital Allocation",
     "description": "Is this the best use of my capital available today?",

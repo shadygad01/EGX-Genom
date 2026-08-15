@@ -214,7 +214,7 @@ export function Portfolio() {
 
       {loading && <LoadingState rows={4} />}
 
-      {!loading && unavailable && <EmptyState title={t("unavailable.title")} detail={error?.message} icon="⛔" />}
+      {!loading && unavailable && <EmptyState title={t("unavailable.title")} detail={t("unavailable.detail")} icon="⛔" />}
 
       {!loading && error && !unavailable && (
         <ErrorState detail={error.message} onRetry={() => runDecide(rows)} />

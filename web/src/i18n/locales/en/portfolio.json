@@ -15,7 +15,8 @@
     "getFlatRead": "Get a flat-portfolio read (no positions held)"
   },
   "unavailable": {
-    "title": "Portfolio needs a live backend"
+    "title": "Personalized decisions unavailable: live backend required",
+    "detail": "Decisions that depend on your current holdings require an operational decision service. Market data, research, and public portfolio views remain available here; no personalized decision is produced without a secure decision-service connection."
   },
   "summary": {
     "title": "Portfolio Summary",

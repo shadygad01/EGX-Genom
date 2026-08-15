@@ -115,7 +115,11 @@ jobs:
           # valid for the schedule trigger; applying it to pushes previously
           # left Pages serving old code and old recommendations indefinitely.
           if [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
-            if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.force_live || 'false' }}" = "true" ]; then
+            # Pushes are code-only publications: rebuild the UI over the last
+            # validated snapshot even when today's live run already succeeded.
+            # They never execute live collection, so this cannot duplicate a
+            # research day or mutate production state.
+            if [ "$GITHUB_EVENT_NAME" = "push" ] || ([ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.force_live || 'false' }}" = "true" ]); then
               echo "already_ran=false" >> "$GITHUB_OUTPUT"
             else
               echo "already_ran=true" >> "$GITHUB_OUTPUT"
@@ -209,20 +213,11 @@ jobs:
             # public snapshot; publish an honest empty research-only table.
             printf '[]\n' > ../web/public/data/research_candidates.json
           fi
-          # Mark this code-only publication truthfully. It reuses persisted
-          # state; it is not a fresh live collection and must never pass the
-          # canonical-production provenance check as if it were one.
-          jq -n \
-            --arg generated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --arg git_commit "$GITHUB_SHA" \
-            --arg workflow_run_id "$GITHUB_RUN_ID" \
-            --arg workflow_name "$GITHUB_WORKFLOW" \
-            --arg repository "$GITHUB_REPOSITORY" \
-            '{generated_at:$generated_at, pipeline_mode:"replay", git_commit:$git_commit,
-              workflow_run_id:$workflow_run_id, workflow_name:$workflow_name,
-              repository:$repository, generator_version:"code-push-snapshot",
-              source_data_as_of:null, schema_version:"1"}' \
-            > ../web/public/data/manifest.json
+          # Preserve the last validated live manifest. This publication changes
+          # only frontend code; it must not relabel verified live data as replay
+          # or fabricate a new source_data_as_of date.
+          curl --fail --silent --show-error --location --retry 2 --connect-timeout 10 \
+            "$snapshot_base/manifest.json" -o ../web/public/data/manifest.json
 
       # Today already has a SUCCEEDED run in the persisted state (see the
       # check above, e.g. this workflow's own `schedule` trigger and a

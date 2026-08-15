@@ -13,8 +13,22 @@
   },
   "sectorComposition": {
     "title": "Sector Composition",
-    "subtitle": "Covered constituents with known sectors",
-    "emptyTitle": "No sector data yet"
+    "subtitle": "All covered constituents grouped by known sector",
+    "emptyTitle": "No sector data yet",
+    "coverage": "{{classified}} of {{universe}} constituents have a sourced sector; {{unclassified}} remain explicitly unclassified",
+    "unclassified": "Unclassified (source gap)"
+  },
+  "dataFreshness": {
+    "title": "Data Freshness & Execution Eligibility",
+    "subtitle": "A research snapshot is not an intraday execution quote",
+    "snapshotDate": "Market snapshot",
+    "age": "Snapshot age",
+    "status": "Status",
+    "researchOnly": "Research-only snapshot",
+    "blocked": "Execution blocked: stale snapshot",
+    "reviewBeforeExecution": "Verify a fresh tradable-session price and liquidity before any live order.",
+    "notEligible": "Live execution is blocked by freshness until the market snapshot is within one day of the current date.",
+    "days": "{{count}} day(s)"
   },
   "macroDashboard": {
     "title": "Macro Dashboard",

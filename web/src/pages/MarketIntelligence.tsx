@@ -27,10 +27,19 @@ export function MarketIntelligence() {
 
   const sectors = marketState.data?.sectors ?? {};
   const constituents = marketState.data?.constituents ?? {};
+  const universeTickers = Object.keys(constituents).sort();
+  const classifiedTickers = new Set(Object.keys(sectors));
+  const unclassifiedTickers = universeTickers.filter((ticker) => !classifiedTickers.has(ticker));
   const bySector = new Map<string, string[]>();
-  for (const [ticker, sector] of Object.entries(sectors)) {
-    bySector.set(sector, [...(bySector.get(sector) ?? []), ticker]);
+  for (const ticker of universeTickers) {
+    const sector = sectors[ticker];
+    if (sector) bySector.set(sector, [...(bySector.get(sector) ?? []), ticker]);
   }
+  const marketAsOf = marketState.data?.as_of ?? null;
+  const snapshotAgeDays = marketAsOf
+    ? Math.max(0, Math.floor((Date.now() - new Date(`${marketAsOf}T00:00:00Z`).getTime()) / 86_400_000))
+    : null;
+  const freshnessEligible = snapshotAgeDays !== null && snapshotAgeDays <= 1;
 
   const latestMacro: { seriesId: string; observation: MacroObservation | null }[] = Object.entries(
     marketState.data?.dataset_snapshot.macro_series ?? {},
@@ -75,18 +84,50 @@ export function MarketIntelligence() {
         )}
       </Section>
 
+      {marketState.data && (
+        <Card title={t("dataFreshness.title")} subtitle={t("dataFreshness.subtitle")}>
+          <div className={styles.grid}>
+            <StatTile label={t("dataFreshness.snapshotDate")} value={formatDate(marketState.data.as_of)} />
+            <StatTile
+              label={t("dataFreshness.age")}
+              value={snapshotAgeDays === null ? "—" : t("dataFreshness.days", { count: snapshotAgeDays })}
+            />
+            <StatTile
+              label={t("dataFreshness.status")}
+              value={t(freshnessEligible ? "dataFreshness.researchOnly" : "dataFreshness.blocked")}
+            />
+          </div>
+          <p className={styles.footnote}>
+            {freshnessEligible ? t("dataFreshness.reviewBeforeExecution") : t("dataFreshness.notEligible")}
+          </p>
+        </Card>
+      )}
+
       <div className={styles.twoCol}>
         <Card title={t("sectorComposition.title")} subtitle={t("sectorComposition.subtitle")}>
           {bySector.size === 0 ? (
             <EmptyState title={t("sectorComposition.emptyTitle")} />
           ) : (
             <div>
-              {[...bySector.entries()].map(([sector, tickers]) => (
+              {[...bySector.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([sector, tickers]) => (
                 <div key={sector} className={styles.sectorRow}>
                   <span className={styles.sectorName}>{sector}</span>
                   <span className={`${styles.sectorTickers} num`}>{tickers.join(", ")}</span>
                 </div>
               ))}
+              {unclassifiedTickers.length > 0 && (
+                <div className={styles.sectorRow}>
+                  <span className={styles.sectorName}>{t("sectorComposition.unclassified")}</span>
+                  <span className={`${styles.sectorTickers} num`}>{unclassifiedTickers.join(", ")}</span>
+                </div>
+              )}
+              <p className={styles.footnote}>
+                {t("sectorComposition.coverage", {
+                  classified: classifiedTickers.size,
+                  universe: universeTickers.length,
+                  unclassified: unclassifiedTickers.length,
+                })}
+              </p>
             </div>
           )}
         </Card>

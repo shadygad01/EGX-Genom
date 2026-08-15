@@ -1,0 +1,56 @@
+{
+  "schema_version": "1",
+  "policy": "A core research module must declare its question, output, uncertainty, validation status, consumer, freshness, and failure mode before production promotion.",
+  "modules": [
+    {
+      "id": "fundamentals",
+      "question": "Is the long-horizon investment thesis supported by reported economics?",
+      "output": "financial evidence and valuation inputs",
+      "uncertainty": "period, unit, currency, and source coverage limitations",
+      "validation_status": "production_contract_validated",
+      "downstream_consumer": "fair_value_and_investment_recommendation",
+      "freshness": "latest reported fiscal period, point-in-time",
+      "failure_mode": "abstain_when_required_periods_or_usable_items_are_missing"
+    },
+    {
+      "id": "price_liquidity",
+      "question": "Can the security be traded with acceptable execution risk?",
+      "output": "price history, liquidity, and tradability evidence",
+      "uncertainty": "public daily data does not observe order-level depth",
+      "validation_status": "production_contract_validated",
+      "downstream_consumer": "readiness_liquidity_and_capital_allocation",
+      "freshness": "latest available market session",
+      "failure_mode": "block_or_abstain_when_price_or_tradability_is_invalid"
+    },
+    {
+      "id": "macro_regime",
+      "question": "What market and country-risk posture should constrain exposure?",
+      "output": "macro overlay and country-risk context",
+      "uncertainty": "correlation is not a ticker-specific causal forecast",
+      "validation_status": "secondary_context",
+      "downstream_consumer": "exposure_overlay_and_risk_explanation",
+      "freshness": "series-specific as-of date and lookback",
+      "failure_mode": "omit_overlay_when_series_are_stale_or_insufficient"
+    },
+    {
+      "id": "events_news",
+      "question": "Did a material dated event confirm, contradict, or invalidate the thesis?",
+      "output": "attributed event evidence and monitoring trigger",
+      "uncertainty": "duplicate reports and incomplete event-time knowledge",
+      "validation_status": "production_with_provenance",
+      "downstream_consumer": "catalysts_risks_and_monitoring",
+      "freshness": "publication and event timestamps with expiry",
+      "failure_mode": "classify_as_context_or_exclude_when_no_decision_impact_is_defensible"
+    },
+    {
+      "id": "cross_stock_exploratory",
+      "question": "Are relative-strength or behavioral relationships measurable across securities?",
+      "output": "research-only network and behavioral signatures",
+      "uncertainty": "daily OHLCV cannot identify mechanism, coordination, or actor identity",
+      "validation_status": "exploratory_not_production_signal",
+      "downstream_consumer": "research_and_future_relative_opportunity_experiments",
+      "freshness": "experiment-specific",
+      "failure_mode": "keep_out_of_core_decision_path_until_walk_forward_validation"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "as_of": "2026-08-13",
+  "cumulative_return_pct": 29.187102009102283,
+  "daily_volatility_pct": 2.5755771387190896,
+  "lookback_days": 20,
+  "reasons": [
+    "Equal-weighted universe return over the trailing 20 trading day(s): +29.19% (bullish floor +3%).",
+    "Daily return volatility: 2.58% (high floor 2.50%)."
+  ],
+  "tickers_with_sufficient_data": 101,
+  "trading_days_observed": 20,
+  "trend": "bullish",
+  "volatility": "high"
+}

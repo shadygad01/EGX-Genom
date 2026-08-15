@@ -1,0 +1,12 @@
+{
+  "as_of": "2026-08-13",
+  "warnings": [
+    {
+      "category": "macro_risk_increased",
+      "detail": "egypt_official_fx_egp_per_usd moved +8.67% over the available window (floor 5%)",
+      "severity": "warning",
+      "ticker": null,
+      "title": "Country & macro risk: deteriorating"
+    }
+  ]
+}

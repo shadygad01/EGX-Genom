@@ -1,0 +1,126 @@
+{
+  "nav_series": [
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": null,
+      "date": "2026-07-30",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-02",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-03",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-04",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-05",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-06",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-09",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-10",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-11",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-12",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    },
+    {
+      "benchmark_cumulative_return_pct": 0.0,
+      "benchmark_nav": 100.0,
+      "cash": 100.0,
+      "cash_pct": 1.0,
+      "cumulative_return_pct": 0.0,
+      "daily_return_pct": 0.0,
+      "date": "2026-08-13",
+      "invested_pct": 0.0,
+      "nav": 100.0
+    }
+  ],
+  "transactions": []
+}

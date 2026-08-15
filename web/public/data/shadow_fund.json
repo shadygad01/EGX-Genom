@@ -64,7 +64,7 @@
           "ref_version": null
         }
       ],
-      "produced_at": "2026-08-13T12:41:24.350278",
+      "produced_at": "2026-08-13T08:14:01.878568",
       "produced_by": "capital_allocation_engine@1.0.0"
     },
     "queue": [],
@@ -101,10 +101,10 @@
   "cash_pct": 1.0,
   "closed_positions": [],
   "cumulative_return_pct": 0.0,
-  "daily_return_pct": null,
+  "daily_return_pct": 0.0,
   "date": "2026-08-13",
   "excess_return_pct": 0.0,
-  "inception_date": "2026-08-13",
+  "inception_date": "2026-07-30",
   "invested_pct": 0.0,
   "nav": 100.0,
   "open_positions": [],
@@ -112,7 +112,27 @@
     "inputs": [
       {
         "kind": "recommendation",
+        "ref_id": "ACTF",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "AFDI",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "AIDC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
         "ref_id": "AIHC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "AMIA",
         "ref_version": null
       },
       {
@@ -122,7 +142,37 @@
       },
       {
         "kind": "recommendation",
+        "ref_id": "ASPI",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "COMI",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "COSG",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "DAPH",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
         "ref_id": "DSCW",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "ECAP",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "EFIH",
         "ref_version": null
       },
       {
@@ -132,7 +182,47 @@
       },
       {
         "kind": "recommendation",
+        "ref_id": "ENGC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "ETEL",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "ETRS",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
         "ref_id": "EXPA",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "GBCO",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "HELI",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "ISMQ",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "KRDI",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "MASR",
         "ref_version": null
       },
       {
@@ -142,23 +232,88 @@
       },
       {
         "kind": "recommendation",
+        "ref_id": "NCCW",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "OBRI",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "OCDI",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "ORHD",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "PHAR",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "RACC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "SCEM",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "SIPC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "SWDY",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
         "ref_id": "TANM",
         "ref_version": null
       },
       {
         "kind": "recommendation",
-        "ref_id": "UNIP",
+        "ref_id": "TAQA",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "UEGC",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "VALU",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "VLMRA",
+        "ref_version": null
+      },
+      {
+        "kind": "recommendation",
+        "ref_id": "ZMID",
         "ref_version": null
       }
     ],
-    "produced_at": "2026-08-13T12:41:24.350336",
+    "produced_at": "2026-08-13T08:14:01.878604",
     "produced_by": "shadow_fund.engine@1.0.0"
   },
   "risk": {
     "herfindahl_index": null,
     "largest_position_pct": null,
-    "max_drawdown_pct": null,
-    "sample_days": 0,
+    "max_drawdown_pct": 0.0,
+    "sample_days": 10,
     "sample_status": "insufficient_sample",
     "sharpe_like_ratio": null,
     "volatility_annualized_pct": null

@@ -104,6 +104,7 @@ export function CIODesk() {
   const committeeSummary = useArtifact((p) => p.getCommitteeSummary());
   const systemMaturity = useArtifact((p) => p.getSystemMaturity());
   const macroSnapshot = useArtifact((p) => p.getMacroSnapshot());
+  const shadowFund = useArtifact((p) => p.getShadowFund());
 
   const [liveDecisions, setLiveDecisions] = useState<PositionAwareDecision[] | null>(null);
   const [liveCapitalPlan, setLiveCapitalPlan] = useState<CapitalAllocationPlan | null>(null);
@@ -189,7 +190,12 @@ export function CIODesk() {
   // Holdings were entered but the live backend itself is unavailable (the
   // static deployment) vs. no holdings entered yet -- two different blockers,
   // so the per-card empty state must say which one actually applies.
-  const needsHoldingsCardTitle = liveUnavailable
+  // The shadow fund is a real, position-unaware production artifact. It can
+  // safely power model allocation intelligence in static mode, but it must
+  // never be presented as a personalized plan for the investor's holdings.
+  const modelCapitalPlan = shadowFund.data?.capital_allocation_plan ?? null;
+  const displayedCapitalPlan = liveCapitalPlan ?? modelCapitalPlan;
+  const needsHoldingsCardTitle = liveUnavailable && !modelCapitalPlan
     ? t("capitalAllocation.needsBackendTitle")
     : t("capitalAllocation.needsHoldingsTitle");
 
@@ -316,16 +322,18 @@ export function CIODesk() {
         <p className={styles.actionsSourceNote}>
           {liveCapitalPlan
             ? t("capitalAllocation.sourceLive")
-            : liveUnavailable
-              ? t("capitalAllocation.sourceUnavailable")
-              : t("capitalAllocation.sourceModelPortfolio")}
+            : displayedCapitalPlan
+              ? t("capitalAllocation.sourceShadowFund")
+              : liveUnavailable
+                ? t("capitalAllocation.sourceUnavailable")
+                : t("capitalAllocation.sourceModelPortfolio")}
         </p>
 
         <Card title={t("capitalAllocation.queue.title")} subtitle={t("capitalAllocation.queue.description")}>
           {(liveLoading || investmentCases.loading) && <LoadingState rows={4} />}
-          {!liveLoading && !investmentCases.loading && liveCapitalPlan && (
+          {!liveLoading && !investmentCases.loading && displayedCapitalPlan && (
             <DataTable
-              rows={liveCapitalPlan.queue}
+              rows={displayedCapitalPlan.queue}
               getRowKey={(row) => row.ticker}
               onRowClick={(row) => navigate(`/cases/${row.ticker}`)}
               emptyTitle={t("todaysActions.emptyTitle")}
@@ -421,7 +429,7 @@ export function CIODesk() {
               ]}
             />
           )}
-          {!liveLoading && !investmentCases.loading && !liveCapitalPlan && (
+          {!liveLoading && !investmentCases.loading && !displayedCapitalPlan && (
             <>
               <p className={styles.actionsSourceNote}>{t("capitalAllocation.queue.fallbackNote")}</p>
               <DataTable
@@ -524,13 +532,13 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.recycling.title")} subtitle={t("capitalAllocation.recycling.description")}>
-          {!liveCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
-          {liveCapitalPlan && liveCapitalPlan.capital_recycled.length === 0 && (
+          {!displayedCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
+          {displayedCapitalPlan && displayedCapitalPlan.capital_recycled.length === 0 && (
             <EmptyState title={t("capitalAllocation.recycling.emptyTitle")} detail={t("capitalAllocation.recycling.emptyDetail")} />
           )}
-          {liveCapitalPlan && liveCapitalPlan.capital_recycled.length > 0 && (
+          {displayedCapitalPlan && displayedCapitalPlan.capital_recycled.length > 0 && (
             <ul className={styles.flowList}>
-              {liveCapitalPlan.capital_recycled.map((f, i) => (
+              {displayedCapitalPlan.capital_recycled.map((f, i) => (
                 <li key={i}>
                   <span className="num">{f.from_ticker}</span> → <span className="num">{f.to_ticker}</span>:{" "}
                   <span className="num">{formatPercent(f.amount)}</span>
@@ -541,13 +549,13 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.released.title")} subtitle={t("capitalAllocation.released.description")}>
-          {!liveCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
-          {liveCapitalPlan && liveCapitalPlan.capital_released_today.length === 0 && (
+          {!displayedCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
+          {displayedCapitalPlan && displayedCapitalPlan.capital_released_today.length === 0 && (
             <EmptyState title={t("capitalAllocation.released.emptyTitle")} detail={t("capitalAllocation.released.emptyDetail")} />
           )}
-          {liveCapitalPlan && liveCapitalPlan.capital_released_today.length > 0 && (
+          {displayedCapitalPlan && displayedCapitalPlan.capital_released_today.length > 0 && (
             <ul className={styles.flowList}>
-              {liveCapitalPlan.capital_released_today.map((r) => (
+              {displayedCapitalPlan.capital_released_today.map((r) => (
                 <li key={r.ticker}>
                   <span className="num">{r.ticker}</span>: <span className="num">{formatPercent(r.amount)}</span> →{" "}
                   {formatCapitalSources(r.destinations)}
@@ -558,12 +566,12 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.bestNew.title")} subtitle={t("capitalAllocation.bestNew.description")}>
-          {liveCapitalPlan ? (
-            liveCapitalPlan.best_new_opportunities.length === 0 ? (
+          {displayedCapitalPlan ? (
+            displayedCapitalPlan.best_new_opportunities.length === 0 ? (
               <EmptyState title={t("capitalAllocation.bestNew.emptyTitle")} detail={t("capitalAllocation.bestNew.emptyDetail")} />
             ) : (
               <ul className={styles.rankList}>
-                {liveCapitalPlan.best_new_opportunities.map((r) => (
+                {displayedCapitalPlan.best_new_opportunities.map((r) => (
                   <li key={r.ticker}>
                     <span className="num">#{r.rank}</span> <span className={`${styles.tickerCode} num`}>{r.ticker}</span> —{" "}
                     {t("capitalAllocation.bestNew.score", { score: r.opportunity_score.toFixed(3) })}
@@ -589,13 +597,13 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.highestCost.title")} subtitle={t("capitalAllocation.highestCost.description")}>
-          {!liveCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
-          {liveCapitalPlan && liveCapitalPlan.highest_opportunity_cost.length === 0 && (
+          {!displayedCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
+          {displayedCapitalPlan && displayedCapitalPlan.highest_opportunity_cost.length === 0 && (
             <EmptyState title={t("capitalAllocation.highestCost.emptyTitle")} detail={t("capitalAllocation.highestCost.emptyDetail")} />
           )}
-          {liveCapitalPlan && liveCapitalPlan.highest_opportunity_cost.length > 0 && (
+          {displayedCapitalPlan && displayedCapitalPlan.highest_opportunity_cost.length > 0 && (
             <ul className={styles.rankList}>
-              {liveCapitalPlan.highest_opportunity_cost.map((h) => (
+              {displayedCapitalPlan.highest_opportunity_cost.map((h) => (
                 <li key={h.ticker}>
                   <span className={`${styles.tickerCode} num`}>{h.ticker}</span>{" "}
                   {t("capitalAllocation.bestNew.score", { score: h.opportunity_score.toFixed(3) })} — {h.reason}
@@ -606,13 +614,13 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.allocationChanges.title")} subtitle={t("capitalAllocation.allocationChanges.description")}>
-          {!liveCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
-          {liveCapitalPlan && liveCapitalPlan.allocation_changes.length === 0 && (
+          {!displayedCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
+          {displayedCapitalPlan && displayedCapitalPlan.allocation_changes.length === 0 && (
             <EmptyState title={t("capitalAllocation.allocationChanges.emptyTitle")} detail={t("capitalAllocation.allocationChanges.emptyDetail")} />
           )}
-          {liveCapitalPlan && liveCapitalPlan.allocation_changes.length > 0 && (
+          {displayedCapitalPlan && displayedCapitalPlan.allocation_changes.length > 0 && (
             <DataTable
-              rows={liveCapitalPlan.allocation_changes}
+              rows={displayedCapitalPlan.allocation_changes}
               getRowKey={(c) => c.ticker}
               onRowClick={(c) => navigate(`/cases/${c.ticker}`)}
               columns={[
@@ -650,14 +658,14 @@ export function CIODesk() {
         </Card>
 
         <Card title={t("capitalAllocation.cashWaiting.title")} subtitle={t("capitalAllocation.cashWaiting.description")}>
-          {!liveCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
-          {liveCapitalPlan && (
+          {!displayedCapitalPlan && <EmptyState title={needsHoldingsCardTitle} />}
+          {displayedCapitalPlan && (
             <>
               <div className={styles.statGrid}>
-                <StatTile label={t("capitalAllocation.cashWaiting.before")} value={formatPercent(liveCapitalPlan.cash_waiting.idle_cash_before)} />
-                <StatTile label={t("capitalAllocation.cashWaiting.after")} value={formatPercent(liveCapitalPlan.cash_waiting.idle_cash_after)} />
+                <StatTile label={t("capitalAllocation.cashWaiting.before")} value={formatPercent(displayedCapitalPlan.cash_waiting.idle_cash_before)} />
+                <StatTile label={t("capitalAllocation.cashWaiting.after")} value={formatPercent(displayedCapitalPlan.cash_waiting.idle_cash_after)} />
               </div>
-              <p className={styles.actionsSourceNote}>{liveCapitalPlan.cash_waiting.reason}</p>
+              <p className={styles.actionsSourceNote}>{displayedCapitalPlan.cash_waiting.reason}</p>
             </>
           )}
         </Card>

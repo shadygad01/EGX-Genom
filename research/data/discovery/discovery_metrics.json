@@ -2,16 +2,15 @@
   "average_confidence_verified": 0.2875,
   "by_verification_result": {
     "legality_blocked": 6,
-    "no_candidates_discovered": 7,
-    "no_reachable_domain": 14,
-    "not_targeted": 6,
+    "no_candidates_discovered": 1,
+    "no_reachable_domain": 9,
     "verified_reachable": 2
   },
-  "duration_seconds": 0.002655,
-  "finished_at": "2026-07-29T05:21:02.646778",
-  "sources_checked_fresh_this_run": 6,
-  "sources_in_report": 35,
-  "sources_served_from_cache": 29,
+  "duration_seconds": 0.028608,
+  "finished_at": "2026-08-17T03:48:12.693365",
+  "sources_checked_fresh_this_run": 0,
+  "sources_in_report": 18,
+  "sources_served_from_cache": 18,
   "sources_verified_reachable": 2,
-  "started_at": "2026-07-29T05:21:02.644123"
+  "started_at": "2026-08-17T03:48:12.664757"
 }

@@ -1,13 +1,21 @@
 {
   "by_status": {
-    "blocked": 6,
-    "discovered": 20,
-    "homepage_unresolved": 75,
+    "blocked": 10,
+    "discovered": 30,
+    "homepage_unresolved": 61,
     "pending": 0,
     "validated": 0
   },
   "companies_total": 101,
-  "documents_discovered_total": 57,
+  "documents_discovered_total": 151,
+  "ir_entry_point_resolution_rate": 0.297,
+  "legal_name_resolution_rate": 0.1386,
   "processed_this_run": 101,
-  "skipped_already_validated": 0
+  "skipped_already_validated": 0,
+  "website_resolution_rate": 0.396,
+  "website_resolutions_by_source": {
+    "heuristic": 13,
+    "web_search": 15,
+    "wikidata": 12
+  }
 }

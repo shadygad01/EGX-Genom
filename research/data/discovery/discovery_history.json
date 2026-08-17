@@ -1049,5 +1049,103 @@
         "verified_at": "2026-07-27T16:24:50.184956"
       }
     }
+  ],
+  "moodys_ratings": [
+    {
+      "id": "moodys_ratings",
+      "version": 1,
+      "source_id": "moodys_ratings",
+      "verified_at": "2026-07-31T13:49:15.959361",
+      "ttl_expires_at": "2026-08-30T13:49:15.959361",
+      "input_fingerprint": "a9dfaf9dc027974fe73bbd1511577bea4d2491e95df053fe8d838f8088350a65",
+      "outcome": {
+        "source_id": "moodys_ratings",
+        "previous_status": "planned",
+        "current_status": "planned",
+        "discovered_endpoints": [],
+        "verification_result": "legality_blocked",
+        "reason_for_failure": "No discovered candidate cleared the legality gate.",
+        "evidence": [],
+        "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
+        "confidence": 0.0,
+        "from_cache": false,
+        "verified_at": "2026-07-31T13:56:10.880669"
+      }
+    }
+  ],
+  "sp_global_ratings": [
+    {
+      "id": "sp_global_ratings",
+      "version": 1,
+      "source_id": "sp_global_ratings",
+      "verified_at": "2026-07-31T13:49:15.959361",
+      "ttl_expires_at": "2026-08-30T13:49:15.959361",
+      "input_fingerprint": "e4b543a81b1844d76e630b8a4907aa69b08b50b00e73513b55936c6bdf8e8084",
+      "outcome": {
+        "source_id": "sp_global_ratings",
+        "previous_status": "planned",
+        "current_status": "planned",
+        "discovered_endpoints": [],
+        "verification_result": "no_reachable_domain",
+        "reason_for_failure": "No reachable domain found from public brand hints or name-derived guesses.",
+        "evidence": [],
+        "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
+        "confidence": 0.0,
+        "from_cache": false,
+        "verified_at": "2026-07-31T13:56:14.439918"
+      }
+    }
+  ],
+  "fitch_ratings": [
+    {
+      "id": "fitch_ratings",
+      "version": 1,
+      "source_id": "fitch_ratings",
+      "verified_at": "2026-07-31T13:49:15.959361",
+      "ttl_expires_at": "2026-08-30T13:49:15.959361",
+      "input_fingerprint": "ad8fae35ef0d13f5138fa74cadb6bd40a9f4fbb3cdc068c91b2ef4661bada479",
+      "outcome": {
+        "source_id": "fitch_ratings",
+        "previous_status": "planned",
+        "current_status": "planned",
+        "discovered_endpoints": [],
+        "verification_result": "legality_blocked",
+        "reason_for_failure": "No discovered candidate cleared the legality gate.",
+        "evidence": [],
+        "recommendation": "No action -- no candidate cleared verification this run. Re-check after the next scheduled discovery run, or supply a corrected domain hint if the target organization's public domain is known to differ from what was tried.",
+        "confidence": 0.0,
+        "from_cache": false,
+        "verified_at": "2026-07-31T14:02:34.593211"
+      }
+    }
+  ],
+  "amwal_alghad": [
+    {
+      "id": "amwal_alghad",
+      "version": 1,
+      "source_id": "amwal_alghad",
+      "verified_at": "2026-07-31T13:49:15.959361",
+      "ttl_expires_at": "2026-08-30T13:49:15.959361",
+      "input_fingerprint": "00bfcb6b7e7dd7b9cafb0571f48b04ac838b59f18324156bf936d3970022289e",
+      "outcome": {
+        "source_id": "amwal_alghad",
+        "previous_status": "planned",
+        "current_status": "planned",
+        "discovered_endpoints": [
+          "https://amwalalghad.com/feed/atom/"
+        ],
+        "verification_result": "verified_reachable",
+        "reason_for_failure": null,
+        "evidence": [
+          "robots.txt permits this path; no red-flag terms found for a structured (non-scraping) access method.",
+          "1/1 probes returned the same status code.",
+          "143 snapshot(s) spanning 1229 day(s)."
+        ],
+        "recommendation": "Endpoint verified and stable. A generic, already-tested collector (RssNewsCollector) already covers this access method -- a maintainer only needs to confirm the feed actually returns real items before flipping status to IMPLEMENTED (same precedent as Enterprise/Al Borsa/Masrawy).",
+        "confidence": 0.875,
+        "from_cache": false,
+        "verified_at": "2026-07-31T14:03:42.549815"
+      }
+    }
   ]
 }

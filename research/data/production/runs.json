@@ -1,0 +1,632 @@
+{
+  "run_a35af546bb13": [
+    {
+      "id": "run_a35af546bb13",
+      "version": 1,
+      "run_date": "2026-07-29",
+      "status": "succeeded",
+      "session_id": "session_5f2def9d45c7",
+      "hypotheses": 386,
+      "promoted": 0,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-07-29T12:45:06.348149",
+      "completed_at": "2026-07-29T12:45:11.787593"
+    }
+  ],
+  "run_17a0ef1d762b": [
+    {
+      "id": "run_17a0ef1d762b",
+      "version": 1,
+      "run_date": "2026-07-30",
+      "status": "succeeded",
+      "session_id": "session_1cb753483d81",
+      "hypotheses": 391,
+      "promoted": 0,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-07-30T17:16:12.336639",
+      "completed_at": "2026-07-30T17:16:27.991723"
+    }
+  ],
+  "run_e7669728415c": [
+    {
+      "id": "run_e7669728415c",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T07:58:50.886600",
+      "completed_at": "2026-07-31T07:58:50.886628"
+    }
+  ],
+  "run_4a9b49d232d6": [
+    {
+      "id": "run_4a9b49d232d6",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T10:13:01.901655",
+      "completed_at": "2026-07-31T10:13:01.901697"
+    }
+  ],
+  "run_b903d2e97b98": [
+    {
+      "id": "run_b903d2e97b98",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T10:39:55.001673",
+      "completed_at": "2026-07-31T10:39:55.001719"
+    }
+  ],
+  "run_1ece6575ef24": [
+    {
+      "id": "run_1ece6575ef24",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T10:50:59.417321",
+      "completed_at": "2026-07-31T10:50:59.417358"
+    }
+  ],
+  "run_00771e1520f4": [
+    {
+      "id": "run_00771e1520f4",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T11:15:19.464463",
+      "completed_at": "2026-07-31T11:15:19.464498"
+    }
+  ],
+  "run_19e739806ffe": [
+    {
+      "id": "run_19e739806ffe",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T11:27:01.178016",
+      "completed_at": "2026-07-31T11:27:01.178059"
+    }
+  ],
+  "run_4ae02c2a9e69": [
+    {
+      "id": "run_4ae02c2a9e69",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T12:25:38.726753",
+      "completed_at": "2026-07-31T12:25:38.726796"
+    }
+  ],
+  "run_1bacb93c3120": [
+    {
+      "id": "run_1bacb93c3120",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T12:47:17.313716",
+      "completed_at": "2026-07-31T12:47:17.313755"
+    }
+  ],
+  "run_fdbd98bee8e6": [
+    {
+      "id": "run_fdbd98bee8e6",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T13:21:06.670583",
+      "completed_at": "2026-07-31T13:21:06.670624"
+    }
+  ],
+  "run_117080d1c71c": [
+    {
+      "id": "run_117080d1c71c",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T13:41:00.268383",
+      "completed_at": "2026-07-31T13:41:00.268413"
+    }
+  ],
+  "run_1ffbf6b6c8ca": [
+    {
+      "id": "run_1ffbf6b6c8ca",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T14:22:59.533635",
+      "completed_at": "2026-07-31T14:22:59.533667"
+    }
+  ],
+  "run_69d6650e8c52": [
+    {
+      "id": "run_69d6650e8c52",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T14:40:53.160759",
+      "completed_at": "2026-07-31T14:40:53.160797"
+    }
+  ],
+  "run_726d492695bf": [
+    {
+      "id": "run_726d492695bf",
+      "version": 1,
+      "run_date": "2026-07-31",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-07-31T15:02:48.335685",
+      "completed_at": "2026-07-31T15:02:48.335719"
+    }
+  ],
+  "run_8a0021c42fc0": [
+    {
+      "id": "run_8a0021c42fc0",
+      "version": 1,
+      "run_date": "2026-08-01",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-08-01T16:39:14.714611",
+      "completed_at": "2026-08-01T16:39:14.714643"
+    }
+  ],
+  "run_eefdfc96f732": [
+    {
+      "id": "run_eefdfc96f732",
+      "version": 1,
+      "run_date": "2026-08-01",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-08-01T19:24:32.861890",
+      "completed_at": "2026-08-01T19:24:32.861926"
+    }
+  ],
+  "run_86bc243ad2c9": [
+    {
+      "id": "run_86bc243ad2c9",
+      "version": 1,
+      "run_date": "2026-08-01",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-08-01T20:45:36.918916",
+      "completed_at": "2026-08-01T20:45:36.918947"
+    }
+  ],
+  "run_5ba413dd3211": [
+    {
+      "id": "run_5ba413dd3211",
+      "version": 1,
+      "run_date": "2026-08-02",
+      "status": "succeeded",
+      "session_id": "session_1ae1e24c8152",
+      "hypotheses": 248,
+      "promoted": 9,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-02T07:03:42.122800",
+      "completed_at": "2026-08-02T07:08:30.564496"
+    }
+  ],
+  "run_9a7478c2d9a6": [
+    {
+      "id": "run_9a7478c2d9a6",
+      "version": 1,
+      "run_date": "2026-08-02",
+      "status": "succeeded",
+      "session_id": "session_1561492358b4",
+      "hypotheses": 389,
+      "promoted": 12,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-02T11:50:53.091838",
+      "completed_at": "2026-08-02T11:51:42.631302"
+    }
+  ],
+  "run_8105be74268a": [
+    {
+      "id": "run_8105be74268a",
+      "version": 1,
+      "run_date": "2026-08-02",
+      "status": "succeeded",
+      "session_id": "session_a235f480c47f",
+      "hypotheses": 387,
+      "promoted": 14,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-02T12:37:37.612781",
+      "completed_at": "2026-08-02T12:38:59.554136"
+    }
+  ],
+  "run_4b234281a9c6": [
+    {
+      "id": "run_4b234281a9c6",
+      "version": 1,
+      "run_date": "2026-08-02",
+      "status": "succeeded",
+      "session_id": "session_798da38cd8dd",
+      "hypotheses": 387,
+      "promoted": 14,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-02T18:16:35.794775",
+      "completed_at": "2026-08-02T18:19:44.969846"
+    }
+  ],
+  "run_16087477968f": [
+    {
+      "id": "run_16087477968f",
+      "version": 1,
+      "run_date": "2026-08-02",
+      "status": "succeeded",
+      "session_id": "session_8d4e8a80fd91",
+      "hypotheses": 387,
+      "promoted": 14,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-02T20:48:33.867532",
+      "completed_at": "2026-08-02T20:55:20.674274"
+    }
+  ],
+  "run_5cdb6d1bd7ad": [
+    {
+      "id": "run_5cdb6d1bd7ad",
+      "version": 1,
+      "run_date": "2026-08-03",
+      "status": "succeeded",
+      "session_id": "session_03a63b718822",
+      "hypotheses": 389,
+      "promoted": 14,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-03T08:51:21.110578",
+      "completed_at": "2026-08-03T09:02:12.477745"
+    }
+  ],
+  "run_5201077136a8": [
+    {
+      "id": "run_5201077136a8",
+      "version": 1,
+      "run_date": "2026-08-03",
+      "status": "succeeded",
+      "session_id": "session_fd9c7639598d",
+      "hypotheses": 389,
+      "promoted": 14,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-03T10:18:33.468133",
+      "completed_at": "2026-08-03T10:28:39.330140"
+    }
+  ],
+  "run_59aa6b905420": [
+    {
+      "id": "run_59aa6b905420",
+      "version": 1,
+      "run_date": "2026-08-03",
+      "status": "succeeded",
+      "session_id": "session_15cfe095b891",
+      "hypotheses": 399,
+      "promoted": 10,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-03T13:33:44.039509",
+      "completed_at": "2026-08-03T13:51:23.157441"
+    }
+  ],
+  "run_22558e070bfe": [
+    {
+      "id": "run_22558e070bfe",
+      "version": 1,
+      "run_date": "2026-08-03",
+      "status": "succeeded",
+      "session_id": "session_84bba9b4675e",
+      "hypotheses": 399,
+      "promoted": 10,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-03T16:22:57.310852",
+      "completed_at": "2026-08-03T16:44:39.898310"
+    }
+  ],
+  "run_673d8c7e85af": [
+    {
+      "id": "run_673d8c7e85af",
+      "version": 1,
+      "run_date": "2026-08-03",
+      "status": "succeeded",
+      "session_id": "session_123b03a756d2",
+      "hypotheses": 397,
+      "promoted": 11,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-03T20:01:49.456626",
+      "completed_at": "2026-08-03T20:18:28.607333"
+    }
+  ],
+  "run_9905f4b2e128": [
+    {
+      "id": "run_9905f4b2e128",
+      "version": 1,
+      "run_date": "2026-08-04",
+      "status": "succeeded",
+      "session_id": "session_4a68dc4145e3",
+      "hypotheses": 393,
+      "promoted": 15,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-04T10:03:45.216520",
+      "completed_at": "2026-08-04T10:34:00.764280"
+    }
+  ],
+  "run_a49f2ab3b95c": [
+    {
+      "id": "run_a49f2ab3b95c",
+      "version": 1,
+      "run_date": "2026-08-04",
+      "status": "succeeded",
+      "session_id": "session_906c7afe2923",
+      "hypotheses": 391,
+      "promoted": 15,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-04T18:51:23.985192",
+      "completed_at": "2026-08-04T19:24:49.291041"
+    }
+  ],
+  "run_da15cddc7de8": [
+    {
+      "id": "run_da15cddc7de8",
+      "version": 1,
+      "run_date": "2026-08-05",
+      "status": "succeeded",
+      "session_id": "session_486eb315eb96",
+      "hypotheses": 395,
+      "promoted": 15,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-05T07:14:04.994070",
+      "completed_at": "2026-08-05T07:51:27.897072"
+    }
+  ],
+  "run_cbd3d38e3f09": [
+    {
+      "id": "run_cbd3d38e3f09",
+      "version": 1,
+      "run_date": "2026-08-06",
+      "status": "succeeded",
+      "session_id": "session_78a5dd69557c",
+      "hypotheses": 404,
+      "promoted": 8,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-06T14:41:30.132585",
+      "completed_at": "2026-08-06T15:20:31.428650"
+    }
+  ],
+  "run_7328a121bf80": [
+    {
+      "id": "run_7328a121bf80",
+      "version": 1,
+      "run_date": "2026-08-07",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-08-07T15:57:05.447782",
+      "completed_at": "2026-08-07T15:57:05.447811"
+    }
+  ],
+  "run_be4fbdfaaac8": [
+    {
+      "id": "run_be4fbdfaaac8",
+      "version": 1,
+      "run_date": "2026-08-07",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-08-07T17:16:41.870984",
+      "completed_at": "2026-08-07T17:16:41.871027"
+    }
+  ],
+  "run_b4dc3d0a0674": [
+    {
+      "id": "run_b4dc3d0a0674",
+      "version": 1,
+      "run_date": "2026-08-07",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-08-07T18:24:39.051048",
+      "completed_at": "2026-08-07T18:24:39.051084"
+    }
+  ],
+  "run_8df98eb49509": [
+    {
+      "id": "run_8df98eb49509",
+      "version": 1,
+      "run_date": "2026-08-09",
+      "status": "succeeded",
+      "session_id": "session_4af099cc52f0",
+      "hypotheses": 398,
+      "promoted": 7,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-09T06:38:45.193427",
+      "completed_at": "2026-08-09T07:20:55.372641"
+    }
+  ],
+  "run_a751b431290c": [
+    {
+      "id": "run_a751b431290c",
+      "version": 1,
+      "run_date": "2026-08-10",
+      "status": "succeeded",
+      "session_id": "session_f30f4e650110",
+      "hypotheses": 398,
+      "promoted": 7,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-10T07:08:14.244559",
+      "completed_at": "2026-08-10T07:54:53.389641"
+    }
+  ],
+  "run_acf3ee086507": [
+    {
+      "id": "run_acf3ee086507",
+      "version": 1,
+      "run_date": "2026-08-11",
+      "status": "succeeded",
+      "session_id": "session_0db4ec3218d4",
+      "hypotheses": 396,
+      "promoted": 6,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-11T06:39:52.797430",
+      "completed_at": "2026-08-11T07:18:09.441834"
+    }
+  ],
+  "run_0a8026285856": [
+    {
+      "id": "run_0a8026285856",
+      "version": 1,
+      "run_date": "2026-08-12",
+      "status": "succeeded",
+      "session_id": "session_1e27e477bed0",
+      "hypotheses": 396,
+      "promoted": 7,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-12T07:16:28.026374",
+      "completed_at": "2026-08-12T08:09:50.453888"
+    }
+  ],
+  "run_5b4f8df62cc8": [
+    {
+      "id": "run_5b4f8df62cc8",
+      "version": 1,
+      "run_date": "2026-08-13",
+      "status": "succeeded",
+      "session_id": "session_80f076ada5c1",
+      "hypotheses": 384,
+      "promoted": 8,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-13T07:17:08.968933",
+      "completed_at": "2026-08-13T08:13:50.280275"
+    }
+  ],
+  "run_029181ceb849": [
+    {
+      "id": "run_029181ceb849",
+      "version": 1,
+      "run_date": "2026-08-14",
+      "status": "skipped_non_trading",
+      "session_id": null,
+      "hypotheses": 0,
+      "promoted": 0,
+      "error": null,
+      "notes": "Non-trading day (weekend)",
+      "started_at": "2026-08-14T20:13:53.179107",
+      "completed_at": "2026-08-14T20:13:53.179143"
+    }
+  ],
+  "run_f9bcb5f64d72": [
+    {
+      "id": "run_f9bcb5f64d72",
+      "version": 1,
+      "run_date": "2026-08-19",
+      "status": "succeeded",
+      "session_id": "session_1ba139901daf",
+      "hypotheses": 484,
+      "promoted": 5,
+      "error": null,
+      "notes": "",
+      "started_at": "2026-08-19T07:16:15.699907",
+      "completed_at": "2026-08-19T08:26:56.637791"
+    }
+  ]
+}

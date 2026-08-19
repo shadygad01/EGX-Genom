@@ -1,0 +1,158 @@
+{
+  "arxiv": [
+    {
+      "id": "arxiv",
+      "version": 1,
+      "name": "arXiv (q-fin)",
+      "category": "research",
+      "country": "EG",
+      "access_method": "rss_feed",
+      "status": "planned",
+      "legal_use_status": "review_required",
+      "lifecycle_state": "candidate",
+      "health_status": "unknown",
+      "activation_status": "active",
+      "base_url": null,
+      "authentication": "none",
+      "reliability_score": 0.7,
+      "freshness_score": 0.3,
+      "historical_coverage": "unknown",
+      "expected_latency": "unknown",
+      "update_frequency": "unknown",
+      "schema_version": "1.0",
+      "collector": null,
+      "collector_version": null,
+      "integrated_via": null,
+      "integrated_capabilities": [],
+      "retry_policy": {
+        "max_attempts": 3,
+        "backoff_seconds": 2.0,
+        "backoff_multiplier": 2.0
+      },
+      "rate_limit": {
+        "requests_per_minute": 10,
+        "min_seconds_between_requests": 1.0
+      },
+      "license": "unknown",
+      "terms_of_use_url": null,
+      "provenance_policy": "raw_document_envelope",
+      "validation_rules": [],
+      "normalization_rules": [],
+      "conflict_priority": 30,
+      "priority": 50,
+      "supported_entities": [],
+      "supported_event_types": [],
+      "supported_languages": [
+        "en"
+      ],
+      "data_quality_score": null,
+      "reputation_score": null,
+      "evidence_tier": "primary",
+      "notes": "Official free API/RSS."
+    }
+  ],
+  "ssrn": [
+    {
+      "id": "ssrn",
+      "version": 1,
+      "name": "SSRN",
+      "category": "research",
+      "country": "EG",
+      "access_method": "rss_feed",
+      "status": "planned",
+      "legal_use_status": "review_required",
+      "lifecycle_state": "candidate",
+      "health_status": "unknown",
+      "activation_status": "active",
+      "base_url": null,
+      "authentication": "none",
+      "reliability_score": 0.7,
+      "freshness_score": 0.3,
+      "historical_coverage": "unknown",
+      "expected_latency": "unknown",
+      "update_frequency": "unknown",
+      "schema_version": "1.0",
+      "collector": null,
+      "collector_version": null,
+      "integrated_via": null,
+      "integrated_capabilities": [],
+      "retry_policy": {
+        "max_attempts": 3,
+        "backoff_seconds": 2.0,
+        "backoff_multiplier": 2.0
+      },
+      "rate_limit": {
+        "requests_per_minute": 10,
+        "min_seconds_between_requests": 1.0
+      },
+      "license": "unknown",
+      "terms_of_use_url": null,
+      "provenance_policy": "raw_document_envelope",
+      "validation_rules": [],
+      "normalization_rules": [],
+      "conflict_priority": 30,
+      "priority": 50,
+      "supported_entities": [],
+      "supported_event_types": [],
+      "supported_languages": [
+        "en"
+      ],
+      "data_quality_score": null,
+      "reputation_score": null,
+      "evidence_tier": "primary",
+      "notes": "Public RSS for new papers."
+    }
+  ],
+  "nber": [
+    {
+      "id": "nber",
+      "version": 1,
+      "name": "NBER",
+      "category": "research",
+      "country": "EG",
+      "access_method": "rss_feed",
+      "status": "planned",
+      "legal_use_status": "review_required",
+      "lifecycle_state": "candidate",
+      "health_status": "unknown",
+      "activation_status": "active",
+      "base_url": null,
+      "authentication": "none",
+      "reliability_score": 0.7,
+      "freshness_score": 0.3,
+      "historical_coverage": "unknown",
+      "expected_latency": "unknown",
+      "update_frequency": "unknown",
+      "schema_version": "1.0",
+      "collector": null,
+      "collector_version": null,
+      "integrated_via": null,
+      "integrated_capabilities": [],
+      "retry_policy": {
+        "max_attempts": 3,
+        "backoff_seconds": 2.0,
+        "backoff_multiplier": 2.0
+      },
+      "rate_limit": {
+        "requests_per_minute": 10,
+        "min_seconds_between_requests": 1.0
+      },
+      "license": "unknown",
+      "terms_of_use_url": null,
+      "provenance_policy": "raw_document_envelope",
+      "validation_rules": [],
+      "normalization_rules": [],
+      "conflict_priority": 30,
+      "priority": 50,
+      "supported_entities": [],
+      "supported_event_types": [],
+      "supported_languages": [
+        "en"
+      ],
+      "data_quality_score": null,
+      "reputation_score": null,
+      "evidence_tier": "primary",
+      "notes": "Public new-papers feed."
+    }
+  ]
+}

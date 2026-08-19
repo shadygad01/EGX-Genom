@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-08-19",
+  "egp_usd": {
+    "current": 0.0198,
+    "date": "2026-08-19",
+    "change_30d_pct": -1.98,
+    "series_length": 285
+  },
+  "cpi_inflation_pct": {
+    "current": 14.0735,
+    "date": "2025-12-31",
+    "regime": "moderate"
+  },
+  "brent_usd": {
+    "current": 91.59,
+    "date": "2026-08-19"
+  },
+  "interest_rate_real_pct": {
+    "current": -7.031,
+    "date": "2024-12-31"
+  },
+  "gdp_growth_pct": {
+    "current": 4.392,
+    "date": "2025-12-31"
+  },
+  "decision_implications": [
+    "EGP broadly stable — currency risk neutral",
+    "Elevated inflation (14.1%) — monitor CBE rate decisions",
+    "High oil ($92/bbl) benefits AMOC, EGCH; adds cost pressure for manufacturers"
+  ],
+  "sources": {
+    "egp_usd": "Yahoo Finance (EGPUSD=X)",
+    "cpi": "World Bank Open Data (FP.CPI.TOTL.ZG)",
+    "brent": "Yahoo Finance (BZ=F)",
+    "interest_rate": "World Bank Open Data (FR.INR.RINR)",
+    "gdp": "World Bank Open Data (NY.GDP.MKTP.KD.ZG)"
+  }
+}

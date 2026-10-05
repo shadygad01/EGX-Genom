@@ -1,1 +1,35 @@
-[]
+[
+  {
+    "access_method_guess": "rss_feed",
+    "composite_score": 0.875,
+    "discovered_url": "https://african-markets.com/en/?format=feed&type=atom",
+    "historical_score": 1.0,
+    "legality_verdict": "allowed",
+    "robots_allows": true,
+    "selected": true,
+    "source_id": "african_markets_egx",
+    "stability_score": 0.75
+  },
+  {
+    "access_method_guess": "rss_feed",
+    "composite_score": 0.575,
+    "discovered_url": "https://african-markets.com/en/?format=feed&type=rss",
+    "historical_score": 0.4,
+    "legality_verdict": "allowed",
+    "robots_allows": true,
+    "selected": false,
+    "source_id": "african_markets_egx",
+    "stability_score": 0.75
+  },
+  {
+    "access_method_guess": "rss_feed",
+    "composite_score": 0.95,
+    "discovered_url": "https://skynewsarabia.com/rss.xml",
+    "historical_score": 1.0,
+    "legality_verdict": "allowed",
+    "robots_allows": true,
+    "selected": true,
+    "source_id": "skynews_arabia_economy",
+    "stability_score": 0.9
+  }
+]

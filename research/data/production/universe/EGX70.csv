@@ -1,0 +1,71 @@
+ticker,company_name,as_of_date,isin,reuters_code,weight_percent,source_url
+ACTF,Act Financial,2026-07-26,EGS7D5P1C019,ACTF.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+AFDI,El Ahli Investment and Development,2026-07-26,EGS69021C011,AFDI.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+AFMC,Alexandria Flour Mills,2026-07-26,EGS30471C014,AFMC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+AIDC,Arabia for Investment and Development,2026-07-26,EGS65R01C015,AIDC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+AIHC,Arabia Investments Holding,2026-07-26,EGS21351C019,AIHC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ALCN,Alexandria Containers and goods,2026-07-26,EGS42111C012,ALCN.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+AMER,Amer Group Holding,2026-07-26,EGS675S1C011,AMER.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+AMIA,Arab Moltaka Investments Co,2026-07-26,EGS67221C019,AMIA.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ARAB,Arab Developers Holding,2026-07-26,EGS694A1C018,ARAB.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ASCM,ASEC Company For Mining - ASCOM,2026-07-26,EGS10001C013,ASCM.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ASPI,Aspire Capital Holding For Financial Investments,2026-07-26,EGS691L1C018,ASPI.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ATLC,Al Tawfeek Leasing Company-A.T.LEASE,2026-07-26,EGS676N1C015,ATLC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ATQA,Misr National Steel - Ataqa,2026-07-26,EGS3D0C1C018,ATQA.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+BIOC,Glaxo Smith Kline,2026-07-26,EGS38171C012,BIOC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+CIEB,Credit Agricole Egypt,2026-07-26,EGS60041C018,CIEB.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+CNFN,Contact Financial Holding,2026-07-26,EGS738I1C018,CNFN.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+COSG,Cairo Oils & Soap,2026-07-26,EGS30581C010,COSG.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+CSAG,Canal Shipping Agencies,2026-07-26,EGS44031C010,CSAG.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+DAPH,Development & Engineering Consultants,2026-07-26,EGS65081C019,DAPH.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+DSCW,Dice Sport & Casual Wear,2026-07-26,EGS33321C018,DSCW.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ECAP,El Ezz Porcelain (Gemma),2026-07-26,EGS3C071C015,ECAP.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+EGTS,Egyptian for Tourism Resorts,2026-07-26,EGS70431C019,EGTS.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+EHDR,Egyptians Housing Development & Reconstruction,2026-07-26,EGS65341C017,EHDR.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ELSH,El Shams Housing & Urbanization,2026-07-26,EGS65091C018,ELSH.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ENGC,Engineering Industries (ICON),2026-07-26,EGS3F021C017,ENGC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ETRS,Egyptian Transport & Commercial Services Co. -EGYTRANS NOSCO,2026-07-26,EGS42051C010,ETRS.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+EXPA,Export Development Bank of Egypt,2026-07-26,EGS60241C014,EXPA.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+GPIM,GPI For Urban Growth,2026-07-26,EGS213S1C010,GPIM.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+HDBK,Housing & Development Bank,2026-07-26,EGS60301C016,HDBK.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ICFC,International Company For Fertilizers & Chemicals,2026-07-26,EGS520D1C015,ICFC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+IDRE,Ismailia Development and Real Estate Co,2026-07-26,EGS214Q1C011,IDRE.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+IEEC,Industrial & Engineering Projects,2026-07-26,EGS22171C010,IEEC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+IFAP,International Agricultural Products,2026-07-26,EGS07061C012,IFAP.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ISMA,Ismailia Misr Poultry,2026-07-26,EGS02021C011,ISMA.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ISMQ,Iron And Steel for Mines and Quarries,2026-07-26,EGS102S1C014,ISMQ.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+KABO,El Nasr Clothes & Textiles (Kabo),2026-07-26,EGS33061C010,KABO.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+KRDI,Al Khair River For Development Agricultural Investment&Envir,2026-07-26,EGS02291C010,KRDI.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+LCSW,Lecico Egypt,2026-07-26,EGS3C161C014,LCSW.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MASR,Madinet Masr For Housing and Development,2026-07-26,EGS65571C019,MASR.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MCRO,Macro Group Pharmaceuticals -Macro Capital,2026-07-26,EGS7D971C011,MCRO.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MEPA,Medical Packaging Company,2026-07-26,EGS3C4L1C015,MEPA.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MFPC,Misr Fertilizers Production Company - Mopco,2026-07-26,EGS39061C014,MFPC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MOED,The Egyptian Modern Education Systems,2026-07-26,EGS729F1C012,MOED.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MPCI,Memphis Pharmaceuticals,2026-07-26,EGS38351C010,MPCI.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MPCO,Mansourah Poultry,2026-07-26,EGS02091C014,MPCO.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MPRC,Egyptian Media Production City,2026-07-26,EGS78021C010,MPRC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+MTIE,MM Group For Industry And International Trade,2026-07-26,EGS75011C014,MTIE.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+NCCW,Nasr Company for Civil Works,2026-07-26,EGS23111C015,NCCW.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+NIPH,El-Nile Co. For Pharmaceuticals And Chemical Industries,2026-07-26,EGS38331C012,NIPH.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+OBRI,El Obour Real Estate Investment,2026-07-26,EGS65551C011,OBRI.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+OCDI,Six of October Development & Investment (SODIC),2026-07-26,EGS65851C015,OCDI.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+OFH,O B Financial Holding,2026-07-26,EGS696S1C016,OFH.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+PHAR,Egyptian International Pharmaceuticals (EIPICO),2026-07-26,EGS38081C013,PHAR.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+POUL,Cairo Poultry,2026-07-26,EGS02051C018,POUL.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+PRCL,Ceramic & Porcelain,2026-07-26,EGS3C111C019,PRCL.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+RACC,Raya Customer Experience,2026-07-26,EGS74191C015,RACC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+SCEM,Sinai Cement,2026-07-26,EGS3C401C014,SCEM.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+SDTI,Sharm Dreams Co. for Tourism Investment,2026-07-26,EGS70571C012,SDTI.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+SIPC,Sabaa International Company for Pharmaceutical and Chemical,2026-07-26,EGS382M1C011,SIPC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+SKPC,Sidi Kerir Petrochemicals - SIDPEC,2026-07-26,EGS380S1C017,SKPC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+SVCE,South Valley Cement,2026-07-26,EGS3C351C011,SVCE.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+SWDY,ELSWEDY ELECTRIC,2026-07-26,EGS3G0Z1C014,SWDY.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+TALM,Taaleem Management Services,2026-07-26,EGS597R1C017,TALM.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+TANM,Tanmiya for Real Estate Investment,2026-07-26,EGS21EB1C011,TANM.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+TAQA,Taqa Arabia,2026-07-26,EGS490S1C014,TAQA.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+UEGC,Elsaeed Contracting& Real Estate Investment Company SCCD,2026-07-26,EGS21531C016,UEGC.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+UNIP,Universal For Paper and Packaging Materials (Unipack,2026-07-26,EGS38161C013,UNIP.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+VALU,U Consumer Finance,2026-07-26,EGS505Z1C018,VALU.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ZEOT,Extracted Oils,2026-07-26,EGS38251C012,ZEOT.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16
+ZMID,Zahraa Maadi Investment & Development,2026-07-26,EGS21171C011,ZMID.CA,,https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16

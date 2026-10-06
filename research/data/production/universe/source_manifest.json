@@ -1,0 +1,18 @@
+{
+  "collection_method": "manual_review",
+  "indexes": {
+    "EGX30": {
+      "constituent_rows": 31,
+      "source_url": "https://www.egx.com.eg/en/CurrentIndexConstituntes.aspx?Nav=1&type=1",
+      "weight_total_percent": 100.0
+    },
+    "EGX70": {
+      "constituent_rows": 70,
+      "source_url": "https://egx.com.eg/en/currentindexconstituntes.aspx?nav=16&type=16"
+    }
+  },
+  "notes": "Transcribed into egx.xlsx and supplied by the user; URLs are official EGX pages. Automated re-fetch was blocked by the EGX site at ingestion time, so this is a reviewed snapshot rather than a live scraper.",
+  "reviewed_at": "2026-07-26",
+  "snapshot_as_of": "2026-07-26",
+  "source_workbook": "egx.xlsx"
+}
